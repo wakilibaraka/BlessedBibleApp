@@ -4,7 +4,7 @@ import 'app_typography.dart';
 
 class AppTheme {
   static ThemeData get lightTheme {
-    final textTheme = AppTypography.serifTextTheme(
+    final textTheme = AppTypography.primaryTextTheme(
       AppColors.lightTextPrimary,
       AppColors.lightTextSecondary,
     );
@@ -37,7 +37,7 @@ class AppTheme {
   }
 
   static ThemeData get sepiaTheme {
-    final textTheme = AppTypography.serifTextTheme(
+    final textTheme = AppTypography.primaryTextTheme(
       AppColors.warmGoldTextPrimary,
       AppColors.warmGoldTextSecondary,
     );
@@ -70,7 +70,7 @@ class AppTheme {
   }
 
   static ThemeData get darkTheme {
-    final textTheme = AppTypography.serifTextTheme(
+    final textTheme = AppTypography.primaryTextTheme(
       AppColors.darkTextPrimary,
       AppColors.darkTextSecondary,
     );

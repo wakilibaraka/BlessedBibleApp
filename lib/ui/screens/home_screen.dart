@@ -3,8 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/home_data.dart';
 import '../../state/home_provider.dart';
+import '../../state/nav_provider.dart';
+import '../../state/study_provider.dart';
 import '../../state/theme_provider.dart';
 import '../widgets/glass_container.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -141,9 +144,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 child: Text(
                   'Wednesday · July 22',
                   textAlign: TextAlign.center,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: 0.3,
+                  style: GoogleFonts.gentiumBookPlus(
+                    textStyle: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 0.3,
+                    ),
                   ),
                 ),
               ),
@@ -198,18 +203,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           Text(
             '\u201c${data.verseOfTheDay.text}\u201d',
             textAlign: TextAlign.center,
-            style: theme.textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              height: 1.42,
+            style: GoogleFonts.gentiumBookPlus(
+              textStyle: theme.textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                height: 1.42,
+              ),
             ),
           ),
           const SizedBox(height: 10),
           Text(
             data.verseOfTheDay.reference,
-            style: theme.textTheme.titleSmall?.copyWith(
-              color: theme.primaryColor,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.5,
+            style: GoogleFonts.gentiumBookPlus(
+              textStyle: theme.textTheme.titleSmall?.copyWith(
+                color: theme.primaryColor,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+              ),
             ),
           ),
 
@@ -227,10 +236,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 // Commentary text — reduced line height for compactness
                 Text(
                   'In the opening moment of creation, God\'s first creative act was calling forth light. This wasn\'t just physical luminescence; it symbolizes the foundational impact of His Word and presence in darkness.\n\nIn our own moments of uncertainty, God continues to bring clarity and life through His voice.',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    height: 1.60,
-                    fontSize: 13.5,
-                    color: theme.textTheme.bodyMedium?.color?.withOpacity(0.82),
+                  style: GoogleFonts.lora(
+                    textStyle: theme.textTheme.bodySmall?.copyWith(
+                      height: 1.60,
+                      fontSize: 13.5,
+                      color: theme.textTheme.bodyMedium?.color?.withOpacity(0.82),
+                    ),
                   ),
                 ),
 
@@ -242,9 +253,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     Expanded(
                       flex: 3,
                       child: _PillButton(
-                        label: 'Read the chapter',
+                        label: 'Read the Commentary',
                         filled: true,
-                        onPressed: () {},
+                        onPressed: () {
+                          ref.read(activeStudyVerseProvider.notifier).setVerse(data.verseOfTheDay.reference);
+                          ref.read(navProvider.notifier).setIndex(3);
+                        },
                       ),
                     ),
                     const SizedBox(width: 10),

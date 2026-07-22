@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTypography {
-  /// Serif for Headings and Body
-  static TextTheme serifTextTheme(Color textColor, Color captionColor) {
-    return GoogleFonts.merriweatherTextTheme(
+  /// Primary App Text Theme
+  static TextTheme primaryTextTheme(Color textColor, Color captionColor) {
+    return GoogleFonts.interTextTheme(
       TextTheme(
         displayLarge: TextStyle(color: textColor, fontWeight: FontWeight.bold),
         displayMedium: TextStyle(color: textColor, fontWeight: FontWeight.bold),
@@ -18,7 +18,6 @@ class AppTypography {
         bodyLarge: TextStyle(color: textColor, fontSize: 18, height: 1.6),
         bodyMedium: TextStyle(color: textColor, fontSize: 16, height: 1.5),
         bodySmall: TextStyle(color: textColor, fontSize: 14, height: 1.4),
-        // Overridden below with Sans-serif for captions
         labelLarge: TextStyle(color: captionColor),
         labelMedium: TextStyle(color: captionColor),
         labelSmall: TextStyle(color: captionColor),

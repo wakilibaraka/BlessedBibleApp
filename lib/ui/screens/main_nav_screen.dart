@@ -107,17 +107,36 @@ class MainNavScreen extends ConsumerWidget {
             ),
             const SizedBox(width: 12.0),
               // ── Dynamic Contextual FAB (Right) ──
-              TexturedGlassContainer(
-                borderRadius: BorderRadius.circular(36), // Fully circular
-                padding: EdgeInsets.zero,
-                child: AnimatedContainer(
-                  duration: currentIndex == 1 ? const Duration(milliseconds: 650) : Duration.zero,
-                  curve: Curves.elasticOut,
-                  width: 72,
-                  height: (currentIndex == 1 && selectedVerses.isNotEmpty) ? 300.0 : 72.0,
-                  child: Stack(
-                    alignment: Alignment.bottomCenter,
-                    children: [
+              TweenAnimationBuilder<BorderRadius?>(
+                duration: currentIndex == 1 ? const Duration(milliseconds: 650) : Duration.zero,
+                curve: Curves.elasticOut,
+                tween: BorderRadiusTween(
+                  begin: BorderRadius.circular(36),
+                  end: (currentIndex == 1 && selectedVerses.isNotEmpty)
+                      ? const BorderRadius.only(
+                          topLeft: Radius.circular(36),
+                          topRight: Radius.circular(36),
+                          bottomLeft: Radius.circular(0), // Asymmetrical right angle
+                          bottomRight: Radius.circular(36),
+                        )
+                      : BorderRadius.circular(36),
+                ),
+                builder: (context, dynamicRadius, child) {
+                  return TexturedGlassContainer(
+                    borderRadius: dynamicRadius ?? BorderRadius.circular(36),
+                    padding: EdgeInsets.zero,
+                    child: AnimatedContainer(
+                      duration: currentIndex == 1 ? const Duration(milliseconds: 650) : Duration.zero,
+                      curve: Curves.elasticOut,
+                      width: 72,
+                      height: (currentIndex == 1 && selectedVerses.isNotEmpty) ? 300.0 : 72.0,
+                      child: child,
+                    ),
+                  );
+                },
+                child: Stack(
+                  alignment: Alignment.bottomCenter,
+                  children: [
                       // Circular Icon State
                       AnimatedOpacity(
                         duration: currentIndex == 1 ? const Duration(milliseconds: 200) : Duration.zero,
@@ -213,9 +232,8 @@ class MainNavScreen extends ConsumerWidget {
                       ),
                     ),
                   ],
-                  ),
                 ),
-                  ),
+              ),
             ],
           ),
         ),
@@ -266,10 +284,8 @@ class MainNavScreen extends ConsumerWidget {
         );
         break;
       case 3:
-        // Study -> Quick Note
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Quick note coming soon!')),
-        );
+        // Study -> Notes Popover
+        showNotesPopover(context, Theme.of(context));
         break;
     }
   }
@@ -285,7 +301,7 @@ class MainNavScreen extends ConsumerWidget {
   }) {
     final isActive = index == currentIndex;
     final theme = Theme.of(context);
-    final color = isActive ? theme.primaryColor : Colors.grey;
+    final color = isActive ? theme.primaryColor : theme.colorScheme.onSurface.withOpacity(0.4);
 
     Widget iconWidget;
     if (label == 'Home') {

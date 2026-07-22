@@ -9,11 +9,13 @@ import '../../data/models/bible_model.dart';
 import '../../state/bible_provider.dart';
 import '../../state/nav_provider.dart';
 import '../../state/study_provider.dart';
+import '../../data/models/commentary_model.dart';
 import '../../state/theme_provider.dart';
 import '../../state/typography_provider.dart';
 import '../../state/immersive_mode_provider.dart';
 import '../../state/read_selection_provider.dart';
 import '../widgets/glass_container.dart';
+import '../widgets/textured_glass_container.dart';
 
 class ReadScreen extends ConsumerStatefulWidget {
   const ReadScreen({super.key});
@@ -23,9 +25,9 @@ class ReadScreen extends ConsumerStatefulWidget {
 }
 
 class _ReadScreenState extends ConsumerState<ReadScreen> {
-  String _selectedBookAbbrev = 'Gn';
-  String _selectedBookName = 'Genesis';
-  int _selectedChapter = 1;
+  String _selectedBookName = 'Revelation';
+  String _selectedBookAbbrev = 'REV';
+  int _selectedChapter = 14;
 
   final Map<int, GlobalKey> _verseKeys = {};
 
@@ -150,6 +152,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
     final typography = ref.watch(typographyProvider);
     final selectedVerses = ref.watch(readSelectionProvider);
     final isImmersive = ref.watch(immersiveModeProvider);
+    final commentaryDataAsync = ref.watch(commentaryDataProvider);
 
     final bibleState = ref.watch(bibleProvider);
     final isLoading = bibleState.isLoading;
@@ -249,10 +252,23 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                     key: _verseKeys[index],
                                     crossAxisAlignment: CrossAxisAlignment.stretch,
                                     children: [
-                                      // Manuscript Chapter Header removed for cleaner readability
+                                      // Check for commentary
+                                      Builder(
+                                        builder: (context) {
+                                          bool hasCommentary = false;
+                                          commentaryDataAsync.whenData((commentaryData) {
+                                            final bookCommentary = commentaryData[_selectedBookName];
+                                            if (bookCommentary != null) {
+                                              final chapterCommentary = bookCommentary[_selectedChapter.toString()];
+                                              if (chapterCommentary != null) {
+                                                if (chapterCommentary.containsKey(verse.number.toString())) {
+                                                  hasCommentary = true;
+                                                }
+                                              }
+                                            }
+                                          });
 
-                                      // Verse Text with Drop Cap on Verse 1
-                                      GestureDetector(
+                                          return GestureDetector(
                                         onTap: () => _toggleVerseSelection(index),
                                         child: Stack(
                                           children: [
@@ -274,7 +290,14 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                                         : Colors.transparent),
                                                 borderRadius: BorderRadius.circular(12),
                                               ),
-                                              child: _buildNormalVerse(verse, theme, typography),
+                                              child: _buildNormalVerse(
+                                                verse,
+                                                theme,
+                                                typography,
+                                                appThemeMode,
+                                                hasCommentary: hasCommentary,
+                                                onCommentaryTap: () => _showCommentaryBottomSheet(context, verse.number, verse.text),
+                                              ),
                                             ),
                                             // Left accent bar — only visible when selected
                                             if (isSelected)
@@ -291,11 +314,13 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                                       left: Radius.circular(12),
                                                     ),
                                                   ),
+                                                  ),
                                                 ),
-                                              ),
-                                          ],
-                                        ),
-                                      ),
+                                            ],
+                                          ),
+                                        );
+                                      }
+                                    ),
                                     ],
                                   );
                                 },
@@ -417,13 +442,42 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
     );
   }
 
-  Widget _buildNormalVerse(BibleVerse verse, ThemeData theme, TypographyState typography) {
+  void _showCommentaryBottomSheet(BuildContext context, int verseNumber, String verseText) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) {
+        return _CommentaryBottomSheetContent(
+          bookName: _selectedBookName,
+          chapter: _selectedChapter,
+          verseNumber: verseNumber,
+          verseText: verseText,
+        );
+      },
+    );
+  }
+
+  Widget _buildNormalVerse(BibleVerse verse, ThemeData theme, TypographyState typography, AppThemeMode appThemeMode, {bool hasCommentary = false, VoidCallback? onCommentaryTap}) {
     final fontStyle = GoogleFonts.getFont(typography.fontFamily).copyWith(
       height: 1.6,
       fontSize: typography.fontSize,
       letterSpacing: 0.15,
       color: theme.textTheme.bodyLarge?.color,
     );
+
+    Color starColor;
+    switch (appThemeMode) {
+      case AppThemeMode.light:
+        starColor = Colors.deepOrange.shade400;
+        break;
+      case AppThemeMode.sepia:
+        starColor = Colors.deepOrange.shade600;
+        break;
+      case AppThemeMode.dark:
+        starColor = Colors.amberAccent;
+        break;
+    }
 
     return RichText(
       text: TextSpan(
@@ -440,6 +494,23 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
             text: verse.text,
             style: fontStyle,
           ),
+          if (hasCommentary)
+            WidgetSpan(
+              alignment: PlaceholderAlignment.top,
+              child: GestureDetector(
+                onTap: onCommentaryTap,
+                behavior: HitTestBehavior.opaque,
+                child: Padding(
+                  // Generous padding increases the invisible tap target area for all finger sizes
+                  padding: const EdgeInsets.only(left: 4.0, right: 8.0, top: 2.0, bottom: 8.0),
+                  child: Icon(
+                    Icons.star_rounded,
+                    color: starColor,
+                    size: typography.fontSize * 0.85, // Slightly larger star for visibility
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -715,30 +786,74 @@ class __BookChapterSelectorSheetState
                 ),
               ),
 
-              // Confirm Button (For Chapter jump)
+              // Confirm & Search Button Row (For Chapter jump + Search)
               const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.primaryColor,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                  ),
-                  onPressed: () {
-                    widget.onSelectionChanged(
-                        _tempBook.abbreviation, _tempBook.name, _tempChapter, _tempVerse);
-                  },
-                  child: Text(
-                    _tempVerse != null
-                        ? 'Go to ${_tempBook.name} $_tempChapter:$_tempVerse'
-                        : 'Go to ${_tempBook.name} $_tempChapter',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                ),
+              Consumer(
+                builder: (context, ref, child) {
+                  final appThemeMode = ref.watch(themeProvider);
+                  final searchButtonColor = appThemeMode == AppThemeMode.dark
+                      ? Colors.amberAccent
+                      : appThemeMode == AppThemeMode.sepia
+                          ? Colors.deepOrange.shade600
+                          : Colors.deepOrange.shade400;
+                  final iconColor = appThemeMode == AppThemeMode.dark ? Colors.black : Colors.white;
+
+                  return Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          height: 50,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: theme.primaryColor,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                            ),
+                            onPressed: () {
+                              widget.onSelectionChanged(
+                                  _tempBook.abbreviation, _tempBook.name, _tempChapter, _tempVerse);
+                            },
+                            child: Text(
+                              _tempVerse != null
+                                  ? 'Go to ${_tempBook.name} $_tempChapter:$_tempVerse'
+                                  : 'Go to ${_tempBook.name} $_tempChapter',
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context); // Close bottom sheet
+                          ref.read(navProvider.notifier).setIndex(2); // Jump to Search Tab
+                        },
+                        child: Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: searchButtonColor,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: searchButtonColor.withOpacity(0.4),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            Icons.search_rounded,
+                            color: iconColor,
+                            size: 24,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ],
           ),
@@ -959,3 +1074,241 @@ class _TypographyBottomSheet extends ConsumerWidget {
     );
   }
 }
+
+class _CommentaryBottomSheetContent extends ConsumerStatefulWidget {
+  final String bookName;
+  final int chapter;
+  final int verseNumber;
+  final String verseText;
+
+  const _CommentaryBottomSheetContent({
+    required this.bookName,
+    required this.chapter,
+    required this.verseNumber,
+    required this.verseText,
+  });
+
+  @override
+  ConsumerState<_CommentaryBottomSheetContent> createState() => _CommentaryBottomSheetContentState();
+}
+
+class _CommentaryBottomSheetContentState extends ConsumerState<_CommentaryBottomSheetContent> {
+  int _tabIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final typography = ref.watch(typographyProvider);
+    final commentaryDataAsync = ref.watch(commentaryDataProvider);
+
+    return TexturedGlassContainer(
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(32.0)),
+      child: Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.85,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: 16),
+            // Handlebar
+            Center(
+              child: Container(
+                width: 48,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.onSurface.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(2.5),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            
+            // Header Row (Title + Close)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Row(
+                children: [
+                  const SizedBox(width: 40), // Balance the close button
+                  Expanded(
+                    child: Text(
+                      '${widget.bookName} ${widget.chapter}:${widget.verseNumber}',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.lora(
+                        textStyle: theme.textTheme.headlineSmall?.copyWith(
+                          color: theme.primaryColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.close_rounded, color: theme.colorScheme.onSurface.withOpacity(0.5)),
+                    onPressed: () => Navigator.of(context).pop(),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            
+            // Highlighted Verse Container
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Container(
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: theme.primaryColor.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  '${widget.verseNumber} "${widget.verseText}"',
+                  style: GoogleFonts.gentiumBookPlus(
+                    textStyle: theme.textTheme.bodyLarge?.copyWith(
+                      fontSize: typography.fontSize,
+                      height: 1.5,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            
+            // Tabs
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Row(
+                children: [
+                  _buildTab(0, 'Commentary', theme),
+                  _buildTab(1, 'Cross-refs', theme),
+                ],
+              ),
+            ),
+            Divider(height: 1, color: theme.dividerColor.withOpacity(0.2)),
+            
+            // Content
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: _tabIndex == 0
+                    ? _buildCommentaryContent(commentaryDataAsync, theme, typography)
+                    : const Center(child: Text('Cross-references coming soon.')),
+              ),
+            ),
+            
+            // Bottom Action Bar
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              decoration: BoxDecoration(
+                border: Border(top: BorderSide(color: theme.dividerColor.withOpacity(0.2))),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextButton.icon(
+                      onPressed: () {},
+                      icon: Icon(Icons.add, color: theme.colorScheme.onSurface.withOpacity(0.6), size: 20),
+                      label: Text(
+                        'Add Note',
+                        style: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.6)),
+                      ),
+                    ),
+                  ),
+                  Container(width: 1, height: 24, color: theme.dividerColor.withOpacity(0.2)),
+                  Expanded(
+                    child: TextButton.icon(
+                      onPressed: () {},
+                      icon: Icon(Icons.ios_share_rounded, color: theme.colorScheme.onSurface.withOpacity(0.6), size: 20),
+                      label: Text(
+                        'Share',
+                        style: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.6)),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTab(int index, String title, ThemeData theme) {
+    final isSelected = _tabIndex == index;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => _tabIndex = index),
+        child: Container(
+          padding: const EdgeInsets.only(bottom: 12.0),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: isSelected ? theme.primaryColor : Colors.transparent,
+                width: 2,
+              ),
+            ),
+          ),
+          child: Text(
+            title,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: isSelected ? theme.primaryColor : theme.colorScheme.onSurface.withOpacity(0.6),
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCommentaryContent(AsyncValue commentaryDataAsync, ThemeData theme, TypographyState typography) {
+    return commentaryDataAsync.when(
+      data: (data) {
+        final entries = data[widget.bookName]?[widget.chapter.toString()]?[widget.verseNumber.toString()];
+        if (entries == null || entries.isEmpty) {
+          return const Center(child: Text('No commentary available.'));
+        }
+        return ListView.builder(
+          padding: const EdgeInsets.only(top: 24.0, bottom: 24.0),
+          itemCount: entries.length,
+          itemBuilder: (context, index) {
+            final entry = entries[index];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 32.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    entry.title.toUpperCase(),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.primaryColor,
+                      letterSpacing: 1.2,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    entry.text,
+                    style: GoogleFonts.lora(
+                      textStyle: theme.textTheme.bodyMedium?.copyWith(
+                        height: 1.6,
+                        fontSize: typography.fontSize - 1,
+                        color: theme.textTheme.bodyLarge?.color?.withOpacity(0.9),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => const Center(child: Text('Error loading commentary')),
+    );
+  }
+}
+
