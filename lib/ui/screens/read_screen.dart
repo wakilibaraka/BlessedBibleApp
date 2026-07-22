@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -28,16 +29,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
 
   final Map<int, GlobalKey> _verseKeys = {};
 
-  // For the manuscript UI, provide classic subtitles for specific chapters
-  String? _getChapterSubtitle(String bookName, int chapter) {
-    if (bookName == 'Genesis' && chapter == 1) {
-      return 'The Creation of the World';
-    }
-    if (bookName == 'Matthew' && chapter == 1) {
-      return 'The Genealogy of Jesus Christ';
-    }
-    return null;
-  }
+
 
   void _toggleVerseSelection(int index) {
     ref.read(readSelectionProvider.notifier).toggle(index);
@@ -193,91 +185,11 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
           ),
 
           // ── Scripture Content Layer ──────────────────────────────────
-          SafeArea(
-            bottom: false,
-            child: Column(
+          Positioned.fill(
+            child: Stack(
               children: [
-                const SizedBox(height: 8),
-
-                // Top Navigation Bar
-                AnimatedSlide(
-                  duration: const Duration(milliseconds: 350),
-                  curve: Curves.easeOutCubic,
-                  offset: isImmersive ? const Offset(0, -1.5) : Offset.zero,
-                  child: AnimatedOpacity(
-                    duration: const Duration(milliseconds: 350),
-                    opacity: isImmersive ? 0.0 : 1.0,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                      child: Row(
-                        children: [
-                          // Top-Left Logo
-                          Icon(
-                            Icons.menu_book_rounded,
-                            color: theme.primaryColor,
-                            size: 24,
-                          ),
-                          
-                          const Spacer(),
-
-                          // Center Book/Chapter Picker
-                          if (!isLoading)
-                            GestureDetector(
-                              onTap: () => _showSelectorBottomSheet(allBooks),
-                              child: GlassContainer(
-                                borderRadius: BorderRadius.circular(30),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16.0,
-                                  vertical: 8.0,
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      '$_selectedBookName $_selectedChapter',
-                                      style: theme.textTheme.labelMedium?.copyWith(
-                                        fontWeight: FontWeight.w600,
-                                        color: theme.colorScheme.onSurface,
-                                        fontSize: 15,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Icon(
-                                      Icons.keyboard_arrow_down_rounded,
-                                      size: 20,
-                                      color: theme.primaryColor,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-
-                          const Spacer(),
-
-                          // Top-Right Typography Toggle
-                          GestureDetector(
-                            onTap: _showTypographyBottomSheet,
-                            child: Text(
-                              'a',
-                              style: theme.textTheme.titleLarge?.copyWith(
-                                decoration: TextDecoration.underline,
-                                decorationColor: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                                fontFamily: 'serif',
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
                 // Scripture View
-                Expanded(
+                Positioned.fill(
                   child: isLoading
                       ? Center(
                           child: CircularProgressIndicator(
@@ -321,7 +233,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                   return false;
                                 },
                                 child: ListView.builder(
-                                padding: const EdgeInsets.only(
+                                padding: EdgeInsets.only(
+                                    top: MediaQuery.of(context).padding.top + 80.0,
                                     left: 24.0, right: 24.0, bottom: 120.0),
                                 itemCount: verses.length,
                                 itemBuilder: (context, index) {
@@ -336,16 +249,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                     key: _verseKeys[index],
                                     crossAxisAlignment: CrossAxisAlignment.stretch,
                                     children: [
-                                      // Manuscript Chapter Header (Only on Verse 1)
-                                      if (index == 0) ...[
-                                        _ChapterHeader(
-                                          bookName: _selectedBookName,
-                                          subtitle: _getChapterSubtitle(
-                                              _selectedBookName, _selectedChapter),
-                                          theme: theme,
-                                        ),
-                                        const SizedBox(height: 24),
-                                      ],
+                                      // Manuscript Chapter Header removed for cleaner readability
 
                                       // Verse Text with Drop Cap on Verse 1
                                       GestureDetector(
@@ -370,9 +274,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                                         : Colors.transparent),
                                                 borderRadius: BorderRadius.circular(12),
                                               ),
-                                              child: index == 0
-                                                  ? _buildDropCapVerse(verse, theme, typography)
-                                                  : _buildNormalVerse(verse, theme, typography),
+                                              child: _buildNormalVerse(verse, theme, typography),
                                             ),
                                             // Left accent bar — only visible when selected
                                             if (isSelected)
@@ -399,104 +301,107 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                 },
                               ),
                             ),
+                          ),
                 ),
-              ],
-            ),
-          ),
-
-          // ── Vertical Floating Action Bar ─────────────
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 400),
-            curve: Curves.easeOutBack,
-            right: selectedVerses.isNotEmpty ? 16 : -100,
-            bottom: 160, // Moved up to clear bottom nav better
-            child: AnimatedOpacity(
-              duration: const Duration(milliseconds: 350),
-              opacity: selectedVerses.isNotEmpty ? 1.0 : 0.0,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(24), // slightly smaller radius
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: theme.cardColor.withValues(alpha: 0.45),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.25),
-                        width: 0.8,
-                      ),
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
-                          blurRadius: 12,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
+                // Top Navigation Bar Layer (Floating above text)
+                Positioned(
+                  top: 0, left: 0, right: 0,
+                  child: Padding(
+                    padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          '${selectedVerses.length}',
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: theme.primaryColor,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        _buildActionIcon(
-                          Icons.bookmark_border_rounded,
-                          'Bookmark',
-                          theme.colorScheme.onSurface,
-                          () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('${selectedVerses.length} verse(s) bookmarked!'),
-                                duration: const Duration(seconds: 2),
+                        const SizedBox(height: 8),
+
+                        // Top Navigation Bar
+                        AnimatedSlide(
+                  duration: const Duration(milliseconds: 350),
+                  curve: Curves.easeOutCubic,
+                  offset: isImmersive ? const Offset(0, -1.5) : Offset.zero,
+                  child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: SizedBox(
+                        height: 48,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            // Top-Left Logo
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Icon(
+                                Icons.menu_book_rounded,
+                                color: theme.primaryColor,
+                                size: 24,
                               ),
-                            );
-                            _clearSelection();
-                          },
+                            ),
+                            
+                            // Center Book/Chapter Picker
+                            if (!isLoading)
+                              Align(
+                                alignment: Alignment.center,
+                                child: GestureDetector(
+                                  onTap: () => _showSelectorBottomSheet(allBooks),
+                                  child: GlassContainer(
+                                    borderRadius: BorderRadius.circular(30),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16.0,
+                                      vertical: 8.0,
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          '$_selectedBookName $_selectedChapter',
+                                          style: theme.textTheme.labelMedium?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: theme.colorScheme.onSurface,
+                                            fontSize: 15,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Icon(
+                                          Icons.keyboard_arrow_down_rounded,
+                                          size: 20,
+                                          color: theme.primaryColor,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                            // Top-Right Typography Toggle
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: GestureDetector(
+                                onTap: _showTypographyBottomSheet,
+                                child: Text(
+                                  'a',
+                                  style: theme.textTheme.titleLarge?.copyWith(
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                    fontFamily: 'serif',
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        _buildActionIcon(
-                          Icons.note_add_outlined,
-                          'Note',
-                          theme.colorScheme.onSurface,
-                          () => _clearSelection(),
-                        ),
-                        IconButton(
-                           icon: const Icon(Icons.auto_awesome),
-                           color: Colors.redAccent,
-                           tooltip: 'Deep Study',
-                           padding: EdgeInsets.zero,
-                           constraints: const BoxConstraints(),
-                           visualDensity: VisualDensity.compact,
-                           onPressed: () {
-                             final sorted = selectedVerses.toList()..sort();
-                             final vStr = sorted.map((i) => verses[i].number).join(', ');
-                             final passage = '$_selectedBookName $_selectedChapter:$vStr';
-                             ref.read(studyPassageProvider.notifier).setPassage(passage);
-                             ref.read(navProvider.notifier).setIndex(3);
-                             _clearSelection();
-                           }
-                        ),
-                        const SizedBox(height: 4),
-                        IconButton(
-                          icon: const Icon(Icons.close_rounded, size: 20),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          visualDensity: VisualDensity.compact,
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                          onPressed: _clearSelection,
-                        ),
+                      ),
+                    ),
+                ),
                       ],
                     ),
                   ),
                 ),
-              ),
+
+              ],
             ),
           ),
+
+
         ],
       ),
     );
@@ -540,88 +445,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
     );
   }
 
-  Widget _buildDropCapVerse(BibleVerse verse, ThemeData theme, TypographyState typography) {
-    final fontStyle = GoogleFonts.getFont(typography.fontFamily).copyWith(
-      height: 1.6,
-      fontSize: typography.fontSize,
-      letterSpacing: 0.15,
-      color: theme.textTheme.bodyLarge?.color,
-    );
-
-    // Basic drop cap implementation using RichText
-    return RichText(
-      text: TextSpan(
-        children: [
-          TextSpan(
-            text: '${verse.number} ',
-            style: theme.textTheme.displayMedium?.copyWith(
-              color: theme.primaryColor,
-              fontWeight: FontWeight.w400,
-              fontSize: typography.fontSize * 3.2, // Scale drop cap
-              height: 1.0,
-            ),
-          ),
-          TextSpan(
-            text: verse.text,
-            style: fontStyle,
-          ),
-        ],
-      ),
-    );
-  }
 }
 
-class _ChapterHeader extends StatelessWidget {
-  final String bookName;
-  final String? subtitle;
-  final ThemeData theme;
-
-  const _ChapterHeader({
-    required this.bookName,
-    this.subtitle,
-    required this.theme,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const SizedBox(height: 32),
-        // Crest / Icon
-        Icon(
-          Icons.shield_outlined,
-          size: 48,
-          color: theme.primaryColor.withOpacity(0.8),
-        ),
-        const SizedBox(height: 24),
-        // Book Title (All Caps)
-        Text(
-          bookName.toUpperCase(),
-          style: theme.textTheme.headlineMedium?.copyWith(
-            fontWeight: FontWeight.w500,
-            letterSpacing: 4.0,
-            color: theme.colorScheme.onSurface,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        // Chapter Subtitle
-        if (subtitle != null) ...[
-          const SizedBox(height: 8),
-          Text(
-            subtitle!,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontStyle: FontStyle.italic,
-              fontWeight: FontWeight.w400,
-              color: theme.colorScheme.onSurface.withOpacity(0.7),
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-        const SizedBox(height: 16),
-      ],
-    );
-  }
-}
 
 /// Modal Bottom Sheet for selecting Book and Chapter
 class _BookChapterSelectorSheet extends StatefulWidget {
@@ -964,6 +789,20 @@ class _TypographyBottomSheet extends ConsumerWidget {
                 style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 24),
+              // Radial Balance: Color Mode Toggles
+              Center(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildColorModeToggle(context, ref, AppThemeMode.light, Icons.light_mode),
+                    const SizedBox(width: 24),
+                    _buildColorModeToggle(context, ref, AppThemeMode.sepia, Icons.auto_awesome),
+                    const SizedBox(width: 24),
+                    _buildColorModeToggle(context, ref, AppThemeMode.dark, Icons.dark_mode),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 32),
               Text(
                 'FONT SIZE',
                 style: theme.textTheme.labelSmall?.copyWith(
@@ -999,37 +838,122 @@ class _TypographyBottomSheet extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              Wrap(
-                spacing: 8.0,
-                runSpacing: 8.0,
-                children: fonts.map((font) {
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 3.0,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                ),
+                itemCount: fonts.length,
+                itemBuilder: (context, index) {
+                  final font = fonts[index];
                   final isSelected = typography.fontFamily == font;
-                  return ChoiceChip(
-                    label: Text(font, style: GoogleFonts.getFont(font)),
-                    selected: isSelected,
-                    selectedColor: theme.primaryColor.withValues(alpha: 0.15),
-                    backgroundColor: theme.colorScheme.surface,
-                    labelStyle: TextStyle(
-                      color: isSelected ? theme.primaryColor : theme.colorScheme.onSurface,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(
-                        color: isSelected ? theme.primaryColor : theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                  
+                  return InkWell(
+                    onTap: () => typographyNotifier.setFontFamily(font),
+                    borderRadius: BorderRadius.circular(12),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: isSelected 
+                            ? theme.primaryColor.withValues(alpha: 0.15) 
+                            : theme.colorScheme.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isSelected 
+                              ? theme.primaryColor 
+                              : theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                          width: isSelected ? 2 : 1,
+                        ),
+                      ),
+                      child: Text(
+                        font,
+                        style: GoogleFonts.getFont(font).copyWith(
+                          color: isSelected ? theme.primaryColor : theme.colorScheme.onSurface,
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          fontSize: 15,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
-                    onSelected: (selected) {
-                      if (selected) {
-                        typographyNotifier.setFontFamily(font);
-                      }
-                    },
                   );
-                }).toList(),
+                },
               ),
               const SizedBox(height: 16),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildColorModeToggle(
+      BuildContext context, WidgetRef ref, AppThemeMode mode, IconData icon) {
+    final currentMode = ref.watch(themeProvider);
+    final themeNotifier = ref.read(themeProvider.notifier);
+    final isSelected = currentMode == mode;
+    final theme = Theme.of(context);
+
+    Color bgColor;
+    Color iconColor;
+    if (mode == AppThemeMode.light) {
+      bgColor = Colors.white;
+      iconColor = Colors.orangeAccent;
+    } else if (mode == AppThemeMode.sepia) {
+      bgColor = const Color(0xFFF4ECD8);
+      iconColor = Colors.brown;
+    } else {
+      bgColor = const Color(0xFF1E1E1E);
+      iconColor = Colors.white70;
+    }
+
+    return GestureDetector(
+      onTap: () => themeNotifier.setTheme(mode),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutCubic,
+        width: isSelected ? 64 : 56,
+        height: isSelected ? 64 : 56,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: bgColor,
+          border: Border.all(
+            color: isSelected ? theme.primaryColor : Colors.transparent,
+            width: 2,
+          ),
+          gradient: isSelected
+              ? RadialGradient(
+                  colors: [
+                    theme.primaryColor.withValues(alpha: 0.25),
+                    bgColor,
+                  ],
+                  stops: const [0.1, 0.9],
+                )
+              : null,
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: theme.primaryColor.withValues(alpha: 0.3),
+                    blurRadius: 20,
+                    spreadRadius: 4,
+                  )
+                ]
+              : [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 8,
+                    spreadRadius: 2,
+                  )
+                ],
+        ),
+        child: Icon(
+          icon,
+          color: isSelected ? theme.primaryColor : iconColor,
+          size: isSelected ? 30 : 26,
         ),
       ),
     );
