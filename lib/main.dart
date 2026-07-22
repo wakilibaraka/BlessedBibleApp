@@ -6,6 +6,7 @@ import 'theme/app_theme.dart';
 import 'ui/screens/main_nav_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(
     const ProviderScope(
       child: TheBlessedBibleApp(),

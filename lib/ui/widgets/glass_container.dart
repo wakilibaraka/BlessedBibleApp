@@ -38,7 +38,7 @@ class GlassContainer extends StatelessWidget {
       child: ClipRRect(
         borderRadius: radius,
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: Container(
             padding: padding,
             decoration: BoxDecoration(
@@ -46,14 +46,14 @@ class GlassContainer extends StatelessWidget {
                   ? Colors.black.withOpacity(0.35)
                   : isWarmGold
                       ? Colors.white.withOpacity(0.65) // More opaque for sharper text in sepia
-                      : Colors.white.withOpacity(0.40),
+                      : Colors.white.withOpacity(0.65), // Intense translucent white fill
               borderRadius: radius,
               border: Border.all(
                 color: isDark
                     ? Colors.white.withOpacity(0.12)
                     : isWarmGold
                         ? Colors.white.withOpacity(0.40)
-                        : Colors.white.withOpacity(0.60),
+                        : Colors.white.withOpacity(0.40), // Ultra thin glass border
                 width: 1.0,
               ),
             ),

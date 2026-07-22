@@ -6,7 +6,7 @@ class TypographyState {
   final double fontSize;
 
   const TypographyState({
-    this.fontFamily = 'Inter',
+    this.fontFamily = 'Gentium Book Plus',
     this.fontSize = 17.5,
   });
 

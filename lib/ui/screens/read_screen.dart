@@ -10,6 +10,8 @@ import '../../state/nav_provider.dart';
 import '../../state/study_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../state/typography_provider.dart';
+import '../../state/immersive_mode_provider.dart';
+import '../../state/read_selection_provider.dart';
 import '../widgets/glass_container.dart';
 
 class ReadScreen extends ConsumerStatefulWidget {
@@ -24,7 +26,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
   String _selectedBookName = 'Genesis';
   int _selectedChapter = 1;
 
-  final Set<int> _selectedVerseIndices = {};
   final Map<int, GlobalKey> _verseKeys = {};
 
   // For the manuscript UI, provide classic subtitles for specific chapters
@@ -39,19 +40,11 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
   }
 
   void _toggleVerseSelection(int index) {
-    setState(() {
-      if (_selectedVerseIndices.contains(index)) {
-        _selectedVerseIndices.remove(index);
-      } else {
-        _selectedVerseIndices.add(index);
-      }
-    });
+    ref.read(readSelectionProvider.notifier).toggle(index);
   }
 
   void _clearSelection() {
-    setState(() {
-      _selectedVerseIndices.clear();
-    });
+    ref.read(readSelectionProvider.notifier).clear();
   }
 
   void _scrollToVerse(int verse) {
@@ -66,10 +59,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
           alignment: 0.1,
         );
         // Highlight it upon jumping
-        setState(() {
-          _selectedVerseIndices.clear();
-          _selectedVerseIndices.add(verse - 1);
-        });
+        ref.read(readSelectionProvider.notifier).setSingle(verse - 1);
       }
     });
   }
@@ -82,18 +72,18 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
     if (_selectedChapter < book.chapters.length) {
       setState(() {
         _selectedChapter++;
-        _selectedVerseIndices.clear();
         _verseKeys.clear();
       });
+      _clearSelection();
     } else if (currentBookIndex < allBooks.length - 1) {
       final nextBook = allBooks[currentBookIndex + 1];
       setState(() {
         _selectedBookAbbrev = nextBook.abbreviation;
         _selectedBookName = nextBook.name;
         _selectedChapter = 1;
-        _selectedVerseIndices.clear();
         _verseKeys.clear();
       });
+      _clearSelection();
     }
   }
 
@@ -104,18 +94,18 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
     if (_selectedChapter > 1) {
       setState(() {
         _selectedChapter--;
-        _selectedVerseIndices.clear();
         _verseKeys.clear();
       });
+      _clearSelection();
     } else if (currentBookIndex > 0) {
       final prevBook = allBooks[currentBookIndex - 1];
       setState(() {
         _selectedBookAbbrev = prevBook.abbreviation;
         _selectedBookName = prevBook.name;
         _selectedChapter = prevBook.chapters.length;
-        _selectedVerseIndices.clear();
         _verseKeys.clear();
       });
+      _clearSelection();
     }
   }
 
@@ -147,8 +137,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
               if (changedChapter) {
                 _verseKeys.clear();
               }
-              _selectedVerseIndices.clear();
             });
+            _clearSelection();
             Navigator.pop(context);
 
             if (verse != null) {
@@ -166,6 +156,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
     final appThemeMode = ref.watch(themeProvider);
     final isDark = appThemeMode == AppThemeMode.dark;
     final typography = ref.watch(typographyProvider);
+    final selectedVerses = ref.watch(readSelectionProvider);
+    final isImmersive = ref.watch(immersiveModeProvider);
 
     final bibleState = ref.watch(bibleProvider);
     final isLoading = bibleState.isLoading;
@@ -208,68 +200,77 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                 const SizedBox(height: 8),
 
                 // Top Navigation Bar
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Row(
-                    children: [
-                      // Top-Left Logo
-                      Icon(
-                        Icons.menu_book_rounded,
-                        color: theme.primaryColor,
-                        size: 24,
-                      ),
-                      
-                      const Spacer(),
+                AnimatedSlide(
+                  duration: const Duration(milliseconds: 350),
+                  curve: Curves.easeOutCubic,
+                  offset: isImmersive ? const Offset(0, -1.5) : Offset.zero,
+                  child: AnimatedOpacity(
+                    duration: const Duration(milliseconds: 350),
+                    opacity: isImmersive ? 0.0 : 1.0,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: Row(
+                        children: [
+                          // Top-Left Logo
+                          Icon(
+                            Icons.menu_book_rounded,
+                            color: theme.primaryColor,
+                            size: 24,
+                          ),
+                          
+                          const Spacer(),
 
-                      // Center Book/Chapter Picker
-                      if (!isLoading)
-                        GestureDetector(
-                          onTap: () => _showSelectorBottomSheet(allBooks),
-                          child: GlassContainer(
-                            borderRadius: BorderRadius.circular(30),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16.0,
-                              vertical: 8.0,
+                          // Center Book/Chapter Picker
+                          if (!isLoading)
+                            GestureDetector(
+                              onTap: () => _showSelectorBottomSheet(allBooks),
+                              child: GlassContainer(
+                                borderRadius: BorderRadius.circular(30),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16.0,
+                                  vertical: 8.0,
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      '$_selectedBookName $_selectedChapter',
+                                      style: theme.textTheme.labelMedium?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                        color: theme.colorScheme.onSurface,
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Icon(
+                                      Icons.keyboard_arrow_down_rounded,
+                                      size: 20,
+                                      color: theme.primaryColor,
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  '$_selectedBookName $_selectedChapter',
-                                  style: theme.textTheme.labelMedium?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    color: theme.colorScheme.onSurface,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                Icon(
-                                  Icons.keyboard_arrow_down_rounded,
-                                  size: 20,
-                                  color: theme.primaryColor,
-                                ),
-                              ],
+
+                          const Spacer(),
+
+                          // Top-Right Typography Toggle
+                          GestureDetector(
+                            onTap: _showTypographyBottomSheet,
+                            child: Text(
+                              'a',
+                              style: theme.textTheme.titleLarge?.copyWith(
+                                decoration: TextDecoration.underline,
+                                decorationColor: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                fontFamily: 'serif',
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
-                        ),
-                      
-                      const Spacer(),
-
-                      // Top-Right Typography Menu
-                      GestureDetector(
-                        onTap: _showTypographyBottomSheet,
-                        child: Text(
-                          'a',
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            decoration: TextDecoration.underline,
-                            decorationColor: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                            fontFamily: 'serif',
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
 
@@ -290,7 +291,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                             )
                           : GestureDetector(
                               onTap: () {
-                                if (_selectedVerseIndices.isNotEmpty) {
+                                if (selectedVerses.isNotEmpty) {
                                   _clearSelection();
                                 }
                               },
@@ -305,7 +306,21 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                 }
                               },
                               behavior: HitTestBehavior.translucent,
-                              child: ListView.builder(
+                              child: NotificationListener<UserScrollNotification>(
+                                onNotification: (notification) {
+                                  if (notification.direction == ScrollDirection.reverse) {
+                                    if (!isImmersive) {
+                                      // Using microtask to avoid setState during build
+                                      Future.microtask(() => ref.read(immersiveModeProvider.notifier).set(true));
+                                    }
+                                  } else if (notification.direction == ScrollDirection.forward) {
+                                    if (isImmersive) {
+                                      Future.microtask(() => ref.read(immersiveModeProvider.notifier).set(false));
+                                    }
+                                  }
+                                  return false;
+                                },
+                                child: ListView.builder(
                                 padding: const EdgeInsets.only(
                                     left: 24.0, right: 24.0, bottom: 120.0),
                                 itemCount: verses.length,
@@ -315,7 +330,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                   }
                                   final verse = verses[index];
                                   final isSelected =
-                                      _selectedVerseIndices.contains(index);
+                                      selectedVerses.contains(index);
 
                                   return Column(
                                     key: _verseKeys[index],
@@ -391,13 +406,13 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
 
           // ── Vertical Floating Action Bar ─────────────
           AnimatedPositioned(
-            duration: const Duration(milliseconds: 350),
+            duration: const Duration(milliseconds: 400),
             curve: Curves.easeOutBack,
-            right: _selectedVerseIndices.isNotEmpty ? 16 : -80,
+            right: selectedVerses.isNotEmpty ? 16 : -100,
             bottom: 160, // Moved up to clear bottom nav better
             child: AnimatedOpacity(
               duration: const Duration(milliseconds: 350),
-              opacity: _selectedVerseIndices.isNotEmpty ? 1.0 : 0.0,
+              opacity: selectedVerses.isNotEmpty ? 1.0 : 0.0,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(24), // slightly smaller radius
                 child: BackdropFilter(
@@ -423,7 +438,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          '${_selectedVerseIndices.length}',
+                          '${selectedVerses.length}',
                           style: theme.textTheme.labelSmall?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: theme.primaryColor,
@@ -437,7 +452,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                           () {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('${_selectedVerseIndices.length} verse(s) bookmarked!'),
+                                content: Text('${selectedVerses.length} verse(s) bookmarked!'),
                                 duration: const Duration(seconds: 2),
                               ),
                             );
@@ -458,7 +473,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                            constraints: const BoxConstraints(),
                            visualDensity: VisualDensity.compact,
                            onPressed: () {
-                             final sorted = _selectedVerseIndices.toList()..sort();
+                             final sorted = selectedVerses.toList()..sort();
                              final vStr = sorted.map((i) => verses[i].number).join(', ');
                              final passage = '$_selectedBookName $_selectedChapter:$vStr';
                              ref.read(studyPassageProvider.notifier).setPassage(passage);

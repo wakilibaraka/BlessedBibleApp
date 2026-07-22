@@ -6,9 +6,9 @@ class AppColors {
   static const Color transparent = Colors.transparent;
 
   // Light Theme (Modern Glass Ivory)
-  static const Color lightBackground = Color(0xFFFAF9F6);
+  static const Color lightBackground = Color(0xFFF5F5F7);
   static const Color lightSurface = Color(0xFFFFFFFF);
-  static const Color lightTextPrimary = Color(0xFF1C1C1E);
+  static const Color lightTextPrimary = Color(0xFF1D1D1F);
   static const Color lightTextSecondary = Color(0xFF6E6E73);
   static const Color lightBorder = Color(0xFFE5E5EA);
   static const Color lightAccent = Color(0xFFB8860B);
