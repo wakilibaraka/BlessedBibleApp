@@ -25,8 +25,10 @@ class ReadScreen extends ConsumerStatefulWidget {
 }
 
 class _ReadScreenState extends ConsumerState<ReadScreen> {
+
   late PageController _pageController;
   bool _isPageControllerInitialized = false;
+  int _currentPageIndex = 0;
   final Map<int, ItemScrollController> _itemScrollControllers = {};
   int? _navigatedVerseIndex;
 
@@ -140,10 +142,17 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
     final flatChapters = ref.watch(flatChaptersProvider);
     final loc = ref.watch(readLocationProvider);
 
-    if (flatChapters.isNotEmpty && !_isPageControllerInitialized) {
-      final initialIndex = flatChapters.indexWhere((fc) => fc.book.abbreviation == loc.bookAbbrev && fc.chapter.number == loc.chapter);
-      _pageController = PageController(initialPage: initialIndex != -1 ? initialIndex : 0);
-      _isPageControllerInitialized = true;
+    if (flatChapters.isNotEmpty) {
+      final targetIndex = flatChapters.indexWhere((fc) => fc.book.abbreviation == loc.bookAbbrev && fc.chapter.number == loc.chapter);
+      final safeTarget = targetIndex != -1 ? targetIndex : 0;
+      if (!_isPageControllerInitialized) {
+        _pageController = PageController(initialPage: safeTarget);
+        _isPageControllerInitialized = true;
+        _currentPageIndex = safeTarget;
+      } else if (!_pageController.hasClients && _pageController.initialPage != safeTarget) {
+        _pageController = PageController(initialPage: safeTarget);
+        _currentPageIndex = safeTarget;
+      }
     }
 
     ref.listen<ReadLocationState>(readLocationProvider, (previous, next) {
@@ -189,17 +198,12 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
     });
 
     String currentBookName = loc.bookName;
-    String currentBookAbbrev = loc.bookAbbrev;
     int currentChapter = loc.chapter;
 
-    // Book name resolution for the top bar
-    if (!isLoading && allBooks.isNotEmpty) {
-      try {
-        final book = allBooks.firstWhere((b) => b.name == currentBookName || b.abbreviation == currentBookAbbrev,
-            orElse: () => allBooks.first);
-        currentBookName = book.name;
-        currentBookAbbrev = book.abbreviation;
-      } catch (_) {}
+    if (flatChapters.isNotEmpty && _currentPageIndex >= 0 && _currentPageIndex < flatChapters.length) {
+      final fc = flatChapters[_currentPageIndex];
+      currentBookName = fc.book.name;
+      currentChapter = fc.chapter.number;
     }
 
     return Scaffold(
@@ -227,6 +231,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                               controller: _pageController,
                               itemCount: flatChapters.length,
                               onPageChanged: (pageIndex) {
+                                setState(() {
+                                  _currentPageIndex = pageIndex;
+                                });
                                 final fc = flatChapters[pageIndex];
                                 final currentLoc = ref.read(readLocationProvider);
                                 if (currentLoc.bookAbbrev != fc.book.abbreviation || currentLoc.chapter != fc.chapter.number) {
@@ -401,22 +408,35 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                   // Left control (Logo)
                                   Positioned(
                                     left: 0,
-                                    child: AnimatedOpacity(
+                                    child: AnimatedSlide(
                                       duration: const Duration(milliseconds: 350),
-                                      opacity: isImmersive ? 0.0 : 1.0,
-                                      child: IgnorePointer(
-                                        ignoring: isImmersive,
-                                        child: Row(
-                                          children: [
-                                            Icon(Icons.menu_book_rounded, color: theme.colorScheme.onSurface),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              'Read',
-                                              style: theme.textTheme.titleMedium?.copyWith(
-                                                fontWeight: FontWeight.w600,
+                                      offset: isImmersive ? const Offset(0, -1) : Offset.zero,
+                                      child: AnimatedOpacity(
+                                        duration: const Duration(milliseconds: 350),
+                                        opacity: isImmersive ? 0.0 : 1.0,
+                                        child: IgnorePointer(
+                                          ignoring: isImmersive,
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              ref.read(navProvider.notifier).setIndex(0);
+                                            },
+                                            behavior: HitTestBehavior.opaque,
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(8.0),
+                                              child: Row(
+                                                children: [
+                                                  Icon(Icons.auto_stories_rounded, color: theme.colorScheme.onSurface),
+                                                  const SizedBox(width: 8),
+                                                  Text(
+                                                    'Home',
+                                                    style: theme.textTheme.titleMedium?.copyWith(
+                                                      fontWeight: FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ),
-                                          ],
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -467,15 +487,19 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                   // Right control (Typography)
                                   Positioned(
                                     right: 0,
-                                    child: AnimatedOpacity(
+                                    child: AnimatedSlide(
                                       duration: const Duration(milliseconds: 350),
-                                      opacity: isImmersive ? 0.0 : 1.0,
-                                      child: IgnorePointer(
-                                        ignoring: isImmersive,
-                                        child: IconButton(
-                                          icon: const Icon(Icons.text_format_rounded),
-                                          onPressed: _showTypographyBottomSheet,
-                                          splashRadius: 24,
+                                      offset: isImmersive ? const Offset(0, -1) : Offset.zero,
+                                      child: AnimatedOpacity(
+                                        duration: const Duration(milliseconds: 350),
+                                        opacity: isImmersive ? 0.0 : 1.0,
+                                        child: IgnorePointer(
+                                          ignoring: isImmersive,
+                                          child: IconButton(
+                                            icon: const Icon(Icons.text_format_rounded),
+                                            onPressed: _showTypographyBottomSheet,
+                                            splashRadius: 24,
+                                          ),
                                         ),
                                       ),
                                     ),
