@@ -14,6 +14,7 @@ import 'settings_screen.dart';
 import '../widgets/animated_background.dart';
 import '../widgets/bouncy_entrance.dart';
 import '../widgets/textured_glass_container.dart';
+import '../../state/immersive_mode_provider.dart';
 
 class MainNavScreen extends ConsumerWidget {
   const MainNavScreen({super.key});
@@ -197,7 +198,7 @@ class MainNavScreen extends ConsumerWidget {
                                             ),
                                           );
                                         },
-                                        child: _buildFabIcon(currentIndex, navSettings),
+                                        child: _buildFabIcon(currentIndex, navSettings, ref),
                                       ),
                                       color: Theme.of(context).primaryColor,
                                       onPressed: () {
@@ -323,7 +324,7 @@ class MainNavScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildFabIcon(int currentIndex, NavSettingsState navSettings) {
+  Widget _buildFabIcon(int currentIndex, NavSettingsState navSettings, WidgetRef ref) {
     if (currentIndex == 0) {
       return Stack(
         key: const ValueKey('settings_entry'),
@@ -340,7 +341,7 @@ class MainNavScreen extends ConsumerWidget {
     IconData iconData;
     switch (currentIndex) {
       case 1: // Read
-        iconData = navSettings.manualMinimizeNav ? Icons.fullscreen_exit_rounded : Icons.fullscreen_rounded;
+        iconData = ref.watch(immersiveModeProvider) ? Icons.fullscreen_exit_rounded : Icons.fullscreen_rounded;
         break;
       case 2: // Search
         iconData = Icons.tune_rounded;
@@ -353,7 +354,7 @@ class MainNavScreen extends ConsumerWidget {
     }
     return Icon(
       iconData,
-      key: ValueKey<int>(currentIndex * 10 + (navSettings.manualMinimizeNav ? 1 : 0)),
+      key: ValueKey<int>(currentIndex * 10 + (ref.watch(immersiveModeProvider) ? 1 : 0)),
       size: 24,
     );
   }
@@ -378,7 +379,7 @@ class MainNavScreen extends ConsumerWidget {
         break;
       case 1:
         // Read -> Toggle Manual Minimize
-        ref.read(navSettingsProvider.notifier).toggleManualMinimize();
+        ref.read(immersiveModeProvider.notifier).toggle();
         break;
       case 2:
         // Search -> Advanced Filters
