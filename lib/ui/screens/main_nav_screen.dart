@@ -101,12 +101,15 @@ class MainNavScreen extends ConsumerWidget {
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 400),
                                 curve: Curves.easeOutCubic,
+                                height: 64.0,
                                 width: isNavHidden ? 0.0 : dockMaxWidth,
                                 child: ClipRect(
                                   child: OverflowBox(
                                     alignment: Alignment.centerRight,
                                     minWidth: dockMaxWidth,
                                     maxWidth: dockMaxWidth,
+                                    minHeight: 64.0,
+                                    maxHeight: 64.0,
                                     child: SizedBox(
                                       width: dockMaxWidth,
                                       child: Padding(
