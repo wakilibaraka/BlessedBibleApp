@@ -52,9 +52,10 @@ class MainNavScreen extends ConsumerWidget {
       bottomNavigationBar: SafeArea(
         child: Builder(
           builder: (context) {
-            final double availableWidth = MediaQuery.of(context).size.width;
+            final double rawWidth = MediaQuery.of(context).size.width;
+            final double availableWidth = rawWidth > 0 ? rawWidth : 360.0;
             final double maxDockWidth = 450.0;
-            final double dockMaxWidth = math.max(0.0, math.min(maxDockWidth, availableWidth - 40 - 72 - 16));
+            final double dockMaxWidth = math.max(250.0, math.min(maxDockWidth, availableWidth - 40 - 72 - 16));
             final double totalExpandedWidth = dockMaxWidth + 12.0 + 72.0;
             final double rightOffset = math.max(20.0, (availableWidth - totalExpandedWidth) / 2);
             final double height = (currentIndex == 1 && selectedVerses.isNotEmpty) ? 300.0 : 72.0;
