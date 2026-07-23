@@ -17,6 +17,7 @@ import '../../state/bible_nav_settings_provider.dart';
 import '../../state/read_location_provider.dart';
 import '../widgets/textured_glass_container.dart';
 import '../widgets/bouncy_entrance.dart';
+import '../../state/nav_settings_provider.dart';
 
 class ReadScreen extends ConsumerStatefulWidget {
   const ReadScreen({super.key});
@@ -267,6 +268,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                   behavior: HitTestBehavior.translucent,
                                   child: NotificationListener<UserScrollNotification>(
                                     onNotification: (notification) {
+                                      final alwaysShow = ref.read(navSettingsProvider).alwaysShowNav;
+                                      if (alwaysShow) return false;
+
                                       if (notification.direction == ScrollDirection.reverse) {
                                         if (!isImmersive) {
                                           Future.microtask(() => ref.read(immersiveModeProvider.notifier).set(true));
