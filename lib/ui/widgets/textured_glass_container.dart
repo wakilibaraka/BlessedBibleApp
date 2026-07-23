@@ -76,21 +76,23 @@ class TexturedGlassContainer extends ConsumerWidget {
         borderRadius: radius,
         clipBehavior: Clip.antiAlias,
         child: isGlassy
-            ? BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: sigmaX, sigmaY: sigmaY),
-                child: CustomPaint(
-                  foregroundPainter: _NoisePainter(),
-                  child: Container(
-                    padding: padding,
-                    decoration: BoxDecoration(
-                      color: fillColor,
-                      border: Border.all(
-                        width: 0.5,
-                        color: Colors.white.withValues(alpha: 0.15),
+            ? RepaintBoundary(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: sigmaX, sigmaY: sigmaY),
+                  child: CustomPaint(
+                    foregroundPainter: _NoisePainter(),
+                    child: Container(
+                      padding: padding,
+                      decoration: BoxDecoration(
+                        color: fillColor,
+                        border: Border.all(
+                          width: 0.5,
+                          color: Colors.white.withValues(alpha: 0.15),
+                        ),
+                        borderRadius: radius,
                       ),
-                      borderRadius: radius,
+                      child: child,
                     ),
-                    child: child,
                   ),
                 ),
               )

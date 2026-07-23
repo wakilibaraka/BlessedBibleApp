@@ -97,6 +97,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
+      useRootNavigator: true,
       builder: (context) {
         final loc = ref.read(readLocationProvider);
         return _BookChapterSelectorSheet(
@@ -278,8 +279,11 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                           padding: EdgeInsets.only(
                                               top: MediaQuery.of(context).padding.top + 80.0,
                                               left: 24.0, right: 24.0, bottom: 400.0),
-                                          itemCount: verses.length,
+                                          itemCount: verses.length + 1,
                                           itemBuilder: (context, index) {
+                                            if (index == verses.length) {
+                                              return _buildEndOfChapterBlock(fc, pageIndex, theme);
+                                            }
                                             final verse = verses[index];
                                             final isSelected = selectedVerses.contains(index);
                                             final isSelectionMode = selectedVerses.isNotEmpty;
@@ -402,38 +406,40 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                             padding: const EdgeInsets.symmetric(horizontal: 20.0),
                             child: SizedBox(
                               height: 48,
-                              child: Stack(
-                                alignment: Alignment.center,
+                              child: Row(
                                 children: [
                                   // Left control (Logo)
-                                  Positioned(
-                                    left: 0,
-                                    child: AnimatedSlide(
-                                      duration: const Duration(milliseconds: 350),
-                                      offset: isImmersive ? const Offset(0, -1) : Offset.zero,
-                                      child: AnimatedOpacity(
+                                  Expanded(
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: AnimatedSlide(
                                         duration: const Duration(milliseconds: 350),
-                                        opacity: isImmersive ? 0.0 : 1.0,
-                                        child: IgnorePointer(
-                                          ignoring: isImmersive,
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              ref.read(navProvider.notifier).setIndex(0);
-                                            },
-                                            behavior: HitTestBehavior.opaque,
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(8.0),
-                                              child: Row(
-                                                children: [
-                                                  Icon(Icons.auto_stories_rounded, color: theme.colorScheme.onSurface),
-                                                  const SizedBox(width: 8),
-                                                  Text(
-                                                    'Home',
-                                                    style: theme.textTheme.titleMedium?.copyWith(
-                                                      fontWeight: FontWeight.w600,
+                                        offset: isImmersive ? const Offset(0, -1) : Offset.zero,
+                                        child: AnimatedOpacity(
+                                          duration: const Duration(milliseconds: 350),
+                                          opacity: isImmersive ? 0.0 : 1.0,
+                                          child: IgnorePointer(
+                                            ignoring: isImmersive,
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                ref.read(navProvider.notifier).setIndex(0);
+                                              },
+                                              behavior: HitTestBehavior.opaque,
+                                              child: Padding(
+                                                padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
+                                                child: Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    Icon(Icons.auto_stories_rounded, color: theme.colorScheme.onSurface),
+                                                    const SizedBox(width: 8),
+                                                    Text(
+                                                      'Home',
+                                                      style: theme.textTheme.titleMedium?.copyWith(
+                                                        fontWeight: FontWeight.w600,
+                                                      ),
                                                     ),
-                                                  ),
-                                                ],
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -485,20 +491,32 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                   ),
 
                                   // Right control (Typography)
-                                  Positioned(
-                                    right: 0,
-                                    child: AnimatedSlide(
-                                      duration: const Duration(milliseconds: 350),
-                                      offset: isImmersive ? const Offset(0, -1) : Offset.zero,
-                                      child: AnimatedOpacity(
+                                  Expanded(
+                                    child: Align(
+                                      alignment: Alignment.centerRight,
+                                      child: AnimatedSlide(
                                         duration: const Duration(milliseconds: 350),
-                                        opacity: isImmersive ? 0.0 : 1.0,
-                                        child: IgnorePointer(
-                                          ignoring: isImmersive,
-                                          child: IconButton(
-                                            icon: const Icon(Icons.text_format_rounded),
-                                            onPressed: _showTypographyBottomSheet,
-                                            splashRadius: 24,
+                                        offset: isImmersive ? const Offset(0, -1) : Offset.zero,
+                                        child: AnimatedOpacity(
+                                          duration: const Duration(milliseconds: 350),
+                                          opacity: isImmersive ? 0.0 : 1.0,
+                                          child: IgnorePointer(
+                                            ignoring: isImmersive,
+                                            child: GestureDetector(
+                                              onTap: _showTypographyBottomSheet,
+                                              behavior: HitTestBehavior.opaque,
+                                              child: Padding(
+                                                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+                                                child: Text(
+                                                  'aA',
+                                                  style: theme.textTheme.titleLarge?.copyWith(
+                                                    fontWeight: FontWeight.w600,
+                                                    color: theme.colorScheme.onSurface,
+                                                    letterSpacing: -1.0,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -600,6 +618,95 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
     );
   }
 
+  Widget _buildEndOfChapterBlock(FlatChapter fc, int pageIndex, ThemeData theme) {
+    final flatChapters = ref.read(flatChaptersProvider);
+    final hasPrevious = pageIndex > 0;
+    final hasNext = pageIndex < flatChapters.length - 1;
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 80.0, bottom: 120.0), // Above nav pill
+      child: Column(
+        children: [
+          // Divider
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(width: 40, height: 1, color: theme.colorScheme.onSurface.withValues(alpha: 0.2)),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  '· End of ${fc.book.name} ${fc.chapter.number} ·',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    fontFamily: 'Georgia',
+                    fontStyle: FontStyle.italic,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                  ),
+                ),
+              ),
+              Container(width: 40, height: 1, color: theme.colorScheme.onSurface.withValues(alpha: 0.2)),
+            ],
+          ),
+          const SizedBox(height: 32),
+          
+          // Commentary Button
+          TextButton.icon(
+            onPressed: () {
+              ref.read(navProvider.notifier).setIndex(3);
+            },
+            icon: Icon(Icons.school_rounded, color: theme.primaryColor),
+            label: Text(
+              'Read commentary on this chapter',
+              style: theme.textTheme.titleSmall?.copyWith(
+                color: theme.colorScheme.onSurface,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              backgroundColor: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.05),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            ),
+          ),
+          const SizedBox(height: 32),
+
+          // Prev/Next Navigation
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (hasPrevious)
+                TextButton(
+                  onPressed: () {
+                    _pageController.animateToPage(pageIndex - 1, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+                  },
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  ),
+                  child: Text('‹ Previous', style: theme.textTheme.titleMedium?.copyWith(color: theme.primaryColor)),
+                )
+              else
+                const SizedBox(width: 100),
+
+              const SizedBox(width: 24),
+
+              if (hasNext)
+                TextButton(
+                  onPressed: () {
+                    _pageController.animateToPage(pageIndex + 1, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+                  },
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  ),
+                  child: Text('Next ›', style: theme.textTheme.titleMedium?.copyWith(color: theme.primaryColor)),
+                )
+              else
+                const SizedBox(width: 100),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 
@@ -656,9 +763,14 @@ class __BookChapterSelectorSheetState
   void _onChapterSelected(int chapter) {
     setState(() {
       _tempChapter = chapter;
-      _tempVerse = null;
-      _mode = SelectionMode.verse; // Auto-advance to Verse
+      _tempVerse = 1;
     });
+    // Auto-navigate immediately upon tapping a chapter
+    widget.onSelectionChanged(
+        _tempBook.abbreviation,
+        _tempBook.name,
+        _tempChapter,
+        _tempVerse);
   }
 
   void _onVerseSelected(int verse) {
@@ -709,24 +821,9 @@ class __BookChapterSelectorSheetState
                 _buildBreadcrumbs(theme),
                 const SizedBox(height: 16),
 
-                // Dynamic Selection View & Floating Pill
+                // Dynamic Selection View
                 Expanded(
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: _buildSelectionView(theme),
-                      ),
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 16),
-                          child: _buildBottomCTA(theme),
-                        ),
-                      ),
-                    ],
-                  ),
+                  child: _buildSelectionView(theme),
                 ),
               ],
             ),
@@ -870,7 +967,7 @@ class __BookChapterSelectorSheetState
         // 2-Column Book Grid
         Expanded(
           child: GridView.builder(
-            padding: const EdgeInsets.only(bottom: 80),
+            padding: const EdgeInsets.only(bottom: 24),
             gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
               maxCrossAxisExtent: 200,
               childAspectRatio: 3,
@@ -897,7 +994,7 @@ class __BookChapterSelectorSheetState
   Widget _buildChapterSelection(ThemeData theme) {
     final chapters = _tempBook.chapters.length;
     return GridView.builder(
-      padding: const EdgeInsets.only(bottom: 80),
+      padding: const EdgeInsets.only(bottom: 24),
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: 64,
         childAspectRatio: 1,
@@ -923,7 +1020,7 @@ class __BookChapterSelectorSheetState
     final verses = chapterData.verses.length;
     
     return GridView.builder(
-      padding: const EdgeInsets.only(bottom: 80),
+      padding: const EdgeInsets.only(bottom: 24),
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: 64,
         childAspectRatio: 1,
@@ -993,75 +1090,7 @@ class __BookChapterSelectorSheetState
     );
   }
 
-  Widget _buildBottomCTA(ThemeData theme) {
-    return TexturedGlassContainer(
-      borderRadius: BorderRadius.circular(30),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      child: Row(
-        children: [
-          // Navigation Confirmation Button
-          Expanded(
-            child: GestureDetector(
-              onTap: () {
-                widget.onSelectionChanged(
-                    _tempBook.abbreviation, _tempBook.name, _tempChapter, _tempVerse);
-              },
-              child: Container(
-                height: 48,
-                decoration: BoxDecoration(
-                  color: theme.primaryColor,
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
-                    BoxShadow(
-                      color: theme.primaryColor.withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  _tempVerse != null
-                      ? 'Go to ${_tempBook.name} $_tempChapter:$_tempVerse'
-                      : 'Go to ${_tempBook.name} $_tempChapter',
-                  style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, color: Colors.white),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          
-          // Search Button inside the pill
-          Consumer(
-            builder: (context, ref, child) {
-              return GestureDetector(
-                onTap: () {
-                  Navigator.pop(context); // Close bottom sheet
-                  ref.read(navProvider.notifier).setIndex(2); // Jump to Search Tab
-                  // Keyboard autofocuses automatically in SearchScreen's initState
-                },
-                child: Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.search_rounded,
-                    color: theme.primaryColor,
-                    size: 24,
-                  ),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
+
 }
 
 class _TypographyBottomSheet extends ConsumerWidget {
