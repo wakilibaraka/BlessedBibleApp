@@ -519,8 +519,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
 }
 
 
-/// Modal Bottom Sheet for selecting Book and Chapter
-class _BookChapterSelectorSheet extends StatefulWidget {
+enum SelectionMode { book, chapter, verse }
+
+/// Modal Bottom Sheet for selecting Book, Chapter, and Verse
+class _BookChapterSelectorSheet extends ConsumerStatefulWidget {
   final List<BibleBook> books;
   final String selectedBookAbbrev;
   final int selectedChapter;
@@ -534,15 +536,18 @@ class _BookChapterSelectorSheet extends StatefulWidget {
   });
 
   @override
-  State<_BookChapterSelectorSheet> createState() =>
+  ConsumerState<_BookChapterSelectorSheet> createState() =>
       __BookChapterSelectorSheetState();
 }
 
 class __BookChapterSelectorSheetState
-    extends State<_BookChapterSelectorSheet> {
+    extends ConsumerState<_BookChapterSelectorSheet> {
   late BibleBook _tempBook;
   late int _tempChapter;
   int? _tempVerse;
+
+  SelectionMode _mode = SelectionMode.book;
+  bool _isOldTestament = true;
 
   @override
   void initState() {
@@ -550,6 +555,38 @@ class __BookChapterSelectorSheetState
     _tempBook = widget.books.firstWhere((b) => b.abbreviation == widget.selectedBookAbbrev,
         orElse: () => widget.books.first);
     _tempChapter = widget.selectedChapter;
+    // Determine testament based on book index
+    final bookIndex = widget.books.indexOf(_tempBook);
+    _isOldTestament = bookIndex < 39;
+  }
+
+  void _onBookSelected(BibleBook book) {
+    setState(() {
+      _tempBook = book;
+      _tempChapter = 1;
+      _tempVerse = null;
+      _mode = SelectionMode.chapter; // Auto-advance to Chapter
+    });
+  }
+
+  void _onChapterSelected(int chapter) {
+    setState(() {
+      _tempChapter = chapter;
+      _tempVerse = null;
+      _mode = SelectionMode.verse; // Auto-advance to Verse
+    });
+  }
+
+  void _onVerseSelected(int verse) {
+    setState(() {
+      _tempVerse = verse;
+    });
+    // Auto-navigate immediately upon tapping a verse
+    widget.onSelectionChanged(
+        _tempBook.abbreviation,
+        _tempBook.name,
+        _tempChapter,
+        _tempVerse);
   }
 
   @override
@@ -561,304 +598,384 @@ class __BookChapterSelectorSheetState
       borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
       clipBehavior: Clip.antiAlias,
       child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.75,
+        height: MediaQuery.of(context).size.height * 0.85,
         child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Handlebar
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.onSurface.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(2),
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Handlebar
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.onSurface.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-              Text(
-                'Navigate',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
+                // Segmented Breadcrumb Header
+                _buildBreadcrumbs(theme),
+                const SizedBox(height: 16),
 
-              // Books & Chapters Section
-              Expanded(
-                child: Row(
-                  children: [
-                    // Left Column: Books
-                    Expanded(
-                      flex: 4,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'BOOK',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: theme.primaryColor,
-                              letterSpacing: 1.2,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Expanded(
-                            child: ListView.builder(
-                              itemCount: widget.books.length,
-                              itemBuilder: (context, idx) {
-                                final bk = widget.books[idx];
-                                final isSel = bk.abbreviation == _tempBook.abbreviation;
-                                return ListTile(
-                                  dense: true,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  selectedTileColor:
-                                      theme.primaryColor.withOpacity(0.12),
-                                  contentPadding:
-                                      const EdgeInsets.symmetric(horizontal: 4),
-                                  selected: isSel,
-                                  title: Text(
-                                    bk.name,
-                                    style: TextStyle(
-                                      fontWeight: isSel
-                                          ? FontWeight.bold
-                                          : FontWeight.normal,
-                                      color: isSel
-                                          ? theme.primaryColor
-                                          : theme.colorScheme.onSurface,
-                                      fontSize: 14,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  onTap: () => setState(() {
-                                    _tempBook = bk;
-                                    _tempChapter = 1;
-                                    _tempVerse = null;
-                                  }),
-                                );
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const VerticalDivider(width: 16),
-
-                    // Middle Column: Chapters Grid
-                    Expanded(
-                      flex: 3,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'CH.',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: theme.primaryColor,
-                              letterSpacing: 1.2,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Expanded(
-                            child: GridView.builder(
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                mainAxisSpacing: 8,
-                                crossAxisSpacing: 8,
-                              ),
-                              itemCount: _tempBook.chapters.length,
-                              itemBuilder: (context, idx) {
-                                final ch = _tempBook.chapters[idx].number;
-                                final isSel = ch == _tempChapter;
-                                return InkWell(
-                                  onTap: () => setState(() {
-                                    _tempChapter = ch;
-                                    _tempVerse = null;
-                                  }),
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: isSel
-                                          ? theme.primaryColor
-                                          : theme.colorScheme.onSurface
-                                              .withOpacity(0.06),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      '$ch',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: isSel
-                                            ? Colors.white
-                                            : theme.colorScheme.onSurface,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const VerticalDivider(width: 16),
-
-                    // Right Column: Verses Grid
-                    Expanded(
-                      flex: 3,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'VERSE',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: theme.primaryColor,
-                              letterSpacing: 1.2,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Expanded(
-                            child: GridView.builder(
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                mainAxisSpacing: 8,
-                                crossAxisSpacing: 8,
-                              ),
-                              itemCount: _tempBook.chapters
-                                  .firstWhere((c) => c.number == _tempChapter,
-                                      orElse: () => _tempBook.chapters.first)
-                                  .verses
-                                  .length,
-                              itemBuilder: (context, idx) {
-                                final v = idx + 1;
-                                final isSel = v == _tempVerse;
-                                return InkWell(
-                                  onTap: () {
-                                    setState(() => _tempVerse = v);
-                                    // Auto-navigate immediately upon tapping a verse
-                                    widget.onSelectionChanged(
-                                        _tempBook.abbreviation,
-                                        _tempBook.name,
-                                        _tempChapter,
-                                        _tempVerse);
-                                  },
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: isSel
-                                          ? theme.primaryColor
-                                          : theme.colorScheme.onSurface
-                                              .withOpacity(0.06),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      '$v',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: isSel
-                                            ? Colors.white
-                                            : theme.colorScheme.onSurface,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Confirm & Search Button Row (For Chapter jump + Search)
-              const SizedBox(height: 16),
-              Consumer(
-                builder: (context, ref, child) {
-                  final appThemeMode = ref.watch(themeProvider);
-                  final searchButtonColor = appThemeMode == AppThemeMode.dark
-                      ? Colors.amberAccent
-                      : appThemeMode == AppThemeMode.sepia
-                          ? Colors.deepOrange.shade600
-                          : Colors.deepOrange.shade400;
-                  final iconColor = appThemeMode == AppThemeMode.dark ? Colors.black : Colors.white;
-
-                  return Row(
+                // Dynamic Selection View & Floating Pill
+                Expanded(
+                  child: Stack(
                     children: [
-                      Expanded(
-                        child: SizedBox(
-                          height: 50,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: theme.primaryColor,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                            ),
-                            onPressed: () {
-                              widget.onSelectionChanged(
-                                  _tempBook.abbreviation, _tempBook.name, _tempChapter, _tempVerse);
-                            },
-                            child: Text(
-                              _tempVerse != null
-                                  ? 'Go to ${_tempBook.name} $_tempChapter:$_tempVerse'
-                                  : 'Go to ${_tempBook.name} $_tempChapter',
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                            ),
-                          ),
-                        ),
+                      Positioned.fill(
+                        child: _buildSelectionView(theme),
                       ),
-                      const SizedBox(width: 12),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context); // Close bottom sheet
-                          ref.read(navProvider.notifier).setIndex(2); // Jump to Search Tab
-                        },
-                        child: Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            color: searchButtonColor,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: searchButtonColor.withOpacity(0.4),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            Icons.search_rounded,
-                            color: iconColor,
-                            size: 24,
-                          ),
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 16),
+                          child: _buildBottomCTA(theme),
                         ),
                       ),
                     ],
-                  );
-                },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBreadcrumbs(ThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.onSurface.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: Row(
+        children: [
+          _buildBreadcrumbSegment('Book', _tempBook.name, SelectionMode.book, theme),
+          _buildBreadcrumbSegment('Chapter', '$_tempChapter', SelectionMode.chapter, theme),
+          _buildBreadcrumbSegment('Verse', _tempVerse != null ? '$_tempVerse' : '-', SelectionMode.verse, theme),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBreadcrumbSegment(String label, String value, SelectionMode mode, ThemeData theme) {
+    final isSelected = _mode == mode;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => _mode = mode),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            color: isSelected ? theme.primaryColor : Colors.transparent,
+            borderRadius: BorderRadius.circular(30),
+            boxShadow: isSelected
+                ? [BoxShadow(color: theme.primaryColor.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 2))]
+                : [],
+          ),
+          child: Column(
+            children: [
+              Text(
+                label.toUpperCase(),
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1,
+                  color: isSelected ? Colors.white.withOpacity(0.8) : theme.colorScheme.onSurface.withOpacity(0.5),
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: isSelected ? Colors.white : theme.colorScheme.onSurface.withOpacity(0.8),
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSelectionView(ThemeData theme) {
+    switch (_mode) {
+      case SelectionMode.book:
+        return _buildBookSelection(theme);
+      case SelectionMode.chapter:
+        return _buildChapterSelection(theme);
+      case SelectionMode.verse:
+        return _buildVerseSelection(theme);
+    }
+  }
+
+  Widget _buildBookSelection(ThemeData theme) {
+    final oldTestamentBooks = widget.books.take(39).toList();
+    final newTestamentBooks = widget.books.skip(39).toList();
+    final displayedBooks = _isOldTestament ? oldTestamentBooks : newTestamentBooks;
+
+    return Column(
+      children: [
+        // Testament Toggles
+        Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.onSurface.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => setState(() => _isOldTestament = true),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      color: _isOldTestament ? theme.primaryColor : Colors.transparent,
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Old Testament',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: _isOldTestament ? Colors.white : theme.colorScheme.onSurface.withOpacity(0.6),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => setState(() => _isOldTestament = false),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      color: !_isOldTestament ? theme.primaryColor : Colors.transparent,
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'New Testament',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: !_isOldTestament ? Colors.white : theme.colorScheme.onSurface.withOpacity(0.6),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
+        // 2-Column Book Grid
+        Expanded(
+          child: GridView.builder(
+            padding: const EdgeInsets.only(bottom: 80),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 3,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+            ),
+            itemCount: displayedBooks.length,
+            itemBuilder: (context, index) {
+              final book = displayedBooks[index];
+              final isSel = book.abbreviation == _tempBook.abbreviation;
+              return _buildGridTile(
+                text: book.name,
+                isSelected: isSel,
+                onTap: () => _onBookSelected(book),
+                theme: theme,
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildChapterSelection(ThemeData theme) {
+    final chapters = _tempBook.chapters.length;
+    return GridView.builder(
+      padding: const EdgeInsets.only(bottom: 80),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 5,
+        childAspectRatio: 1,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+      ),
+      itemCount: chapters,
+      itemBuilder: (context, index) {
+        final chapter = index + 1;
+        final isSel = chapter == _tempChapter;
+        return _buildGridTile(
+          text: '$chapter',
+          isSelected: isSel,
+          onTap: () => _onChapterSelected(chapter),
+          theme: theme,
+        );
+      },
+    );
+  }
+
+  Widget _buildVerseSelection(ThemeData theme) {
+    final chapterData = _tempBook.chapters.firstWhere((c) => c.number == _tempChapter, orElse: () => _tempBook.chapters.first);
+    final verses = chapterData.verses.length;
+    
+    return GridView.builder(
+      padding: const EdgeInsets.only(bottom: 80),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 5,
+        childAspectRatio: 1,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+      ),
+      itemCount: verses,
+      itemBuilder: (context, index) {
+        final verse = index + 1;
+        final isSel = verse == _tempVerse;
+        return _buildGridTile(
+          text: '$verse',
+          isSelected: isSel,
+          onTap: () => _onVerseSelected(verse),
+          theme: theme,
+        );
+      },
+    );
+  }
+
+  Widget _buildGridTile({required String text, required bool isSelected, required VoidCallback onTap, required ThemeData theme}) {
+    if (!isSelected) {
+      // Use TexturedGlassContainer for liquid glass look when unselected
+      return GestureDetector(
+        onTap: onTap,
+        child: TexturedGlassContainer(
+          borderRadius: BorderRadius.circular(30),
+          padding: EdgeInsets.zero,
+          child: Center(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: theme.colorScheme.onSurface.withOpacity(0.8),
+                fontSize: text.length > 3 ? 14 : 16,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      );
+    }
+    
+    // Solid theme-colored pill for selected state
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: theme.primaryColor,
+          borderRadius: BorderRadius.circular(30),
+          boxShadow: [BoxShadow(color: theme.primaryColor.withOpacity(0.4), blurRadius: 8, offset: const Offset(0, 3))],
+        ),
+        child: Text(
+          text,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            fontSize: text.length > 3 ? 14 : 16,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomCTA(ThemeData theme) {
+    return TexturedGlassContainer(
+      borderRadius: BorderRadius.circular(30),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      child: Row(
+        children: [
+          // Navigation Confirmation Button
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                widget.onSelectionChanged(
+                    _tempBook.abbreviation, _tempBook.name, _tempChapter, _tempVerse);
+              },
+              child: Container(
+                height: 48,
+                decoration: BoxDecoration(
+                  color: theme.primaryColor,
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: theme.primaryColor.withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  _tempVerse != null
+                      ? 'Go to ${_tempBook.name} $_tempChapter:$_tempVerse'
+                      : 'Go to ${_tempBook.name} $_tempChapter',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          
+          // Search Button inside the pill
+          Consumer(
+            builder: (context, ref, child) {
+              return GestureDetector(
+                onTap: () {
+                  Navigator.pop(context); // Close bottom sheet
+                  ref.read(navProvider.notifier).setIndex(2); // Jump to Search Tab
+                  // Keyboard autofocuses automatically in SearchScreen's initState
+                },
+                child: Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.onSurface.withOpacity(0.05),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.search_rounded,
+                    color: theme.primaryColor,
+                    size: 24,
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
@@ -1115,41 +1232,28 @@ class _CommentaryBottomSheetContentState extends ConsumerState<_CommentaryBottom
             // Handlebar
             Center(
               child: Container(
-                width: 48,
-                height: 5,
+                width: 40,
+                height: 4,
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.onSurface.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(2.5),
+                  color: theme.colorScheme.onSurface.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             
-            // Header Row (Title + Close)
+            // Header Row (Title)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Row(
-                children: [
-                  const SizedBox(width: 40), // Balance the close button
-                  Expanded(
-                    child: Text(
-                      '${widget.bookName} ${widget.chapter}:${widget.verseNumber}',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.lora(
-                        textStyle: theme.textTheme.headlineSmall?.copyWith(
-                          color: theme.primaryColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
+              child: Text(
+                '${widget.bookName} ${widget.chapter}:${widget.verseNumber}',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.lora(
+                  textStyle: theme.textTheme.headlineSmall?.copyWith(
+                    color: theme.primaryColor,
+                    fontWeight: FontWeight.bold,
                   ),
-                  IconButton(
-                    icon: Icon(Icons.close_rounded, color: theme.colorScheme.onSurface.withOpacity(0.5)),
-                    onPressed: () => Navigator.of(context).pop(),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
-                ],
+                ),
               ),
             ),
             const SizedBox(height: 24),
@@ -1157,18 +1261,16 @@ class _CommentaryBottomSheetContentState extends ConsumerState<_CommentaryBottom
             // Highlighted Verse Container
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: theme.primaryColor.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(16),
-                ),
+              child: TexturedGlassContainer(
+                padding: const EdgeInsets.all(20.0),
+                borderRadius: BorderRadius.circular(24),
                 child: Text(
                   '${widget.verseNumber} "${widget.verseText}"',
                   style: GoogleFonts.gentiumBookPlus(
                     textStyle: theme.textTheme.bodyLarge?.copyWith(
                       fontSize: typography.fontSize,
                       height: 1.5,
+                      fontStyle: FontStyle.italic,
                     ),
                   ),
                 ),
@@ -1176,54 +1278,77 @@ class _CommentaryBottomSheetContentState extends ConsumerState<_CommentaryBottom
             ),
             const SizedBox(height: 24),
             
-            // Tabs
+            // Pill Tabs
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Row(
-                children: [
-                  _buildTab(0, 'Commentary', theme),
-                  _buildTab(1, 'Cross-refs', theme),
-                ],
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.onSurface.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Row(
+                  children: [
+                    _buildPillTab(0, 'Commentary', theme),
+                    _buildPillTab(1, 'Cross-refs', theme),
+                  ],
+                ),
               ),
             ),
-            Divider(height: 1, color: theme.dividerColor.withOpacity(0.2)),
+            const SizedBox(height: 16),
             
-            // Content
+            // Content & Floating CTA
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: _tabIndex == 0
-                    ? _buildCommentaryContent(commentaryDataAsync, theme, typography)
-                    : const Center(child: Text('Cross-references coming soon.')),
-              ),
-            ),
-            
-            // Bottom Action Bar
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              decoration: BoxDecoration(
-                border: Border(top: BorderSide(color: theme.dividerColor.withOpacity(0.2))),
-              ),
-              child: Row(
+              child: Stack(
                 children: [
-                  Expanded(
-                    child: TextButton.icon(
-                      onPressed: () {},
-                      icon: Icon(Icons.add, color: theme.colorScheme.onSurface.withOpacity(0.6), size: 20),
-                      label: Text(
-                        'Add Note',
-                        style: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.6)),
-                      ),
+                  Positioned.fill(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                      child: _tabIndex == 0
+                          ? _buildCommentaryContent(commentaryDataAsync, theme, typography)
+                          : const Center(child: Text('Cross-references coming soon.')),
                     ),
                   ),
-                  Container(width: 1, height: 24, color: theme.dividerColor.withOpacity(0.2)),
-                  Expanded(
-                    child: TextButton.icon(
-                      onPressed: () {},
-                      icon: Icon(Icons.ios_share_rounded, color: theme.colorScheme.onSurface.withOpacity(0.6), size: 20),
-                      label: Text(
-                        'Share',
-                        style: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.6)),
+                  
+                  // Floating Action Pill
+                  Positioned(
+                    left: 24,
+                    right: 24,
+                    bottom: 16,
+                    child: TexturedGlassContainer(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      borderRadius: BorderRadius.circular(30),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Expanded(
+                            child: TextButton.icon(
+                              onPressed: () {},
+                              icon: Icon(Icons.add, color: theme.colorScheme.onSurface.withOpacity(0.8), size: 20),
+                              label: Text(
+                                'Add Note',
+                                style: TextStyle(
+                                  color: theme.colorScheme.onSurface.withOpacity(0.8),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(width: 1, height: 24, color: theme.dividerColor.withOpacity(0.2)),
+                          Expanded(
+                            child: TextButton.icon(
+                              onPressed: () {},
+                              icon: Icon(Icons.ios_share_rounded, color: theme.colorScheme.onSurface.withOpacity(0.8), size: 20),
+                              label: Text(
+                                'Share',
+                                style: TextStyle(
+                                  color: theme.colorScheme.onSurface.withOpacity(0.8),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -1236,27 +1361,23 @@ class _CommentaryBottomSheetContentState extends ConsumerState<_CommentaryBottom
     );
   }
 
-  Widget _buildTab(int index, String title, ThemeData theme) {
+  Widget _buildPillTab(int index, String title, ThemeData theme) {
     final isSelected = _tabIndex == index;
     return Expanded(
       child: GestureDetector(
         onTap: () => setState(() => _tabIndex = index),
         child: Container(
-          padding: const EdgeInsets.only(bottom: 12.0),
+          padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                color: isSelected ? theme.primaryColor : Colors.transparent,
-                width: 2,
-              ),
-            ),
+            color: isSelected ? theme.primaryColor : Colors.transparent,
+            borderRadius: BorderRadius.circular(30),
           ),
+          alignment: Alignment.center,
           child: Text(
             title,
-            textAlign: TextAlign.center,
             style: TextStyle(
-              color: isSelected ? theme.primaryColor : theme.colorScheme.onSurface.withOpacity(0.6),
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+              fontWeight: FontWeight.bold,
+              color: isSelected ? Colors.white : theme.colorScheme.onSurface.withOpacity(0.6),
             ),
           ),
         ),
@@ -1272,7 +1393,7 @@ class _CommentaryBottomSheetContentState extends ConsumerState<_CommentaryBottom
           return const Center(child: Text('No commentary available.'));
         }
         return ListView.builder(
-          padding: const EdgeInsets.only(top: 24.0, bottom: 24.0),
+          padding: const EdgeInsets.only(top: 24.0, bottom: 100.0),
           itemCount: entries.length,
           itemBuilder: (context, index) {
             final entry = entries[index];
