@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../state/glass_ui_provider.dart';
 import '../../state/nav_settings_provider.dart';
+import '../../state/search_settings_provider.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -11,6 +12,7 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isGlassy = ref.watch(glassUiProvider);
     final navSettings = ref.watch(navSettingsProvider);
+    final searchSettings = ref.watch(searchSettingsProvider);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -32,6 +34,12 @@ class SettingsScreen extends ConsumerWidget {
             subtitle: const Text('Keep bottom nav visible even when verses are selected'),
             value: navSettings.alwaysShowNav,
             onChanged: (value) => ref.read(navSettingsProvider.notifier).setAlwaysShowNav(value),
+          ),
+          SwitchListTile(
+            title: const Text('Auto-open single search result'),
+            subtitle: const Text('Automatically navigate when a search returns exactly one result'),
+            value: searchSettings.autoOpenSingleSearchResult,
+            onChanged: (value) => ref.read(searchSettingsProvider.notifier).toggleAutoOpen(value),
           ),
         ],
       ),

@@ -10,6 +10,7 @@ import '../../state/read_selection_provider.dart';
 import '../../state/read_location_provider.dart';
 import '../../state/glass_ui_provider.dart';
 import '../../state/bible_provider.dart';
+import '../../state/search_settings_provider.dart';
 import '../widgets/textured_glass_container.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
@@ -23,6 +24,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> with SingleTickerPr
   late TextEditingController _controller;
   late FocusNode _focusNode;
   Timer? _focusTimer;
+  Timer? _debounceTimer;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
@@ -63,6 +65,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> with SingleTickerPr
   @override
   void dispose() {
     _focusTimer?.cancel();
+    _debounceTimer?.cancel();
     _controller.dispose();
     _focusNode.dispose();
     _animationController.dispose();
@@ -154,6 +157,21 @@ class _SearchScreenState extends ConsumerState<SearchScreen> with SingleTickerPr
                                     focusNode: _focusNode,
                                     onChanged: (val) {
                                       ref.read(searchStateProvider.notifier).setQuery(val);
+                                      _debounceTimer?.cancel();
+                                      _debounceTimer = Timer(const Duration(milliseconds: 500), () {
+                                        if (!mounted) return;
+                                        final searchState = ref.read(searchStateProvider);
+                                        final searchSettings = ref.read(searchSettingsProvider);
+                                        if (searchSettings.autoOpenSingleSearchResult && searchState.results.length == 1) {
+                                          _onResultTap(searchState.results.first);
+                                        }
+                                      });
+                                    },
+                                    onSubmitted: (val) {
+                                      final results = ref.read(searchStateProvider).results;
+                                      if (results.isNotEmpty) {
+                                        _onResultTap(results.first);
+                                      }
                                     },
                                     style: theme.textTheme.titleMedium,
                                     decoration: InputDecoration(
