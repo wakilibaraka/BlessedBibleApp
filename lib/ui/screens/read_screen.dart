@@ -57,6 +57,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
 
   void _scrollToVerse(int verse, ReadLocationState loc) {
     void tryScroll(int retries) {
+      if (!mounted) return;
       final flatChapters = ref.read(flatChaptersProvider);
       if (flatChapters.isEmpty) return;
       
@@ -81,7 +82,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
         }
       }
     }
-    tryScroll(0);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      tryScroll(0);
+    });
   }
 
 
@@ -162,45 +165,44 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
     }
 
     ref.listen<ReadLocationState>(readLocationProvider, (previous, next) {
-      if (flatChapters.isNotEmpty && _isPageControllerInitialized) {
-        final targetIndex = flatChapters.indexWhere((fc) => fc.book.abbreviation == next.bookAbbrev && fc.chapter.number == next.chapter);
-        if (targetIndex != -1 && _pageController.hasClients) {
-          final currentPage = _pageController.page?.round() ?? 0;
-          if (currentPage != targetIndex) {
-            if ((currentPage - targetIndex).abs() == 1) {
-              _pageController.animateToPage(targetIndex, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
-            } else {
-              _pageController.jumpToPage(targetIndex);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        if (flatChapters.isNotEmpty && _isPageControllerInitialized) {
+          final targetIndex = flatChapters.indexWhere((fc) => fc.book.abbreviation == next.bookAbbrev && fc.chapter.number == next.chapter);
+          if (targetIndex != -1 && _pageController.hasClients) {
+            final currentPage = _pageController.page?.round() ?? 0;
+            if (currentPage != targetIndex) {
+              if ((currentPage - targetIndex).abs() == 1) {
+                _pageController.animateToPage(targetIndex, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+              } else {
+                _pageController.jumpToPage(targetIndex);
+              }
             }
           }
         }
-      }
 
-      if (next.requestedVerse != null) {
-        _scrollToVerse(next.requestedVerse!, next);
-        Future.microtask(() {
+        if (next.requestedVerse != null) {
+          _scrollToVerse(next.requestedVerse!, next);
           ref.read(readLocationProvider.notifier).clearRequestedVerse();
-        });
-      }
-      if (next.openCommentary && next.requestedVerse != null) {
-        if (!isLoading && allBooks.isNotEmpty) {
-          try {
-            final book = allBooks.firstWhere((b) => b.abbreviation == next.bookAbbrev, orElse: () => allBooks.first);
-            final chapter = book.chapters.firstWhere((c) => c.number == next.chapter, orElse: () => book.chapters.first);
-            if (next.requestedVerse! <= chapter.verses.length) {
-              final verseText = chapter.verses[next.requestedVerse! - 1].text;
-              Future.delayed(const Duration(milliseconds: 500), () {
-                if (mounted) {
-                  _showCommentaryBottomSheet(next.requestedVerse!, verseText);
-                }
-              });
-            }
-          } catch (_) {}
         }
-        Future.microtask(() {
+        if (next.openCommentary && next.requestedVerse != null) {
+          if (!isLoading && allBooks.isNotEmpty) {
+            try {
+              final book = allBooks.firstWhere((b) => b.abbreviation == next.bookAbbrev, orElse: () => allBooks.first);
+              final chapter = book.chapters.firstWhere((c) => c.number == next.chapter, orElse: () => book.chapters.first);
+              if (next.requestedVerse! <= chapter.verses.length) {
+                final verseText = chapter.verses[next.requestedVerse! - 1].text;
+                Future.delayed(const Duration(milliseconds: 500), () {
+                  if (mounted) {
+                    _showCommentaryBottomSheet(next.requestedVerse!, verseText);
+                  }
+                });
+              }
+            } catch (_) {}
+          }
           ref.read(readLocationProvider.notifier).clearCommentary();
-        });
-      }
+        }
+      });
     });
 
     String currentBookName = loc.bookName;
