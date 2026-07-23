@@ -18,6 +18,7 @@ import '../../state/read_location_provider.dart';
 import '../widgets/textured_glass_container.dart';
 import '../widgets/bouncy_entrance.dart';
 import '../../state/nav_settings_provider.dart';
+import 'commentary_list_screen.dart';
 
 class ReadScreen extends ConsumerStatefulWidget {
   const ReadScreen({super.key});
@@ -293,7 +294,17 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                           itemCount: verses.length + 1,
                                           itemBuilder: (context, index) {
                                             if (index == verses.length) {
-                                              return _buildEndOfChapterBlock(fc, pageIndex, theme);
+                                              bool hasChapterCommentary = false;
+                                              commentaryDataAsync.whenData((state) {
+                                                final bookCommentary = state[fc.book.name];
+                                                if (bookCommentary != null) {
+                                                  final chapterCommentary = bookCommentary[fc.chapter.number.toString()];
+                                                  if (chapterCommentary != null && chapterCommentary.isNotEmpty) {
+                                                    hasChapterCommentary = true;
+                                                  }
+                                                }
+                                              });
+                                              return _buildEndOfChapterBlock(fc, pageIndex, theme, hasChapterCommentary);
                                             }
                                             final verse = verses[index];
                                             final isSelected = selectedVerses.contains(index);
@@ -630,7 +641,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
     );
   }
 
-  Widget _buildEndOfChapterBlock(FlatChapter fc, int pageIndex, ThemeData theme) {
+  Widget _buildEndOfChapterBlock(FlatChapter fc, int pageIndex, ThemeData theme, bool hasChapterCommentary) {
     final flatChapters = ref.read(flatChaptersProvider);
     final hasPrevious = pageIndex > 0;
     final hasNext = pageIndex < flatChapters.length - 1;
@@ -663,14 +674,20 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
           
           // Commentary Button
           TextButton.icon(
-            onPressed: () {
+            onPressed: hasChapterCommentary ? () {
               ref.read(navProvider.notifier).setIndex(3);
-            },
-            icon: Icon(Icons.school_rounded, color: theme.primaryColor),
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) => CommentaryListScreen(
+                  bookName: fc.book.name,
+                  chapterNumber: fc.chapter.number.toString(),
+                ),
+              ));
+            } : null,
+            icon: Icon(Icons.school_rounded, color: hasChapterCommentary ? theme.primaryColor : theme.disabledColor),
             label: Text(
               'Read commentary on this chapter',
               style: theme.textTheme.titleSmall?.copyWith(
-                color: theme.colorScheme.onSurface,
+                color: hasChapterCommentary ? theme.colorScheme.onSurface : theme.disabledColor,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -1665,18 +1682,31 @@ class _CommentaryBottomSheetContent extends ConsumerWidget {
                         right: 24,
                         bottom: 16,
                         child: TexturedGlassContainer(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
                           borderRadius: BorderRadius.circular(30),
-                          child: TextButton.icon(
-                            onPressed: () => _showShareMenu(context, theme),
-                            icon: Icon(Icons.ios_share_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.8), size: 20),
-                            label: Text(
-                              'Share',
-                              style: TextStyle(
-                                color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
-                                fontWeight: FontWeight.bold,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              TextButton.icon(
+                                onPressed: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved to Notes')));
+                                },
+                                icon: Icon(Icons.bookmark_add_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.8), size: 20),
+                                label: Text('Save', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.8), fontWeight: FontWeight.bold)),
                               ),
-                            ),
+                              IconButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                icon: Icon(Icons.keyboard_arrow_down_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.8), size: 24),
+                                style: IconButton.styleFrom(
+                                  backgroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.05),
+                                ),
+                              ),
+                              TextButton.icon(
+                                onPressed: () => _showShareMenu(context, theme),
+                                icon: Icon(Icons.ios_share_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.8), size: 20),
+                                label: Text('Share', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.8), fontWeight: FontWeight.bold)),
+                              ),
+                            ],
                           ),
                         ),
                       ),

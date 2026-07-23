@@ -50,10 +50,10 @@ final navSettingsProvider = NotifierProvider<NavSettingsNotifier, NavSettingsSta
 
 final bottomNavVisibilityProvider = Provider<bool>((ref) {
   final currentIndex = ref.watch(navProvider);
-  final isReadOrStudy = currentIndex == 1 || currentIndex == 3;
+  final isRead = currentIndex == 1;
 
   // On Home, Search, and Settings, the bottom nav is ALWAYS visible
-  if (!isReadOrStudy) return true;
+  if (!isRead) return true;
 
   // 1. Verse Selection hides nav (mutually exclusive)
   final hasSelection = ref.watch(readSelectionProvider).isNotEmpty;

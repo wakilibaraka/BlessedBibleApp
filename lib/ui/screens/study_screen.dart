@@ -320,7 +320,7 @@ He said in a loud voice, 'Fear God and give him glory, because the hour of his j
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CommentaryListScreen()));
+                          Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CommentaryListScreen(bookName: 'Revelation', chapterNumber: '14')));
                         },
                         style: TextButton.styleFrom(
                           foregroundColor: Colors.white,
@@ -515,7 +515,7 @@ He said in a loud voice, 'Fear God and give him glory, because the hour of his j
           child: InkWell(
             borderRadius: BorderRadius.circular(28),
             onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CommentaryListScreen()));
+                          Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CommentaryListScreen(bookName: 'Revelation', chapterNumber: '14')));
             },
             child: Padding(
               padding: const EdgeInsets.all(24.0),

@@ -4,7 +4,14 @@ import '../../state/study_provider.dart';
 import '../../data/models/commentary_model.dart';
 
 class CommentaryListScreen extends ConsumerWidget {
-  const CommentaryListScreen({super.key});
+  final String bookName;
+  final String chapterNumber;
+
+  const CommentaryListScreen({
+    super.key,
+    required this.bookName,
+    required this.chapterNumber,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -17,7 +24,7 @@ class CommentaryListScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text('Commentary', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        title: Text('$bookName $chapterNumber Commentary', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new_rounded, color: theme.primaryColor),
           onPressed: () => Navigator.of(context).pop(),
@@ -25,14 +32,14 @@ class CommentaryListScreen extends ConsumerWidget {
       ),
       body: commentaryDataAsync.when(
         data: (state) {
-          final rev14Data = state.data['Revelation']?['14'];
-          if (rev14Data == null || rev14Data.isEmpty) {
+          final chapterData = state.data[bookName]?[chapterNumber];
+          if (chapterData == null || chapterData.isEmpty) {
             return const Center(child: Text('No commentary available.'));
           }
 
           final itemList = <MapEntry<String, CommentaryEntry>>[];
-          for (final verseStr in rev14Data.keys) {
-            for (final entry in rev14Data[verseStr]!) {
+          for (final verseStr in chapterData.keys) {
+            for (final entry in chapterData[verseStr]!) {
               itemList.add(MapEntry(verseStr, entry));
             }
           }
