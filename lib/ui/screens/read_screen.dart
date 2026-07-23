@@ -557,6 +557,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
+      useSafeArea: true,
       builder: (context) {
         return _CommentaryBottomSheetContent(
           bookName: loc.bookName,
@@ -1515,7 +1516,7 @@ class _TypographyBottomSheet extends ConsumerWidget {
   }
 }
 
-class _CommentaryBottomSheetContent extends ConsumerStatefulWidget {
+class _CommentaryBottomSheetContent extends ConsumerWidget {
   final String bookName;
   final int chapter;
   final int verseNumber;
@@ -1528,196 +1529,181 @@ class _CommentaryBottomSheetContent extends ConsumerStatefulWidget {
     required this.verseText,
   });
 
-  @override
-  ConsumerState<_CommentaryBottomSheetContent> createState() => _CommentaryBottomSheetContentState();
-}
+  void _showShareMenu(BuildContext context, ThemeData theme) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return TexturedGlassContainer(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24.0)),
+          child: SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 8),
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                ListTile(
+                  leading: Icon(Icons.bookmark_add_rounded, color: theme.primaryColor),
+                  title: const Text('Save to Notes'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Saved $bookName $chapter:$verseNumber to Notes')),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.ios_share_rounded, color: theme.primaryColor),
+                  title: const Text('Share to other apps'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Share dialog opened')),
+                    );
+                  },
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
-class _CommentaryBottomSheetContentState extends ConsumerState<_CommentaryBottomSheetContent> {
-  int _tabIndex = 0;
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final typography = ref.watch(typographyProvider);
     final commentaryDataAsync = ref.watch(combinedCommentaryProvider);
 
-    return TexturedGlassContainer(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(32.0)),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 800),
-          child: Container(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.85,
-            ),
+    return DraggableScrollableSheet(
+      initialChildSize: 0.9,
+      minChildSize: 0.5,
+      maxChildSize: 1.0,
+      snap: true,
+      builder: (context, scrollController) {
+        return TexturedGlassContainer(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32.0)),
+          padding: EdgeInsets.zero,
+          child: SafeArea(
             child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const SizedBox(height: 16),
-            // Handlebar
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            
-            // Header Row (Title)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Text(
-                '${widget.bookName} ${widget.chapter}:${widget.verseNumber}',
-                textAlign: TextAlign.center,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  color: theme.primaryColor,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            
-            // Highlighted Verse Container
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: TexturedGlassContainer(
-                padding: const EdgeInsets.all(20.0),
-                borderRadius: BorderRadius.circular(24),
-                child: Text(
-                  '${widget.verseNumber} "${widget.verseText}"',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    height: 1.5,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            
-            // Pill Tabs
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: Row(
-                  children: [
-                    _buildPillTab(0, 'Commentary', theme),
-                    _buildPillTab(1, 'Cross-refs', theme),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            
-            // Content & Floating CTA
-            Expanded(
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                      child: _tabIndex == 0
-                          ? _buildCommentaryContent(commentaryDataAsync, theme, typography)
-                          : const Center(child: Text('Cross-references coming soon.')),
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 16),
+                // Handlebar
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                  
-                  // Floating Action Pill
-                  Positioned(
-                    left: 24,
-                    right: 24,
-                    bottom: 16,
-                    child: TexturedGlassContainer(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      borderRadius: BorderRadius.circular(30),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Expanded(
-                            child: TextButton.icon(
-                              onPressed: () {},
-                              icon: Icon(Icons.add, color: theme.colorScheme.onSurface.withValues(alpha: 0.8), size: 20),
-                              label: Text(
-                                'Add Note',
-                                style: TextStyle(
-                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Container(width: 1, height: 24, color: theme.dividerColor.withValues(alpha: 0.2)),
-                          Expanded(
-                            child: TextButton.icon(
-                              onPressed: () {},
-                              icon: Icon(Icons.ios_share_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.8), size: 20),
-                              label: Text(
-                                'Share',
-                                style: TextStyle(
-                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                ),
+                const SizedBox(height: 24),
+                
+                // Header Row (Title)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Text(
+                    '$bookName $chapter:$verseNumber',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      color: theme.primaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                
+                // Highlighted Verse Container
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: TexturedGlassContainer(
+                    padding: const EdgeInsets.all(20.0),
+                    borderRadius: BorderRadius.circular(24),
+                    child: Text(
+                      '$verseNumber "$verseText"',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        height: 1.5,
+                        fontStyle: FontStyle.italic,
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 24),
+                
+                // Content & Floating CTA
+                Expanded(
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                          child: _buildCommentaryContent(commentaryDataAsync, theme, typography, scrollController),
+                        ),
+                      ),
+                      
+                      // Floating Action Pill
+                      Positioned(
+                        left: 24,
+                        right: 24,
+                        bottom: 16,
+                        child: TexturedGlassContainer(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          borderRadius: BorderRadius.circular(30),
+                          child: TextButton.icon(
+                            onPressed: () => _showShareMenu(context, theme),
+                            icon: Icon(Icons.ios_share_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.8), size: 20),
+                            label: Text(
+                              'Share',
+                              style: TextStyle(
+                                color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildPillTab(int index, String title, ThemeData theme) {
-    final isSelected = _tabIndex == index;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => setState(() => _tabIndex = index),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            color: isSelected ? theme.primaryColor : Colors.transparent,
-            borderRadius: BorderRadius.circular(30),
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            title,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: isSelected ? Colors.white : theme.colorScheme.onSurface.withValues(alpha: 0.6),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCommentaryContent(AsyncValue<CombinedCommentaryState> commentaryDataAsync, ThemeData theme, TypographyState typography) {
+  Widget _buildCommentaryContent(AsyncValue<CombinedCommentaryState> commentaryDataAsync, ThemeData theme, TypographyState typography, ScrollController scrollController) {
     return commentaryDataAsync.when(
       data: (state) {
-        final entries = state.data[widget.bookName]?[widget.chapter.toString()]?[widget.verseNumber.toString()];
+        final entries = state.data[bookName]?[chapter.toString()]?[verseNumber.toString()];
         
         if (entries == null || entries.isEmpty) {
-          return const Center(child: Text('No commentary available.'));
+          return ListView(
+            controller: scrollController,
+            children: const [
+              SizedBox(height: 40),
+              Center(child: Text('No commentary available.')),
+            ],
+          );
         }
         return ListView.builder(
-          padding: const EdgeInsets.only(top: 24.0, bottom: 100.0),
+          controller: scrollController,
+          padding: const EdgeInsets.only(top: 8.0, bottom: 100.0),
           itemCount: entries.length + (state.isEgwMissing ? 1 : 0),
           itemBuilder: (context, index) {
             if (index == entries.length) {
@@ -1763,8 +1749,8 @@ class _CommentaryBottomSheetContentState extends ConsumerState<_CommentaryBottom
           },
         );
       },
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => const Center(child: Text('Error loading commentary')),
+      loading: () => ListView(controller: scrollController, children: const [SizedBox(height: 40), Center(child: CircularProgressIndicator())]),
+      error: (error, stack) => ListView(controller: scrollController, children: const [SizedBox(height: 40), Center(child: Text('Error loading commentary'))]),
     );
   }
 }
