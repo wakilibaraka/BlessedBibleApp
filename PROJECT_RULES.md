@@ -1,0 +1,14 @@
+# Project Rules & Workflow
+
+## 1. Always Verify Build Before Done
+After making ANY code change, before reporting a task or prompt as complete, the agent/developer MUST:
+1. Run `flutter analyze` and confirm zero errors (fix any errors found).
+2. Confirm the project compiles cleanly and hot-reloads without build errors.
+3. Verify the specific feature changed actually works, and that existing screens (Home, Read, Search, Study, Settings) and navigation are not broken.
+
+Only report a task as complete once the build is green and nothing is broken.
+
+## 2. Commit After Every Green Build
+- Immediately after verifying a build is green (`flutter analyze` zero errors + clean compile), commit the changes to git.
+- Keep commits atomic, clean, and descriptive of the feature or refactor accomplished.
+- This prevents regressions and protects working states from getting lost.

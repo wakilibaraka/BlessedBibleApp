@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../state/study_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../state/typography_provider.dart';
@@ -71,12 +70,9 @@ class CommentaryListScreen extends ConsumerWidget {
                     const SizedBox(height: 12),
                     Text(
                       entry.text,
-                      style: GoogleFonts.lora(
-                        textStyle: theme.textTheme.bodyMedium?.copyWith(
-                          height: 1.6,
-                          fontSize: typography.fontSize,
-                          color: theme.textTheme.bodyLarge?.color?.withOpacity(0.9),
-                        ),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        height: 1.6,
+                        color: theme.textTheme.bodyLarge?.color?.withOpacity(0.9),
                       ),
                     ),
                   ],

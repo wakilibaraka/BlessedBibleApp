@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../state/study_provider.dart';
 import '../../state/theme_provider.dart';
@@ -9,6 +8,7 @@ import '../widgets/textured_glass_container.dart';
 import 'analysis_screen.dart';
 import 'commentary_list_screen.dart';
 import 'reading_plan_screen.dart';
+import '../widgets/bouncy_entrance.dart';
 
 class StudyScreen extends ConsumerStatefulWidget {
   const StudyScreen({super.key});
@@ -65,8 +65,11 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
       backgroundColor: Colors.transparent,
       body: SafeArea(
         bottom: false,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 800),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -81,18 +84,14 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                       children: [
                         Text(
                           'Peace be with you,',
-                          style: GoogleFonts.inter(
-                            textStyle: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           subGreeting,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            fontSize: 11,
+                          style: theme.textTheme.labelMedium?.copyWith(
                             color: theme.textTheme.bodySmall?.color?.withOpacity(0.6),
                           ),
                         ),
@@ -151,6 +150,8 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
             ],
           ),
         ),
+          ),
+        ),
       ),
       
       // Removed local floatingActionButton as it is handled by main_nav_screen.dart
@@ -160,34 +161,34 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
   void _showStreakPopover(BuildContext context, ThemeData theme) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.transparent,
-        contentPadding: EdgeInsets.zero,
-        content: TexturedGlassContainer(
-          borderRadius: BorderRadius.circular(24),
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.local_fire_department_rounded, color: Colors.orangeAccent, size: 64),
-              const SizedBox(height: 16),
-              Text(
-                '5 Days',
-                style: GoogleFonts.lora(
-                  textStyle: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+      builder: (context) => BouncyEntrance(
+        child: AlertDialog(
+          backgroundColor: Colors.transparent,
+          contentPadding: EdgeInsets.zero,
+          content: TexturedGlassContainer(
+            borderRadius: BorderRadius.circular(24),
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.local_fire_department_rounded, color: Colors.orangeAccent, size: 64),
+                const SizedBox(height: 16),
+                Text(
+                  '5 Days',
+                  style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Reading Streak',
-                style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Keep up the great work!',
-                style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface.withOpacity(0.6)),
-              ),
-            ],
+                const SizedBox(height: 4),
+                Text(
+                  'Reading Streak',
+                  style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Keep up the great work!',
+                  style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface.withOpacity(0.6)),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -197,49 +198,49 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
   void _showNotificationsPopover(BuildContext context, ThemeData theme) {
     showDialog(
       context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        alignment: Alignment.topRight,
-        insetPadding: const EdgeInsets.only(top: 80, right: 20, left: 60),
-        child: TexturedGlassContainer(
-          borderRadius: BorderRadius.circular(20),
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Notifications',
-                style: GoogleFonts.lora(
-                  textStyle: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+      builder: (context) => BouncyEntrance(
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          alignment: Alignment.topRight,
+          insetPadding: const EdgeInsets.only(top: 80, right: 20, left: 60),
+          child: TexturedGlassContainer(
+            borderRadius: BorderRadius.circular(20),
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Notifications',
+                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: theme.primaryColor.withOpacity(0.1),
-                      shape: BoxShape.circle,
+                const SizedBox(height: 16),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: theme.primaryColor.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(Icons.menu_book_rounded, color: theme.primaryColor, size: 20),
                     ),
-                    child: Icon(Icons.menu_book_rounded, color: theme.primaryColor, size: 20),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Daily Reminder', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                        const SizedBox(height: 4),
-                        Text('Read your Bible, pray every day.', style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withOpacity(0.7))),
-                      ],
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Daily Reminder', style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 4),
+                          Text('Read your Bible, pray every day.', style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurface.withOpacity(0.7))),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              )
-            ],
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -298,11 +299,9 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                     const SizedBox(height: 4),
                     Text(
                       ref.watch(activeStudyVerseProvider) ?? 'Revelation 14:1, 7',
-                      style: GoogleFonts.lora(
-                        textStyle: theme.textTheme.titleMedium?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -310,12 +309,10 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                       '''"Then I looked, and there before me was the Lamb, standing on Mount Zion...
                       
 He said in a loud voice, 'Fear God and give him glory, because the hour of his judgment has come.'"''',
-                      style: GoogleFonts.gentiumBookPlus(
-                        textStyle: theme.textTheme.bodyLarge?.copyWith(
-                          color: Colors.white.withOpacity(0.95),
-                          height: 1.5,
-                          fontStyle: FontStyle.italic,
-                        ),
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        color: Colors.white.withOpacity(0.95),
+                        height: 1.5,
+                        fontStyle: FontStyle.italic,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -345,7 +342,7 @@ He said in a loud voice, 'Fear God and give him glory, because the hour of his j
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _buildInteractionButton(Icons.favorite_rounded, 'Save', Colors.redAccent, onTap: () {
+                          _buildInteractionButton(context, Icons.favorite_rounded, 'Save', Colors.redAccent, onTap: () {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: const Text('Reflection saved to your Notes!'),
@@ -354,9 +351,9 @@ He said in a loud voice, 'Fear God and give him glory, because the hour of his j
                               ),
                             );
                           }),
-                          _buildInteractionButton(Icons.chat_bubble_outline_rounded, '12.5k', Colors.white),
-                          _buildInteractionButton(Icons.ios_share_rounded, '300.3k', Colors.white),
-                          _buildInteractionButton(Icons.more_vert_rounded, 'More', Colors.white),
+                          _buildInteractionButton(context, Icons.chat_bubble_outline_rounded, '12.5k', Colors.white),
+                          _buildInteractionButton(context, Icons.ios_share_rounded, '300.3k', Colors.white),
+                          _buildInteractionButton(context, Icons.more_vert_rounded, 'More', Colors.white),
                         ],
                       ),
                   ],
@@ -369,7 +366,7 @@ He said in a loud voice, 'Fear God and give him glory, because the hour of his j
     );
   }
 
-  Widget _buildInteractionButton(IconData icon, String label, Color iconColor, {VoidCallback? onTap}) {
+  Widget _buildInteractionButton(BuildContext context, IconData icon, String label, Color iconColor, {VoidCallback? onTap}) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
@@ -382,7 +379,7 @@ He said in a loud voice, 'Fear God and give him glory, because the hour of his j
             const SizedBox(height: 6),
             Text(
               label,
-              style: const TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.w600),
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Colors.white70, fontWeight: FontWeight.w600),
             ),
           ],
         ),
@@ -425,10 +422,8 @@ He said in a loud voice, 'Fear God and give him glory, because the hour of his j
                       children: [
                         Text(
                           'Active Reading Plan',
-                          style: GoogleFonts.lora(
-                            textStyle: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -503,10 +498,8 @@ He said in a loud voice, 'Fear God and give him glory, because the hour of his j
                     children: [
                       Text(
                         'Commentary',
-                        style: GoogleFonts.lora(
-                          textStyle: theme.textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                       Container(
@@ -538,12 +531,10 @@ He said in a loud voice, 'Fear God and give him glory, because the hour of his j
                   // Snippet filling the container
                   Text(
                     '"The Lamb on Mount Zion represents Christ in His triumphant role. The 144,000 having the Father\'s name on their foreheads denotes a seal of absolute ownership, protection, and moral reflection..."',
-                    style: GoogleFonts.gentiumBookPlus(
-                      textStyle: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.textTheme.bodyMedium?.color?.withOpacity(0.85),
-                        height: 1.5,
-                        fontStyle: FontStyle.italic,
-                      ),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.textTheme.bodyMedium?.color?.withOpacity(0.85),
+                      height: 1.5,
+                      fontStyle: FontStyle.italic,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -581,9 +572,11 @@ void showNotesPopover(BuildContext context, ThemeData theme) {
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
     builder: (context) {
-      return TexturedGlassContainer(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(32.0)),
-        padding: const EdgeInsets.all(24.0),
+      return BouncyEntrance(
+        delay: const Duration(milliseconds: 50),
+        child: TexturedGlassContainer(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32.0)),
+          padding: const EdgeInsets.all(24.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -597,9 +590,7 @@ void showNotesPopover(BuildContext context, ThemeData theme) {
             const SizedBox(height: 24),
             Text(
               'My Notes',
-              style: GoogleFonts.lora(
-                textStyle: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-              ),
+              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 32),
             Icon(Icons.edit_note_rounded, size: 48, color: theme.primaryColor.withOpacity(0.5)),
@@ -619,6 +610,7 @@ void showNotesPopover(BuildContext context, ThemeData theme) {
             ),
             const SizedBox(height: 48),
           ],
+        ),
         ),
       );
     },

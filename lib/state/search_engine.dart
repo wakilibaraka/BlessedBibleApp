@@ -21,7 +21,7 @@ class SearchResult {
   });
 }
 
-enum SearchResultType { bible, commentary, history }
+enum SearchResultType { reference, bible, commentary, history }
 
 // The Search Engine handles the actual query logic
 class SearchEngine {
@@ -30,11 +30,76 @@ class SearchEngine {
 
   SearchEngine({this.bibleBooks, this.commentaryData});
 
+  List<SearchResult> _parseReference(String query, List<BibleBook> books) {
+    final q = query.toLowerCase().trim();
+    if (q.isEmpty) return [];
+
+    final regex = RegExp(r'^((?:\d\s*)?[a-z]+(?:\s+[a-z]+)*)\s*(?:(\d+)[\s:.]*(\d+)?)?$');
+    final match = regex.firstMatch(q);
+    
+    if (match == null) return [];
+
+    final bookStr = match.group(1)?.trim() ?? '';
+    final chapterStr = match.group(2);
+    final verseStr = match.group(3);
+
+    final results = <SearchResult>[];
+
+    for (final book in books) {
+      final nameLower = book.name.toLowerCase();
+      final abbrevLower = book.abbreviation.toLowerCase();
+
+      if (nameLower.startsWith(bookStr) || abbrevLower.startsWith(bookStr)) {
+        int? chapter;
+        int? verse;
+
+        if (chapterStr != null) {
+          chapter = int.tryParse(chapterStr);
+          if (chapter != null) {
+            chapter = chapter.clamp(1, book.chapters.length);
+          }
+        }
+        
+        if (chapter != null && verseStr != null) {
+          verse = int.tryParse(verseStr);
+          if (verse != null) {
+            final maxVerse = book.chapters[chapter - 1].verses.length;
+            verse = verse.clamp(1, maxVerse);
+          }
+        }
+
+        String title = book.name;
+        if (chapter != null) title += ' $chapter';
+        if (verse != null) title += ':$verse';
+
+        results.add(SearchResult(
+          title: title,
+          subtitle: 'Jump To',
+          snippet: 'Go to ${book.name} Chapter ${chapter ?? 1}${verse != null ? ' Verse $verse' : ''}',
+          type: SearchResultType.reference,
+          metadata: {
+            'bookAbbrev': book.abbreviation,
+            'bookName': book.name,
+            'chapter': chapter ?? 1,
+            if (verse != null) 'verse': verse,
+          },
+        ));
+      }
+    }
+
+    return results;
+  }
+
   List<SearchResult> search(String query, {bool includeBible = true, bool includeCommentary = true}) {
     if (query.trim().isEmpty) return [];
     
     final queryLower = query.toLowerCase().trim();
     final results = <SearchResult>[];
+
+    // 0. Search References (Highest Priority)
+    if (includeBible && bibleBooks != null) {
+      results.addAll(_parseReference(queryLower, bibleBooks!));
+    }
 
     // 1. Search Bible
     if (includeBible && bibleBooks != null) {
@@ -50,6 +115,7 @@ class SearchEngine {
                 type: SearchResultType.bible,
                 metadata: {
                   'book': bookName,
+                  'bookAbbrev': book.abbreviation,
                   'chapter': chapter.number,
                   'verse': verse.number,
                   'text': verse.text,

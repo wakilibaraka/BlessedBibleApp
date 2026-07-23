@@ -3,10 +3,12 @@ import 'app_colors.dart';
 import 'app_typography.dart';
 
 class AppTheme {
-  static ThemeData get lightTheme {
-    final textTheme = AppTypography.primaryTextTheme(
+  static ThemeData lightTheme(double baseFontSize, String fontFamily) {
+    final textTheme = AppTypography.getTheme(
       AppColors.lightTextPrimary,
       AppColors.lightTextSecondary,
+      baseFontSize,
+      fontFamily,
     );
 
     return ThemeData(
@@ -36,10 +38,12 @@ class AppTheme {
     );
   }
 
-  static ThemeData get sepiaTheme {
-    final textTheme = AppTypography.primaryTextTheme(
-      AppColors.warmGoldTextPrimary,
-      AppColors.warmGoldTextSecondary,
+  static ThemeData sepiaTheme(double baseFontSize, String fontFamily) {
+    final textTheme = AppTypography.getTheme(
+      AppColors.sepiaTextPrimary,
+      AppColors.sepiaTextSecondary,
+      baseFontSize,
+      fontFamily,
     );
 
     return ThemeData(
@@ -69,10 +73,12 @@ class AppTheme {
     );
   }
 
-  static ThemeData get darkTheme {
-    final textTheme = AppTypography.primaryTextTheme(
+  static ThemeData darkTheme(double baseFontSize, String fontFamily) {
+    final textTheme = AppTypography.getTheme(
       AppColors.darkTextPrimary,
       AppColors.darkTextSecondary,
+      baseFontSize,
+      fontFamily,
     );
 
     return ThemeData(
@@ -85,7 +91,7 @@ class AppTheme {
         onSurface: AppColors.darkTextPrimary,
       ),
       textTheme: textTheme,
-      appBarTheme: AppBarTheme(
+      appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.darkBackground,
         foregroundColor: AppColors.darkTextPrimary,
         elevation: 0,

@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/search_provider.dart';
@@ -6,6 +7,9 @@ import '../../state/search_engine.dart';
 import '../../state/theme_provider.dart';
 import '../../state/nav_provider.dart';
 import '../../state/read_selection_provider.dart';
+import '../../state/read_location_provider.dart';
+import '../../state/glass_ui_provider.dart';
+import '../../state/bible_provider.dart';
 import '../widgets/textured_glass_container.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
@@ -18,6 +22,7 @@ class SearchScreen extends ConsumerStatefulWidget {
 class _SearchScreenState extends ConsumerState<SearchScreen> with SingleTickerProviderStateMixin {
   late TextEditingController _controller;
   late FocusNode _focusNode;
+  Timer? _focusTimer;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
@@ -27,6 +32,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> with SingleTickerPr
     super.initState();
     _controller = TextEditingController();
     _focusNode = FocusNode();
+    _focusNode.addListener(() {
+      if (mounted) setState(() {});
+    });
     
     _animationController = AnimationController(
       vsync: this,
@@ -43,9 +51,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> with SingleTickerPr
 
     // Delay focus and animation slightly to allow tab transition to complete
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       _animationController.forward();
       // Auto-focus the search bar
-      Future.delayed(const Duration(milliseconds: 150), () {
+      _focusTimer = Timer(const Duration(milliseconds: 150), () {
         if (mounted) _focusNode.requestFocus();
       });
     });
@@ -53,6 +62,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> with SingleTickerPr
 
   @override
   void dispose() {
+    _focusTimer?.cancel();
     _controller.dispose();
     _focusNode.dispose();
     _animationController.dispose();
@@ -60,15 +70,28 @@ class _SearchScreenState extends ConsumerState<SearchScreen> with SingleTickerPr
   }
 
   void _onResultTap(SearchResult result) {
-    // Navigate to read screen and set the context
     ref.read(searchStateProvider.notifier).addRecentPlace(result);
-    // TODO: Actually jump to the verse in Read Screen or Commentary in Study Screen
-    if (result.type == SearchResultType.bible) {
+    
+    if (result.type == SearchResultType.bible || result.type == SearchResultType.reference) {
       ref.read(navProvider.notifier).setIndex(1); // Read Screen
-      // Would need to update active book/chapter/verse state here
+      ref.read(readLocationProvider.notifier).updateLocation(
+        bookAbbrev: result.metadata['bookAbbrev'],
+        bookName: result.metadata['bookName'] ?? result.metadata['book'],
+        chapter: result.metadata['chapter'],
+        verse: result.metadata['verse'],
+      );
     } else if (result.type == SearchResultType.commentary) {
-      ref.read(navProvider.notifier).setIndex(3); // Study Screen
-      // Would need to update active study verse here
+      ref.read(navProvider.notifier).setIndex(1); // Read Screen
+      final books = ref.read(bibleProvider).books;
+      final bookName = result.metadata['book'] as String;
+      final book = books.firstWhere((b) => b.name == bookName, orElse: () => books.first);
+      ref.read(readLocationProvider.notifier).updateLocation(
+        bookAbbrev: book.abbreviation,
+        bookName: bookName,
+        chapter: result.metadata['chapter'],
+        verse: result.metadata['verse'],
+        openCommentary: true,
+      );
     }
   }
 
@@ -78,13 +101,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> with SingleTickerPr
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     
-    // Determine glow color based on theme
-    final appThemeMode = ref.watch(themeProvider);
-    final glowColor = appThemeMode == AppThemeMode.dark 
-        ? Colors.amberAccent.withOpacity(0.3)
-        : appThemeMode == AppThemeMode.sepia
-            ? Colors.deepOrange.withOpacity(0.3)
-            : Colors.blueAccent.withOpacity(0.3);
+    final isGlassy = ref.watch(glassUiProvider);
 
     return Scaffold(
       backgroundColor: Colors.transparent, // Rely on app background
@@ -94,7 +111,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> with SingleTickerPr
           opacity: _fadeAnimation,
           child: SlideTransition(
             position: _slideAnimation,
-            child: Column(
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 800),
+                child: Column(
               children: [
                 const SizedBox(height: 32),
                 
@@ -106,12 +126,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> with SingleTickerPr
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(32),
                       boxShadow: [
-                        if (_focusNode.hasFocus)
+                        if (isGlassy)
                           BoxShadow(
-                            color: glowColor,
-                            blurRadius: 32,
-                            spreadRadius: 4,
-                            offset: const Offset(0, 8),
+                            color: theme.primaryColor.withValues(alpha: _focusNode.hasFocus ? 0.35 : 0.15),
+                            blurRadius: _focusNode.hasFocus ? 32 : 16,
+                            spreadRadius: _focusNode.hasFocus ? 4 : 0,
+                            offset: _focusNode.hasFocus ? const Offset(0, 8) : const Offset(0, 4),
                           ),
                       ],
                     ),
@@ -208,6 +228,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> with SingleTickerPr
               ],
             ),
           ),
+            ),
+          ),
         ),
       ),
     );
@@ -286,17 +308,51 @@ class _SearchScreenState extends ConsumerState<SearchScreen> with SingleTickerPr
       );
     }
     
-    return ListView.builder(
+    final referenceResults = state.results.where((r) => r.type == SearchResultType.reference).toList();
+    final bibleResults = state.results.where((r) => r.type == SearchResultType.bible).toList();
+    final commentaryResults = state.results.where((r) => r.type == SearchResultType.commentary).toList();
+
+    return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-      itemCount: state.results.length,
-      itemBuilder: (context, index) {
-        final result = state.results[index];
-        return _buildResultItem(result, theme);
-      },
+      children: [
+        if (referenceResults.isNotEmpty) ...[
+          _buildSectionHeader('Jump To', theme),
+          ...referenceResults.map((r) => _buildResultItem(r, theme, state.query)),
+          const SizedBox(height: 16),
+        ],
+        if (bibleResults.isNotEmpty) ...[
+          _buildSectionHeader('Verses', theme),
+          ...bibleResults.map((r) => _buildResultItem(r, theme, state.query)),
+          const SizedBox(height: 16),
+        ],
+        if (commentaryResults.isNotEmpty) ...[
+          _buildSectionHeader('Commentary', theme),
+          ...commentaryResults.map((r) => _buildResultItem(r, theme, state.query)),
+        ],
+      ],
     );
   }
 
-  Widget _buildResultItem(SearchResult result, ThemeData theme) {
+  Widget _buildSectionHeader(String title, ThemeData theme) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0, left: 4.0),
+      child: Text(
+        title,
+        style: theme.textTheme.titleSmall?.copyWith(
+          color: theme.colorScheme.onSurface.withOpacity(0.6),
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.2,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildResultItem(SearchResult result, ThemeData theme, [String query = '']) {
+    IconData icon;
+    if (result.type == SearchResultType.reference) icon = Icons.keyboard_double_arrow_right_rounded;
+    else if (result.type == SearchResultType.bible) icon = Icons.menu_book_rounded;
+    else icon = Icons.library_books_rounded;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: GestureDetector(
@@ -310,7 +366,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> with SingleTickerPr
               Row(
                 children: [
                   Icon(
-                    result.type == SearchResultType.bible ? Icons.menu_book_rounded : Icons.library_books_rounded,
+                    icon,
                     size: 16,
                     color: theme.primaryColor,
                   ),
@@ -332,18 +388,58 @@ class _SearchScreenState extends ConsumerState<SearchScreen> with SingleTickerPr
                 ),
               ),
               const SizedBox(height: 4),
-              Text(
-                result.snippet,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.7),
-                  height: 1.5,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
+              _buildSnippet(result.snippet, query, theme),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSnippet(String text, String query, ThemeData theme) {
+    final style = theme.textTheme.bodyMedium?.copyWith(
+      color: theme.colorScheme.onSurface.withOpacity(0.7),
+      height: 1.5,
+    );
+
+    if (query.isEmpty) {
+      return Text(
+        text,
+        style: style,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      );
+    }
+
+    final queryLower = query.toLowerCase();
+    final textLower = text.toLowerCase();
+    final index = textLower.indexOf(queryLower);
+    
+    if (index == -1) {
+      return Text(
+        text,
+        style: style,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      );
+    }
+    
+    final highlightStyle = style?.copyWith(
+      color: theme.brightness == Brightness.dark ? Colors.amberAccent : Colors.amber.shade800, 
+      fontWeight: FontWeight.bold,
+      backgroundColor: (theme.brightness == Brightness.dark ? Colors.amberAccent : Colors.amber.shade800).withOpacity(0.1),
+    );
+
+    return RichText(
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+      text: TextSpan(
+        style: style,
+        children: [
+          TextSpan(text: text.substring(0, index)),
+          TextSpan(text: text.substring(index, index + query.length), style: highlightStyle),
+          TextSpan(text: text.substring(index + query.length)),
+        ],
       ),
     );
   }

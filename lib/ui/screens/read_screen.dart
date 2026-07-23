@@ -9,13 +9,14 @@ import '../../data/models/bible_model.dart';
 import '../../state/bible_provider.dart';
 import '../../state/nav_provider.dart';
 import '../../state/study_provider.dart';
-import '../../data/models/commentary_model.dart';
 import '../../state/theme_provider.dart';
 import '../../state/typography_provider.dart';
 import '../../state/immersive_mode_provider.dart';
 import '../../state/read_selection_provider.dart';
+import '../../state/read_location_provider.dart';
 import '../widgets/glass_container.dart';
 import '../widgets/textured_glass_container.dart';
+import '../widgets/bouncy_entrance.dart';
 
 class ReadScreen extends ConsumerStatefulWidget {
   const ReadScreen({super.key});
@@ -25,19 +26,22 @@ class ReadScreen extends ConsumerStatefulWidget {
 }
 
 class _ReadScreenState extends ConsumerState<ReadScreen> {
-  String _selectedBookName = 'Revelation';
-  String _selectedBookAbbrev = 'REV';
-  int _selectedChapter = 14;
+
 
   final Map<int, GlobalKey> _verseKeys = {};
-
-
+  int? _navigatedVerseIndex;
 
   void _toggleVerseSelection(int index) {
+    setState(() {
+      _navigatedVerseIndex = null;
+    });
     ref.read(readSelectionProvider.notifier).toggle(index);
   }
 
   void _clearSelection() {
+    setState(() {
+      _navigatedVerseIndex = null;
+    });
     ref.read(readSelectionProvider.notifier).clear();
   }
 
@@ -52,53 +56,55 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
           curve: Curves.easeInOutCubic,
           alignment: 0.1,
         );
-        // Highlight it upon jumping
-        ref.read(readSelectionProvider.notifier).setSingle(verse - 1);
+        // Highlight it faintly upon jumping
+        if (mounted) {
+          setState(() {
+            _navigatedVerseIndex = verse - 1;
+          });
+        }
       }
     });
   }
 
   void _nextChapter(List<BibleBook> allBooks) {
-    final currentBookIndex = allBooks.indexWhere((b) => b.abbreviation == _selectedBookAbbrev);
+    final loc = ref.read(readLocationProvider);
+    final currentBookIndex = allBooks.indexWhere((b) => b.abbreviation == loc.bookAbbrev);
     if (currentBookIndex == -1) return;
     
     final book = allBooks[currentBookIndex];
-    if (_selectedChapter < book.chapters.length) {
-      setState(() {
-        _selectedChapter++;
-        _verseKeys.clear();
-      });
+    if (loc.chapter < book.chapters.length) {
+      ref.read(readLocationProvider.notifier).updateLocation(chapter: loc.chapter + 1);
+      setState(() { _verseKeys.clear(); });
       _clearSelection();
     } else if (currentBookIndex < allBooks.length - 1) {
       final nextBook = allBooks[currentBookIndex + 1];
-      setState(() {
-        _selectedBookAbbrev = nextBook.abbreviation;
-        _selectedBookName = nextBook.name;
-        _selectedChapter = 1;
-        _verseKeys.clear();
-      });
+      ref.read(readLocationProvider.notifier).updateLocation(
+        bookAbbrev: nextBook.abbreviation,
+        bookName: nextBook.name,
+        chapter: 1,
+      );
+      setState(() { _verseKeys.clear(); });
       _clearSelection();
     }
   }
 
   void _previousChapter(List<BibleBook> allBooks) {
-    final currentBookIndex = allBooks.indexWhere((b) => b.abbreviation == _selectedBookAbbrev);
+    final loc = ref.read(readLocationProvider);
+    final currentBookIndex = allBooks.indexWhere((b) => b.abbreviation == loc.bookAbbrev);
     if (currentBookIndex == -1) return;
 
-    if (_selectedChapter > 1) {
-      setState(() {
-        _selectedChapter--;
-        _verseKeys.clear();
-      });
+    if (loc.chapter > 1) {
+      ref.read(readLocationProvider.notifier).updateLocation(chapter: loc.chapter - 1);
+      setState(() { _verseKeys.clear(); });
       _clearSelection();
     } else if (currentBookIndex > 0) {
       final prevBook = allBooks[currentBookIndex - 1];
-      setState(() {
-        _selectedBookAbbrev = prevBook.abbreviation;
-        _selectedBookName = prevBook.name;
-        _selectedChapter = prevBook.chapters.length;
-        _verseKeys.clear();
-      });
+      ref.read(readLocationProvider.notifier).updateLocation(
+        bookAbbrev: prevBook.abbreviation,
+        bookName: prevBook.name,
+        chapter: prevBook.chapters.length,
+      );
+      setState(() { _verseKeys.clear(); });
       _clearSelection();
     }
   }
@@ -118,20 +124,21 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (context) {
+        final loc = ref.read(readLocationProvider);
         return _BookChapterSelectorSheet(
           books: allBooks,
-          selectedBookAbbrev: _selectedBookAbbrev,
-          selectedChapter: _selectedChapter,
+          selectedBookAbbrev: loc.bookAbbrev,
+          selectedChapter: loc.chapter,
           onSelectionChanged: (abbrev, name, chapter, verse) {
-            bool changedChapter = _selectedBookAbbrev != abbrev || _selectedChapter != chapter;
-            setState(() {
-              _selectedBookAbbrev = abbrev;
-              _selectedBookName = name;
-              _selectedChapter = chapter;
-              if (changedChapter) {
-                _verseKeys.clear();
-              }
-            });
+            bool changedChapter = loc.bookAbbrev != abbrev || loc.chapter != chapter;
+            ref.read(readLocationProvider.notifier).updateLocation(
+              bookAbbrev: abbrev,
+              bookName: name,
+              chapter: chapter,
+            );
+            if (changedChapter) {
+              setState(() { _verseKeys.clear(); });
+            }
             _clearSelection();
             Navigator.pop(context);
 
@@ -158,19 +165,52 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
     final isLoading = bibleState.isLoading;
     final allBooks = bibleState.books;
 
+    ref.listen<ReadLocationState>(readLocationProvider, (previous, next) {
+      if (next.requestedVerse != null) {
+        _scrollToVerse(next.requestedVerse!);
+        Future.microtask(() {
+          ref.read(readLocationProvider.notifier).clearRequestedVerse();
+        });
+      }
+      if (next.openCommentary && next.requestedVerse != null) {
+        if (!isLoading && allBooks.isNotEmpty) {
+          try {
+            final book = allBooks.firstWhere((b) => b.abbreviation == next.bookAbbrev, orElse: () => allBooks.first);
+            final chapter = book.chapters.firstWhere((c) => c.number == next.chapter, orElse: () => book.chapters.first);
+            if (next.requestedVerse! <= chapter.verses.length) {
+              final verseText = chapter.verses[next.requestedVerse! - 1].text;
+              Future.delayed(const Duration(milliseconds: 500), () {
+                if (mounted) {
+                  _showCommentaryBottomSheet(context, next.requestedVerse!, verseText);
+                }
+              });
+            }
+          } catch (_) {}
+        }
+        Future.microtask(() {
+          ref.read(readLocationProvider.notifier).clearCommentary();
+        });
+      }
+    });
+
+    final loc = ref.watch(readLocationProvider);
+    String currentBookName = loc.bookName;
+    String currentBookAbbrev = loc.bookAbbrev;
+    int currentChapter = loc.chapter;
+
     // Find active chapter
     List<BibleVerse> verses = [];
     if (!isLoading && allBooks.isNotEmpty) {
       try {
-        final book = allBooks.firstWhere((b) => b.name == _selectedBookName || b.abbreviation == _selectedBookAbbrev,
+        final book = allBooks.firstWhere((b) => b.name == currentBookName || b.abbreviation == currentBookAbbrev,
             orElse: () => allBooks.first);
-        _selectedBookName = book.name;
-        _selectedBookAbbrev = book.abbreviation;
+        currentBookName = book.name;
+        currentBookAbbrev = book.abbreviation;
 
-        if (_selectedChapter > book.chapters.length) {
-          _selectedChapter = 1;
+        if (currentChapter > book.chapters.length) {
+          currentChapter = 1;
         }
-        final chapter = book.chapters.firstWhere((c) => c.number == _selectedChapter,
+        final chapter = book.chapters.firstWhere((c) => c.number == currentChapter,
             orElse: () => book.chapters.first);
         verses = chapter.verses;
       } catch (_) {}
@@ -180,13 +220,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
       backgroundColor: Colors.transparent,
       body: Stack(
         children: [
-          // ── Background color matching theme ───────────────────────
-          Positioned.fill(
-            child: Container(
-              color: theme.scaffoldBackgroundColor,
-            ),
-          ),
-
           // ── Scripture Content Layer ──────────────────────────────────
           Positioned.fill(
             child: Stack(
@@ -235,98 +268,123 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                   }
                                   return false;
                                 },
-                                child: ListView.builder(
-                                padding: EdgeInsets.only(
-                                    top: MediaQuery.of(context).padding.top + 80.0,
-                                    left: 24.0, right: 24.0, bottom: 120.0),
-                                itemCount: verses.length,
-                                itemBuilder: (context, index) {
-                                  if (!_verseKeys.containsKey(index)) {
-                                    _verseKeys[index] = GlobalKey();
-                                  }
-                                  final verse = verses[index];
-                                  final isSelected =
-                                      selectedVerses.contains(index);
+                                child: Center(
+                                  child: ConstrainedBox(
+                                    constraints: const BoxConstraints(maxWidth: 800),
+                                    child: ListView.builder(
+                                      padding: EdgeInsets.only(
+                                          top: MediaQuery.of(context).padding.top + 80.0,
+                                          left: 24.0, right: 24.0, bottom: 400.0), // increased padding so verses can scroll above pills
+                                      itemCount: verses.length,
+                                      itemBuilder: (context, index) {
+                                        if (!_verseKeys.containsKey(index)) {
+                                          _verseKeys[index] = GlobalKey();
+                                        }
+                                        final verse = verses[index];
+                                        final isSelected = selectedVerses.contains(index);
+                                        final isSelectionMode = selectedVerses.isNotEmpty;
 
-                                  return Column(
-                                    key: _verseKeys[index],
-                                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                                    children: [
-                                      // Check for commentary
-                                      Builder(
-                                        builder: (context) {
-                                          bool hasCommentary = false;
-                                          commentaryDataAsync.whenData((commentaryData) {
-                                            final bookCommentary = commentaryData[_selectedBookName];
-                                            if (bookCommentary != null) {
-                                              final chapterCommentary = bookCommentary[_selectedChapter.toString()];
-                                              if (chapterCommentary != null) {
-                                                if (chapterCommentary.containsKey(verse.number.toString())) {
-                                                  hasCommentary = true;
-                                                }
-                                              }
-                                            }
-                                          });
-
-                                          return GestureDetector(
-                                        onTap: () => _toggleVerseSelection(index),
-                                        child: Stack(
+                                        return Column(
+                                          key: _verseKeys[index],
+                                          crossAxisAlignment: CrossAxisAlignment.stretch,
                                           children: [
-                                            AnimatedContainer(
-                                              duration:
-                                                  const Duration(milliseconds: 250),
-                                              padding: const EdgeInsets.only(
-                                                  top: 6.0,
-                                                  bottom: 6.0,
-                                                  left: 15.0,  // extra left space for accent bar
-                                                  right: 12.0),
-                                              decoration: BoxDecoration(
-                                                color: isSelected
-                                                    ? (isDark
-                                                        ? Colors.amber.withOpacity(0.20)
-                                                        : Colors.amber.withOpacity(0.15))
-                                                    : (verse.isHighlighted
-                                                        ? Colors.amber.withOpacity(0.10)
-                                                        : Colors.transparent),
-                                                borderRadius: BorderRadius.circular(12),
-                                              ),
-                                              child: _buildNormalVerse(
-                                                verse,
-                                                theme,
-                                                typography,
-                                                appThemeMode,
-                                                hasCommentary: hasCommentary,
-                                                onCommentaryTap: () => _showCommentaryBottomSheet(context, verse.number, verse.text),
-                                              ),
+                                            // Check for commentary
+                                            AnimatedOpacity(
+                                              duration: const Duration(milliseconds: 250),
+                                              opacity: (isSelectionMode && !isSelected) ? 0.25 : 1.0,
+                                              child: Builder(
+                                              builder: (context) {
+                                                bool hasCommentary = false;
+                                                commentaryDataAsync.whenData((commentaryData) {
+                                                  final bookCommentary = commentaryData[currentBookName];
+                                                  if (bookCommentary != null) {
+                                                    final chapterCommentary = bookCommentary[currentChapter.toString()];
+                                                    if (chapterCommentary != null) {
+                                                      if (chapterCommentary.containsKey(verse.number.toString())) {
+                                                        hasCommentary = true;
+                                                      }
+                                                    }
+                                                  }
+                                                });
+
+                                                return GestureDetector(
+                                                  onTap: () => _toggleVerseSelection(index),
+                                                  child: Stack(
+                                                    children: [
+                                                      AnimatedContainer(
+                                                        duration:
+                                                            const Duration(milliseconds: 250),
+                                                        padding: const EdgeInsets.only(
+                                                            top: 6.0,
+                                                            bottom: 6.0,
+                                                            left: 15.0,  // extra left space for accent bar
+                                                            right: 12.0),
+                                                        decoration: BoxDecoration(
+                                                          color: isSelected
+                                                              ? (isDark
+                                                                  ? Colors.amber.withOpacity(0.20)
+                                                                  : Colors.amber.withOpacity(0.15))
+                                                              : (_navigatedVerseIndex == index
+                                                                  ? (isDark
+                                                                      ? Colors.amber.withOpacity(0.15)
+                                                                      : Colors.amber.withOpacity(0.10))
+                                                                  : (verse.isHighlighted
+                                                                      ? Colors.amber.withOpacity(0.10)
+                                                                      : Colors.transparent)),
+                                                          borderRadius: BorderRadius.circular(12),
+                                                        ),
+                                                        child: _buildNormalVerse(
+                                                          verse,
+                                                          theme,
+                                                          typography,
+                                                          appThemeMode,
+                                                          hasCommentary: hasCommentary,
+                                                          onCommentaryTap: () => _showCommentaryBottomSheet(context, verse.number, verse.text),
+                                                        ),
+                                                      ),
+                                                      // Left accent bar — only visible when selected
+                                                      if (isSelected)
+                                                        Positioned(
+                                                          left: 4,
+                                                          top: 10,
+                                                          bottom: 10,
+                                                          child: Container(
+                                                            width: 4.0,
+                                                            decoration: BoxDecoration(
+                                                              borderRadius: BorderRadius.circular(4),
+                                                              gradient: LinearGradient(
+                                                                begin: Alignment.topCenter,
+                                                                end: Alignment.bottomCenter,
+                                                                colors: [
+                                                                  theme.primaryColor.withValues(alpha: 0.3),
+                                                                  theme.primaryColor,
+                                                                  theme.primaryColor.withValues(alpha: 0.3),
+                                                                ],
+                                                              ),
+                                                              boxShadow: [
+                                                                BoxShadow(
+                                                                  color: theme.primaryColor.withValues(alpha: 0.2),
+                                                                  blurRadius: 4,
+                                                                  offset: const Offset(1, 0),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                    ],
+                                                  ),
+                                                );
+                                              }
                                             ),
-                                            // Left accent bar — only visible when selected
-                                            if (isSelected)
-                                              Positioned(
-                                                left: 0,
-                                                top: 0,
-                                                bottom: 0,
-                                                child: Container(
-                                                  width: 3.5,
-                                                  decoration: BoxDecoration(
-                                                    color: theme.primaryColor,
-                                                    borderRadius:
-                                                        const BorderRadius.horizontal(
-                                                      left: Radius.circular(12),
-                                                    ),
-                                                  ),
-                                                  ),
-                                                ),
-                                            ],
-                                          ),
+                                            ),
+                                          ],
                                         );
-                                      }
+                                      },
                                     ),
-                                    ],
-                                  );
-                                },
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
                 ),
                 // Top Navigation Bar Layer (Floating above text)
                 Positioned(
@@ -376,11 +434,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Text(
-                                          '$_selectedBookName $_selectedChapter',
+                                          '$currentBookName $currentChapter',
                                           style: theme.textTheme.labelMedium?.copyWith(
                                             fontWeight: FontWeight.w600,
                                             color: theme.colorScheme.onSurface,
-                                            fontSize: 15,
                                           ),
                                         ),
                                         const SizedBox(width: 4),
@@ -443,14 +500,15 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
   }
 
   void _showCommentaryBottomSheet(BuildContext context, int verseNumber, String verseText) {
+    final loc = ref.read(readLocationProvider);
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (context) {
         return _CommentaryBottomSheetContent(
-          bookName: _selectedBookName,
-          chapter: _selectedChapter,
+          bookName: loc.bookName,
+          chapter: loc.chapter,
           verseNumber: verseNumber,
           verseText: verseText,
         );
@@ -459,9 +517,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
   }
 
   Widget _buildNormalVerse(BibleVerse verse, ThemeData theme, TypographyState typography, AppThemeMode appThemeMode, {bool hasCommentary = false, VoidCallback? onCommentaryTap}) {
-    final fontStyle = GoogleFonts.getFont(typography.fontFamily).copyWith(
+    final fontStyle = theme.textTheme.bodyMedium?.copyWith(
       height: 1.6,
-      fontSize: typography.fontSize,
       letterSpacing: 0.15,
       color: theme.textTheme.bodyLarge?.color,
     );
@@ -487,7 +544,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
             style: theme.textTheme.titleMedium?.copyWith(
               color: theme.primaryColor,
               fontWeight: FontWeight.bold,
-              fontSize: typography.fontSize * 0.75, // Scale number down
+              fontSize: (theme.textTheme.bodyMedium?.fontSize ?? 17.5) * 0.75, // Scale number down
             ),
           ),
           TextSpan(
@@ -593,11 +650,13 @@ class __BookChapterSelectorSheetState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Material(
-      color: theme.scaffoldBackgroundColor,
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-      clipBehavior: Clip.antiAlias,
-      child: SizedBox(
+    return BouncyEntrance(
+      delay: const Duration(milliseconds: 50),
+      child: Material(
+        color: theme.scaffoldBackgroundColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        clipBehavior: Clip.antiAlias,
+        child: SizedBox(
         height: MediaQuery.of(context).size.height * 0.85,
         child: SafeArea(
           top: false,
@@ -647,6 +706,7 @@ class __BookChapterSelectorSheetState
           ),
         ),
       ),
+      ),
     );
   }
 
@@ -686,8 +746,7 @@ class __BookChapterSelectorSheetState
             children: [
               Text(
                 label.toUpperCase(),
-                style: TextStyle(
-                  fontSize: 10,
+                style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1,
                   color: isSelected ? Colors.white.withOpacity(0.8) : theme.colorScheme.onSurface.withOpacity(0.5),
@@ -696,8 +755,7 @@ class __BookChapterSelectorSheetState
               const SizedBox(height: 2),
               Text(
                 value,
-                style: TextStyle(
-                  fontSize: 14,
+                style: theme.textTheme.labelMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: isSelected ? Colors.white : theme.colorScheme.onSurface.withOpacity(0.8),
                 ),
@@ -786,8 +844,8 @@ class __BookChapterSelectorSheetState
         Expanded(
           child: GridView.builder(
             padding: const EdgeInsets.only(bottom: 80),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
+            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 200,
               childAspectRatio: 3,
               crossAxisSpacing: 12,
               mainAxisSpacing: 12,
@@ -813,8 +871,8 @@ class __BookChapterSelectorSheetState
     final chapters = _tempBook.chapters.length;
     return GridView.builder(
       padding: const EdgeInsets.only(bottom: 80),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 5,
+      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 64,
         childAspectRatio: 1,
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
@@ -839,8 +897,8 @@ class __BookChapterSelectorSheetState
     
     return GridView.builder(
       padding: const EdgeInsets.only(bottom: 80),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 5,
+      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 64,
         childAspectRatio: 1,
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
@@ -870,10 +928,9 @@ class __BookChapterSelectorSheetState
           child: Center(
             child: Text(
               text,
-              style: TextStyle(
+              style: (text.length > 3 ? theme.textTheme.labelMedium : theme.textTheme.titleMedium)?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: theme.colorScheme.onSurface.withOpacity(0.8),
-                fontSize: text.length > 3 ? 14 : 16,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -897,10 +954,9 @@ class __BookChapterSelectorSheetState
         ),
         child: Text(
           text,
-          style: TextStyle(
+          style: (text.length > 3 ? theme.textTheme.labelMedium : theme.textTheme.titleMedium)?.copyWith(
             fontWeight: FontWeight.bold,
             color: Colors.white,
-            fontSize: text.length > 3 ? 14 : 16,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -941,7 +997,7 @@ class __BookChapterSelectorSheetState
                   _tempVerse != null
                       ? 'Go to ${_tempBook.name} $_tempChapter:$_tempVerse'
                       : 'Go to ${_tempBook.name} $_tempChapter',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+                  style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, color: Colors.white),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -992,11 +1048,13 @@ class _TypographyBottomSheet extends ConsumerWidget {
 
     final fonts = ['Inter', 'Gentium Book Plus', 'Lora', 'Literata'];
 
-    return Material(
-      color: theme.scaffoldBackgroundColor,
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-      clipBehavior: Clip.antiAlias,
-      child: SafeArea(
+    return BouncyEntrance(
+      delay: const Duration(milliseconds: 50),
+      child: Material(
+        color: theme.scaffoldBackgroundColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        clipBehavior: Clip.antiAlias,
+        child: SafeArea(
         top: false,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
@@ -1046,7 +1104,7 @@ class _TypographyBottomSheet extends ConsumerWidget {
               const SizedBox(height: 8),
               Row(
                 children: [
-                  const Text('A', style: TextStyle(fontSize: 14)),
+                  Text('A', style: theme.textTheme.labelSmall),
                   Expanded(
                     child: Slider(
                       value: typography.fontSize,
@@ -1057,7 +1115,7 @@ class _TypographyBottomSheet extends ConsumerWidget {
                       onChanged: (value) => typographyNotifier.setFontSize(value),
                     ),
                   ),
-                  const Text('A', style: TextStyle(fontSize: 24)),
+                  Text('A', style: theme.textTheme.titleLarge),
                 ],
               ),
               const SizedBox(height: 24),
@@ -1107,7 +1165,6 @@ class _TypographyBottomSheet extends ConsumerWidget {
                         style: GoogleFonts.getFont(font).copyWith(
                           color: isSelected ? theme.primaryColor : theme.colorScheme.onSurface,
                           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          fontSize: 15,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -1119,6 +1176,7 @@ class _TypographyBottomSheet extends ConsumerWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }
@@ -1220,11 +1278,14 @@ class _CommentaryBottomSheetContentState extends ConsumerState<_CommentaryBottom
 
     return TexturedGlassContainer(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(32.0)),
-      child: Container(
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.85,
-        ),
-        child: Column(
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 800),
+          child: Container(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.85,
+            ),
+            child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -1248,11 +1309,9 @@ class _CommentaryBottomSheetContentState extends ConsumerState<_CommentaryBottom
               child: Text(
                 '${widget.bookName} ${widget.chapter}:${widget.verseNumber}',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.lora(
-                  textStyle: theme.textTheme.headlineSmall?.copyWith(
-                    color: theme.primaryColor,
-                    fontWeight: FontWeight.bold,
-                  ),
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  color: theme.primaryColor,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -1266,12 +1325,9 @@ class _CommentaryBottomSheetContentState extends ConsumerState<_CommentaryBottom
                 borderRadius: BorderRadius.circular(24),
                 child: Text(
                   '${widget.verseNumber} "${widget.verseText}"',
-                  style: GoogleFonts.gentiumBookPlus(
-                    textStyle: theme.textTheme.bodyLarge?.copyWith(
-                      fontSize: typography.fontSize,
-                      height: 1.5,
-                      fontStyle: FontStyle.italic,
-                    ),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    height: 1.5,
+                    fontStyle: FontStyle.italic,
                   ),
                 ),
               ),
@@ -1357,6 +1413,8 @@ class _CommentaryBottomSheetContentState extends ConsumerState<_CommentaryBottom
             ),
           ],
         ),
+          ),
+        ),
       ),
     );
   }
@@ -1413,12 +1471,9 @@ class _CommentaryBottomSheetContentState extends ConsumerState<_CommentaryBottom
                   const SizedBox(height: 12),
                   Text(
                     entry.text,
-                    style: GoogleFonts.lora(
-                      textStyle: theme.textTheme.bodyMedium?.copyWith(
-                        height: 1.6,
-                        fontSize: typography.fontSize - 1,
-                        color: theme.textTheme.bodyLarge?.color?.withOpacity(0.9),
-                      ),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      height: 1.6,
+                      color: theme.textTheme.bodyLarge?.color?.withOpacity(0.9),
                     ),
                   ),
                 ],

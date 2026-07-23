@@ -1,45 +1,38 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTypography {
-  /// Primary App Text Theme
-  static TextTheme primaryTextTheme(Color textColor, Color captionColor) {
-    return GoogleFonts.interTextTheme(
-      TextTheme(
-        displayLarge: TextStyle(color: textColor, fontWeight: FontWeight.bold),
-        displayMedium: TextStyle(color: textColor, fontWeight: FontWeight.bold),
-        displaySmall: TextStyle(color: textColor, fontWeight: FontWeight.bold),
-        headlineLarge: TextStyle(color: textColor, fontWeight: FontWeight.w600),
-        headlineMedium: TextStyle(color: textColor, fontWeight: FontWeight.w600),
-        headlineSmall: TextStyle(color: textColor, fontWeight: FontWeight.w600),
-        titleLarge: TextStyle(color: textColor, fontWeight: FontWeight.w600),
-        titleMedium: TextStyle(color: textColor, fontWeight: FontWeight.w500),
-        titleSmall: TextStyle(color: textColor, fontWeight: FontWeight.w500),
-        bodyLarge: TextStyle(color: textColor, fontSize: 18, height: 1.6),
-        bodyMedium: TextStyle(color: textColor, fontSize: 16, height: 1.5),
-        bodySmall: TextStyle(color: textColor, fontSize: 14, height: 1.4),
-        labelLarge: TextStyle(color: captionColor),
-        labelMedium: TextStyle(color: captionColor),
-        labelSmall: TextStyle(color: captionColor),
-      ),
-    );
-  }
+  /// Generates a proportionally scaled TextTheme based on a baseFontSize
+  /// Ratio: 1.25 (Major Third)
+  /// Headings & Body: Gentium Book Plus
+  /// Captions: Inter (sans-serif)
+  static TextTheme getTheme(Color textColor, Color captionColor, double baseFontSize, String fontFamily) {
+    const double ratio = 1.25;
 
-  /// Sans-serif for Captions, Overlines, and small UI elements
-  static TextStyle sansCaption(Color color) {
-    return GoogleFonts.inter(
-      color: color,
-      fontSize: 12,
-      fontWeight: FontWeight.w500,
-      letterSpacing: 0.5,
-    );
-  }
-
-  static TextStyle sansLabel(Color color) {
-    return GoogleFonts.inter(
-      color: color,
-      fontSize: 14,
-      fontWeight: FontWeight.w600,
+    return TextTheme(
+      // Display/Headings
+      displayLarge: GoogleFonts.getFont(fontFamily, color: textColor, fontSize: baseFontSize * pow(ratio, 4), fontWeight: FontWeight.bold, height: 1.2),
+      displayMedium: GoogleFonts.getFont(fontFamily, color: textColor, fontSize: baseFontSize * pow(ratio, 3), fontWeight: FontWeight.bold, height: 1.2),
+      displaySmall: GoogleFonts.getFont(fontFamily, color: textColor, fontSize: baseFontSize * pow(ratio, 2), fontWeight: FontWeight.w600, height: 1.2),
+      headlineLarge: GoogleFonts.getFont(fontFamily, color: textColor, fontSize: baseFontSize * pow(ratio, 1.5), fontWeight: FontWeight.w600, height: 1.2),
+      headlineMedium: GoogleFonts.getFont(fontFamily, color: textColor, fontSize: baseFontSize * pow(ratio, 1.25), fontWeight: FontWeight.w600, height: 1.2),
+      headlineSmall: GoogleFonts.getFont(fontFamily, color: textColor, fontSize: baseFontSize * ratio, fontWeight: FontWeight.w600, height: 1.3),
+      
+      // Titles
+      titleLarge: GoogleFonts.getFont(fontFamily, color: textColor, fontSize: baseFontSize * ratio, fontWeight: FontWeight.w600, height: 1.3),
+      titleMedium: GoogleFonts.getFont(fontFamily, color: textColor, fontSize: baseFontSize * pow(ratio, 0.5), fontWeight: FontWeight.bold, height: 1.4),
+      titleSmall: GoogleFonts.getFont(fontFamily, color: textColor, fontSize: baseFontSize, fontWeight: FontWeight.bold, height: 1.4),
+      
+      // Body
+      bodyLarge: GoogleFonts.getFont(fontFamily, color: textColor, fontSize: baseFontSize * pow(ratio, 0.5), height: 1.6),
+      bodyMedium: GoogleFonts.getFont(fontFamily, color: textColor, fontSize: baseFontSize, height: 1.6),
+      bodySmall: GoogleFonts.getFont(fontFamily, color: textColor, fontSize: baseFontSize / pow(ratio, 0.5), height: 1.5),
+      
+      // Captions / Labels (Sans-serif)
+      labelLarge: GoogleFonts.inter(color: captionColor, fontSize: baseFontSize / ratio, fontWeight: FontWeight.w500, letterSpacing: 0.5),
+      labelMedium: GoogleFonts.inter(color: captionColor, fontSize: baseFontSize / pow(ratio, 1.5), fontWeight: FontWeight.w500, letterSpacing: 0.5),
+      labelSmall: GoogleFonts.inter(color: captionColor, fontSize: baseFontSize / pow(ratio, 2), fontWeight: FontWeight.w500, letterSpacing: 0.5),
     );
   }
 }
