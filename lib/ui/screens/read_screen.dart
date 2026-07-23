@@ -4,6 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../data/models/bible_model.dart';
 import '../../state/bible_provider.dart';
@@ -26,9 +27,7 @@ class ReadScreen extends ConsumerStatefulWidget {
 }
 
 class _ReadScreenState extends ConsumerState<ReadScreen> {
-
-
-  final Map<int, GlobalKey> _verseKeys = {};
+  final ItemScrollController _itemScrollController = ItemScrollController();
   int? _navigatedVerseIndex;
 
   void _toggleVerseSelection(int index) {
@@ -48,10 +47,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
   void _scrollToVerse(int verse) {
     // Wait for the bottom sheet to fully dismiss before scrolling to avoid jank
     Future.delayed(const Duration(milliseconds: 400), () {
-      final key = _verseKeys[verse - 1];
-      if (key != null && key.currentContext != null) {
-        Scrollable.ensureVisible(
-          key.currentContext!,
+      if (_itemScrollController.isAttached) {
+        _itemScrollController.scrollTo(
+          index: verse - 1,
           duration: const Duration(milliseconds: 600),
           curve: Curves.easeInOutCubic,
           alignment: 0.1,
@@ -74,7 +72,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
     final book = allBooks[currentBookIndex];
     if (loc.chapter < book.chapters.length) {
       ref.read(readLocationProvider.notifier).updateLocation(chapter: loc.chapter + 1);
-      setState(() { _verseKeys.clear(); });
       _clearSelection();
     } else if (currentBookIndex < allBooks.length - 1) {
       final nextBook = allBooks[currentBookIndex + 1];
@@ -83,7 +80,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
         bookName: nextBook.name,
         chapter: 1,
       );
-      setState(() { _verseKeys.clear(); });
       _clearSelection();
     }
   }
@@ -95,7 +91,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
 
     if (loc.chapter > 1) {
       ref.read(readLocationProvider.notifier).updateLocation(chapter: loc.chapter - 1);
-      setState(() { _verseKeys.clear(); });
       _clearSelection();
     } else if (currentBookIndex > 0) {
       final prevBook = allBooks[currentBookIndex - 1];
@@ -104,7 +99,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
         bookName: prevBook.name,
         chapter: prevBook.chapters.length,
       );
-      setState(() { _verseKeys.clear(); });
       _clearSelection();
     }
   }
@@ -137,7 +131,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
               chapter: chapter,
             );
             if (changedChapter) {
-              setState(() { _verseKeys.clear(); });
+              // Chapter changed, list will rebuild automatically
             }
             _clearSelection();
             Navigator.pop(context);
@@ -271,21 +265,18 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                 child: Center(
                                   child: ConstrainedBox(
                                     constraints: const BoxConstraints(maxWidth: 800),
-                                    child: ListView.builder(
+                                    child: ScrollablePositionedList.builder(
+                                      itemScrollController: _itemScrollController,
                                       padding: EdgeInsets.only(
                                           top: MediaQuery.of(context).padding.top + 80.0,
                                           left: 24.0, right: 24.0, bottom: 400.0), // increased padding so verses can scroll above pills
                                       itemCount: verses.length,
                                       itemBuilder: (context, index) {
-                                        if (!_verseKeys.containsKey(index)) {
-                                          _verseKeys[index] = GlobalKey();
-                                        }
                                         final verse = verses[index];
                                         final isSelected = selectedVerses.contains(index);
                                         final isSelectionMode = selectedVerses.isNotEmpty;
-
+                                        
                                         return Column(
-                                          key: _verseKeys[index],
                                           crossAxisAlignment: CrossAxisAlignment.stretch,
                                           children: [
                                             // Check for commentary
