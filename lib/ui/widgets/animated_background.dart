@@ -62,7 +62,6 @@ class _AnimatedBackgroundState extends State<AnimatedBackground> with SingleTick
             ];
             break;
           case AppThemeMode.light:
-          default:
             // Very subtle warm glow that fades quickly into the pure ivory background
             colors = [
               Color.lerp(const Color(0xFFFDF3D7), const Color(0xFFFDE4A9), t)!,

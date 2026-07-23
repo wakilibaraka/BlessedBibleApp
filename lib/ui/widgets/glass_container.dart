@@ -29,7 +29,7 @@ class GlassContainer extends StatelessWidget {
         borderRadius: radius,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -43,17 +43,17 @@ class GlassContainer extends StatelessWidget {
             padding: padding,
             decoration: BoxDecoration(
               color: isDark
-                  ? Colors.black.withOpacity(0.35)
+                  ? Colors.black.withValues(alpha: 0.35)
                   : isWarmGold
-                      ? Colors.white.withOpacity(0.65) // More opaque for sharper text in sepia
-                      : Colors.white.withOpacity(0.65), // Intense translucent white fill
+                      ? Colors.white.withValues(alpha: 0.65) // More opaque for sharper text in sepia
+                      : Colors.white.withValues(alpha: 0.65), // Intense translucent white fill
               borderRadius: radius,
               border: Border.all(
                 color: isDark
-                    ? Colors.white.withOpacity(0.12)
+                    ? Colors.white.withValues(alpha: 0.12)
                     : isWarmGold
-                        ? Colors.white.withOpacity(0.40)
-                        : Colors.white.withOpacity(0.40), // Ultra thin glass border
+                        ? Colors.white.withValues(alpha: 0.40)
+                        : Colors.white.withValues(alpha: 0.40), // Ultra thin glass border
                 width: 1.0,
               ),
             ),

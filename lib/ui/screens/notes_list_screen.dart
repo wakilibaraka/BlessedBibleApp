@@ -22,20 +22,20 @@ class NotesListScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.edit_note_rounded, size: 64, color: theme.primaryColor.withOpacity(0.5)),
+            Icon(Icons.edit_note_rounded, size: 64, color: theme.primaryColor.withValues(alpha: 0.5)),
             const SizedBox(height: 16),
             Text(
               'No notes yet',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
             const SizedBox(height: 8),
             Text(
               'Tap the + button to add your first note.',
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.5),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
               ),
             ),
           ],

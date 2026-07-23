@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import '../data/models/commentary_model.dart';
 import 'egw_provider.dart';
@@ -46,7 +47,7 @@ final commentaryDataProvider = FutureProvider<Map<String, Map<String, Map<String
         }
       }
     } catch (e) {
-      print('Error loading commentary file $path: $e');
+      debugPrint('Error loading commentary file $path: $e');
     }
   }
   

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/study_provider.dart';
-import '../../state/theme_provider.dart';
-import '../../state/typography_provider.dart';
 import '../../data/models/commentary_model.dart';
 
 class CommentaryListScreen extends ConsumerWidget {
@@ -11,7 +9,7 @@ class CommentaryListScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final typography = ref.watch(typographyProvider);
+
     final commentaryDataAsync = ref.watch(combinedCommentaryProvider);
 
     return Scaffold(
@@ -51,7 +49,7 @@ class CommentaryListScreen extends ConsumerWidget {
                       'Local EGW module not found. Place EGW JSON files in your local directory to enable this commentary.',
                       style: theme.textTheme.bodySmall?.copyWith(
                         fontStyle: FontStyle.italic,
-                        color: theme.textTheme.bodySmall?.color?.withOpacity(0.6),
+                        color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.6),
                       ),
                     ),
                   );
@@ -77,7 +75,7 @@ class CommentaryListScreen extends ConsumerWidget {
                     Text(
                       entry.title.toUpperCase(),
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                         letterSpacing: 1.2,
                         fontWeight: FontWeight.bold,
                       ),
@@ -87,7 +85,7 @@ class CommentaryListScreen extends ConsumerWidget {
                       entry.text,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         height: 1.6,
-                        color: theme.textTheme.bodyLarge?.color?.withOpacity(0.9),
+                        color: theme.textTheme.bodyLarge?.color?.withValues(alpha: 0.9),
                       ),
                     ),
                   ],

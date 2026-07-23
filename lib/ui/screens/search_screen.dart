@@ -1,12 +1,9 @@
-import 'dart:ui';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/search_provider.dart';
 import '../../state/search_engine.dart';
-import '../../state/theme_provider.dart';
 import '../../state/nav_provider.dart';
-import '../../state/read_selection_provider.dart';
 import '../../state/read_location_provider.dart';
 import '../../state/glass_ui_provider.dart';
 import '../../state/bible_provider.dart';
@@ -102,7 +99,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> with SingleTickerPr
   Widget build(BuildContext context) {
     final searchState = ref.watch(searchStateProvider);
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+
     
     final isGlassy = ref.watch(glassUiProvider);
 
@@ -149,7 +146,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> with SingleTickerPr
                             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                             child: Row(
                               children: [
-                                Icon(Icons.search_rounded, color: theme.colorScheme.onSurface.withOpacity(0.6)),
+                                Icon(Icons.search_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: TextField(
@@ -177,7 +174,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> with SingleTickerPr
                                     decoration: InputDecoration(
                                       hintText: 'Search verses, commentary...',
                                       hintStyle: theme.textTheme.titleMedium?.copyWith(
-                                        color: theme.colorScheme.onSurface.withOpacity(0.4),
+                                        color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                                       ),
                                       border: InputBorder.none,
                                     ),
@@ -192,10 +189,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> with SingleTickerPr
                                     child: Container(
                                       padding: const EdgeInsets.all(4),
                                       decoration: BoxDecoration(
-                                        color: theme.colorScheme.onSurface.withOpacity(0.1),
+                                        color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
                                         shape: BoxShape.circle,
                                       ),
-                                      child: Icon(Icons.close_rounded, size: 16, color: theme.colorScheme.onSurface.withOpacity(0.7)),
+                                      child: Icon(Icons.close_rounded, size: 16, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
                                     ),
                                   ),
                               ],
@@ -203,7 +200,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> with SingleTickerPr
                           ),
                           
                           // Divider
-                          Container(height: 1, color: theme.colorScheme.onSurface.withOpacity(0.1)),
+                          Container(height: 1, color: theme.colorScheme.onSurface.withValues(alpha: 0.1)),
                           
                           // Bottom: Advanced Filters (Conjoined Twins)
                           Padding(
@@ -269,7 +266,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> with SingleTickerPr
           color: isActive ? theme.primaryColor : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isActive ? Colors.transparent : theme.colorScheme.onSurface.withOpacity(0.2),
+            color: isActive ? Colors.transparent : theme.colorScheme.onSurface.withValues(alpha: 0.2),
           ),
         ),
         child: Row(
@@ -304,12 +301,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> with SingleTickerPr
         Text(
           'Recent Places',
           style: theme.textTheme.titleSmall?.copyWith(
-            color: theme.colorScheme.onSurface.withOpacity(0.6),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
             fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 16),
-        ...state.recentPlaces.map((place) => _buildResultItem(place, theme)).toList(),
+        ...state.recentPlaces.map((place) => _buildResultItem(place, theme)),
       ],
     );
   }
@@ -320,7 +317,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> with SingleTickerPr
         child: Text(
           'No results found.',
           style: theme.textTheme.bodyLarge?.copyWith(
-            color: theme.colorScheme.onSurface.withOpacity(0.5),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
           ),
         ),
       );
@@ -357,7 +354,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> with SingleTickerPr
       child: Text(
         title,
         style: theme.textTheme.titleSmall?.copyWith(
-          color: theme.colorScheme.onSurface.withOpacity(0.6),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
           fontWeight: FontWeight.bold,
           letterSpacing: 1.2,
         ),
@@ -367,9 +364,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> with SingleTickerPr
 
   Widget _buildResultItem(SearchResult result, ThemeData theme, [String query = '']) {
     IconData icon;
-    if (result.type == SearchResultType.reference) icon = Icons.keyboard_double_arrow_right_rounded;
-    else if (result.type == SearchResultType.bible) icon = Icons.menu_book_rounded;
-    else icon = Icons.library_books_rounded;
+    if (result.type == SearchResultType.reference) {
+      icon = Icons.keyboard_double_arrow_right_rounded;
+    } else if (result.type == SearchResultType.bible) {
+      icon = Icons.menu_book_rounded;
+    } else {
+      icon = Icons.library_books_rounded;
+    }
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
@@ -416,7 +417,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> with SingleTickerPr
 
   Widget _buildSnippet(String text, String query, ThemeData theme) {
     final style = theme.textTheme.bodyMedium?.copyWith(
-      color: theme.colorScheme.onSurface.withOpacity(0.7),
+      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
       height: 1.5,
     );
 
@@ -445,7 +446,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> with SingleTickerPr
     final highlightStyle = style?.copyWith(
       color: theme.brightness == Brightness.dark ? Colors.amberAccent : Colors.amber.shade800, 
       fontWeight: FontWeight.bold,
-      backgroundColor: (theme.brightness == Brightness.dark ? Colors.amberAccent : Colors.amber.shade800).withOpacity(0.1),
+      backgroundColor: (theme.brightness == Brightness.dark ? Colors.amberAccent : Colors.amber.shade800).withValues(alpha: 0.1),
     );
 
     return RichText(

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../state/theme_provider.dart';
 import '../widgets/textured_glass_container.dart';
 
 class ReadingPlanScreen extends ConsumerWidget {
@@ -59,7 +58,7 @@ class ReadingPlanScreen extends ConsumerWidget {
               Text(
                 'Structured daily reading plans, topical studies, and chronological guides designed to nourish your daily spiritual journey.',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.textTheme.bodyMedium?.color?.withOpacity(0.75),
+                  color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.75),
                   height: 1.5,
                 ),
               ),
@@ -141,13 +140,13 @@ class ReadingPlanScreen extends ConsumerWidget {
                 height: 44,
                 decoration: BoxDecoration(
                   color: isActive
-                      ? theme.primaryColor.withOpacity(0.2)
-                      : theme.colorScheme.onSurface.withOpacity(0.06),
+                      ? theme.primaryColor.withValues(alpha: 0.2)
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.06),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   iconData,
-                  color: isActive ? theme.primaryColor : theme.colorScheme.onSurface.withOpacity(0.7),
+                  color: isActive ? theme.primaryColor : theme.colorScheme.onSurface.withValues(alpha: 0.7),
                   size: 22,
                 ),
               ),
@@ -159,7 +158,7 @@ class ReadingPlanScreen extends ConsumerWidget {
                     Text(
                       tag,
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: isActive ? theme.primaryColor : theme.colorScheme.onSurface.withOpacity(0.5),
+                        color: isActive ? theme.primaryColor : theme.colorScheme.onSurface.withValues(alpha: 0.5),
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1.1,
                       ),
@@ -179,7 +178,7 @@ class ReadingPlanScreen extends ConsumerWidget {
               Icon(
                 Icons.arrow_forward_ios_rounded,
                 size: 14,
-                color: theme.colorScheme.onSurface.withOpacity(0.3),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
               ),
             ],
           ),
@@ -187,7 +186,7 @@ class ReadingPlanScreen extends ConsumerWidget {
           Text(
             description,
             style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.75),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.75),
               height: 1.4,
             ),
           ),

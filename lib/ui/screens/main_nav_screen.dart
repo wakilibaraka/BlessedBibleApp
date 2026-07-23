@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../state/nav_provider.dart';
-import '../../state/immersive_mode_provider.dart';
 import '../../state/nav_settings_provider.dart';
 import '../../state/read_selection_provider.dart';
 import '../../state/theme_provider.dart';
@@ -404,7 +403,7 @@ class MainNavScreen extends ConsumerWidget {
   }) {
     final isActive = index == currentIndex;
     final theme = Theme.of(context);
-    final color = isActive ? theme.primaryColor : theme.colorScheme.onSurface.withOpacity(0.4);
+    final color = isActive ? theme.primaryColor : theme.colorScheme.onSurface.withValues(alpha: 0.4);
 
     Widget iconWidget;
     if (label == 'Home') {

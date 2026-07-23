@@ -71,7 +71,7 @@ This is a placeholder for the extended deep-dive analysis view that the user can
               style: GoogleFonts.lora(
                 textStyle: theme.textTheme.bodyMedium?.copyWith(
                   height: 1.8,
-                  color: theme.textTheme.bodyMedium?.color?.withOpacity(0.9),
+                  color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.9),
                 ),
               ),
             ),

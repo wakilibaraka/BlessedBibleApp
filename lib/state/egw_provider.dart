@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import '../data/models/commentary_model.dart';
@@ -46,7 +47,7 @@ final egwCommentaryProvider = FutureProvider<Map<String, Map<String, Map<String,
       ));
     }
   } catch (e) {
-    print('Failed to load EGW commentary: $e');
+    debugPrint('Failed to load EGW commentary: $e');
   }
 
   return result;

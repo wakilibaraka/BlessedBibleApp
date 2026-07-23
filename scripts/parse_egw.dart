@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_print
 import 'dart:convert';
 import 'dart:io';
 
@@ -26,7 +27,7 @@ void main() {
   void saveCurrentEntry() {
     if (currentChapter != null && currentVerse != null && currentText.isNotEmpty && currentTitle != null) {
       // Create chapter if not exists
-      result["Genesis"]!.putIfAbsent(currentChapter!, () => {});
+      result["Genesis"]!.putIfAbsent(currentChapter, () => {});
       
       // Parse verses (might be a range like "1-3" or a list like "16, 17" or single "26")
       // To simplify, we will just associate the commentary with the first verse mentioned
@@ -34,8 +35,8 @@ void main() {
       // The current UI might expect exact verse numbers.
       // Let's attach it to all mentioned verses.
       List<String> verses = [];
-      if (currentVerse!.contains('-')) {
-         final parts = currentVerse!.split('-');
+      if (currentVerse.contains('-')) {
+         final parts = currentVerse.split('-');
          if (parts.length == 2) {
             int start = int.tryParse(parts[0].trim()) ?? 0;
             int end = int.tryParse(parts[1].trim()) ?? 0;
@@ -44,29 +45,29 @@ void main() {
                     verses.add(i.toString());
                 }
             } else {
-               verses.add(currentVerse!);
+               verses.add(currentVerse);
             }
          } else {
-           verses.add(currentVerse!);
+           verses.add(currentVerse);
          }
-      } else if (currentVerse!.contains(',')) {
-         final parts = currentVerse!.split(',');
+      } else if (currentVerse.contains(',')) {
+         final parts = currentVerse.split(',');
          for (var part in parts) {
             verses.add(part.trim());
          }
       } else {
-         verses.add(currentVerse!.trim());
+         verses.add(currentVerse.trim());
       }
       
       for (final v in verses) {
-          result["Genesis"]![currentChapter!]!.putIfAbsent(v, () => []);
+          result["Genesis"]![currentChapter]!.putIfAbsent(v, () => []);
           
           String fullText = currentText.trim();
           if (currentSource != null && currentSource!.isNotEmpty) {
              fullText += '\n\nSource: $currentSource';
           }
           
-          result["Genesis"]![currentChapter!]![v]!.add({
+          result["Genesis"]![currentChapter]![v]!.add({
             "id": "egw_genesis_${currentChapter}_${v}_${DateTime.now().millisecondsSinceEpoch}",
             "title": currentTitle, // Combining author and title or just title
             "text": fullText,
@@ -103,7 +104,7 @@ void main() {
       saveCurrentEntry(); // End of an entry
     } else {
       if (currentChapter != null && currentVerse != null) {
-        currentText += line + '\n';
+        currentText += '$line\n';
       }
     }
   }

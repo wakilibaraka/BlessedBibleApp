@@ -76,3 +76,22 @@ class BibleNotifier extends Notifier<BibleState> {
 }
 
 final bibleProvider = NotifierProvider<BibleNotifier, BibleState>(BibleNotifier.new);
+
+class FlatChapter {
+  final BibleBook book;
+  final BibleChapter chapter;
+  FlatChapter(this.book, this.chapter);
+}
+
+final flatChaptersProvider = Provider<List<FlatChapter>>((ref) {
+  final bibleState = ref.watch(bibleProvider);
+  if (bibleState.isLoading || bibleState.books.isEmpty) return [];
+  
+  List<FlatChapter> chapters = [];
+  for (final book in bibleState.books) {
+    for (final chapter in book.chapters) {
+      chapters.add(FlatChapter(book, chapter));
+    }
+  }
+  return chapters;
+});

@@ -92,7 +92,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                         Text(
                           subGreeting,
                           style: theme.textTheme.labelMedium?.copyWith(
-                            color: theme.textTheme.bodySmall?.color?.withOpacity(0.6),
+                            color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.6),
                           ),
                         ),
                       ],
@@ -185,7 +185,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                 const SizedBox(height: 16),
                 Text(
                   'Keep up the great work!',
-                  style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface.withOpacity(0.6)),
+                  style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                 ),
               ],
             ),
@@ -221,7 +221,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: theme.primaryColor.withOpacity(0.1),
+                        color: theme.primaryColor.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(Icons.menu_book_rounded, color: theme.primaryColor, size: 20),
@@ -233,7 +233,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                         children: [
                           Text('Daily Reminder', style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.bold)),
                           const SizedBox(height: 4),
-                          Text('Read your Bible, pray every day.', style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurface.withOpacity(0.7))),
+                          Text('Read your Bible, pray every day.', style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.7))),
                         ],
                       ),
                     ),
@@ -260,15 +260,15 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
           borderRadius: BorderRadius.circular(24),
           gradient: LinearGradient(
             colors: [
-              theme.primaryColor.withOpacity(0.8),
-              theme.primaryColor.withOpacity(0.4),
+              theme.primaryColor.withValues(alpha: 0.8),
+              theme.primaryColor.withValues(alpha: 0.4),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           boxShadow: [
             BoxShadow(
-              color: theme.shadowColor.withOpacity(0.1),
+              color: theme.shadowColor.withValues(alpha: 0.1),
               blurRadius: 20,
               offset: const Offset(0, 10),
             )
@@ -280,7 +280,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
             children: [
               Positioned.fill(
                 child: Container(
-                  color: Colors.black.withOpacity(0.15),
+                  color: Colors.black.withValues(alpha: 0.15),
                 ),
               ),
               Padding(
@@ -310,7 +310,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                       
 He said in a loud voice, 'Fear God and give him glory, because the hour of his judgment has come.'"''',
                       style: theme.textTheme.bodyLarge?.copyWith(
-                        color: Colors.white.withOpacity(0.95),
+                        color: Colors.white.withValues(alpha: 0.95),
                         height: 1.5,
                         fontStyle: FontStyle.italic,
                       ),
@@ -405,7 +405,7 @@ He said in a loud voice, 'Fear God and give him glory, because the hour of his j
               borderRadius: BorderRadius.circular(20),
               gradient: LinearGradient(
                 colors: [
-                  theme.primaryColor.withOpacity(0.15),
+                  theme.primaryColor.withValues(alpha: 0.15),
                   Colors.transparent,
                 ],
                 begin: Alignment.centerLeft,
@@ -430,7 +430,7 @@ He said in a loud voice, 'Fear God and give him glory, because the hour of his j
                         Text(
                           'Chronological Bible in a Year',
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.textTheme.bodySmall?.color?.withOpacity(0.8),
+                            color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.8),
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -448,7 +448,7 @@ He said in a loud voice, 'Fear God and give him glory, because the hour of his j
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: theme.primaryColor.withOpacity(0.2),
+                      color: theme.primaryColor.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(Icons.play_arrow_rounded, color: theme.primaryColor, size: 28),
@@ -606,7 +606,7 @@ void showNotesPopover(BuildContext context, ThemeData theme) {
             Container(
               width: 48, height: 5,
               decoration: BoxDecoration(
-                color: theme.colorScheme.onSurface.withOpacity(0.3),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2.5),
               ),
             ),
@@ -616,9 +616,9 @@ void showNotesPopover(BuildContext context, ThemeData theme) {
               style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 32),
-            Icon(Icons.edit_note_rounded, size: 48, color: theme.primaryColor.withOpacity(0.5)),
+            Icon(Icons.edit_note_rounded, size: 48, color: theme.primaryColor.withValues(alpha: 0.5)),
             const SizedBox(height: 16),
-            Text('No notes yet.', style: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.6))),
+            Text('No notes yet.', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
             const SizedBox(height: 32),
             ElevatedButton.icon(
               onPressed: () => Navigator.of(context).pop(),

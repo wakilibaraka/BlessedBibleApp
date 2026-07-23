@@ -8,7 +8,6 @@ import '../../state/study_provider.dart';
 import '../../state/theme_provider.dart';
 import '../widgets/glass_container.dart';
 import '../widgets/bouncy_entrance.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -58,7 +57,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final homeState = ref.watch(homeProvider);
     final appThemeMode = ref.watch(themeProvider);
     final isDark    = appThemeMode == AppThemeMode.dark;
-    final isWarmGold = appThemeMode == AppThemeMode.sepia;
+
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -98,7 +97,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   Widget _buildPage(BuildContext context, HomeData data, AppThemeMode appThemeMode) {
     final theme = Theme.of(context);
-    final isDark    = appThemeMode == AppThemeMode.dark;
+
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -221,7 +220,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   'In the opening moment of creation, God\'s first creative act was calling forth light. This wasn\'t just physical luminescence; it symbolizes the foundational impact of His Word and presence in darkness.\n\nIn our own moments of uncertainty, God continues to bring clarity and life through His voice.',
                   style: theme.textTheme.bodySmall?.copyWith(
                     height: 1.60,
-                    color: theme.textTheme.bodyMedium?.color?.withOpacity(0.82),
+                    color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.82),
                   ),
                 ),
 
@@ -330,8 +329,8 @@ class _PillButton extends StatelessWidget {
             foregroundColor: gold,
             side: BorderSide(
               color: Theme.of(context).brightness == Brightness.dark
-                  ? gold.withOpacity(0.55)
-                  : const Color(0xFF8C6300).withOpacity(0.8), // Deeper bronze for sharper contrast
+                  ? gold.withValues(alpha: 0.55)
+                  : const Color(0xFF8C6300).withValues(alpha: 0.8), // Deeper bronze for sharper contrast
             ),
             shape: shape,
             padding: EdgeInsets.zero,
