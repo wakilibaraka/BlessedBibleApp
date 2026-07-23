@@ -11,7 +11,8 @@ final egwCommentaryProvider = FutureProvider<Map<String, Map<String, Map<String,
   try {
     File egwFile;
     if (Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
-      egwFile = File('local-data/egw_genesis.json');
+      final projectDir = Platform.environment['PWD'] ?? Directory.current.path;
+      egwFile = File('$projectDir/local-data/egw_genesis.json');
     } else {
       final docDir = await getApplicationDocumentsDirectory();
       egwFile = File('${docDir.path}/egw/egw_genesis.json');
@@ -24,27 +25,31 @@ final egwCommentaryProvider = FutureProvider<Map<String, Map<String, Map<String,
     final jsonString = await egwFile.readAsString();
     final Map<String, dynamic> jsonData = json.decode(jsonString);
     
-    if (!jsonData.containsKey('commentaries')) return result;
-    
-    final List<dynamic> commentaries = jsonData['commentaries'];
-    
-    for (var item in commentaries) {
-      final String book = item['book']?.toString() ?? 'Genesis';
-      final String chapter = item['chapter']?.toString() ?? '1';
-      final String verseStart = item['verseStart']?.toString() ?? '1';
-      final String id = item['id']?.toString() ?? '';
-      final String commentary = item['commentary']?.toString() ?? '';
-      final String sourceReference = item['sourceReference']?.toString() ?? 'Unknown Source';
-
+    for (var bookEntry in jsonData.entries) {
+      final String book = bookEntry.key;
       result.putIfAbsent(book, () => {});
-      result[book]!.putIfAbsent(chapter, () => {});
-      result[book]![chapter]!.putIfAbsent(verseStart, () => []);
-
-      result[book]![chapter]![verseStart]!.add(CommentaryEntry(
-        id: id,
-        title: 'ELLEN G. WHITE - $sourceReference',
-        text: commentary,
-      ));
+      final Map<String, dynamic> chapters = bookEntry.value;
+      
+      for (var chapterEntry in chapters.entries) {
+        final String chapter = chapterEntry.key;
+        result[book]!.putIfAbsent(chapter, () => {});
+        final Map<String, dynamic> verses = chapterEntry.value;
+        
+        for (var verseEntry in verses.entries) {
+          final String verse = verseEntry.key;
+          result[book]![chapter]!.putIfAbsent(verse, () => []);
+          final List<dynamic> comments = verseEntry.value;
+          
+          for (var item in comments) {
+            final entryMap = item as Map<String, dynamic>;
+            result[book]![chapter]![verse]!.add(CommentaryEntry(
+              id: entryMap['id']?.toString() ?? '',
+              title: 'ELLEN G. WHITE - ${entryMap['title']?.toString() ?? 'Commentary'}',
+              text: entryMap['text']?.toString() ?? '',
+            ));
+          }
+        }
+      }
     }
   } catch (e) {
     debugPrint('Failed to load EGW commentary: $e');
