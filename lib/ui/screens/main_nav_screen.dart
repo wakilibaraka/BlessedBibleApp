@@ -102,9 +102,10 @@ class MainNavScreen extends ConsumerWidget {
                                 curve: Curves.easeOutCubic,
                                 width: isNavHidden ? 0.0 : dockMaxWidth,
                                 child: ClipRect(
-                                  child: SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    physics: const NeverScrollableScrollPhysics(),
+                                  child: OverflowBox(
+                                    alignment: Alignment.centerRight,
+                                    minWidth: dockMaxWidth,
+                                    maxWidth: dockMaxWidth,
                                     child: SizedBox(
                                       width: dockMaxWidth,
                                       child: Padding(

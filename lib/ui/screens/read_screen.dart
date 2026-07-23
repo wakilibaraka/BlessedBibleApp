@@ -56,8 +56,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
   }
 
   void _scrollToVerse(int verse, ReadLocationState loc) {
-    // Wait for the bottom sheet to fully dismiss before scrolling to avoid jank
-    Future.delayed(const Duration(milliseconds: 400), () {
+    void tryScroll(int retries) {
       final flatChapters = ref.read(flatChaptersProvider);
       if (flatChapters.isEmpty) return;
       
@@ -69,7 +68,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
             index: verse - 1,
             duration: const Duration(milliseconds: 600),
             curve: Curves.easeInOutCubic,
-            alignment: 0.1,
+            alignment: 0.15, // Account for top header
           );
           // Highlight it faintly upon jumping
           if (mounted) {
@@ -77,9 +76,12 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
               _navigatedVerseIndex = verse - 1;
             });
           }
+        } else if (retries < 20) {
+          Future.delayed(const Duration(milliseconds: 50), () => tryScroll(retries + 1));
         }
       }
-    });
+    }
+    tryScroll(0);
   }
 
 
