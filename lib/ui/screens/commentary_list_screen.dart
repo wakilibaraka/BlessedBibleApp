@@ -12,7 +12,7 @@ class CommentaryListScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final typography = ref.watch(typographyProvider);
-    final commentaryDataAsync = ref.watch(commentaryDataProvider);
+    final commentaryDataAsync = ref.watch(combinedCommentaryProvider);
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -26,8 +26,8 @@ class CommentaryListScreen extends ConsumerWidget {
         ),
       ),
       body: commentaryDataAsync.when(
-        data: (data) {
-          final rev14Data = data['Revelation']?['14'];
+        data: (state) {
+          final rev14Data = state.data['Revelation']?['14'];
           if (rev14Data == null || rev14Data.isEmpty) {
             return const Center(child: Text('No commentary available.'));
           }
@@ -41,8 +41,23 @@ class CommentaryListScreen extends ConsumerWidget {
           
           return ListView.builder(
             padding: const EdgeInsets.all(24.0),
-            itemCount: itemList.length,
+            itemCount: itemList.length + (state.isEgwMissing ? 1 : 0),
             itemBuilder: (context, index) {
+              if (index == itemList.length) {
+                if (state.isEgwMissing) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 32.0, top: 16.0),
+                    child: Text(
+                      'Local EGW module not found. Place EGW JSON files in your local directory to enable this commentary.',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontStyle: FontStyle.italic,
+                        color: theme.textTheme.bodySmall?.color?.withOpacity(0.6),
+                      ),
+                    ),
+                  );
+                }
+                return const SizedBox.shrink();
+              }
               final verseStr = itemList[index].key;
               final entry = itemList[index].value;
               return Padding(

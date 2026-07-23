@@ -463,19 +463,48 @@ He said in a loud voice, 'Fear God and give him glory, because the hour of his j
   }
 
   Widget _buildCommentaryBanner(BuildContext context, ThemeData theme) {
-    final currentAuthor = _commentaryAuthors[_currentAuthorIndex];
-    
+    final activeVerse = ref.watch(activeStudyVerseProvider);
+    final commentaryAsync = ref.watch(combinedCommentaryProvider);
+
+    String displayAuthor = 'ELLEN G. WHITE';
+    String displayReference = activeVerse ?? 'Genesis 1:1';
+    String displaySnippet = 'Local EGW module not found. Place EGW JSON files in your local directory to enable this commentary.';
+
+    if (activeVerse != null && commentaryAsync is AsyncData<CombinedCommentaryState>) {
+      final state = commentaryAsync.value;
+      
+      // Parse activeVerse e.g. "Genesis 1:1"
+      final parts = activeVerse.split(' ');
+      if (parts.length >= 2) {
+        final bookName = parts[0];
+        final refParts = parts[1].split(':');
+        if (refParts.length >= 2) {
+          final chapter = refParts[0];
+          final verse = refParts[1];
+          
+          final entries = state.data[bookName]?[chapter]?[verse];
+          if (entries != null && entries.isNotEmpty) {
+            final entry = entries.first;
+            displayAuthor = entry.title;
+            displaySnippet = '"${entry.text.split('. ').take(2).join('. ')}..."';
+          } else if (!state.isEgwMissing) {
+            displaySnippet = 'No commentary available for this verse.';
+          }
+        }
+      }
+    }
+
     return TexturedGlassContainer(
-      borderRadius: BorderRadius.circular(28), // Distinct shape
+      borderRadius: BorderRadius.circular(28),
       padding: EdgeInsets.zero,
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(28),
           gradient: LinearGradient(
             colors: [
-              theme.primaryColor.withOpacity(0.1),
+              theme.primaryColor.withValues(alpha: 0.1),
               Colors.transparent,
-              theme.primaryColor.withOpacity(0.05),
+              theme.primaryColor.withValues(alpha: 0.05),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -506,7 +535,7 @@ He said in a loud voice, 'Fear God and give him glory, because the hour of his j
                         width: 48,
                         height: 48,
                         decoration: BoxDecoration(
-                          color: theme.primaryColor.withOpacity(0.15),
+                          color: theme.primaryColor.withValues(alpha: 0.15),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(Icons.library_books_rounded, color: theme.primaryColor, size: 24),
@@ -514,25 +543,19 @@ He said in a loud voice, 'Fear God and give him glory, because the hour of his j
                     ],
                   ),
                   const SizedBox(height: 12),
-                  // Rotating Author Name
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 500),
-                    child: Text(
-                      '$currentAuthor • Revelation 14:1',
-                      key: ValueKey<String>(currentAuthor),
-                      style: theme.textTheme.labelMedium?.copyWith(
-                        color: theme.primaryColor,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.1,
-                      ),
+                  Text(
+                    '$displayAuthor • $displayReference',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: theme.primaryColor,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.1,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  // Snippet filling the container
                   Text(
-                    '"The Lamb on Mount Zion represents Christ in His triumphant role. The 144,000 having the Father\'s name on their foreheads denotes a seal of absolute ownership, protection, and moral reflection..."',
+                    displaySnippet,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.textTheme.bodyMedium?.color?.withOpacity(0.85),
+                      color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.85),
                       height: 1.5,
                       fontStyle: FontStyle.italic,
                     ),

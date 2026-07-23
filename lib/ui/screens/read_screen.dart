@@ -1274,7 +1274,7 @@ class _CommentaryBottomSheetContentState extends ConsumerState<_CommentaryBottom
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final typography = ref.watch(typographyProvider);
-    final commentaryDataAsync = ref.watch(commentaryDataProvider);
+    final commentaryDataAsync = ref.watch(combinedCommentaryProvider);
 
     return TexturedGlassContainer(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(32.0)),
@@ -1443,17 +1443,33 @@ class _CommentaryBottomSheetContentState extends ConsumerState<_CommentaryBottom
     );
   }
 
-  Widget _buildCommentaryContent(AsyncValue commentaryDataAsync, ThemeData theme, TypographyState typography) {
+  Widget _buildCommentaryContent(AsyncValue<CombinedCommentaryState> commentaryDataAsync, ThemeData theme, TypographyState typography) {
     return commentaryDataAsync.when(
-      data: (data) {
-        final entries = data[widget.bookName]?[widget.chapter.toString()]?[widget.verseNumber.toString()];
+      data: (state) {
+        final entries = state.data[widget.bookName]?[widget.chapter.toString()]?[widget.verseNumber.toString()];
+        
         if (entries == null || entries.isEmpty) {
           return const Center(child: Text('No commentary available.'));
         }
         return ListView.builder(
           padding: const EdgeInsets.only(top: 24.0, bottom: 100.0),
-          itemCount: entries.length,
+          itemCount: entries.length + (state.isEgwMissing ? 1 : 0),
           itemBuilder: (context, index) {
+            if (index == entries.length) {
+              if (state.isEgwMissing) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 32.0, top: 16.0),
+                  child: Text(
+                    'Local EGW module not found. Place EGW JSON files in your local directory to enable this commentary.',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontStyle: FontStyle.italic,
+                      color: theme.textTheme.bodySmall?.color?.withOpacity(0.6),
+                    ),
+                  ),
+                );
+              }
+              return const SizedBox.shrink();
+            }
             final entry = entries[index];
             return Padding(
               padding: const EdgeInsets.only(bottom: 32.0),

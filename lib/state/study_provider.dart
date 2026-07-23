@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'dart:convert';
 import '../data/models/commentary_model.dart';
+import 'egw_provider.dart';
 
 class ActiveStudyVerseNotifier extends Notifier<String?> {
   @override
@@ -18,7 +19,6 @@ final commentaryDataProvider = FutureProvider<Map<String, Map<String, Map<String
   final assetPaths = [
     'assets/data/uriah_smith_daniel.json',
     'assets/data/uriah_smith_revelation.json',
-    'assets/data/egw_genesis.json',
   ];
 
   Map<String, Map<String, Map<String, List<CommentaryEntry>>>> result = {};
@@ -51,4 +51,37 @@ final commentaryDataProvider = FutureProvider<Map<String, Map<String, Map<String
   }
   
   return result;
+});
+
+class CombinedCommentaryState {
+  final Map<String, Map<String, Map<String, List<CommentaryEntry>>>> data;
+  final bool isEgwMissing;
+  CombinedCommentaryState({required this.data, required this.isEgwMissing});
+}
+
+final combinedCommentaryProvider = FutureProvider<CombinedCommentaryState>((ref) async {
+  final uriahData = await ref.watch(commentaryDataProvider.future);
+  final egwData = await ref.watch(egwCommentaryProvider.future);
+  
+  bool isEgwMissing = egwData.isEmpty;
+  
+  Map<String, Map<String, Map<String, List<CommentaryEntry>>>> combined = {};
+  
+  void merge(Map<String, Map<String, Map<String, List<CommentaryEntry>>>> source) {
+    for (var book in source.keys) {
+      combined.putIfAbsent(book, () => {});
+      for (var chapter in source[book]!.keys) {
+        combined[book]!.putIfAbsent(chapter, () => {});
+        for (var verse in source[book]![chapter]!.keys) {
+          combined[book]![chapter]!.putIfAbsent(verse, () => []);
+          combined[book]![chapter]![verse]!.addAll(source[book]![chapter]![verse]!);
+        }
+      }
+    }
+  }
+  
+  merge(uriahData);
+  merge(egwData);
+  
+  return CombinedCommentaryState(data: combined, isEgwMissing: isEgwMissing);
 });
