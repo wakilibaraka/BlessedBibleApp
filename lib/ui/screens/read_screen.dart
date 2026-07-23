@@ -13,6 +13,7 @@ import '../../state/theme_provider.dart';
 import '../../state/typography_provider.dart';
 import '../../state/immersive_mode_provider.dart';
 import '../../state/read_selection_provider.dart';
+import '../../state/bible_nav_settings_provider.dart';
 import '../../state/read_location_provider.dart';
 import '../widgets/textured_glass_container.dart';
 import '../widgets/bouncy_entrance.dart';
@@ -104,7 +105,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
           books: allBooks,
           selectedBookAbbrev: loc.bookAbbrev,
           selectedChapter: loc.chapter,
-          onSelectionChanged: (abbrev, name, chapter, verse) {
+          onSelectionChanged: (abbrev, name, chapter, verse, {bool autoClose = true}) {
             bool changedChapter = loc.bookAbbrev != abbrev || loc.chapter != chapter;
             ref.read(readLocationProvider.notifier).updateLocation(
               bookAbbrev: abbrev,
@@ -115,7 +116,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
               // Chapter changed, list will rebuild automatically
             }
             _clearSelection();
-            Navigator.pop(context);
+            if (autoClose) {
+              Navigator.pop(context);
+            }
 
             if (verse != null) {
               _scrollToVerse(verse, loc);
@@ -710,14 +713,36 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
 }
 
 
-enum SelectionMode { book, chapter, verse }
+enum SelectionMode { testament, book, chapter, verse }
+
+class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final Widget child;
+
+  _StickyHeaderDelegate({required this.child});
+
+  @override
+  double get minExtent => 48.0;
+
+  @override
+  double get maxExtent => 48.0;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return child;
+  }
+
+  @override
+  bool shouldRebuild(_StickyHeaderDelegate oldDelegate) {
+    return oldDelegate.child != child;
+  }
+}
 
 /// Modal Bottom Sheet for selecting Book, Chapter, and Verse
 class _BookChapterSelectorSheet extends ConsumerStatefulWidget {
   final List<BibleBook> books;
   final String selectedBookAbbrev;
   final int selectedChapter;
-  final Function(String abbrev, String name, int chapter, int? verse) onSelectionChanged;
+  final void Function(String abbrev, String name, int chapter, int? verse, {bool autoClose}) onSelectionChanged;
 
   const _BookChapterSelectorSheet({
     required this.books,
@@ -737,7 +762,7 @@ class __BookChapterSelectorSheetState
   late int _tempChapter;
   int? _tempVerse;
 
-  SelectionMode _mode = SelectionMode.book;
+  late SelectionMode _mode;
   bool _isOldTestament = true;
 
   @override
@@ -749,9 +774,23 @@ class __BookChapterSelectorSheetState
     // Determine testament based on book index
     final bookIndex = widget.books.indexOf(_tempBook);
     _isOldTestament = bookIndex < 39;
+
+    final settings = ref.read(bibleNavSettingsProvider);
+    if (settings.depth == NavigationDepth.fourPart) {
+      _mode = SelectionMode.testament;
+    } else {
+      _mode = SelectionMode.book;
+    }
   }
 
-  void _onBookSelected(BibleBook book) {
+  void _onTestamentSelected(bool isOld) {
+    setState(() {
+      _isOldTestament = isOld;
+      _mode = SelectionMode.book;
+    });
+  }
+
+  void _onBookSelected(BibleBook book, BibleNavSettingsState settings) {
     setState(() {
       _tempBook = book;
       _tempChapter = 1;
@@ -760,20 +799,29 @@ class __BookChapterSelectorSheetState
     });
   }
 
-  void _onChapterSelected(int chapter) {
+  void _onChapterSelected(int chapter, BibleNavSettingsState settings) {
     setState(() {
       _tempChapter = chapter;
       _tempVerse = 1;
     });
-    // Auto-navigate immediately upon tapping a chapter
-    widget.onSelectionChanged(
-        _tempBook.abbreviation,
-        _tempBook.name,
-        _tempChapter,
-        _tempVerse);
+    
+    if (settings.depth == NavigationDepth.twoPart) {
+      // Auto-navigate immediately upon tapping a chapter
+      widget.onSelectionChanged(
+          _tempBook.abbreviation,
+          _tempBook.name,
+          _tempChapter,
+          null,
+          autoClose: settings.autoCloseOnFinalSelection,
+      );
+    } else {
+      setState(() {
+        _mode = SelectionMode.verse;
+      });
+    }
   }
 
-  void _onVerseSelected(int verse) {
+  void _onVerseSelected(int verse, BibleNavSettingsState settings) {
     setState(() {
       _tempVerse = verse;
     });
@@ -782,12 +830,15 @@ class __BookChapterSelectorSheetState
         _tempBook.abbreviation,
         _tempBook.name,
         _tempChapter,
-        _tempVerse);
+        _tempVerse,
+        autoClose: settings.autoCloseOnFinalSelection,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final settings = ref.watch(bibleNavSettingsProvider);
 
     return BouncyEntrance(
       delay: const Duration(milliseconds: 50),
@@ -818,12 +869,12 @@ class __BookChapterSelectorSheetState
                 const SizedBox(height: 20),
 
                 // Segmented Breadcrumb Header
-                _buildBreadcrumbs(theme),
+                _buildBreadcrumbs(theme, settings),
                 const SizedBox(height: 16),
 
                 // Dynamic Selection View
                 Expanded(
-                  child: _buildSelectionView(theme),
+                  child: _buildSelectionView(theme, settings),
                 ),
               ],
             ),
@@ -834,7 +885,7 @@ class __BookChapterSelectorSheetState
     );
   }
 
-  Widget _buildBreadcrumbs(ThemeData theme) {
+  Widget _buildBreadcrumbs(ThemeData theme, BibleNavSettingsState settings) {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
@@ -843,9 +894,12 @@ class __BookChapterSelectorSheetState
       ),
       child: Row(
         children: [
+          if (settings.depth == NavigationDepth.fourPart)
+            _buildBreadcrumbSegment('Testament', _isOldTestament ? 'OT' : 'NT', SelectionMode.testament, theme),
           _buildBreadcrumbSegment('Book', _tempBook.name, SelectionMode.book, theme),
           _buildBreadcrumbSegment('Chapter', '$_tempChapter', SelectionMode.chapter, theme),
-          _buildBreadcrumbSegment('Verse', _tempVerse != null ? '$_tempVerse' : '-', SelectionMode.verse, theme),
+          if (settings.depth != NavigationDepth.twoPart)
+            _buildBreadcrumbSegment('Verse', _tempVerse != null ? '$_tempVerse' : '-', SelectionMode.verse, theme),
         ],
       ),
     );
@@ -893,105 +947,257 @@ class __BookChapterSelectorSheetState
     );
   }
 
-  Widget _buildSelectionView(ThemeData theme) {
+  Widget _buildSelectionView(ThemeData theme, BibleNavSettingsState settings) {
     switch (_mode) {
+      case SelectionMode.testament:
+        return _buildTestamentSelection(theme);
       case SelectionMode.book:
-        return _buildBookSelection(theme);
+        return _buildBookSelection(theme, settings);
       case SelectionMode.chapter:
-        return _buildChapterSelection(theme);
+        return _buildChapterSelection(theme, settings);
       case SelectionMode.verse:
-        return _buildVerseSelection(theme);
+        return _buildVerseSelection(theme, settings);
     }
   }
 
-  Widget _buildBookSelection(ThemeData theme) {
-    final oldTestamentBooks = widget.books.take(39).toList();
-    final newTestamentBooks = widget.books.skip(39).toList();
-    final displayedBooks = _isOldTestament ? oldTestamentBooks : newTestamentBooks;
-
-    return Column(
+  Widget _buildTestamentSelection(ThemeData theme) {
+    return Row(
       children: [
-        // Testament Toggles
-        Container(
-          margin: const EdgeInsets.only(bottom: 16),
-          padding: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => setState(() => _isOldTestament = true),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    decoration: BoxDecoration(
-                      color: _isOldTestament ? theme.primaryColor : Colors.transparent,
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Old Testament',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: _isOldTestament ? Colors.white : theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => setState(() => _isOldTestament = false),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    decoration: BoxDecoration(
-                      color: !_isOldTestament ? theme.primaryColor : Colors.transparent,
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'New Testament',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: !_isOldTestament ? Colors.white : theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: _buildGridTile(
+              text: 'Old\nTestament', 
+              isSelected: _isOldTestament, 
+              onTap: () => _onTestamentSelected(true), 
+              theme: theme,
+            ),
           ),
         ),
-        // 2-Column Book Grid
         Expanded(
-          child: GridView.builder(
-            padding: const EdgeInsets.only(bottom: 24),
-            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 200,
-              childAspectRatio: 3,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: _buildGridTile(
+              text: 'New\nTestament', 
+              isSelected: !_isOldTestament, 
+              onTap: () => _onTestamentSelected(false), 
+              theme: theme,
             ),
-            itemCount: displayedBooks.length,
-            itemBuilder: (context, index) {
-              final book = displayedBooks[index];
-              final isSel = book.abbreviation == _tempBook.abbreviation;
-              return _buildGridTile(
-                text: book.name,
-                isSelected: isSel,
-                onTap: () => _onBookSelected(book),
-                theme: theme,
-              );
-            },
           ),
         ),
       ],
     );
   }
 
-  Widget _buildChapterSelection(ThemeData theme) {
+  Widget _buildBookSelection(ThemeData theme, BibleNavSettingsState settings) {
+    final oldTestamentBooks = widget.books.take(39).toList();
+    final newTestamentBooks = widget.books.skip(39).toList();
+
+    switch (settings.layout) {
+      case TestamentLayout.filterTabs:
+        final displayedBooks = _isOldTestament ? oldTestamentBooks : newTestamentBooks;
+        return Column(
+          children: [
+            // Testament Toggles
+            Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() => _isOldTestament = true),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                          color: _isOldTestament ? theme.primaryColor : Colors.transparent,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          'Old Testament',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: _isOldTestament ? Colors.white : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() => _isOldTestament = false),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                          color: !_isOldTestament ? theme.primaryColor : Colors.transparent,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          'New Testament',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: !_isOldTestament ? Colors.white : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // 2-Column Book Grid
+            Expanded(
+              child: GridView.builder(
+                padding: const EdgeInsets.only(bottom: 24),
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 200,
+                  childAspectRatio: 3,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                ),
+                itemCount: displayedBooks.length,
+                itemBuilder: (context, index) {
+                  final book = displayedBooks[index];
+                  final isSel = book.abbreviation == _tempBook.abbreviation;
+                  return _buildGridTile(
+                    text: book.name,
+                    isSelected: isSel,
+                    onTap: () => _onBookSelected(book, settings),
+                    theme: theme,
+                  );
+                },
+              ),
+            ),
+          ],
+        );
+      case TestamentLayout.sideBySide:
+        return Row(
+          children: [
+            Expanded(
+              child: Column(
+                children: [
+                  Text('Old Testament', style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface.withValues(alpha: 0.5))),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: ListView.builder(
+                      padding: const EdgeInsets.only(bottom: 24),
+                      itemCount: oldTestamentBooks.length,
+                      itemBuilder: (context, index) {
+                        final book = oldTestamentBooks[index];
+                        final isSel = book.abbreviation == _tempBook.abbreviation;
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0, right: 4.0),
+                          child: SizedBox(
+                            height: 48,
+                            child: _buildGridTile(text: book.name, isSelected: isSel, onTap: () => _onBookSelected(book, settings), theme: theme),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(width: 1, color: theme.colorScheme.onSurface.withValues(alpha: 0.1), margin: const EdgeInsets.symmetric(horizontal: 8)),
+            Expanded(
+              child: Column(
+                children: [
+                  Text('New Testament', style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface.withValues(alpha: 0.5))),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: ListView.builder(
+                      padding: const EdgeInsets.only(bottom: 24),
+                      itemCount: newTestamentBooks.length,
+                      itemBuilder: (context, index) {
+                        final book = newTestamentBooks[index];
+                        final isSel = book.abbreviation == _tempBook.abbreviation;
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0, left: 4.0),
+                          child: SizedBox(
+                            height: 48,
+                            child: _buildGridTile(text: book.name, isSelected: isSel, onTap: () => _onBookSelected(book, settings), theme: theme),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      case TestamentLayout.stickySections:
+        return CustomScrollView(
+          slivers: [
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _StickyHeaderDelegate(
+                child: Container(
+                  color: theme.scaffoldBackgroundColor.withValues(alpha: 0.95),
+                  alignment: Alignment.centerLeft,
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text('Old Testament', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: theme.colorScheme.primary)),
+                ),
+              ),
+            ),
+            SliverGrid(
+              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 200,
+                childAspectRatio: 3,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+              ),
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final book = oldTestamentBooks[index];
+                  final isSel = book.abbreviation == _tempBook.abbreviation;
+                  return _buildGridTile(text: book.name, isSelected: isSel, onTap: () => _onBookSelected(book, settings), theme: theme);
+                },
+                childCount: oldTestamentBooks.length,
+              ),
+            ),
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _StickyHeaderDelegate(
+                child: Container(
+                  color: theme.scaffoldBackgroundColor.withValues(alpha: 0.95),
+                  alignment: Alignment.centerLeft,
+                  padding: const EdgeInsets.only(top: 24, bottom: 8),
+                  child: Text('New Testament', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: theme.colorScheme.primary)),
+                ),
+              ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.only(bottom: 24),
+              sliver: SliverGrid(
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 200,
+                  childAspectRatio: 3,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                ),
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final book = newTestamentBooks[index];
+                    final isSel = book.abbreviation == _tempBook.abbreviation;
+                    return _buildGridTile(text: book.name, isSelected: isSel, onTap: () => _onBookSelected(book, settings), theme: theme);
+                  },
+                  childCount: newTestamentBooks.length,
+                ),
+              ),
+            ),
+          ],
+        );
+    }
+  }
+
+  Widget _buildChapterSelection(ThemeData theme, BibleNavSettingsState settings) {
     final chapters = _tempBook.chapters.length;
     return GridView.builder(
       padding: const EdgeInsets.only(bottom: 24),
@@ -1008,14 +1214,14 @@ class __BookChapterSelectorSheetState
         return _buildGridTile(
           text: '$chapter',
           isSelected: isSel,
-          onTap: () => _onChapterSelected(chapter),
+          onTap: () => _onChapterSelected(chapter, settings),
           theme: theme,
         );
       },
     );
   }
 
-  Widget _buildVerseSelection(ThemeData theme) {
+  Widget _buildVerseSelection(ThemeData theme, BibleNavSettingsState settings) {
     final chapterData = _tempBook.chapters.firstWhere((c) => c.number == _tempChapter, orElse: () => _tempBook.chapters.first);
     final verses = chapterData.verses.length;
     
@@ -1034,7 +1240,7 @@ class __BookChapterSelectorSheetState
         return _buildGridTile(
           text: '$verse',
           isSelected: isSel,
-          onTap: () => _onVerseSelected(verse),
+          onTap: () => _onVerseSelected(verse, settings),
           theme: theme,
         );
       },
@@ -1056,7 +1262,7 @@ class __BookChapterSelectorSheetState
                 fontWeight: FontWeight.w600,
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
               ),
-              maxLines: 1,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
             ),
@@ -1082,14 +1288,13 @@ class __BookChapterSelectorSheetState
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
-          maxLines: 1,
+          maxLines: 2,
           overflow: TextOverflow.ellipsis,
           textAlign: TextAlign.center,
         ),
       ),
     );
   }
-
 
 }
 
