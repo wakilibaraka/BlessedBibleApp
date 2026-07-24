@@ -11,11 +11,10 @@ final egwCommentaryProvider = FutureProvider<Map<String, Map<String, Map<String,
   try {
     File egwFile;
     if (Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
-      final projectDir = Platform.environment['PWD'] ?? Directory.current.path;
-      egwFile = File('$projectDir/local-data/egw_genesis.json');
+      egwFile = File('${Directory.current.path}/local-data/egw_genesis.json');
     } else {
       final docDir = await getApplicationDocumentsDirectory();
-      egwFile = File('${docDir.path}/egw/egw_genesis.json');
+      egwFile = File('${docDir.path}/egw_genesis.json');
     }
 
     if (!await egwFile.exists()) {
