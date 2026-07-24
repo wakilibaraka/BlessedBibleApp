@@ -432,15 +432,18 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                 // Top Navigation Bar Layer (Floating above text)
                 Positioned(
                   top: 0, left: 0, right: 0,
-                  child: Padding(
-                    padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const SizedBox(height: 12),
-
-                        // Top Navigation Bar
-                        Padding(
+                  child: ClipRRect(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
+                      child: Container(
+                        color: theme.scaffoldBackgroundColor.withValues(alpha: 0.85),
+                        padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const SizedBox(height: 12),
+                            // Top Navigation Bar
+                            Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 24.0),
                             child: SizedBox(
                               height: 48,
@@ -573,8 +576,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                     ),
                   ),
                 ),
-              ],
+              ),
             ),
+          ],
+        ),
           ),
 
 
@@ -887,21 +892,20 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
 
   void _onBookSelected(BibleBook book, BibleNavSettingsState settings) {
     ref.read(_sheetStateProvider.notifier).setBook(book);
+    ref.read(_sheetStateProvider.notifier).setMode(SelectionMode.chapter);
   }
 
   void _onChapterSelected(int chapter, BibleNavSettingsState settings) {
     ref.read(_sheetStateProvider.notifier).setChapter(chapter, settings.depth != NavigationDepth.twoPart);
     
-    if (settings.depth == NavigationDepth.twoPart) {
-      final book = ref.read(_sheetStateProvider).book!;
-      widget.onSelectionChanged(
-          book.abbreviation,
-          book.name,
-          chapter,
-          null,
-          autoClose: settings.autoCloseOnFinalSelection,
-      );
-    }
+    final book = ref.read(_sheetStateProvider).book!;
+    widget.onSelectionChanged(
+        book.abbreviation,
+        book.name,
+        chapter,
+        1,
+        autoClose: true,
+    );
   }
 
   void _onVerseSelected(int verse, BibleNavSettingsState settings) {
@@ -1361,21 +1365,25 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
     if (!isSelected) {
       return GestureDetector(
         onTap: onTap,
-        child: RepaintBoundary(
-          child: TexturedGlassContainer(
+        child: Container(
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface.withValues(alpha: 0.8),
             borderRadius: BorderRadius.circular(30),
-            padding: EdgeInsets.zero,
-            child: Center(
-              child: Text(
-                text,
-                style: (text.length > 3 ? theme.textTheme.labelMedium : theme.textTheme.titleMedium)?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
+            border: Border.all(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+              width: 1,
+            ),
+          ),
+          child: Center(
+            child: Text(
+              text,
+              style: (text.length > 3 ? theme.textTheme.labelMedium : theme.textTheme.titleMedium)?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
               ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
             ),
           ),
         ),
@@ -1654,28 +1662,55 @@ class _CommentaryBottomSheetContent extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-                const SizedBox(height: 24),
-                ListTile(
-                  leading: Icon(Icons.bookmark_add_rounded, color: theme.primaryColor),
-                  title: const Text('Save to Notes'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Saved $bookName $chapter:$verseNumber to Notes')),
-                    );
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.ios_share_rounded, color: theme.primaryColor),
-                  title: const Text('Share to other apps'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Share dialog opened')),
-                    );
-                  },
+                const SizedBox(height: 32),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.colorScheme.surface,
+                      foregroundColor: theme.primaryColor,
+                      elevation: 0,
+                      minimumSize: const Size(double.infinity, 56),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50),
+                        side: BorderSide(color: theme.colorScheme.onSurface.withValues(alpha: 0.1)),
+                      ),
+                    ),
+                    icon: Icon(Icons.bookmark_add_rounded, color: theme.primaryColor),
+                    label: const Text('Save to Notes', style: TextStyle(fontWeight: FontWeight.bold)),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Saved $bookName $chapter:$verseNumber to Notes')),
+                      );
+                    },
+                  ),
                 ),
                 const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.colorScheme.surface,
+                      foregroundColor: theme.primaryColor,
+                      elevation: 0,
+                      minimumSize: const Size(double.infinity, 56),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50),
+                        side: BorderSide(color: theme.colorScheme.onSurface.withValues(alpha: 0.1)),
+                      ),
+                    ),
+                    icon: Icon(Icons.ios_share_rounded, color: theme.primaryColor),
+                    label: const Text('Share to other apps', style: TextStyle(fontWeight: FontWeight.bold)),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Share dialog opened')),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 32),
               ],
             ),
           ),
