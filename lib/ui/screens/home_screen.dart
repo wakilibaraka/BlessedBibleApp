@@ -116,7 +116,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 height: 26,
                 child: Center(
                   child: Icon(
-                    Icons.auto_stories_rounded,
+                    Icons.book_rounded,
                     size: 26,
                     color: theme.primaryColor,
                   ),

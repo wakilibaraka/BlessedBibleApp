@@ -437,11 +437,11 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 12),
 
                         // Top Navigation Bar
                         Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                            padding: const EdgeInsets.symmetric(horizontal: 24.0),
                             child: SizedBox(
                               height: 48,
                               child: Row(
@@ -553,7 +553,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                               ),
                             ),
                           ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 12),
                       ],
                     ),
                   ),
@@ -1457,7 +1457,7 @@ class _TypographyBottomSheet extends ConsumerWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               Row(
                 children: [
                   Text('A', style: theme.textTheme.labelSmall),
@@ -1630,7 +1630,7 @@ class _CommentaryBottomSheetContent extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 Container(
                   width: 40,
                   height: 4,
