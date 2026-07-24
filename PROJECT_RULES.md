@@ -16,3 +16,10 @@ Only report a task as complete once the build is green and nothing is broken.
 ## Layout & Symmetry
 - SYMMETRY IS DEFAULT. Unless I explicitly say otherwise, all layouts must be mathematically balanced: split space into clean halves, thirds, or quarters. Elements in a row must share one level baseline (identical vertical centers). Side elements must have equal insets from their screen edges. Paired buttons must be equal size and evenly spaced. Never leave lopsided margins, uneven gaps, or misaligned baselines.
 - When laying out any new row, group, or set of controls, choose halves / thirds / quarters proportions by default and align to a shared grid.
+
+## UI Change Preservation
+- PRESERVE, DON'T OVERWRITE. When I request a change to existing UI or system behavior, do NOT silently replace the old behavior. First judge whether the change is SIGNIFICANT (a layout mode, scroll behavior, navigation flow, view style, or any behavior a user might prefer the old version of) or MINOR (a small spacing, color, label, or one-off fix).
+- For SIGNIFICANT changes: preserve the previous behavior as a user-selectable option. If a related setting already exists (e.g. a Reading View, Navigation Depth, or Font setting), ADD the new choice to that existing setting automatically. If no related setting exists, ASK me: "Do you want a setting to toggle between the old and new version?" before proceeding. Default the setting to whichever version I indicated I prefer.
+- For MINOR changes: just make the change; no toggle needed.
+- NEVER completely rewrite or delete existing UI/system behavior in a way that makes the old version unrecoverable without a toggle or my explicit approval. When in doubt, ask before destroying the old behavior.
+- Group related toggles under their logical Settings section (Reading, Navigation, Typography, etc.) rather than scattering them, to keep Settings clean.
