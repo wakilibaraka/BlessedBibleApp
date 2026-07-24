@@ -40,6 +40,13 @@ class SearchState {
 class SearchNotifier extends Notifier<SearchState> {
   @override
   SearchState build() {
+    // Reactively update search results when commentary data resolves
+    ref.listen(searchEngineProvider, (previous, next) {
+      if (state.query.trim().isNotEmpty) {
+        _performSearch();
+      }
+    });
+
     return SearchState(
       // Seed with some mock recent places
       recentPlaces: [
