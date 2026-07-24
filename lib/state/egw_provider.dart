@@ -10,12 +10,14 @@ final egwCommentaryProvider = FutureProvider<Map<String, Map<String, Map<String,
 
   try {
     File egwFile;
-    if (Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
-      egwFile = File('${Directory.current.path}/local-data/egw_genesis.json');
-    } else {
+    if (Platform.isAndroid || Platform.isIOS) {
       final docDir = await getApplicationDocumentsDirectory();
       egwFile = File('${docDir.path}/egw_genesis.json');
+    } else {
+      egwFile = File('${Directory.current.path}/local-data/egw_genesis.json');
     }
+
+    debugPrint('EGW Path: ${egwFile.path} | existsSync: ${egwFile.existsSync()}');
 
     if (!await egwFile.exists()) {
       return result; // Empty map if not found
@@ -54,5 +56,5 @@ final egwCommentaryProvider = FutureProvider<Map<String, Map<String, Map<String,
     debugPrint('Failed to load EGW commentary: $e');
   }
 
-  return result;
+  return result; // Return empty map instead of throwing if parsing fails
 });
