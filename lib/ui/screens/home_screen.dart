@@ -111,63 +111,66 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Left: Bible / cross logo placeholder
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Icon(
-                  Icons.auto_stories_rounded,
-                size: 28,
-                color: theme.primaryColor,
+              SizedBox(
+                width: 26,
+                height: 26,
+                child: Center(
+                  child: Icon(
+                    Icons.auto_stories_rounded,
+                    size: 26,
+                    color: theme.primaryColor,
+                  ),
                 ),
               ),
 
               // Center: Date
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Text(
-                    'Wednesday · July 22',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 0.3,
-                    ),
+                child: Text(
+                  'Wednesday · July 22',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 0.3,
                   ),
                 ),
               ),
 
               // Right: Animated 3-way theme toggle
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: GestureDetector(
-                  onTap: () => ref.read(themeProvider.notifier).cycleTheme(),
-                  child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 350),
-                  transitionBuilder: (child, anim) => RotationTransition(
-                    turns: Tween<double>(begin: 0.75, end: 1.0).animate(anim),
-                    child: FadeTransition(opacity: anim, child: child),
+              SizedBox(
+                width: 26,
+                height: 26,
+                child: Center(
+                  child: GestureDetector(
+                    onTap: () => ref.read(themeProvider.notifier).cycleTheme(),
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 350),
+                      transitionBuilder: (child, anim) => RotationTransition(
+                        turns: Tween<double>(begin: 0.75, end: 1.0).animate(anim),
+                        child: FadeTransition(opacity: anim, child: child),
+                      ),
+                      child: switch (appThemeMode) {
+                        AppThemeMode.light    => Icon(
+                            Icons.wb_sunny_outlined,
+                            key: const ValueKey('light'),
+                            size: 26,
+                            color: theme.primaryColor,
+                          ),
+                        AppThemeMode.sepia => Icon(
+                            Icons.auto_awesome,
+                            key: const ValueKey('sepia'),
+                            size: 26,
+                            color: theme.primaryColor,
+                          ),
+                        AppThemeMode.dark     => Icon(
+                            Icons.nightlight_round,
+                            key: const ValueKey('dark'),
+                            size: 26,
+                            color: theme.primaryColor,
+                          ),
+                      },
+                    ),
                   ),
-                  child: switch (appThemeMode) {
-                    AppThemeMode.light    => Icon(
-                        Icons.wb_sunny_outlined,
-                        key: const ValueKey('light'),
-                        size: 26,
-                        color: theme.primaryColor,
-                      ),
-                    AppThemeMode.sepia => Icon(
-                        Icons.auto_awesome,
-                        key: const ValueKey('sepia'),
-                        size: 26,
-                        color: theme.primaryColor,
-                      ),
-                    AppThemeMode.dark     => Icon(
-                        Icons.nightlight_round,
-                        key: const ValueKey('dark'),
-                        size: 26,
-                        color: theme.primaryColor,
-                      ),
-                  },
                 ),
-              ),
               ),
             ],
           ),

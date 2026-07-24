@@ -545,7 +545,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                               onTap: _showTypographyBottomSheet,
                                               behavior: HitTestBehavior.opaque,
                                               child: Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+                                                padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
                                                 child: Text(
                                                   'aA',
                                                   style: theme.textTheme.titleLarge?.copyWith(
