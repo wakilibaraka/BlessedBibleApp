@@ -135,17 +135,33 @@ class SearchEngine {
           final chapterNum = chapterEntry.key;
           for (final verseEntry in chapterEntry.value.entries) {
             final verseNum = verseEntry.key;
+            // Parse verse number, handling ranges like "1-3"
+            int parsedVerse = 1;
+            if (verseNum.contains('-')) {
+              parsedVerse = int.tryParse(verseNum.split('-').first) ?? 1;
+            } else {
+              parsedVerse = int.tryParse(verseNum) ?? 1;
+            }
+
             for (final entry in verseEntry.value) {
               if (entry.text.toLowerCase().contains(queryLower) || entry.title.toLowerCase().contains(queryLower)) {
+                
+                String authorLabel = 'Commentary';
+                if (entry.id.toLowerCase().contains('egw')) {
+                  authorLabel = 'EGW Commentary';
+                } else if (entry.id.toLowerCase().contains('uriah')) {
+                  authorLabel = 'Uriah Smith Commentary';
+                }
+
                 results.add(SearchResult(
-                  title: '$bookName $chapterNum:$verseNum - ${entry.title}',
-                  subtitle: 'Commentary Note',
-                  snippet: _highlightSnippet(entry.text, queryLower),
+                  title: '$bookName $chapterNum:$verseNum',
+                  subtitle: authorLabel,
+                  snippet: (entry.title.isNotEmpty ? '«${entry.title}» ' : '') + _highlightSnippet(entry.text, queryLower),
                   type: SearchResultType.commentary,
                   metadata: {
                     'book': bookName,
                     'chapter': int.tryParse(chapterNum) ?? 1,
-                    'verse': int.tryParse(verseNum) ?? 1,
+                    'verse': parsedVerse,
                     'author': entry.title,
                   },
                 ));
@@ -177,10 +193,10 @@ class SearchEngine {
 
 final searchEngineProvider = Provider<SearchEngine>((ref) {
   final bibleState = ref.watch(bibleProvider);
-  final commentaryAsync = ref.watch(commentaryDataProvider);
+  final commentaryAsync = ref.watch(combinedCommentaryProvider);
 
   return SearchEngine(
     bibleBooks: bibleState.books,
-    commentaryData: commentaryAsync.asData?.value,
+    commentaryData: commentaryAsync.asData?.value.data,
   );
 });
