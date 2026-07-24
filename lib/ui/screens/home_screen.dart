@@ -403,16 +403,22 @@ class _CircularGlassButton extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          GlassContainer(
-            borderRadius: BorderRadius.circular(30),
-            padding: const EdgeInsets.all(14),
-            child: Icon(
-              icon,
-              size: 24,
-              color: gold,
+          SizedBox(
+            width: 64,
+            height: 64,
+            child: GlassContainer(
+              borderRadius: BorderRadius.circular(32),
+              padding: EdgeInsets.zero,
+              child: Center(
+                child: Icon(
+                  icon,
+                  size: 28,
+                  color: gold,
+                ),
+              ),
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(
             label,
             style: theme.textTheme.labelSmall?.copyWith(
