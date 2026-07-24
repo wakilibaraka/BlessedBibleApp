@@ -42,10 +42,77 @@ class NotesListScreen extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () => showAddNoteSheet(context, theme),
         backgroundColor: theme.primaryColor,
         child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }
+}
+
+void showAddNoteSheet(BuildContext context, ThemeData theme, {String? initialReference}) {
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: theme.scaffoldBackgroundColor,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
+    builder: (context) => Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+        left: 24,
+        right: 24,
+        top: 24,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            initialReference != null ? 'New Note on $initialReference' : 'New Note',
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: theme.primaryColor,
+            ),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            decoration: InputDecoration(
+              hintText: 'Start typing...',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: theme.primaryColor.withValues(alpha: 0.3)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: theme.primaryColor),
+              ),
+            ),
+            maxLines: 5,
+            autofocus: true,
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.primaryColor,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 16),
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Note saved! (Mock)')),
+              );
+            },
+            child: const Text('Save Note', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+          const SizedBox(height: 24),
+        ],
+      ),
+    ),
+  );
 }

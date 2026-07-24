@@ -19,6 +19,25 @@ class SearchResult {
     required this.type,
     this.metadata = const {},
   });
+
+  Map<String, dynamic> toJson() => {
+    'title': title,
+    'subtitle': subtitle,
+    'snippet': snippet,
+    'type': type.name,
+    'metadata': metadata,
+  };
+
+  factory SearchResult.fromJson(Map<String, dynamic> json) => SearchResult(
+    title: json['title'],
+    subtitle: json['subtitle'],
+    snippet: json['snippet'],
+    type: SearchResultType.values.firstWhere(
+      (e) => e.name == json['type'],
+      orElse: () => SearchResultType.bible,
+    ),
+    metadata: json['metadata'] ?? {},
+  );
 }
 
 enum SearchResultType { reference, bible, commentary, history }

@@ -61,13 +61,59 @@ He said in a loud voice, "Fear God and give him glory, because the hour of his j
                 ),
               ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 16),
             Text(
-              '''This passage introduces a powerful vision of ultimate victory and a universal call to worship. The Lamb standing on Mount Zion represents Christ's triumphant reign. The 144,000 symbolize the complete, redeemed people of God who remain faithful. 
-
-The first angel's message (verse 7) is a global imperative to "Fear God and give him glory." It is a reminder that amidst the chaos of the world, ultimate allegiance belongs to the Creator. The call is deeply practical—worship is not merely an intellectual acknowledgment, but a reorientation of life toward the One who made the heavens, earth, and sea.
-
-This is a placeholder for the extended deep-dive analysis view that the user can read without leaving the Study tab layout context.''',
+              'Historical Context',
+              style: GoogleFonts.lora(
+                textStyle: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.primaryColor,
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'This vision was written during a time of intense persecution under the Roman Empire (likely Domitian\'s reign). Mount Zion represents the heavenly sanctuary and the secure place of God\'s people, contrasting with the beast\'s domain described in chapter 13.',
+              style: GoogleFonts.lora(
+                textStyle: theme.textTheme.bodyMedium?.copyWith(
+                  height: 1.8,
+                  color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.9),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Literary Analysis',
+              style: GoogleFonts.lora(
+                textStyle: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.primaryColor,
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'The "144,000" is heavily symbolic, drawing from military census imagery in the Old Testament (12 tribes x 12,000). The "Father\'s name written on their foreheads" directly parallels the High Priest\'s mitre in Exodus 28:36, marking them as wholly consecrated to God, in direct opposition to the "mark of the beast" (Rev 13:16).',
+              style: GoogleFonts.lora(
+                textStyle: theme.textTheme.bodyMedium?.copyWith(
+                  height: 1.8,
+                  color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.9),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Application',
+              style: GoogleFonts.lora(
+                textStyle: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.primaryColor,
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'The first angel\'s message (verse 7) is a global imperative to "Fear God and give him glory." It reminds us that amidst the chaos of the world, ultimate allegiance belongs to the Creator. The call is deeply practical—worship is not merely intellectual, but a reorientation of life toward the One who made the heavens, earth, and sea.',
               style: GoogleFonts.lora(
                 textStyle: theme.textTheme.bodyMedium?.copyWith(
                   height: 1.8,

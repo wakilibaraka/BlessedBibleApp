@@ -13,7 +13,7 @@ class BouncyEntrance extends StatefulWidget {
     required this.child,
     this.delay = Duration.zero,
     this.isVisible = true,
-    this.duration = const Duration(milliseconds: 650),
+    this.duration = const Duration(milliseconds: 500),
     this.animateIn = true,
   });
 
@@ -38,18 +38,18 @@ class _BouncyEntranceState extends State<BouncyEntrance> with SingleTickerProvid
       reverseDuration: const Duration(milliseconds: 250),
     );
 
-    _scaleAnimation = Tween<double>(begin: 0.7, end: 1.0).animate(
+    _scaleAnimation = Tween<double>(begin: 0.85, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: Curves.elasticOut,
+        curve: Curves.easeOutBack,
         reverseCurve: Curves.easeIn,
       ),
     );
 
-    _slideAnimation = Tween<Offset>(begin: const Offset(0, 0.25), end: Offset.zero).animate(
+    _slideAnimation = Tween<Offset>(begin: const Offset(0, 0.10), end: Offset.zero).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: Curves.elasticOut,
+        curve: Curves.easeOutBack,
         reverseCurve: Curves.easeIn,
       ),
     );

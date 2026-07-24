@@ -15,17 +15,27 @@ import '../widgets/animated_background.dart';
 import '../widgets/bouncy_entrance.dart';
 import '../widgets/textured_glass_container.dart';
 import '../../state/immersive_mode_provider.dart';
+import '../../state/user_data_provider.dart';
+import '../../state/read_location_provider.dart';
+import '../../state/bible_provider.dart';
+import 'package:flutter/services.dart';
+import 'notes_list_screen.dart';
 
 class MainNavScreen extends ConsumerWidget {
   const MainNavScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final currentIndex = ref.watch(navProvider);
     final isNavVisible = ref.watch(bottomNavVisibilityProvider);
     final isNavHidden = !isNavVisible;
     final navSettings = ref.watch(navSettingsProvider);
     final selectedVerses = ref.watch(readSelectionProvider);
+    final bookmarks = ref.watch(bookmarksProvider);
+    final favorites = ref.watch(favoritesProvider);
+    final readLoc = ref.watch(readLocationProvider);
+    final flatChapters = ref.watch(flatChaptersProvider);
 
     final screens = [
       const HomeScreen(),
@@ -259,13 +269,26 @@ class MainNavScreen extends ConsumerWidget {
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
                                               _buildActionIcon(
-                                                Icons.bookmark_border_rounded,
+                                                selectedVerses.every((v) => bookmarks.contains('${readLoc.bookName} ${readLoc.chapter}:$v'))
+                                                    ? Icons.bookmark_rounded
+                                                    : Icons.bookmark_border_rounded,
                                                 'Bookmark',
-                                                Theme.of(context).colorScheme.onSurface,
+                                                selectedVerses.every((v) => bookmarks.contains('${readLoc.bookName} ${readLoc.chapter}:$v'))
+                                                    ? theme.primaryColor
+                                                    : Theme.of(context).colorScheme.onSurface,
                                                 () {
+                                                  final isAllBookmarked = selectedVerses.every((v) => bookmarks.contains('${readLoc.bookName} ${readLoc.chapter}:$v'));
+                                                  for (var v in selectedVerses) {
+                                                    final refStr = '${readLoc.bookName} ${readLoc.chapter}:$v';
+                                                    if (isAllBookmarked) {
+                                                      ref.read(bookmarksProvider.notifier).toggle(refStr); // remove
+                                                    } else {
+                                                      if (!bookmarks.contains(refStr)) ref.read(bookmarksProvider.notifier).toggle(refStr); // add
+                                                    }
+                                                  }
                                                   ScaffoldMessenger.of(context).showSnackBar(
                                                     SnackBar(
-                                                      content: Text('${selectedVerses.length} verse(s) bookmarked!'),
+                                                      content: Text(isAllBookmarked ? 'Bookmark(s) removed' : '${selectedVerses.length} verse(s) bookmarked!'),
                                                       duration: const Duration(seconds: 2),
                                                     ),
                                                   );
@@ -274,10 +297,66 @@ class MainNavScreen extends ConsumerWidget {
                                               ),
                                               const SizedBox(height: 16),
                                               _buildActionIcon(
+                                                selectedVerses.every((v) => favorites.contains('${readLoc.bookName} ${readLoc.chapter}:$v'))
+                                                    ? Icons.star_rounded
+                                                    : Icons.star_outline_rounded,
+                                                'Favorite',
+                                                selectedVerses.every((v) => favorites.contains('${readLoc.bookName} ${readLoc.chapter}:$v'))
+                                                    ? Colors.amber
+                                                    : Theme.of(context).colorScheme.onSurface,
+                                                () {
+                                                  final isAllFavorited = selectedVerses.every((v) => favorites.contains('${readLoc.bookName} ${readLoc.chapter}:$v'));
+                                                  for (var v in selectedVerses) {
+                                                    final refStr = '${readLoc.bookName} ${readLoc.chapter}:$v';
+                                                    if (isAllFavorited) {
+                                                      ref.read(favoritesProvider.notifier).toggle(refStr);
+                                                    } else {
+                                                      if (!favorites.contains(refStr)) ref.read(favoritesProvider.notifier).toggle(refStr);
+                                                    }
+                                                  }
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(isAllFavorited ? 'Removed from Favorites' : '${selectedVerses.length} verse(s) favorited!'),
+                                                      duration: const Duration(seconds: 2),
+                                                    ),
+                                                  );
+                                                  ref.read(readSelectionProvider.notifier).clear();
+                                                },
+                                              ),
+                                              const SizedBox(height: 16),
+                                              _buildActionIcon(
+                                                Icons.copy_rounded,
+                                                'Copy',
+                                                Theme.of(context).colorScheme.onSurface,
+                                                () {
+                                                  if (flatChapters.isNotEmpty) {
+                                                    try {
+                                                      final chapter = flatChapters.firstWhere(
+                                                        (c) => c.book.name == readLoc.bookName && c.chapter.number == readLoc.chapter,
+                                                      ).chapter;
+                                                      final sorted = selectedVerses.toList()..sort();
+                                                      final texts = sorted.map((v) => v - 1 >= 0 && v - 1 < chapter.verses.length ? '$v. ${chapter.verses[v-1].text}' : '').join(' ');
+                                                      final refStr = '${readLoc.bookName} ${readLoc.chapter}:${sorted.join(', ')}';
+                                                      Clipboard.setData(ClipboardData(text: '$texts — $refStr'));
+                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                        const SnackBar(content: Text('Copied to clipboard'), duration: Duration(seconds: 2)),
+                                                      );
+                                                    } catch (_) {}
+                                                  }
+                                                  ref.read(readSelectionProvider.notifier).clear();
+                                                },
+                                              ),
+                                              const SizedBox(height: 16),
+                                              _buildActionIcon(
                                                 Icons.note_add_outlined,
                                                 'Note',
                                                 Theme.of(context).colorScheme.onSurface,
-                                                () => ref.read(readSelectionProvider.notifier).clear(),
+                                                () {
+                                                  final sorted = selectedVerses.toList()..sort();
+                                                  final refStr = '${readLoc.bookName} ${readLoc.chapter}:${sorted.join(', ')}';
+                                                  showAddNoteSheet(context, theme, initialReference: refStr);
+                                                  ref.read(readSelectionProvider.notifier).clear();
+                                                },
                                               ),
                                               const SizedBox(height: 16),
                                               IconButton(

@@ -8,7 +8,7 @@ void main() {
       final spans = VerseLinker.parse("In the beginning, Genesis 1:1 says...");
       expect(spans.length, 3);
       expect((spans[0] as TextSpan).text, "In the beginning, ");
-      expect((spans[1] as TextSpan).text, "Genesis 1:1");
+      expect((spans[1] as TextSpan).toPlainText(), "Genesis 1:1");
       expect((spans[2] as TextSpan).text, " says...");
     });
 
@@ -16,7 +16,7 @@ void main() {
       final spans = VerseLinker.parse("Read 1 Kings 8:22 for more.");
       expect(spans.length, 3);
       expect((spans[0] as TextSpan).text, "Read ");
-      expect((spans[1] as TextSpan).text, "1 Kings 8:22");
+      expect((spans[1] as TextSpan).toPlainText(), "1 Kings 8:22");
       expect((spans[2] as TextSpan).text, " for more.");
     });
 
@@ -24,14 +24,14 @@ void main() {
       final spans = VerseLinker.parse("Go to Song of Solomon 2:1 now.");
       expect(spans.length, 3);
       expect((spans[0] as TextSpan).text, "Go to ");
-      expect((spans[1] as TextSpan).text, "Song of Solomon 2:1");
+      expect((spans[1] as TextSpan).toPlainText(), "Song of Solomon 2:1");
       expect((spans[2] as TextSpan).text, " now.");
     });
 
     test('parses reference with verse range', () {
       final spans = VerseLinker.parse("Look at John 3:16-18.");
       expect(spans.length, 3);
-      expect((spans[1] as TextSpan).text, "John 3:16-18");
+      expect((spans[1] as TextSpan).toPlainText(), "John 3:16-18");
     });
 
     test('does not falsely match plain times or numbers', () {
@@ -44,8 +44,8 @@ void main() {
     test('multiple references in one string', () {
       final spans = VerseLinker.parse("See Genesis 1:1 and Revelation 22:21.");
       expect(spans.length, 5); // "See ", "Genesis 1:1", " and ", "Revelation 22:21", "."
-      expect((spans[1] as TextSpan).text, "Genesis 1:1");
-      expect((spans[3] as TextSpan).text, "Revelation 22:21");
+      expect((spans[1] as TextSpan).toPlainText(), "Genesis 1:1");
+      expect((spans[3] as TextSpan).toPlainText(), "Revelation 22:21");
     });
   });
 }

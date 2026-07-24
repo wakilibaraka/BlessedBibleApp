@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'search_engine.dart';
 
+import '../data/local_storage/preferences_service.dart';
+
 class SearchState {
   final String query;
   final bool filterBible;
@@ -47,25 +49,14 @@ class SearchNotifier extends Notifier<SearchState> {
       }
     });
 
-    return SearchState(
-      // Seed with some mock recent places
-      recentPlaces: [
-        SearchResult(
-          title: 'Revelation 14:1',
-          subtitle: 'Bible Verse',
-          snippet: 'And I looked, and, lo, a Lamb stood on the mount Sion...',
-          type: SearchResultType.bible,
-          metadata: {'book': 'Revelation', 'chapter': 14, 'verse': 1},
-        ),
-        SearchResult(
-          title: 'Genesis 1:1 - Uriah Smith',
-          subtitle: 'Commentary Note',
-          snippet: 'God spoke, and His words created His works...',
-          type: SearchResultType.commentary,
-          metadata: {'book': 'Genesis', 'chapter': 1, 'verse': 1},
-        ),
-      ]
-    );
+    _loadRecentPlaces();
+
+    return SearchState();
+  }
+
+  Future<void> _loadRecentPlaces() async {
+    final history = await preferencesService.getSearchHistory();
+    state = state.copyWith(recentPlaces: history);
   }
 
   void setQuery(String query) {
@@ -86,6 +77,7 @@ class SearchNotifier extends Notifier<SearchState> {
   void addRecentPlace(SearchResult result) {
     final updatedList = [result, ...state.recentPlaces.where((r) => r.title != result.title)].take(10).toList();
     state = state.copyWith(recentPlaces: updatedList);
+    preferencesService.saveSearchHistory(updatedList);
   }
 
   void _performSearch() {
