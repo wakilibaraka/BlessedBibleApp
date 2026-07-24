@@ -265,15 +265,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   ],
                 ),
 
-                const SizedBox(height: 10),
-
-                // Secondary: full-width Save
-                _PillButton(
-                  label: 'Save reflection',
-                  filled: false,
-                  fullWidth: true,
-                  onPressed: () {},
-                ),
               ],
             ),
           ),
@@ -281,13 +272,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
           const SizedBox(height: 16),
 
-          // ── Boxy Watch & Listen Liquid Glass Buttons ──────────────
+          // ── Pill Watch & Listen Liquid Glass Buttons ──────────────
           BouncyEntrance(
             delay: const Duration(milliseconds: 500),
             child: Row(
               children: [
                 Expanded(
-                  child: _BoxyGlassButton(
+                  child: _PillGlassButton(
                     icon: Icons.play_arrow_rounded,
                     label: 'Watch',
                     onTap: () {},
@@ -295,7 +286,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: _BoxyGlassButton(
+                  child: _PillGlassButton(
                     icon: Icons.headphones_rounded,
                     label: 'Listen',
                     onTap: () {},
@@ -306,7 +297,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           ),
 
           // Clearance above the floating nav bar
-          const SizedBox(height: 24),
+          const SizedBox(height: 82),
         ],
       ),
     );
@@ -320,14 +311,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 class _PillButton extends StatelessWidget {
   final String label;
   final bool filled;
-  final bool fullWidth;
   final VoidCallback onPressed;
 
   const _PillButton({
     required this.label,
     required this.filled,
     required this.onPressed,
-    this.fullWidth = false,
   });
 
   @override
@@ -342,7 +331,6 @@ class _PillButton extends StatelessWidget {
     if (filled) {
       return SizedBox(
         height: 48,
-        width: fullWidth ? double.infinity : null,
         child: ElevatedButton(
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
@@ -361,7 +349,6 @@ class _PillButton extends StatelessWidget {
     } else {
       return SizedBox(
         height: 48,
-        width: fullWidth ? double.infinity : null,
         child: OutlinedButton(
           onPressed: onPressed,
           style: OutlinedButton.styleFrom(
@@ -384,13 +371,13 @@ class _PillButton extends StatelessWidget {
   }
 }
 
-// ── Boxy Liquid Glass Button for Watch / Listen ─────────────────────
-class _BoxyGlassButton extends StatelessWidget {
+// ── Pill Liquid Glass Button for Watch / Listen ─────────────────────
+class _PillGlassButton extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
 
-  const _BoxyGlassButton({
+  const _PillGlassButton({
     required this.icon,
     required this.label,
     required this.onTap,
@@ -404,32 +391,25 @@ class _BoxyGlassButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: SizedBox(
-        height: 130, // Tall and boxy for future thumbnails
+        height: 48,
         child: GlassContainer(
-          borderRadius: BorderRadius.circular(24),
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.start,
+          borderRadius: BorderRadius.circular(50),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Future thumbnail space
-              const Spacer(),
-              Row(
-                children: [
-                  Icon(
-                    icon,
-                    size: 22,
-                    color: gold,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    label,
-                    style: theme.textTheme.labelLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: gold,
-                    ),
-                  ),
-                ],
+              Icon(
+                icon,
+                size: 20,
+                color: gold,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: gold,
+                ),
               ),
             ],
           ),
