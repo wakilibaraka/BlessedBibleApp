@@ -281,13 +281,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
           const SizedBox(height: 16),
 
-          // ── Pill Watch & Listen Liquid Glass Buttons ──────────────
+          // ── Boxy Watch & Listen Liquid Glass Buttons ──────────────
           BouncyEntrance(
             delay: const Duration(milliseconds: 500),
             child: Row(
               children: [
                 Expanded(
-                  child: _PillGlassButton(
+                  child: _BoxyGlassButton(
                     icon: Icons.play_arrow_rounded,
                     label: 'Watch',
                     onTap: () {},
@@ -295,7 +295,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: _PillGlassButton(
+                  child: _BoxyGlassButton(
                     icon: Icons.headphones_rounded,
                     label: 'Listen',
                     onTap: () {},
@@ -384,13 +384,13 @@ class _PillButton extends StatelessWidget {
   }
 }
 
-// ── Pill Liquid Glass Button for Watch / Listen ─────────────────────
-class _PillGlassButton extends StatelessWidget {
+// ── Boxy Liquid Glass Button for Watch / Listen ─────────────────────
+class _BoxyGlassButton extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
 
-  const _PillGlassButton({
+  const _BoxyGlassButton({
     required this.icon,
     required this.label,
     required this.onTap,
@@ -404,25 +404,32 @@ class _PillGlassButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: SizedBox(
-        height: 48,
+        height: 130, // Tall and boxy for future thumbnails
         child: GlassContainer(
-          borderRadius: BorderRadius.circular(50),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          borderRadius: BorderRadius.circular(24),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                icon,
-                size: 20,
-                color: gold,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: theme.textTheme.labelMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: gold,
-                ),
+              // Future thumbnail space
+              const Spacer(),
+              Row(
+                children: [
+                  Icon(
+                    icon,
+                    size: 22,
+                    color: gold,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    label,
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: gold,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
