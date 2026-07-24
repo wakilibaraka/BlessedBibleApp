@@ -108,30 +108,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
           // ── Header Row ────────────────────────────────────────────────
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Left: Bible / cross logo placeholder
-              Icon(
-                Icons.auto_stories_rounded,
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Icon(
+                  Icons.auto_stories_rounded,
                 size: 28,
                 color: theme.primaryColor,
+                ),
               ),
 
               // Center: Date
               Expanded(
-                child: Text(
-                  'Wednesday · July 22',
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: 0.3,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Text(
+                    'Wednesday · July 22',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 0.3,
+                    ),
                   ),
                 ),
               ),
 
               // Right: Animated 3-way theme toggle
-              GestureDetector(
-                onTap: () => ref.read(themeProvider.notifier).cycleTheme(),
-                child: AnimatedSwitcher(
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: GestureDetector(
+                  onTap: () => ref.read(themeProvider.notifier).cycleTheme(),
+                  child: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 350),
                   transitionBuilder: (child, anim) => RotationTransition(
                     turns: Tween<double>(begin: 0.75, end: 1.0).animate(anim),
@@ -158,6 +167,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       ),
                   },
                 ),
+              ),
               ),
             ],
           ),

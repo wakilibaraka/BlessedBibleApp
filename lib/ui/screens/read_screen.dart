@@ -445,6 +445,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                             child: SizedBox(
                               height: 48,
                               child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   // Left control (Logo)
                                   Expanded(
