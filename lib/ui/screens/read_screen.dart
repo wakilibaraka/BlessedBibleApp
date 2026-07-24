@@ -11,6 +11,7 @@ import '../../state/nav_provider.dart';
 import '../../state/study_provider.dart';
 import '../../state/read_settings_provider.dart';
 import '../widgets/verse_link_text.dart';
+import '../widgets/shared_top_header.dart';
 import '../../data/models/commentary_model.dart';
 
 import '../../state/theme_provider.dart';
@@ -452,143 +453,112 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                             // Top Navigation Bar
                             Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                            child: SizedBox(
-                              height: 48,
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  // Left control (Logo)
-                                  Expanded(
-                                    child: Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: AnimatedSlide(
-                                        duration: const Duration(milliseconds: 350),
-                                        offset: isImmersive ? const Offset(0, -1) : Offset.zero,
-                                        child: AnimatedOpacity(
-                                          duration: const Duration(milliseconds: 350),
-                                          opacity: isImmersive ? 0.0 : 1.0,
-                                          child: IgnorePointer(
-                                            ignoring: isImmersive,
-                                            child: GestureDetector(
-                                              onTap: () {
-                                                ref.read(navProvider.notifier).setIndex(0);
-                                              },
-                                              behavior: HitTestBehavior.opaque,
-                                              child: SizedBox(
-                                                width: 26,
-                                                height: 26,
-                                                child: Center(
-                                                  child: Icon(
-                                                    Icons.book_rounded,
-                                                    size: 26,
-                                                    color: theme.primaryColor,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
+                            child: SharedTopHeader(
+                                leading: AnimatedSlide(
+                                  duration: const Duration(milliseconds: 350),
+                                  offset: isImmersive ? const Offset(0, -1) : Offset.zero,
+                                  child: AnimatedOpacity(
+                                    duration: const Duration(milliseconds: 350),
+                                    opacity: isImmersive ? 0.0 : 1.0,
+                                    child: IgnorePointer(
+                                      ignoring: isImmersive,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          ref.read(navProvider.notifier).setIndex(0);
+                                        },
+                                        behavior: HitTestBehavior.opaque,
+                                        child: Center(
+                                          child: Icon(
+                                            Icons.book_rounded,
+                                            size: 26,
+                                            color: theme.primaryColor,
                                           ),
                                         ),
                                       ),
                                     ),
                                   ),
-
-                                  // Center control (Chapter Pill - Always Visible)
-                                  Flexible(
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        if (isImmersive) {
-                                          ref.read(immersiveModeProvider.notifier).set(false);
-                                        } else {
-                                          _showSelectorBottomSheet(allBooks);
-                                        }
-                                      },
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(20),
-                                        child: BackdropFilter(
-                                          filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                            decoration: BoxDecoration(
-                                              color: theme.colorScheme.surface.withValues(alpha: 0.6),
-                                              borderRadius: BorderRadius.circular(20),
-                                              border: Border.all(
-                                                color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                                                width: 1,
-                                              ),
-                                            ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Flexible(
-                                                  child: FittedBox(
-                                                    fit: BoxFit.scaleDown,
-                                                    child: ConstrainedBox(
-                                                      constraints: const BoxConstraints(maxWidth: 180),
-                                                      child: MediaQuery(
-                                                        data: MediaQuery.of(context).copyWith(
-                                                          textScaler: const TextScaler.linear(1.0),
-                                                        ),
-                                                        child: Text(
-                                                          '$currentBookName $currentChapter',
-                                                          style: theme.textTheme.titleSmall?.copyWith(
-                                                            fontWeight: FontWeight.w700,
-                                                            fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14).clamp(12.0, 18.0),
-                                                          ),
-                                                        ),
+                                ),
+                                centerContent: GestureDetector(
+                                  onTap: () {
+                                    if (isImmersive) {
+                                      ref.read(immersiveModeProvider.notifier).set(false);
+                                    } else {
+                                      _showSelectorBottomSheet(allBooks);
+                                    }
+                                  },
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: BackdropFilter(
+                                      filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                        decoration: BoxDecoration(
+                                          color: theme.colorScheme.surface.withValues(alpha: 0.6),
+                                          borderRadius: BorderRadius.circular(20),
+                                          border: Border.all(
+                                            color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                                            width: 1,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Flexible(
+                                              child: FittedBox(
+                                                fit: BoxFit.scaleDown,
+                                                child: ConstrainedBox(
+                                                  constraints: const BoxConstraints(maxWidth: 180),
+                                                  child: MediaQuery(
+                                                    data: MediaQuery.of(context).copyWith(
+                                                      textScaler: const TextScaler.linear(1.0),
+                                                    ),
+                                                    child: Text(
+                                                      '$currentBookName $currentChapter',
+                                                      style: theme.textTheme.titleSmall?.copyWith(
+                                                        fontWeight: FontWeight.w700,
+                                                        fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14).clamp(12.0, 18.0),
                                                       ),
                                                     ),
                                                   ),
                                                 ),
-                                                const SizedBox(width: 4),
-                                                Icon(Icons.keyboard_arrow_down_rounded, 
-                                                  size: 16, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-
-                                  // Right control (Typography)
-                                  Expanded(
-                                    child: Align(
-                                      alignment: Alignment.centerRight,
-                                      child: AnimatedSlide(
-                                        duration: const Duration(milliseconds: 350),
-                                        offset: isImmersive ? const Offset(0, -1) : Offset.zero,
-                                        child: AnimatedOpacity(
-                                          duration: const Duration(milliseconds: 350),
-                                          opacity: isImmersive ? 0.0 : 1.0,
-                                          child: IgnorePointer(
-                                            ignoring: isImmersive,
-                                            child: GestureDetector(
-                                              onTap: _showTypographyBottomSheet,
-                                              behavior: HitTestBehavior.opaque,
-                                              child: SizedBox(
-                                                width: 26,
-                                                height: 26,
-                                                child: Center(
-                                                  child: Text(
-                                                    'aA',
-                                                    style: theme.textTheme.titleLarge?.copyWith(
-                                                      fontWeight: FontWeight.w600,
-                                                      color: theme.colorScheme.onSurface,
-                                                      letterSpacing: -1.0,
-                                                    ),
-                                                  ),
-                                                ),
                                               ),
                                             ),
+                                            const SizedBox(width: 4),
+                                            Icon(Icons.keyboard_arrow_down_rounded, 
+                                              size: 16, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                trailing: AnimatedSlide(
+                                  duration: const Duration(milliseconds: 350),
+                                  offset: isImmersive ? const Offset(0, -1) : Offset.zero,
+                                  child: AnimatedOpacity(
+                                    duration: const Duration(milliseconds: 350),
+                                    opacity: isImmersive ? 0.0 : 1.0,
+                                    child: IgnorePointer(
+                                      ignoring: isImmersive,
+                                      child: GestureDetector(
+                                        onTap: _showTypographyBottomSheet,
+                                        behavior: HitTestBehavior.opaque,
+                                        child: Center(
+                                          child: Text(
+                                            'aA',
+                                            style: theme.textTheme.titleLarge?.copyWith(
+                                              fontWeight: FontWeight.w600,
+                                              color: theme.colorScheme.onSurface,
+                                              letterSpacing: -1.0,
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ],
+                                ),
                               ),
                             ),
-                          ),
                         const SizedBox(height: 12),
                       ],
                     ),

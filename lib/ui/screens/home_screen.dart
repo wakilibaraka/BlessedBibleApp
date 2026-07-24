@@ -6,6 +6,7 @@ import '../../state/home_provider.dart';
 import '../../state/nav_provider.dart';
 import '../../state/study_provider.dart';
 import '../../state/theme_provider.dart';
+import '../widgets/shared_top_header.dart';
 import '../widgets/glass_container.dart';
 import '../widgets/bouncy_entrance.dart';
 
@@ -107,72 +108,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           const SizedBox(height: 12),
 
           // ── Header Row ────────────────────────────────────────────────
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Left: Bible / cross logo placeholder
-              SizedBox(
-                width: 26,
-                height: 26,
-                child: Center(
-                  child: Icon(
-                    Icons.book_rounded,
-                    size: 26,
-                    color: theme.primaryColor,
-                  ),
-                ),
+          SharedTopHeader(
+            centerContent: Text(
+              'Wednesday · July 22',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w500,
+                letterSpacing: 0.3,
               ),
-
-              // Center: Date
-              Expanded(
-                child: Text(
-                  'Wednesday · July 22',
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: 0.3,
-                  ),
-                ),
-              ),
-
-              // Right: Animated 3-way theme toggle
-              SizedBox(
-                width: 26,
-                height: 26,
-                child: Center(
-                  child: GestureDetector(
-                    onTap: () => ref.read(themeProvider.notifier).cycleTheme(),
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 350),
-                      transitionBuilder: (child, anim) => RotationTransition(
-                        turns: Tween<double>(begin: 0.75, end: 1.0).animate(anim),
-                        child: FadeTransition(opacity: anim, child: child),
-                      ),
-                      child: switch (appThemeMode) {
-                        AppThemeMode.light    => Icon(
-                            Icons.wb_sunny_outlined,
-                            key: const ValueKey('light'),
-                            size: 26,
-                            color: theme.primaryColor,
-                          ),
-                        AppThemeMode.sepia => Icon(
-                            Icons.auto_awesome,
-                            key: const ValueKey('sepia'),
-                            size: 26,
-                            color: theme.primaryColor,
-                          ),
-                        AppThemeMode.dark     => Icon(
-                            Icons.nightlight_round,
-                            key: const ValueKey('dark'),
-                            size: 26,
-                            color: theme.primaryColor,
-                          ),
-                      },
-                    ),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
 
           // ── Spacer pushes verse downward to balance the layout ────────────
@@ -259,7 +203,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       child: _PillButton(
                         label: 'Share',
                         filled: false,
-                        onPressed: () {},
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Share dialog opened')),
+                          );
+                        },
                       ),
                     ),
                   ],
@@ -281,7 +229,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   child: _PillGlassButton(
                     icon: Icons.play_arrow_rounded,
                     label: 'Watch',
-                    onTap: () {},
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Media features coming in a future update')),
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -289,7 +241,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   child: _PillGlassButton(
                     icon: Icons.headphones_rounded,
                     label: 'Listen',
-                    onTap: () {},
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Media features coming in a future update')),
+                      );
+                    },
                   ),
                 ),
               ],
