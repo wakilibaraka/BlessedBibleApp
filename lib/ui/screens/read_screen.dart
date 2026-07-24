@@ -466,19 +466,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                               behavior: HitTestBehavior.opaque,
                                               child: Padding(
                                                 padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
-                                                child: Row(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    Icon(Icons.auto_stories_rounded, color: theme.colorScheme.onSurface),
-                                                    const SizedBox(width: 8),
-                                                    Text(
-                                                      'Home',
-                                                      style: theme.textTheme.titleMedium?.copyWith(
-                                                        fontWeight: FontWeight.w600,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
+                                                child: Icon(Icons.auto_stories_rounded, color: theme.colorScheme.onSurface),
                                               ),
                                             ),
                                           ),

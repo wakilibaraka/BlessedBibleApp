@@ -239,13 +239,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
                 const SizedBox(height: 14),
 
-                // Primary action row: Read + Listen
+                // Primary action row: Go Deeper + Share
                 Row(
                   children: [
                     Expanded(
                       flex: 3,
                       child: _PillButton(
-                        label: 'Read the Commentary',
+                        label: 'Go Deeper',
                         filled: true,
                         onPressed: () {
                           ref.read(activeStudyVerseProvider.notifier).setVerse(data.verseOfTheDay.reference);
@@ -257,7 +257,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     Expanded(
                       flex: 2,
                       child: _PillButton(
-                        label: '\u25B6  Listen',
+                        label: 'Share',
                         filled: false,
                         onPressed: () {},
                       ),
@@ -279,8 +279,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           ),
           ),
 
-          // Comfortable clearance above the floating nav bar (≈ 64dp)
-          const SizedBox(height: 64),
+          const SizedBox(height: 16),
+
+          // ── Circular Watch & Listen Liquid Glass Buttons ──────────────
+          BouncyEntrance(
+            delay: const Duration(milliseconds: 500),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _CircularGlassButton(
+                  icon: Icons.play_arrow_rounded,
+                  label: 'Watch',
+                  onTap: () {},
+                ),
+                const SizedBox(width: 32),
+                _CircularGlassButton(
+                  icon: Icons.headphones_rounded,
+                  label: 'Listen',
+                  onTap: () {},
+                ),
+              ],
+            ),
+          ),
+
+          // Clearance above the floating nav bar
+          const SizedBox(height: 24),
         ],
       ),
     );
@@ -355,6 +378,52 @@ class _PillButton extends StatelessWidget {
         ),
       );
     }
+  }
+}
+
+// ── Circular Liquid Glass Button for Watch / Listen ─────────────────────
+class _CircularGlassButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _CircularGlassButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final gold = theme.primaryColor;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          GlassContainer(
+            borderRadius: BorderRadius.circular(30),
+            padding: const EdgeInsets.all(14),
+            child: Icon(
+              icon,
+              size: 24,
+              color: gold,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            label,
+            style: theme.textTheme.labelSmall?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+              letterSpacing: 0.3,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
