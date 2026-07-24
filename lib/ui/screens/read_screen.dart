@@ -10,6 +10,7 @@ import '../../state/bible_provider.dart';
 import '../../state/nav_provider.dart';
 import '../../state/study_provider.dart';
 import '../../state/read_settings_provider.dart';
+import '../../state/user_data_provider.dart';
 import '../widgets/verse_link_text.dart';
 import '../widgets/shared_top_header.dart';
 import '../../data/models/commentary_model.dart';
@@ -351,6 +352,14 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                                         }
                                                       }
                                                     });
+                                                    
+                                                    final highlights = ref.watch(highlightsProvider);
+                                                    final refStr = '${fc.book.name} ${fc.chapter.number}:${verse.number}';
+                                                    final savedColorIndex = highlights[refStr];
+                                                    Color? highlightColor;
+                                                    if (savedColorIndex != null && savedColorIndex >= 0 && savedColorIndex < highlightPalette.length) {
+                                                      highlightColor = highlightPalette[savedColorIndex];
+                                                    }
 
                                                 return GestureDetector(
                                                   onTap: () => _toggleVerseSelection(index),
@@ -373,8 +382,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                                                   ? (isDark
                                                                       ? Colors.amber.withValues(alpha: 0.15)
                                                                       : Colors.amber.withValues(alpha: 0.10))
-                                                                  : (verse.isHighlighted
-                                                                      ? Colors.amber.withValues(alpha: 0.10)
+                                                                  : (highlightColor != null
+                                                                      ? highlightColor.withValues(alpha: isDark ? 0.20 : 0.15)
                                                                       : Colors.transparent)),
                                                           borderRadius: BorderRadius.circular(12),
                                                         ),

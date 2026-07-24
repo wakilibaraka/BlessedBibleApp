@@ -10,6 +10,7 @@ import 'analysis_screen.dart';
 import 'commentary_list_screen.dart';
 import 'reading_plan_screen.dart';
 import '../widgets/bouncy_entrance.dart';
+import 'your_space_screen.dart' as your_space;
 
 class StudyScreen extends ConsumerStatefulWidget {
   const StudyScreen({super.key});
@@ -141,6 +142,8 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
 
               // ── ACTIVE READING PLAN BANNER ────────────────────────
               _buildReadingPlanBanner(context, theme),
+              const SizedBox(height: 16),
+              _buildYourSpaceBanner(context, theme),
 
               const SizedBox(height: 16),
 
@@ -454,6 +457,75 @@ He said in a loud voice, 'Fear God and give him glory, because the hour of his j
                     ),
                     child: Icon(Icons.play_arrow_rounded, color: theme.primaryColor, size: 28),
                   ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildYourSpaceBanner(BuildContext context, ThemeData theme) {
+    return TexturedGlassContainer(
+      borderRadius: BorderRadius.circular(20),
+      padding: EdgeInsets.zero,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const your_space.YourSpaceScreen()),
+            );
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              gradient: LinearGradient(
+                colors: [
+                  theme.primaryColor.withValues(alpha: 0.1),
+                  Colors.transparent,
+                ],
+                begin: Alignment.centerRight,
+                end: Alignment.centerLeft,
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Your Space',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'View all your color-coded highlighted verses.',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.8),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: theme.primaryColor.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Icon(Icons.auto_awesome, color: theme.primaryColor),
+                    ),
+                  )
                 ],
               ),
             ),

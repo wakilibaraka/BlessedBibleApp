@@ -6,6 +6,7 @@ class PreferencesService {
   static const String _searchHistoryKey = 'search_history';
   static const String _bookmarksKey = 'bookmarks';
   static const String _favoritesKey = 'favorites';
+  static const String _highlightsKey = 'highlights';
 
   Future<void> saveSearchHistory(List<SearchResult> history) async {
     final prefs = await SharedPreferences.getInstance();
@@ -45,6 +46,25 @@ class PreferencesService {
   Future<List<String>> getFavorites() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getStringList(_favoritesKey) ?? [];
+  }
+
+  Future<void> saveHighlights(Map<String, int> highlights) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_highlightsKey, jsonEncode(highlights));
+  }
+
+  Future<Map<String, int>> getHighlights() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonString = prefs.getString(_highlightsKey);
+    if (jsonString != null) {
+      try {
+        final Map<String, dynamic> decoded = jsonDecode(jsonString);
+        return decoded.map((key, value) => MapEntry(key, value as int));
+      } catch (e) {
+        return {};
+      }
+    }
+    return {};
   }
 }
 

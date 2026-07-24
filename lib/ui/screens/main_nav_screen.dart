@@ -247,10 +247,26 @@ class MainNavScreen extends ConsumerWidget {
                                               ),
                                             ),
                                             const SizedBox(width: 12),
-                                            _buildColorDot(Colors.yellow.withValues(alpha: 0.8)),
-                                            _buildColorDot(Colors.lightGreen.withValues(alpha: 0.8)),
-                                            _buildColorDot(Colors.lightBlue.withValues(alpha: 0.8)),
-                                            _buildColorDot(Colors.pinkAccent.withValues(alpha: 0.8)),
+                                            ...List.generate(highlightPalette.length, (i) {
+                                              final color = highlightPalette[i];
+                                              final allHaveThisColor = selectedVerses.every((v) {
+                                                final refStr = '${readLoc.bookName} ${readLoc.chapter}:$v';
+                                                final highlights = ref.read(highlightsProvider);
+                                                return highlights.containsKey(refStr) && highlights[refStr] == i;
+                                              });
+
+                                              return _buildColorDot(
+                                                color,
+                                                isSelected: allHaveThisColor,
+                                                onTap: () {
+                                                  for (var v in selectedVerses) {
+                                                    final refStr = '${readLoc.bookName} ${readLoc.chapter}:$v';
+                                                    ref.read(highlightsProvider.notifier).toggleHighlight(refStr, i);
+                                                  }
+                                                  ref.read(readSelectionProvider.notifier).clear();
+                                                },
+                                              );
+                                            }),
                                           ],
                                         ),
                                       ),
@@ -587,15 +603,22 @@ class MainNavScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildColorDot(Color color) {
+  Widget _buildColorDot(Color color, {bool isSelected = false, VoidCallback? onTap}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4.0),
-      child: Container(
-        width: 16,
-        height: 16,
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 20,
+          height: 20,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.8),
+            shape: BoxShape.circle,
+            border: isSelected ? Border.all(color: Colors.white, width: 2) : null,
+            boxShadow: isSelected
+                ? [BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 4, spreadRadius: 1)]
+                : null,
+          ),
         ),
       ),
     );

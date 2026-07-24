@@ -1,5 +1,14 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/local_storage/preferences_service.dart';
+
+const List<Color> highlightPalette = [
+  Colors.yellow,
+  Colors.lightGreen,
+  Colors.lightBlue,
+  Colors.pinkAccent,
+  Colors.orange,
+];
 
 class BookmarksNotifier extends Notifier<Set<String>> {
   @override
@@ -48,3 +57,30 @@ class FavoritesNotifier extends Notifier<Set<String>> {
 }
 
 final favoritesProvider = NotifierProvider<FavoritesNotifier, Set<String>>(FavoritesNotifier.new);
+
+class HighlightsNotifier extends Notifier<Map<String, int>> {
+  @override
+  Map<String, int> build() {
+    _load();
+    return {};
+  }
+
+  Future<void> _load() async {
+    final map = await preferencesService.getHighlights();
+    state = Map.from(map);
+  }
+
+  void toggleHighlight(String reference, int colorIndex) {
+    final newState = Map<String, int>.from(state);
+    if (newState.containsKey(reference) && newState[reference] == colorIndex) {
+      newState.remove(reference); // Toggle off if tapping the same color
+    } else {
+      newState[reference] = colorIndex; // Update or add highlight
+    }
+    state = newState;
+    preferencesService.saveHighlights(newState);
+  }
+}
+
+final highlightsProvider = NotifierProvider<HighlightsNotifier, Map<String, int>>(HighlightsNotifier.new);
+
