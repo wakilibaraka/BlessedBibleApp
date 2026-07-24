@@ -5,6 +5,7 @@ import '../../state/glass_ui_provider.dart';
 import '../../state/nav_settings_provider.dart';
 import '../../state/search_settings_provider.dart';
 import '../../state/bible_nav_settings_provider.dart';
+import '../../state/read_settings_provider.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -93,6 +94,30 @@ class SettingsScreen extends StatelessWidget {
               subtitle: const Text('Automatically dismiss the picker after the last step'),
               value: autoClose,
               onChanged: (value) => ref.read(bibleNavSettingsProvider.notifier).setAutoClose(value),
+            );
+          }),
+          const Divider(),
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 8.0),
+            child: Text(
+              'Font/Typography',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+          ),
+          Consumer(builder: (context, ref, _) {
+            final viewMode = ref.watch(readSettingsProvider.select((s) => s.readingViewMode));
+            return _AnimatedSegmentedTile<ReadingViewMode>(
+              title: 'Reading View',
+              subtitle: 'How the header behaves when scrolling',
+              selectedValue: viewMode,
+              options: const [
+                MapEntry(ReadingViewMode.immersive, 'Immersive'),
+                MapEntry(ReadingViewMode.pinned, 'Pinned header'),
+              ],
+              onChanged: (val) => ref.read(readSettingsProvider.notifier).setReadingViewMode(val),
             );
           }),
         ],

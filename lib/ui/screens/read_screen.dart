@@ -9,6 +9,7 @@ import '../../data/models/bible_model.dart';
 import '../../state/bible_provider.dart';
 import '../../state/nav_provider.dart';
 import '../../state/study_provider.dart';
+import '../../state/read_settings_provider.dart';
 import '../../data/models/commentary_model.dart';
 
 import '../../state/theme_provider.dart';
@@ -144,6 +145,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
     final appThemeMode = ref.watch(themeProvider);
     final isDark = appThemeMode == AppThemeMode.dark;
     final typography = ref.watch(typographyProvider);
+    final readSettings = ref.watch(readSettingsProvider);
     final selectedVerses = ref.watch(readSelectionProvider);
     final isImmersive = ref.watch(immersiveModeProvider);
     final commentaryDataAsync = ref.watch(combinedCommentaryProvider);
@@ -434,9 +436,13 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                   top: 0, left: 0, right: 0,
                   child: ClipRRect(
                     child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
+                      filter: readSettings.readingViewMode == ReadingViewMode.pinned
+                          ? ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0)
+                          : ImageFilter.blur(sigmaX: 0.0, sigmaY: 0.0),
                       child: Container(
-                        color: theme.scaffoldBackgroundColor.withValues(alpha: 0.85),
+                        color: readSettings.readingViewMode == ReadingViewMode.pinned
+                            ? theme.scaffoldBackgroundColor.withValues(alpha: 0.85)
+                            : Colors.transparent,
                         padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
@@ -513,12 +519,23 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
                                                 Flexible(
-                                                  child: Text(
-                                                    '$currentBookName $currentChapter',
-                                                    style: theme.textTheme.titleSmall?.copyWith(
-                                                      fontWeight: FontWeight.w700,
+                                                  child: FittedBox(
+                                                    fit: BoxFit.scaleDown,
+                                                    child: ConstrainedBox(
+                                                      constraints: const BoxConstraints(maxWidth: 180),
+                                                      child: MediaQuery(
+                                                        data: MediaQuery.of(context).copyWith(
+                                                          textScaler: const TextScaler.linear(1.0),
+                                                        ),
+                                                        child: Text(
+                                                          '$currentBookName $currentChapter',
+                                                          style: theme.textTheme.titleSmall?.copyWith(
+                                                            fontWeight: FontWeight.w700,
+                                                            fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14).clamp(12.0, 18.0),
+                                                          ),
+                                                        ),
+                                                      ),
                                                     ),
-                                                    overflow: TextOverflow.ellipsis,
                                                   ),
                                                 ),
                                                 const SizedBox(width: 4),
