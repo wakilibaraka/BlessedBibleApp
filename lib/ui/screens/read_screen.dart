@@ -9,6 +9,8 @@ import '../../data/models/bible_model.dart';
 import '../../state/bible_provider.dart';
 import '../../state/nav_provider.dart';
 import '../../state/study_provider.dart';
+import '../../data/models/commentary_model.dart';
+
 import '../../state/theme_provider.dart';
 import '../../state/typography_provider.dart';
 import '../../state/immersive_mode_provider.dart';
@@ -144,7 +146,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
     final typography = ref.watch(typographyProvider);
     final selectedVerses = ref.watch(readSelectionProvider);
     final isImmersive = ref.watch(immersiveModeProvider);
-    final commentaryDataAsync = ref.watch(commentaryDataProvider);
+    final commentaryDataAsync = ref.watch(combinedCommentaryProvider);
 
     final bibleState = ref.watch(bibleProvider);
     final isLoading = bibleState.isLoading;
@@ -296,7 +298,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                             if (index == verses.length) {
                                               bool hasChapterCommentary = false;
                                               commentaryDataAsync.whenData((state) {
-                                                final bookCommentary = state[fc.book.name];
+                                                final bookCommentary = state.data[fc.book.name];
                                                 if (bookCommentary != null) {
                                                   final chapterCommentary = bookCommentary[fc.chapter.number.toString()];
                                                   if (chapterCommentary != null && chapterCommentary.isNotEmpty) {
@@ -320,17 +322,31 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                                   child: Builder(
                                                   builder: (context) {
                                                     bool hasCommentary = false;
-                                                    commentaryDataAsync.whenData((commentaryData) {
-                                                      final bookCommentary = commentaryData[fc.book.name];
+                                                    commentaryDataAsync.whenData((state) {
+                                                      final bookCommentary = state.data[fc.book.name];
                                                       if (bookCommentary != null) {
                                                         final chapterCommentary = bookCommentary[fc.chapter.number.toString()];
-                                                    if (chapterCommentary != null) {
-                                                      if (chapterCommentary.containsKey(verse.number.toString())) {
-                                                        hasCommentary = true;
+                                                        if (chapterCommentary != null) {
+                                                          final targetVerse = verse.number;
+                                                          for (final key in chapterCommentary.keys) {
+                                                            if (key == targetVerse.toString()) {
+                                                              hasCommentary = true;
+                                                              break;
+                                                            } else if (key.contains('-')) {
+                                                              final parts = key.split('-');
+                                                              if (parts.length == 2) {
+                                                                final start = int.tryParse(parts[0]);
+                                                                final end = int.tryParse(parts[1]);
+                                                                if (start != null && end != null && targetVerse >= start && targetVerse <= end) {
+                                                                  hasCommentary = true;
+                                                                  break;
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
                                                       }
-                                                    }
-                                                  }
-                                                });
+                                                    });
 
                                                 return GestureDetector(
                                                   onTap: () => _toggleVerseSelection(index),
@@ -1788,9 +1804,26 @@ class _CommentaryBottomSheetContent extends ConsumerWidget {
   Widget _buildCommentaryContent(AsyncValue<CombinedCommentaryState> commentaryDataAsync, ThemeData theme, TypographyState typography, ScrollController scrollController) {
     return commentaryDataAsync.when(
       data: (state) {
-        final entries = state.data[bookName]?[chapter.toString()]?[verseNumber.toString()];
+        final chapterData = state.data[bookName]?[chapter.toString()];
+        final List<CommentaryEntry> entries = [];
+        if (chapterData != null) {
+          for (final key in chapterData.keys) {
+            if (key == verseNumber.toString()) {
+              entries.addAll(chapterData[key]!);
+            } else if (key.contains('-')) {
+              final parts = key.split('-');
+              if (parts.length == 2) {
+                final start = int.tryParse(parts[0]);
+                final end = int.tryParse(parts[1]);
+                if (start != null && end != null && verseNumber >= start && verseNumber <= end) {
+                  entries.addAll(chapterData[key]!);
+                }
+              }
+            }
+          }
+        }
         
-        if (entries == null || entries.isEmpty) {
+        if (entries.isEmpty) {
           return ListView(
             controller: scrollController,
             children: const [
