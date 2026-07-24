@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class VerseLinker {
@@ -13,13 +14,19 @@ class VerseLinker {
 
   static final RegExp _regex = () {
     final booksPattern = _books.join('|');
-    // Matches: "Book Chapter:Verse" or "Book Chapter:Verse-Verse"
-    // e.g., "1 Corinthians 13:4-8", "Song of Solomon 2:1"
-    return RegExp(r'\b(' + booksPattern + r')\s+\d+:\d+(?:-\d+)?\b');
+    // Group 1: Book name
+    // Group 2: Numbers (e.g., 1:1 or 13:4-8)
+    return RegExp(r'\b(' + booksPattern + r')\s+(\d+:\d+(?:-\d+)?)\b');
   }();
 
   /// Parses a string and returns a list of TextSpans, separating normal text from Bible references.
-  static List<InlineSpan> parse(String text, {TextStyle? defaultStyle, TextStyle? referenceStyle}) {
+  static List<InlineSpan> parse(
+    String text, {
+    TextStyle? defaultStyle,
+    TextStyle? referenceStyle,
+    TextStyle? numberStyle,
+    GestureRecognizer Function(String reference)? recognizerBuilder,
+  }) {
     final List<InlineSpan> spans = [];
     int lastMatchEnd = 0;
 
@@ -31,12 +38,21 @@ class VerseLinker {
         ));
       }
 
-      // The matched reference
       final reference = match.group(0)!;
+      final bookName = match.group(1)!;
+      final numbers = match.group(2)!;
+      
       spans.add(TextSpan(
-        text: reference,
-        style: referenceStyle ?? defaultStyle, // No visual change by default
-        // In the future, a gesture recognizer will be added here
+        style: referenceStyle ?? defaultStyle,
+        recognizer: recognizerBuilder?.call(reference),
+        children: [
+          TextSpan(text: bookName),
+          const TextSpan(text: ' '),
+          TextSpan(
+            text: numbers,
+            style: numberStyle,
+          ),
+        ],
       ));
 
       lastMatchEnd = match.end;

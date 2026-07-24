@@ -10,7 +10,7 @@ import '../../state/bible_provider.dart';
 import '../../state/nav_provider.dart';
 import '../../state/study_provider.dart';
 import '../../state/read_settings_provider.dart';
-import '../../utils/verse_linker.dart';
+import '../widgets/verse_link_text.dart';
 import '../../data/models/commentary_model.dart';
 
 import '../../state/theme_provider.dart';
@@ -1924,22 +1924,18 @@ class _CommentaryBottomSheetContent extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  RichText(
-                    text: TextSpan(
-                      children: VerseLinker.parse(
-                        entry.text,
-                        defaultStyle: theme.textTheme.bodySmall?.copyWith(
-                          height: 1.6,
-                          color: theme.textTheme.bodyLarge?.color?.withValues(alpha: 0.9),
-                        ),
-                        referenceStyle: const TextStyle(
-                          decoration: TextDecoration.underline,
-                        ),
-                        numberStyle: TextStyle(
-                          color: theme.primaryColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                  VerseLinkText(
+                    text: entry.text,
+                    defaultStyle: theme.textTheme.bodySmall?.copyWith(
+                      height: 1.6,
+                      color: theme.textTheme.bodyLarge?.color?.withValues(alpha: 0.9),
+                    ),
+                    referenceStyle: const TextStyle(
+                      decoration: TextDecoration.underline,
+                    ),
+                    numberStyle: TextStyle(
+                      color: theme.primaryColor,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],

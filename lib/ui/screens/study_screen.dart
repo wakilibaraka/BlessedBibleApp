@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../state/study_provider.dart';
-import '../../utils/verse_linker.dart';
+import '../widgets/verse_link_text.dart';
 import '../../state/theme_provider.dart';
 import '../widgets/textured_glass_container.dart';
 import 'analysis_screen.dart';
@@ -553,23 +553,19 @@ He said in a loud voice, 'Fear God and give him glory, because the hour of his j
                     ),
                   ),
                   const SizedBox(height: 8),
-                  RichText(
-                    text: TextSpan(
-                      children: VerseLinker.parse(
-                        displaySnippet,
-                        defaultStyle: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.85),
-                          height: 1.5,
-                          fontStyle: FontStyle.italic,
-                        ),
-                        referenceStyle: const TextStyle(
-                          decoration: TextDecoration.underline,
-                        ),
-                        numberStyle: TextStyle(
-                          color: theme.primaryColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                  VerseLinkText(
+                    text: displaySnippet,
+                    defaultStyle: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.85),
+                      height: 1.5,
+                      fontStyle: FontStyle.italic,
+                    ),
+                    referenceStyle: const TextStyle(
+                      decoration: TextDecoration.underline,
+                    ),
+                    numberStyle: TextStyle(
+                      color: theme.primaryColor,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 16),
