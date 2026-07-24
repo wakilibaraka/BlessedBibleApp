@@ -281,22 +281,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
           const SizedBox(height: 16),
 
-          // ── Circular Watch & Listen Liquid Glass Buttons ──────────────
+          // ── Pill Watch & Listen Liquid Glass Buttons ──────────────
           BouncyEntrance(
             delay: const Duration(milliseconds: 500),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _CircularGlassButton(
-                  icon: Icons.play_arrow_rounded,
-                  label: 'Watch',
-                  onTap: () {},
+                Expanded(
+                  child: _PillGlassButton(
+                    icon: Icons.play_arrow_rounded,
+                    label: 'Watch',
+                    onTap: () {},
+                  ),
                 ),
-                const SizedBox(width: 32),
-                _CircularGlassButton(
-                  icon: Icons.headphones_rounded,
-                  label: 'Listen',
-                  onTap: () {},
+                const SizedBox(width: 16),
+                Expanded(
+                  child: _PillGlassButton(
+                    icon: Icons.headphones_rounded,
+                    label: 'Listen',
+                    onTap: () {},
+                  ),
                 ),
               ],
             ),
@@ -381,13 +384,13 @@ class _PillButton extends StatelessWidget {
   }
 }
 
-// ── Circular Liquid Glass Button for Watch / Listen ─────────────────────
-class _CircularGlassButton extends StatelessWidget {
+// ── Pill Liquid Glass Button for Watch / Listen ─────────────────────
+class _PillGlassButton extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
 
-  const _CircularGlassButton({
+  const _PillGlassButton({
     required this.icon,
     required this.label,
     required this.onTap,
@@ -400,34 +403,30 @@ class _CircularGlassButton extends StatelessWidget {
 
     return GestureDetector(
       onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            width: 64,
-            height: 64,
-            child: GlassContainer(
-              borderRadius: BorderRadius.circular(32),
-              padding: EdgeInsets.zero,
-              child: Center(
-                child: Icon(
-                  icon,
-                  size: 28,
+      child: SizedBox(
+        height: 48,
+        child: GlassContainer(
+          borderRadius: BorderRadius.circular(50),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 20,
+                color: gold,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
                   color: gold,
                 ),
               ),
-            ),
+            ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: theme.textTheme.labelSmall?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
-              letterSpacing: 0.3,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
