@@ -464,9 +464,16 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                                 ref.read(navProvider.notifier).setIndex(0);
                                               },
                                               behavior: HitTestBehavior.opaque,
-                                              child: Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
-                                                child: Icon(Icons.auto_stories_rounded, color: theme.colorScheme.onSurface),
+                                              child: SizedBox(
+                                                width: 26,
+                                                height: 26,
+                                                child: Center(
+                                                  child: Icon(
+                                                    Icons.book_rounded,
+                                                    size: 26,
+                                                    color: theme.primaryColor,
+                                                  ),
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -476,41 +483,46 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                   ),
 
                                   // Center control (Chapter Pill - Always Visible)
-                                  GestureDetector(
-                                    onTap: () {
-                                      if (isImmersive) {
-                                        ref.read(immersiveModeProvider.notifier).set(false);
-                                      } else {
-                                        _showSelectorBottomSheet(allBooks);
-                                      }
-                                    },
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(20),
-                                      child: BackdropFilter(
-                                        filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                          decoration: BoxDecoration(
-                                            color: theme.colorScheme.surface.withValues(alpha: 0.6),
-                                            borderRadius: BorderRadius.circular(20),
-                                            border: Border.all(
-                                              color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                                              width: 1,
-                                            ),
-                                          ),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Text(
-                                                '$currentBookName $currentChapter',
-                                                style: theme.textTheme.titleSmall?.copyWith(
-                                                  fontWeight: FontWeight.w700,
-                                                ),
+                                  Flexible(
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        if (isImmersive) {
+                                          ref.read(immersiveModeProvider.notifier).set(false);
+                                        } else {
+                                          _showSelectorBottomSheet(allBooks);
+                                        }
+                                      },
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(20),
+                                        child: BackdropFilter(
+                                          filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                            decoration: BoxDecoration(
+                                              color: theme.colorScheme.surface.withValues(alpha: 0.6),
+                                              borderRadius: BorderRadius.circular(20),
+                                              border: Border.all(
+                                                color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                                                width: 1,
                                               ),
-                                              const SizedBox(width: 4),
-                                              Icon(Icons.keyboard_arrow_down_rounded, 
-                                                size: 16, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
-                                            ],
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Flexible(
+                                                  child: Text(
+                                                    '$currentBookName $currentChapter',
+                                                    style: theme.textTheme.titleSmall?.copyWith(
+                                                      fontWeight: FontWeight.w700,
+                                                    ),
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Icon(Icons.keyboard_arrow_down_rounded, 
+                                                  size: 16, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -532,14 +544,17 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                             child: GestureDetector(
                                               onTap: _showTypographyBottomSheet,
                                               behavior: HitTestBehavior.opaque,
-                                              child: Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
-                                                child: Text(
-                                                  'aA',
-                                                  style: theme.textTheme.titleLarge?.copyWith(
-                                                    fontWeight: FontWeight.w600,
-                                                    color: theme.colorScheme.onSurface,
-                                                    letterSpacing: -1.0,
+                                              child: SizedBox(
+                                                width: 26,
+                                                height: 26,
+                                                child: Center(
+                                                  child: Text(
+                                                    'aA',
+                                                    style: theme.textTheme.titleLarge?.copyWith(
+                                                      fontWeight: FontWeight.w600,
+                                                      color: theme.colorScheme.onSurface,
+                                                      letterSpacing: -1.0,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
