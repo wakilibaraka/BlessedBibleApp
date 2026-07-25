@@ -445,131 +445,113 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                 // Top Navigation Bar Layer (Floating above text)
                 Positioned(
                   top: 0, left: 0, right: 0,
-                  child: ClipRRect(
-                    child: BackdropFilter(
-                      filter: readSettings.readingViewMode == ReadingViewMode.pinned
-                          ? ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0)
-                          : ImageFilter.blur(sigmaX: 0.0, sigmaY: 0.0),
-                      child: Container(
-                        color: readSettings.readingViewMode == ReadingViewMode.pinned
-                            ? theme.scaffoldBackgroundColor.withValues(alpha: 0.85)
-                            : Colors.transparent,
-                        padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const SizedBox(height: 12),
-                            // Top Navigation Bar
-                            Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                            child: SharedTopHeader(
-                                leading: AnimatedSlide(
-                                  duration: const Duration(milliseconds: 350),
-                                  offset: isImmersive ? const Offset(0, -1) : Offset.zero,
-                                  child: AnimatedOpacity(
-                                    duration: const Duration(milliseconds: 350),
-                                    opacity: isImmersive ? 0.0 : 1.0,
-                                    child: IgnorePointer(
-                                      ignoring: isImmersive,
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          ref.read(navProvider.notifier).setIndex(0);
-                                        },
-                                        behavior: HitTestBehavior.opaque,
-                                        child: Center(
-                                          child: Icon(
-                                            Icons.book_rounded,
-                                            size: 26,
-                                            color: theme.primaryColor,
-                                          ),
+                  child: AnimatedSlide(
+                    duration: const Duration(milliseconds: 350),
+                    offset: (isImmersive && readSettings.readingViewMode == ReadingViewMode.immersive) ? const Offset(0, -1) : Offset.zero,
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 350),
+                      opacity: (isImmersive && readSettings.readingViewMode == ReadingViewMode.immersive) ? 0.0 : 1.0,
+                      child: ClipRRect(
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
+                          child: Container(
+                            color: theme.scaffoldBackgroundColor.withValues(alpha: 0.85),
+                            padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const SizedBox(height: 12),
+                                // Top Navigation Bar
+                                Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                                child: SharedTopHeader(
+                                    leading: GestureDetector(
+                                      onTap: () {
+                                        ref.read(navProvider.notifier).setIndex(0);
+                                      },
+                                      behavior: HitTestBehavior.opaque,
+                                      child: Center(
+                                        child: Icon(
+                                          Icons.book_rounded,
+                                          size: 26,
+                                          color: theme.primaryColor,
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ),
-                                centerContent: GestureDetector(
-                                  onTap: () {
-                                    if (isImmersive) {
-                                      ref.read(immersiveModeProvider.notifier).set(false);
-                                    } else {
-                                      _showSelectorBottomSheet(allBooks);
-                                    }
-                                  },
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(20),
-                                    child: BackdropFilter(
-                                      filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                        decoration: BoxDecoration(
-                                          color: theme.colorScheme.surface.withValues(alpha: 0.6),
-                                          borderRadius: BorderRadius.circular(20),
-                                          border: Border.all(
-                                            color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                                            width: 1,
-                                          ),
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Flexible(
-                                              child: FittedBox(
-                                                fit: BoxFit.scaleDown,
-                                                child: ConstrainedBox(
-                                                  constraints: const BoxConstraints(maxWidth: 180),
-                                                  child: MediaQuery(
-                                                    data: MediaQuery.of(context).copyWith(
-                                                      textScaler: const TextScaler.linear(1.0),
-                                                    ),
-                                                    child: Text(
-                                                      '$currentBookName $currentChapter',
-                                                      style: theme.textTheme.titleSmall?.copyWith(
-                                                        fontWeight: FontWeight.w700,
-                                                        fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14).clamp(12.0, 18.0),
+                                    centerContent: GestureDetector(
+                                      onTap: () {
+                                        if (isImmersive) {
+                                          ref.read(immersiveModeProvider.notifier).set(false);
+                                        } else {
+                                          _showSelectorBottomSheet(allBooks);
+                                        }
+                                      },
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(20),
+                                        child: BackdropFilter(
+                                          filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                            decoration: BoxDecoration(
+                                              color: theme.colorScheme.surface.withValues(alpha: 0.6),
+                                              borderRadius: BorderRadius.circular(20),
+                                              border: Border.all(
+                                                color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                                                width: 1,
+                                              ),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Flexible(
+                                                  child: FittedBox(
+                                                    fit: BoxFit.scaleDown,
+                                                    child: ConstrainedBox(
+                                                      constraints: const BoxConstraints(maxWidth: 180),
+                                                      child: MediaQuery(
+                                                        data: MediaQuery.of(context).copyWith(
+                                                          textScaler: const TextScaler.linear(1.0),
+                                                        ),
+                                                        child: Text(
+                                                          '$currentBookName $currentChapter',
+                                                          style: theme.textTheme.titleSmall?.copyWith(
+                                                            fontWeight: FontWeight.w700,
+                                                            fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14).clamp(12.0, 18.0),
+                                                          ),
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
                                                 ),
-                                              ),
+                                                const SizedBox(width: 4),
+                                                Icon(Icons.keyboard_arrow_down_rounded, 
+                                                  size: 16, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
+                                              ],
                                             ),
-                                            const SizedBox(width: 4),
-                                            Icon(Icons.keyboard_arrow_down_rounded, 
-                                              size: 16, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
-                                          ],
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ),
-                                trailing: AnimatedSlide(
-                                  duration: const Duration(milliseconds: 350),
-                                  offset: isImmersive ? const Offset(0, -1) : Offset.zero,
-                                  child: AnimatedOpacity(
-                                    duration: const Duration(milliseconds: 350),
-                                    opacity: isImmersive ? 0.0 : 1.0,
-                                    child: IgnorePointer(
-                                      ignoring: isImmersive,
-                                      child: GestureDetector(
-                                        onTap: _showTypographyBottomSheet,
-                                        behavior: HitTestBehavior.opaque,
-                                        child: Center(
-                                          child: Text(
-                                            'aA',
-                                            style: theme.textTheme.titleLarge?.copyWith(
-                                              fontWeight: FontWeight.w600,
-                                              color: theme.colorScheme.onSurface,
-                                              letterSpacing: -1.0,
-                                            ),
+                                    trailing: GestureDetector(
+                                      onTap: _showTypographyBottomSheet,
+                                      behavior: HitTestBehavior.opaque,
+                                      child: Center(
+                                        child: Text(
+                                          'aA',
+                                          style: theme.textTheme.titleLarge?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: theme.colorScheme.onSurface,
+                                            letterSpacing: -1.0,
                                           ),
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ),
-                        const SizedBox(height: 12),
-                      ],
+                            const SizedBox(height: 12),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),

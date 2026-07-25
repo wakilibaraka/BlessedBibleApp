@@ -1,8 +1,10 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../state/theme_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../state/read_settings_provider.dart';
 
-class AnimatedBackground extends StatefulWidget {
+class AnimatedBackground extends ConsumerStatefulWidget {
   final AppThemeMode appThemeMode;
 
   const AnimatedBackground({
@@ -11,10 +13,10 @@ class AnimatedBackground extends StatefulWidget {
   });
 
   @override
-  State<AnimatedBackground> createState() => _AnimatedBackgroundState();
+  ConsumerState<AnimatedBackground> createState() => _AnimatedBackgroundState();
 }
 
-class _AnimatedBackgroundState extends State<AnimatedBackground> with SingleTickerProviderStateMixin {
+class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground> with SingleTickerProviderStateMixin {
   late AnimationController _bgAnimation;
 
   @override
@@ -37,11 +39,15 @@ class _AnimatedBackgroundState extends State<AnimatedBackground> with SingleTick
     return AnimatedBuilder(
       animation: _bgAnimation,
       builder: (_, __) {
+        final glowStyle = ref.watch(readSettingsProvider.select((s) => s.backgroundGlowStyle));
+        final isTopGlow = glowStyle == BackgroundGlowStyle.top;
+        
         final t = _bgAnimation.value;
 
         // Slowly drift the focal point of the radial gradient
         final cx = lerpDouble(-0.3, 0.3, t);
-        final cy = lerpDouble(-0.4, 0.1, t);
+        final cy = isTopGlow ? -1.0 + (lerpDouble(-0.4, 0.1, t)! * 0.2) : lerpDouble(-0.4, 0.1, t);
+        final radius = isTopGlow ? 1.0 : 1.6;
 
         final List<Color> colors;
         switch (widget.appThemeMode) {
@@ -74,7 +80,7 @@ class _AnimatedBackgroundState extends State<AnimatedBackground> with SingleTick
           decoration: BoxDecoration(
             gradient: RadialGradient(
               center: Alignment(cx!, cy!),
-              radius: 1.6,
+              radius: radius,
               colors: colors,
               stops: const [0.0, 0.5, 1.0],
             ),

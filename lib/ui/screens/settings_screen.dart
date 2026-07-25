@@ -120,6 +120,30 @@ class SettingsScreen extends StatelessWidget {
               onChanged: (val) => ref.read(readSettingsProvider.notifier).setReadingViewMode(val),
             );
           }),
+          const Divider(),
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 8.0),
+            child: Text(
+              'Advanced',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+          ),
+          Consumer(builder: (context, ref, _) {
+            final glowStyle = ref.watch(readSettingsProvider.select((s) => s.backgroundGlowStyle));
+            return _AnimatedSegmentedTile<BackgroundGlowStyle>(
+              title: 'Background Glow',
+              subtitle: 'Position of the animated background glow in Read view',
+              selectedValue: glowStyle,
+              options: const [
+                MapEntry(BackgroundGlowStyle.top, 'Top glow (default)'),
+                MapEntry(BackgroundGlowStyle.full, 'Full background glow (original)'),
+              ],
+              onChanged: (val) => ref.read(readSettingsProvider.notifier).setBackgroundGlowStyle(val),
+            );
+          }),
         ],
       ),
     );
