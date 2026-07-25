@@ -26,16 +26,12 @@ class MainNavScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     final currentIndex = ref.watch(navProvider);
     final isNavVisible = ref.watch(bottomNavVisibilityProvider);
     final isNavHidden = !isNavVisible;
     final navSettings = ref.watch(navSettingsProvider);
     final selectedVerses = ref.watch(readSelectionProvider);
-    final bookmarks = ref.watch(bookmarksProvider);
-    final favorites = ref.watch(favoritesProvider);
     final readLoc = ref.watch(readLocationProvider);
-    final flatChapters = ref.watch(flatChaptersProvider);
 
     final screens = [
       const HomeScreen(),
