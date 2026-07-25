@@ -8,9 +8,9 @@ class ReadLocationState {
   final bool openCommentary;
 
   const ReadLocationState({
-    this.bookAbbrev = 'REV',
-    this.bookName = 'Revelation',
-    this.chapter = 14,
+    this.bookAbbrev = 'GEN',
+    this.bookName = 'Genesis',
+    this.chapter = 1,
     this.requestedVerse,
     this.openCommentary = false,
   });

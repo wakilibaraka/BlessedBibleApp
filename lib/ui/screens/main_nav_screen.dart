@@ -179,60 +179,28 @@ class MainNavScreen extends ConsumerWidget {
                           width: isNavHidden ? 0.0 : 12.0, // Collapse the gap too!
                         ),
                         // ── Dynamic Contextual FAB (Right) ──
-                        Stack(
-                          alignment: Alignment.bottomCenter,
-                          clipBehavior: Clip.none,
-                          children: [
-                            // ── Default FAB ──
-                            BouncyEntrance(
-                              isVisible: !(currentIndex == 1 && selectedVerses.isNotEmpty),
-                              duration: const Duration(milliseconds: 400),
-                              animateIn: false,
-                              child: TexturedGlassContainer(
-                                borderRadius: BorderRadius.circular(28),
-                                padding: EdgeInsets.zero,
-                                child: SizedBox(
-                                  width: 56,
-                                  height: 56,
-                                  child: Align(
-                                    alignment: Alignment.center,
-                                    child: IconButton(
-                                      icon: AnimatedSwitcher(
-                                        duration: const Duration(milliseconds: 300),
-                                        transitionBuilder: (Widget child, Animation<double> animation) {
-                                          return ScaleTransition(
-                                            scale: animation,
-                                            child: RotationTransition(
-                                              turns: Tween<double>(begin: 0.5, end: 1.0).animate(animation),
-                                              child: child,
-                                            ),
-                                          );
-                                        },
-                                        child: _buildFabIcon(currentIndex, navSettings, ref),
-                                      ),
-                                      color: Theme.of(context).primaryColor,
-                                      onPressed: () {
-                                        _handleFabTap(currentIndex, ref, context);
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            // ── Two Pills Action Menu ──
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: IgnorePointer(
-                                ignoring: !(currentIndex == 1 && selectedVerses.isNotEmpty),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    // Top Pill (Verse + Colors)
-                                    BouncyEntrance(
-                                      isVisible: currentIndex == 1 && selectedVerses.isNotEmpty,
-                                      delay: const Duration(milliseconds: 40), // Staggered
+                        TweenAnimationBuilder<double>(
+                          duration: const Duration(milliseconds: 400),
+                          curve: Curves.easeOutCubic,
+                          tween: Tween<double>(
+                            begin: 56.0,
+                            end: (currentIndex == 1 && selectedVerses.isNotEmpty) ? 380.0 : 56.0,
+                          ),
+                          builder: (context, height, child) {
+                            final bool isAction = currentIndex == 1 && selectedVerses.isNotEmpty;
+                            return Stack(
+                              alignment: Alignment.bottomCenter,
+                              clipBehavior: Clip.none,
+                              children: [
+                                // ── Top Pill (Verse + Colors) ──
+                                Positioned(
+                                  bottom: height + 12.0,
+                                  right: 0,
+                                  child: IgnorePointer(
+                                    ignoring: !isAction,
+                                    child: BouncyEntrance(
+                                      isVisible: isAction,
+                                      delay: const Duration(milliseconds: 40),
                                       child: TexturedGlassContainer(
                                         borderRadius: BorderRadius.circular(36),
                                         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
@@ -271,141 +239,55 @@ class MainNavScreen extends ConsumerWidget {
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(height: 12),
-                                    // Bottom Pill (Actions)
-                                    BouncyEntrance(
-                                      isVisible: currentIndex == 1 && selectedVerses.isNotEmpty,
-                                      delay: Duration.zero, // Bottom appears first
-                                      child: TexturedGlassContainer(
-                                        borderRadius: BorderRadius.circular(36),
-                                        padding: const EdgeInsets.symmetric(vertical: 24.0),
-                                        child: SizedBox(
-                                          width: 72,
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              _buildActionIcon(
-                                                selectedVerses.every((v) => bookmarks.contains('${readLoc.bookName} ${readLoc.chapter}:$v'))
-                                                    ? Icons.bookmark_rounded
-                                                    : Icons.bookmark_border_rounded,
-                                                'Bookmark',
-                                                selectedVerses.every((v) => bookmarks.contains('${readLoc.bookName} ${readLoc.chapter}:$v'))
-                                                    ? theme.primaryColor
-                                                    : Theme.of(context).colorScheme.onSurface,
-                                                () {
-                                                  final isAllBookmarked = selectedVerses.every((v) => bookmarks.contains('${readLoc.bookName} ${readLoc.chapter}:$v'));
-                                                  for (var v in selectedVerses) {
-                                                    final refStr = '${readLoc.bookName} ${readLoc.chapter}:$v';
-                                                    if (isAllBookmarked) {
-                                                      ref.read(bookmarksProvider.notifier).toggle(refStr); // remove
-                                                    } else {
-                                                      if (!bookmarks.contains(refStr)) ref.read(bookmarksProvider.notifier).toggle(refStr); // add
-                                                    }
-                                                  }
-                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                    SnackBar(
-                                                      content: Text(isAllBookmarked ? 'Bookmark(s) removed' : '${selectedVerses.length} verse(s) bookmarked!'),
-                                                      duration: const Duration(seconds: 2),
+                                  ),
+                                ),
+                                // ── Morphing FAB / Bottom Pill ──
+                                TexturedGlassContainer(
+                                  borderRadius: BorderRadius.circular(28),
+                                  padding: EdgeInsets.zero,
+                                  child: SizedBox(
+                                    width: 56,
+                                    height: height,
+                                    child: ClipRect(
+                                      child: OverflowBox(
+                                        minHeight: 56,
+                                        maxHeight: 380,
+                                        alignment: Alignment.bottomCenter,
+                                        child: AnimatedSwitcher(
+                                          duration: const Duration(milliseconds: 300),
+                                          child: isAction
+                                              ? _buildActionMenuIcons(context, ref, Theme.of(context))
+                                              : SizedBox(
+                                                  key: const ValueKey('fab'),
+                                                  height: 56,
+                                                  child: Center(
+                                                    child: IconButton(
+                                                      icon: AnimatedSwitcher(
+                                                        duration: const Duration(milliseconds: 300),
+                                                        transitionBuilder: (Widget child, Animation<double> animation) {
+                                                          return ScaleTransition(
+                                                            scale: animation,
+                                                            child: RotationTransition(
+                                                              turns: Tween<double>(begin: 0.5, end: 1.0).animate(animation),
+                                                              child: child,
+                                                            ),
+                                                          );
+                                                        },
+                                                        child: _buildFabIcon(currentIndex, navSettings, ref),
+                                                      ),
+                                                      color: Theme.of(context).primaryColor,
+                                                      onPressed: () => _handleFabTap(currentIndex, ref, context),
                                                     ),
-                                                  );
-                                                  ref.read(readSelectionProvider.notifier).clear();
-                                                },
-                                              ),
-                                              const SizedBox(height: 16),
-                                              _buildActionIcon(
-                                                selectedVerses.every((v) => favorites.contains('${readLoc.bookName} ${readLoc.chapter}:$v'))
-                                                    ? Icons.star_rounded
-                                                    : Icons.star_outline_rounded,
-                                                'Favorite',
-                                                selectedVerses.every((v) => favorites.contains('${readLoc.bookName} ${readLoc.chapter}:$v'))
-                                                    ? Colors.amber
-                                                    : Theme.of(context).colorScheme.onSurface,
-                                                () {
-                                                  final isAllFavorited = selectedVerses.every((v) => favorites.contains('${readLoc.bookName} ${readLoc.chapter}:$v'));
-                                                  for (var v in selectedVerses) {
-                                                    final refStr = '${readLoc.bookName} ${readLoc.chapter}:$v';
-                                                    if (isAllFavorited) {
-                                                      ref.read(favoritesProvider.notifier).toggle(refStr);
-                                                    } else {
-                                                      if (!favorites.contains(refStr)) ref.read(favoritesProvider.notifier).toggle(refStr);
-                                                    }
-                                                  }
-                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                    SnackBar(
-                                                      content: Text(isAllFavorited ? 'Removed from Favorites' : '${selectedVerses.length} verse(s) favorited!'),
-                                                      duration: const Duration(seconds: 2),
-                                                    ),
-                                                  );
-                                                  ref.read(readSelectionProvider.notifier).clear();
-                                                },
-                                              ),
-                                              const SizedBox(height: 16),
-                                              _buildActionIcon(
-                                                Icons.copy_rounded,
-                                                'Copy',
-                                                Theme.of(context).colorScheme.onSurface,
-                                                () {
-                                                  if (flatChapters.isNotEmpty) {
-                                                    try {
-                                                      final chapter = flatChapters.firstWhere(
-                                                        (c) => c.book.name == readLoc.bookName && c.chapter.number == readLoc.chapter,
-                                                      ).chapter;
-                                                      final sorted = selectedVerses.toList()..sort();
-                                                      final texts = sorted.map((v) => v - 1 >= 0 && v - 1 < chapter.verses.length ? '$v. ${chapter.verses[v-1].text}' : '').join(' ');
-                                                      final refStr = '${readLoc.bookName} ${readLoc.chapter}:${sorted.join(', ')}';
-                                                      Clipboard.setData(ClipboardData(text: '$texts — $refStr'));
-                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                        const SnackBar(content: Text('Copied to clipboard'), duration: Duration(seconds: 2)),
-                                                      );
-                                                    } catch (_) {}
-                                                  }
-                                                  ref.read(readSelectionProvider.notifier).clear();
-                                                },
-                                              ),
-                                              const SizedBox(height: 16),
-                                              _buildActionIcon(
-                                                Icons.note_add_outlined,
-                                                'Note',
-                                                Theme.of(context).colorScheme.onSurface,
-                                                () {
-                                                  final sorted = selectedVerses.toList()..sort();
-                                                  final refStr = '${readLoc.bookName} ${readLoc.chapter}:${sorted.join(', ')}';
-                                                  showAddNoteSheet(context, theme, initialReference: refStr);
-                                                  ref.read(readSelectionProvider.notifier).clear();
-                                                },
-                                              ),
-                                              const SizedBox(height: 16),
-                                              IconButton(
-                                                 icon: const Icon(Icons.auto_awesome),
-                                                 color: Colors.redAccent,
-                                                 tooltip: 'Deep Study',
-                                                 padding: EdgeInsets.zero,
-                                                 constraints: const BoxConstraints(),
-                                                 visualDensity: VisualDensity.compact,
-                                                 onPressed: () {
-                                                   ref.read(navProvider.notifier).setIndex(3);
-                                                   ref.read(readSelectionProvider.notifier).clear();
-                                                 }
-                                              ),
-                                              const SizedBox(height: 16),
-                                              IconButton(
-                                                icon: const Icon(Icons.close_rounded, size: 20),
-                                                padding: EdgeInsets.zero,
-                                                constraints: const BoxConstraints(),
-                                                visualDensity: VisualDensity.compact,
-                                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
-                                                onPressed: () => ref.read(readSelectionProvider.notifier).clear(),
-                                              ),
-                                            ],
-                                          ),
+                                                  ),
+                                                ),
                                         ),
                                       ),
                                     ),
-                                  ],
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ],
+                              ],
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -619,6 +501,134 @@ class MainNavScreen extends ConsumerWidget {
                 ? [BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 4, spreadRadius: 1)]
                 : null,
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionMenuIcons(BuildContext context, WidgetRef ref, ThemeData theme) {
+    final readLoc = ref.watch(readLocationProvider);
+    final selectedVerses = ref.watch(readSelectionProvider);
+
+    return SizedBox(
+      key: const ValueKey('action_menu_icons'),
+      height: 380,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildActionIcon(
+              selectedVerses.every((v) => ref.read(bookmarksProvider).contains('${readLoc.bookName} ${readLoc.chapter}:$v'))
+                  ? Icons.bookmark_rounded
+                  : Icons.bookmark_border_rounded,
+              'Bookmark',
+              selectedVerses.every((v) => ref.read(bookmarksProvider).contains('${readLoc.bookName} ${readLoc.chapter}:$v'))
+                  ? theme.primaryColor
+                  : theme.colorScheme.onSurface,
+              () {
+                final bookmarks = ref.read(bookmarksProvider);
+                final isAllBookmarked = selectedVerses.every((v) => bookmarks.contains('${readLoc.bookName} ${readLoc.chapter}:$v'));
+                for (var v in selectedVerses) {
+                  final refStr = '${readLoc.bookName} ${readLoc.chapter}:$v';
+                  if (isAllBookmarked) {
+                    ref.read(bookmarksProvider.notifier).toggle(refStr);
+                  } else {
+                    if (!bookmarks.contains(refStr)) ref.read(bookmarksProvider.notifier).toggle(refStr);
+                  }
+                }
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(isAllBookmarked ? 'Bookmark(s) removed' : '${selectedVerses.length} verse(s) bookmarked!'),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+                ref.read(readSelectionProvider.notifier).clear();
+              },
+            ),
+            _buildActionIcon(
+              selectedVerses.every((v) => ref.read(favoritesProvider).contains('${readLoc.bookName} ${readLoc.chapter}:$v'))
+                  ? Icons.star_rounded
+                  : Icons.star_outline_rounded,
+              'Favorite',
+              selectedVerses.every((v) => ref.read(favoritesProvider).contains('${readLoc.bookName} ${readLoc.chapter}:$v'))
+                  ? Colors.amber
+                  : theme.colorScheme.onSurface,
+              () {
+                final favorites = ref.read(favoritesProvider);
+                final isAllFavorited = selectedVerses.every((v) => favorites.contains('${readLoc.bookName} ${readLoc.chapter}:$v'));
+                for (var v in selectedVerses) {
+                  final refStr = '${readLoc.bookName} ${readLoc.chapter}:$v';
+                  if (isAllFavorited) {
+                    ref.read(favoritesProvider.notifier).toggle(refStr);
+                  } else {
+                    if (!favorites.contains(refStr)) ref.read(favoritesProvider.notifier).toggle(refStr);
+                  }
+                }
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(isAllFavorited ? 'Removed from Favorites' : '${selectedVerses.length} verse(s) favorited!'),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+                ref.read(readSelectionProvider.notifier).clear();
+              },
+            ),
+            _buildActionIcon(
+              Icons.copy_rounded,
+              'Copy',
+              theme.colorScheme.onSurface,
+              () {
+                final flatChapters = ref.read(flatChaptersProvider);
+                if (flatChapters.isNotEmpty) {
+                  try {
+                    final chapter = flatChapters.firstWhere(
+                      (c) => c.book.name == readLoc.bookName && c.chapter.number == readLoc.chapter,
+                    ).chapter;
+                    final sorted = selectedVerses.toList()..sort();
+                    final texts = sorted.map((v) => v - 1 >= 0 && v - 1 < chapter.verses.length ? '$v. ${chapter.verses[v-1].text}' : '').join(' ');
+                    final refStr = '${readLoc.bookName} ${readLoc.chapter}:${sorted.join(', ')}';
+                    Clipboard.setData(ClipboardData(text: '$texts — $refStr'));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Copied to clipboard'), duration: Duration(seconds: 2)),
+                    );
+                  } catch (_) {}
+                }
+                ref.read(readSelectionProvider.notifier).clear();
+              },
+            ),
+            _buildActionIcon(
+              Icons.note_add_outlined,
+              'Note',
+              theme.colorScheme.onSurface,
+              () {
+                final sorted = selectedVerses.toList()..sort();
+                final refStr = '${readLoc.bookName} ${readLoc.chapter}:${sorted.join(', ')}';
+                showAddNoteSheet(context, theme, initialReference: refStr);
+                ref.read(readSelectionProvider.notifier).clear();
+              },
+            ),
+            IconButton(
+               icon: const Icon(Icons.auto_awesome),
+               color: Colors.redAccent,
+               tooltip: 'Deep Study',
+               padding: EdgeInsets.zero,
+               constraints: const BoxConstraints(),
+               visualDensity: VisualDensity.compact,
+               onPressed: () {
+                 ref.read(navProvider.notifier).setIndex(3);
+                 ref.read(readSelectionProvider.notifier).clear();
+               }
+            ),
+            IconButton(
+              icon: const Icon(Icons.close_rounded, size: 20),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              visualDensity: VisualDensity.compact,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+              onPressed: () => ref.read(readSelectionProvider.notifier).clear(),
+            ),
+          ],
         ),
       ),
     );
