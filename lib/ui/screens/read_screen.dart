@@ -11,6 +11,7 @@ import '../../state/nav_provider.dart';
 import '../../state/study_provider.dart';
 import '../../state/read_settings_provider.dart';
 import '../../state/user_data_provider.dart';
+import '../../services/share_service.dart';
 import '../widgets/verse_link_text.dart';
 import '../widgets/shared_top_header.dart';
 import '../../data/models/commentary_model.dart';
@@ -363,6 +364,15 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
 
                                                 return GestureDetector(
                                                   onTap: () => _toggleVerseSelection(index),
+                                                  onLongPress: () {
+                                                    _showVerseContextMenu(
+                                                      context,
+                                                      verse.number,
+                                                      fc.chapter,
+                                                      fc.book.name,
+                                                      fc.chapter.number
+                                                    );
+                                                  },
                                                   child: Stack(
                                                     children: [
                                                       AnimatedContainer(
@@ -568,6 +578,68 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
   }
 
 
+
+  void _showVerseContextMenu(BuildContext context, int verseNumber, dynamic chapterData, String bookName, int chapterNum) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.1),
+      builder: (ctx) {
+        return Center(
+          child: Material(
+            color: Colors.transparent,
+            child: TexturedGlassContainer(
+              borderRadius: BorderRadius.circular(24),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '$bookName $chapterNum:$verseNumber',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.titleSmall?.color?.withValues(alpha: 0.7)),
+                    ),
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _ContextMenuButton(
+                          icon: Icons.copy_rounded,
+                          label: 'Copy',
+                          onTap: () {
+                            Navigator.of(ctx).pop();
+                            final text = ShareService.formatVerses(
+                                bookName: bookName,
+                                chapterNumber: chapterNum,
+                                verseNumbers: [verseNumber],
+                                chapterData: chapterData);
+                            ShareService.copyText(context, text);
+                          }
+                        ),
+                        const SizedBox(width: 40),
+                        _ContextMenuButton(
+                          icon: Icons.ios_share_rounded,
+                          label: 'Share',
+                          onTap: () {
+                            Navigator.of(ctx).pop();
+                            final text = ShareService.formatVerses(
+                                bookName: bookName,
+                                chapterNumber: chapterNum,
+                                verseNumbers: [verseNumber],
+                                chapterData: chapterData);
+                            ShareService.shareText(body: text);
+                          }
+                        ),
+                      ],
+                    )
+                  ]
+                )
+              )
+            )
+          )
+        );
+      }
+    );
+  }
 
   void _showCommentaryBottomSheet(int verseNumber, String verseText) {
     if (!mounted) return;
@@ -1907,6 +1979,37 @@ class _CommentaryBottomSheetContent extends ConsumerWidget {
       },
       loading: () => ListView(controller: scrollController, children: const [SizedBox(height: 40), Center(child: CircularProgressIndicator())]),
       error: (error, stack) => ListView(controller: scrollController, children: const [SizedBox(height: 40), Center(child: Text('Error loading commentary'))]),
+    );
+  }
+}
+
+class _ContextMenuButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  const _ContextMenuButton({required this.icon, required this.label, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.08),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: theme.colorScheme.onSurface, size: 28),
+          ),
+          const SizedBox(height: 8),
+          Text(label, style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w600)),
+        ],
+      ),
     );
   }
 }

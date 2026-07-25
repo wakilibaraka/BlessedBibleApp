@@ -16,9 +16,9 @@ import '../widgets/bouncy_entrance.dart';
 import '../widgets/textured_glass_container.dart';
 import '../../state/immersive_mode_provider.dart';
 import '../../state/user_data_provider.dart';
+import '../../services/share_service.dart';
 import '../../state/read_location_provider.dart';
 import '../../state/bible_provider.dart';
-import 'package:flutter/services.dart';
 import 'notes_list_screen.dart';
 
 class MainNavScreen extends ConsumerWidget {
@@ -581,13 +581,15 @@ class MainNavScreen extends ConsumerWidget {
                     final chapter = flatChapters.firstWhere(
                       (c) => c.book.name == readLoc.bookName && c.chapter.number == readLoc.chapter,
                     ).chapter;
-                    final sorted = selectedVerses.toList()..sort();
-                    final texts = sorted.map((v) => v - 1 >= 0 && v - 1 < chapter.verses.length ? '$v. ${chapter.verses[v-1].text}' : '').join(' ');
-                    final refStr = '${readLoc.bookName} ${readLoc.chapter}:${sorted.join(', ')}';
-                    Clipboard.setData(ClipboardData(text: '$texts — $refStr'));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Copied to clipboard'), duration: Duration(seconds: 2)),
+                    
+                    final formattedText = ShareService.formatVerses(
+                      bookName: readLoc.bookName,
+                      chapterNumber: readLoc.chapter,
+                      verseNumbers: selectedVerses.toList(),
+                      chapterData: chapter,
                     );
+                    
+                    ShareService.copyText(context, formattedText);
                   } catch (_) {}
                 }
                 ref.read(readSelectionProvider.notifier).clear();
