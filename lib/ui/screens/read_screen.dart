@@ -29,6 +29,7 @@ import '../widgets/textured_glass_container.dart';
 import '../widgets/bouncy_entrance.dart';
 import '../../state/nav_settings_provider.dart';
 import 'commentary_list_screen.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 class ReadScreen extends ConsumerStatefulWidget {
   const ReadScreen({super.key});
@@ -37,7 +38,7 @@ class ReadScreen extends ConsumerStatefulWidget {
   ConsumerState<ReadScreen> createState() => _ReadScreenState();
 }
 
-class _ReadScreenState extends ConsumerState<ReadScreen> {
+class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObserver {
 
   late PageController _pageController;
   bool _isPageControllerInitialized = false;
@@ -80,11 +81,31 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
   // ────────────────────────────────────────────────────────────────
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    WakelockPlus.enable(); // Keep screen on during reading
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Release wakelock when app goes to background, re-enable on resume
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      WakelockPlus.disable();
+    } else if (state == AppLifecycleState.resumed) {
+      WakelockPlus.enable();
+    }
+  }
+
+  @override
   void dispose() {
     _scrollDebounceTimer?.cancel();
     if (_isPageControllerInitialized) {
       _pageController.dispose();
     }
+    WidgetsBinding.instance.removeObserver(this);
+    WakelockPlus.disable(); // Release wakelock
     super.dispose();
   }
 
@@ -474,7 +495,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                                     });
                                                     
                                                     final highlights = ref.watch(highlightsProvider);
-                                                    final refStr = generateVerseKey(fc.book.name, fc.chapter.number, verse.number);
+                                                    final refStr = generateVerseKey(fc.book.abbreviation, fc.chapter.number, verse.number);
                                                     final savedColorIndex = highlights[refStr];
                                                     Color? highlightColor;
                                                     if (savedColorIndex != null && savedColorIndex >= 0 && savedColorIndex < highlightPalette.length) {

@@ -102,7 +102,7 @@ class PreferencesService {
   }
 
   static const String _chapterPositionsKey = 'chapter_positions';
-  static const int _expiryMillis = 10 * 60 * 1000; // 10 minutes
+  static const int _expiryMillis = 7 * 24 * 60 * 60 * 1000; // 7 days
 
   void saveChapterScrollPosition(String bookAbbrev, int chapter, int verseIndex) {
     final jsonString = prefs.getString(_chapterPositionsKey);

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/local_storage/preferences_service.dart';
 
-/// Centralized key generator for persistent verse data (bookmarks, highlights, etc.)
-String generateVerseKey(String bookName, int chapterNum, int verseNum) {
-  return '$bookName $chapterNum:$verseNum';
+/// Canonical key for persistent verse data (bookmarks, highlights, etc.).
+/// Uses the 3-letter abbreviation (e.g. 'GEN', '1CO') which is unique and
+/// collision-free — avoids the '1 Corinthians' vs '1 Chronicles' problem.
+String generateVerseKey(String bookAbbrev, int chapterNum, int verseNum) {
+  return '${bookAbbrev}_$chapterNum:$verseNum';
 }
 
 const List<Color> highlightPalette = [
