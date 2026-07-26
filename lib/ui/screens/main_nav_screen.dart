@@ -83,7 +83,7 @@ class MainNavScreen extends ConsumerWidget {
             final double dockMaxWidth = math.max(250.0, math.min(maxDockWidth, availableWidth - 40 - 72 - 16));
             final double totalExpandedWidth = dockMaxWidth + 12.0 + 72.0;
             final double rightOffset = math.max(20.0, (availableWidth - totalExpandedWidth) / 2);
-            final double height = (currentIndex == 1 && selectedVerses.isNotEmpty) ? 300.0 : 72.0;
+            final double height = (currentIndex == 1 && selectedVerses.isNotEmpty) ? 420.0 : 72.0;
 
             return SizedBox(
               height: height + 32.0,
@@ -233,9 +233,12 @@ class MainNavScreen extends ConsumerWidget {
                           builder: (context, height, child) {
                             final bool isAction = currentIndex == 1 && selectedVerses.isNotEmpty;
                             return Stack(
-                              alignment: Alignment.bottomCenter,
+                              alignment: Alignment.bottomRight,
                               clipBehavior: Clip.none,
                               children: [
+                                // Expand bounds to catch Top Pill hits
+                                if (isAction) SizedBox(width: 250, height: height + 70),
+
                                 // ── Top Pill (Verse + Colors) ──
                                 Positioned(
                                   bottom: height + 12.0,
