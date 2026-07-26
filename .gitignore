@@ -12,6 +12,10 @@
 .swiftpm/
 migrate_working_dir/
 local-data/
+egw_genesis.json
+egw_original_recovered.json
+*egw*.json
+*egw*.txt
 
 # IntelliJ related
 *.iml
