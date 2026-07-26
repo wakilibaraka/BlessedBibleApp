@@ -419,8 +419,16 @@ class SearchEngine {
 
 final baseSearchIndexProvider = FutureProvider<IndexData>((ref) async {
   final bibleState = ref.watch(bibleProvider);
+
+  // Don't build the index until Bible data is ready — avoids a pointless heavy
+  // compute() call that would immediately be cancelled and re-triggered.
+  if (bibleState.isLoading || bibleState.books.isEmpty) {
+    return IndexData([], {});
+  }
+
+  // Commentary is optional — use whatever is already available without blocking
   final commentaryAsync = ref.watch(combinedCommentaryProvider);
-  
+
   final args = IndexBuildArgs(
     bibleState.books,
     commentaryAsync.asData?.value.data,

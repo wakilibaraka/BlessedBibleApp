@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/foundation.dart';
-import 'dart:convert';
 import '../data/models/commentary_model.dart';
+import '../utils/isolate_parsers.dart';
 import 'egw_provider.dart';
 
 class ActiveStudyVerseNotifier extends Notifier<String?> {
@@ -27,22 +27,17 @@ final commentaryDataProvider = FutureProvider<Map<String, Map<String, Map<String
   for (final path in assetPaths) {
     try {
       final jsonString = await rootBundle.loadString(path);
-      final Map<String, dynamic> jsonData = json.decode(jsonString);
+      // Decode + parse on a background isolate — never blocks the UI thread
+      final parsed = await compute(parseCommentaryJson, jsonString);
 
-      for (var bookKey in jsonData.keys) {
-        result.putIfAbsent(bookKey, () => {});
-        final chapters = jsonData[bookKey] as Map<String, dynamic>;
-        
-        for (var chapterKey in chapters.keys) {
-          result[bookKey]!.putIfAbsent(chapterKey, () => {});
-          final verses = chapters[chapterKey] as Map<String, dynamic>;
-          
-          for (var verseKey in verses.keys) {
-            final entriesData = verses[verseKey] as List<dynamic>;
-            final entries = entriesData.map((e) => CommentaryEntry.fromJson(e as Map<String, dynamic>)).toList();
-            
-            result[bookKey]![chapterKey]!.putIfAbsent(verseKey, () => []);
-            result[bookKey]![chapterKey]![verseKey]!.addAll(entries);
+      // Merge parsed result into combined map
+      for (final book in parsed.keys) {
+        result.putIfAbsent(book, () => {});
+        for (final chapter in parsed[book]!.keys) {
+          result[book]!.putIfAbsent(chapter, () => {});
+          for (final verse in parsed[book]![chapter]!.keys) {
+            result[book]![chapter]!.putIfAbsent(verse, () => []);
+            result[book]![chapter]![verse]!.addAll(parsed[book]![chapter]![verse]!);
           }
         }
       }

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/local_storage/preferences_service.dart';
 import '../services/notification_service.dart';
@@ -153,7 +154,11 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
     // we need to be careful. The user already tested it and it worked.
     try {
       final jsonString = await rootBundle.loadString('assets/data/chronological_plan.json');
-      final List<dynamic> decoded = jsonDecode(jsonString);
+      // Parse on a background isolate — this JSON is ~27KB with complex per-day expansion
+      final List<dynamic> decoded = await compute<String, List<dynamic>>(
+        (s) => jsonDecode(s) as List<dynamic>,
+        jsonString,
+      );
       final planData = decoded.map((e) => ChronologicalDay.fromJson(e)).toList();
 
       final prefsState = ref.read(preferencesProvider).getReadingPlanState();

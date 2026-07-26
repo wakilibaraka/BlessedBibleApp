@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'state/theme_provider.dart';
-import 'state/typography_provider.dart';
 import 'theme/app_theme.dart';
 import 'ui/screens/main_nav_screen.dart';
 

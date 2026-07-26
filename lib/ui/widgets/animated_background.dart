@@ -60,7 +60,7 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground> with Si
       child: AnimatedBuilder(
         animation: _bgAnimation,
         builder: (_, __) {
-          final glowStyle = ref.watch(readSettingsProvider.select((s) => s.backgroundGlowStyle));
+          final glowStyle = ref.read(readSettingsProvider).backgroundGlowStyle;
           final isTopGlow = glowStyle == BackgroundGlowStyle.top;
           
           final t = _bgAnimation.value;
