@@ -7,7 +7,6 @@ import '../../state/nav_provider.dart';
 import '../../state/read_location_provider.dart';
 import '../../state/glass_ui_provider.dart';
 import '../../state/bible_provider.dart';
-import 'main_nav_screen.dart';
 
 class NewSearchScreen extends ConsumerWidget {
   const NewSearchScreen({super.key});
@@ -118,7 +117,7 @@ class NewSearchScreen extends ConsumerWidget {
                     icon: Icon(Icons.close_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.7), size: 28),
                     onPressed: () {
                       FocusManager.instance.primaryFocus?.unfocus();
-                      ref.read(searchInputActiveProvider.notifier).setActive(false);
+                      // No-op: search input state managed by SearchScreen
                     },
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
