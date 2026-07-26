@@ -22,7 +22,7 @@ import '../../state/bible_provider.dart';
 import 'notes_list_screen.dart';
 
 import '../../state/study_provider.dart';
-import 'commentary_list_screen.dart';
+import 'verse_detail_screen.dart';
 
 class MainNavScreen extends ConsumerWidget {
   const MainNavScreen({super.key});
@@ -739,13 +739,9 @@ class MainNavScreen extends ConsumerWidget {
                 chapter: chapter,
                 verse: verseNum,
               );
-          ref
-              .read(activeStudyVerseProvider.notifier)
-              .setVerse('$bookName $chapter:$verseNum');
+          ref.read(activeStudyVerseProvider.notifier).setVerse('$bookName $chapter:$verseNum');
 
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (_) => CommentaryListScreen(
-                  bookName: bookName, chapterNumber: chapter.toString())));
+          Navigator.of(context).push(MaterialPageRoute(builder: (_) => VerseDetailScreen(reference: '$bookName $chapter:$verseNum')));
         } catch (_) {}
       }
     }

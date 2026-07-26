@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/study_provider.dart';
 import '../../state/theme_provider.dart';
 import '../widgets/textured_glass_container.dart';
-import 'commentary_list_screen.dart';
+import 'verse_detail_screen.dart';
 import 'your_space_screen.dart' as your_space;
 import '../../state/study_layout_provider.dart';
 import '../widgets/jiggle_animator.dart';
@@ -664,21 +664,8 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
             child: InkWell(
               borderRadius: BorderRadius.circular(28),
               onTap: () {
-                String navBook = 'Revelation';
-                String navChapter = '14';
-                if (activeVerse != null) {
-                  final parts = activeVerse.split(' ');
-                  if (parts.length >= 2) {
-                    navBook = parts[0];
-                    final refParts = parts[1].split(':');
-                    if (refParts.isNotEmpty) {
-                      navChapter = refParts[0];
-                    }
-                  }
-                }
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => CommentaryListScreen(
-                        bookName: navBook, chapterNumber: navChapter)));
+                final refStr = activeVerse ?? 'Revelation 14:12';
+                Navigator.of(context).push(MaterialPageRoute(builder: (_) => VerseDetailScreen(reference: refStr)));
               },
               child: Padding(
                 padding: const EdgeInsets.all(20.0),

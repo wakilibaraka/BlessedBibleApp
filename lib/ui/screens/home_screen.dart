@@ -3,12 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/home_data.dart';
 import '../../state/home_provider.dart';
-import '../../state/nav_provider.dart';
-import '../../state/study_provider.dart';
+
 import '../../state/theme_provider.dart';
 import '../widgets/shared_top_header.dart';
 import '../widgets/glass_container.dart';
 import '../widgets/bouncy_entrance.dart';
+import 'verse_detail_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -186,8 +186,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         label: 'Go Deeper',
                         filled: true,
                         onPressed: () {
-                          ref.read(activeStudyVerseProvider.notifier).setVerse(data.verseOfTheDay.reference);
-                          ref.read(navProvider.notifier).setIndex(3);
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (_) => VerseDetailScreen(reference: data.verseOfTheDay.reference)
+                          ));
                         },
                       ),
                     ),
