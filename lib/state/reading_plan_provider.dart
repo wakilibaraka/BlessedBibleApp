@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/local_storage/preferences_service.dart';
-
+import '../services/notification_service.dart';
 enum PlanStartMode { startToday, calendarYear }
 
 class ChronologicalDay {
@@ -138,6 +138,9 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
     }
     state = state.copyWith(currentDay: day, startDate: DateTime.now());
     _saveState();
+    
+    // Schedule daily notification
+    ref.read(notificationServiceProvider).scheduleDailyReminder();
   }
 
   void changeStartMode(PlanStartMode mode) {
@@ -192,6 +195,10 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
       currentDay: nextDay,
     );
     _saveState();
+
+    if (state.isPlanComplete) {
+      ref.read(notificationServiceProvider).cancelReminder();
+    }
   }
 
   void markDayIncomplete(int day) {

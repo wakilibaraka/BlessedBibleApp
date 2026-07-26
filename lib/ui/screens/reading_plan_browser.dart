@@ -331,6 +331,22 @@ class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
             ),
         ],
       ),
+      floatingActionButton: planState.isPlanComplete ? null : FloatingActionButton.extended(
+        backgroundColor: theme.primaryColor,
+        foregroundColor: Colors.white,
+        icon: Icon(planState.currentDay == 0 ? Icons.play_arrow_rounded : Icons.fast_forward_rounded),
+        label: Text(planState.currentDay == 0 ? 'Start Plan' : 'Continue', style: const TextStyle(fontWeight: FontWeight.bold)),
+        onPressed: () {
+          if (planState.currentDay == 0) {
+            ref.read(readingPlanProvider.notifier).startPlan();
+          }
+          final newPlanState = ref.read(readingPlanProvider);
+          if (newPlanState.currentDay > 0 && newPlanState.currentDay <= newPlanState.planData.length) {
+            final firstReading = newPlanState.planData[newPlanState.currentDay - 1].readings.first;
+            _openReading(firstReading, context);
+          }
+        },
+      ),
     );
   }
 }
