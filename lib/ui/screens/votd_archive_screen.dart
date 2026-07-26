@@ -14,12 +14,12 @@ class VotdArchiveScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final viewedDays = ref.watch(votdTrackerProvider);
 
-    // Compute past 30 days
+    // Compute past 7 days
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     
     // Create list of dates (most recent first)
-    final dates = List.generate(30, (index) => today.subtract(Duration(days: index)));
+    final dates = List.generate(7, (index) => today.subtract(Duration(days: index)));
     
     // Epoch used for VotD calculation
     final epoch = DateTime(2026, 1, 1);
