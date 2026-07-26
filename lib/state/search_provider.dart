@@ -13,6 +13,7 @@ class SearchState {
   final List<SearchResult> results;
   final bool isSearching;
   final List<SearchResult> recentPlaces;
+  final bool showFilters;
 
   SearchState({
     this.query = '',
@@ -23,6 +24,7 @@ class SearchState {
     this.results = const [],
     this.isSearching = false,
     this.recentPlaces = const [],
+    this.showFilters = false,
   });
 
   SearchState copyWith({
@@ -34,6 +36,7 @@ class SearchState {
     List<SearchResult>? results,
     bool? isSearching,
     List<SearchResult>? recentPlaces,
+    bool? showFilters,
   }) {
     return SearchState(
       query: query ?? this.query,
@@ -44,6 +47,7 @@ class SearchState {
       results: results ?? this.results,
       isSearching: isSearching ?? this.isSearching,
       recentPlaces: recentPlaces ?? this.recentPlaces,
+      showFilters: showFilters ?? this.showFilters,
     );
   }
 }
@@ -87,6 +91,10 @@ class SearchNotifier extends Notifier<SearchState> {
     _debounce = Timer(const Duration(milliseconds: 300), () {
       _performSearch();
     });
+  }
+
+  void toggleFilters() {
+    state = state.copyWith(showFilters: !state.showFilters);
   }
 
   void toggleOtFilter() {

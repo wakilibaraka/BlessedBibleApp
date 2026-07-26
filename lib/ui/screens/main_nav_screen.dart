@@ -20,6 +20,24 @@ import '../../services/share_service.dart';
 import '../../state/read_location_provider.dart';
 import '../../state/bible_provider.dart';
 import 'notes_list_screen.dart';
+import '../../state/search_provider.dart';
+
+class SearchInputActiveNotifier extends Notifier<bool> {
+  @override
+  bool build() => false;
+  void setActive(bool val) => state = val;
+}
+final searchInputActiveProvider = NotifierProvider<SearchInputActiveNotifier, bool>(SearchInputActiveNotifier.new);
+final mainNavSearchFocusProvider = Provider.autoDispose<FocusNode>((ref) {
+  final focusNode = FocusNode();
+  ref.onDispose(() => focusNode.dispose());
+  return focusNode;
+});
+final mainNavSearchControllerProvider = Provider.autoDispose<TextEditingController>((ref) {
+  final controller = TextEditingController(text: ref.read(searchStateProvider).query);
+  ref.onDispose(() => controller.dispose());
+  return controller;
+});
 
 class MainNavScreen extends ConsumerWidget {
   const MainNavScreen({super.key});
@@ -121,48 +139,78 @@ class MainNavScreen extends ConsumerWidget {
                                       width: dockMaxWidth,
                                       child: Padding(
                                         padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 24.0),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                          _buildNavItem(
-                                            context,
-                                            ref,
-                                            index: 0,
-                                            icon: Icons.home_outlined,
-                                            activeIcon: Icons.home,
-                                            label: 'Home',
-                                            currentIndex: currentIndex,
-                                          ),
-                                          _buildNavItem(
-                                            context,
-                                            ref,
-                                            index: 1,
-                                            icon: Icons.menu_book_outlined,
-                                            activeIcon: Icons.menu_book,
-                                            label: 'Read',
-                                            currentIndex: currentIndex,
-                                          ),
-                                          _buildNavItem(
-                                            context,
-                                            ref,
-                                            index: 3,
-                                            icon: Icons.school_outlined,
-                                            activeIcon: Icons.school,
-                                            label: 'Study',
-                                            currentIndex: currentIndex,
-                                          ),
-                                          _buildNavItem(
-                                            context,
-                                            ref,
-                                            index: 2,
-                                            icon: Icons.search,
-                                            activeIcon: Icons.search,
-                                            label: 'Search',
-                                            currentIndex: currentIndex,
-                                          ),
-                                        ],
+                                        child: AnimatedSwitcher(
+                                          duration: const Duration(milliseconds: 300),
+                                          child: ref.watch(searchInputActiveProvider)
+                                            ? SizedBox(
+                                                key: const ValueKey('search_input'),
+                                                height: 56,
+                                                child: Center(
+                                                  child: TextField(
+                                                    controller: ref.watch(mainNavSearchControllerProvider),
+                                                    focusNode: ref.watch(mainNavSearchFocusProvider),
+                                                    onChanged: (val) => ref.read(searchStateProvider.notifier).setQuery(val),
+                                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                                      fontWeight: FontWeight.w600,
+                                                      color: Theme.of(context).colorScheme.onSurface,
+                                                    ),
+                                                    decoration: InputDecoration(
+                                                      hintText: 'Search the Bible...',
+                                                      hintStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                                                        fontWeight: FontWeight.w400,
+                                                      ),
+                                                      border: InputBorder.none,
+                                                      isDense: true,
+                                                    ),
+                                                    cursorColor: Theme.of(context).colorScheme.primary,
+                                                  ),
+                                                ),
+                                              )
+                                            : Row(
+                                                key: const ValueKey('nav_tabs'),
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                _buildNavItem(
+                                                  context,
+                                                  ref,
+                                                  index: 0,
+                                                  icon: Icons.home_outlined,
+                                                  activeIcon: Icons.home,
+                                                  label: 'Home',
+                                                  currentIndex: currentIndex,
+                                                ),
+                                                _buildNavItem(
+                                                  context,
+                                                  ref,
+                                                  index: 1,
+                                                  icon: Icons.menu_book_outlined,
+                                                  activeIcon: Icons.menu_book,
+                                                  label: 'Read',
+                                                  currentIndex: currentIndex,
+                                                ),
+                                                _buildNavItem(
+                                                  context,
+                                                  ref,
+                                                  index: 3,
+                                                  icon: Icons.school_outlined,
+                                                  activeIcon: Icons.school,
+                                                  label: 'Study',
+                                                  currentIndex: currentIndex,
+                                                ),
+                                                _buildNavItem(
+                                                  context,
+                                                  ref,
+                                                  index: 2,
+                                                  icon: Icons.search,
+                                                  activeIcon: Icons.search,
+                                                  label: 'Search',
+                                                  currentIndex: currentIndex,
+                                                ),
+                                              ],
+                                            ),
+                                        ),
                                       ),
-                                    ),
                                   ),
                                 ),
                               ),
@@ -249,39 +297,33 @@ class MainNavScreen extends ConsumerWidget {
                                         minHeight: 56,
                                         maxHeight: 380,
                                         alignment: Alignment.bottomCenter,
-                                        child: Visibility(
-                                          visible: currentIndex != 2,
-                                          maintainSize: true,
-                                          maintainAnimation: true,
-                                          maintainState: true,
-                                          child: AnimatedSwitcher(
-                                            duration: const Duration(milliseconds: 300),
-                                            child: isAction
-                                                ? _buildActionMenuIcons(context, ref, Theme.of(context))
-                                                : SizedBox(
-                                                    key: const ValueKey('fab'),
-                                                    height: 56,
-                                                    child: Center(
-                                                      child: IconButton(
-                                                        icon: AnimatedSwitcher(
-                                                          duration: const Duration(milliseconds: 300),
-                                                          transitionBuilder: (Widget child, Animation<double> animation) {
-                                                            return ScaleTransition(
-                                                              scale: animation,
-                                                              child: RotationTransition(
-                                                                turns: Tween<double>(begin: 0.5, end: 1.0).animate(animation),
-                                                                child: child,
-                                                              ),
-                                                            );
-                                                          },
-                                                          child: _buildFabIcon(currentIndex, navSettings, ref),
-                                                        ),
-                                                        color: Theme.of(context).primaryColor,
-                                                        onPressed: () => _handleFabTap(currentIndex, ref, context),
+                                        child: AnimatedSwitcher(
+                                          duration: const Duration(milliseconds: 300),
+                                          child: isAction
+                                              ? _buildActionMenuIcons(context, ref, Theme.of(context))
+                                              : SizedBox(
+                                                  key: const ValueKey('fab'),
+                                                  height: 56,
+                                                  child: Center(
+                                                    child: IconButton(
+                                                      icon: AnimatedSwitcher(
+                                                        duration: const Duration(milliseconds: 300),
+                                                        transitionBuilder: (Widget child, Animation<double> animation) {
+                                                          return ScaleTransition(
+                                                            scale: animation,
+                                                            child: RotationTransition(
+                                                              turns: Tween<double>(begin: 0.5, end: 1.0).animate(animation),
+                                                              child: child,
+                                                            ),
+                                                          );
+                                                        },
+                                                        child: _buildFabIcon(currentIndex, navSettings, ref),
                                                       ),
+                                                      color: Theme.of(context).primaryColor,
+                                                      onPressed: () => _handleFabTap(currentIndex, ref, context),
                                                     ),
                                                   ),
-                                          ),
+                                                ),
                                         ),
                                       ),
                                     ),
@@ -348,6 +390,15 @@ class MainNavScreen extends ConsumerWidget {
     
     // Switch tab
     ref.read(navProvider.notifier).setIndex(index);
+
+    if (index == 2) {
+      ref.read(searchInputActiveProvider.notifier).setActive(true);
+      Future.delayed(const Duration(milliseconds: 150), () {
+        ref.read(mainNavSearchFocusProvider).requestFocus();
+      });
+    } else {
+      ref.read(searchInputActiveProvider.notifier).setActive(false);
+    }
   }
 
   void _handleFabTap(int currentIndex, WidgetRef ref, BuildContext context) {
@@ -361,7 +412,8 @@ class MainNavScreen extends ConsumerWidget {
         ref.read(immersiveModeProvider.notifier).toggle();
         break;
       case 2:
-        // Search -> FAB is hidden, so this won't be called.
+        // Search -> Advanced Filters
+        ref.read(searchStateProvider.notifier).toggleFilters();
         break;
       case 3:
         // Study -> Notes Popover
