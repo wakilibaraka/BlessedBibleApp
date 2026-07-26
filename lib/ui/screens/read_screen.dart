@@ -58,7 +58,7 @@ class ReadScreen extends ConsumerStatefulWidget {
 class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObserver {
 
   late PageController _pageController;
-  bool _isPageControllerInitialized = false;
+  bool _hasInitialJumped = false;
   int _currentPageIndex = 0;
   final Map<int, ItemScrollController> _itemScrollControllers = {};
   final Map<int, ItemPositionsListener> _itemPositionsListeners = {};
@@ -100,6 +100,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(initialPage: 0);
     WidgetsBinding.instance.addObserver(this);
     WakelockPlus.enable(); // Keep screen on during reading
   }
@@ -118,9 +119,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
   @override
   void dispose() {
     _scrollDebounceTimer?.cancel();
-    if (_isPageControllerInitialized) {
-      _pageController.dispose();
-    }
+    _pageController.dispose();
     WidgetsBinding.instance.removeObserver(this);
     WakelockPlus.disable(); // Release wakelock
     super.dispose();
@@ -243,20 +242,26 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
     if (flatChapters.isNotEmpty) {
       final targetIndex = flatChapters.indexWhere((fc) => fc.book.abbreviation == loc.bookAbbrev && fc.chapter.number == loc.chapter);
       final safeTarget = targetIndex != -1 ? targetIndex : 0;
-      if (!_isPageControllerInitialized) {
-        _pageController = PageController(initialPage: safeTarget);
-        _isPageControllerInitialized = true;
+      if (!_hasInitialJumped) {
+        _hasInitialJumped = true;
         _currentPageIndex = safeTarget;
-      } else if (!_pageController.hasClients && _pageController.initialPage != safeTarget) {
-        _pageController = PageController(initialPage: safeTarget);
-        _currentPageIndex = safeTarget;
+        if (!_pageController.hasClients) {
+          _pageController.dispose();
+          _pageController = PageController(initialPage: safeTarget);
+        } else {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted && _pageController.hasClients) {
+              _pageController.jumpToPage(safeTarget);
+            }
+          });
+        }
       }
     }
 
     ref.listen<ReadLocationState>(readLocationProvider, (previous, next) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
-        if (flatChapters.isNotEmpty && _isPageControllerInitialized) {
+        if (flatChapters.isNotEmpty && _hasInitialJumped) {
           final targetIndex = flatChapters.indexWhere((fc) => fc.book.abbreviation == next.bookAbbrev && fc.chapter.number == next.chapter);
           if (targetIndex != -1 && _pageController.hasClients) {
             final currentPage = _pageController.page?.round() ?? 0;
