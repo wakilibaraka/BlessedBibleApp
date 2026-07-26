@@ -6,8 +6,8 @@ class TypographyState {
   final double fontSize;
 
   const TypographyState({
-    this.fontFamily = 'Gentium Book Plus',
-    this.fontSize = 17.5,
+    this.fontFamily = 'Lexend',
+    this.fontSize = 18.0,
   });
 
   TypographyState copyWith({

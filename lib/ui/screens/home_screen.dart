@@ -77,17 +77,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               onRefresh: _onRefresh,
               color: const Color(0xFFC9A227),
               backgroundColor: isDark ? const Color(0xFF2C2A28) : Colors.white,
-              child: CustomScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                slivers: [
-                  SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: FadeTransition(
-                      opacity: _verseFade,
-                      child: _buildPage(context, homeState, appThemeMode),
-                    ),
-                  ),
-                ],
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                child: FadeTransition(
+                  opacity: _verseFade,
+                  child: _buildPage(context, homeState, appThemeMode),
+                ),
               ),
             ),
           ),
@@ -289,7 +284,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           ),
 
           // Clearance above the floating nav bar
-          const SizedBox(height: 82),
+          const SizedBox(height: 140),
         ],
       ),
     );
