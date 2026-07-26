@@ -457,10 +457,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                           if (!isImmersive) {
                                             Future.microtask(() => ref.read(immersiveModeProvider.notifier).set(true));
                                           }
-                                        } else if (notification.direction == ScrollDirection.forward) {
-                                          if (isImmersive) {
-                                            Future.microtask(() => ref.read(immersiveModeProvider.notifier).set(false));
-                                          }
                                         }
                                       }
                                       return false;
