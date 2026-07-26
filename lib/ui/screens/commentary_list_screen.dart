@@ -33,36 +33,36 @@ class CommentaryListScreen extends ConsumerWidget {
       body: commentaryDataAsync.when(
         data: (state) {
           final chapterData = state.data[bookName]?[chapterNumber];
-          if (chapterData == null || chapterData.isEmpty) {
-            return const Center(child: Text('No commentary available.'));
-          }
-
+          
           final itemList = <MapEntry<String, CommentaryEntry>>[];
-          for (final verseStr in chapterData.keys) {
-            for (final entry in chapterData[verseStr]!) {
-              itemList.add(MapEntry(verseStr, entry));
+          if (chapterData != null) {
+            for (final verseStr in chapterData.keys) {
+              for (final entry in chapterData[verseStr]!) {
+                itemList.add(MapEntry(verseStr, entry));
+              }
             }
           }
-          
+
+          if (itemList.isEmpty) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Text(
+                  'No commentary available for this verse yet.',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontStyle: FontStyle.italic,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                  ),
+                ),
+              ),
+            );
+          }
+
           return ListView.builder(
             padding: const EdgeInsets.all(24.0),
-            itemCount: itemList.length + (state.isEgwMissing ? 1 : 0),
+            itemCount: itemList.length,
             itemBuilder: (context, index) {
-              if (index == itemList.length) {
-                if (state.isEgwMissing) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 32.0, top: 16.0),
-                    child: Text(
-                      'Local EGW module not found. Place EGW JSON files in your local directory to enable this commentary.',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        fontStyle: FontStyle.italic,
-                        color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.6),
-                      ),
-                    ),
-                  );
-                }
-                return const SizedBox.shrink();
-              }
               final verseStr = itemList[index].key;
               final entry = itemList[index].value;
               return Padding(

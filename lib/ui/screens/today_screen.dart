@@ -4,6 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../theme/app_colors.dart';
 import '../widgets/shared_top_header.dart';
+import '../../state/theme_provider.dart';
+import '../widgets/animated_background.dart';
+import '../widgets/glass_container.dart';
+import '../../state/home_provider.dart';
+import '../../state/reading_plan_provider.dart';
+import '../../state/notes_provider.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TODAY SCREEN — static scaffold (Stage 1: design / no data wiring)
@@ -46,30 +52,43 @@ class TodayScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: SafeArea(
-        bottom: false,
-        child: CustomScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          slivers: [
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const SizedBox(height: 12),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: AnimatedBackground(
+              appThemeMode: ref.watch(themeProvider),
+            ),
+          ),
+          SafeArea(
+            bottom: false,
+            child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SizedBox(height: 12),
 
-                    // ── Shared top header ──────────────────────────────────
-                    SharedTopHeader(
-                      centerContent: Text(
-                        dayLabel,
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 0.3,
+                        // ── Shared top header ──────────────────────────────────
+                        SharedTopHeader(
+                          leading: const SizedBox.shrink(),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.close_rounded),
+                            color: theme.colorScheme.onSurface,
+                            onPressed: () => Navigator.of(context).pop(),
+                          ),
+                          centerContent: Text(
+                            dayLabel,
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
 
                     const SizedBox(height: 28),
 
@@ -132,7 +151,9 @@ class TodayScreen extends ConsumerWidget {
           ],
         ),
       ),
-    );
+    ],
+  ),
+);
   }
 }
 
@@ -158,38 +179,7 @@ class _SectionLabel extends StatelessWidget {
   }
 }
 
-// Frosted glass card base
-class _GlassCard extends StatelessWidget {
-  final Widget child;
-  final EdgeInsetsGeometry? padding;
-  const _GlassCard({required this.child, this.padding});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-        child: Container(
-          padding: padding ?? const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.07)
-                : Colors.white.withValues(alpha: 0.60),
-            border: Border.all(
-              color: AppColors.goldAccent.withValues(alpha: 0.22),
-              width: 1.0,
-            ),
-          ),
-          child: child,
-        ),
-      ),
-    );
-  }
-}
+// _GlassCard has been replaced by GlassContainer from lib/ui/widgets/glass_container.dart
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 1. Greeting / Date header card
@@ -201,7 +191,8 @@ class _GreetingHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _GlassCard(
+    return GlassContainer(
+      padding: const EdgeInsets.all(20),
       child: Row(
         children: [
           // Icon
@@ -249,18 +240,18 @@ class _GreetingHeader extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 // 2. Verse of the Day card
 // ─────────────────────────────────────────────────────────────────────────────
-class _VerseOfTheDayCard extends StatelessWidget {
+class _VerseOfTheDayCard extends ConsumerWidget {
   final ThemeData theme;
   const _VerseOfTheDayCard({required this.theme});
 
   @override
-  Widget build(BuildContext context) {
-    // Stage 2: replace with ref.watch(homeProvider).verseOfTheDay
-    const verseText =
-        'For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.';
-    const verseRef = 'John 3:16';
+  Widget build(BuildContext context, WidgetRef ref) {
+    final homeState = ref.watch(homeProvider);
+    final verseText = homeState.verseOfTheDay.text;
+    final verseRef = homeState.verseOfTheDay.reference;
 
-    return _GlassCard(
+    return GlassContainer(
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -314,18 +305,26 @@ class _VerseOfTheDayCard extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 // 3. Today's Reading card
 // ─────────────────────────────────────────────────────────────────────────────
-class _TodaysReadingCard extends StatelessWidget {
+class _TodaysReadingCard extends ConsumerWidget {
   final ThemeData theme;
   const _TodaysReadingCard({required this.theme});
 
   @override
-  Widget build(BuildContext context) {
-    // Stage 2: ref.watch(readingPlanProvider) → currentDay, planData[day-1].chapters
-    const dayLabel = 'Day 42 of 365';
-    const chapters = ['Genesis 1', 'Genesis 2', 'Matthew 1'];
-    const progress = 0.42; // 42%
+  Widget build(BuildContext context, WidgetRef ref) {
+    final planState = ref.watch(readingPlanProvider);
+    final totalDays = planState.planData.length;
+    final currentDay = planState.currentDay;
+    
+    final dayLabel = totalDays > 0 ? 'Day $currentDay of $totalDays' : 'No active plan';
+    final progress = totalDays > 0 ? (currentDay > 1 ? (currentDay - 1) / totalDays : 0.0) : 0.0;
+    
+    List<String> chapters = [];
+    if (totalDays > 0 && currentDay > 0 && currentDay <= totalDays) {
+      chapters = planState.planData[currentDay - 1].chapters.map((c) => '${c.bookName} ${c.chapterNum}').toList();
+    }
 
-    return _GlassCard(
+    return GlassContainer(
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -367,10 +366,11 @@ class _TodaysReadingCard extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           // Chapter chips
-          Wrap(
-            spacing: 8,
-            runSpacing: 6,
-            children: chapters
+          if (chapters.isNotEmpty)
+            Wrap(
+              spacing: 8,
+              runSpacing: 6,
+              children: chapters
                 .map(
                   (c) => Container(
                     padding: const EdgeInsets.symmetric(
@@ -428,19 +428,20 @@ class _TodaysReadingCard extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 // 4. Latest Note card
 // ─────────────────────────────────────────────────────────────────────────────
-class _LatestNoteCard extends StatelessWidget {
+class _LatestNoteCard extends ConsumerWidget {
   final ThemeData theme;
   const _LatestNoteCard({required this.theme});
 
   @override
-  Widget build(BuildContext context) {
-    // Stage 2: ref.watch(notesProvider).first (sorted by date desc)
-    const noteTitle = 'On the Prodigal Son';
-    const notePreview =
-        'The father running to meet his son \u2014 God does not wait for us to arrive, He runs toward us\u2026';
-    const noteDate = 'July 20, 2026';
+  Widget build(BuildContext context, WidgetRef ref) {
+    final notes = ref.watch(notesProvider);
+    final hasNote = notes.isNotEmpty;
+    final noteTitle = hasNote ? notes.first.title : 'No notes yet';
+    final notePreview = hasNote ? notes.first.content : 'Write your first note to see it here.';
+    final noteDate = hasNote ? notes.first.date : '';
 
-    return _GlassCard(
+    return GlassContainer(
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -502,18 +503,19 @@ class _LatestNoteCard extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 // 5. Streak / Progress card
 // ─────────────────────────────────────────────────────────────────────────────
-class _StreakProgressCard extends StatelessWidget {
+class _StreakProgressCard extends ConsumerWidget {
   final ThemeData theme;
   const _StreakProgressCard({required this.theme});
 
   @override
-  Widget build(BuildContext context) {
-    // Stage 2: readingPlanProvider.completedDays.length / planData.length
-    const streakDays = 7;
-    const totalCompleted = 42;
-    const totalDays = 365;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final planState = ref.watch(readingPlanProvider);
+    final streakDays = planState.currentDay > 1 ? planState.currentDay - 1 : 0;
+    final totalDays = planState.planData.length;
+    final totalCompleted = planState.currentDay > 1 && totalDays > 0 ? planState.currentDay - 1 : 0;
 
-    return _GlassCard(
+    return GlassContainer(
+      padding: const EdgeInsets.all(20),
       child: Row(
         children: [
           // Flame / streak icon
@@ -566,7 +568,7 @@ class _StreakProgressCard extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(4),
                   child: LinearProgressIndicator(
-                    value: totalCompleted / totalDays,
+                    value: totalDays > 0 ? totalCompleted / totalDays : 0.0,
                     minHeight: 7,
                     backgroundColor:
                         AppColors.goldAccent.withValues(alpha: 0.14),
@@ -623,7 +625,7 @@ class _QuickActionsRow extends StatelessWidget {
       ),
     ];
 
-    return _GlassCard(
+    return GlassContainer(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,

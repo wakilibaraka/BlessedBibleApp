@@ -20,6 +20,7 @@ import '../../utils/bible_sections.dart';
 import '../../services/share_service.dart';
 import '../widgets/verse_link_text.dart';
 import '../widgets/shared_top_header.dart';
+import '../widgets/glass_container.dart';
 import '../../state/notes_provider.dart';
 import '../../data/models/home_data.dart';
 import '../widgets/day_complete_celebration.dart';
@@ -2249,7 +2250,7 @@ class _CommentaryBottomSheetContent extends ConsumerWidget {
       maxChildSize: 1.0,
       snap: true,
       builder: (context, scrollController) {
-        return TexturedGlassContainer(
+        return GlassContainer(
           borderRadius: const BorderRadius.vertical(top: Radius.circular(32.0)),
           padding: EdgeInsets.zero,
           child: SafeArea(
@@ -2288,7 +2289,7 @@ class _CommentaryBottomSheetContent extends ConsumerWidget {
                 // Highlighted Verse Container
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: TexturedGlassContainer(
+                  child: GlassContainer(
                     padding: const EdgeInsets.all(20.0),
                     borderRadius: BorderRadius.circular(24),
                     child: Text(
@@ -2318,7 +2319,7 @@ class _CommentaryBottomSheetContent extends ConsumerWidget {
                         left: 24,
                         right: 24,
                         bottom: 16,
-                        child: TexturedGlassContainer(
+                        child: GlassContainer(
                           padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
                           borderRadius: BorderRadius.circular(30),
                           child: Row(
@@ -2411,32 +2412,29 @@ class _CommentaryBottomSheetContent extends ConsumerWidget {
         if (entries.isEmpty) {
           return ListView(
             controller: scrollController,
-            children: const [
-              SizedBox(height: 40),
-              Center(child: Text('No commentary available.')),
+            children: [
+              const SizedBox(height: 60),
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Text(
+                    'No commentary available for this verse yet.',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontStyle: FontStyle.italic,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                    ),
+                  ),
+                ),
+              ),
             ],
           );
         }
         return ListView.builder(
           controller: scrollController,
           padding: const EdgeInsets.only(top: 8.0, bottom: 100.0),
-          itemCount: entries.length + (state.isEgwMissing ? 1 : 0),
+          itemCount: entries.length,
           itemBuilder: (context, index) {
-            if (index == entries.length) {
-              if (state.isEgwMissing) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 32.0, top: 16.0),
-                  child: Text(
-                    'Local EGW module not found. Place EGW JSON files in your local directory to enable this commentary.',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      fontStyle: FontStyle.italic,
-                      color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.6),
-                    ),
-                  ),
-                );
-              }
-              return const SizedBox.shrink();
-            }
             final entry = entries[index];
             return Padding(
               padding: const EdgeInsets.only(bottom: 32.0),
