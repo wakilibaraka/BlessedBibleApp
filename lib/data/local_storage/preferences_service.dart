@@ -16,6 +16,7 @@ class PreferencesService {
   static const String _lastReadLocKey = 'last_read_loc';
   static const String _studyLayoutKey = 'study_layout';
   static const String _readingPlanStateKey = 'reading_plan_state';
+  static const String _votdViewedDaysKey = 'votd_viewed_days';
 
   void saveSearchHistory(List<SearchResult> history) {
     final jsonList = history.map((e) => e.toJson()).toList();
@@ -121,10 +122,18 @@ class PreferencesService {
       try {
         return jsonDecode(jsonString) as Map<String, dynamic>;
       } catch (e) {
-        return null;
+        // ignore
       }
     }
     return null;
+  }
+
+  void saveVotdViewedDays(List<String> days) {
+    prefs.setStringList(_votdViewedDaysKey, days);
+  }
+
+  List<String> getVotdViewedDays() {
+    return prefs.getStringList(_votdViewedDaysKey) ?? [];
   }
 
   static const String _chapterPositionsKey = 'chapter_positions';

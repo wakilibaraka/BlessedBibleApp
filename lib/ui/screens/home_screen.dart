@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/home_data.dart';
 import '../../state/home_provider.dart';
+import '../../state/votd_tracker_provider.dart';
 
 import '../../state/theme_provider.dart';
 import '../widgets/shared_top_header.dart';
@@ -27,6 +28,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   @override
   void initState() {
     super.initState();
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(votdTrackerProvider.notifier).markViewed(DateTime.now());
+    });
 
     // Verse fade-in on load
     _verseController = AnimationController(

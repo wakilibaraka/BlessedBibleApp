@@ -3,7 +3,7 @@ import '../data/models/home_data.dart';
 import 'notes_provider.dart';
 
 class HomeNotifier extends Notifier<HomeData> {
-  static const _votdList = [
+  static const votdList = [
     ['John 3:16', 'For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.'],
     ['Psalm 23:1', 'The Lord is my shepherd; I shall not want.'],
     ['Proverbs 3:5', 'Trust in the Lord with all thine heart; and lean not unto thine own understanding.'],
@@ -44,8 +44,8 @@ class HomeNotifier extends Notifier<HomeData> {
   }
 
   HomeData _fetchData(List<PersonalNote> notes) {
-    final dayIndex = DateTime.now().difference(DateTime(2026, 1, 1)).inDays % _votdList.length;
-    final votdEntry = _votdList[dayIndex];
+    final dayIndex = DateTime.now().difference(DateTime(2026, 1, 1)).inDays % votdList.length;
+    final votdEntry = votdList[dayIndex];
     final votd = VerseOfTheDay(votdEntry[0], votdEntry[1]);
 
     // Show the 3 most recent notes

@@ -7,6 +7,7 @@ import '../../state/theme_provider.dart';
 import '../widgets/textured_glass_container.dart';
 import 'verse_detail_screen.dart';
 import '../widgets/your_space_hero.dart';
+import 'votd_archive_screen.dart';
 import '../../state/study_layout_provider.dart';
 import '../widgets/jiggle_animator.dart';
 import '../../state/reading_plan_provider.dart';
@@ -274,7 +275,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                       break;
                     case 'saved_verses':
                       cardWidget =
-                          _buildSavedVersesCompact(context, theme, config.size);
+                          _buildVotdArchiveBanner(context, theme, config.size);
                       break;
                     default:
                       cardWidget = const SizedBox.shrink();
@@ -745,7 +746,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
     );
   }
 
-  Widget _buildSavedVersesCompact(
+  Widget _buildVotdArchiveBanner(
       BuildContext context, ThemeData theme, CardSize size) {
     return AnimatedSize(
       duration: const Duration(milliseconds: 250),
@@ -758,13 +759,8 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
           child: InkWell(
             borderRadius: BorderRadius.circular(20),
             onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('Saved Verses coming soon!'),
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                ),
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const VotdArchiveScreen()),
               );
             },
             child: Container(
@@ -780,7 +776,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.bookmark_rounded,
+                        Icon(Icons.history_rounded,
                             color: theme.primaryColor, size: 24),
                         const SizedBox(width: 16),
                         Expanded(
@@ -788,13 +784,13 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Saved Verses',
+                                'Verse of the Day Archive',
                                 style: theme.textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                               Text(
-                                'Your collected reflections',
+                                'Catch up on verses from days you missed.',
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: theme.textTheme.bodySmall?.color
                                 ),
@@ -802,7 +798,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                             ],
                           ),
                         ),
-                        Icon(Icons.keyboard_arrow_down_rounded,
+                        Icon(Icons.keyboard_arrow_right_rounded,
                             color: theme.primaryColor),
                       ],
                     ),
@@ -817,39 +813,15 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                         ),
                         child: Row(
                           children: [
-                            Icon(Icons.book_rounded,
+                            Icon(Icons.auto_awesome,
                                 color:
                                     theme.primaryColor.withValues(alpha: 0.7),
                                 size: 16),
                             const SizedBox(width: 8),
-                            Text('24 verses saved total',
+                            Text('Explore your past daily verses',
                                 style: theme.textTheme.labelSmall?.copyWith(
                                     color: theme.colorScheme.onSurface
                                         .withValues(alpha: 0.7))),
-                          ],
-                        ),
-                      ),
-                    ],
-                    if (size == CardSize.large) ...[
-                      const SizedBox(height: 12),
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: theme.primaryColor.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Recently Added',
-                              style: theme.textTheme.labelMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text('"In the beginning God created the heaven and the earth." - Genesis 1:1', style: theme.textTheme.bodySmall, maxLines: 2, overflow: TextOverflow.ellipsis),
                           ],
                         ),
                       ),
