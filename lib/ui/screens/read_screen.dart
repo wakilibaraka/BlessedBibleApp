@@ -346,7 +346,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                           itemPositionsListener: _itemPositionsListeners[pageIndex],
                                           initialScrollIndex: (pageIndex == _currentPageIndex ? _navigatedVerseIndex : null) ?? ref.read(preferencesProvider).getChapterScrollPosition(fc.book.abbreviation, fc.chapter.number) ?? 0,
                                           padding: EdgeInsets.only(
-                                              top: MediaQuery.of(context).padding.top + 80.0,
+                                              top: MediaQuery.of(context).padding.top + (isImmersive ? 16.0 : 64.0),
                                               left: 24.0, right: 24.0, bottom: 400.0),
                                           itemCount: verses.length + 1,
                                           itemBuilder: (context, index) {
@@ -510,106 +510,131 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                     child: AnimatedOpacity(
                       duration: const Duration(milliseconds: 350),
                       opacity: (isImmersive && readSettings.readingViewMode == ReadingViewMode.immersive) ? 0.0 : 1.0,
-                      child: ClipRRect(
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
-                          child: Container(
-                            color: theme.scaffoldBackgroundColor.withValues(alpha: 0.85),
-                            padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const SizedBox(height: 12),
-                                // Top Navigation Bar
-                                Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                                child: SharedTopHeader(
-                                    leading: GestureDetector(
-                                      onTap: () {
-                                        ref.read(navProvider.notifier).setIndex(0);
-                                      },
-                                      behavior: HitTestBehavior.opaque,
-                                      child: Center(
-                                        child: Icon(
-                                          Icons.book_rounded,
-                                          size: 26,
-                                          color: theme.primaryColor,
-                                        ),
+                      child: Padding(
+                        padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 8.0, left: 24.0, right: 24.0),
+                        child: SharedTopHeader(
+                          leading: RepaintBoundary(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(24),
+                              child: BackdropFilter(
+                                filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    ref.read(navProvider.notifier).setIndex(0);
+                                  },
+                                  behavior: HitTestBehavior.opaque,
+                                  child: Container(
+                                    width: 48,
+                                    height: 48,
+                                    decoration: BoxDecoration(
+                                      color: theme.colorScheme.surface.withValues(alpha: 0.6),
+                                      border: Border.all(
+                                        color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                                        width: 1,
                                       ),
                                     ),
-                                    centerContent: GestureDetector(
-                                      onTap: () {
-                                        if (isImmersive) {
-                                          ref.read(immersiveModeProvider.notifier).set(false);
-                                        } else {
-                                          _showSelectorBottomSheet(allBooks);
-                                        }
-                                      },
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(20),
-                                        child: Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                            decoration: BoxDecoration(
-                                              color: theme.colorScheme.surface.withValues(alpha: 0.6),
-                                              borderRadius: BorderRadius.circular(20),
-                                              border: Border.all(
-                                                color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                                                width: 1,
-                                              ),
-                                            ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Flexible(
-                                                  child: FittedBox(
-                                                    fit: BoxFit.scaleDown,
-                                                    child: ConstrainedBox(
-                                                      constraints: const BoxConstraints(maxWidth: 180),
-                                                      child: MediaQuery(
-                                                        data: MediaQuery.of(context).copyWith(
-                                                          textScaler: const TextScaler.linear(1.0),
-                                                        ),
-                                                        child: Text(
-                                                          '$currentBookName $currentChapter',
-                                                          style: theme.textTheme.titleSmall?.copyWith(
-                                                            fontWeight: FontWeight.w700,
-                                                            fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14).clamp(12.0, 18.0),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
+                                    child: Center(
+                                      child: Icon(
+                                        Icons.book_rounded,
+                                        size: 24,
+                                        color: theme.primaryColor,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          centerContent: RepaintBoundary(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: BackdropFilter(
+                                filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    if (isImmersive) {
+                                      ref.read(immersiveModeProvider.notifier).set(false);
+                                    } else {
+                                      _showSelectorBottomSheet(allBooks);
+                                    }
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: theme.colorScheme.surface.withValues(alpha: 0.6),
+                                      border: Border.all(
+                                        color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                                        width: 1,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Flexible(
+                                          child: FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: ConstrainedBox(
+                                              constraints: const BoxConstraints(maxWidth: 180),
+                                              child: MediaQuery(
+                                                data: MediaQuery.of(context).copyWith(
+                                                  textScaler: const TextScaler.linear(1.0),
+                                                ),
+                                                child: Text(
+                                                  '$currentBookName $currentChapter',
+                                                  style: theme.textTheme.titleSmall?.copyWith(
+                                                    fontWeight: FontWeight.w700,
+                                                    fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14).clamp(12.0, 18.0),
                                                   ),
                                                 ),
-                                                const SizedBox(width: 4),
-                                                Icon(Icons.keyboard_arrow_down_rounded, 
-                                                  size: 16, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
-                                              ],
+                                              ),
                                             ),
                                           ),
                                         ),
+                                        const SizedBox(width: 4),
+                                        Icon(Icons.keyboard_arrow_down_rounded, 
+                                          size: 16, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          trailing: RepaintBoundary(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(24),
+                              child: BackdropFilter(
+                                filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
+                                child: GestureDetector(
+                                  onTap: _showTypographyBottomSheet,
+                                  behavior: HitTestBehavior.opaque,
+                                  child: Container(
+                                    width: 48,
+                                    height: 48,
+                                    decoration: BoxDecoration(
+                                      color: theme.colorScheme.surface.withValues(alpha: 0.6),
+                                      border: Border.all(
+                                        color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                                        width: 1,
                                       ),
-                                      trailing: GestureDetector(
-                                      onTap: _showTypographyBottomSheet,
-                                      behavior: HitTestBehavior.opaque,
-                                      child: Center(
-                                        child: Text(
-                                          'aA',
-                                          style: theme.textTheme.titleLarge?.copyWith(
-                                            fontWeight: FontWeight.w600,
-                                            color: theme.colorScheme.onSurface,
-                                            letterSpacing: -1.0,
-                                          ),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        'aA',
+                                        style: theme.textTheme.titleLarge?.copyWith(
+                                          fontWeight: FontWeight.w600,
+                                          color: theme.colorScheme.onSurface,
+                                          letterSpacing: -1.0,
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
-                            const SizedBox(height: 12),
-                          ],
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
                 ),
               ),
             ),
