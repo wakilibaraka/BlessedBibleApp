@@ -1,11 +1,15 @@
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/models/bible_model.dart';
 import '../data/models/commentary_model.dart';
+import '../data/models/home_data.dart';
 import 'bible_provider.dart';
 import 'study_provider.dart';
+import 'home_provider.dart';
 
-// Represents a search result
+enum SearchResultType { reference, bible, commentary, history, note }
+
 class SearchResult {
   final String title;
   final String subtitle;
@@ -41,36 +45,174 @@ class SearchResult {
   );
 }
 
-enum SearchResultType { reference, bible, commentary, history }
+class SearchItem {
+  final int id;
+  final SearchResultType type;
+  final String title;
+  final String subtitle;
+  final String text;
+  final Map<String, dynamic> metadata;
 
-class SearchArgs {
-  final String query;
-  final bool includeBible;
-  final bool includeCommentary;
-  final List<BibleBook>? bibleBooks;
-  final Map<String, Map<String, Map<String, List<CommentaryEntry>>>>? commentaryData;
-
-  SearchArgs(this.query, this.includeBible, this.includeCommentary, this.bibleBooks, this.commentaryData);
+  SearchItem({
+    required this.id,
+    required this.type,
+    required this.title,
+    required this.subtitle,
+    required this.text,
+    required this.metadata,
+  });
 }
 
-List<SearchResult> _executeSearchIsolate(SearchArgs args) {
-  final query = args.query;
-  final includeBible = args.includeBible;
-  final includeCommentary = args.includeCommentary;
-  final bibleBooks = args.bibleBooks;
-  final commentaryData = args.commentaryData;
-
-  if (query.trim().isEmpty) return [];
+class IndexData {
+  final List<SearchItem> corpus;
+  final Map<String, List<int>> invertedIndex;
   
-  final queryLower = query.toLowerCase().trim();
+  IndexData(this.corpus, this.invertedIndex);
+}
+
+class IndexBuildArgs {
+  final List<BibleBook>? bibleBooks;
+  final Map<String, Map<String, Map<String, List<CommentaryEntry>>>>? commentaryData;
+  final List<PersonalNote> notes;
+  
+  IndexBuildArgs(this.bibleBooks, this.commentaryData, this.notes);
+}
+
+class SearchQueryArgs {
+  final String query;
+  final IndexData indexData;
+  final bool includeBible;
+  final bool includeCommentary;
+  final List<BibleBook>? bibleBooks; // Needed for reference matching
+  
+  SearchQueryArgs(this.query, this.indexData, this.includeBible, this.includeCommentary, this.bibleBooks);
+}
+
+List<String> _tokenize(String text) {
+  // Lowercase and replace non-alphanumeric (except spaces) with spaces, then split
+  return text.toLowerCase().replaceAll(RegExp(r'[^\p{L}\p{N}\s]', unicode: true), ' ').split(RegExp(r'\s+')).where((t) => t.isNotEmpty).toList();
+}
+
+IndexData _buildIndexIsolate(IndexBuildArgs args) {
+  final corpus = <SearchItem>[];
+  final index = <String, List<int>>{};
+  int nextId = 0;
+
+  void addTokens(int id, String text) {
+    final tokens = _tokenize(text);
+    // Use a set to avoid duplicate document IDs for the same token
+    for (final token in tokens.toSet()) {
+      index.putIfAbsent(token, () => []).add(id);
+    }
+  }
+
+  // 1. Bible Books
+  if (args.bibleBooks != null) {
+    for (final book in args.bibleBooks!) {
+      for (final chapter in book.chapters) {
+        for (final verse in chapter.verses) {
+          final item = SearchItem(
+            id: nextId++,
+            type: SearchResultType.bible,
+            title: '${book.name} ${chapter.number}:${verse.number}',
+            subtitle: 'Bible Verse',
+            text: verse.text,
+            metadata: {
+              'book': book.name,
+              'bookAbbrev': book.abbreviation,
+              'chapter': chapter.number,
+              'verse': verse.number,
+              'text': verse.text,
+            },
+          );
+          corpus.add(item);
+          addTokens(item.id, '${item.title} ${item.text}');
+        }
+      }
+    }
+  }
+
+  // 2. Commentary
+  if (args.commentaryData != null) {
+    for (final bookEntry in args.commentaryData!.entries) {
+      final bookName = bookEntry.key;
+      for (final chapterEntry in bookEntry.value.entries) {
+        final chapterNum = chapterEntry.key;
+        for (final verseEntry in chapterEntry.value.entries) {
+          final verseNum = verseEntry.key;
+          int parsedVerse = 1;
+          if (verseNum.contains('-')) {
+            parsedVerse = int.tryParse(verseNum.split('-').first) ?? 1;
+          } else {
+            parsedVerse = int.tryParse(verseNum) ?? 1;
+          }
+
+          for (final entry in verseEntry.value) {
+            // EXPLICITLY IGNORE EGW
+            if (entry.id.toLowerCase().contains('egw')) continue;
+            
+            String authorLabel = 'Commentary';
+            if (entry.id.toLowerCase().contains('uriah')) {
+              authorLabel = 'Uriah Smith Commentary';
+            }
+
+            final item = SearchItem(
+              id: nextId++,
+              type: SearchResultType.commentary,
+              title: '$bookName $chapterNum:$verseNum',
+              subtitle: authorLabel,
+              text: (entry.title.isNotEmpty ? '«${entry.title}» ' : '') + entry.text,
+              metadata: {
+                'book': bookName,
+                'chapter': int.tryParse(chapterNum) ?? 1,
+                'verse': parsedVerse,
+                'author': entry.title,
+              },
+            );
+            corpus.add(item);
+            addTokens(item.id, '${item.title} ${item.text}');
+          }
+        }
+      }
+    }
+  }
+
+  // 3. User Notes
+  for (final note in args.notes) {
+    final item = SearchItem(
+      id: nextId++,
+      type: SearchResultType.note,
+      title: note.title,
+      subtitle: 'Note • ${note.date}',
+      text: note.content,
+      metadata: {
+        'title': note.title,
+      },
+    );
+    corpus.add(item);
+    addTokens(item.id, '${item.title} ${item.text}');
+  }
+
+  return IndexData(corpus, index);
+}
+
+List<SearchResult> _searchIsolate(SearchQueryArgs args) {
+  final query = args.query.trim();
+  if (query.isEmpty) return [];
+
+  final queryLower = query.toLowerCase();
+  final queryTokens = _tokenize(query);
+  if (queryTokens.isEmpty) return [];
+
   final results = <SearchResult>[];
 
-  String highlightSnippet(String text, String query) {
-    final index = text.toLowerCase().indexOf(query);
+  // Helper for snippet
+  String highlightSnippet(String text, String queryLower) {
+    final index = text.toLowerCase().indexOf(queryLower);
     if (index == -1) return text.length > 100 ? '${text.substring(0, 100)}...' : text;
     
     final start = (index - 30).clamp(0, text.length);
-    final end = (index + query.length + 30).clamp(0, text.length);
+    final end = (index + queryLower.length + 30).clamp(0, text.length);
     
     String snippet = text.substring(start, end);
     if (start > 0) snippet = '...$snippet';
@@ -79,8 +221,8 @@ List<SearchResult> _executeSearchIsolate(SearchArgs args) {
     return snippet;
   }
 
-  // 0. Search References
-  if (includeBible && bibleBooks != null) {
+  // 0. Exact Reference Match (highest priority)
+  if (args.includeBible && args.bibleBooks != null) {
     final regex = RegExp(r'^((?:\d\s*)?[a-z]+(?:\s+[a-z]+)*)\s*(?:(\d+)[\s:.]*(\d+)?)?$');
     final match = regex.firstMatch(queryLower);
     
@@ -89,7 +231,7 @@ List<SearchResult> _executeSearchIsolate(SearchArgs args) {
       final chapterStr = match.group(2);
       final verseStr = match.group(3);
 
-      for (final book in bibleBooks) {
+      for (final book in args.bibleBooks!) {
         final nameLower = book.name.toLowerCase();
         final abbrevLower = book.abbreviation.toLowerCase();
 
@@ -133,97 +275,116 @@ List<SearchResult> _executeSearchIsolate(SearchArgs args) {
     }
   }
 
-  // 1. Search Bible
-  if (includeBible && bibleBooks != null) {
-    for (final book in bibleBooks) {
-      final bookName = book.name;
-      for (final chapter in book.chapters) {
-        for (final verse in chapter.verses) {
-          if (verse.text.toLowerCase().contains(queryLower)) {
-            results.add(SearchResult(
-              title: '$bookName ${chapter.number}:${verse.number}',
-              subtitle: 'Bible Verse',
-              snippet: highlightSnippet(verse.text, queryLower),
-              type: SearchResultType.bible,
-              metadata: {
-                'book': bookName,
-                'bookAbbrev': book.abbreviation,
-                'chapter': chapter.number,
-                'verse': verse.number,
-                'text': verse.text,
-              },
-            ));
+  // 1. Predictive Prefix Matching via Inverted Index
+  // For each token in the query, we find all documents that contain a word starting with that token.
+  final index = args.indexData.invertedIndex;
+  final corpus = args.indexData.corpus;
+  
+  // Start with null for intersection
+  Set<int>? matchingIds;
+  
+  // Store matching metadata for ranking later
+  final matchQuality = <int, int>{}; // id -> score (higher is better)
+
+  for (final token in queryTokens) {
+    final currentTokenMatches = <int>{};
+    
+    // Exact matches
+    if (index.containsKey(token)) {
+      for (final id in index[token]!) {
+        currentTokenMatches.add(id);
+        matchQuality[id] = (matchQuality[id] ?? 0) + 10; // Exact word match = 10 pts
+      }
+    }
+    
+    // Prefix matches (only if token is reasonably long, e.g., > 1 char to avoid exploding)
+    if (token.isNotEmpty) {
+      for (final key in index.keys) {
+        if (key != token && key.startsWith(token)) {
+          for (final id in index[key]!) {
+            currentTokenMatches.add(id);
+            matchQuality[id] = (matchQuality[id] ?? 0) + 1; // Prefix match = 1 pt
           }
         }
       }
     }
+    
+    if (matchingIds == null) {
+      matchingIds = currentTokenMatches;
+    } else {
+      matchingIds = matchingIds.intersection(currentTokenMatches);
+    }
+    
+    // If at any point the intersection is empty, we can abort early
+    if (matchingIds.isEmpty) break;
   }
-
-  // 2. Search Commentary
-  if (includeCommentary && commentaryData != null) {
-    for (final bookEntry in commentaryData.entries) {
-      final bookName = bookEntry.key;
-      for (final chapterEntry in bookEntry.value.entries) {
-        final chapterNum = chapterEntry.key;
-        for (final verseEntry in chapterEntry.value.entries) {
-          final verseNum = verseEntry.key;
-          int parsedVerse = 1;
-          if (verseNum.contains('-')) {
-            parsedVerse = int.tryParse(verseNum.split('-').first) ?? 1;
-          } else {
-            parsedVerse = int.tryParse(verseNum) ?? 1;
-          }
-
-          for (final entry in verseEntry.value) {
-            if (entry.text.toLowerCase().contains(queryLower) || entry.title.toLowerCase().contains(queryLower)) {
-              String authorLabel = 'Commentary';
-              if (entry.id.toLowerCase().contains('egw')) {
-                authorLabel = 'EGW Commentary';
-              } else if (entry.id.toLowerCase().contains('uriah')) {
-                authorLabel = 'Uriah Smith Commentary';
-              }
-
-              results.add(SearchResult(
-                title: '$bookName $chapterNum:$verseNum',
-                subtitle: authorLabel,
-                snippet: (entry.title.isNotEmpty ? '«${entry.title}» ' : '') + highlightSnippet(entry.text, queryLower),
-                type: SearchResultType.commentary,
-                metadata: {
-                  'book': bookName,
-                  'chapter': int.tryParse(chapterNum) ?? 1,
-                  'verse': parsedVerse,
-                  'author': entry.title,
-                },
-              ));
-            }
-          }
-        }
+  
+  if (matchingIds != null && matchingIds.isNotEmpty) {
+    // Filter by requested types and gather items
+    final matchedItems = <SearchItem>[];
+    for (final id in matchingIds) {
+      final item = corpus[id];
+      if (item.type == SearchResultType.bible && !args.includeBible) continue;
+      if (item.type == SearchResultType.commentary && !args.includeCommentary) continue;
+      matchedItems.add(item);
+    }
+    
+    // Add Exact Phrase boosting
+    for (final item in matchedItems) {
+      if (item.text.toLowerCase().contains(queryLower)) {
+        matchQuality[item.id] = (matchQuality[item.id] ?? 0) + 50; // Exact phrase = 50 pts
       }
+    }
+    
+    // Sort by match quality descending
+    matchedItems.sort((a, b) {
+      final scoreA = matchQuality[a.id] ?? 0;
+      final scoreB = matchQuality[b.id] ?? 0;
+      return scoreB.compareTo(scoreA); // Highest first
+    });
+    
+    // Take top 100
+    for (final item in matchedItems.take(100)) {
+      results.add(SearchResult(
+        title: item.title,
+        subtitle: item.subtitle,
+        snippet: highlightSnippet(item.text, queryLower),
+        type: item.type,
+        metadata: item.metadata,
+      ));
     }
   }
 
-  return results.take(100).toList();
+  // The 'reference' matches added at the beginning are implicitly at the top.
+  return results;
 }
 
-// The Search Engine handles the actual query logic
 class SearchEngine {
   final List<BibleBook>? bibleBooks;
   final Map<String, Map<String, Map<String, List<CommentaryEntry>>>>? commentaryData;
+  final List<PersonalNote> notes;
+  
+  late final Future<IndexData> _indexFuture;
 
-  SearchEngine({this.bibleBooks, this.commentaryData});
+  SearchEngine({this.bibleBooks, this.commentaryData, this.notes = const []}) {
+    _indexFuture = compute(_buildIndexIsolate, IndexBuildArgs(bibleBooks, commentaryData, notes));
+  }
 
   Future<List<SearchResult>> search(String query, {bool includeBible = true, bool includeCommentary = true}) async {
-    final args = SearchArgs(query, includeBible, includeCommentary, bibleBooks, commentaryData);
-    return await compute(_executeSearchIsolate, args);
+    final indexData = await _indexFuture;
+    final args = SearchQueryArgs(query, indexData, includeBible, includeCommentary, bibleBooks);
+    return await compute(_searchIsolate, args);
   }
 }
 
 final searchEngineProvider = Provider<SearchEngine>((ref) {
   final bibleState = ref.watch(bibleProvider);
   final commentaryAsync = ref.watch(combinedCommentaryProvider);
+  final homeState = ref.watch(homeProvider);
 
   return SearchEngine(
     bibleBooks: bibleState.books,
     commentaryData: commentaryAsync.asData?.value.data,
+    notes: homeState.asData?.value.recentNotes ?? [],
   );
 });

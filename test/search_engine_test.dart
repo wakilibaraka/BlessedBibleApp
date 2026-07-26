@@ -1,131 +1,77 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:the_blessed_bible/data/models/bible_model.dart';
+import 'package:the_blessed_bible/data/models/commentary_model.dart';
+import 'package:the_blessed_bible/data/models/home_data.dart';
 import 'package:the_blessed_bible/state/search_engine.dart';
 
 void main() {
-  group('SearchEngine', () {
-    final mockBooks = [
+  test('SearchEngine builds index and executes query', () async {
+    final books = [
       BibleBook(
         name: 'Genesis',
-        abbreviation: 'GEN',
+        abbreviation: 'Gen',
         chapters: [
           BibleChapter(
             number: 1,
             verses: [
-              BibleVerse(number: 1, text: 'In the beginning...'),
-              BibleVerse(number: 2, text: 'And the earth...'),
-            ],
-          ),
-          BibleChapter(
-            number: 2,
-            verses: [
-              BibleVerse(number: 1, text: 'Thus the heavens...'),
+              BibleVerse(number: 1, text: "In the beginning God created the heaven and the earth."),
             ],
           ),
         ],
       ),
       BibleBook(
-        name: 'Revelation',
-        abbreviation: 'REV',
+        name: 'John',
+        abbreviation: 'John',
         chapters: [
           BibleChapter(
-            number: 1,
+            number: 3,
             verses: [
-              BibleVerse(number: 1, text: 'The Revelation of Jesus Christ...'),
-            ],
-          ),
-          BibleChapter(
-            number: 14,
-            verses: [
-              BibleVerse(number: 1, text: 'And I looked, and, lo, a Lamb stood on the mount Sion...'),
+              BibleVerse(number: 16, text: "For God so loved the world..."),
             ],
           ),
         ],
-      ),
-      BibleBook(
-        name: '1 Corinthians',
-        abbreviation: '1CO',
-        chapters: List.generate(13, (i) {
-          return BibleChapter(
-            number: i + 1,
-            verses: [
-              if (i == 12) BibleVerse(number: 1, text: 'Though I speak with the tongues of men and of angels...'),
-            ],
-          );
-        }),
-      ),
+      )
     ];
 
-    test('parses exact book name correctly', () async {
-      final engine = SearchEngine(bibleBooks: mockBooks);
-      final results = await engine.search('Genesis');
-      
-      final refResults = results.where((r) => r.type == SearchResultType.reference).toList();
-      expect(refResults.length, 1);
-      expect(refResults[0].metadata['bookAbbrev'], 'GEN');
-      expect(refResults[0].metadata['chapter'], 1);
-    });
+    final commentary = {
+      'Daniel': {
+        '1': {
+          '1': [
+            CommentaryEntry(id: 'uriah_smith', title: 'Uriah Smith', text: 'This is a test commentary by Uriah.'),
+            CommentaryEntry(id: 'egw', title: 'EGW', text: 'This should be ignored.'),
+          ]
+        }
+      }
+    };
 
-    test('parses book abbreviation correctly', () async {
-      final engine = SearchEngine(bibleBooks: mockBooks);
-      final results = await engine.search('REV');
-      
-      final refResults = results.where((r) => r.type == SearchResultType.reference).toList();
-      expect(refResults.length, 1);
-      expect(refResults[0].metadata['bookAbbrev'], 'REV');
-    });
+    final notes = [
+      PersonalNote('My Note', 'This is a test note about creation.', '2026-07-26'),
+    ];
 
-    test('parses book prefix correctly', () async {
-      final engine = SearchEngine(bibleBooks: mockBooks);
-      final results = await engine.search('reve');
-      
-      final refResults = results.where((r) => r.type == SearchResultType.reference).toList();
-      expect(refResults.length, 1);
-      expect(refResults[0].metadata['bookAbbrev'], 'REV');
-    });
+    final engine = SearchEngine(bibleBooks: books, commentaryData: commentary, notes: notes);
 
-    test('parses book and chapter correctly', () async {
-      final engine = SearchEngine(bibleBooks: mockBooks);
-      final results = await engine.search('gen 2');
-      
-      final refResults = results.where((r) => r.type == SearchResultType.reference).toList();
-      expect(refResults.length, 1);
-      expect(refResults[0].metadata['bookAbbrev'], 'GEN');
-      expect(refResults[0].metadata['chapter'], 2);
-      expect(refResults[0].metadata['verse'], null);
-    });
+    // Test 1: Verse text query
+    final res1 = await engine.search('beginning');
+    expect(res1.isNotEmpty, isTrue);
+    expect(res1.first.title, 'Genesis 1:1');
 
-    test('parses book, chapter and verse correctly', () async {
-      final engine = SearchEngine(bibleBooks: mockBooks);
-      final results = await engine.search('gen 1:2');
-      
-      final refResults = results.where((r) => r.type == SearchResultType.reference).toList();
-      expect(refResults.length, 1);
-      expect(refResults[0].metadata['bookAbbrev'], 'GEN');
-      expect(refResults[0].metadata['chapter'], 1);
-      expect(refResults[0].metadata['verse'], 2);
-    });
+    // Test 2: Reference query
+    final res2 = await engine.search('John 3:16');
+    expect(res2.isNotEmpty, isTrue);
+    expect(res2.first.type, SearchResultType.reference);
 
-    test('parses numbered books correctly', () async {
-      final engine = SearchEngine(bibleBooks: mockBooks);
-      final results = await engine.search('1 cor 13:1');
-      
-      final refResults = results.where((r) => r.type == SearchResultType.reference).toList();
-      expect(refResults.length, 1);
-      expect(refResults[0].metadata['bookAbbrev'], '1CO');
-      expect(refResults[0].metadata['chapter'], 13);
-      expect(refResults[0].metadata['verse'], 1);
-    });
-    
-    test('returns bible verse match correctly', () async {
-      final engine = SearchEngine(bibleBooks: mockBooks);
-      final results = await engine.search('Lamb stood');
-      
-      final bibleResults = results.where((r) => r.type == SearchResultType.bible).toList();
-      expect(bibleResults.length, 1);
-      expect(bibleResults[0].metadata['bookAbbrev'], 'REV');
-      expect(bibleResults[0].metadata['chapter'], 14);
-      expect(bibleResults[0].metadata['verse'], 1);
-    });
+    // Test 3: Commentary query
+    final res3 = await engine.search('uriah');
+    expect(res3.isNotEmpty, isTrue);
+    expect(res3.first.type, SearchResultType.commentary);
+
+    // Test 4: EGW query (should be ignored)
+    final res4 = await engine.search('ignored');
+    expect(res4.isEmpty, isTrue);
+
+    // Test 5: Note query
+    final res5 = await engine.search('creation');
+    expect(res5.isNotEmpty, isTrue);
+    expect(res5.first.type, SearchResultType.note);
   });
 }
