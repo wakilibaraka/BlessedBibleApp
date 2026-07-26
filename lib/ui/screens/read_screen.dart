@@ -33,6 +33,19 @@ import '../../state/nav_settings_provider.dart';
 import 'commentary_list_screen.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
+String _toHeadingCase(String text) {
+  if (text.isEmpty) return text;
+  final minorWords = {'a', 'an', 'the', 'and', 'but', 'or', 'for', 'nor', 'on', 'at', 'to', 'from', 'by', 'in', 'of', 'with'};
+  final words = text.toLowerCase().split(' ');
+  for (int i = 0; i < words.length; i++) {
+    if (words[i].isEmpty) continue;
+    if (i == 0 || i == words.length - 1 || !minorWords.contains(words[i])) {
+      words[i] = words[i][0].toUpperCase() + words[i].substring(1);
+    }
+  }
+  return words.join(' ');
+}
+
 class ReadScreen extends ConsumerStatefulWidget {
   const ReadScreen({super.key});
 
@@ -469,16 +482,16 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                               children: [
                                                 if (index == 0 && chapterTitle != null) ...[
                                                   Padding(
-                                                    padding: const EdgeInsets.only(top: 8.0, bottom: 32.0, left: 16.0, right: 16.0),
+                                                    padding: const EdgeInsets.only(top: 16.0, bottom: 8.0, left: 15.0, right: 12.0),
                                                     child: Text(
-                                                      chapterTitle.toUpperCase(),
-                                                      style: theme.textTheme.titleMedium?.copyWith(
+                                                      _toHeadingCase(chapterTitle),
+                                                      style: theme.textTheme.titleSmall?.copyWith(
                                                         color: theme.primaryColor,
                                                         fontFamily: typography.fontFamily,
-                                                        fontWeight: FontWeight.w600,
-                                                        letterSpacing: 1.5,
+                                                        fontWeight: FontWeight.w700,
+                                                        letterSpacing: 0.2,
                                                       ),
-                                                      textAlign: TextAlign.center,
+                                                      textAlign: TextAlign.left,
                                                     ),
                                                   ),
                                                 ],
