@@ -503,7 +503,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                                       _toHeadingCase(chapterTitle),
                                                       style: theme.textTheme.titleSmall?.copyWith(
                                                         color: theme.primaryColor,
-                                                        fontFamily: typography.fontFamily,
+                                                        fontFamily: typography.fontFamily == 'System' ? null : typography.fontFamily,
                                                         fontWeight: FontWeight.w700,
                                                         letterSpacing: 0.2,
                                                       ),
@@ -1859,7 +1859,7 @@ class _TypographyBottomSheet extends ConsumerWidget {
     final typography = ref.watch(typographyProvider);
     final typographyNotifier = ref.read(typographyProvider.notifier);
 
-    final fonts = ['Inter', 'Gentium Book Plus', 'Lora', 'Literata'];
+    final fonts = ['System', 'Inter', 'Gentium Book Plus', 'Lora', 'Literata'];
 
     return BouncyEntrance(
       delay: const Duration(milliseconds: 50),
@@ -1906,29 +1906,53 @@ class _TypographyBottomSheet extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 32),
-              Text(
-                'FONT SIZE',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: theme.primaryColor,
-                  letterSpacing: 1.2,
-                  fontWeight: FontWeight.bold,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'FONT SIZE',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.primaryColor,
+                      letterSpacing: 1.2,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    '${typography.fontSize.round()}',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: theme.primaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Text('A', style: theme.textTheme.labelSmall),
+                  GestureDetector(
+                    onTap: () => typographyNotifier.setFontSize((typography.fontSize - 1).clamp(12.0, 40.0)),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+                      child: Text('A', style: theme.textTheme.labelSmall),
+                    ),
+                  ),
                   Expanded(
                     child: Slider(
                       value: typography.fontSize,
                       min: 12.0,
-                      max: 28.0,
+                      max: 40.0,
                       activeColor: theme.primaryColor,
                       inactiveColor: theme.primaryColor.withValues(alpha: 0.2),
                       onChanged: (value) => typographyNotifier.setFontSize(value),
                     ),
                   ),
-                  Text('A', style: theme.textTheme.titleLarge),
+                  GestureDetector(
+                    onTap: () => typographyNotifier.setFontSize((typography.fontSize + 1).clamp(12.0, 40.0)),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+                      child: Text('A', style: theme.textTheme.titleLarge),
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 24),
@@ -1975,7 +1999,7 @@ class _TypographyBottomSheet extends ConsumerWidget {
                       ),
                       child: Text(
                         font,
-                        style: TextStyle(fontFamily: font).copyWith(
+                        style: TextStyle(fontFamily: font == 'System' ? null : font).copyWith(
                           color: isSelected ? theme.primaryColor : theme.colorScheme.onSurface,
                           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                         ),

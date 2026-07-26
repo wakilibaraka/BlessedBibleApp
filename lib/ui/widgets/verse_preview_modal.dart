@@ -81,7 +81,7 @@ class VersePreviewModal extends ConsumerWidget {
                       style: theme.textTheme.titleMedium?.copyWith(
                         color: theme.primaryColor,
                         fontWeight: FontWeight.bold,
-                        fontFamily: typography.fontFamily,
+                        fontFamily: typography.fontFamily == 'System' ? null : typography.fontFamily,
                       ),
                     ),
                   ),
@@ -103,7 +103,7 @@ class VersePreviewModal extends ConsumerWidget {
                 child: Text(
                   verseText,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    fontFamily: typography.fontFamily,
+                    fontFamily: typography.fontFamily == 'System' ? null : typography.fontFamily,
                     fontSize: typography.fontSize,
                     height: 1.6,
                     color: theme.textTheme.bodyLarge?.color,
