@@ -672,29 +672,42 @@ Positioned(
                                   child: RepaintBoundary(
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(24),
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          ref.read(navProvider.notifier).setIndex(0);
-                                        },
-                                        behavior: HitTestBehavior.opaque,
-                                        child: Container(
-                                          width: 48,
-                                          height: 48,
-                                          decoration: BoxDecoration(
-                                            color: theme.colorScheme.surface.withValues(alpha: isGlassy ? 0.6 : nonGlassAlpha),
-                                            border: Border.all(
-                                              color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                                              width: 1,
+                                      clipBehavior: Clip.antiAlias,
+                                      child: Stack(
+                                        children: [
+                                          if (isGlassy)
+                                            Positioned.fill(
+                                              child: BackdropFilter(
+                                                filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
+                                                child: const SizedBox.shrink(),
+                                              ),
+                                            ),
+                                          GestureDetector(
+                                            onTap: () {
+                                              ref.read(navProvider.notifier).setIndex(0);
+                                            },
+                                            behavior: HitTestBehavior.opaque,
+                                            child: Container(
+                                              width: 48,
+                                              height: 48,
+                                              decoration: BoxDecoration(
+                                                color: theme.colorScheme.surface.withValues(alpha: isGlassy ? 0.6 : nonGlassAlpha),
+                                                borderRadius: BorderRadius.circular(24),
+                                                border: Border.all(
+                                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                                                  width: 1,
+                                                ),
+                                              ),
+                                              child: Center(
+                                                child: Icon(
+                                                  Icons.book_rounded,
+                                                  size: 24,
+                                                  color: theme.primaryColor,
+                                                ),
+                                              ),
                                             ),
                                           ),
-                                          child: Center(
-                                            child: Icon(
-                                              Icons.book_rounded,
-                                              size: 24,
-                                              color: theme.primaryColor,
-                                            ),
-                                          ),
-                                        ),
+                                        ],
                                       ),
                                     ),
                                   ),
@@ -703,6 +716,7 @@ Positioned(
                               centerContent: RepaintBoundary(
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(20),
+                                  clipBehavior: Clip.antiAlias,
                                   child: Stack(
                                     children: [
                                       if (isGlassy)
@@ -724,6 +738,7 @@ Positioned(
                                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                           decoration: BoxDecoration(
                                             color: theme.colorScheme.surface.withValues(alpha: isGlassy ? 0.6 : nonGlassAlpha),
+                                            borderRadius: BorderRadius.circular(20),
                                             border: Border.all(
                                               color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
                                               width: 1,
@@ -772,30 +787,43 @@ Positioned(
                                   child: RepaintBoundary(
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(24),
-                                      child: GestureDetector(
-                                        onTap: _showTypographyBottomSheet,
-                                        behavior: HitTestBehavior.opaque,
-                                        child: Container(
-                                          width: 48,
-                                          height: 48,
-                                          decoration: BoxDecoration(
-                                            color: theme.colorScheme.surface.withValues(alpha: isGlassy ? 0.6 : nonGlassAlpha),
-                                            border: Border.all(
-                                              color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                                              width: 1,
+                                      clipBehavior: Clip.antiAlias,
+                                      child: Stack(
+                                        children: [
+                                          if (isGlassy)
+                                            Positioned.fill(
+                                              child: BackdropFilter(
+                                                filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
+                                                child: const SizedBox.shrink(),
+                                              ),
                                             ),
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              'aA',
-                                              style: theme.textTheme.titleLarge?.copyWith(
-                                                fontWeight: FontWeight.w600,
-                                                color: theme.colorScheme.onSurface,
-                                                letterSpacing: -1.0,
+                                          GestureDetector(
+                                            onTap: _showTypographyBottomSheet,
+                                            behavior: HitTestBehavior.opaque,
+                                            child: Container(
+                                              width: 48,
+                                              height: 48,
+                                              decoration: BoxDecoration(
+                                                color: theme.colorScheme.surface.withValues(alpha: isGlassy ? 0.6 : nonGlassAlpha),
+                                                borderRadius: BorderRadius.circular(24),
+                                                border: Border.all(
+                                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                                                  width: 1,
+                                                ),
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  'aA',
+                                                  style: theme.textTheme.titleLarge?.copyWith(
+                                                    fontWeight: FontWeight.w600,
+                                                    color: theme.colorScheme.onSurface,
+                                                    letterSpacing: -1.0,
+                                                  ),
+                                                ),
                                               ),
                                             ),
                                           ),
-                                        ),
+                                        ],
                                       ),
                                     ),
                                   ),
