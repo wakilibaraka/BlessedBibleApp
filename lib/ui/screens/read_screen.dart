@@ -79,10 +79,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
   //   Max vel   : 250 px/s  — any faster is a flick, not a deliberate drag
   static const double _kOverscrollDistanceThreshold = 60.0;
   static const int    _kHoldMillis                  = 700;
-  static const double _kMaxVelocityForIntent        = 250.0;
 
   double _overscrollAccum   = 0.0; // total negative overscroll pixels seen
-  double _lastOverscrollVel = 0.0; // velocity from the last notification
   DateTime? _overscrollStart;      // when the drag crossed the first threshold
   bool _navTriggeredThisDrag = false;
 
@@ -93,7 +91,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
 
   void _resetOverscrollGate() {
     _overscrollAccum      = 0.0;
-    _lastOverscrollVel    = 0.0;
     _overscrollStart      = null;
     _navTriggeredThisDrag = false;
     if (mounted) setState(() {});
@@ -415,28 +412,25 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                       if (bibleNavSettings.swipeDownToNav) {
                                         if (notification is OverscrollNotification &&
                                             notification.overscroll < 0) {
+                                          
+                                          // Reject inertial overscrolls (flicks) — dragDetails is null
+                                          // when the user's finger is no longer on the screen.
+                                          if (notification.dragDetails == null) {
+                                            _resetOverscrollGate();
+                                            return false;
+                                          }
+
                                           // Accumulate how far the user has dragged
                                           final delta = -notification.overscroll;
-                                          _lastOverscrollVel =
-                                              (notification as dynamic).velocity?.pixelsPerSecond.dy.abs()
-                                              as double? ?? 0.0;
 
                                           // Mark the start of intentional territory once
-                                          // we've seen a first meaningful pull AND velocity
-                                          // is low (i.e. this is a deliberate drag, not a flick)
-                                          if (_overscrollAccum == 0.0 &&
-                                              delta > 4.0 &&
-                                              _lastOverscrollVel < _kMaxVelocityForIntent) {
+                                          // we've seen a first meaningful pull
+                                          if (_overscrollAccum == 0.0 && delta > 4.0) {
                                             _overscrollStart = DateTime.now();
                                           }
 
-                                          if (_lastOverscrollVel < _kMaxVelocityForIntent) {
-                                            _overscrollAccum += delta;
-                                            if (mounted) setState(() {});
-                                          } else {
-                                            // Fast flick detected — reset immediately
-                                            _resetOverscrollGate();
-                                          }
+                                          _overscrollAccum += delta;
+                                          if (mounted) setState(() {});
 
                                           // Check if both thresholds are satisfied
                                           if (!_navTriggeredThisDrag &&
