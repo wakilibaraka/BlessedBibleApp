@@ -14,6 +14,7 @@ class PreferencesService {
   static const String _highlightsKey = 'highlights';
   static const String _lastTabKey = 'last_tab';
   static const String _lastReadLocKey = 'last_read_loc';
+  static const String _studyLayoutKey = 'study_layout';
 
   void saveSearchHistory(List<SearchResult> history) {
     final jsonList = history.map((e) => e.toJson()).toList();
@@ -99,6 +100,14 @@ class PreferencesService {
       }
     }
     return null;
+  }
+
+  void saveStudyLayout(String jsonString) {
+    prefs.setString(_studyLayoutKey, jsonString);
+  }
+
+  String? getStudyLayout() {
+    return prefs.getString(_studyLayoutKey);
   }
 
   static const String _chapterPositionsKey = 'chapter_positions';
