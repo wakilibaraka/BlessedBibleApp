@@ -110,7 +110,7 @@ class SettingsScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 8.0),
             child: Text(
-              'Font/Typography',
+              'Reading',
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     color: Theme.of(context).colorScheme.primary,
                     fontWeight: FontWeight.bold,
@@ -120,12 +120,12 @@ class SettingsScreen extends StatelessWidget {
           Consumer(builder: (context, ref, _) {
             final viewMode = ref.watch(readSettingsProvider.select((s) => s.readingViewMode));
             return _AnimatedSegmentedTile<ReadingViewMode>(
-              title: 'Reading View',
-              subtitle: 'How the header behaves when scrolling',
+              title: 'Immersive Reading',
+              subtitle: 'Hide navigation bars while scrolling',
               selectedValue: viewMode,
               options: const [
-                MapEntry(ReadingViewMode.immersive, 'Immersive'),
-                MapEntry(ReadingViewMode.pinned, 'Pinned header'),
+                MapEntry(ReadingViewMode.immersive, 'On'),
+                MapEntry(ReadingViewMode.pinned, 'Off'),
               ],
               onChanged: (val) => ref.read(readSettingsProvider.notifier).setReadingViewMode(val),
             );
