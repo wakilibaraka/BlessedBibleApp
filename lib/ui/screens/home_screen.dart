@@ -67,27 +67,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           // ── Layer 2: Content ───────────────────────────────────────────
           SafeArea(
             bottom: false,
-            child: homeState.when(
-              loading: () => const Center(
-                child: CircularProgressIndicator(),
-              ),
-              error: (err, _) => Center(child: Text('Error: $err')),
-              data: (data) => RefreshIndicator(
-                onRefresh: _onRefresh,
-                color: const Color(0xFFC9A227),
-                backgroundColor: isDark ? const Color(0xFF2C2A28) : Colors.white,
-                child: CustomScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  slivers: [
-                    SliverFillRemaining(
-                      hasScrollBody: false,
-                      child: FadeTransition(
-                        opacity: _verseFade,
-                        child: _buildPage(context, data, appThemeMode),
-                      ),
+            child: RefreshIndicator(
+              onRefresh: _onRefresh,
+              color: const Color(0xFFC9A227),
+              backgroundColor: isDark ? const Color(0xFF2C2A28) : Colors.white,
+              child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: [
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: FadeTransition(
+                      opacity: _verseFade,
+                      child: _buildPage(context, homeState, appThemeMode),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),

@@ -33,7 +33,22 @@ class PersonalNote {
   final String title;
   final String content;
   final String date;
-  PersonalNote(this.title, this.content, this.date);
+  final String? reference;
+
+  PersonalNote(this.title, this.content, this.date, {this.reference});
+
+  Map<String, dynamic> toJson() => {
+        'title': title,
+        'content': content,
+        'date': date,
+        if (reference != null) 'reference': reference,
+      };
+
+  factory PersonalNote.fromJson(Map<String, dynamic> json) => PersonalNote(
+        json['title'] as String,
+        json['content'] as String,
+        json['date'] as String,
+      );
 }
 
 class MostReadVerse {

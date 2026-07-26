@@ -6,7 +6,7 @@ import '../data/models/commentary_model.dart';
 import '../data/models/home_data.dart';
 import 'bible_provider.dart';
 import 'study_provider.dart';
-import 'home_provider.dart';
+import 'notes_provider.dart';
 
 enum SearchResultType { reference, bible, commentary, history, note }
 
@@ -386,11 +386,11 @@ class SearchEngine {
 final searchEngineProvider = Provider<SearchEngine>((ref) {
   final bibleState = ref.watch(bibleProvider);
   final commentaryAsync = ref.watch(combinedCommentaryProvider);
-  final homeState = ref.watch(homeProvider);
+  final notes = ref.watch(notesProvider);
 
   return SearchEngine(
     bibleBooks: bibleState.books,
     commentaryData: commentaryAsync.asData?.value.data,
-    notes: homeState.asData?.value.recentNotes ?? [],
+    notes: notes,
   );
 });
