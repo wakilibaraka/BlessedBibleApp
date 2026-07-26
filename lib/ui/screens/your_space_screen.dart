@@ -5,8 +5,10 @@ import '../../state/theme_provider.dart';
 import '../../state/read_location_provider.dart';
 import '../../state/nav_provider.dart';
 import '../../state/bible_provider.dart';
+import '../../state/notes_provider.dart';
 import '../widgets/animated_background.dart';
 import '../widgets/textured_glass_container.dart';
+import 'notes_list_screen.dart';
 
 class _VerseData {
   final String bookAbbrev;
@@ -14,8 +16,9 @@ class _VerseData {
   final int chapter;
   final int verseNum;
   final String text;
-  
-  _VerseData(this.bookAbbrev, this.bookName, this.chapter, this.verseNum, this.text);
+
+  _VerseData(
+      this.bookAbbrev, this.bookName, this.chapter, this.verseNum, this.text);
 }
 
 class YourSpaceScreen extends ConsumerWidget {
@@ -44,7 +47,8 @@ class YourSpaceScreen extends ConsumerWidget {
     return null;
   }
 
-  Widget _buildVerseCard(BuildContext context, WidgetRef ref, String refStr, _VerseData data, ThemeData theme) {
+  Widget _buildVerseCard(BuildContext context, WidgetRef ref, String refStr,
+      _VerseData data, ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: TexturedGlassContainer(
@@ -54,11 +58,11 @@ class YourSpaceScreen extends ConsumerWidget {
           borderRadius: BorderRadius.circular(16),
           onTap: () {
             ref.read(readLocationProvider.notifier).updateLocation(
-              bookAbbrev: data.bookAbbrev,
-              bookName: data.bookName,
-              chapter: data.chapter,
-              verse: data.verseNum,
-            );
+                  bookAbbrev: data.bookAbbrev,
+                  bookName: data.bookName,
+                  chapter: data.chapter,
+                  verse: data.verseNum,
+                );
             Navigator.of(context).pop();
             ref.read(navProvider.notifier).setIndex(1); // Jump to read
           },
@@ -93,12 +97,14 @@ class YourSpaceScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildEmptyState(ThemeData theme, IconData icon, String title, String subtitle) {
+  Widget _buildEmptyState(
+      ThemeData theme, IconData icon, String title, String subtitle) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 64, color: theme.primaryColor.withValues(alpha: 0.5)),
+          Icon(icon,
+              size: 64, color: theme.primaryColor.withValues(alpha: 0.5)),
           const SizedBox(height: 16),
           Text(
             title,
@@ -113,6 +119,7 @@ class YourSpaceScreen extends ConsumerWidget {
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
             ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -125,7 +132,7 @@ class YourSpaceScreen extends ConsumerWidget {
     final appThemeMode = ref.watch(themeProvider);
     final highlights = ref.watch(highlightsProvider);
     final bookmarks = ref.watch(bookmarksProvider);
-    final favorites = ref.watch(favoritesProvider);
+    final notes = ref.watch(notesProvider);
     final flatChapters = ref.watch(flatChaptersProvider);
 
     // Group highlights by color
@@ -141,20 +148,34 @@ class YourSpaceScreen extends ConsumerWidget {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          title: Text('Your Space', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+          title: Text('Your Space',
+              style: theme.textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold)),
           leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios_new_rounded, color: theme.primaryColor),
+            icon: Icon(Icons.arrow_back_ios_new_rounded,
+                color: theme.primaryColor),
             onPressed: () => Navigator.of(context).pop(),
           ),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.note_add_rounded, color: theme.primaryColor),
+              onPressed: () => showAddNoteSheet(context, ref, theme),
+              tooltip: 'Add Note',
+            ),
+            const SizedBox(width: 8),
+          ],
           bottom: TabBar(
             indicatorColor: theme.primaryColor,
             labelColor: theme.primaryColor,
-            unselectedLabelColor: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+            unselectedLabelColor:
+                theme.colorScheme.onSurface.withValues(alpha: 0.5),
             dividerColor: Colors.transparent,
+            isScrollable: true,
+            tabAlignment: TabAlignment.center,
             tabs: const [
               Tab(text: 'Highlights'),
-              Tab(text: 'Bookmarks'),
-              Tab(text: 'Favorites'),
+              Tab(text: 'Bookmarks/Favorites'),
+              Tab(text: 'My Notes'),
             ],
           ),
         ),
@@ -165,30 +186,35 @@ class YourSpaceScreen extends ConsumerWidget {
             ),
             TabBarView(
               children: [
-                // Highlights Tab
+                // ── Highlights Tab ──
                 groupedHighlights.isEmpty
                     ? _buildEmptyState(
-                        theme, 
-                        Icons.auto_awesome, 
-                        'No highlights yet', 
+                        theme,
+                        Icons.auto_awesome,
+                        'No highlights yet',
                         'Color-code a verse to see it here.',
                       )
                     : ListView.builder(
-                        padding: const EdgeInsets.only(top: 16, bottom: 100, left: 16, right: 16),
+                        padding: const EdgeInsets.only(
+                            top: 16, bottom: 100, left: 16, right: 16),
                         itemCount: highlightPalette.length,
                         itemBuilder: (context, colorIndex) {
                           final refs = groupedHighlights[colorIndex];
-                          if (refs == null || refs.isEmpty) return const SizedBox.shrink();
+                          if (refs == null || refs.isEmpty) {
+                            return const SizedBox.shrink();
+                          }
 
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 16.0, horizontal: 8.0),
                                 child: Row(
                                   children: [
                                     Container(
-                                      width: 16, height: 16,
+                                      width: 16,
+                                      height: 16,
                                       decoration: BoxDecoration(
                                         color: highlightPalette[colorIndex],
                                         shape: BoxShape.circle,
@@ -197,53 +223,143 @@ class YourSpaceScreen extends ConsumerWidget {
                                     const SizedBox(width: 12),
                                     Text(
                                       'Highlighted',
-                                      style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                                      style: theme.textTheme.titleMedium
+                                          ?.copyWith(
+                                              fontWeight: FontWeight.bold),
                                     ),
                                   ],
                                 ),
                               ),
                               ...refs.map((refStr) {
-                                final data = _parseVerseRef(refStr, flatChapters);
-                                if (data == null) return const SizedBox.shrink();
-                                return _buildVerseCard(context, ref, refStr, data, theme);
+                                final data =
+                                    _parseVerseRef(refStr, flatChapters);
+                                if (data == null) {
+                                  return const SizedBox.shrink();
+                                }
+                                return _buildVerseCard(
+                                    context, ref, refStr, data, theme);
                               }),
                             ],
                           );
                         },
                       ),
-                
-                // Bookmarks Tab
+
+                // ── Bookmarks / Favorites Tab ──
                 bookmarks.isEmpty
                     ? _buildEmptyState(
-                        theme, 
-                        Icons.bookmark_border, 
-                        'No bookmarks yet', 
-                        'No bookmarks yet — select a verse and tap the bookmark icon',
+                        theme,
+                        Icons.bookmark_border,
+                        'No saved verses',
+                        'Select a verse and tap the bookmark icon to save it.',
                       )
                     : ListView(
-                        padding: const EdgeInsets.only(top: 16, bottom: 100, left: 16, right: 16),
+                        padding: const EdgeInsets.only(
+                            top: 16, bottom: 100, left: 16, right: 16),
                         children: bookmarks.map((refStr) {
                           final data = _parseVerseRef(refStr, flatChapters);
-                          if (data == null) return const SizedBox.shrink();
-                          return _buildVerseCard(context, ref, refStr, data, theme);
+                          if (data == null) {
+                            return const SizedBox.shrink();
+                          }
+                          return _buildVerseCard(
+                              context, ref, refStr, data, theme);
                         }).toList(),
                       ),
 
-                // Favorites Tab
-                favorites.isEmpty
+                // ── My Notes Tab ──
+                notes.isEmpty
                     ? _buildEmptyState(
-                        theme, 
-                        Icons.star_border, 
-                        'No favorites yet', 
-                        'No favorites yet — select a verse and tap the star icon',
+                        theme,
+                        Icons.edit_note_rounded,
+                        'No notes yet',
+                        'Tap the + icon above to write your first note.',
                       )
-                    : ListView(
-                        padding: const EdgeInsets.only(top: 16, bottom: 100, left: 16, right: 16),
-                        children: favorites.map((refStr) {
-                          final data = _parseVerseRef(refStr, flatChapters);
-                          if (data == null) return const SizedBox.shrink();
-                          return _buildVerseCard(context, ref, refStr, data, theme);
-                        }).toList(),
+                    : ListView.builder(
+                        padding: const EdgeInsets.only(
+                            top: 16, bottom: 100, left: 16, right: 16),
+                        itemCount: notes.length,
+                        itemBuilder: (context, index) {
+                          final note = notes[index];
+                          return Dismissible(
+                            key: ValueKey(
+                                note.title + note.date + index.toString()),
+                            direction: DismissDirection.endToStart,
+                            background: Container(
+                              alignment: Alignment.centerRight,
+                              padding: const EdgeInsets.only(right: 20),
+                              margin: const EdgeInsets.only(bottom: 12),
+                              decoration: BoxDecoration(
+                                color: Colors.red.withValues(alpha: 0.8),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child:
+                                  const Icon(Icons.delete, color: Colors.white),
+                            ),
+                            onDismissed: (_) {
+                              ref.read(notesProvider.notifier).remove(index);
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(bottom: 12.0),
+                              child: TexturedGlassContainer(
+                                borderRadius: BorderRadius.circular(16),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              note.title,
+                                              style: theme.textTheme.titleMedium
+                                                  ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                            ),
+                                          ),
+                                          Text(
+                                            note.date,
+                                            style: theme.textTheme.bodySmall
+                                                ?.copyWith(
+                                              color: theme.colorScheme.onSurface
+                                                  .withValues(alpha: 0.5),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      if (note.reference != null) ...[
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          note.reference!,
+                                          style: theme.textTheme.bodySmall
+                                              ?.copyWith(
+                                            color: theme.primaryColor,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        note.content,
+                                        maxLines: 4,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: theme.textTheme.bodyMedium
+                                            ?.copyWith(
+                                          color: theme.colorScheme.onSurface
+                                              .withValues(alpha: 0.8),
+                                          height: 1.5,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
                       ),
               ],
             ),

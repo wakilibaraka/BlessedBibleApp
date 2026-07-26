@@ -21,7 +21,8 @@ import '../../state/read_location_provider.dart';
 import '../../state/bible_provider.dart';
 import 'notes_list_screen.dart';
 
-
+import '../../state/study_provider.dart';
+import 'commentary_list_screen.dart';
 
 class MainNavScreen extends ConsumerWidget {
   const MainNavScreen({super.key});
@@ -64,10 +65,13 @@ class MainNavScreen extends ConsumerWidget {
             final double rawWidth = MediaQuery.of(context).size.width;
             final double availableWidth = rawWidth > 0 ? rawWidth : 360.0;
             final double maxDockWidth = 450.0;
-            final double dockMaxWidth = math.max(250.0, math.min(maxDockWidth, availableWidth - 40 - 72 - 16));
+            final double dockMaxWidth = math.max(
+                250.0, math.min(maxDockWidth, availableWidth - 40 - 72 - 16));
             final double totalExpandedWidth = dockMaxWidth + 12.0 + 72.0;
-            final double rightOffset = math.max(20.0, (availableWidth - totalExpandedWidth) / 2);
-            final double height = (currentIndex == 1 && selectedVerses.isNotEmpty) ? 420.0 : 72.0;
+            final double rightOffset =
+                math.max(20.0, (availableWidth - totalExpandedWidth) / 2);
+            final double height =
+                (currentIndex == 1 && selectedVerses.isNotEmpty) ? 420.0 : 72.0;
 
             return SizedBox(
               height: height + 32.0,
@@ -91,7 +95,7 @@ class MainNavScreen extends ConsumerWidget {
                               curve: Curves.easeOutCubic,
                               tween: BorderRadiusTween(
                                 begin: BorderRadius.circular(32),
-                                end: isNavHidden 
+                                end: isNavHidden
                                     ? const BorderRadius.only(
                                         topLeft: Radius.circular(32),
                                         bottomLeft: Radius.circular(32),
@@ -102,7 +106,8 @@ class MainNavScreen extends ConsumerWidget {
                               ),
                               builder: (context, radius, child) {
                                 return TexturedGlassContainer(
-                                  borderRadius: radius ?? BorderRadius.circular(32),
+                                  borderRadius:
+                                      radius ?? BorderRadius.circular(32),
                                   padding: EdgeInsets.zero,
                                   child: child!,
                                 );
@@ -122,47 +127,49 @@ class MainNavScreen extends ConsumerWidget {
                                     child: SizedBox(
                                       width: dockMaxWidth,
                                       child: Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 24.0),
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 8.0, horizontal: 24.0),
                                         child: Row(
                                           key: const ValueKey('nav_tabs'),
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
-                                                _buildNavItem(
-                                                  context,
-                                                  ref,
-                                                  index: 0,
-                                                  icon: Icons.home_outlined,
-                                                  activeIcon: Icons.home,
-                                                  label: 'Home',
-                                                  currentIndex: currentIndex,
-                                                ),
-                                                _buildNavItem(
-                                                  context,
-                                                  ref,
-                                                  index: 1,
-                                                  icon: Icons.menu_book_outlined,
-                                                  activeIcon: Icons.menu_book,
-                                                  label: 'Read',
-                                                  currentIndex: currentIndex,
-                                                ),
-                                                _buildNavItem(
-                                                  context,
-                                                  ref,
-                                                  index: 3,
-                                                  icon: Icons.school_outlined,
-                                                  activeIcon: Icons.school,
-                                                  label: 'Study',
-                                                  currentIndex: currentIndex,
-                                                ),
-                                                _buildNavItem(
-                                                  context,
-                                                  ref,
-                                                  index: 2,
-                                                  icon: Icons.search,
-                                                  activeIcon: Icons.search,
-                                                  label: 'Search',
-                                                  currentIndex: currentIndex,
-                                                ),
+                                            _buildNavItem(
+                                              context,
+                                              ref,
+                                              index: 0,
+                                              icon: Icons.home_outlined,
+                                              activeIcon: Icons.home,
+                                              label: 'Home',
+                                              currentIndex: currentIndex,
+                                            ),
+                                            _buildNavItem(
+                                              context,
+                                              ref,
+                                              index: 1,
+                                              icon: Icons.menu_book_outlined,
+                                              activeIcon: Icons.menu_book,
+                                              label: 'Read',
+                                              currentIndex: currentIndex,
+                                            ),
+                                            _buildNavItem(
+                                              context,
+                                              ref,
+                                              index: 3,
+                                              icon: Icons.school_outlined,
+                                              activeIcon: Icons.school,
+                                              label: 'Study',
+                                              currentIndex: currentIndex,
+                                            ),
+                                            _buildNavItem(
+                                              context,
+                                              ref,
+                                              index: 2,
+                                              icon: Icons.search,
+                                              activeIcon: Icons.search,
+                                              label: 'Search',
+                                              currentIndex: currentIndex,
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -175,7 +182,8 @@ class MainNavScreen extends ConsumerWidget {
                         ),
                         AnimatedContainer(
                           duration: const Duration(milliseconds: 400),
-                          width: isNavHidden ? 0.0 : 12.0, // Collapse the gap too!
+                          width:
+                              isNavHidden ? 0.0 : 12.0, // Collapse the gap too!
                         ),
                         // ── Dynamic Contextual FAB (Right) ──
                         TweenAnimationBuilder<double>(
@@ -183,16 +191,21 @@ class MainNavScreen extends ConsumerWidget {
                           curve: Curves.easeOutCubic,
                           tween: Tween<double>(
                             begin: 56.0,
-                            end: (currentIndex == 1 && selectedVerses.isNotEmpty) ? 380.0 : 56.0,
+                            end:
+                                (currentIndex == 1 && selectedVerses.isNotEmpty)
+                                    ? 380.0
+                                    : 56.0,
                           ),
                           builder: (context, height, child) {
-                            final bool isAction = currentIndex == 1 && selectedVerses.isNotEmpty;
+                            final bool isAction =
+                                currentIndex == 1 && selectedVerses.isNotEmpty;
                             return Stack(
                               alignment: Alignment.bottomRight,
                               clipBehavior: Clip.none,
                               children: [
                                 // Expand bounds to catch Top Pill hits
-                                if (isAction) SizedBox(width: 250, height: height + 70),
+                                if (isAction)
+                                  SizedBox(width: 250, height: height + 70),
 
                                 // ── Top Pill (Verse + Colors) ──
                                 Positioned(
@@ -205,35 +218,61 @@ class MainNavScreen extends ConsumerWidget {
                                       delay: const Duration(milliseconds: 40),
                                       child: TexturedGlassContainer(
                                         borderRadius: BorderRadius.circular(36),
-                                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 16.0, vertical: 12.0),
                                         child: Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Text(
                                               '${selectedVerses.length}',
-                                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                                fontWeight: FontWeight.bold,
-                                                color: Theme.of(context).primaryColor,
-                                              ),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleSmall
+                                                  ?.copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Theme.of(context)
+                                                        .primaryColor,
+                                                  ),
                                             ),
                                             const SizedBox(width: 12),
-                                            ...List.generate(highlightPalette.length, (i) {
+                                            ...List.generate(
+                                                highlightPalette.length, (i) {
                                               final color = highlightPalette[i];
-                                              final highlights = ref.watch(highlightsProvider);
-                                              final allHaveThisColor = selectedVerses.every((v) {
-                                                final refStr = generateVerseKey(readLoc.bookAbbrev, readLoc.chapter, v);
-                                                return highlights.containsKey(refStr) && highlights[refStr] == i;
+                                              final highlights =
+                                                  ref.watch(highlightsProvider);
+                                              final allHaveThisColor =
+                                                  selectedVerses.every((v) {
+                                                final refStr = generateVerseKey(
+                                                    readLoc.bookAbbrev,
+                                                    readLoc.chapter,
+                                                    v);
+                                                return highlights
+                                                        .containsKey(refStr) &&
+                                                    highlights[refStr] == i;
                                               });
 
                                               return _buildColorDot(
                                                 color,
                                                 isSelected: allHaveThisColor,
                                                 onTap: () {
-                                                  for (var v in selectedVerses) {
-                                                    final refStr = generateVerseKey(readLoc.bookAbbrev, readLoc.chapter, v);
-                                                    ref.read(highlightsProvider.notifier).toggleHighlight(refStr, i);
+                                                  for (var v
+                                                      in selectedVerses) {
+                                                    final refStr =
+                                                        generateVerseKey(
+                                                            readLoc.bookAbbrev,
+                                                            readLoc.chapter,
+                                                            v);
+                                                    ref
+                                                        .read(highlightsProvider
+                                                            .notifier)
+                                                        .toggleHighlight(
+                                                            refStr, i);
                                                   }
-                                                  ref.read(readSelectionProvider.notifier).clear();
+                                                  ref
+                                                      .read(
+                                                          readSelectionProvider
+                                                              .notifier)
+                                                      .clear();
                                                 },
                                               );
                                             }),
@@ -256,29 +295,53 @@ class MainNavScreen extends ConsumerWidget {
                                         maxHeight: 380,
                                         alignment: Alignment.bottomCenter,
                                         child: AnimatedSwitcher(
-                                          duration: const Duration(milliseconds: 300),
+                                          duration:
+                                              const Duration(milliseconds: 300),
                                           child: isAction
-                                              ? _buildActionMenuIcons(context, ref, Theme.of(context))
+                                              ? _buildActionMenuIcons(context,
+                                                  ref, Theme.of(context))
                                               : SizedBox(
                                                   key: const ValueKey('fab'),
                                                   height: 56,
                                                   child: Center(
                                                     child: IconButton(
                                                       icon: AnimatedSwitcher(
-                                                        duration: const Duration(milliseconds: 300),
-                                                        transitionBuilder: (Widget child, Animation<double> animation) {
+                                                        duration:
+                                                            const Duration(
+                                                                milliseconds:
+                                                                    300),
+                                                        transitionBuilder:
+                                                            (Widget child,
+                                                                Animation<
+                                                                        double>
+                                                                    animation) {
                                                           return ScaleTransition(
                                                             scale: animation,
-                                                            child: RotationTransition(
-                                                              turns: Tween<double>(begin: 0.5, end: 1.0).animate(animation),
+                                                            child:
+                                                                RotationTransition(
+                                                              turns: Tween<
+                                                                          double>(
+                                                                      begin:
+                                                                          0.5,
+                                                                      end: 1.0)
+                                                                  .animate(
+                                                                      animation),
                                                               child: child,
                                                             ),
                                                           );
                                                         },
-                                                        child: _buildFabIcon(currentIndex, navSettings, ref),
+                                                        child: _buildFabIcon(
+                                                            currentIndex,
+                                                            navSettings,
+                                                            ref),
                                                       ),
-                                                      color: Theme.of(context).primaryColor,
-                                                      onPressed: () => _handleFabTap(currentIndex, ref, context),
+                                                      color: Theme.of(context)
+                                                          .primaryColor,
+                                                      onPressed: () =>
+                                                          _handleFabTap(
+                                                              currentIndex,
+                                                              ref,
+                                                              context),
                                                     ),
                                                   ),
                                                 ),
@@ -303,7 +366,8 @@ class MainNavScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildFabIcon(int currentIndex, NavSettingsState navSettings, WidgetRef ref) {
+  Widget _buildFabIcon(
+      int currentIndex, NavSettingsState navSettings, WidgetRef ref) {
     if (currentIndex == 0) {
       return Stack(
         key: const ValueKey('settings_entry'),
@@ -314,26 +378,30 @@ class MainNavScreen extends ConsumerWidget {
         ],
       );
     } else if (currentIndex == 4) {
-      return const Icon(Icons.close_rounded, size: 28, key: ValueKey('settings_close'));
+      return const Icon(Icons.close_rounded,
+          size: 28, key: ValueKey('settings_close'));
     }
 
     IconData iconData;
     switch (currentIndex) {
       case 1: // Read
-        iconData = ref.watch(immersiveModeProvider) ? Icons.fullscreen_exit_rounded : Icons.fullscreen_rounded;
+        iconData = ref.watch(immersiveModeProvider)
+            ? Icons.fullscreen_exit_rounded
+            : Icons.fullscreen_rounded;
         break;
       case 2: // Search
         iconData = Icons.tune_rounded;
         break;
       case 3: // Study
-        iconData = Icons.edit_note_rounded;
+        iconData = Icons.auto_awesome;
         break;
       default:
         iconData = Icons.add_rounded;
     }
     return Icon(
       iconData,
-      key: ValueKey<int>(currentIndex * 10 + (ref.watch(immersiveModeProvider) ? 1 : 0)),
+      key: ValueKey<int>(
+          currentIndex * 10 + (ref.watch(immersiveModeProvider) ? 1 : 0)),
       size: 24,
     );
   }
@@ -345,7 +413,7 @@ class MainNavScreen extends ConsumerWidget {
     FocusManager.instance.primaryFocus?.unfocus();
     // 3. Clear any transient SnackBars/Banners
     ScaffoldMessenger.of(context).clearSnackBars();
-    
+
     // Switch tab
     ref.read(navProvider.notifier).setIndex(index);
   }
@@ -364,8 +432,8 @@ class MainNavScreen extends ConsumerWidget {
         // Search tab: no FAB action (search bar is in the screen itself)
         break;
       case 3:
-        // Study -> Notes Popover
-        showNotesPopover(context, Theme.of(context));
+        // Study -> I'm Feeling Lucky
+        _handleImFeelingLucky(context, ref);
         break;
       case 4:
         // Settings -> Return to Home
@@ -385,13 +453,16 @@ class MainNavScreen extends ConsumerWidget {
   }) {
     final isActive = index == currentIndex;
     final theme = Theme.of(context);
-    final color = isActive ? theme.primaryColor : theme.colorScheme.onSurface.withValues(alpha: 0.4);
+    final color = isActive
+        ? theme.primaryColor
+        : theme.colorScheme.onSurface.withValues(alpha: 0.4);
 
     Widget iconWidget;
     if (label == 'Home') {
       iconWidget = AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
-        transitionBuilder: (child, anim) => FadeTransition(opacity: anim, child: child),
+        transitionBuilder: (child, anim) =>
+            FadeTransition(opacity: anim, child: child),
         child: Icon(
           isActive ? Icons.home : Icons.home_outlined,
           key: ValueKey(isActive),
@@ -402,7 +473,8 @@ class MainNavScreen extends ConsumerWidget {
     } else if (label == 'Read') {
       iconWidget = AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
-        transitionBuilder: (child, anim) => FadeTransition(opacity: anim, child: child),
+        transitionBuilder: (child, anim) =>
+            FadeTransition(opacity: anim, child: child),
         child: Icon(
           isActive ? Icons.auto_stories : Icons.menu_book,
           key: ValueKey(isActive),
@@ -460,9 +532,10 @@ class MainNavScreen extends ConsumerWidget {
               Text(
                 label,
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: color,
-                  fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-                ),
+                      color: color,
+                      fontWeight:
+                          isActive ? FontWeight.bold : FontWeight.normal,
+                    ),
               ),
             ],
           ),
@@ -484,7 +557,8 @@ class MainNavScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildColorDot(Color color, {bool isSelected = false, VoidCallback? onTap}) {
+  Widget _buildColorDot(Color color,
+      {bool isSelected = false, VoidCallback? onTap}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4.0),
       child: GestureDetector(
@@ -495,9 +569,15 @@ class MainNavScreen extends ConsumerWidget {
           decoration: BoxDecoration(
             color: color.withValues(alpha: 0.8),
             shape: BoxShape.circle,
-            border: isSelected ? Border.all(color: Colors.white, width: 2) : null,
+            border:
+                isSelected ? Border.all(color: Colors.white, width: 2) : null,
             boxShadow: isSelected
-                ? [BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 4, spreadRadius: 1)]
+                ? [
+                    BoxShadow(
+                        color: color.withValues(alpha: 0.4),
+                        blurRadius: 4,
+                        spreadRadius: 1)
+                  ]
                 : null,
           ),
         ),
@@ -505,11 +585,11 @@ class MainNavScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildActionMenuIcons(BuildContext context, WidgetRef ref, ThemeData theme) {
+  Widget _buildActionMenuIcons(
+      BuildContext context, WidgetRef ref, ThemeData theme) {
     final readLoc = ref.watch(readLocationProvider);
     final selectedVerses = ref.watch(readSelectionProvider);
     final bookmarks = ref.watch(bookmarksProvider);
-    final favorites = ref.watch(favoritesProvider);
 
     return SizedBox(
       key: const ValueKey('action_menu_icons'),
@@ -520,55 +600,36 @@ class MainNavScreen extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _buildActionIcon(
-              selectedVerses.every((v) => bookmarks.contains(generateVerseKey(readLoc.bookAbbrev, readLoc.chapter, v)))
+              selectedVerses.every((v) => bookmarks.contains(
+                      generateVerseKey(readLoc.bookAbbrev, readLoc.chapter, v)))
                   ? Icons.bookmark_rounded
                   : Icons.bookmark_border_rounded,
               'Bookmark',
-              selectedVerses.every((v) => bookmarks.contains(generateVerseKey(readLoc.bookAbbrev, readLoc.chapter, v)))
+              selectedVerses.every((v) => bookmarks.contains(
+                      generateVerseKey(readLoc.bookAbbrev, readLoc.chapter, v)))
                   ? theme.primaryColor
                   : theme.colorScheme.onSurface,
               () {
                 final bookmarks = ref.read(bookmarksProvider);
-                final isAllBookmarked = selectedVerses.every((v) => bookmarks.contains(generateVerseKey(readLoc.bookAbbrev, readLoc.chapter, v)));
+                final isAllBookmarked = selectedVerses.every((v) =>
+                    bookmarks.contains(generateVerseKey(
+                        readLoc.bookAbbrev, readLoc.chapter, v)));
                 for (var v in selectedVerses) {
-                  final refStr = generateVerseKey(readLoc.bookAbbrev, readLoc.chapter, v);
+                  final refStr =
+                      generateVerseKey(readLoc.bookAbbrev, readLoc.chapter, v);
                   if (isAllBookmarked) {
                     ref.read(bookmarksProvider.notifier).toggle(refStr);
                   } else {
-                    if (!bookmarks.contains(refStr)) ref.read(bookmarksProvider.notifier).toggle(refStr);
+                    if (!bookmarks.contains(refStr)) {
+                      ref.read(bookmarksProvider.notifier).toggle(refStr);
+                    }
                   }
                 }
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(isAllBookmarked ? 'Bookmark(s) removed' : '${selectedVerses.length} verse(s) bookmarked!'),
-                    duration: const Duration(seconds: 2),
-                  ),
-                );
-                ref.read(readSelectionProvider.notifier).clear();
-              },
-            ),
-            _buildActionIcon(
-              selectedVerses.every((v) => favorites.contains(generateVerseKey(readLoc.bookAbbrev, readLoc.chapter, v)))
-                  ? Icons.star_rounded
-                  : Icons.star_outline_rounded,
-              'Favorite',
-              selectedVerses.every((v) => favorites.contains(generateVerseKey(readLoc.bookAbbrev, readLoc.chapter, v)))
-                  ? Colors.amber
-                  : theme.colorScheme.onSurface,
-              () {
-                final favorites = ref.read(favoritesProvider);
-                final isAllFavorited = selectedVerses.every((v) => favorites.contains(generateVerseKey(readLoc.bookAbbrev, readLoc.chapter, v)));
-                for (var v in selectedVerses) {
-                  final refStr = generateVerseKey(readLoc.bookAbbrev, readLoc.chapter, v);
-                  if (isAllFavorited) {
-                    ref.read(favoritesProvider.notifier).toggle(refStr);
-                  } else {
-                    if (!favorites.contains(refStr)) ref.read(favoritesProvider.notifier).toggle(refStr);
-                  }
-                }
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(isAllFavorited ? 'Removed from Favorites' : '${selectedVerses.length} verse(s) favorited!'),
+                    content: Text(isAllBookmarked
+                        ? 'Bookmark(s) removed'
+                        : '${selectedVerses.length} verse(s) bookmarked!'),
                     duration: const Duration(seconds: 2),
                   ),
                 );
@@ -583,17 +644,21 @@ class MainNavScreen extends ConsumerWidget {
                 final flatChapters = ref.read(flatChaptersProvider);
                 if (flatChapters.isNotEmpty) {
                   try {
-                    final chapter = flatChapters.firstWhere(
-                      (c) => c.book.name == readLoc.bookName && c.chapter.number == readLoc.chapter,
-                    ).chapter;
-                    
+                    final chapter = flatChapters
+                        .firstWhere(
+                          (c) =>
+                              c.book.name == readLoc.bookName &&
+                              c.chapter.number == readLoc.chapter,
+                        )
+                        .chapter;
+
                     final formattedText = ShareService.formatVerses(
                       bookName: readLoc.bookName,
                       chapterNumber: readLoc.chapter,
                       verseNumbers: selectedVerses.toList(),
                       chapterData: chapter,
                     );
-                    
+
                     ShareService.copyText(context, formattedText);
                   } catch (_) {}
                 }
@@ -606,23 +671,23 @@ class MainNavScreen extends ConsumerWidget {
               theme.colorScheme.onSurface,
               () {
                 final sorted = selectedVerses.toList()..sort();
-                final refStr = '${readLoc.bookName} ${readLoc.chapter}:${sorted.join(', ')}';
+                final refStr =
+                    '${readLoc.bookName} ${readLoc.chapter}:${sorted.join(', ')}';
                 showAddNoteSheet(context, ref, theme, initialReference: refStr);
                 ref.read(readSelectionProvider.notifier).clear();
               },
             ),
             IconButton(
-               icon: const Icon(Icons.auto_awesome),
-               color: Colors.redAccent,
-               tooltip: 'Deep Study',
-               padding: EdgeInsets.zero,
-               constraints: const BoxConstraints(),
-               visualDensity: VisualDensity.compact,
-               onPressed: () {
-                 ref.read(navProvider.notifier).setIndex(3);
-                 ref.read(readSelectionProvider.notifier).clear();
-               }
-            ),
+                icon: const Icon(Icons.auto_awesome),
+                color: Colors.redAccent,
+                tooltip: 'Deep Study',
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                visualDensity: VisualDensity.compact,
+                onPressed: () {
+                  ref.read(navProvider.notifier).setIndex(3);
+                  ref.read(readSelectionProvider.notifier).clear();
+                }),
             IconButton(
               icon: const Icon(Icons.close_rounded, size: 20),
               padding: EdgeInsets.zero,
@@ -635,5 +700,54 @@ class MainNavScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  void _handleImFeelingLucky(BuildContext context, WidgetRef ref) {
+    final commentaryAsync = ref.read(combinedCommentaryProvider);
+    if (commentaryAsync is AsyncData<CombinedCommentaryState>) {
+      final state = commentaryAsync.value;
+
+      List<String> availableVerses = [];
+      for (var book in state.data.keys) {
+        for (var chapter in state.data[book]!.keys) {
+          for (var verse in state.data[book]![chapter]!.keys) {
+            if (state.data[book]![chapter]![verse]!.isNotEmpty) {
+              availableVerses.add('$book $chapter:$verse');
+            }
+          }
+        }
+      }
+
+      if (availableVerses.isNotEmpty) {
+        final randomVerse =
+            availableVerses[math.Random().nextInt(availableVerses.length)];
+
+        final lastSpaceIdx = randomVerse.lastIndexOf(' ');
+        final bookName = randomVerse.substring(0, lastSpaceIdx);
+        final refParts = randomVerse.substring(lastSpaceIdx + 1).split(':');
+        final chapter = int.parse(refParts[0]);
+        final verseNum = int.parse(refParts[1]);
+
+        final flatChapters = ref.read(flatChaptersProvider);
+        try {
+          final fc = flatChapters.firstWhere(
+              (c) => c.book.name == bookName && c.chapter.number == chapter);
+          ref.read(navProvider.notifier).setIndex(1); // Jump to Read Screen
+          ref.read(readLocationProvider.notifier).updateLocation(
+                bookAbbrev: fc.book.abbreviation,
+                bookName: bookName,
+                chapter: chapter,
+                verse: verseNum,
+              );
+          ref
+              .read(activeStudyVerseProvider.notifier)
+              .setVerse('$bookName $chapter:$verseNum');
+
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) => CommentaryListScreen(
+                  bookName: bookName, chapterNumber: chapter.toString())));
+        } catch (_) {}
+      }
+    }
   }
 }

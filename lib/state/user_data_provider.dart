@@ -20,7 +20,15 @@ const List<Color> highlightPalette = [
 class BookmarksNotifier extends Notifier<Set<String>> {
   @override
   Set<String> build() {
-    return ref.watch(preferencesProvider).getBookmarks().toSet();
+    final prefs = ref.watch(preferencesProvider);
+    final b = prefs.getBookmarks().toSet();
+    final f = prefs.getFavorites().toSet();
+    final merged = {...b, ...f};
+    
+    if (merged.length > b.length) {
+      Future.microtask(() => prefs.saveBookmarks(merged.toList()));
+    }
+    return merged;
   }
 
   void toggle(String reference) {
@@ -35,23 +43,7 @@ class BookmarksNotifier extends Notifier<Set<String>> {
 
 final bookmarksProvider = NotifierProvider<BookmarksNotifier, Set<String>>(BookmarksNotifier.new);
 
-class FavoritesNotifier extends Notifier<Set<String>> {
-  @override
-  Set<String> build() {
-    return ref.watch(preferencesProvider).getFavorites().toSet();
-  }
 
-  void toggle(String reference) {
-    if (state.contains(reference)) {
-      state = {...state}..remove(reference);
-    } else {
-      state = {...state, reference};
-    }
-    ref.read(preferencesProvider).saveFavorites(state.toList());
-  }
-}
-
-final favoritesProvider = NotifierProvider<FavoritesNotifier, Set<String>>(FavoritesNotifier.new);
 
 class HighlightsNotifier extends Notifier<Map<String, int>> {
   @override
