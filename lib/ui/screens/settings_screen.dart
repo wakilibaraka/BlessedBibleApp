@@ -6,6 +6,7 @@ import '../../state/nav_settings_provider.dart';
 import '../../state/search_settings_provider.dart';
 import '../../state/bible_nav_settings_provider.dart';
 import '../../state/read_settings_provider.dart';
+import '../../services/backup_service.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -172,6 +173,68 @@ class SettingsScreen extends StatelessWidget {
               ],
             );
           }),
+          const Divider(),
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 8.0),
+            child: Text(
+              'Data & Backup',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+          ),
+          Consumer(builder: (context, ref, _) {
+            return Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.upload_file_rounded),
+                  title: const Text('Back up my data'),
+                  subtitle: const Text('Export notes, highlights, and settings'),
+                  onTap: () => BackupService.exportData(context, ref),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.download_rounded),
+                  title: const Text('Restore from backup'),
+                  subtitle: const Text('Import your data from a backup JSON'),
+                  onTap: () {
+                    final controller = TextEditingController();
+                    showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: const Text('Restore from Backup'),
+                        content: TextField(
+                          controller: controller,
+                          maxLines: 5,
+                          decoration: const InputDecoration(
+                            hintText: 'Paste your backup JSON here...',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(ctx).pop(),
+                            child: const Text('Cancel'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              final text = controller.text.trim();
+                              Navigator.of(ctx).pop();
+                              if (text.isNotEmpty) {
+                                BackupService.importData(context, ref, text);
+                              }
+                            },
+                            child: const Text('Restore'),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ],
+            );
+          }),
+          const SizedBox(height: 32),
         ],
       ),
     );

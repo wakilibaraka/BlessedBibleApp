@@ -15,7 +15,7 @@ class NotificationService {
   }
 
   Future<void> scheduleDailyReminder() async {
-    debugPrint('Mock NotificationService: scheduleDailyReminder() called. Time for today\\'s reading.');
+    debugPrint("Mock NotificationService: scheduleDailyReminder() called. Time for today's reading.");
   }
 
   Future<void> cancelReminder() async {
