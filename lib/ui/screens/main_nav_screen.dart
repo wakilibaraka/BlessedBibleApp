@@ -741,7 +741,7 @@ class MainNavScreen extends ConsumerWidget {
         try {
           final fc = flatChapters.firstWhere(
               (c) => c.book.name == bookName && c.chapter.number == chapter);
-          ref.read(navProvider.notifier).setIndex(1); // Jump to Read Screen
+          // Just push the VerseDetailScreen without switching the active tab.
           ref.read(readLocationProvider.notifier).updateLocation(
                 bookAbbrev: fc.book.abbreviation,
                 bookName: bookName,
