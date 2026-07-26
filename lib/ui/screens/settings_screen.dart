@@ -48,6 +48,15 @@ class SettingsScreen extends StatelessWidget {
               onChanged: (value) => ref.read(searchSettingsProvider.notifier).toggleAutoOpen(value),
             );
           }),
+          Consumer(builder: (context, ref, _) {
+            final classicSearch = ref.watch(searchSettingsProvider.select((s) => s.useClassicSearch));
+            return SwitchListTile(
+              title: const Text('Classic Search UI'),
+              subtitle: const Text('Use the old full-screen search layout'),
+              value: classicSearch,
+              onChanged: (value) => ref.read(searchSettingsProvider.notifier).toggleClassicSearch(value),
+            );
+          }),
           const Divider(),
           Padding(
             padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 8.0),

@@ -81,11 +81,13 @@ class IndexBuildArgs {
 class SearchQueryArgs {
   final String query;
   final IndexData indexData;
-  final bool includeBible;
+  final bool includeOt;
+  final bool includeNt;
   final bool includeCommentary;
+  final bool includeNotes;
   final List<BibleBook>? bibleBooks; // Needed for reference matching
   
-  SearchQueryArgs(this.query, this.indexData, this.includeBible, this.includeCommentary, this.bibleBooks);
+  SearchQueryArgs(this.query, this.indexData, this.includeOt, this.includeNt, this.includeCommentary, this.includeNotes, this.bibleBooks);
 }
 
 List<String> _tokenize(String text) {
@@ -108,7 +110,9 @@ IndexData _buildIndexIsolate(IndexBuildArgs args) {
 
   // 1. Bible Books
   if (args.bibleBooks != null) {
-    for (final book in args.bibleBooks!) {
+    for (int i = 0; i < args.bibleBooks!.length; i++) {
+      final book = args.bibleBooks![i];
+      final isOt = i < 39;
       for (final chapter in book.chapters) {
         for (final verse in chapter.verses) {
           final item = SearchItem(
@@ -123,6 +127,7 @@ IndexData _buildIndexIsolate(IndexBuildArgs args) {
               'chapter': chapter.number,
               'verse': verse.number,
               'text': verse.text,
+              'isOt': isOt,
             },
           );
           corpus.add(item);
@@ -216,7 +221,7 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
   }
 
   // 0. Exact Reference Match (highest priority)
-  if (args.includeBible && args.bibleBooks != null) {
+  if ((args.includeOt || args.includeNt) && args.bibleBooks != null) {
     final regex = RegExp(r'^((?:\d\s*)?[a-z]+(?:\s+[a-z]+)*)\s*(?:(\d+)[\s:.]*(\d+)?)?$');
     final match = regex.firstMatch(queryLower);
     
@@ -318,8 +323,15 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
     final matchedItems = <SearchItem>[];
     for (final id in matchingIds) {
       final item = corpus[id];
-      if (item.type == SearchResultType.bible && !args.includeBible) continue;
-      if (item.type == SearchResultType.commentary && !args.includeCommentary) continue;
+      if (item.type == SearchResultType.bible) {
+        final isOt = item.metadata['isOt'] == true;
+        if (isOt && !args.includeOt) continue;
+        if (!isOt && !args.includeNt) continue;
+      } else if (item.type == SearchResultType.commentary) {
+        if (!args.includeCommentary) continue;
+      } else if (item.type == SearchResultType.note) {
+        if (!args.includeNotes) continue;
+      }
       matchedItems.add(item);
     }
     
@@ -364,9 +376,9 @@ class SearchEngine {
     _indexFuture = compute(_buildIndexIsolate, IndexBuildArgs(bibleBooks, commentaryData, notes));
   }
 
-  Future<List<SearchResult>> search(String query, {bool includeBible = true, bool includeCommentary = true}) async {
+  Future<List<SearchResult>> search(String query, {bool includeOt = true, bool includeNt = true, bool includeCommentary = true, bool includeNotes = true}) async {
     final indexData = await _indexFuture;
-    final args = SearchQueryArgs(query, indexData, includeBible, includeCommentary, bibleBooks);
+    final args = SearchQueryArgs(query, indexData, includeOt, includeNt, includeCommentary, includeNotes, bibleBooks);
     return await compute(_searchIsolate, args);
   }
 }
