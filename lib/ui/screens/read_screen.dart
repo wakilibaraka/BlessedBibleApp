@@ -22,6 +22,7 @@ import '../../data/models/home_data.dart';
 import '../../data/models/commentary_model.dart';
 import '../../state/theme_provider.dart';
 import '../../state/typography_provider.dart';
+import '../../state/chapter_titles_provider.dart';
 import '../../state/immersive_mode_provider.dart';
 import '../../state/read_selection_provider.dart';
 import '../../state/bible_nav_settings_provider.dart';
@@ -209,6 +210,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
     final appThemeMode = ref.watch(themeProvider);
     final isDark = appThemeMode == AppThemeMode.dark;
     final typography = ref.watch(typographyProvider);
+    final chapterTitles = ref.watch(chapterTitlesProvider);
     final readSettings = ref.watch(readSettingsProvider);
     final selectedVerses = ref.watch(readSelectionProvider);
     final isImmersive = ref.watch(immersiveModeProvider);
@@ -459,9 +461,27 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                             final isSelected = selectedVerses.contains(index);
                                             final isSelectionMode = selectedVerses.isNotEmpty;
                                             
+                                            final bookData = chapterTitles[fc.book.name];
+                                            final chapterTitle = bookData?[fc.chapter.number.toString()];
+                                            
                                             return Column(
                                               crossAxisAlignment: CrossAxisAlignment.stretch,
                                               children: [
+                                                if (index == 0 && chapterTitle != null) ...[
+                                                  Padding(
+                                                    padding: const EdgeInsets.only(top: 8.0, bottom: 32.0, left: 16.0, right: 16.0),
+                                                    child: Text(
+                                                      chapterTitle.toUpperCase(),
+                                                      style: theme.textTheme.titleMedium?.copyWith(
+                                                        color: theme.primaryColor,
+                                                        fontFamily: typography.fontFamily,
+                                                        fontWeight: FontWeight.w600,
+                                                        letterSpacing: 1.5,
+                                                      ),
+                                                      textAlign: TextAlign.center,
+                                                    ),
+                                                  ),
+                                                ],
                                                 // Check for commentary
                                                 AnimatedOpacity(
                                                   duration: const Duration(milliseconds: 250),
