@@ -43,9 +43,9 @@ class TheBlessedBibleApp extends ConsumerWidget {
         AppThemeMode.dark => ThemeMode.dark,
       },
       theme: themeMode == AppThemeMode.sepia 
-          ? AppTheme.sepiaTheme(typography.fontSize, typography.fontFamily)
-          : AppTheme.lightTheme(typography.fontSize, typography.fontFamily),
-      darkTheme: AppTheme.darkTheme(typography.fontSize, typography.fontFamily),
+          ? AppTheme.sepiaTheme(17.5, typography.fontFamily)
+          : AppTheme.lightTheme(17.5, typography.fontFamily),
+      darkTheme: AppTheme.darkTheme(17.5, typography.fontFamily),
       home: const MainNavScreen(),
     );
   }

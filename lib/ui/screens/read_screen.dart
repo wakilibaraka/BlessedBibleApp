@@ -504,6 +504,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                                       _toHeadingCase(chapterTitle),
                                                       style: theme.textTheme.titleSmall?.copyWith(
                                                         color: theme.primaryColor,
+                                                        fontSize: typography.fontSize * 1.25,
                                                         fontFamily: typography.fontFamily == 'System' ? null : typography.fontFamily,
                                                         fontWeight: FontWeight.w700,
                                                         letterSpacing: 0.2,
@@ -897,6 +898,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
 
   Widget _buildNormalVerse(BibleVerse verse, ThemeData theme, TypographyState typography, AppThemeMode appThemeMode, {bool hasCommentary = false, VoidCallback? onCommentaryTap, bool isBookmarked = false}) {
     final fontStyle = theme.textTheme.bodyMedium?.copyWith(
+      fontSize: typography.fontSize,
       height: 1.6,
       letterSpacing: 0.15,
       color: theme.textTheme.bodyLarge?.color,
@@ -927,7 +929,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
             style: theme.textTheme.titleMedium?.copyWith(
               color: theme.primaryColor,
               fontWeight: FontWeight.bold,
-              fontSize: (theme.textTheme.bodyMedium?.fontSize ?? 17.5) * 0.75, // Scale number down
+              fontSize: typography.fontSize * 0.75, // Scale number down
             ),
           ),
           TextSpan(
