@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'read_selection_provider.dart';
 import 'nav_provider.dart';
+import 'immersive_mode_provider.dart';
+import 'read_settings_provider.dart';
 
 class NavSettingsState {
   final bool alwaysShowNav;
@@ -58,6 +60,11 @@ final bottomNavVisibilityProvider = Provider<bool>((ref) {
   // 1. Verse Selection hides nav (mutually exclusive)
   final hasSelection = ref.watch(readSelectionProvider).isNotEmpty;
   if (hasSelection) return false;
+
+  // 2. Immersive mode hides nav on Read
+  final isImmersive = ref.watch(immersiveModeProvider);
+  final readSettings = ref.watch(readSettingsProvider);
+  if (isImmersive && readSettings.readingViewMode == ReadingViewMode.immersive) return false;
 
   return true;
 });
