@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import '../../theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -1930,24 +1931,49 @@ class _TypographyBottomSheet extends ConsumerWidget {
               Row(
                 children: [
                   GestureDetector(
-                    onTap: () => typographyNotifier.setFontSize((typography.fontSize - 1).clamp(12.0, 32.0)),
+                    onTap: () {
+                      final newValue = (typography.fontSize - 1).clamp(12.0, 32.0);
+                      if (newValue != typography.fontSize) {
+                        HapticFeedback.selectionClick();
+                        typographyNotifier.setFontSize(newValue);
+                      }
+                    },
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
                       child: Text('A', style: theme.textTheme.labelSmall),
                     ),
                   ),
                   Expanded(
-                    child: Slider(
-                      value: typography.fontSize.clamp(12.0, 32.0),
-                      min: 12.0,
-                      max: 32.0,
-                      activeColor: theme.primaryColor,
-                      inactiveColor: theme.primaryColor.withValues(alpha: 0.2),
-                      onChanged: (value) => typographyNotifier.setFontSize(value),
+                    child: SliderTheme(
+                      data: SliderTheme.of(context).copyWith(
+                        tickMarkShape: const RoundSliderTickMarkShape(tickMarkRadius: 2.0),
+                        activeTickMarkColor: theme.scaffoldBackgroundColor.withValues(alpha: 0.6),
+                        inactiveTickMarkColor: theme.primaryColor.withValues(alpha: 0.3),
+                      ),
+                      child: Slider(
+                        value: typography.fontSize.clamp(12.0, 32.0),
+                        min: 12.0,
+                        max: 32.0,
+                        divisions: 20,
+                        activeColor: theme.primaryColor,
+                        inactiveColor: theme.primaryColor.withValues(alpha: 0.2),
+                        onChanged: (value) {
+                          if (value != typography.fontSize) {
+                            HapticFeedback.selectionClick();
+                            typographyNotifier.setFontSize(value);
+                          }
+                        },
+                      ),
                     ),
                   ),
                   GestureDetector(
-                    onTap: () => typographyNotifier.setFontSize((typography.fontSize + 1).clamp(12.0, 32.0)),
+                    onTap: () {
+                      final newValue = (typography.fontSize + 1).clamp(12.0, 32.0);
+                      if (newValue != typography.fontSize) {
+                        HapticFeedback.selectionClick();
+                        typographyNotifier.setFontSize(newValue);
+                      }
+                    },
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
                       child: Text('A', style: theme.textTheme.titleLarge),
