@@ -607,7 +607,7 @@ class MainNavScreen extends ConsumerWidget {
               () {
                 final sorted = selectedVerses.toList()..sort();
                 final refStr = '${readLoc.bookName} ${readLoc.chapter}:${sorted.join(', ')}';
-                showAddNoteSheet(context, theme, initialReference: refStr);
+                showAddNoteSheet(context, ref, theme, initialReference: refStr);
                 ref.read(readSelectionProvider.notifier).clear();
               },
             ),

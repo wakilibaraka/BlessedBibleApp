@@ -1,40 +1,51 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../data/local_storage/preferences_service.dart';
 import '../data/models/home_data.dart';
 
+/// Persists user notes to SharedPreferences.
+/// Notes are stored as JSON under the 'user_notes' key.
 class NotesNotifier extends Notifier<List<PersonalNote>> {
-  static const _key = 'personal_notes';
+  static const _key = 'user_notes';
 
   @override
   List<PersonalNote> build() {
-    _loadNotes();
-    return [];
+    return _load();
   }
 
-  Future<void> _loadNotes() async {
-    final prefs = await SharedPreferences.getInstance();
-    final notesString = prefs.getString(_key);
-    if (notesString != null) {
-      try {
-        final List<dynamic> decoded = jsonDecode(notesString);
-        state = decoded.map((e) => PersonalNote.fromJson(e as Map<String, dynamic>)).toList();
-      } catch (e) {
-        // Handle parsing errors quietly
-      }
+  List<PersonalNote> _load() {
+    final json = ref.read(preferencesProvider).prefs.getString(_key);
+    if (json == null) return [];
+    try {
+      final list = jsonDecode(json) as List;
+      return list.map((e) => PersonalNote.fromJson(e as Map<String, dynamic>)).toList();
+    } catch (_) {
+      return [];
     }
   }
 
-  Future<void> addNote(PersonalNote note) async {
-    final newState = [...state, note];
-    state = newState;
-    await _saveNotes(newState);
+  void _save() {
+    final json = jsonEncode(state.map((n) => n.toJson()).toList());
+    ref.read(preferencesProvider).prefs.setString(_key, json);
   }
 
-  Future<void> _saveNotes(List<PersonalNote> notes) async {
-    final prefs = await SharedPreferences.getInstance();
-    final encoded = jsonEncode(notes.map((e) => e.toJson()).toList());
-    await prefs.setString(_key, encoded);
+  void add(PersonalNote note) {
+    state = [note, ...state];
+    _save();
+  }
+
+  void update(int index, PersonalNote note) {
+    final copy = [...state];
+    copy[index] = note;
+    state = copy;
+    _save();
+  }
+
+  void remove(int index) {
+    final copy = [...state];
+    copy.removeAt(index);
+    state = copy;
+    _save();
   }
 }
 
