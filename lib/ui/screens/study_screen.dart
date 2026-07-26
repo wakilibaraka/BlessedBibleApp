@@ -6,9 +6,7 @@ import '../../state/study_provider.dart';
 import '../widgets/verse_link_text.dart';
 import '../../state/theme_provider.dart';
 import '../widgets/textured_glass_container.dart';
-import 'analysis_screen.dart';
 import 'commentary_list_screen.dart';
-import 'reading_plan_screen.dart';
 import '../widgets/bouncy_entrance.dart';
 import 'your_space_screen.dart' as your_space;
 
@@ -103,7 +101,15 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                   Row(
                     children: [
                       GestureDetector(
-                        onTap: () => _showStreakPopover(context, theme),
+                        onTap: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: const Text('Reading streaks coming soon!'),
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                          );
+                        },
                         child: Row(
                           children: [
                             const Icon(Icons.local_fire_department_rounded, color: Colors.orangeAccent, size: 24),
@@ -114,7 +120,15 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                       ),
                       const SizedBox(width: 16),
                       GestureDetector(
-                        onTap: () => _showNotificationsPopover(context, theme),
+                        onTap: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: const Text('Notifications coming soon!'),
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                          );
+                        },
                         child: Stack(
                           alignment: Alignment.topRight,
                           children: [
@@ -162,94 +176,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
     );
   }
 
-  void _showStreakPopover(BuildContext context, ThemeData theme) {
-    showDialog(
-      context: context,
-      builder: (context) => BouncyEntrance(
-        child: AlertDialog(
-          backgroundColor: Colors.transparent,
-          contentPadding: EdgeInsets.zero,
-          content: TexturedGlassContainer(
-            borderRadius: BorderRadius.circular(24),
-            padding: const EdgeInsets.all(32),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.local_fire_department_rounded, color: Colors.orangeAccent, size: 64),
-                const SizedBox(height: 16),
-                Text(
-                  '5 Days',
-                  style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Reading Streak',
-                  style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Keep up the great work!',
-                  style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _showNotificationsPopover(BuildContext context, ThemeData theme) {
-    showDialog(
-      context: context,
-      builder: (context) => BouncyEntrance(
-        child: Dialog(
-          backgroundColor: Colors.transparent,
-          alignment: Alignment.topRight,
-          insetPadding: const EdgeInsets.only(top: 80, right: 20, left: 60),
-          child: TexturedGlassContainer(
-            borderRadius: BorderRadius.circular(20),
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Notifications',
-                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: theme.primaryColor.withValues(alpha: 0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(Icons.menu_book_rounded, color: theme.primaryColor, size: 20),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Daily Reminder', style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 4),
-                          Text('Read your Bible, pray every day.', style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.7))),
-                        ],
-                      ),
-                    ),
-                  ],
-                )
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+// Removed unused static popover functions
 
 // Removed _showNotesPopover from here, moved to top level
 
@@ -257,7 +184,13 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
   Widget _buildHeroCard(BuildContext context, ThemeData theme) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AnalysisScreen()));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Deep Dive analysis coming soon!'),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
       },
       child: Container(
         decoration: BoxDecoration(
@@ -324,7 +257,20 @@ He said in a loud voice, 'Fear God and give him glory, because the hour of his j
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CommentaryListScreen(bookName: 'Revelation', chapterNumber: '14')));
+                          String navBook = 'Revelation';
+                          String navChapter = '14';
+                          final activeVerse = ref.read(activeStudyVerseProvider);
+                          if (activeVerse != null) {
+                            final parts = activeVerse.split(' ');
+                            if (parts.length >= 2) {
+                              navBook = parts[0];
+                              final refParts = parts[1].split(':');
+                              if (refParts.isNotEmpty) {
+                                navChapter = refParts[0];
+                              }
+                            }
+                          }
+                          Navigator.of(context).push(MaterialPageRoute(builder: (_) => CommentaryListScreen(bookName: navBook, chapterNumber: navChapter)));
                         },
                         style: TextButton.styleFrom(
                           foregroundColor: Colors.white,
@@ -400,8 +346,12 @@ He said in a loud voice, 'Fear God and give him glory, because the hour of his j
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
           onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const ReadingPlanScreen()),
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('Reading plans coming soon!'),
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
             );
           },
           child: Container(
@@ -588,7 +538,19 @@ He said in a loud voice, 'Fear God and give him glory, because the hour of his j
           child: InkWell(
             borderRadius: BorderRadius.circular(28),
             onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CommentaryListScreen(bookName: 'Revelation', chapterNumber: '14')));
+              String navBook = 'Revelation';
+              String navChapter = '14';
+              if (activeVerse != null) {
+                final parts = activeVerse.split(' ');
+                if (parts.length >= 2) {
+                  navBook = parts[0];
+                  final refParts = parts[1].split(':');
+                  if (refParts.isNotEmpty) {
+                    navChapter = refParts[0];
+                  }
+                }
+              }
+              Navigator.of(context).push(MaterialPageRoute(builder: (_) => CommentaryListScreen(bookName: navBook, chapterNumber: navChapter)));
             },
             child: Padding(
               padding: const EdgeInsets.all(24.0),

@@ -215,7 +215,7 @@ class MainNavScreen extends ConsumerWidget {
                                               final color = highlightPalette[i];
                                               final highlights = ref.watch(highlightsProvider);
                                               final allHaveThisColor = selectedVerses.every((v) {
-                                                final refStr = '${readLoc.bookName} ${readLoc.chapter}:$v';
+                                                final refStr = generateVerseKey(readLoc.bookName, readLoc.chapter, v);
                                                 return highlights.containsKey(refStr) && highlights[refStr] == i;
                                               });
 
@@ -224,7 +224,7 @@ class MainNavScreen extends ConsumerWidget {
                                                 isSelected: allHaveThisColor,
                                                 onTap: () {
                                                   for (var v in selectedVerses) {
-                                                    final refStr = '${readLoc.bookName} ${readLoc.chapter}:$v';
+                                                    final refStr = generateVerseKey(readLoc.bookName, readLoc.chapter, v);
                                                     ref.read(highlightsProvider.notifier).toggleHighlight(refStr, i);
                                                   }
                                                   ref.read(readSelectionProvider.notifier).clear();
@@ -517,18 +517,18 @@ class MainNavScreen extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _buildActionIcon(
-              selectedVerses.every((v) => bookmarks.contains('${readLoc.bookName} ${readLoc.chapter}:$v'))
+              selectedVerses.every((v) => bookmarks.contains(generateVerseKey(readLoc.bookName, readLoc.chapter, v)))
                   ? Icons.bookmark_rounded
                   : Icons.bookmark_border_rounded,
               'Bookmark',
-              selectedVerses.every((v) => bookmarks.contains('${readLoc.bookName} ${readLoc.chapter}:$v'))
+              selectedVerses.every((v) => bookmarks.contains(generateVerseKey(readLoc.bookName, readLoc.chapter, v)))
                   ? theme.primaryColor
                   : theme.colorScheme.onSurface,
               () {
                 final bookmarks = ref.read(bookmarksProvider);
-                final isAllBookmarked = selectedVerses.every((v) => bookmarks.contains('${readLoc.bookName} ${readLoc.chapter}:$v'));
+                final isAllBookmarked = selectedVerses.every((v) => bookmarks.contains(generateVerseKey(readLoc.bookName, readLoc.chapter, v)));
                 for (var v in selectedVerses) {
-                  final refStr = '${readLoc.bookName} ${readLoc.chapter}:$v';
+                  final refStr = generateVerseKey(readLoc.bookName, readLoc.chapter, v);
                   if (isAllBookmarked) {
                     ref.read(bookmarksProvider.notifier).toggle(refStr);
                   } else {
@@ -545,18 +545,18 @@ class MainNavScreen extends ConsumerWidget {
               },
             ),
             _buildActionIcon(
-              selectedVerses.every((v) => favorites.contains('${readLoc.bookName} ${readLoc.chapter}:$v'))
+              selectedVerses.every((v) => favorites.contains(generateVerseKey(readLoc.bookName, readLoc.chapter, v)))
                   ? Icons.star_rounded
                   : Icons.star_outline_rounded,
               'Favorite',
-              selectedVerses.every((v) => favorites.contains('${readLoc.bookName} ${readLoc.chapter}:$v'))
+              selectedVerses.every((v) => favorites.contains(generateVerseKey(readLoc.bookName, readLoc.chapter, v)))
                   ? Colors.amber
                   : theme.colorScheme.onSurface,
               () {
                 final favorites = ref.read(favoritesProvider);
-                final isAllFavorited = selectedVerses.every((v) => favorites.contains('${readLoc.bookName} ${readLoc.chapter}:$v'));
+                final isAllFavorited = selectedVerses.every((v) => favorites.contains(generateVerseKey(readLoc.bookName, readLoc.chapter, v)));
                 for (var v in selectedVerses) {
-                  final refStr = '${readLoc.bookName} ${readLoc.chapter}:$v';
+                  final refStr = generateVerseKey(readLoc.bookName, readLoc.chapter, v);
                   if (isAllFavorited) {
                     ref.read(favoritesProvider.notifier).toggle(refStr);
                   } else {

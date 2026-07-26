@@ -355,7 +355,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                                     });
                                                     
                                                     final highlights = ref.watch(highlightsProvider);
-                                                    final refStr = '${fc.book.name} ${fc.chapter.number}:${verse.number}';
+                                                    final refStr = generateVerseKey(fc.book.name, fc.chapter.number, verse.number);
                                                     final savedColorIndex = highlights[refStr];
                                                     Color? highlightColor;
                                                     if (savedColorIndex != null && savedColorIndex >= 0 && savedColorIndex < highlightPalette.length) {
