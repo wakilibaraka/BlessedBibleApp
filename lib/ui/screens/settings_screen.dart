@@ -133,15 +133,34 @@ class SettingsScreen extends StatelessWidget {
           ),
           Consumer(builder: (context, ref, _) {
             final glowStyle = ref.watch(readSettingsProvider.select((s) => s.backgroundGlowStyle));
-            return _AnimatedSegmentedTile<BackgroundGlowStyle>(
-              title: 'Background Glow',
-              subtitle: 'Position of the animated background glow in Read view',
-              selectedValue: glowStyle,
-              options: const [
-                MapEntry(BackgroundGlowStyle.top, 'Top glow (default)'),
-                MapEntry(BackgroundGlowStyle.full, 'Full background glow (original)'),
+            final swipeDown = ref.watch(bibleNavSettingsProvider.select((s) => s.swipeDownToNav));
+            
+            return Column(
+              children: [
+                _AnimatedSegmentedTile<BackgroundGlowStyle>(
+                  title: 'Background Glow',
+                  subtitle: 'Position of the animated background glow in Read view',
+                  selectedValue: glowStyle,
+                  options: const [
+                    MapEntry(BackgroundGlowStyle.top, 'Top glow (default)'),
+                    MapEntry(BackgroundGlowStyle.full, 'Full background glow (original)'),
+                  ],
+                  onChanged: (val) => ref.read(readSettingsProvider.notifier).setBackgroundGlowStyle(val),
+                ),
+                SwitchListTile(
+                  title: Text(
+                    'Swipe Down to Open Navigation',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Text(
+                    'Pull down at the top of a chapter to quickly open the Book/Chapter selector.',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  value: swipeDown,
+                  activeTrackColor: Theme.of(context).primaryColor,
+                  onChanged: (val) => ref.read(bibleNavSettingsProvider.notifier).setSwipeDown(val),
+                ),
               ],
-              onChanged: (val) => ref.read(readSettingsProvider.notifier).setBackgroundGlowStyle(val),
             );
           }),
         ],

@@ -8,22 +8,26 @@ class BibleNavSettingsState {
   final TestamentLayout layout;
   final NavigationDepth depth;
   final bool autoCloseOnFinalSelection;
+  final bool swipeDownToNav;
 
   const BibleNavSettingsState({
     this.layout = TestamentLayout.sideBySide,
     this.depth = NavigationDepth.twoPart,
     this.autoCloseOnFinalSelection = true,
+    this.swipeDownToNav = true,
   });
 
   BibleNavSettingsState copyWith({
     TestamentLayout? layout,
     NavigationDepth? depth,
     bool? autoCloseOnFinalSelection,
+    bool? swipeDownToNav,
   }) {
     return BibleNavSettingsState(
       layout: layout ?? this.layout,
       depth: depth ?? this.depth,
       autoCloseOnFinalSelection: autoCloseOnFinalSelection ?? this.autoCloseOnFinalSelection,
+      swipeDownToNav: swipeDownToNav ?? this.swipeDownToNav,
     );
   }
 }
@@ -32,6 +36,7 @@ class BibleNavSettingsNotifier extends Notifier<BibleNavSettingsState> {
   static const _layoutKey = 'bible_nav_layout';
   static const _depthKey = 'bible_nav_depth';
   static const _autoCloseKey = 'bible_nav_auto_close';
+  static const _swipeDownKey = 'bible_nav_swipe_down';
 
   @override
   BibleNavSettingsState build() {
@@ -45,11 +50,13 @@ class BibleNavSettingsNotifier extends Notifier<BibleNavSettingsState> {
     final layoutIndex = prefs.getInt(_layoutKey) ?? TestamentLayout.sideBySide.index;
     final depthIndex = prefs.getInt(_depthKey) ?? NavigationDepth.twoPart.index;
     final autoClose = prefs.getBool(_autoCloseKey) ?? true;
+    final swipeDown = prefs.getBool(_swipeDownKey) ?? true;
 
     state = state.copyWith(
       layout: TestamentLayout.values[layoutIndex.clamp(0, TestamentLayout.values.length - 1)],
       depth: NavigationDepth.values[depthIndex.clamp(0, NavigationDepth.values.length - 1)],
       autoCloseOnFinalSelection: autoClose,
+      swipeDownToNav: swipeDown,
     );
   }
 
@@ -69,6 +76,12 @@ class BibleNavSettingsNotifier extends Notifier<BibleNavSettingsState> {
     state = state.copyWith(autoCloseOnFinalSelection: autoClose);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_autoCloseKey, autoClose);
+  }
+
+  Future<void> setSwipeDown(bool swipeDown) async {
+    state = state.copyWith(swipeDownToNav: swipeDown);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_swipeDownKey, swipeDown);
   }
 }
 

@@ -13,6 +13,7 @@ import '../../state/study_provider.dart';
 import '../../state/read_settings_provider.dart';
 import '../../state/user_data_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
+import '../../utils/bible_sections.dart';
 import '../../services/share_service.dart';
 import '../widgets/verse_link_text.dart';
 import '../widgets/shared_top_header.dart';
@@ -310,18 +311,29 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                     }
                                   },
                                   behavior: HitTestBehavior.translucent,
-                                  child: NotificationListener<UserScrollNotification>(
+                                  child: NotificationListener<ScrollNotification>(
                                     onNotification: (notification) {
-                                      final alwaysShow = ref.read(navSettingsProvider).alwaysShowNav;
-                                      if (alwaysShow) return false;
-
-                                      if (notification.direction == ScrollDirection.reverse) {
-                                        if (!isImmersive) {
-                                          Future.microtask(() => ref.read(immersiveModeProvider.notifier).set(true));
+                                      final bibleNavSettings = ref.read(bibleNavSettingsProvider);
+                                      final navSettings = ref.read(navSettingsProvider);
+                                      
+                                      // Swipe down to nav
+                                      if (bibleNavSettings.swipeDownToNav && notification is OverscrollNotification && notification.overscroll < -15) {
+                                        if (ModalRoute.of(context)?.isCurrent == true) {
+                                          _showSelectorBottomSheet(allBooks);
                                         }
-                                      } else if (notification.direction == ScrollDirection.forward) {
-                                        if (isImmersive) {
-                                          Future.microtask(() => ref.read(immersiveModeProvider.notifier).set(false));
+                                      }
+
+                                      if (navSettings.alwaysShowNav) return false;
+
+                                      if (notification is UserScrollNotification) {
+                                        if (notification.direction == ScrollDirection.reverse) {
+                                          if (!isImmersive) {
+                                            Future.microtask(() => ref.read(immersiveModeProvider.notifier).set(true));
+                                          }
+                                        } else if (notification.direction == ScrollDirection.forward) {
+                                          if (isImmersive) {
+                                            Future.microtask(() => ref.read(immersiveModeProvider.notifier).set(false));
+                                          }
                                         }
                                       }
                                       return false;
@@ -1018,12 +1030,18 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
     }
 
     return Material(
-      color: theme.scaffoldBackgroundColor,
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-      clipBehavior: Clip.antiAlias,
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.85,
-        child: SafeArea(
+      color: Colors.transparent, // Let AnimatedContainer handle the color
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeInOut,
+        decoration: BoxDecoration(
+          color: theme.scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height * 0.85,
+          child: SafeArea(
           top: false,
           child: Padding(
             padding: const EdgeInsets.all(24.0),
@@ -1050,6 +1068,7 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
             ),
           ),
         ),
+      ),
       ),
     );
   }
@@ -1113,6 +1132,7 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1,
+                  fontFamily: theme.textTheme.bodyMedium?.fontFamily,
                   color: isSelected ? Colors.white.withValues(alpha: 0.8) : theme.colorScheme.onSurface.withValues(alpha: 0.5),
                 ),
               ),
@@ -1121,6 +1141,7 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
                 value,
                 style: theme.textTheme.labelMedium?.copyWith(
                   fontWeight: FontWeight.bold,
+                  fontFamily: theme.textTheme.bodyMedium?.fontFamily,
                   color: isSelected ? Colors.white : theme.colorScheme.onSurface.withValues(alpha: 0.8),
                 ),
                 maxLines: 1,
@@ -1259,6 +1280,7 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
                       isSelected: isSel,
                       onTap: () => _onBookSelected(book, settings),
                       theme: theme,
+                      backgroundColor: getSectionColor(book.name, theme.brightness == Brightness.dark),
                     );
                   },
                 );
@@ -1286,7 +1308,7 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
                           final isSel = book.abbreviation == selectedBookAbbrev;
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 8.0, right: 4.0),
-                            child: _buildGridTile(text: book.name, isSelected: isSel, onTap: () => _onBookSelected(book, settings), theme: theme),
+                            child: _buildGridTile(text: book.name, isSelected: isSel, onTap: () => _onBookSelected(book, settings), theme: theme, backgroundColor: getSectionColor(book.name, theme.brightness == Brightness.dark)),
                           );
                         },
                       );
@@ -1313,7 +1335,7 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
                           final isSel = book.abbreviation == selectedBookAbbrev;
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 8.0, left: 4.0),
-                            child: _buildGridTile(text: book.name, isSelected: isSel, onTap: () => _onBookSelected(book, settings), theme: theme),
+                            child: _buildGridTile(text: book.name, isSelected: isSel, onTap: () => _onBookSelected(book, settings), theme: theme, backgroundColor: getSectionColor(book.name, theme.brightness == Brightness.dark)),
                           );
                         },
                       );
@@ -1351,7 +1373,7 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
                   (context, index) {
                     final book = oldTestamentBooks[index];
                     final isSel = book.abbreviation == selectedBookAbbrev;
-                    return _buildGridTile(text: book.name, isSelected: isSel, onTap: () => _onBookSelected(book, settings), theme: theme);
+                    return _buildGridTile(text: book.name, isSelected: isSel, onTap: () => _onBookSelected(book, settings), theme: theme, backgroundColor: getSectionColor(book.name, theme.brightness == Brightness.dark));
                   },
                   childCount: oldTestamentBooks.length,
                 ),
@@ -1378,7 +1400,7 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
                   (context, index) {
                     final book = newTestamentBooks[index];
                     final isSel = book.abbreviation == selectedBookAbbrev;
-                    return _buildGridTile(text: book.name, isSelected: isSel, onTap: () => _onBookSelected(book, settings), theme: theme);
+                    return _buildGridTile(text: book.name, isSelected: isSel, onTap: () => _onBookSelected(book, settings), theme: theme, backgroundColor: getSectionColor(book.name, theme.brightness == Brightness.dark));
                   },
                   childCount: newTestamentBooks.length,
                 ),
@@ -1449,14 +1471,17 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
     });
   }
 
-  Widget _buildGridTile({required String text, required bool isSelected, required VoidCallback onTap, required ThemeData theme}) {
+  Widget _buildGridTile({required String text, required bool isSelected, required VoidCallback onTap, required ThemeData theme, Color? backgroundColor}) {
+    // Determine if it's a book name (contains letters) to apply serif font consistency
+    final isBook = text.contains(RegExp(r'[a-zA-Z]'));
+    
     if (!isSelected) {
       return GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
-            color: theme.colorScheme.surface.withValues(alpha: 0.8),
+            color: backgroundColor ?? theme.colorScheme.surface.withValues(alpha: 0.8),
             borderRadius: BorderRadius.circular(30),
             border: Border.all(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
@@ -1468,6 +1493,7 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
               text,
               style: (text.length > 3 ? theme.textTheme.labelMedium : theme.textTheme.titleMedium)?.copyWith(
                 fontWeight: FontWeight.w600,
+                fontFamily: isBook ? theme.textTheme.bodyMedium?.fontFamily : null, // Font consistency for books
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
               ),
               maxLines: 2,
@@ -1494,6 +1520,7 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
           text,
           style: (text.length > 3 ? theme.textTheme.labelMedium : theme.textTheme.titleMedium)?.copyWith(
             fontWeight: FontWeight.bold,
+            fontFamily: isBook ? theme.textTheme.bodyMedium?.fontFamily : null, // Font consistency for books
             color: Colors.white,
           ),
           maxLines: 2,
