@@ -54,58 +54,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
     }
   }
 
-  void _showJumpToBookDialog(BuildContext context, WidgetRef ref) {
-    final textController = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          title: const Text('Jump to Book'),
-          content: TextField(
-            controller: textController,
-            decoration: const InputDecoration(
-              hintText: 'e.g. Numbers, Luke',
-              border: OutlineInputBorder(),
-            ),
-            autofocus: true,
-            onSubmitted: (query) {
-              if (query.isNotEmpty) {
-                final found = ref.read(readingPlanProvider.notifier).jumpToBook(query);
-                Navigator.of(context).pop();
-                if (!found) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Book '$query' not found in plan.")),
-                  );
-                }
-              }
-            },
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final query = textController.text;
-                if (query.isNotEmpty) {
-                  final found = ref.read(readingPlanProvider.notifier).jumpToBook(query);
-                  Navigator.of(context).pop();
-                  if (!found) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Book '$query' not found in plan.")),
-                    );
-                  }
-                }
-              },
-              child: const Text('Jump'),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   @override
   void initState() {
@@ -618,7 +566,15 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
           child: InkWell(
             borderRadius: BorderRadius.circular(20),
             onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ReadingPlanBrowser()));
+              Navigator.of(context).push(
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) => const ReadingPlanBrowser(),
+                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+                  transitionDuration: const Duration(milliseconds: 300),
+                )
+              );
             },
             child: Container(
               decoration: BoxDecoration(
@@ -650,14 +606,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              IconButton(
-                                icon: Icon(Icons.search_rounded, color: theme.primaryColor, size: 20),
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(),
-                                onPressed: () {
-                                  _showJumpToBookDialog(context, ref);
-                                },
-                              ),
                             ],
                           ),
                           const SizedBox(height: 8),
@@ -677,31 +625,12 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                           else if (planState.isPlanComplete)
                             Text('Plan Completed!', style: theme.textTheme.labelSmall?.copyWith(color: theme.primaryColor, fontWeight: FontWeight.w600))
                           else
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Day ${planState.currentDay} · ${planState.getFormattedDateForDay(planState.currentDay)} • ${planState.planData[planState.currentDay - 1].readings.length} Reading(s)',
-                                  style: theme.textTheme.labelSmall?.copyWith(
-                                    color: theme.primaryColor,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    if (planState.completedDays.contains(planState.currentDay)) {
-                                      ref.read(readingPlanProvider.notifier).markDayIncomplete(planState.currentDay);
-                                    } else {
-                                      ref.read(readingPlanProvider.notifier).markDayComplete(planState.currentDay);
-                                    }
-                                  },
-                                  child: Icon(
-                                    planState.completedDays.contains(planState.currentDay) ? Icons.check_box_rounded : Icons.check_box_outline_blank_rounded,
-                                    color: planState.completedDays.contains(planState.currentDay) ? theme.primaryColor : theme.colorScheme.onSurface.withValues(alpha: 0.3),
-                                    size: 20,
-                                  ),
-                                ),
-                              ],
+                            Text(
+                              'Day ${planState.currentDay} · ${planState.getFormattedDateForDay(planState.currentDay)} • ${planState.planData[planState.currentDay - 1].readings.length} Reading(s)',
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: theme.primaryColor,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
 
                           if (size == CardSize.medium || size == CardSize.large) ...[
@@ -759,35 +688,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                                       ),
                                     );
                                   }),
-                                  const SizedBox(height: 8),
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      if (planState.completedDays.contains(planState.currentDay)) {
-                                        ref.read(readingPlanProvider.notifier).markDayIncomplete(planState.currentDay);
-                                      } else {
-                                        ref.read(readingPlanProvider.notifier).markDayComplete(planState.currentDay);
-                                      }
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: planState.completedDays.contains(planState.currentDay) ? theme.colorScheme.surface : theme.primaryColor,
-                                      foregroundColor: planState.completedDays.contains(planState.currentDay) ? theme.primaryColor : Colors.white,
-                                      minimumSize: const Size(double.infinity, 36),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        side: BorderSide(
-                                          color: planState.completedDays.contains(planState.currentDay) ? theme.primaryColor.withValues(alpha: 0.5) : Colors.transparent,
-                                        ),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(planState.completedDays.contains(planState.currentDay) ? Icons.check_circle_rounded : Icons.check_circle_outline_rounded, size: 18),
-                                        const SizedBox(width: 8),
-                                        Text(planState.completedDays.contains(planState.currentDay) ? 'Mark Day Incomplete' : 'Mark Day Complete'),
-                                      ],
-                                    ),
-                                  ),
                                 ],
                               ),
                             ),

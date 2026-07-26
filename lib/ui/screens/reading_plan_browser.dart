@@ -46,6 +46,59 @@ class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
     }
   }
 
+  void _showJumpToBookDialog(BuildContext context, WidgetRef ref) {
+    final textController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          title: const Text('Jump to Book'),
+          content: TextField(
+            controller: textController,
+            decoration: const InputDecoration(
+              hintText: 'e.g. Numbers, Luke',
+              border: OutlineInputBorder(),
+            ),
+            autofocus: true,
+            onSubmitted: (query) {
+              if (query.isNotEmpty) {
+                final found = ref.read(readingPlanProvider.notifier).jumpToBook(query);
+                Navigator.of(context).pop();
+                if (!found) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Book '$query' not found in plan.")),
+                  );
+                }
+              }
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final query = textController.text;
+                if (query.isNotEmpty) {
+                  final found = ref.read(readingPlanProvider.notifier).jumpToBook(query);
+                  Navigator.of(context).pop();
+                  if (!found) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Book '$query' not found in plan.")),
+                    );
+                  }
+                }
+              },
+              child: const Text('Jump'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -66,8 +119,15 @@ class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         actions: [
+          IconButton(
+            icon: Icon(Icons.search_rounded, color: theme.primaryColor),
+            tooltip: 'Search Plan',
+            onPressed: () {
+              _showJumpToBookDialog(context, ref);
+            },
+          ),
           PopupMenuButton<PlanStartMode>(
-            icon: Icon(Icons.settings_rounded, color: theme.primaryColor),
+            icon: Icon(Icons.calendar_today_rounded, color: theme.primaryColor),
             tooltip: 'Plan Settings',
             onSelected: (mode) {
               ref.read(readingPlanProvider.notifier).changeStartMode(mode);
