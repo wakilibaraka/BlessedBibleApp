@@ -2239,24 +2239,52 @@ class _CommentaryBottomSheetContent extends ConsumerWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              TextButton.icon(
-                                onPressed: () {
-                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved to Notes')));
-                                },
-                                icon: Icon(Icons.bookmark_add_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.8), size: 20),
-                                label: Text('Save', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.8), fontWeight: FontWeight.bold)),
-                              ),
-                              IconButton(
-                                onPressed: () => Navigator.of(context).pop(),
-                                icon: Icon(Icons.keyboard_arrow_down_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.8), size: 24),
-                                style: IconButton.styleFrom(
-                                  backgroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.05),
+                              // LEFT — Save (aligned to left edge)
+                              Expanded(
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: TextButton.icon(
+                                    onPressed: () {
+                                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved to Notes')));
+                                    },
+                                    style: TextButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                                      minimumSize: const Size(0, 48),
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    ),
+                                    icon: Icon(Icons.bookmark_add_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.8), size: 20),
+                                    label: Text('Save', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.8), fontWeight: FontWeight.bold)),
+                                  ),
                                 ),
                               ),
-                              TextButton.icon(
-                                onPressed: () => _showShareMenu(context, theme),
-                                icon: Icon(Icons.ios_share_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.8), size: 20),
-                                label: Text('Share', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.8), fontWeight: FontWeight.bold)),
+                              // CENTER — Close (perfectly centered)
+                              SizedBox(
+                                width: 48,
+                                height: 48,
+                                child: IconButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  icon: Icon(Icons.keyboard_arrow_down_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.8), size: 24),
+                                  style: IconButton.styleFrom(
+                                    backgroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.05),
+                                  ),
+                                  padding: EdgeInsets.zero,
+                                ),
+                              ),
+                              // RIGHT — Share (aligned to right edge)
+                              Expanded(
+                                child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: TextButton.icon(
+                                    onPressed: () => _showShareMenu(context, theme),
+                                    style: TextButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                                      minimumSize: const Size(0, 48),
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    ),
+                                    icon: Icon(Icons.ios_share_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.8), size: 20),
+                                    label: Text('Share', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.8), fontWeight: FontWeight.bold)),
+                                  ),
+                                ),
                               ),
                             ],
                           ),

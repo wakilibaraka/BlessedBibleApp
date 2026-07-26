@@ -21,35 +21,32 @@ class SharedTopHeader extends ConsumerWidget {
     final appThemeMode = ref.watch(themeProvider);
     final isDarkMode = theme.brightness == Brightness.dark;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
-      child: SizedBox(
-        height: 48,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Leading strictly sized
-            SizedBox(
-              width: 48,
-              height: 48,
-              child: leading ?? _buildDefaultLeading(theme, isDarkMode),
+    return SizedBox(
+      height: 48,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Leading strictly sized — identical vertical center to trailing
+          SizedBox(
+            width: 48,
+            height: 48,
+            child: leading ?? _buildDefaultLeading(theme, isDarkMode),
+          ),
+
+          // Center truly expanded — content is centered within all remaining space
+          Expanded(
+            child: Center(
+              child: centerContent,
             ),
-            
-            // Center expanded perfectly
-            Expanded(
-              child: Center(
-                child: centerContent,
-              ),
-            ),
-            
-            // Trailing strictly sized
-            SizedBox(
-              width: 48,
-              height: 48,
-              child: trailing ?? _buildDefaultTrailing(ref, theme, appThemeMode),
-            ),
-          ],
-        ),
+          ),
+
+          // Trailing strictly sized — equal width/height to leading
+          SizedBox(
+            width: 48,
+            height: 48,
+            child: trailing ?? _buildDefaultTrailing(ref, theme, appThemeMode),
+          ),
+        ],
       ),
     );
   }
