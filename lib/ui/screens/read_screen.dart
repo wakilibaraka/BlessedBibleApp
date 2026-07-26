@@ -47,8 +47,41 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
   int? _navigatedVerseIndex;
   Timer? _scrollDebounceTimer;
 
+  // ── Deliberate-drag-to-nav gate ──────────────────────────────────
+  // A fast flick must NOT open navigation. Only a slow, sustained pull
+  // past a distance threshold that has been held for a minimum duration
+  // qualifies as an intentional gesture.
+  //
+  // Thresholds (tuned for feel):
+  //   Distance  : 60 logical pixels of overscroll accumulated
+  //   Hold time : 700 ms — the drag must be held for at least this long
+  //   Max vel   : 250 px/s  — any faster is a flick, not a deliberate drag
+  static const double _kOverscrollDistanceThreshold = 60.0;
+  static const int    _kHoldMillis                  = 700;
+  static const double _kMaxVelocityForIntent        = 250.0;
+
+  double _overscrollAccum   = 0.0; // total negative overscroll pixels seen
+  double _lastOverscrollVel = 0.0; // velocity from the last notification
+  DateTime? _overscrollStart;      // when the drag crossed the first threshold
+  bool _navTriggeredThisDrag = false;
+
+  /// Called from the indicator widget to provide the current pull fraction
+  /// (0.0 → 1.0, capped) so a subtle indicator can be drawn.
+  double get _overscrollFraction =>
+      (_overscrollAccum / _kOverscrollDistanceThreshold).clamp(0.0, 1.0);
+
+  void _resetOverscrollGate() {
+    _overscrollAccum      = 0.0;
+    _lastOverscrollVel    = 0.0;
+    _overscrollStart      = null;
+    _navTriggeredThisDrag = false;
+    if (mounted) setState(() {});
+  }
+  // ────────────────────────────────────────────────────────────────
+
   @override
   void dispose() {
+    _scrollDebounceTimer?.cancel();
     if (_isPageControllerInitialized) {
       _pageController.dispose();
     }
@@ -165,6 +198,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
 
     final flatChapters = ref.watch(flatChaptersProvider);
     final loc = ref.watch(readLocationProvider);
+    final bibleNavSettings = ref.watch(bibleNavSettingsProvider);
 
     if (flatChapters.isNotEmpty) {
       final targetIndex = flatChapters.indexWhere((fc) => fc.book.abbreviation == loc.bookAbbrev && fc.chapter.number == loc.chapter);
@@ -313,13 +347,49 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                   behavior: HitTestBehavior.translucent,
                                   child: NotificationListener<ScrollNotification>(
                                     onNotification: (notification) {
-                                      final bibleNavSettings = ref.read(bibleNavSettingsProvider);
                                       final navSettings = ref.read(navSettingsProvider);
                                       
-                                      // Swipe down to nav
-                                      if (bibleNavSettings.swipeDownToNav && notification is OverscrollNotification && notification.overscroll < -15) {
-                                        if (ModalRoute.of(context)?.isCurrent == true) {
-                                          _showSelectorBottomSheet(allBooks);
+                                      // ── Deliberate-drag gate for navigation ──
+                                      if (bibleNavSettings.swipeDownToNav) {
+                                        if (notification is OverscrollNotification &&
+                                            notification.overscroll < 0) {
+                                          // Accumulate how far the user has dragged
+                                          final delta = -notification.overscroll;
+                                          _lastOverscrollVel =
+                                              (notification as dynamic).velocity?.pixelsPerSecond.dy.abs()
+                                              as double? ?? 0.0;
+
+                                          // Mark the start of intentional territory once
+                                          // we've seen a first meaningful pull AND velocity
+                                          // is low (i.e. this is a deliberate drag, not a flick)
+                                          if (_overscrollAccum == 0.0 &&
+                                              delta > 4.0 &&
+                                              _lastOverscrollVel < _kMaxVelocityForIntent) {
+                                            _overscrollStart = DateTime.now();
+                                          }
+
+                                          if (_lastOverscrollVel < _kMaxVelocityForIntent) {
+                                            _overscrollAccum += delta;
+                                            if (mounted) setState(() {});
+                                          } else {
+                                            // Fast flick detected — reset immediately
+                                            _resetOverscrollGate();
+                                          }
+
+                                          // Check if both thresholds are satisfied
+                                          if (!_navTriggeredThisDrag &&
+                                              _overscrollAccum >= _kOverscrollDistanceThreshold &&
+                                              _overscrollStart != null &&
+                                              DateTime.now().difference(_overscrollStart!) >=
+                                                  Duration(milliseconds: _kHoldMillis) &&
+                                              ModalRoute.of(context)?.isCurrent == true) {
+                                            _navTriggeredThisDrag = true;
+                                            _resetOverscrollGate();
+                                            _showSelectorBottomSheet(allBooks);
+                                          }
+                                        } else {
+                                          // Drag released / scroll changed direction — reset gate
+                                          if (_overscrollAccum > 0) _resetOverscrollGate();
                                         }
                                       }
 
@@ -638,6 +708,66 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                 ),
               ),
             ),
+
+            // ── Pull-to-navigate progressive indicator ──────────────────────
+            // Fades in and grows as the user sustains a deliberate downward
+            // drag from the top edge. Vanishes if they release early.
+            if (bibleNavSettings.swipeDownToNav && _overscrollFraction > 0.01)
+              Positioned(
+                top: MediaQuery.of(context).padding.top + 64,
+                left: 0,
+                right: 0,
+                child: IgnorePointer(
+                  child: AnimatedOpacity(
+                    duration: const Duration(milliseconds: 80),
+                    opacity: _overscrollFraction,
+                    child: Center(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: theme.primaryColor.withValues(
+                                  alpha: 0.12 + 0.18 * _overscrollFraction),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: theme.primaryColor.withValues(
+                                    alpha: 0.25 * _overscrollFraction),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.menu_book_outlined,
+                                  size: 14,
+                                  color: theme.primaryColor.withValues(
+                                      alpha: 0.4 + 0.6 * _overscrollFraction),
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  _overscrollFraction >= 1.0
+                                      ? 'Release to navigate'
+                                      : 'Keep holding…',
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    color: theme.primaryColor.withValues(
+                                        alpha: 0.5 + 0.5 * _overscrollFraction),
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 0.2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            // ────────────────────────────────────────────────────────────────
           ],
         ),
           ),
