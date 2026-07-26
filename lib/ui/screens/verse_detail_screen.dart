@@ -19,15 +19,19 @@ class VerseDetailScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final appThemeMode = ref.watch(themeProvider);
 
-    // Parse reference
-    final lastSpaceIdx = reference.lastIndexOf(' ');
-    final bookName =
-        lastSpaceIdx != -1 ? reference.substring(0, lastSpaceIdx) : reference;
-    final refStr =
-        lastSpaceIdx != -1 ? reference.substring(lastSpaceIdx + 1) : '';
-    final refParts = refStr.split(':');
-    final chapterNum = refParts.isNotEmpty ? int.tryParse(refParts[0]) : null;
-    final verseNum = refParts.length > 1 ? int.tryParse(refParts[1]) : null;
+    // Parse reference safely using Regex (supports "Genesis 1:3" and "GEN_1:3")
+    final refRegex = RegExp(r'^(.+?)[_\s]+(\d+):(\d+)$');
+    final match = refRegex.firstMatch(reference.trim());
+
+    String bookName = reference;
+    int? chapterNum;
+    int? verseNum;
+
+    if (match != null) {
+      bookName = match.group(1)!.trim();
+      chapterNum = int.parse(match.group(2)!);
+      verseNum = int.parse(match.group(3)!);
+    }
 
     // Get flat chapters
     final flatChapters = ref.watch(flatChaptersProvider);
@@ -36,16 +40,22 @@ class VerseDetailScreen extends ConsumerWidget {
 
     if (chapterNum != null && verseNum != null && flatChapters.isNotEmpty) {
       try {
-        final fc = flatChapters.firstWhere(
-            (c) => c.book.name == bookName && c.chapter.number == chapterNum);
+        final fc = flatChapters.firstWhere((c) =>
+            (c.book.name.toLowerCase() == bookName.toLowerCase() ||
+                c.book.abbreviation.toLowerCase() == bookName.toLowerCase()) &&
+            c.chapter.number == chapterNum);
         if (verseNum - 1 >= 0 && verseNum - 1 < fc.chapter.verses.length) {
           verseText = fc.chapter.verses[verseNum - 1].text;
           verseKey =
               generateVerseKey(fc.book.abbreviation, chapterNum, verseNum);
+        } else {
+          verseText = 'Verse $verseNum out of bounds.';
         }
       } catch (_) {
-        verseText = 'Verse text not found.';
+        verseText = 'Verse text not found for $bookName $chapterNum:$verseNum';
       }
+    } else if (chapterNum == null || verseNum == null) {
+      verseText = 'Invalid reference format.';
     }
 
     // Commentary Data
