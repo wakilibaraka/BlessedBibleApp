@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../data/local_storage/preferences_service.dart';
+
 class ReadLocationState {
   final String bookAbbrev;
   final String bookName;
@@ -37,6 +39,18 @@ class ReadLocationState {
 class ReadLocationNotifier extends Notifier<ReadLocationState> {
   @override
   ReadLocationState build() {
+    final prefs = ref.read(preferencesProvider);
+    final lastLoc = prefs.getLastReadLocation();
+    
+    if (lastLoc != null) {
+      return ReadLocationState(
+        bookAbbrev: lastLoc['bookAbbrev'] as String? ?? 'GEN',
+        bookName: lastLoc['bookName'] as String? ?? 'Genesis',
+        chapter: lastLoc['chapter'] as int? ?? 1,
+        requestedVerse: (lastLoc['verseIndex'] as int? ?? 0) + 1,
+      );
+    }
+    
     return const ReadLocationState();
   }
 

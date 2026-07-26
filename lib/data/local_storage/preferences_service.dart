@@ -1,21 +1,26 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/search_engine.dart';
 
 class PreferencesService {
+  final SharedPreferences prefs;
+
+  PreferencesService(this.prefs);
+
   static const String _searchHistoryKey = 'search_history';
   static const String _bookmarksKey = 'bookmarks';
   static const String _favoritesKey = 'favorites';
   static const String _highlightsKey = 'highlights';
+  static const String _lastTabKey = 'last_tab';
+  static const String _lastReadLocKey = 'last_read_loc';
 
-  Future<void> saveSearchHistory(List<SearchResult> history) async {
-    final prefs = await SharedPreferences.getInstance();
+  void saveSearchHistory(List<SearchResult> history) {
     final jsonList = history.map((e) => e.toJson()).toList();
-    await prefs.setString(_searchHistoryKey, jsonEncode(jsonList));
+    prefs.setString(_searchHistoryKey, jsonEncode(jsonList));
   }
 
-  Future<List<SearchResult>> getSearchHistory() async {
-    final prefs = await SharedPreferences.getInstance();
+  List<SearchResult> getSearchHistory() {
     final jsonString = prefs.getString(_searchHistoryKey);
     if (jsonString != null) {
       try {
@@ -28,44 +33,73 @@ class PreferencesService {
     return [];
   }
 
-  Future<void> saveBookmarks(List<String> bookmarks) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(_bookmarksKey, bookmarks);
+  void saveBookmarks(List<String> bookmarks) {
+    prefs.setStringList(_bookmarksKey, bookmarks);
   }
 
-  Future<List<String>> getBookmarks() async {
-    final prefs = await SharedPreferences.getInstance();
+  List<String> getBookmarks() {
     return prefs.getStringList(_bookmarksKey) ?? [];
   }
 
-  Future<void> saveFavorites(List<String> favorites) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(_favoritesKey, favorites);
+  void saveFavorites(List<String> favorites) {
+    prefs.setStringList(_favoritesKey, favorites);
   }
 
-  Future<List<String>> getFavorites() async {
-    final prefs = await SharedPreferences.getInstance();
+  List<String> getFavorites() {
     return prefs.getStringList(_favoritesKey) ?? [];
   }
 
-  Future<void> saveHighlights(Map<String, int> highlights) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_highlightsKey, jsonEncode(highlights));
+  void saveHighlights(Map<String, int> highlights) {
+    prefs.setString(_highlightsKey, jsonEncode(highlights));
   }
 
-  Future<Map<String, int>> getHighlights() async {
-    final prefs = await SharedPreferences.getInstance();
+  Map<String, int> getHighlights() {
     final jsonString = prefs.getString(_highlightsKey);
     if (jsonString != null) {
       try {
-        final Map<String, dynamic> decoded = jsonDecode(jsonString);
-        return decoded.map((key, value) => MapEntry(key, value as int));
+        final Map<String, dynamic> jsonMap = jsonDecode(jsonString);
+        return jsonMap.map((key, value) => MapEntry(key, value as int));
       } catch (e) {
         return {};
       }
     }
     return {};
   }
+
+  void saveLastTab(int index) {
+    prefs.setInt(_lastTabKey, index);
+  }
+
+  int? getLastTab() {
+    return prefs.getInt(_lastTabKey);
+  }
+
+  void saveLastReadLocation({
+    required String bookAbbrev,
+    required String bookName,
+    required int chapter,
+    required int verseIndex,
+  }) {
+    final data = {
+      'bookAbbrev': bookAbbrev,
+      'bookName': bookName,
+      'chapter': chapter,
+      'verseIndex': verseIndex,
+    };
+    prefs.setString(_lastReadLocKey, jsonEncode(data));
+  }
+
+  Map<String, dynamic>? getLastReadLocation() {
+    final jsonString = prefs.getString(_lastReadLocKey);
+    if (jsonString != null) {
+      try {
+        return jsonDecode(jsonString) as Map<String, dynamic>;
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
 }
 
-final preferencesService = PreferencesService();
+final preferencesProvider = Provider<PreferencesService>((ref) => throw UnimplementedError());

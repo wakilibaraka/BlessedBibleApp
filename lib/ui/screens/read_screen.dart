@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -11,6 +12,7 @@ import '../../state/nav_provider.dart';
 import '../../state/study_provider.dart';
 import '../../state/read_settings_provider.dart';
 import '../../state/user_data_provider.dart';
+import '../../data/local_storage/preferences_service.dart';
 import '../../services/share_service.dart';
 import '../widgets/verse_link_text.dart';
 import '../widgets/shared_top_header.dart';
@@ -40,7 +42,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
   bool _isPageControllerInitialized = false;
   int _currentPageIndex = 0;
   final Map<int, ItemScrollController> _itemScrollControllers = {};
+  final Map<int, ItemPositionsListener> _itemPositionsListeners = {};
   int? _navigatedVerseIndex;
+  Timer? _scrollDebounceTimer;
 
   @override
   void dispose() {
@@ -267,6 +271,31 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                 final fc = flatChapters[pageIndex];
                                 final verses = fc.chapter.verses;
                                 _itemScrollControllers[pageIndex] ??= ItemScrollController();
+                                if (!_itemPositionsListeners.containsKey(pageIndex)) {
+                                  final listener = ItemPositionsListener.create();
+                                  _itemPositionsListeners[pageIndex] = listener;
+                                  listener.itemPositions.addListener(() {
+                                    final positions = listener.itemPositions.value;
+                                    if (positions.isNotEmpty) {
+                                      final firstVisible = positions.where((p) => p.itemTrailingEdge > 0).reduce((min, p) => p.itemLeadingEdge < min.itemLeadingEdge ? p : min);
+                                      if (firstVisible.index < verses.length) {
+                                        _scrollDebounceTimer?.cancel();
+                                        _scrollDebounceTimer = Timer(const Duration(milliseconds: 500), () {
+                                          if (!mounted) return;
+                                          final currentBookName = fc.book.name;
+                                          final currentChapter = fc.chapter.number;
+                                          final currentAbbrev = fc.book.abbreviation;
+                                          ref.read(preferencesProvider).saveLastReadLocation(
+                                            bookAbbrev: currentAbbrev,
+                                            bookName: currentBookName,
+                                            chapter: currentChapter,
+                                            verseIndex: firstVisible.index,
+                                          );
+                                        });
+                                      }
+                                    }
+                                  });
+                                }
                                 
                                 return GestureDetector(
                                   onTap: () {
@@ -296,6 +325,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                         constraints: const BoxConstraints(maxWidth: 800),
                                         child: ScrollablePositionedList.builder(
                                           itemScrollController: _itemScrollControllers[pageIndex],
+                                          itemPositionsListener: _itemPositionsListeners[pageIndex],
                                           padding: EdgeInsets.only(
                                               top: MediaQuery.of(context).padding.top + 80.0,
                                               left: 24.0, right: 24.0, bottom: 400.0),

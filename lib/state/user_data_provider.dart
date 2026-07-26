@@ -18,13 +18,7 @@ const List<Color> highlightPalette = [
 class BookmarksNotifier extends Notifier<Set<String>> {
   @override
   Set<String> build() {
-    _load();
-    return {};
-  }
-
-  Future<void> _load() async {
-    final list = await preferencesService.getBookmarks();
-    state = list.toSet();
+    return ref.read(preferencesProvider).getBookmarks().toSet();
   }
 
   void toggle(String reference) {
@@ -33,7 +27,7 @@ class BookmarksNotifier extends Notifier<Set<String>> {
     } else {
       state = {...state, reference};
     }
-    preferencesService.saveBookmarks(state.toList());
+    ref.read(preferencesProvider).saveBookmarks(state.toList());
   }
 }
 
@@ -42,13 +36,7 @@ final bookmarksProvider = NotifierProvider<BookmarksNotifier, Set<String>>(Bookm
 class FavoritesNotifier extends Notifier<Set<String>> {
   @override
   Set<String> build() {
-    _load();
-    return {};
-  }
-
-  Future<void> _load() async {
-    final list = await preferencesService.getFavorites();
-    state = list.toSet();
+    return ref.read(preferencesProvider).getFavorites().toSet();
   }
 
   void toggle(String reference) {
@@ -57,7 +45,7 @@ class FavoritesNotifier extends Notifier<Set<String>> {
     } else {
       state = {...state, reference};
     }
-    preferencesService.saveFavorites(state.toList());
+    ref.read(preferencesProvider).saveFavorites(state.toList());
   }
 }
 
@@ -66,13 +54,7 @@ final favoritesProvider = NotifierProvider<FavoritesNotifier, Set<String>>(Favor
 class HighlightsNotifier extends Notifier<Map<String, int>> {
   @override
   Map<String, int> build() {
-    _load();
-    return {};
-  }
-
-  Future<void> _load() async {
-    final map = await preferencesService.getHighlights();
-    state = Map.from(map);
+    return Map.from(ref.read(preferencesProvider).getHighlights());
   }
 
   void toggleHighlight(String reference, int colorIndex) {
@@ -83,7 +65,7 @@ class HighlightsNotifier extends Notifier<Map<String, int>> {
       newState[reference] = colorIndex; // Update or add highlight
     }
     state = newState;
-    preferencesService.saveHighlights(newState);
+    ref.read(preferencesProvider).saveHighlights(newState);
   }
 }
 

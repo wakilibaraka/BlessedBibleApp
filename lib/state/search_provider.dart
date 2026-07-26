@@ -57,8 +57,8 @@ class SearchNotifier extends Notifier<SearchState> {
     return SearchState();
   }
 
-  Future<void> _loadRecentPlaces() async {
-    final history = await preferencesService.getSearchHistory();
+  void _loadRecentPlaces() {
+    final history = ref.read(preferencesProvider).getSearchHistory();
     state = state.copyWith(recentPlaces: history);
   }
 
@@ -84,7 +84,7 @@ class SearchNotifier extends Notifier<SearchState> {
   void addRecentPlace(SearchResult result) {
     final updatedList = [result, ...state.recentPlaces.where((r) => r.title != result.title)].take(10).toList();
     state = state.copyWith(recentPlaces: updatedList);
-    preferencesService.saveSearchHistory(updatedList);
+    ref.read(preferencesProvider).saveSearchHistory(updatedList);
   }
 
   Future<void> _performSearch() async {

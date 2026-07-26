@@ -6,11 +6,19 @@ import 'state/typography_provider.dart';
 import 'theme/app_theme.dart';
 import 'ui/screens/main_nav_screen.dart';
 
-void main() {
+import 'package:shared_preferences/shared_preferences.dart';
+import 'data/local_storage/preferences_service.dart';
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final prefs = await SharedPreferences.getInstance();
+
   runApp(
-    const ProviderScope(
-      child: TheBlessedBibleApp(),
+    ProviderScope(
+      overrides: [
+        preferencesProvider.overrideWithValue(PreferencesService(prefs)),
+      ],
+      child: const TheBlessedBibleApp(),
     ),
   );
 }
