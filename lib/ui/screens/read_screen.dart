@@ -1859,7 +1859,7 @@ class _TypographyBottomSheet extends ConsumerWidget {
     final typography = ref.watch(typographyProvider);
     final typographyNotifier = ref.read(typographyProvider.notifier);
 
-    final fonts = ['System', 'Inter', 'Gentium Book Plus', 'Lora', 'Literata'];
+    final fonts = ['System', 'Inter', 'Gentium Book Plus', 'Lora', 'Literata', 'Lexend'];
 
     return BouncyEntrance(
       delay: const Duration(milliseconds: 50),
@@ -1918,7 +1918,7 @@ class _TypographyBottomSheet extends ConsumerWidget {
                     ),
                   ),
                   Text(
-                    '${typography.fontSize.round()}',
+                    '${typography.fontSize.clamp(12.0, 32.0).round()}',
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: theme.primaryColor,
                       fontWeight: FontWeight.bold,
@@ -1930,7 +1930,7 @@ class _TypographyBottomSheet extends ConsumerWidget {
               Row(
                 children: [
                   GestureDetector(
-                    onTap: () => typographyNotifier.setFontSize((typography.fontSize - 1).clamp(12.0, 40.0)),
+                    onTap: () => typographyNotifier.setFontSize((typography.fontSize - 1).clamp(12.0, 32.0)),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
                       child: Text('A', style: theme.textTheme.labelSmall),
@@ -1938,16 +1938,16 @@ class _TypographyBottomSheet extends ConsumerWidget {
                   ),
                   Expanded(
                     child: Slider(
-                      value: typography.fontSize,
+                      value: typography.fontSize.clamp(12.0, 32.0),
                       min: 12.0,
-                      max: 40.0,
+                      max: 32.0,
                       activeColor: theme.primaryColor,
                       inactiveColor: theme.primaryColor.withValues(alpha: 0.2),
                       onChanged: (value) => typographyNotifier.setFontSize(value),
                     ),
                   ),
                   GestureDetector(
-                    onTap: () => typographyNotifier.setFontSize((typography.fontSize + 1).clamp(12.0, 40.0)),
+                    onTap: () => typographyNotifier.setFontSize((typography.fontSize + 1).clamp(12.0, 32.0)),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
                       child: Text('A', style: theme.textTheme.titleLarge),

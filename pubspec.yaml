@@ -66,3 +66,13 @@ flutter:
           weight: 600
         - asset: assets/fonts/Literata-700-normal.ttf
           weight: 700
+    - family: Lexend
+      fonts:
+        - asset: assets/fonts/Lexend-400-normal.ttf
+          weight: 400
+        - asset: assets/fonts/Lexend-500-normal.ttf
+          weight: 500
+        - asset: assets/fonts/Lexend-600-normal.ttf
+          weight: 600
+        - asset: assets/fonts/Lexend-700-normal.ttf
+          weight: 700
