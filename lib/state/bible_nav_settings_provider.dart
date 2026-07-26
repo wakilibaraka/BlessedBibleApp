@@ -11,7 +11,7 @@ class BibleNavSettingsState {
 
   const BibleNavSettingsState({
     this.layout = TestamentLayout.sideBySide,
-    this.depth = NavigationDepth.threePart,
+    this.depth = NavigationDepth.twoPart,
     this.autoCloseOnFinalSelection = true,
   });
 
@@ -43,7 +43,7 @@ class BibleNavSettingsNotifier extends Notifier<BibleNavSettingsState> {
     final prefs = await SharedPreferences.getInstance();
     
     final layoutIndex = prefs.getInt(_layoutKey) ?? TestamentLayout.sideBySide.index;
-    final depthIndex = prefs.getInt(_depthKey) ?? NavigationDepth.threePart.index;
+    final depthIndex = prefs.getInt(_depthKey) ?? NavigationDepth.twoPart.index;
     final autoClose = prefs.getBool(_autoCloseKey) ?? true;
 
     state = state.copyWith(

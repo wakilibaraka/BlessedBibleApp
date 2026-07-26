@@ -973,16 +973,19 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
   }
 
   void _onChapterSelected(int chapter, BibleNavSettingsState settings) {
-    ref.read(_sheetStateProvider.notifier).setChapter(chapter, settings.depth != NavigationDepth.twoPart);
-    
-    final book = ref.read(_sheetStateProvider).book!;
-    widget.onSelectionChanged(
-        book.abbreviation,
-        book.name,
-        chapter,
-        1,
-        autoClose: true,
-    );
+    if (settings.depth == NavigationDepth.twoPart) {
+      ref.read(_sheetStateProvider.notifier).setChapter(chapter, false);
+      final book = ref.read(_sheetStateProvider).book!;
+      widget.onSelectionChanged(
+          book.abbreviation,
+          book.name,
+          chapter,
+          1,
+          autoClose: true,
+      );
+    } else {
+      ref.read(_sheetStateProvider.notifier).setChapter(chapter, true);
+    }
   }
 
   void _onVerseSelected(int verse, BibleNavSettingsState settings) {
@@ -1073,7 +1076,7 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
             Consumer(builder: (context, ref, _) {
               final verse = ref.watch(_sheetStateProvider.select((s) => s.verse));
               final mode = ref.watch(_sheetStateProvider.select((s) => s.mode));
-              return _buildBreadcrumbSegment('Verse', verse != null ? '$verse' : '-', SelectionMode.verse, mode, theme);
+              return _buildBreadcrumbSegment('Verse', verse != null ? '$verse' : '1', SelectionMode.verse, mode, theme);
             }),
         ],
       ),
@@ -1084,6 +1087,7 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
     final isSelected = currentMode == targetMode;
     return Expanded(
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: () => ref.read(_sheetStateProvider.notifier).setMode(targetMode),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
@@ -1441,6 +1445,7 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
   Widget _buildGridTile({required String text, required bool isSelected, required VoidCallback onTap, required ThemeData theme}) {
     if (!isSelected) {
       return GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
@@ -1468,6 +1473,7 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
     }
     
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),

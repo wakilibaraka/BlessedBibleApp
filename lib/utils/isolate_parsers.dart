@@ -20,7 +20,7 @@ List<BibleBook> parseBibleJson(String jsonString) {
     
     booksMap.putIfAbsent(bookName, () => BibleBook(
       name: bookName,
-      abbreviation: bookName.substring(0, 3), // Fallback abbreviation
+      abbreviation: bookName, // Fixed from substring(0, 3) to prevent collisions
       chapters: [],
     ));
     
