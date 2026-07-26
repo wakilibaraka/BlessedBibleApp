@@ -9,6 +9,7 @@ import '../widgets/shared_top_header.dart';
 import '../widgets/glass_container.dart';
 import '../widgets/bouncy_entrance.dart';
 import 'verse_detail_screen.dart';
+import 'today_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -109,6 +110,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w500,
                 letterSpacing: 0.3,
+              ),
+            ),
+          ),
+
+          // ── Temporary "Today" preview entry point ─────────────────────
+          // REMOVE IN STAGE 2 once Today is wired as a real tab/destination.
+          const SizedBox(height: 10),
+          GestureDetector(
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const TodayScreen()),
+            ),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: const Color(0xFFC9A227).withValues(alpha: 0.12),
+                border: Border.all(
+                  color: const Color(0xFFC9A227).withValues(alpha: 0.35),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.wb_sunny_outlined,
+                      size: 14, color: Color(0xFFC9A227)),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Preview Today Hub  ✦',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: const Color(0xFFC9A227),
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
