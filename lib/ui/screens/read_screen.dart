@@ -20,6 +20,7 @@ import '../widgets/verse_link_text.dart';
 import '../widgets/shared_top_header.dart';
 import '../../state/notes_provider.dart';
 import '../../data/models/home_data.dart';
+import '../widgets/day_complete_celebration.dart';
 import '../../data/models/commentary_model.dart';
 import '../../state/theme_provider.dart';
 import '../../state/typography_provider.dart';
@@ -828,107 +829,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
           ],
         ),
           ),
-
-          // ── Plan Context Layer ──────────────────────────────────────
-          Builder(builder: (context) {
-            final activePlanDay = ref.watch(activePlanContextProvider);
-            if (activePlanDay == null) return const SizedBox.shrink();
-            
-            return Positioned(
-              left: 16,
-              right: 16,
-              bottom: 16,
-              child: SafeArea(
-                child: TexturedGlassContainer(
-                  borderRadius: BorderRadius.circular(24),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: theme.primaryColor.withValues(alpha: 0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(Icons.bookmark_added_rounded, color: theme.primaryColor, size: 20),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'Reading Plan',
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                            Text(
-                              'Day $activePlanDay',
-                              style: theme.textTheme.titleSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: theme.colorScheme.onSurface,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          final planState = ref.read(readingPlanProvider);
-                          final planNotifier = ref.read(readingPlanProvider.notifier);
-                          
-                          // Mark complete
-                          planNotifier.markDayComplete(activePlanDay);
-                          
-                          if (activePlanDay == planState.planData.length) {
-                            // Last day completed
-                            ref.read(activePlanContextProvider.notifier).setContext(null);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Plan completed! Congratulations! 🎉')),
-                            );
-                          } else {
-                            // Next day
-                            final nextDay = activePlanDay + 1;
-                            final nextFirstReading = planState.planData[nextDay - 1].readings.first;
-                            ref.read(activePlanContextProvider.notifier).setContext(nextDay);
-                            
-                            // Parse reading and jump
-                            final match = RegExp(r'^(\d?\s*[a-zA-Z\s]+)(?:\s+(\d+))?').firstMatch(nextFirstReading);
-                            if (match != null) {
-                              String bookName = match.group(1)!.trim();
-                              if (bookName.toLowerCase() == 'song of solomon') bookName = 'Song of Solomon';
-                              int chapterNum = match.group(2) != null ? (int.tryParse(match.group(2)!) ?? 1) : 1;
-                              
-                              final fcList = ref.read(flatChaptersProvider);
-                              final fc = fcList.where((c) => c.book.name.toLowerCase() == bookName.toLowerCase() || c.book.abbreviation.toLowerCase() == bookName.toLowerCase()).toList();
-                              if (fc.isNotEmpty) {
-                                final chapterMatch = fc.where((c) => c.chapter.number == chapterNum).toList();
-                                if (chapterMatch.isNotEmpty) {
-                                  ref.read(readLocationProvider.notifier).updateLocation(bookAbbrev: chapterMatch.first.book.abbreviation, chapter: chapterNum, verse: 1);
-                                }
-                              }
-                            }
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.primaryColor,
-                          foregroundColor: theme.colorScheme.onPrimary,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        ),
-                        child: const Text('Mark done & next'),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          }),
-
         ],
       ),
     );
@@ -1118,6 +1018,126 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
               else
                 const SizedBox(width: 100),
             ],
+          ),
+          
+          // Plan End-of-Chapter Prompt
+          Consumer(
+            builder: (context, ref, child) {
+              final activePlanDay = ref.watch(activePlanContextProvider);
+              if (activePlanDay == null) return const SizedBox.shrink();
+              
+              final planState = ref.watch(readingPlanProvider);
+              if (activePlanDay < 1 || activePlanDay > planState.planData.length) return const SizedBox.shrink();
+              
+              final dayTarget = planState.planData[activePlanDay - 1];
+              final chapterId = '${fc.book.name}_${fc.chapter.number}';
+              
+              final isPartOfDay = dayTarget.chapters.any((c) => c.id == chapterId);
+              if (!isPartOfDay) return const SizedBox.shrink();
+              
+              final isCompleted = planState.completedChapters.contains(chapterId);
+              if (isCompleted) {
+                 return const Padding(
+                    padding: EdgeInsets.only(top: 32.0),
+                    child: Center(child: Icon(Icons.check_circle_rounded, color: Colors.green, size: 32)),
+                 );
+              }
+              
+              return Padding(
+                padding: const EdgeInsets.only(top: 32.0, bottom: 16.0),
+                child: TexturedGlassContainer(
+                  borderRadius: BorderRadius.circular(24),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Reading Plan · Day $activePlanDay',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.check_circle_outline_rounded),
+                          onPressed: () {
+                            final notifier = ref.read(readingPlanProvider.notifier);
+                            final chapterToMark = PlanChapter(bookName: fc.book.name, chapterNum: fc.chapter.number);
+                            notifier.markChapterComplete(chapterToMark);
+                            
+                            final updatedPlanState = ref.read(readingPlanProvider);
+                            if (updatedPlanState.isDayComplete(activePlanDay)) {
+                               ref.read(activePlanContextProvider.notifier).setContext(null);
+                               showDialog(
+                                 context: context, 
+                                 barrierDismissible: false,
+                                 builder: (context) => DayCompleteCelebration(
+                                   day: activePlanDay,
+                                   onComplete: () {
+                                     Navigator.of(context).pop();
+                                     notifier.markDayComplete(activePlanDay);
+                                     
+                                     final finalState = ref.read(readingPlanProvider);
+                                     if (finalState.isPlanComplete) {
+                                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Plan completed! Congratulations! 🎉')));
+                                     } else {
+                                        final nextDay = finalState.currentDay;
+                                        if (nextDay > 0 && nextDay <= finalState.planData.length) {
+                                           ref.read(activePlanContextProvider.notifier).setContext(nextDay);
+                                           final nextDayTarget = finalState.planData[nextDay - 1];
+                                           PlanChapter? firstUnread;
+                                           for (final c in nextDayTarget.chapters) {
+                                             if (!finalState.completedChapters.contains(c.id)) {
+                                               firstUnread = c;
+                                               break;
+                                             }
+                                           }
+                                           firstUnread ??= nextDayTarget.chapters.last;
+                                           final fcList = ref.read(flatChaptersProvider);
+                                           final match = fcList.where((c) => c.book.name.toLowerCase() == firstUnread!.bookName.toLowerCase() && c.chapter.number == firstUnread.chapterNum).toList();
+                                           if (match.isNotEmpty) {
+                                              ref.read(readLocationProvider.notifier).updateLocation(bookAbbrev: match.first.book.abbreviation, chapter: firstUnread.chapterNum, verse: 1);
+                                           }
+                                        }
+                                     }
+                                   }
+                                 )
+                               );
+                            } else {
+                               PlanChapter? nextUnread;
+                               for (final c in dayTarget.chapters) {
+                                 if (!updatedPlanState.completedChapters.contains(c.id)) {
+                                   nextUnread = c;
+                                   break;
+                                 }
+                               }
+                               if (nextUnread != null) {
+                                  final fcList = ref.read(flatChaptersProvider);
+                                  final match = fcList.where((c) => c.book.name.toLowerCase() == nextUnread!.bookName.toLowerCase() && c.chapter.number == nextUnread.chapterNum).toList();
+                                  if (match.isNotEmpty) {
+                                    ref.read(readLocationProvider.notifier).updateLocation(bookAbbrev: match.first.book.abbreviation, chapter: nextUnread.chapterNum, verse: 1);
+                                  }
+                               }
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: theme.primaryColor,
+                            foregroundColor: theme.colorScheme.onPrimary,
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          ),
+                          label: Text('Mark ${fc.book.name} ${fc.chapter.number} done & continue', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
         ],
       ),

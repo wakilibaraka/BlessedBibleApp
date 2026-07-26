@@ -5,16 +5,62 @@ import '../data/local_storage/preferences_service.dart';
 import '../services/notification_service.dart';
 enum PlanStartMode { startToday, calendarYear }
 
+class PlanChapter {
+  final String bookName;
+  final int chapterNum;
+
+  PlanChapter({required this.bookName, required this.chapterNum});
+
+  String get id => '${bookName}_$chapterNum';
+}
+
+List<PlanChapter> _expandReadings(List<String> readings) {
+  List<PlanChapter> result = [];
+  for (String reading in readings) {
+    final match = RegExp(r'^(\d?\s*[a-zA-Z\s]+)(?:\s+([\d,\-\s;]+))?').firstMatch(reading);
+    if (match != null) {
+      String bookName = match.group(1)!.trim();
+      if (bookName.toLowerCase() == 'song of solomon') bookName = 'Song of Solomon';
+      
+      String? chaptersStr = match.group(2);
+      if (chaptersStr == null || chaptersStr.isEmpty) {
+        result.add(PlanChapter(bookName: bookName, chapterNum: 1));
+      } else {
+        final parts = chaptersStr.split(RegExp(r'[,;]'));
+        for (var part in parts) {
+          part = part.trim();
+          if (part.isEmpty) continue;
+          if (part.contains('-')) {
+            final rangeParts = part.split('-');
+            int start = int.tryParse(rangeParts[0]) ?? 1;
+            int end = int.tryParse(rangeParts[1]) ?? 1;
+            for (int i = start; i <= end; i++) {
+              result.add(PlanChapter(bookName: bookName, chapterNum: i));
+            }
+          } else {
+            int num = int.tryParse(part) ?? 1;
+            result.add(PlanChapter(bookName: bookName, chapterNum: num));
+          }
+        }
+      }
+    }
+  }
+  return result;
+}
+
 class ChronologicalDay {
   final int day;
   final List<String> readings;
+  final List<PlanChapter> chapters;
 
-  ChronologicalDay({required this.day, required this.readings});
+  ChronologicalDay({required this.day, required this.readings, required this.chapters});
 
   factory ChronologicalDay.fromJson(Map<String, dynamic> json) {
+    final rawReadings = List<String>.from(json['readings'] as List);
     return ChronologicalDay(
       day: json['day'] as int,
-      readings: List<String>.from(json['readings'] as List),
+      readings: rawReadings,
+      chapters: _expandReadings(rawReadings),
     );
   }
 }
@@ -23,7 +69,7 @@ class ReadingPlanState {
   final bool isLoading;
   final List<ChronologicalDay> planData;
   final int currentDay; // 0 means not started
-  final Set<int> completedDays;
+  final Set<String> completedChapters;
   final DateTime startDate;
   final PlanStartMode startMode;
 
@@ -31,13 +77,20 @@ class ReadingPlanState {
     this.isLoading = false,
     this.planData = const [],
     this.currentDay = 0,
-    this.completedDays = const {},
+    this.completedChapters = const {},
     required this.startDate,
     this.startMode = PlanStartMode.startToday,
   });
 
-  bool get isPlanComplete => completedDays.contains(365);
-  double get completionPercentage => planData.isEmpty ? 0 : completedDays.length / planData.length;
+  bool get isPlanComplete => planData.isNotEmpty && completedChapters.length >= planData.fold(0, (sum, d) => sum + d.chapters.length);
+  
+  double get completionPercentage => planData.isEmpty ? 0 : completedChapters.length / planData.fold(0, (sum, d) => sum + d.chapters.length);
+
+  bool isDayComplete(int day) {
+    if (planData.isEmpty || day < 1 || day > planData.length) return false;
+    final target = planData[day - 1];
+    return target.chapters.every((c) => completedChapters.contains(c.id));
+  }
 
   DateTime getDateForDay(int day) {
     if (startMode == PlanStartMode.calendarYear) {
@@ -59,7 +112,7 @@ class ReadingPlanState {
     bool? isLoading,
     List<ChronologicalDay>? planData,
     int? currentDay,
-    Set<int>? completedDays,
+    Set<String>? completedChapters,
     DateTime? startDate,
     PlanStartMode? startMode,
   }) {
@@ -67,7 +120,7 @@ class ReadingPlanState {
       isLoading: isLoading ?? this.isLoading,
       planData: planData ?? this.planData,
       currentDay: currentDay ?? this.currentDay,
-      completedDays: completedDays ?? this.completedDays,
+      completedChapters: completedChapters ?? this.completedChapters,
       startDate: startDate ?? this.startDate,
       startMode: startMode ?? this.startMode,
     );
@@ -93,13 +146,27 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
 
       final prefsState = ref.read(preferencesProvider).getReadingPlanState();
       int currentDay = 0;
-      Set<int> completedDays = {};
+      Set<String> completedChapters = {};
       DateTime startDate = DateTime.now();
       PlanStartMode startMode = PlanStartMode.startToday;
 
       if (prefsState != null) {
         currentDay = prefsState['currentDay'] as int? ?? 0;
-        completedDays = Set<int>.from(prefsState['completedDays'] ?? []);
+        
+        if (prefsState.containsKey('completedChapters')) {
+          final chaptersList = prefsState['completedChapters'] as List;
+          completedChapters = chaptersList.map((e) => e.toString()).toSet();
+        } else if (prefsState.containsKey('completedDays')) {
+          // Migration!
+          final completedDays = Set<int>.from(prefsState['completedDays']);
+          for (final d in completedDays) {
+            if (d >= 1 && d <= planData.length) {
+              for (final c in planData[d - 1].chapters) {
+                completedChapters.add(c.id);
+              }
+            }
+          }
+        }
         if (prefsState['startDate'] != null) {
           startDate = DateTime.parse(prefsState['startDate'] as String);
         }
@@ -112,7 +179,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
         isLoading: false,
         planData: planData,
         currentDay: currentDay,
-        completedDays: completedDays,
+        completedChapters: completedChapters,
         startDate: startDate,
         startMode: startMode,
       );
@@ -124,7 +191,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
   void _saveState() {
     ref.read(preferencesProvider).saveReadingPlanState({
       'currentDay': state.currentDay,
-      'completedDays': state.completedDays.toList(),
+      'completedChapters': state.completedChapters.toList(),
       'startDate': state.startDate.toIso8601String(),
       'startMode': state.startMode.name,
     });
@@ -145,7 +212,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
 
   void changeStartMode(PlanStartMode mode) {
     int newCurrentDay = state.currentDay;
-    if (state.currentDay == 0 || state.completedDays.isEmpty) {
+    if (state.currentDay == 0 || state.completedChapters.isEmpty) {
       if (mode == PlanStartMode.calendarYear) {
         final now = DateTime.now();
         newCurrentDay = now.difference(DateTime(now.year, 1, 1)).inDays + 1;
@@ -158,9 +225,11 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
   }
 
   void startPlanFromDay(int day) {
-    final newCompleted = Set<int>.from(state.completedDays);
+    final newCompleted = Set<String>.from(state.completedChapters);
     for (int i = 1; i < day; i++) {
-      newCompleted.add(i);
+      for (final c in state.planData[i - 1].chapters) {
+        newCompleted.add(c.id);
+      }
     }
     
     DateTime newStartDate = state.startDate;
@@ -172,7 +241,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
 
     state = state.copyWith(
       currentDay: day,
-      completedDays: newCompleted,
+      completedChapters: newCompleted,
       startDate: newStartDate,
     );
     _saveState();
@@ -232,18 +301,22 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
   }
 
   void markDayComplete(int day) {
-    final newCompleted = Set<int>.from(state.completedDays)..add(day);
+    if (day < 1 || day > state.planData.length) return;
+    final newCompleted = Set<String>.from(state.completedChapters);
+    for (final c in state.planData[day - 1].chapters) {
+      newCompleted.add(c.id);
+    }
     
     int nextDay = state.currentDay;
     if (day == state.currentDay && day < state.planData.length) {
       nextDay = day + 1;
-      while (newCompleted.contains(nextDay) && nextDay < state.planData.length) {
+      while (nextDay < state.planData.length && state.planData[nextDay - 1].chapters.every((c) => newCompleted.contains(c.id))) {
         nextDay++;
       }
     }
 
     state = state.copyWith(
-      completedDays: newCompleted,
+      completedChapters: newCompleted,
       currentDay: nextDay,
     );
     _saveState();
@@ -254,8 +327,18 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
   }
 
   void markDayIncomplete(int day) {
-    final newCompleted = Set<int>.from(state.completedDays)..remove(day);
-    state = state.copyWith(completedDays: newCompleted);
+    if (day < 1 || day > state.planData.length) return;
+    final newCompleted = Set<String>.from(state.completedChapters);
+    for (final c in state.planData[day - 1].chapters) {
+      newCompleted.remove(c.id);
+    }
+    state = state.copyWith(completedChapters: newCompleted);
+    _saveState();
+  }
+
+  void markChapterComplete(PlanChapter chapter) {
+    final newCompleted = Set<String>.from(state.completedChapters)..add(chapter.id);
+    state = state.copyWith(completedChapters: newCompleted);
     _saveState();
   }
 

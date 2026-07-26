@@ -20,6 +20,19 @@ class ReadingPlanBrowser extends ConsumerStatefulWidget {
 class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
   final Set<int> _expandedDays = {};
 
+  String _formatDayTitle(int dayNum, List<PlanChapter> chapters) {
+    if (chapters.isEmpty) return 'Day $dayNum';
+    Map<String, List<int>> groups = {};
+    for (var c in chapters) {
+      groups.putIfAbsent(c.bookName, () => []).add(c.chapterNum);
+    }
+    List<String> parts = [];
+    for (var entry in groups.entries) {
+      parts.add('${entry.key} ${entry.value.join(", ")}');
+    }
+    return 'Day $dayNum (${parts.join("; ")})';
+  }
+
   void _openReading(String reading, int planDay, BuildContext context, WidgetRef ref) {
     final match = RegExp(r'^(\d?\s*[a-zA-Z\s]+)(?:\s+(\d+))?').firstMatch(reading);
     if (match != null) {
@@ -244,7 +257,7 @@ class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
               itemCount: planState.planData.length,
               itemBuilder: (context, index) {
                 final dayData = planState.planData[index];
-                final isCompleted = planState.completedDays.contains(dayData.day);
+                final isCompleted = planState.isDayComplete(dayData.day);
                 final isActive = dayData.day == planState.currentDay;
                 final isExpanded = _expandedDays.contains(dayData.day) || isActive;
 
@@ -314,7 +327,7 @@ class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            'Day ${dayData.day} · ${planState.getFormattedDateForDay(dayData.day)}',
+                                            '${_formatDayTitle(dayData.day, dayData.chapters)} · ${planState.getFormattedDateForDay(dayData.day)}',
                                             style: theme.textTheme.titleMedium?.copyWith(
                                               fontWeight: FontWeight.bold,
                                               color: isCompleted ? theme.primaryColor : null,
@@ -323,7 +336,7 @@ class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
                                           if (!isExpanded) ...[
                                             const SizedBox(height: 4),
                                             Text(
-                                              dayData.readings.join(' • '),
+                                              dayData.chapters.map((c) => '${c.bookName} ${c.chapterNum}').join(' • '),
                                               style: theme.textTheme.bodySmall?.copyWith(
                                                 color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                                               ),
@@ -355,24 +368,29 @@ class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
                                   padding: const EdgeInsets.only(left: 72.0, right: 16.0, bottom: 16.0),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.stretch,
-                                    children: dayData.readings.map((reading) {
+                                    children: dayData.chapters.map((chapter) {
+                                      final isChapterDone = planState.completedChapters.contains(chapter.id);
                                       return Padding(
                                         padding: const EdgeInsets.only(bottom: 8.0),
                                         child: InkWell(
-                                          onTap: () => _showReadOrStartDialog(context, ref, reading, dayData.day),
+                                          onTap: () => _showReadOrStartDialog(context, ref, '${chapter.bookName} ${chapter.chapterNum}', dayData.day),
                                           borderRadius: BorderRadius.circular(8),
                                           child: Padding(
                                             padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 4.0),
                                             child: Row(
                                               children: [
-                                                Icon(Icons.menu_book_rounded, color: theme.primaryColor, size: 16),
+                                                Icon(
+                                                  isChapterDone ? Icons.check_circle_rounded : Icons.radio_button_unchecked, 
+                                                  color: isChapterDone ? theme.primaryColor : theme.colorScheme.onSurface.withValues(alpha: 0.3), 
+                                                  size: 20,
+                                                ),
                                                 const SizedBox(width: 8),
                                                 Expanded(
                                                   child: Text(
-                                                    reading,
+                                                    '${chapter.bookName} ${chapter.chapterNum}',
                                                     style: theme.textTheme.bodyMedium?.copyWith(
-                                                      color: theme.primaryColor,
-                                                      decoration: TextDecoration.underline,
+                                                      color: isChapterDone ? theme.colorScheme.onSurface.withValues(alpha: 0.5) : theme.primaryColor,
+                                                      decoration: isChapterDone ? TextDecoration.lineThrough : null,
                                                     ),
                                                   ),
                                                 ),
@@ -401,13 +419,22 @@ class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
         icon: Icon(planState.currentDay == 0 ? Icons.play_arrow_rounded : Icons.fast_forward_rounded),
         label: Text(planState.currentDay == 0 ? 'Start Plan' : 'Continue', style: const TextStyle(fontWeight: FontWeight.bold)),
         onPressed: () {
-          if (planState.currentDay == 0) {
+          final planState = ref.read(readingPlanProvider);
+          if (planState.currentDay == 0 || planState.completedChapters.isEmpty) {
             ref.read(readingPlanProvider.notifier).startPlan();
           }
           final newPlanState = ref.read(readingPlanProvider);
           if (newPlanState.currentDay > 0 && newPlanState.currentDay <= newPlanState.planData.length) {
-            final firstReading = newPlanState.planData[newPlanState.currentDay - 1].readings.first;
-            _openReading(firstReading, newPlanState.currentDay, context, ref);
+            final dayTarget = newPlanState.planData[newPlanState.currentDay - 1];
+            PlanChapter? firstUnread;
+            for (final c in dayTarget.chapters) {
+              if (!newPlanState.completedChapters.contains(c.id)) {
+                firstUnread = c;
+                break;
+              }
+            }
+            firstUnread ??= dayTarget.chapters.last;
+            _openReading('${firstUnread.bookName} ${firstUnread.chapterNum}', newPlanState.currentDay, context, ref);
           }
         },
       ),
