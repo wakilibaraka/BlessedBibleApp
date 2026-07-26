@@ -9,6 +9,11 @@ import 'verse_detail_screen.dart';
 import 'your_space_screen.dart' as your_space;
 import '../../state/study_layout_provider.dart';
 import '../widgets/jiggle_animator.dart';
+import '../../state/reading_plan_provider.dart';
+import 'reading_plan_browser.dart';
+import '../../state/nav_provider.dart';
+import '../../state/read_location_provider.dart';
+import '../../state/bible_provider.dart';
 
 class StudyScreen extends ConsumerStatefulWidget {
   const StudyScreen({super.key});
@@ -22,6 +27,32 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
   final List<String> _commentaryAuthors = ['Uriah Smith'];
   Timer? _timer;
   bool _isEditing = false;
+
+  void _openReading(String reading, BuildContext context, WidgetRef ref) {
+    final match = RegExp(r'^(\d?\s*[a-zA-Z\s]+)(?:\s+(\d+))?').firstMatch(reading);
+    if (match != null) {
+      String bookName = match.group(1)!.trim();
+      if (bookName.toLowerCase() == 'song of solomon') {
+        bookName = 'Song of Solomon';
+      }
+      int chapterNum = 1;
+      if (match.group(2) != null) {
+        chapterNum = int.tryParse(match.group(2)!) ?? 1;
+      }
+      
+      final flatChapters = ref.read(flatChaptersProvider);
+      final fc = flatChapters.where((c) => c.book.name.toLowerCase() == bookName.toLowerCase() || c.book.abbreviation.toLowerCase() == bookName.toLowerCase()).toList();
+      
+      if (fc.isNotEmpty) {
+        final chapterMatch = fc.where((c) => c.chapter.number == chapterNum).toList();
+        if (chapterMatch.isNotEmpty) {
+          final readLoc = ref.read(readLocationProvider.notifier);
+          readLoc.updateLocation(bookAbbrev: chapterMatch.first.book.abbreviation, chapter: chapterNum, verse: 1);
+          ref.read(navProvider.notifier).setIndex(1);
+        }
+      }
+    }
+  }
 
   @override
   void initState() {
@@ -235,7 +266,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                       break;
                     case 'reading_plan':
                       cardWidget =
-                          _buildReadingPlanBanner(context, theme, config.size);
+                          _buildReadingPlanBanner(context, theme, config.size, ref);
                       break;
                     case 'commentary':
                       cardWidget =
@@ -520,7 +551,9 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
   }
 
   Widget _buildReadingPlanBanner(
-      BuildContext context, ThemeData theme, CardSize size) {
+      BuildContext context, ThemeData theme, CardSize size, WidgetRef ref) {
+    final planState = ref.watch(readingPlanProvider);
+    
     return AnimatedSize(
       duration: const Duration(milliseconds: 250),
       curve: Curves.easeInOut,
@@ -532,14 +565,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
           child: InkWell(
             borderRadius: BorderRadius.circular(20),
             onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('Reading plans coming soon!'),
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                ),
-              );
+              Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ReadingPlanBrowser()));
             },
             child: Container(
               decoration: BoxDecoration(
@@ -577,19 +603,28 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                             ),
                           ),
                           const SizedBox(height: 4),
-                          Text(
-                            'Day 203 • 4 Chapters',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: theme.primaryColor,
-                              fontWeight: FontWeight.w600,
+                          
+                          if (planState.isLoading)
+                            Text('Loading...', style: theme.textTheme.labelSmall)
+                          else if (planState.currentDay == 0)
+                            Text('Not Started', style: theme.textTheme.labelSmall?.copyWith(color: theme.primaryColor, fontWeight: FontWeight.w600))
+                          else if (planState.isPlanComplete)
+                            Text('Plan Completed!', style: theme.textTheme.labelSmall?.copyWith(color: theme.primaryColor, fontWeight: FontWeight.w600))
+                          else
+                            Text(
+                              'Day ${planState.currentDay} • ${planState.planData[planState.currentDay - 1].readings.length} Reading(s)',
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: theme.primaryColor,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                          ),
+
                           if (size == CardSize.medium || size == CardSize.large) ...[
                             const SizedBox(height: 16),
                             ClipRRect(
                               borderRadius: BorderRadius.circular(4),
                               child: LinearProgressIndicator(
-                                value: 203 / 365,
+                                value: planState.completionPercentage,
                                 backgroundColor:
                                     theme.primaryColor.withValues(alpha: 0.2),
                                 valueColor: AlwaysStoppedAnimation<Color>(
@@ -598,12 +633,12 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                               ),
                             ),
                             const SizedBox(height: 8),
-                            Text('55% Complete',
+                            Text('${(planState.completionPercentage * 100).toStringAsFixed(1)}% Complete',
                                 style: theme.textTheme.labelSmall?.copyWith(
                                     color: theme.textTheme.labelSmall?.color
                                         ?.withValues(alpha: 0.6))),
                           ],
-                          if (size == CardSize.large) ...[
+                          if (size == CardSize.large && planState.currentDay > 0 && !planState.isPlanComplete) ...[
                             const SizedBox(height: 16),
                             Container(
                               padding: const EdgeInsets.all(12),
@@ -622,30 +657,66 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                                     ),
                                   ),
                                   const SizedBox(height: 8),
-                                  Row(
-                                    children: [
-                                      Icon(Icons.check_circle_rounded, color: theme.primaryColor, size: 16),
-                                      const SizedBox(width: 8),
-                                      Text('1 Kings 10', style: theme.textTheme.bodySmall),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Row(
-                                    children: [
-                                      Icon(Icons.circle_outlined, color: theme.colorScheme.onSurface.withValues(alpha: 0.3), size: 16),
-                                      const SizedBox(width: 8),
-                                      Text('1 Kings 11', style: theme.textTheme.bodySmall),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Row(
-                                    children: [
-                                      Icon(Icons.circle_outlined, color: theme.colorScheme.onSurface.withValues(alpha: 0.3), size: 16),
-                                      const SizedBox(width: 8),
-                                      Text('2 Chronicles 9', style: theme.textTheme.bodySmall),
-                                    ],
+                                  ...planState.planData[planState.currentDay - 1].readings.map((reading) {
+                                    return InkWell(
+                                      onTap: () {
+                                        _openReading(reading, context, ref);
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 4.0),
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.menu_book_rounded, color: theme.primaryColor, size: 16),
+                                            const SizedBox(width: 8),
+                                            Text(reading, style: theme.textTheme.bodySmall?.copyWith(color: theme.primaryColor, decoration: TextDecoration.underline)),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                                  const SizedBox(height: 8),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      ref.read(readingPlanProvider.notifier).markDayComplete(planState.currentDay);
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: theme.primaryColor,
+                                      foregroundColor: Colors.white,
+                                      minimumSize: const Size(double.infinity, 36),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                    ),
+                                    child: const Text('Mark Day Complete'),
                                   ),
                                 ],
+                              ),
+                            ),
+                          ],
+                          if (size == CardSize.large && planState.currentDay == 0) ...[
+                            const SizedBox(height: 16),
+                            ElevatedButton(
+                              onPressed: () {
+                                ref.read(readingPlanProvider.notifier).startPlan();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: theme.primaryColor,
+                                foregroundColor: Colors.white,
+                                minimumSize: const Size(double.infinity, 36),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              ),
+                              child: const Text('Start Day 1'),
+                            ),
+                          ],
+                          if (size == CardSize.large && planState.isPlanComplete) ...[
+                            const SizedBox(height: 16),
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: theme.primaryColor.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                'You\'ve completed the Bible! Praise God for this milestone.',
+                                style: theme.textTheme.bodySmall?.copyWith(color: theme.primaryColor, fontStyle: FontStyle.italic),
                               ),
                             ),
                           ],

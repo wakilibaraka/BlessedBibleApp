@@ -15,6 +15,7 @@ class PreferencesService {
   static const String _lastTabKey = 'last_tab';
   static const String _lastReadLocKey = 'last_read_loc';
   static const String _studyLayoutKey = 'study_layout';
+  static const String _readingPlanStateKey = 'reading_plan_state';
 
   void saveSearchHistory(List<SearchResult> history) {
     final jsonList = history.map((e) => e.toJson()).toList();
@@ -108,6 +109,22 @@ class PreferencesService {
 
   String? getStudyLayout() {
     return prefs.getString(_studyLayoutKey);
+  }
+
+  void saveReadingPlanState(Map<String, dynamic> state) {
+    prefs.setString(_readingPlanStateKey, jsonEncode(state));
+  }
+
+  Map<String, dynamic>? getReadingPlanState() {
+    final jsonString = prefs.getString(_readingPlanStateKey);
+    if (jsonString != null) {
+      try {
+        return jsonDecode(jsonString) as Map<String, dynamic>;
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
   }
 
   static const String _chapterPositionsKey = 'chapter_positions';
