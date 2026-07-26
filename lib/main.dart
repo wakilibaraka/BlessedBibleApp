@@ -7,10 +7,18 @@ import 'ui/screens/main_nav_screen.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'data/local_storage/preferences_service.dart';
+import 'ui/screens/splash_loading_screen.dart';
+import 'state/bible_provider.dart';
+
+const bool kStartupTrace = true;
+final startupStopwatch = Stopwatch()..start();
 
 void main() async {
+  if (kStartupTrace) debugPrint('App start: ${startupStopwatch.elapsedMilliseconds} ms');
   WidgetsFlutterBinding.ensureInitialized();
+  if (kStartupTrace) debugPrint('FlutterBinding initialized: ${startupStopwatch.elapsedMilliseconds} ms');
   final prefs = await SharedPreferences.getInstance();
+  if (kStartupTrace) debugPrint('Prefs loaded: ${startupStopwatch.elapsedMilliseconds} ms');
 
   runApp(
     ProviderScope(
@@ -22,12 +30,26 @@ void main() async {
   );
 }
 
-class TheBlessedBibleApp extends ConsumerWidget {
+class TheBlessedBibleApp extends ConsumerStatefulWidget {
   const TheBlessedBibleApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TheBlessedBibleApp> createState() => _TheBlessedBibleAppState();
+}
+
+class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (kStartupTrace) debugPrint('First frame rendered: ${startupStopwatch.elapsedMilliseconds} ms');
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final themeMode = ref.watch(themeProvider);
+    final isBibleLoading = ref.watch(bibleProvider.select((s) => s.isLoading));
 
     return MaterialApp(
       title: 'The Blessed Bible',
@@ -44,7 +66,7 @@ class TheBlessedBibleApp extends ConsumerWidget {
           ? AppTheme.sepiaTheme(14.0)
           : AppTheme.lightTheme(14.0),
       darkTheme: AppTheme.darkTheme(14.0),
-      home: const MainNavScreen(),
+      home: isBibleLoading ? const SplashLoadingScreen() : const MainNavScreen(),
     );
   }
 }

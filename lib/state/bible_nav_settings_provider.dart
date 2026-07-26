@@ -9,12 +9,14 @@ class BibleNavSettingsState {
   final NavigationDepth depth;
   final bool autoCloseOnFinalSelection;
   final bool swipeDownToNav;
+  final bool fullScreenNavigationVersePicker;
 
   const BibleNavSettingsState({
     this.layout = TestamentLayout.sideBySide,
-    this.depth = NavigationDepth.twoPart,
+    this.depth = NavigationDepth.threePart,
     this.autoCloseOnFinalSelection = true,
     this.swipeDownToNav = true,
+    this.fullScreenNavigationVersePicker = false,
   });
 
   BibleNavSettingsState copyWith({
@@ -22,12 +24,14 @@ class BibleNavSettingsState {
     NavigationDepth? depth,
     bool? autoCloseOnFinalSelection,
     bool? swipeDownToNav,
+    bool? fullScreenNavigationVersePicker,
   }) {
     return BibleNavSettingsState(
       layout: layout ?? this.layout,
       depth: depth ?? this.depth,
       autoCloseOnFinalSelection: autoCloseOnFinalSelection ?? this.autoCloseOnFinalSelection,
       swipeDownToNav: swipeDownToNav ?? this.swipeDownToNav,
+      fullScreenNavigationVersePicker: fullScreenNavigationVersePicker ?? this.fullScreenNavigationVersePicker,
     );
   }
 }
@@ -37,6 +41,7 @@ class BibleNavSettingsNotifier extends Notifier<BibleNavSettingsState> {
   static const _depthKey = 'bible_nav_depth';
   static const _autoCloseKey = 'bible_nav_auto_close';
   static const _swipeDownKey = 'bible_nav_swipe_down';
+  static const _fullScreenPickerKey = 'bible_nav_full_screen_picker';
 
   @override
   BibleNavSettingsState build() {
@@ -48,15 +53,17 @@ class BibleNavSettingsNotifier extends Notifier<BibleNavSettingsState> {
     final prefs = await SharedPreferences.getInstance();
     
     final layoutIndex = prefs.getInt(_layoutKey) ?? TestamentLayout.sideBySide.index;
-    final depthIndex = prefs.getInt(_depthKey) ?? NavigationDepth.twoPart.index;
+    final depthIndex = prefs.getInt(_depthKey) ?? NavigationDepth.threePart.index;
     final autoClose = prefs.getBool(_autoCloseKey) ?? true;
     final swipeDown = prefs.getBool(_swipeDownKey) ?? true;
+    final fullScreenPicker = prefs.getBool(_fullScreenPickerKey) ?? false;
 
     state = state.copyWith(
       layout: TestamentLayout.values[layoutIndex.clamp(0, TestamentLayout.values.length - 1)],
       depth: NavigationDepth.values[depthIndex.clamp(0, NavigationDepth.values.length - 1)],
       autoCloseOnFinalSelection: autoClose,
       swipeDownToNav: swipeDown,
+      fullScreenNavigationVersePicker: fullScreenPicker,
     );
   }
 
@@ -82,6 +89,12 @@ class BibleNavSettingsNotifier extends Notifier<BibleNavSettingsState> {
     state = state.copyWith(swipeDownToNav: swipeDown);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_swipeDownKey, swipeDown);
+  }
+
+  Future<void> setFullScreenPicker(bool fullScreen) async {
+    state = state.copyWith(fullScreenNavigationVersePicker: fullScreen);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_fullScreenPickerKey, fullScreen);
   }
 }
 

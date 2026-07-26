@@ -3,7 +3,6 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/foundation.dart';
 import '../data/models/commentary_model.dart';
 import '../utils/isolate_parsers.dart';
-import 'egw_provider.dart';
 
 class ActiveStudyVerseNotifier extends Notifier<String?> {
   @override
@@ -51,15 +50,11 @@ final commentaryDataProvider = FutureProvider<Map<String, Map<String, Map<String
 
 class CombinedCommentaryState {
   final Map<String, Map<String, Map<String, List<CommentaryEntry>>>> data;
-  final bool isEgwMissing;
-  CombinedCommentaryState({required this.data, required this.isEgwMissing});
+  CombinedCommentaryState({required this.data});
 }
 
 final combinedCommentaryProvider = FutureProvider<CombinedCommentaryState>((ref) async {
   final uriahData = await ref.watch(commentaryDataProvider.future);
-  final egwData = await ref.watch(egwCommentaryProvider.future);
-  
-  bool isEgwMissing = egwData.isEmpty;
   
   Map<String, Map<String, Map<String, List<CommentaryEntry>>>> combined = {};
   
@@ -77,7 +72,6 @@ final combinedCommentaryProvider = FutureProvider<CombinedCommentaryState>((ref)
   }
   
   merge(uriahData);
-  merge(egwData);
   
-  return CombinedCommentaryState(data: combined, isEgwMissing: isEgwMissing);
+  return CombinedCommentaryState(data: combined);
 });

@@ -642,7 +642,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
             displayAuthor = 'Commentary';
             displaySnippet =
                 '"${entry.text.split('. ').take(2).join('. ')}..."';
-          } else if (!state.isEgwMissing) {
+          } else {
             displaySnippet = 'No commentary available for this verse.';
           }
         }

@@ -15,6 +15,7 @@ import '../../state/study_provider.dart';
 import '../../state/read_settings_provider.dart';
 import '../../state/user_data_provider.dart';
 import '../../state/reading_plan_provider.dart';
+import '../../state/most_read_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../../utils/bible_sections.dart';
 import '../../services/share_service.dart';
@@ -68,6 +69,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
   final Map<int, ItemPositionsListener> _itemPositionsListeners = {};
   int? _navigatedVerseIndex;
   Timer? _scrollDebounceTimer;
+  Timer? _visitTimer;
   final ValueNotifier<bool> _isScrolling = ValueNotifier(false);
   Timer? _scrollEndTimer;
 
@@ -122,6 +124,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
   @override
   void dispose() {
     _scrollDebounceTimer?.cancel();
+    _visitTimer?.cancel();
     _scrollEndTimer?.cancel();
     _isScrolling.dispose();
     _pageController.dispose();
@@ -193,6 +196,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       useRootNavigator: true,
+      useSafeArea: false,
       builder: (context) {
         final loc = ref.read(readLocationProvider);
         return _BookChapterSelectorSheet(
@@ -287,8 +291,14 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
         if (next.openCommentary && next.requestedVerse != null) {
           if (!isLoading && allBooks.isNotEmpty) {
             try {
-              final book = allBooks.firstWhere((b) => b.abbreviation == next.bookAbbrev, orElse: () => allBooks.first);
-              final chapter = book.chapters.firstWhere((c) => c.number == next.chapter, orElse: () => book.chapters.first);
+              int bookIdx = allBooks.indexWhere((b) => b.abbreviation == next.bookAbbrev);
+              if (bookIdx == -1) bookIdx = 0;
+              final book = allBooks[bookIdx];
+              
+              if (book.chapters.isEmpty) return;
+              int chapIdx = book.chapters.indexWhere((c) => c.number == next.chapter);
+              if (chapIdx == -1) chapIdx = 0;
+              final chapter = book.chapters[chapIdx];
               if (next.requestedVerse! <= chapter.verses.length) {
                 final verseText = chapter.verses[next.requestedVerse! - 1].text;
                 Future.delayed(const Duration(milliseconds: 500), () {
@@ -365,6 +375,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                       final firstVisible = positions.where((p) => p.itemTrailingEdge > 0).reduce((min, p) => p.itemLeadingEdge < min.itemLeadingEdge ? p : min);
                                       if (firstVisible.index < verses.length) {
                                         _scrollDebounceTimer?.cancel();
+                                        _visitTimer?.cancel();
                                         _scrollDebounceTimer = Timer(const Duration(milliseconds: 500), () {
                                           if (!mounted) return;
                                           final currentBookName = fc.book.name;
@@ -381,6 +392,15 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                             currentAbbrev,
                                             currentChapter,
                                             firstVisible.index,
+                                          );
+                                        });
+                                        _visitTimer = Timer(const Duration(seconds: 4), () {
+                                          if (!mounted) return;
+                                          ref.read(mostReadProvider.notifier).incrementVisit(
+                                            fc.book.abbreviation,
+                                            fc.book.name,
+                                            fc.chapter.number,
+                                            verses[firstVisible.index].number,
                                           );
                                         });
                                       }
@@ -1326,8 +1346,10 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final initialBook = widget.books.firstWhere((b) => b.abbreviation == widget.selectedBookAbbrev, orElse: () => widget.books.first);
-      final bookIndex = widget.books.indexOf(initialBook);
+      if (widget.books.isEmpty) return;
+      int bookIndex = widget.books.indexWhere((b) => b.abbreviation == widget.selectedBookAbbrev);
+      if (bookIndex == -1) bookIndex = 0;
+      final initialBook = widget.books[bookIndex];
       final isOldTestament = bookIndex < 39;
       final settings = ref.read(bibleNavSettingsProvider);
       final mode = settings.depth == NavigationDepth.fourPart ? SelectionMode.testament : SelectionMode.book;
@@ -1394,11 +1416,11 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
         ),
         clipBehavior: Clip.antiAlias,
         child: SizedBox(
-          height: MediaQuery.of(context).size.height * 0.85,
-          child: SafeArea(
-          top: false,
+          height: settings.fullScreenNavigationVersePicker
+              ? MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top
+              : MediaQuery.of(context).size.height * 0.85,
           child: Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -1422,7 +1444,6 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
             ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -1556,6 +1577,35 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
     final oldTestamentBooks = widget.books.take(39).toList();
     final newTestamentBooks = widget.books.skip(39).toList();
 
+    if (settings.depth == NavigationDepth.fourPart) {
+      final isOldTestament = ref.watch(_sheetStateProvider.select((s) => s.isOldTestament));
+      final displayedBooks = isOldTestament ? oldTestamentBooks : newTestamentBooks;
+      return Consumer(builder: (context, ref, _) {
+        final selectedBookAbbrev = ref.watch(_sheetStateProvider.select((s) => s.book!.abbreviation));
+        return GridView.builder(
+          padding: const EdgeInsets.only(bottom: 4),
+          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 200,
+            mainAxisExtent: 48,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+          ),
+          itemCount: displayedBooks.length,
+          itemBuilder: (context, index) {
+            final book = displayedBooks[index];
+            final isSel = book.abbreviation == selectedBookAbbrev;
+            return _buildGridTile(
+              text: book.name,
+              isSelected: isSel,
+              onTap: () => _onBookSelected(book, settings),
+              theme: theme,
+              backgroundColor: getSectionColor(book.name, theme.brightness == Brightness.dark),
+            );
+          },
+        );
+      });
+    }
+
     switch (settings.layout) {
       case TestamentLayout.filterTabs:
         final isOldTestament = ref.watch(_sheetStateProvider.select((s) => s.isOldTestament));
@@ -1618,7 +1668,7 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
               child: Consumer(builder: (context, ref, _) {
                 final selectedBookAbbrev = ref.watch(_sheetStateProvider.select((s) => s.book!.abbreviation));
                 return GridView.builder(
-                  padding: const EdgeInsets.only(bottom: 24),
+                  padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 4),
                   gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                     maxCrossAxisExtent: 200,
                     mainAxisExtent: 48,
@@ -1654,14 +1704,14 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
                     child: Consumer(builder: (context, ref, _) {
                       final selectedBookAbbrev = ref.watch(_sheetStateProvider.select((s) => s.book!.abbreviation));
                       return ListView.builder(
-                        padding: const EdgeInsets.only(bottom: 24),
+                        padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 4),
                         itemCount: oldTestamentBooks.length,
-                        itemExtent: 56,
+                        itemExtent: 50,
                         itemBuilder: (context, index) {
                           final book = oldTestamentBooks[index];
                           final isSel = book.abbreviation == selectedBookAbbrev;
                           return Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0, right: 4.0),
+                            padding: const EdgeInsets.only(bottom: 6.0, right: 4.0),
                             child: _buildGridTile(text: book.name, isSelected: isSel, onTap: () => _onBookSelected(book, settings), theme: theme, backgroundColor: getSectionColor(book.name, theme.brightness == Brightness.dark)),
                           );
                         },
@@ -1681,14 +1731,14 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
                     child: Consumer(builder: (context, ref, _) {
                       final selectedBookAbbrev = ref.watch(_sheetStateProvider.select((s) => s.book!.abbreviation));
                       return ListView.builder(
-                        padding: const EdgeInsets.only(bottom: 24),
+                        padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 4),
                         itemCount: newTestamentBooks.length,
-                        itemExtent: 56,
+                        itemExtent: 50,
                         itemBuilder: (context, index) {
                           final book = newTestamentBooks[index];
                           final isSel = book.abbreviation == selectedBookAbbrev;
                           return Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0, left: 4.0),
+                            padding: const EdgeInsets.only(bottom: 6.0, left: 4.0),
                             child: _buildGridTile(text: book.name, isSelected: isSel, onTap: () => _onBookSelected(book, settings), theme: theme, backgroundColor: getSectionColor(book.name, theme.brightness == Brightness.dark)),
                           );
                         },
@@ -1772,7 +1822,7 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
     return Consumer(builder: (context, ref, _) {
       final selectedChapter = ref.watch(_sheetStateProvider.select((s) => s.chapter));
       return GridView.builder(
-        padding: const EdgeInsets.only(bottom: 24),
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 24),
         gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
           maxCrossAxisExtent: 64,
           mainAxisExtent: 64,
@@ -1797,13 +1847,17 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
   Widget _buildVerseSelection(ThemeData theme, BibleNavSettingsState settings) {
     final book = ref.read(_sheetStateProvider).book!;
     final selectedChapter = ref.read(_sheetStateProvider).chapter;
-    final chapterData = book.chapters.firstWhere((c) => c.number == selectedChapter, orElse: () => book.chapters.first);
+    
+    if (book.chapters.isEmpty) return const SizedBox.shrink();
+    int chapIdx = book.chapters.indexWhere((c) => c.number == selectedChapter);
+    if (chapIdx == -1) chapIdx = 0;
+    final chapterData = book.chapters[chapIdx];
     final verses = chapterData.verses.length;
     
     return Consumer(builder: (context, ref, _) {
       final selectedVerse = ref.watch(_sheetStateProvider.select((s) => s.verse));
       return GridView.builder(
-        padding: const EdgeInsets.only(bottom: 24),
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 24),
         gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
           maxCrossAxisExtent: 64,
           mainAxisExtent: 64,
@@ -1829,6 +1883,25 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
     // Determine if it's a book name (contains letters) to apply serif font consistency
     final isBook = text.contains(RegExp(r'[a-zA-Z]'));
     
+    final textStyle = theme.textTheme.titleMedium?.copyWith(
+      fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+      fontFamily: isBook ? theme.textTheme.bodyMedium?.fontFamily : null, // Font consistency for books
+      color: isSelected ? Colors.white : theme.colorScheme.onSurface.withValues(alpha: 0.8),
+    );
+
+    final textWidget = Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          text,
+          style: textStyle,
+          maxLines: 1,
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+
     if (!isSelected) {
       return GestureDetector(
         behavior: HitTestBehavior.opaque,
@@ -1843,17 +1916,7 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
             ),
           ),
           child: Center(
-            child: Text(
-              text,
-              style: (text.length > 3 ? theme.textTheme.labelMedium : theme.textTheme.titleMedium)?.copyWith(
-                fontWeight: FontWeight.w600,
-                fontFamily: isBook ? theme.textTheme.bodyMedium?.fontFamily : null, // Font consistency for books
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-            ),
+            child: textWidget,
           ),
         ),
       );
@@ -1870,17 +1933,7 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
           borderRadius: BorderRadius.circular(30),
           boxShadow: [BoxShadow(color: theme.primaryColor.withValues(alpha: 0.4), blurRadius: 8, offset: const Offset(0, 3))],
         ),
-        child: Text(
-          text,
-          style: (text.length > 3 ? theme.textTheme.labelMedium : theme.textTheme.titleMedium)?.copyWith(
-            fontWeight: FontWeight.bold,
-            fontFamily: isBook ? theme.textTheme.bodyMedium?.fontFamily : null, // Font consistency for books
-            color: Colors.white,
-          ),
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          textAlign: TextAlign.center,
-        ),
+        child: textWidget,
       ),
     );
   }
@@ -2315,66 +2368,71 @@ class _CommentaryBottomSheetContent extends ConsumerWidget {
                         ),
                       ),
                       
-                      // Floating Action Pill
+                      // Floating Action Bar
                       Positioned(
                         left: 24,
                         right: 24,
                         bottom: 16,
-                        child: GlassContainer(
-                          padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-                          borderRadius: BorderRadius.circular(30),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              // LEFT — Save (aligned to left edge)
-                              Expanded(
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: TextButton.icon(
-                                    onPressed: () {
-                                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved to Notes')));
-                                    },
-                                    style: TextButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-                                      minimumSize: const Size(0, 48),
-                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                    ),
-                                    icon: Icon(Icons.bookmark_add_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.8), size: 20),
-                                    label: Text('Save', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.8), fontWeight: FontWeight.bold)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // LEFT — Save Pill
+                            Expanded(
+                              child: GlassContainer(
+                                padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 12.0),
+                                borderRadius: BorderRadius.circular(30),
+                                child: TextButton.icon(
+                                  onPressed: () {
+                                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved to Notes')));
+                                  },
+                                  style: TextButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                    minimumSize: const Size(0, 48),
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                   ),
+                                  icon: Icon(Icons.bookmark_add_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.8), size: 20),
+                                  label: Text('Save', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.8), fontWeight: FontWeight.bold)),
                                 ),
                               ),
-                              // CENTER — Close (perfectly centered)
-                              SizedBox(
+                            ),
+                            
+                            const SizedBox(width: 16),
+                            
+                            // CENTER — Close (in its own circle)
+                            GlassContainer(
+                              padding: EdgeInsets.zero,
+                              borderRadius: BorderRadius.circular(30),
+                              child: SizedBox(
                                 width: 48,
                                 height: 48,
                                 child: IconButton(
                                   onPressed: () => Navigator.of(context).pop(),
                                   icon: Icon(Icons.keyboard_arrow_down_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.8), size: 24),
-                                  style: IconButton.styleFrom(
-                                    backgroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.05),
-                                  ),
                                   padding: EdgeInsets.zero,
                                 ),
                               ),
-                              // RIGHT — Share (aligned to right edge)
-                              Expanded(
-                                child: Align(
-                                  alignment: Alignment.centerRight,
-                                  child: TextButton.icon(
-                                    onPressed: () => _showShareMenu(context, theme),
-                                    style: TextButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-                                      minimumSize: const Size(0, 48),
-                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                    ),
-                                    icon: Icon(Icons.ios_share_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.8), size: 20),
-                                    label: Text('Share', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.8), fontWeight: FontWeight.bold)),
+                            ),
+                            
+                            const SizedBox(width: 16),
+                            
+                            // RIGHT — Share Pill
+                            Expanded(
+                              child: GlassContainer(
+                                padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 12.0),
+                                borderRadius: BorderRadius.circular(30),
+                                child: TextButton.icon(
+                                  onPressed: () => _showShareMenu(context, theme),
+                                  style: TextButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                    minimumSize: const Size(0, 48),
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                   ),
+                                  icon: Icon(Icons.ios_share_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.8), size: 20),
+                                  label: Text('Share', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.8), fontWeight: FontWeight.bold)),
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -2443,7 +2501,7 @@ class _CommentaryBottomSheetContent extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    entry.title.toUpperCase(),
+                    entry.title.replaceAll(RegExp(r'^Title:\s*', caseSensitive: false), '').toUpperCase(),
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: theme.primaryColor,
                       letterSpacing: 1.2,

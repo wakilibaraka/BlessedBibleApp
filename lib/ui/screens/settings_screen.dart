@@ -7,6 +7,7 @@ import '../../state/search_settings_provider.dart';
 import '../../state/bible_nav_settings_provider.dart';
 import '../../state/read_settings_provider.dart';
 import '../../services/backup_service.dart';
+import '../../state/reminders_provider.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -144,6 +145,7 @@ class SettingsScreen extends StatelessWidget {
           Consumer(builder: (context, ref, _) {
             final glowStyle = ref.watch(readSettingsProvider.select((s) => s.backgroundGlowStyle));
             final swipeDown = ref.watch(bibleNavSettingsProvider.select((s) => s.swipeDownToNav));
+            final fullScreenPicker = ref.watch(bibleNavSettingsProvider.select((s) => s.fullScreenNavigationVersePicker));
             
             return Column(
               children: [
@@ -170,6 +172,140 @@ class SettingsScreen extends StatelessWidget {
                   activeTrackColor: Theme.of(context).primaryColor,
                   onChanged: (val) => ref.read(bibleNavSettingsProvider.notifier).setSwipeDown(val),
                 ),
+                SwitchListTile(
+                  title: Text(
+                    'Full-screen Book Navigation',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Text(
+                    'Cover the whole screen when choosing a book. Off shows a shorter sheet so the chapter pill stays visible.',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  value: fullScreenPicker,
+                  activeTrackColor: Theme.of(context).primaryColor,
+                  onChanged: (val) => ref.read(bibleNavSettingsProvider.notifier).setFullScreenPicker(val),
+                ),
+              ],
+            );
+          }),
+          const Divider(),
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 8.0),
+            child: Text(
+              'Reminders',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+          ),
+          Consumer(builder: (context, ref, _) {
+            final remindersState = ref.watch(remindersProvider);
+            final notifier = ref.read(remindersProvider.notifier);
+            final theme = Theme.of(context);
+
+            return Column(
+              children: [
+                SwitchListTile(
+                  title: Text(
+                    'Friday Sunset Reminder',
+                    style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Text(
+                    'Welcome the Sabbath at your local sunset time.',
+                    style: theme.textTheme.bodySmall,
+                  ),
+                  value: remindersState.sabbathEnabled,
+                  activeTrackColor: theme.primaryColor,
+                  onChanged: (val) {
+                    notifier.toggleSabbath(val);
+                    if (val && remindersState.sabbathLocationName == null) {
+                      _showLocationPicker(context, notifier);
+                    }
+                  },
+                ),
+                if (remindersState.sabbathEnabled)
+                  ListTile(
+                    title: const Text('Location'),
+                    subtitle: Text(remindersState.sabbathLocationName ?? 'Not set (Tap to set)'),
+                    trailing: const Icon(Icons.edit_location_alt_rounded),
+                    onTap: () => _showLocationPicker(context, notifier),
+                  ),
+                const SizedBox(height: 8),
+                SwitchListTile(
+                  title: Text(
+                    'Daily Reading Reminder',
+                    style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Text(
+                    'A daily nudge to spend time in the Word.',
+                    style: theme.textTheme.bodySmall,
+                  ),
+                  value: remindersState.dailyEnabled,
+                  activeTrackColor: theme.primaryColor,
+                  onChanged: (val) => notifier.toggleDaily(val),
+                ),
+                if (remindersState.dailyEnabled)
+                  ListTile(
+                    title: const Text('Time'),
+                    subtitle: Text('${remindersState.dailyHour.toString().padLeft(2, '0')}:${remindersState.dailyMinute.toString().padLeft(2, '0')}'),
+                    trailing: const Icon(Icons.access_time_rounded),
+                    onTap: () async {
+                      final time = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay(hour: remindersState.dailyHour, minute: remindersState.dailyMinute),
+                      );
+                      if (time != null) {
+                        notifier.setDailyTime(time.hour, time.minute);
+                      }
+                    },
+                  ),
+                const SizedBox(height: 8),
+                SwitchListTile(
+                  title: Text(
+                    'Custom Weekly Reminder',
+                    style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Text(
+                    'Set a specific day and time each week for deeper study.',
+                    style: theme.textTheme.bodySmall,
+                  ),
+                  value: remindersState.customWeeklyEnabled,
+                  activeTrackColor: theme.primaryColor,
+                  onChanged: (val) => notifier.toggleCustomWeekly(val),
+                ),
+                if (remindersState.customWeeklyEnabled)
+                  ListTile(
+                    title: const Text('Day & Time'),
+                    subtitle: Text('${_weekdayName(remindersState.customWeeklyDay)} at ${remindersState.customWeeklyHour.toString().padLeft(2, '0')}:${remindersState.customWeeklyMinute.toString().padLeft(2, '0')}'),
+                    trailing: const Icon(Icons.edit_calendar_rounded),
+                    onTap: () async {
+                      // Simple dialog to pick day
+                      int? selectedDay = await showDialog<int>(
+                        context: context,
+                        builder: (ctx) => SimpleDialog(
+                          title: const Text('Choose Day'),
+                          children: [
+                            for (int i = 1; i <= 7; i++)
+                              SimpleDialogOption(
+                                onPressed: () => Navigator.pop(ctx, i),
+                                child: Text(_weekdayName(i)),
+                              ),
+                          ],
+                        ),
+                      );
+                      
+                      if (selectedDay != null && context.mounted) {
+                        final time = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay(hour: remindersState.customWeeklyHour, minute: remindersState.customWeeklyMinute),
+                        );
+                        if (time != null) {
+                          notifier.setCustomWeeklyTime(selectedDay, time.hour, time.minute);
+                        }
+                      }
+                    },
+                  ),
               ],
             );
           }),
@@ -237,6 +373,77 @@ class SettingsScreen extends StatelessWidget {
           const SizedBox(height: 32),
         ],
       ),
+    );
+  }
+
+  String _weekdayName(int day) {
+    const names = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    if (day >= 1 && day <= 7) return names[day - 1];
+    return 'Unknown';
+  }
+
+  void _showLocationPicker(BuildContext context, RemindersNotifier notifier) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (ctx) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(ctx).viewInsets.bottom,
+            left: 16, right: 16, top: 24,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text('Set Location for Sunset', style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                onPressed: () {
+                  // Simulated GPS lock
+                  notifier.setSabbathLocation('Current Location (GPS)', 34.0522, -118.2437);
+                  Navigator.pop(ctx);
+                },
+                icon: const Icon(Icons.my_location),
+                label: const Text('Use my current location'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).primaryColor,
+                  foregroundColor: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Center(child: Text('OR select a major city')),
+              const SizedBox(height: 16),
+              SizedBox(
+                height: 200,
+                child: ListView(
+                  children: [
+                    _cityTile(ctx, notifier, 'New York, USA', 40.7128, -74.0060),
+                    _cityTile(ctx, notifier, 'London, UK', 51.5074, -0.1278),
+                    _cityTile(ctx, notifier, 'Sydney, Australia', -33.8688, 151.2093),
+                    _cityTile(ctx, notifier, 'Tokyo, Japan', 35.6762, 139.6503),
+                    _cityTile(ctx, notifier, 'Johannesburg, SA', -26.2041, 28.0473),
+                    _cityTile(ctx, notifier, 'São Paulo, Brazil', -23.5505, -46.6333),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _cityTile(BuildContext context, RemindersNotifier notifier, String name, double lat, double lng) {
+    return ListTile(
+      title: Text(name),
+      onTap: () {
+        notifier.setSabbathLocation(name, lat, lng);
+        Navigator.pop(context);
+      },
     );
   }
 }

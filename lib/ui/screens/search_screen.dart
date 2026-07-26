@@ -8,6 +8,7 @@ import '../../state/read_location_provider.dart';
 import '../../state/glass_ui_provider.dart';
 import '../../state/bible_provider.dart';
 import '../../state/search_settings_provider.dart';
+import '../../state/most_read_provider.dart';
 import '../widgets/textured_glass_container.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
@@ -368,9 +369,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     );
   }
 
-  // ── Recent places ──────────────────────────────────────────────────────
+  // ── Recent places & Most Read ────────────────────────────────────────────
   Widget _buildRecentPlaces(SearchState state, ThemeData theme) {
-    if (state.recentPlaces.isEmpty) {
+    final mostRead = ref.watch(mostReadProvider);
+    final showMostRead = mostRead.length >= 5;
+
+    if (state.recentPlaces.isEmpty && !showMostRead) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -394,22 +398,40 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
         ),
       );
     }
+    
     return ListView(
       padding: const EdgeInsets.symmetric(
           horizontal: 24.0, vertical: 8.0),
       children: [
-        Text(
-          'RECENT',
-          style: theme.textTheme.labelSmall?.copyWith(
-            color:
-                theme.colorScheme.onSurface.withValues(alpha: 0.5),
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.2,
+        if (state.recentPlaces.isNotEmpty) ...[
+          Text(
+            'RECENT',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color:
+                  theme.colorScheme.onSurface.withValues(alpha: 0.5),
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+            ),
           ),
-        ),
-        const SizedBox(height: 12),
-        ...state.recentPlaces
-            .map((place) => _buildResultItem(place, theme)),
+          const SizedBox(height: 12),
+          ...state.recentPlaces
+              .map((place) => _buildResultItem(place, theme)),
+          const SizedBox(height: 24),
+        ],
+        if (showMostRead) ...[
+          Text(
+            'MOST READ',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color:
+                  theme.colorScheme.onSurface.withValues(alpha: 0.5),
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+            ),
+          ),
+          const SizedBox(height: 12),
+          // take top 5
+          ...mostRead.take(5).map((m) => _buildResultItem(m.toSearchResult(), theme)),
+        ]
       ],
     );
   }

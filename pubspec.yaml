@@ -17,6 +17,8 @@ dependencies:
   scrollable_positioned_list: ^0.3.8
   share_plus: ^13.3.0
   wakelock_plus: ^1.2.11
+  flutter_local_notifications: ^22.2.0
+  timezone: ^0.11.1
 
 dev_dependencies:
   flutter_test:

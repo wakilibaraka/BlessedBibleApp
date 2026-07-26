@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/models/bible_model.dart';
 import '../utils/isolate_parsers.dart';
+import '../main.dart'; // For startupStopwatch
 
 class BibleState {
   final bool isLoading;
@@ -38,7 +39,10 @@ class BibleNotifier extends Notifier<BibleState> {
   Future<void> _loadBible() async {
     try {
       final jsonString = await rootBundle.loadString('assets/data/kjvbible.json');
+      if (kStartupTrace) debugPrint('Bible JSON string loaded: ${startupStopwatch.elapsedMilliseconds} ms');
+      
       final booksList = await compute(parseBibleJson, jsonString);
+      if (kStartupTrace) debugPrint('Bible data ready: ${startupStopwatch.elapsedMilliseconds} ms');
       
       state = state.copyWith(isLoading: false, books: booksList);
     } catch (e) {
