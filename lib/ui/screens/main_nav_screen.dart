@@ -50,12 +50,21 @@ class MainNavScreen extends ConsumerWidget {
       extendBody: true,
       body: Stack(
         children: [
-          Positioned.fill(
-            child: AnimatedBackground(appThemeMode: appThemeMode),
-          ),
           IndexedStack(
             index: currentIndex,
-            children: screens,
+            children: screens.asMap().entries.map((entry) {
+              return Stack(
+                children: [
+                  Positioned.fill(
+                    child: AnimatedBackground(
+                      appThemeMode: appThemeMode,
+                      tabIndex: entry.key,
+                    ),
+                  ),
+                  entry.value,
+                ],
+              );
+            }).toList(),
           ),
         ],
       ),
