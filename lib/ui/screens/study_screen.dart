@@ -11,7 +11,7 @@ import 'votd_archive_screen.dart';
 import '../../state/study_layout_provider.dart';
 import '../widgets/jiggle_animator.dart';
 import '../../state/reading_plan_provider.dart';
-import 'reading_plan_browser.dart';
+import 'reading_plans_hub_screen.dart';
 import '../../state/nav_provider.dart';
 import '../../state/read_location_provider.dart';
 import '../../state/bible_provider.dart';
@@ -436,7 +436,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
             onTap: () {
               Navigator.of(context).push(
                 PageRouteBuilder(
-                  pageBuilder: (context, animation, secondaryAnimation) => const ReadingPlanBrowser(),
+                  pageBuilder: (context, animation, secondaryAnimation) => const ReadingPlansHubScreen(),
                   transitionsBuilder: (context, animation, secondaryAnimation, child) {
                     return FadeTransition(opacity: animation, child: child);
                   },
@@ -469,11 +469,12 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Active Reading Plan',
+                                'Reading Plans',
                                 style: theme.textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
+                              Icon(Icons.arrow_forward_ios_rounded, size: 16, color: theme.primaryColor.withValues(alpha: 0.5)),
                             ],
                           ),
                           const SizedBox(height: 8),
