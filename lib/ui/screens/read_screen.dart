@@ -34,6 +34,7 @@ import '../widgets/bouncy_entrance.dart';
 import '../../state/nav_settings_provider.dart';
 import 'commentary_list_screen.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+import '../../state/glass_ui_provider.dart';
 
 String _toHeadingCase(String text) {
   if (text.isEmpty) return text;
@@ -64,6 +65,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
   final Map<int, ItemPositionsListener> _itemPositionsListeners = {};
   int? _navigatedVerseIndex;
   Timer? _scrollDebounceTimer;
+  final ValueNotifier<bool> _isScrolling = ValueNotifier(false);
+  Timer? _scrollEndTimer;
 
   // ── Deliberate-drag-to-nav gate ──────────────────────────────────
   // A fast flick must NOT open navigation. Only a slow, sustained pull
@@ -119,6 +122,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
   @override
   void dispose() {
     _scrollDebounceTimer?.cancel();
+    _scrollEndTimer?.cancel();
+    _isScrolling.dispose();
     _pageController.dispose();
     WidgetsBinding.instance.removeObserver(this);
     WakelockPlus.disable(); // Release wakelock
@@ -392,6 +397,18 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                   behavior: HitTestBehavior.translucent,
                                   child: NotificationListener<ScrollNotification>(
                                     onNotification: (notification) {
+                                      if (notification is ScrollStartNotification || notification is ScrollUpdateNotification) {
+                                        if (!_isScrolling.value) {
+                                          _isScrolling.value = true;
+                                        }
+                                        _scrollEndTimer?.cancel();
+                                      } else if (notification is ScrollEndNotification) {
+                                        _scrollEndTimer?.cancel();
+                                        _scrollEndTimer = Timer(const Duration(milliseconds: 150), () {
+                                          if (mounted) _isScrolling.value = false;
+                                        });
+                                      }
+
                                       final navSettings = ref.read(navSettingsProvider);
                                       
                                       // ── Deliberate-drag gate for navigation ──
@@ -643,121 +660,130 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                     child: AnimatedOpacity(
                       duration: const Duration(milliseconds: 350),
                       opacity: (isImmersive && readSettings.readingViewMode == ReadingViewMode.immersive) ? 0.0 : 1.0,
-                      child: Padding(
-                        padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 8.0, left: 24.0, right: 24.0),
-                        child: SharedTopHeader(
-                          leading: RepaintBoundary(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(24),
-                              child: BackdropFilter(
-                                filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    ref.read(navProvider.notifier).setIndex(0);
-                                  },
-                                  behavior: HitTestBehavior.opaque,
-                                  child: Container(
-                                    width: 48,
-                                    height: 48,
-                                    decoration: BoxDecoration(
-                                      color: theme.colorScheme.surface.withValues(alpha: 0.6),
-                                      border: Border.all(
-                                        color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                                        width: 1,
+                      child: ValueListenableBuilder<bool>(
+                        valueListenable: _isScrolling,
+                        builder: (context, isScrolling, _) {
+                          final isGlassy = ref.watch(glassUiProvider) && !isScrolling;
+                          final double nonGlassAlpha = 0.85;
+                          return Padding(
+                            padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 8.0, left: 24.0, right: 24.0),
+                            child: SharedTopHeader(
+                              leading: RepaintBoundary(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(24),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      ref.read(navProvider.notifier).setIndex(0);
+                                    },
+                                    behavior: HitTestBehavior.opaque,
+                                    child: Container(
+                                      width: 48,
+                                      height: 48,
+                                      decoration: BoxDecoration(
+                                        color: theme.colorScheme.surface.withValues(alpha: isGlassy ? 0.6 : nonGlassAlpha),
+                                        border: Border.all(
+                                          color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                                          width: 1,
+                                        ),
                                       ),
-                                    ),
-                                    child: Center(
-                                      child: Icon(
-                                        Icons.book_rounded,
-                                        size: 24,
-                                        color: theme.primaryColor,
+                                      child: Center(
+                                        child: Icon(
+                                          Icons.book_rounded,
+                                          size: 24,
+                                          color: theme.primaryColor,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ),
-                          centerContent: RepaintBoundary(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: BackdropFilter(
-                                filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    if (isImmersive) {
-                                      ref.read(immersiveModeProvider.notifier).set(false);
-                                    } else {
-                                      _showSelectorBottomSheet(allBooks);
-                                    }
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                    decoration: BoxDecoration(
-                                      color: theme.colorScheme.surface.withValues(alpha: 0.6),
-                                      border: Border.all(
-                                        color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                                        width: 1,
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Flexible(
-                                          child: FittedBox(
-                                            fit: BoxFit.scaleDown,
-                                            child: ConstrainedBox(
-                                              constraints: const BoxConstraints(maxWidth: 180),
-                                              child: MediaQuery(
-                                                data: MediaQuery.of(context).copyWith(
-                                                  textScaler: const TextScaler.linear(1.0),
-                                                ),
-                                                child: Text(
-                                                  '$currentBookName $currentChapter',
-                                                  style: theme.textTheme.titleSmall?.copyWith(
-                                                    fontWeight: FontWeight.w700,
-                                                    fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14).clamp(12.0, 18.0),
+                              centerContent: RepaintBoundary(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: Stack(
+                                    children: [
+                                      if (isGlassy)
+                                        Positioned.fill(
+                                          child: BackdropFilter(
+                                            filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
+                                            child: const SizedBox.shrink(),
+                                          ),
+                                        ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          if (isImmersive) {
+                                            ref.read(immersiveModeProvider.notifier).set(false);
+                                          } else {
+                                            _showSelectorBottomSheet(allBooks);
+                                          }
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                          decoration: BoxDecoration(
+                                            color: theme.colorScheme.surface.withValues(alpha: isGlassy ? 0.6 : nonGlassAlpha),
+                                            border: Border.all(
+                                              color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                                              width: 1,
+                                            ),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Flexible(
+                                                child: FittedBox(
+                                                  fit: BoxFit.scaleDown,
+                                                  child: ConstrainedBox(
+                                                    constraints: const BoxConstraints(maxWidth: 180),
+                                                    child: MediaQuery(
+                                                      data: MediaQuery.of(context).copyWith(
+                                                        textScaler: const TextScaler.linear(1.0),
+                                                      ),
+                                                      child: Text(
+                                                        '$currentBookName $currentChapter',
+                                                        style: theme.textTheme.titleSmall?.copyWith(
+                                                          fontWeight: FontWeight.w700,
+                                                          fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14).clamp(12.0, 18.0),
+                                                        ),
+                                                      ),
+                                                    ),
                                                   ),
                                                 ),
                                               ),
-                                            ),
+                                              const SizedBox(width: 4),
+                                              Icon(Icons.keyboard_arrow_down_rounded, 
+                                                size: 16, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
+                                            ],
                                           ),
                                         ),
-                                        const SizedBox(width: 4),
-                                        Icon(Icons.keyboard_arrow_down_rounded, 
-                                          size: 16, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
-                            ),
-                          ),
-                          trailing: RepaintBoundary(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(24),
-                              child: BackdropFilter(
-                                filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
-                                child: GestureDetector(
-                                  onTap: _showTypographyBottomSheet,
-                                  behavior: HitTestBehavior.opaque,
-                                  child: Container(
-                                    width: 48,
-                                    height: 48,
-                                    decoration: BoxDecoration(
-                                      color: theme.colorScheme.surface.withValues(alpha: 0.6),
-                                      border: Border.all(
-                                        color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                                        width: 1,
+                              trailing: RepaintBoundary(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(24),
+                                  child: GestureDetector(
+                                    onTap: _showTypographyBottomSheet,
+                                    behavior: HitTestBehavior.opaque,
+                                    child: Container(
+                                      width: 48,
+                                      height: 48,
+                                      decoration: BoxDecoration(
+                                        color: theme.colorScheme.surface.withValues(alpha: isGlassy ? 0.6 : nonGlassAlpha),
+                                        border: Border.all(
+                                          color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                                          width: 1,
+                                        ),
                                       ),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        'aA',
-                                        style: theme.textTheme.titleLarge?.copyWith(
-                                          fontWeight: FontWeight.w600,
-                                          color: theme.colorScheme.onSurface,
-                                          letterSpacing: -1.0,
+                                      child: Center(
+                                        child: Text(
+                                          'aA',
+                                          style: theme.textTheme.titleLarge?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: theme.colorScheme.onSurface,
+                                            letterSpacing: -1.0,
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -765,8 +791,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                 ),
                               ),
                             ),
-                          ),
-                        ),
+                          );
+                        },
                       ),
                 ),
               ),
@@ -787,42 +813,39 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                     child: Center(
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(20),
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                            decoration: BoxDecoration(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: theme.primaryColor.withValues(
+                                alpha: 0.12 + 0.18 * _overscrollFraction),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
                               color: theme.primaryColor.withValues(
-                                  alpha: 0.12 + 0.18 * _overscrollFraction),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
+                                  alpha: 0.25 * _overscrollFraction),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.menu_book_outlined,
+                                size: 14,
                                 color: theme.primaryColor.withValues(
-                                    alpha: 0.25 * _overscrollFraction),
+                                    alpha: 0.4 + 0.6 * _overscrollFraction),
                               ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.menu_book_outlined,
-                                  size: 14,
+                              const SizedBox(width: 6),
+                              Text(
+                                _overscrollFraction >= 1.0
+                                    ? 'Release to navigate'
+                                    : 'Keep holding…',
+                                style: theme.textTheme.labelSmall?.copyWith(
                                   color: theme.primaryColor.withValues(
-                                      alpha: 0.4 + 0.6 * _overscrollFraction),
+                                      alpha: 0.5 + 0.5 * _overscrollFraction),
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.2,
                                 ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  _overscrollFraction >= 1.0
-                                      ? 'Release to navigate'
-                                      : 'Keep holding…',
-                                  style: theme.textTheme.labelSmall?.copyWith(
-                                    color: theme.primaryColor.withValues(
-                                        alpha: 0.5 + 0.5 * _overscrollFraction),
-                                    fontWeight: FontWeight.w600,
-                                    letterSpacing: 0.2,
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
