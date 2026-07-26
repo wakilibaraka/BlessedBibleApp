@@ -29,7 +29,6 @@ class TheBlessedBibleApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeProvider);
-    final typography = ref.watch(typographyProvider);
 
     return MaterialApp(
       title: 'The Blessed Bible',
@@ -43,9 +42,9 @@ class TheBlessedBibleApp extends ConsumerWidget {
         AppThemeMode.dark => ThemeMode.dark,
       },
       theme: themeMode == AppThemeMode.sepia 
-          ? AppTheme.sepiaTheme(17.5, typography.fontFamily)
-          : AppTheme.lightTheme(17.5, typography.fontFamily),
-      darkTheme: AppTheme.darkTheme(17.5, typography.fontFamily),
+          ? AppTheme.sepiaTheme(14.0)
+          : AppTheme.lightTheme(14.0),
+      darkTheme: AppTheme.darkTheme(14.0),
       home: const MainNavScreen(),
     );
   }

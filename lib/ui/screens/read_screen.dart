@@ -931,6 +931,7 @@ Positioned(
 
   Widget _buildNormalVerse(BibleVerse verse, ThemeData theme, TypographyState typography, AppThemeMode appThemeMode, {bool hasCommentary = false, VoidCallback? onCommentaryTap, bool isBookmarked = false}) {
     final fontStyle = theme.textTheme.bodyMedium?.copyWith(
+      fontFamily: typography.fontFamily == 'System' ? null : typography.fontFamily,
       fontSize: typography.fontSize,
       height: 1.6,
       letterSpacing: 0.15,

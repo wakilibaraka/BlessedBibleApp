@@ -3,12 +3,11 @@ import 'app_colors.dart';
 import 'app_typography.dart';
 
 class AppTheme {
-  static ThemeData lightTheme(double baseFontSize, String fontFamily) {
+  static ThemeData lightTheme(double baseFontSize) {
     final textTheme = AppTypography.getTheme(
       AppColors.lightTextPrimary,
       AppColors.lightTextSecondary,
       baseFontSize,
-      fontFamily,
     );
 
     return ThemeData(
@@ -38,12 +37,11 @@ class AppTheme {
     );
   }
 
-  static ThemeData sepiaTheme(double baseFontSize, String fontFamily) {
+  static ThemeData sepiaTheme(double baseFontSize) {
     final textTheme = AppTypography.getTheme(
       AppColors.sepiaTextPrimary,
       AppColors.sepiaTextSecondary,
       baseFontSize,
-      fontFamily,
     );
 
     return ThemeData(
@@ -73,12 +71,11 @@ class AppTheme {
     );
   }
 
-  static ThemeData darkTheme(double baseFontSize, String fontFamily) {
+  static ThemeData darkTheme(double baseFontSize) {
     final textTheme = AppTypography.getTheme(
       AppColors.darkTextPrimary,
       AppColors.darkTextSecondary,
       baseFontSize,
-      fontFamily,
     );
 
     return ThemeData(
