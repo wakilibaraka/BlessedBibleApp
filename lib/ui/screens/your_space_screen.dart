@@ -301,8 +301,26 @@ class YourSpaceScreen extends ConsumerWidget {
                               padding: const EdgeInsets.only(bottom: 12.0),
                               child: TexturedGlassContainer(
                                 borderRadius: BorderRadius.circular(16),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16.0),
+                                padding: EdgeInsets.zero,
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(16),
+                                  onTap: () {
+                                    if (note.reference != null) {
+                                      final data = _parseVerseRef(note.reference!, flatChapters);
+                                      if (data != null) {
+                                        ref.read(readLocationProvider.notifier).updateLocation(
+                                          bookAbbrev: data.bookAbbrev,
+                                          bookName: data.bookName,
+                                          chapter: data.chapter,
+                                          verse: data.verseNum,
+                                        );
+                                        Navigator.of(context).pop();
+                                        ref.read(navProvider.notifier).setIndex(1); // Jump to read
+                                      }
+                                    }
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16.0),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -346,8 +364,7 @@ class YourSpaceScreen extends ConsumerWidget {
                                         note.content,
                                         maxLines: 4,
                                         overflow: TextOverflow.ellipsis,
-                                        style: theme.textTheme.bodyMedium
-                                            ?.copyWith(
+                                        style: theme.textTheme.bodyMedium?.copyWith(
                                           color: theme.colorScheme.onSurface
                                               .withValues(alpha: 0.8),
                                           height: 1.5,
@@ -358,7 +375,8 @@ class YourSpaceScreen extends ConsumerWidget {
                                 ),
                               ),
                             ),
-                          );
+                          ),
+                        );
                         },
                       ),
               ],

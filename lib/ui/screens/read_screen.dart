@@ -17,8 +17,9 @@ import '../../utils/bible_sections.dart';
 import '../../services/share_service.dart';
 import '../widgets/verse_link_text.dart';
 import '../widgets/shared_top_header.dart';
+import '../../state/notes_provider.dart';
+import '../../data/models/home_data.dart';
 import '../../data/models/commentary_model.dart';
-
 import '../../state/theme_provider.dart';
 import '../../state/typography_provider.dart';
 import '../../state/immersive_mode_provider.dart';
@@ -806,58 +807,12 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.1),
       builder: (ctx) {
-        return Center(
-          child: Material(
-            color: Colors.transparent,
-            child: TexturedGlassContainer(
-              borderRadius: BorderRadius.circular(24),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '$bookName $chapterNum:$verseNumber',
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.titleSmall?.color?.withValues(alpha: 0.7)),
-                    ),
-                    const SizedBox(height: 24),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _ContextMenuButton(
-                          icon: Icons.copy_rounded,
-                          label: 'Copy',
-                          onTap: () {
-                            Navigator.of(ctx).pop();
-                            final text = ShareService.formatVerses(
-                                bookName: bookName,
-                                chapterNumber: chapterNum,
-                                verseNumbers: [verseNumber],
-                                chapterData: chapterData);
-                            ShareService.copyText(context, text);
-                          }
-                        ),
-                        const SizedBox(width: 40),
-                        _ContextMenuButton(
-                          icon: Icons.ios_share_rounded,
-                          label: 'Share',
-                          onTap: () {
-                            Navigator.of(ctx).pop();
-                            final text = ShareService.formatVerses(
-                                bookName: bookName,
-                                chapterNumber: chapterNum,
-                                verseNumbers: [verseNumber],
-                                chapterData: chapterData);
-                            ShareService.shareText(body: text);
-                          }
-                        ),
-                      ],
-                    )
-                  ]
-                )
-              )
-            )
-          )
+        return _VerseContextMenuContent(
+          verseNumber: verseNumber,
+          chapterData: chapterData,
+          bookName: bookName,
+          chapterNum: chapterNum,
+          bookAbbrev: ref.read(readLocationProvider).bookAbbrev,
         );
       }
     );
@@ -2230,7 +2185,8 @@ class _ContextMenuButton extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
-  const _ContextMenuButton({required this.icon, required this.label, required this.onTap});
+  final Color? color;
+  const _ContextMenuButton({required this.icon, required this.label, required this.onTap, this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -2244,15 +2200,144 @@ class _ContextMenuButton extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.08),
+              color: color != null ? color!.withValues(alpha: 0.15) : theme.colorScheme.onSurface.withValues(alpha: 0.08),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: theme.colorScheme.onSurface, size: 28),
+            child: Icon(icon, color: color ?? theme.colorScheme.onSurface, size: 28),
           ),
           const SizedBox(height: 8),
-          Text(label, style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w600)),
+          Text(label, style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w600, color: color)),
         ],
       ),
+    );
+  }
+}
+
+class _VerseContextMenuContent extends ConsumerWidget {
+  final int verseNumber;
+  final dynamic chapterData;
+  final String bookName;
+  final int chapterNum;
+  final String bookAbbrev;
+
+  const _VerseContextMenuContent({
+    required this.verseNumber,
+    required this.chapterData,
+    required this.bookName,
+    required this.chapterNum,
+    required this.bookAbbrev,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final verseKey = generateVerseKey(bookAbbrev, chapterNum, verseNumber);
+    final isBookmarked = ref.watch(bookmarksProvider).contains(verseKey);
+    final hasNote = ref.watch(notesProvider).any((n) => n.reference == verseKey);
+    final isHighlighted = ref.watch(highlightsProvider).containsKey(verseKey);
+    final theme = Theme.of(context);
+
+    return Center(
+      child: Material(
+        color: Colors.transparent,
+        child: TexturedGlassContainer(
+          borderRadius: BorderRadius.circular(24),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '$bookName $chapterNum:$verseNumber',
+                  style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, color: theme.textTheme.titleSmall?.color?.withValues(alpha: 0.7)),
+                ),
+                const SizedBox(height: 24),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _ContextMenuButton(
+                        icon: isHighlighted ? Icons.format_color_text_rounded : Icons.format_color_text_rounded,
+                        label: isHighlighted ? 'Highlighted' : 'Highlight',
+                        color: isHighlighted ? Colors.amber.shade600 : null,
+                        onTap: () {
+                          if (isHighlighted) {
+                            ref.read(highlightsProvider.notifier).toggleHighlight(verseKey, 0);
+                          } else {
+                            ref.read(highlightsProvider.notifier).toggleHighlight(verseKey, 0); // Default color index
+                          }
+                        }
+                      ),
+                      const SizedBox(width: 20),
+                      _ContextMenuButton(
+                        icon: isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+                        label: isBookmarked ? 'Saved' : 'Bookmark',
+                        color: isBookmarked ? theme.primaryColor : null,
+                        onTap: () {
+                          ref.read(bookmarksProvider.notifier).toggle(verseKey);
+                        }
+                      ),
+                      const SizedBox(width: 20),
+                      _ContextMenuButton(
+                        icon: hasNote ? Icons.edit_document : Icons.edit_document,
+                        label: hasNote ? 'Edit Note' : 'Note',
+                        color: hasNote ? Colors.blue.shade600 : null,
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          // Find note or create one
+                          final notes = ref.read(notesProvider);
+                          final existingNoteIndex = notes.indexWhere((n) => n.reference == verseKey);
+                          // Ideally open a note editor here
+                          // For now, we simulate saving
+                          if (existingNoteIndex == -1) {
+                             ref.read(notesProvider.notifier).add(PersonalNote(
+                               'Note on $bookName $chapterNum:$verseNumber',
+                               '',
+                               'Today',
+                               reference: verseKey
+                             ));
+                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Note added for $bookName $chapterNum:$verseNumber')));
+                          } else {
+                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Note already exists for $bookName $chapterNum:$verseNumber')));
+                          }
+                        }
+                      ),
+                      const SizedBox(width: 20),
+                      _ContextMenuButton(
+                        icon: Icons.copy_rounded,
+                        label: 'Copy',
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          final text = ShareService.formatVerses(
+                              bookName: bookName,
+                              chapterNumber: chapterNum,
+                              verseNumbers: [verseNumber],
+                              chapterData: chapterData);
+                          ShareService.copyText(context, text);
+                        }
+                      ),
+                      const SizedBox(width: 20),
+                      _ContextMenuButton(
+                        icon: Icons.ios_share_rounded,
+                        label: 'Share',
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          final text = ShareService.formatVerses(
+                              bookName: bookName,
+                              chapterNumber: chapterNum,
+                              verseNumbers: [verseNumber],
+                              chapterData: chapterData);
+                          ShareService.shareText(body: text);
+                        }
+                      ),
+                    ],
+                  ),
+                )
+              ]
+            )
+          )
+        )
+      )
     );
   }
 }
