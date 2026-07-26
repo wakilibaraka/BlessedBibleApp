@@ -56,9 +56,9 @@ void main() {
       ),
     ];
 
-    test('parses exact book name correctly', () {
+    test('parses exact book name correctly', () async {
       final engine = SearchEngine(bibleBooks: mockBooks);
-      final results = engine.search('Genesis');
+      final results = await engine.search('Genesis');
       
       final refResults = results.where((r) => r.type == SearchResultType.reference).toList();
       expect(refResults.length, 1);
@@ -66,27 +66,27 @@ void main() {
       expect(refResults[0].metadata['chapter'], 1);
     });
 
-    test('parses book abbreviation correctly', () {
+    test('parses book abbreviation correctly', () async {
       final engine = SearchEngine(bibleBooks: mockBooks);
-      final results = engine.search('REV');
+      final results = await engine.search('REV');
       
       final refResults = results.where((r) => r.type == SearchResultType.reference).toList();
       expect(refResults.length, 1);
       expect(refResults[0].metadata['bookAbbrev'], 'REV');
     });
 
-    test('parses book prefix correctly', () {
+    test('parses book prefix correctly', () async {
       final engine = SearchEngine(bibleBooks: mockBooks);
-      final results = engine.search('reve');
+      final results = await engine.search('reve');
       
       final refResults = results.where((r) => r.type == SearchResultType.reference).toList();
       expect(refResults.length, 1);
       expect(refResults[0].metadata['bookAbbrev'], 'REV');
     });
 
-    test('parses book and chapter correctly', () {
+    test('parses book and chapter correctly', () async {
       final engine = SearchEngine(bibleBooks: mockBooks);
-      final results = engine.search('gen 2');
+      final results = await engine.search('gen 2');
       
       final refResults = results.where((r) => r.type == SearchResultType.reference).toList();
       expect(refResults.length, 1);
@@ -95,9 +95,9 @@ void main() {
       expect(refResults[0].metadata['verse'], null);
     });
 
-    test('parses book, chapter and verse correctly', () {
+    test('parses book, chapter and verse correctly', () async {
       final engine = SearchEngine(bibleBooks: mockBooks);
-      final results = engine.search('gen 1:2');
+      final results = await engine.search('gen 1:2');
       
       final refResults = results.where((r) => r.type == SearchResultType.reference).toList();
       expect(refResults.length, 1);
@@ -106,9 +106,9 @@ void main() {
       expect(refResults[0].metadata['verse'], 2);
     });
 
-    test('parses numbered books correctly', () {
+    test('parses numbered books correctly', () async {
       final engine = SearchEngine(bibleBooks: mockBooks);
-      final results = engine.search('1 cor 13:1');
+      final results = await engine.search('1 cor 13:1');
       
       final refResults = results.where((r) => r.type == SearchResultType.reference).toList();
       expect(refResults.length, 1);
@@ -117,9 +117,9 @@ void main() {
       expect(refResults[0].metadata['verse'], 1);
     });
     
-    test('returns bible verse match correctly', () {
+    test('returns bible verse match correctly', () async {
       final engine = SearchEngine(bibleBooks: mockBooks);
-      final results = engine.search('Lamb stood');
+      final results = await engine.search('Lamb stood');
       
       final bibleResults = results.where((r) => r.type == SearchResultType.bible).toList();
       expect(bibleResults.length, 1);

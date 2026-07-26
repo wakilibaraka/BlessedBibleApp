@@ -312,6 +312,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> with SingleTickerPr
   }
 
   Widget _buildSearchResults(SearchState state, ThemeData theme) {
+    if (state.isSearching && state.results.isEmpty) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
     if (state.results.isEmpty && !state.isSearching) {
       return Center(
         child: Text(

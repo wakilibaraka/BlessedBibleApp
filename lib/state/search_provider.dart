@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'search_engine.dart';
 
@@ -40,6 +41,8 @@ class SearchState {
 }
 
 class SearchNotifier extends Notifier<SearchState> {
+  Timer? _debounce;
+
   @override
   SearchState build() {
     // Reactively update search results when commentary data resolves
@@ -61,7 +64,11 @@ class SearchNotifier extends Notifier<SearchState> {
 
   void setQuery(String query) {
     state = state.copyWith(query: query, isSearching: true);
-    _performSearch();
+    
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      _performSearch();
+    });
   }
 
   void toggleBibleFilter() {
@@ -80,18 +87,27 @@ class SearchNotifier extends Notifier<SearchState> {
     preferencesService.saveSearchHistory(updatedList);
   }
 
-  void _performSearch() {
+  Future<void> _performSearch() async {
     if (state.query.trim().isEmpty) {
       state = state.copyWith(results: [], isSearching: false);
       return;
     }
 
+    // Force isSearching to true again in case it was toggled by a filter change
+    if (!state.isSearching) {
+      state = state.copyWith(isSearching: true);
+    }
+
     final engine = ref.read(searchEngineProvider);
-    final results = engine.search(
+    final results = await engine.search(
       state.query,
       includeBible: state.filterBible,
       includeCommentary: state.filterCommentary,
     );
+
+    // If query changed while searching, don't update results
+    final currentQuery = ref.read(searchStateProvider).query;
+    if (currentQuery != state.query) return;
 
     state = state.copyWith(results: results, isSearching: false);
   }

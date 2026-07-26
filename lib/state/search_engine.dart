@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/models/bible_model.dart';
 import '../data/models/commentary_model.dart';
@@ -42,102 +43,156 @@ class SearchResult {
 
 enum SearchResultType { reference, bible, commentary, history }
 
-// The Search Engine handles the actual query logic
-class SearchEngine {
+class SearchArgs {
+  final String query;
+  final bool includeBible;
+  final bool includeCommentary;
   final List<BibleBook>? bibleBooks;
   final Map<String, Map<String, Map<String, List<CommentaryEntry>>>>? commentaryData;
 
-  SearchEngine({this.bibleBooks, this.commentaryData});
+  SearchArgs(this.query, this.includeBible, this.includeCommentary, this.bibleBooks, this.commentaryData);
+}
 
-  List<SearchResult> _parseReference(String query, List<BibleBook> books) {
-    final q = query.toLowerCase().trim();
-    if (q.isEmpty) return [];
+List<SearchResult> _executeSearchIsolate(SearchArgs args) {
+  final query = args.query;
+  final includeBible = args.includeBible;
+  final includeCommentary = args.includeCommentary;
+  final bibleBooks = args.bibleBooks;
+  final commentaryData = args.commentaryData;
 
-    final regex = RegExp(r'^((?:\d\s*)?[a-z]+(?:\s+[a-z]+)*)\s*(?:(\d+)[\s:.]*(\d+)?)?$');
-    final match = regex.firstMatch(q);
+  if (query.trim().isEmpty) return [];
+  
+  final queryLower = query.toLowerCase().trim();
+  final results = <SearchResult>[];
+
+  String highlightSnippet(String text, String query) {
+    final index = text.toLowerCase().indexOf(query);
+    if (index == -1) return text.length > 100 ? '${text.substring(0, 100)}...' : text;
     
-    if (match == null) return [];
-
-    final bookStr = match.group(1)?.trim() ?? '';
-    final chapterStr = match.group(2);
-    final verseStr = match.group(3);
-
-    final results = <SearchResult>[];
-
-    for (final book in books) {
-      final nameLower = book.name.toLowerCase();
-      final abbrevLower = book.abbreviation.toLowerCase();
-
-      if (nameLower.startsWith(bookStr) || abbrevLower.startsWith(bookStr)) {
-        int? chapter;
-        int? verse;
-
-        if (chapterStr != null) {
-          chapter = int.tryParse(chapterStr);
-          if (chapter != null) {
-            chapter = chapter.clamp(1, book.chapters.length);
-          }
-        }
-        
-        if (chapter != null && verseStr != null) {
-          verse = int.tryParse(verseStr);
-          if (verse != null) {
-            final maxVerse = book.chapters[chapter - 1].verses.length;
-            verse = verse.clamp(1, maxVerse);
-          }
-        }
-
-        String title = book.name;
-        if (chapter != null) title += ' $chapter';
-        if (verse != null) title += ':$verse';
-
-        results.add(SearchResult(
-          title: title,
-          subtitle: 'Jump To',
-          snippet: 'Go to ${book.name} Chapter ${chapter ?? 1}${verse != null ? ' Verse $verse' : ''}',
-          type: SearchResultType.reference,
-          metadata: {
-            'bookAbbrev': book.abbreviation,
-            'bookName': book.name,
-            'chapter': chapter ?? 1,
-            if (verse != null) 'verse': verse,
-          },
-        ));
-      }
-    }
-
-    return results;
+    final start = (index - 30).clamp(0, text.length);
+    final end = (index + query.length + 30).clamp(0, text.length);
+    
+    String snippet = text.substring(start, end);
+    if (start > 0) snippet = '...$snippet';
+    if (end < text.length) snippet = '$snippet...';
+    
+    return snippet;
   }
 
-  List<SearchResult> search(String query, {bool includeBible = true, bool includeCommentary = true}) {
-    if (query.trim().isEmpty) return [];
+  // 0. Search References
+  if (includeBible && bibleBooks != null) {
+    final regex = RegExp(r'^((?:\d\s*)?[a-z]+(?:\s+[a-z]+)*)\s*(?:(\d+)[\s:.]*(\d+)?)?$');
+    final match = regex.firstMatch(queryLower);
     
-    final queryLower = query.toLowerCase().trim();
-    final results = <SearchResult>[];
+    if (match != null) {
+      final bookStr = match.group(1)?.trim() ?? '';
+      final chapterStr = match.group(2);
+      final verseStr = match.group(3);
 
-    // 0. Search References (Highest Priority)
-    if (includeBible && bibleBooks != null) {
-      results.addAll(_parseReference(queryLower, bibleBooks!));
+      for (final book in bibleBooks) {
+        final nameLower = book.name.toLowerCase();
+        final abbrevLower = book.abbreviation.toLowerCase();
+
+        if (nameLower.startsWith(bookStr) || abbrevLower.startsWith(bookStr)) {
+          int? chapter;
+          int? verse;
+
+          if (chapterStr != null) {
+            chapter = int.tryParse(chapterStr);
+            if (chapter != null) {
+              chapter = chapter.clamp(1, book.chapters.length);
+            }
+          }
+          
+          if (chapter != null && verseStr != null) {
+            verse = int.tryParse(verseStr);
+            if (verse != null) {
+              final maxVerse = book.chapters[chapter - 1].verses.length;
+              verse = verse.clamp(1, maxVerse);
+            }
+          }
+
+          String title = book.name;
+          if (chapter != null) title += ' $chapter';
+          if (verse != null) title += ':$verse';
+
+          results.add(SearchResult(
+            title: title,
+            subtitle: 'Jump To',
+            snippet: 'Go to ${book.name} Chapter ${chapter ?? 1}${verse != null ? ' Verse $verse' : ''}',
+            type: SearchResultType.reference,
+            metadata: {
+              'bookAbbrev': book.abbreviation,
+              'bookName': book.name,
+              'chapter': chapter ?? 1,
+              if (verse != null) 'verse': verse,
+            },
+          ));
+        }
+      }
     }
+  }
 
-    // 1. Search Bible
-    if (includeBible && bibleBooks != null) {
-      for (final book in bibleBooks!) {
-        final bookName = book.name;
-        for (final chapter in book.chapters) {
-          for (final verse in chapter.verses) {
-            if (verse.text.toLowerCase().contains(queryLower)) {
+  // 1. Search Bible
+  if (includeBible && bibleBooks != null) {
+    for (final book in bibleBooks) {
+      final bookName = book.name;
+      for (final chapter in book.chapters) {
+        for (final verse in chapter.verses) {
+          if (verse.text.toLowerCase().contains(queryLower)) {
+            results.add(SearchResult(
+              title: '$bookName ${chapter.number}:${verse.number}',
+              subtitle: 'Bible Verse',
+              snippet: highlightSnippet(verse.text, queryLower),
+              type: SearchResultType.bible,
+              metadata: {
+                'book': bookName,
+                'bookAbbrev': book.abbreviation,
+                'chapter': chapter.number,
+                'verse': verse.number,
+                'text': verse.text,
+              },
+            ));
+          }
+        }
+      }
+    }
+  }
+
+  // 2. Search Commentary
+  if (includeCommentary && commentaryData != null) {
+    for (final bookEntry in commentaryData.entries) {
+      final bookName = bookEntry.key;
+      for (final chapterEntry in bookEntry.value.entries) {
+        final chapterNum = chapterEntry.key;
+        for (final verseEntry in chapterEntry.value.entries) {
+          final verseNum = verseEntry.key;
+          int parsedVerse = 1;
+          if (verseNum.contains('-')) {
+            parsedVerse = int.tryParse(verseNum.split('-').first) ?? 1;
+          } else {
+            parsedVerse = int.tryParse(verseNum) ?? 1;
+          }
+
+          for (final entry in verseEntry.value) {
+            if (entry.text.toLowerCase().contains(queryLower) || entry.title.toLowerCase().contains(queryLower)) {
+              String authorLabel = 'Commentary';
+              if (entry.id.toLowerCase().contains('egw')) {
+                authorLabel = 'EGW Commentary';
+              } else if (entry.id.toLowerCase().contains('uriah')) {
+                authorLabel = 'Uriah Smith Commentary';
+              }
+
               results.add(SearchResult(
-                title: '$bookName ${chapter.number}:${verse.number}',
-                subtitle: 'Bible Verse',
-                snippet: _highlightSnippet(verse.text, queryLower),
-                type: SearchResultType.bible,
+                title: '$bookName $chapterNum:$verseNum',
+                subtitle: authorLabel,
+                snippet: (entry.title.isNotEmpty ? '«${entry.title}» ' : '') + highlightSnippet(entry.text, queryLower),
+                type: SearchResultType.commentary,
                 metadata: {
                   'book': bookName,
-                  'bookAbbrev': book.abbreviation,
-                  'chapter': chapter.number,
-                  'verse': verse.number,
-                  'text': verse.text,
+                  'chapter': int.tryParse(chapterNum) ?? 1,
+                  'verse': parsedVerse,
+                  'author': entry.title,
                 },
               ));
             }
@@ -145,68 +200,21 @@ class SearchEngine {
         }
       }
     }
-
-    // 2. Search Commentary
-    if (includeCommentary && commentaryData != null) {
-      for (final bookEntry in commentaryData!.entries) {
-        final bookName = bookEntry.key;
-        for (final chapterEntry in bookEntry.value.entries) {
-          final chapterNum = chapterEntry.key;
-          for (final verseEntry in chapterEntry.value.entries) {
-            final verseNum = verseEntry.key;
-            // Parse verse number, handling ranges like "1-3"
-            int parsedVerse = 1;
-            if (verseNum.contains('-')) {
-              parsedVerse = int.tryParse(verseNum.split('-').first) ?? 1;
-            } else {
-              parsedVerse = int.tryParse(verseNum) ?? 1;
-            }
-
-            for (final entry in verseEntry.value) {
-              if (entry.text.toLowerCase().contains(queryLower) || entry.title.toLowerCase().contains(queryLower)) {
-                
-                String authorLabel = 'Commentary';
-                if (entry.id.toLowerCase().contains('egw')) {
-                  authorLabel = 'EGW Commentary';
-                } else if (entry.id.toLowerCase().contains('uriah')) {
-                  authorLabel = 'Uriah Smith Commentary';
-                }
-
-                results.add(SearchResult(
-                  title: '$bookName $chapterNum:$verseNum',
-                  subtitle: authorLabel,
-                  snippet: (entry.title.isNotEmpty ? '«${entry.title}» ' : '') + _highlightSnippet(entry.text, queryLower),
-                  type: SearchResultType.commentary,
-                  metadata: {
-                    'book': bookName,
-                    'chapter': int.tryParse(chapterNum) ?? 1,
-                    'verse': parsedVerse,
-                    'author': entry.title,
-                  },
-                ));
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // Return top 100 matches
-    return results.take(100).toList();
   }
 
-  String _highlightSnippet(String text, String query) {
-    final index = text.toLowerCase().indexOf(query);
-    if (index == -1) return text.length > 100 ? '${text.substring(0, 100)}...' : text;
-    
-    final start = (index - 40).clamp(0, text.length);
-    final end = (index + query.length + 40).clamp(0, text.length);
-    
-    String snippet = text.substring(start, end).replaceAll('\n', ' ');
-    if (start > 0) snippet = '...$snippet';
-    if (end < text.length) snippet = '$snippet...';
-    
-    return snippet;
+  return results.take(100).toList();
+}
+
+// The Search Engine handles the actual query logic
+class SearchEngine {
+  final List<BibleBook>? bibleBooks;
+  final Map<String, Map<String, Map<String, List<CommentaryEntry>>>>? commentaryData;
+
+  SearchEngine({this.bibleBooks, this.commentaryData});
+
+  Future<List<SearchResult>> search(String query, {bool includeBible = true, bool includeCommentary = true}) async {
+    final args = SearchArgs(query, includeBible, includeCommentary, bibleBooks, commentaryData);
+    return await compute(_executeSearchIsolate, args);
   }
 }
 
