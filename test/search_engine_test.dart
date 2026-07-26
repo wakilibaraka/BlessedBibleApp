@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:the_blessed_bible/data/models/bible_model.dart';
 import 'package:the_blessed_bible/data/models/commentary_model.dart';
@@ -49,7 +50,11 @@ void main() {
       PersonalNote('My Note', 'This is a test note about creation.', '2026-07-26'),
     ];
 
-    final engine = SearchEngine(bibleBooks: books, commentaryData: commentary, notes: notes);
+    final baseIndexFuture = compute(
+      buildIndexIsolate,
+      IndexBuildArgs(books, commentary, []),
+    );
+    final engine = SearchEngine(bibleBooks: books, baseIndexFuture: baseIndexFuture, notes: notes);
 
     // Test 1: Verse text query
     final res1 = await engine.search('beginning');

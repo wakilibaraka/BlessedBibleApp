@@ -86,8 +86,9 @@ class SearchQueryArgs {
   final bool includeCommentary;
   final bool includeNotes;
   final List<BibleBook>? bibleBooks; // Needed for reference matching
+  final List<PersonalNote> notes;
   
-  SearchQueryArgs(this.query, this.indexData, this.includeOt, this.includeNt, this.includeCommentary, this.includeNotes, this.bibleBooks);
+  SearchQueryArgs(this.query, this.indexData, this.includeOt, this.includeNt, this.includeCommentary, this.includeNotes, this.bibleBooks, this.notes);
 }
 
 List<String> _tokenize(String text) {
@@ -95,7 +96,7 @@ List<String> _tokenize(String text) {
   return text.toLowerCase().replaceAll(RegExp(r'[^\p{L}\p{N}\s]', unicode: true), ' ').split(RegExp(r'\s+')).where((t) => t.isNotEmpty).toList();
 }
 
-IndexData _buildIndexIsolate(IndexBuildArgs args) {
+IndexData buildIndexIsolate(IndexBuildArgs args) {
   final corpus = <SearchItem>[];
   final index = <String, List<int>>{};
   int nextId = 0;
@@ -176,21 +177,7 @@ IndexData _buildIndexIsolate(IndexBuildArgs args) {
     }
   }
 
-  // 3. User Notes
-  for (final note in args.notes) {
-    final item = SearchItem(
-      id: nextId++,
-      type: SearchResultType.note,
-      title: note.title,
-      subtitle: 'Note • ${note.date}',
-      text: note.content,
-      metadata: {
-        'title': note.title,
-      },
-    );
-    corpus.add(item);
-    addTokens(item.id, '${item.title} ${item.text}');
-  }
+  // Notes are now indexed separately during search to avoid full re-index
 
   return IndexData(corpus, index);
 }
@@ -204,6 +191,33 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
   if (queryTokens.isEmpty) return [];
 
   final results = <SearchResult>[];
+
+  // Dynamically index notes
+  final noteCorpus = <SearchItem>[];
+  final noteIndex = <String, List<int>>{};
+  int nextNoteId = args.indexData.corpus.length;
+
+  void addNoteTokens(int id, String text) {
+    final tokens = _tokenize(text);
+    for (final token in tokens.toSet()) {
+      noteIndex.putIfAbsent(token, () => []).add(id);
+    }
+  }
+
+  if (args.includeNotes) {
+    for (final note in args.notes) {
+      final item = SearchItem(
+        id: nextNoteId++,
+        type: SearchResultType.note,
+        title: note.title,
+        subtitle: 'Note • ${note.date}',
+        text: note.content,
+        metadata: {'title': note.title},
+      );
+      noteCorpus.add(item);
+      addNoteTokens(item.id, '${item.title} ${item.text}');
+    }
+  }
 
   // Helper for snippet
   String highlightSnippet(String text, String queryLower) {
@@ -295,6 +309,12 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
         matchQuality[id] = (matchQuality[id] ?? 0) + 10; // Exact word match = 10 pts
       }
     }
+    if (noteIndex.containsKey(token)) {
+      for (final id in noteIndex[token]!) {
+        currentTokenMatches.add(id);
+        matchQuality[id] = (matchQuality[id] ?? 0) + 10;
+      }
+    }
     
     // Prefix matches (only if token is reasonably long, e.g., > 1 char to avoid exploding)
     if (token.isNotEmpty) {
@@ -303,6 +323,14 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
           for (final id in index[key]!) {
             currentTokenMatches.add(id);
             matchQuality[id] = (matchQuality[id] ?? 0) + 1; // Prefix match = 1 pt
+          }
+        }
+      }
+      for (final key in noteIndex.keys) {
+        if (key != token && key.startsWith(token)) {
+          for (final id in noteIndex[key]!) {
+            currentTokenMatches.add(id);
+            matchQuality[id] = (matchQuality[id] ?? 0) + 1;
           }
         }
       }
@@ -322,7 +350,12 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
     // Filter by requested types and gather items
     final matchedItems = <SearchItem>[];
     for (final id in matchingIds) {
-      final item = corpus[id];
+      final SearchItem item;
+      if (id >= corpus.length) {
+        item = noteCorpus[id - corpus.length];
+      } else {
+        item = corpus[id];
+      }
       if (item.type == SearchResultType.bible) {
         final isOt = item.metadata['isOt'] == true;
         if (isOt && !args.includeOt) continue;
@@ -367,30 +400,43 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
 
 class SearchEngine {
   final List<BibleBook>? bibleBooks;
-  final Map<String, Map<String, Map<String, List<CommentaryEntry>>>>? commentaryData;
+  final Future<IndexData> baseIndexFuture;
   final List<PersonalNote> notes;
-  
-  late final Future<IndexData> _indexFuture;
 
-  SearchEngine({this.bibleBooks, this.commentaryData, this.notes = const []}) {
-    _indexFuture = compute(_buildIndexIsolate, IndexBuildArgs(bibleBooks, commentaryData, notes));
-  }
+  SearchEngine({this.bibleBooks, required this.baseIndexFuture, this.notes = const []});
 
-  Future<List<SearchResult>> search(String query, {bool includeOt = true, bool includeNt = true, bool includeCommentary = true, bool includeNotes = true}) async {
-    final indexData = await _indexFuture;
-    final args = SearchQueryArgs(query, indexData, includeOt, includeNt, includeCommentary, includeNotes, bibleBooks);
+  Future<List<SearchResult>> search(String query, {
+    bool includeOt = true,
+    bool includeNt = true,
+    bool includeCommentary = true,
+    bool includeNotes = true,
+  }) async {
+    final indexData = await baseIndexFuture;
+    final args = SearchQueryArgs(query, indexData, includeOt, includeNt, includeCommentary, includeNotes, bibleBooks, notes);
     return await compute(_searchIsolate, args);
   }
 }
 
-final searchEngineProvider = Provider<SearchEngine>((ref) {
+final baseSearchIndexProvider = FutureProvider<IndexData>((ref) async {
   final bibleState = ref.watch(bibleProvider);
   final commentaryAsync = ref.watch(combinedCommentaryProvider);
+  
+  final args = IndexBuildArgs(
+    bibleState.books,
+    commentaryAsync.asData?.value.data,
+    [], // Notes handled dynamically
+  );
+  return await compute(buildIndexIsolate, args);
+});
+
+final searchEngineProvider = Provider<SearchEngine>((ref) {
+  final bibleState = ref.watch(bibleProvider);
+  final baseIndexFuture = ref.watch(baseSearchIndexProvider.future);
   final notes = ref.watch(notesProvider);
 
   return SearchEngine(
     bibleBooks: bibleState.books,
-    commentaryData: commentaryAsync.asData?.value.data,
+    baseIndexFuture: baseIndexFuture,
     notes: notes,
   );
 });
