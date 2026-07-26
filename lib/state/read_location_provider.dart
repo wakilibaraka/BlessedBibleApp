@@ -39,7 +39,7 @@ class ReadLocationState {
 class ReadLocationNotifier extends Notifier<ReadLocationState> {
   @override
   ReadLocationState build() {
-    final prefs = ref.read(preferencesProvider);
+    final prefs = ref.watch(preferencesProvider);
     final lastLoc = prefs.getLastReadLocation();
     
     if (lastLoc != null) {

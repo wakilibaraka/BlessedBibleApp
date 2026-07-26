@@ -18,7 +18,7 @@ const List<Color> highlightPalette = [
 class BookmarksNotifier extends Notifier<Set<String>> {
   @override
   Set<String> build() {
-    return ref.read(preferencesProvider).getBookmarks().toSet();
+    return ref.watch(preferencesProvider).getBookmarks().toSet();
   }
 
   void toggle(String reference) {
@@ -36,7 +36,7 @@ final bookmarksProvider = NotifierProvider<BookmarksNotifier, Set<String>>(Bookm
 class FavoritesNotifier extends Notifier<Set<String>> {
   @override
   Set<String> build() {
-    return ref.read(preferencesProvider).getFavorites().toSet();
+    return ref.watch(preferencesProvider).getFavorites().toSet();
   }
 
   void toggle(String reference) {
@@ -54,7 +54,7 @@ final favoritesProvider = NotifierProvider<FavoritesNotifier, Set<String>>(Favor
 class HighlightsNotifier extends Notifier<Map<String, int>> {
   @override
   Map<String, int> build() {
-    return Map.from(ref.read(preferencesProvider).getHighlights());
+    return Map.from(ref.watch(preferencesProvider).getHighlights());
   }
 
   void toggleHighlight(String reference, int colorIndex) {
