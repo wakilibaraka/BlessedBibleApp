@@ -32,8 +32,7 @@ class _YourSpaceHeroState extends ConsumerState<YourSpaceHero> {
       borderRadius: BorderRadius.circular(24),
       padding: EdgeInsets.zero,
       child: Container(
-        // Defaulting to large means we can let it dictate its own height or constraints
-        constraints: const BoxConstraints(minHeight: 400),
+        height: 400,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
