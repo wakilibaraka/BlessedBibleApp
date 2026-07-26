@@ -677,12 +677,31 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                           else if (planState.isPlanComplete)
                             Text('Plan Completed!', style: theme.textTheme.labelSmall?.copyWith(color: theme.primaryColor, fontWeight: FontWeight.w600))
                           else
-                            Text(
-                              'Day ${planState.currentDay} · ${planState.getFormattedDateForDay(planState.currentDay)} • ${planState.planData[planState.currentDay - 1].readings.length} Reading(s)',
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: theme.primaryColor,
-                                fontWeight: FontWeight.w600,
-                              ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Day ${planState.currentDay} · ${planState.getFormattedDateForDay(planState.currentDay)} • ${planState.planData[planState.currentDay - 1].readings.length} Reading(s)',
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    color: theme.primaryColor,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    if (planState.completedDays.contains(planState.currentDay)) {
+                                      ref.read(readingPlanProvider.notifier).markDayIncomplete(planState.currentDay);
+                                    } else {
+                                      ref.read(readingPlanProvider.notifier).markDayComplete(planState.currentDay);
+                                    }
+                                  },
+                                  child: Icon(
+                                    planState.completedDays.contains(planState.currentDay) ? Icons.check_box_rounded : Icons.check_box_outline_blank_rounded,
+                                    color: planState.completedDays.contains(planState.currentDay) ? theme.primaryColor : theme.colorScheme.onSurface.withValues(alpha: 0.3),
+                                    size: 20,
+                                  ),
+                                ),
+                              ],
                             ),
 
                           if (size == CardSize.medium || size == CardSize.large) ...[
@@ -743,15 +762,31 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                                   const SizedBox(height: 8),
                                   ElevatedButton(
                                     onPressed: () {
-                                      ref.read(readingPlanProvider.notifier).markDayComplete(planState.currentDay);
+                                      if (planState.completedDays.contains(planState.currentDay)) {
+                                        ref.read(readingPlanProvider.notifier).markDayIncomplete(planState.currentDay);
+                                      } else {
+                                        ref.read(readingPlanProvider.notifier).markDayComplete(planState.currentDay);
+                                      }
                                     },
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: theme.primaryColor,
-                                      foregroundColor: Colors.white,
+                                      backgroundColor: planState.completedDays.contains(planState.currentDay) ? theme.colorScheme.surface : theme.primaryColor,
+                                      foregroundColor: planState.completedDays.contains(planState.currentDay) ? theme.primaryColor : Colors.white,
                                       minimumSize: const Size(double.infinity, 36),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        side: BorderSide(
+                                          color: planState.completedDays.contains(planState.currentDay) ? theme.primaryColor.withValues(alpha: 0.5) : Colors.transparent,
+                                        ),
+                                      ),
                                     ),
-                                    child: const Text('Mark Day Complete'),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(planState.completedDays.contains(planState.currentDay) ? Icons.check_circle_rounded : Icons.check_circle_outline_rounded, size: 18),
+                                        const SizedBox(width: 8),
+                                        Text(planState.completedDays.contains(planState.currentDay) ? 'Mark Day Incomplete' : 'Mark Day Complete'),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),

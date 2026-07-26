@@ -2,15 +2,52 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/reading_plan_provider.dart';
 import '../../state/theme_provider.dart';
+import '../../state/read_location_provider.dart';
+import '../../state/nav_provider.dart';
+import '../../state/bible_provider.dart';
 import '../widgets/textured_glass_container.dart';
 import '../widgets/bouncy_entrance.dart';
 import '../widgets/animated_background.dart';
 
-class ReadingPlanBrowser extends ConsumerWidget {
+class ReadingPlanBrowser extends ConsumerStatefulWidget {
   const ReadingPlanBrowser({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ReadingPlanBrowser> createState() => _ReadingPlanBrowserState();
+}
+
+class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
+  final Set<int> _expandedDays = {};
+
+  void _openReading(String reading, BuildContext context) {
+    final match = RegExp(r'^(\d?\s*[a-zA-Z\s]+)(?:\s+(\d+))?').firstMatch(reading);
+    if (match != null) {
+      String bookName = match.group(1)!.trim();
+      if (bookName.toLowerCase() == 'song of solomon') {
+        bookName = 'Song of Solomon';
+      }
+      int chapterNum = 1;
+      if (match.group(2) != null) {
+        chapterNum = int.tryParse(match.group(2)!) ?? 1;
+      }
+      
+      final flatChapters = ref.read(flatChaptersProvider);
+      final fc = flatChapters.where((c) => c.book.name.toLowerCase() == bookName.toLowerCase() || c.book.abbreviation.toLowerCase() == bookName.toLowerCase()).toList();
+      
+      if (fc.isNotEmpty) {
+        final chapterMatch = fc.where((c) => c.chapter.number == chapterNum).toList();
+        if (chapterMatch.isNotEmpty) {
+          final readLoc = ref.read(readLocationProvider.notifier);
+          readLoc.updateLocation(bookAbbrev: chapterMatch.first.book.abbreviation, chapter: chapterNum, verse: 1);
+          ref.read(navProvider.notifier).setIndex(1);
+          Navigator.of(context).pop(); // Close the browser and go to Read
+        }
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final appThemeMode = ref.watch(themeProvider);
     final planState = ref.watch(readingPlanProvider);
@@ -85,6 +122,7 @@ class ReadingPlanBrowser extends ConsumerWidget {
                 final dayData = planState.planData[index];
                 final isCompleted = planState.completedDays.contains(dayData.day);
                 final isActive = dayData.day == planState.currentDay;
+                final isExpanded = _expandedDays.contains(dayData.day) || isActive;
 
                 return BouncyEntrance(
                   delay: Duration(milliseconds: 50 * (index % 10)),
@@ -96,11 +134,19 @@ class ReadingPlanBrowser extends ConsumerWidget {
                       child: InkWell(
                         borderRadius: BorderRadius.circular(16),
                         onTap: () {
-                          // Jump to this day
-                          ref.read(readingPlanProvider.notifier).jumpToDay(dayData.day);
-                          Navigator.of(context).pop();
+                          setState(() {
+                            if (_expandedDays.contains(dayData.day)) {
+                              _expandedDays.remove(dayData.day);
+                            } else {
+                              _expandedDays.add(dayData.day);
+                              if (!isActive) {
+                                ref.read(readingPlanProvider.notifier).jumpToDay(dayData.day);
+                              }
+                            }
+                          });
                         },
-                        child: Container(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 250),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(16),
                             border: isActive 
@@ -110,55 +156,111 @@ class ReadingPlanBrowser extends ConsumerWidget {
                                 ? theme.primaryColor.withValues(alpha: 0.05)
                                 : null,
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    color: isCompleted
-                                        ? theme.primaryColor
-                                        : theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Center(
-                                    child: isCompleted
-                                        ? const Icon(Icons.check_rounded, color: Colors.white, size: 20)
-                                        : Text(
-                                            '${dayData.day}',
-                                            style: theme.textTheme.titleSmall?.copyWith(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 40,
+                                      height: 40,
+                                      decoration: BoxDecoration(
+                                        color: isCompleted
+                                            ? theme.primaryColor
+                                            : theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Center(
+                                        child: isCompleted
+                                            ? const Icon(Icons.check_rounded, color: Colors.white, size: 20)
+                                            : Text(
+                                                '${dayData.day}',
+                                                style: theme.textTheme.titleSmall?.copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                                                ),
+                                              ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Day ${dayData.day} · ${planState.getFormattedDateForDay(dayData.day)}',
+                                            style: theme.textTheme.titleMedium?.copyWith(
                                               fontWeight: FontWeight.bold,
-                                              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                                              color: isCompleted ? theme.primaryColor : null,
                                             ),
                                           ),
-                                  ),
+                                          if (!isExpanded) ...[
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              dayData.readings.join(' • '),
+                                              style: theme.textTheme.bodySmall?.copyWith(
+                                                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ],
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: Icon(
+                                        isCompleted ? Icons.check_box_rounded : Icons.check_box_outline_blank_rounded,
+                                        color: isCompleted ? theme.primaryColor : theme.colorScheme.onSurface.withValues(alpha: 0.3),
+                                      ),
+                                      onPressed: () {
+                                        if (isCompleted) {
+                                          ref.read(readingPlanProvider.notifier).markDayIncomplete(dayData.day);
+                                        } else {
+                                          ref.read(readingPlanProvider.notifier).markDayComplete(dayData.day);
+                                        }
+                                      },
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(width: 16),
-                                Expanded(
+                              ),
+                              if (isExpanded)
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 72.0, right: 16.0, bottom: 16.0),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Day ${dayData.day} · ${planState.getFormattedDateForDay(dayData.day)}',
-                                        style: theme.textTheme.titleMedium?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                          color: isCompleted ? theme.primaryColor : null,
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    children: dayData.readings.map((reading) {
+                                      return Padding(
+                                        padding: const EdgeInsets.only(bottom: 8.0),
+                                        child: InkWell(
+                                          onTap: () => _openReading(reading, context),
+                                          borderRadius: BorderRadius.circular(8),
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 4.0),
+                                            child: Row(
+                                              children: [
+                                                Icon(Icons.menu_book_rounded, color: theme.primaryColor, size: 16),
+                                                const SizedBox(width: 8),
+                                                Expanded(
+                                                  child: Text(
+                                                    reading,
+                                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                                      color: theme.primaryColor,
+                                                      decoration: TextDecoration.underline,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        dayData.readings.join(' • '),
-                                        style: theme.textTheme.bodySmall?.copyWith(
-                                          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                                        ),
-                                      ),
-                                    ],
+                                      );
+                                    }).toList(),
                                   ),
                                 ),
-                              ],
-                            ),
+                            ],
                           ),
                         ),
                       ),
