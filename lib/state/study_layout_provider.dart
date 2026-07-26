@@ -2,31 +2,48 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/local_storage/preferences_service.dart';
 
+enum CardSize { small, medium, large }
+
 class StudyCardConfig {
   final String id;
-  final bool isExpanded;
+  final CardSize size;
 
-  StudyCardConfig({required this.id, required this.isExpanded});
+  StudyCardConfig({required this.id, required this.size});
 
   Map<String, dynamic> toJson() => {
         'id': id,
-        'isExpanded': isExpanded,
+        'size': size.name,
       };
 
   factory StudyCardConfig.fromJson(Map<String, dynamic> json) {
+    // Migration from old `isExpanded` boolean
+    if (json.containsKey('isExpanded')) {
+      final isExpanded = json['isExpanded'] as bool;
+      return StudyCardConfig(
+        id: json['id'] as String,
+        size: isExpanded ? CardSize.large : CardSize.small,
+      );
+    }
+
+    final sizeStr = json['size'] as String?;
+    final size = CardSize.values.firstWhere(
+      (e) => e.name == sizeStr,
+      orElse: () => CardSize.medium,
+    );
+
     return StudyCardConfig(
       id: json['id'] as String,
-      isExpanded: json['isExpanded'] as bool,
+      size: size,
     );
   }
 }
 
 class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
   static final List<StudyCardConfig> _defaultLayout = [
-    StudyCardConfig(id: 'your_space', isExpanded: true),
-    StudyCardConfig(id: 'reading_plan', isExpanded: true),
-    StudyCardConfig(id: 'commentary', isExpanded: true),
-    StudyCardConfig(id: 'saved_verses', isExpanded: false),
+    StudyCardConfig(id: 'your_space', size: CardSize.large),
+    StudyCardConfig(id: 'reading_plan', size: CardSize.medium),
+    StudyCardConfig(id: 'commentary', size: CardSize.medium),
+    StudyCardConfig(id: 'saved_verses', size: CardSize.small),
   ];
 
   @override
@@ -35,8 +52,10 @@ class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
     if (prefsJson != null) {
       try {
         final List<dynamic> decoded = jsonDecode(prefsJson);
-        final loaded = decoded.map((e) => StudyCardConfig.fromJson(e as Map<String, dynamic>)).toList();
-        
+        final loaded = decoded
+            .map((e) => StudyCardConfig.fromJson(e as Map<String, dynamic>))
+            .toList();
+
         // Ensure all default cards are present (in case of updates)
         final loadedIds = loaded.map((c) => c.id).toSet();
         for (final defCard in _defaultLayout) {
@@ -68,10 +87,10 @@ class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
     _save();
   }
 
-  void toggleExpanded(String id) {
+  void setSize(String id, CardSize newSize) {
     state = state.map((card) {
       if (card.id == id) {
-        return StudyCardConfig(id: card.id, isExpanded: !card.isExpanded);
+        return StudyCardConfig(id: card.id, size: newSize);
       }
       return card;
     }).toList();
@@ -79,4 +98,6 @@ class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
   }
 }
 
-final studyLayoutProvider = NotifierProvider<StudyLayoutNotifier, List<StudyCardConfig>>(StudyLayoutNotifier.new);
+final studyLayoutProvider =
+    NotifierProvider<StudyLayoutNotifier, List<StudyCardConfig>>(
+        StudyLayoutNotifier.new);

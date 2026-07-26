@@ -220,7 +220,9 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                 ),
                 itemCount: layoutConfig.length,
                 onReorderItem: (int oldIndex, int newIndex) {
-                  ref.read(studyLayoutProvider.notifier).reorder(oldIndex, newIndex);
+                  ref
+                      .read(studyLayoutProvider.notifier)
+                      .reorder(oldIndex, newIndex);
                 },
                 itemBuilder: (context, index) {
                   final config = layoutConfig[index];
@@ -228,20 +230,20 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
 
                   switch (config.id) {
                     case 'your_space':
-                      cardWidget = _buildYourSpaceHero(
-                          context, theme, config.isExpanded);
+                      cardWidget =
+                          _buildYourSpaceHero(context, theme, config.size);
                       break;
                     case 'reading_plan':
-                      cardWidget = _buildReadingPlanBanner(
-                          context, theme, config.isExpanded);
+                      cardWidget =
+                          _buildReadingPlanBanner(context, theme, config.size);
                       break;
                     case 'commentary':
-                      cardWidget = _buildCommentaryBanner(
-                          context, theme, config.isExpanded);
+                      cardWidget =
+                          _buildCommentaryBanner(context, theme, config.size);
                       break;
                     case 'saved_verses':
-                      cardWidget = _buildSavedVersesCompact(
-                          context, theme, config.isExpanded);
+                      cardWidget =
+                          _buildSavedVersesCompact(context, theme, config.size);
                       break;
                     default:
                       cardWidget = const SizedBox.shrink();
@@ -267,19 +269,95 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                                   child: Material(
                                     color: Colors.black.withValues(alpha: 0.5),
                                     shape: const CircleBorder(),
-                                    child: IconButton(
-                                      icon: Icon(
-                                        config.isExpanded
-                                            ? Icons.close_fullscreen_rounded
-                                            : Icons.open_in_full_rounded,
-                                        color: Colors.white,
-                                        size: 20,
-                                      ),
-                                      onPressed: () {
+                                    child: PopupMenuButton<CardSize>(
+                                      icon: const Icon(Icons.more_horiz_rounded,
+                                          color: Colors.white, size: 20),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(16)),
+                                      color: theme.colorScheme.surface,
+                                      onSelected: (newSize) {
                                         ref
                                             .read(studyLayoutProvider.notifier)
-                                            .toggleExpanded(config.id);
+                                            .setSize(config.id, newSize);
                                       },
+                                      itemBuilder: (context) => [
+                                        PopupMenuItem(
+                                          value: CardSize.small,
+                                          child: Row(
+                                            children: [
+                                              Icon(
+                                                  Icons
+                                                      .photo_size_select_small_rounded,
+                                                  color: config.size ==
+                                                          CardSize.small
+                                                      ? theme.primaryColor
+                                                      : null),
+                                              const SizedBox(width: 8),
+                                              Text('Small',
+                                                  style: TextStyle(
+                                                      color: config.size ==
+                                                              CardSize.small
+                                                          ? theme.primaryColor
+                                                          : null,
+                                                      fontWeight: config.size ==
+                                                              CardSize.small
+                                                          ? FontWeight.bold
+                                                          : null)),
+                                            ],
+                                          ),
+                                        ),
+                                        PopupMenuItem(
+                                          value: CardSize.medium,
+                                          child: Row(
+                                            children: [
+                                              Icon(
+                                                  Icons
+                                                      .photo_size_select_actual_rounded,
+                                                  color: config.size ==
+                                                          CardSize.medium
+                                                      ? theme.primaryColor
+                                                      : null),
+                                              const SizedBox(width: 8),
+                                              Text('Medium',
+                                                  style: TextStyle(
+                                                      color: config.size ==
+                                                              CardSize.medium
+                                                          ? theme.primaryColor
+                                                          : null,
+                                                      fontWeight: config.size ==
+                                                              CardSize.medium
+                                                          ? FontWeight.bold
+                                                          : null)),
+                                            ],
+                                          ),
+                                        ),
+                                        PopupMenuItem(
+                                          value: CardSize.large,
+                                          child: Row(
+                                            children: [
+                                              Icon(
+                                                  Icons
+                                                      .photo_size_select_large_rounded,
+                                                  color: config.size ==
+                                                          CardSize.large
+                                                      ? theme.primaryColor
+                                                      : null),
+                                              const SizedBox(width: 8),
+                                              Text('Large',
+                                                  style: TextStyle(
+                                                      color: config.size ==
+                                                              CardSize.large
+                                                          ? theme.primaryColor
+                                                          : null,
+                                                      fontWeight: config.size ==
+                                                              CardSize.large
+                                                          ? FontWeight.bold
+                                                          : null)),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
@@ -308,7 +386,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
   }
 
   Widget _buildYourSpaceHero(
-      BuildContext context, ThemeData theme, bool isExpanded) {
+      BuildContext context, ThemeData theme, CardSize size) {
     return AnimatedSize(
       duration: const Duration(milliseconds: 250),
       curve: Curves.easeInOut,
@@ -362,12 +440,33 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                                 color: Colors.white,
                               ),
                             ),
-                            if (isExpanded) ...[
+                            if (size == CardSize.medium ||
+                                size == CardSize.large) ...[
                               const SizedBox(height: 8),
                               Text(
                                 'View all your color-coded highlighted verses.',
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   color: Colors.white.withValues(alpha: 0.9),
+                                ),
+                              ),
+                            ],
+                            if (size == CardSize.large) ...[
+                              const SizedBox(height: 16),
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.history_rounded,
+                                        color: Colors.white70, size: 16),
+                                    const SizedBox(width: 8),
+                                    Text('12 verses highlighted this week',
+                                        style: theme.textTheme.labelSmall
+                                            ?.copyWith(color: Colors.white70)),
+                                  ],
                                 ),
                               ),
                             ],
@@ -397,7 +496,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
   }
 
   Widget _buildReadingPlanBanner(
-      BuildContext context, ThemeData theme, bool isExpanded) {
+      BuildContext context, ThemeData theme, CardSize size) {
     return AnimatedSize(
       duration: const Duration(milliseconds: 250),
       curve: Curves.easeInOut,
@@ -445,7 +544,8 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          if (isExpanded) ...[
+                          if (size == CardSize.medium ||
+                              size == CardSize.large) ...[
                             const SizedBox(height: 8),
                             Text(
                               'Chronological Bible in a Year',
@@ -463,9 +563,28 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                               ),
                             ),
                           ],
+                          if (size == CardSize.large) ...[
+                            const SizedBox(height: 16),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: LinearProgressIndicator(
+                                value: 203 / 365,
+                                backgroundColor:
+                                    theme.primaryColor.withValues(alpha: 0.2),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    theme.primaryColor),
+                                minHeight: 6,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text('55% Complete',
+                                style: theme.textTheme.labelSmall
+                                    ?.copyWith(color: theme.primaryColor)),
+                          ],
                         ],
                       ),
                     ),
+                    const SizedBox(width: 16),
                     Container(
                       width: 48,
                       height: 48,
@@ -487,7 +606,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
   }
 
   Widget _buildCommentaryBanner(
-      BuildContext context, ThemeData theme, bool isExpanded) {
+      BuildContext context, ThemeData theme, CardSize size) {
     final activeVerse = ref.watch(activeStudyVerseProvider);
     final commentaryAsync = ref.watch(combinedCommentaryProvider);
 
@@ -588,11 +707,11 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    if (isExpanded) ...[
+                    if (size == CardSize.medium || size == CardSize.large) ...[
                       const SizedBox(height: 8),
                       Text(
                         displaySnippet,
-                        maxLines: 3,
+                        maxLines: size == CardSize.large ? 6 : 3,
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.bodyMedium?.copyWith(
                           height: 1.5,
@@ -611,7 +730,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
   }
 
   Widget _buildSavedVersesCompact(
-      BuildContext context, ThemeData theme, bool isExpanded) {
+      BuildContext context, ThemeData theme, CardSize size) {
     return AnimatedSize(
       duration: const Duration(milliseconds: 250),
       curve: Curves.easeInOut,
@@ -640,34 +759,64 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(
                     horizontal: 20.0, vertical: 16.0),
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.bookmark_rounded,
-                        color: theme.primaryColor, size: 24),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Saved Verses',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          if (isExpanded)
-                            Text(
-                              'Your collected reflections',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.textTheme.bodySmall?.color
-                                    ?.withValues(alpha: 0.7),
+                    Row(
+                      children: [
+                        Icon(Icons.bookmark_rounded,
+                            color: theme.primaryColor, size: 24),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Saved Verses',
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                        ],
-                      ),
+                              if (size == CardSize.medium ||
+                                  size == CardSize.large)
+                                Text(
+                                  'Your collected reflections',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: theme.textTheme.bodySmall?.color
+                                        ?.withValues(alpha: 0.7),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                        Icon(Icons.keyboard_arrow_down_rounded,
+                            color: theme.primaryColor),
+                      ],
                     ),
-                    Icon(Icons.keyboard_arrow_down_rounded,
-                        color: theme.primaryColor),
+                    if (size == CardSize.large) ...[
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.05),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.book_rounded,
+                                color:
+                                    theme.primaryColor.withValues(alpha: 0.7),
+                                size: 16),
+                            const SizedBox(width: 8),
+                            Text('24 verses saved total',
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                    color: theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.7))),
+                          ],
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -702,12 +851,16 @@ void showNotesPopover(BuildContext context, ThemeData theme) {
             const SizedBox(height: 24),
             Text(
               'My Notes',
-              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              style: theme.textTheme.titleLarge
+                  ?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 32),
-            Icon(Icons.edit_note_rounded, size: 48, color: theme.primaryColor.withValues(alpha: 0.5)),
+            Icon(Icons.edit_note_rounded,
+                size: 48, color: theme.primaryColor.withValues(alpha: 0.5)),
             const SizedBox(height: 16),
-            Text('No notes yet.', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
+            Text('No notes yet.',
+                style: TextStyle(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
             const SizedBox(height: 32),
             ElevatedButton.icon(
               onPressed: () => Navigator.of(context).pop(),
@@ -716,8 +869,10 @@ void showNotesPopover(BuildContext context, ThemeData theme) {
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.primaryColor,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24)),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               ),
             ),
             const SizedBox(height: 48),
