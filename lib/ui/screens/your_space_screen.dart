@@ -4,6 +4,8 @@ import '../../state/user_data_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../state/read_location_provider.dart';
 import '../../state/nav_provider.dart';
+import '../../theme/app_colors.dart';
+import '../../state/user_data_provider.dart';
 import '../../state/bible_provider.dart';
 import '../../state/notes_provider.dart';
 import '../widgets/animated_background.dart';
@@ -132,6 +134,7 @@ class YourSpaceScreen extends ConsumerWidget {
     final appThemeMode = ref.watch(themeProvider);
     final highlights = ref.watch(highlightsProvider);
     final bookmarks = ref.watch(bookmarksProvider);
+    final bookmarksList = bookmarks.toList();
     final notes = ref.watch(notesProvider);
     final flatChapters = ref.watch(flatChaptersProvider);
 
@@ -141,209 +144,240 @@ class YourSpaceScreen extends ConsumerWidget {
       groupedHighlights.putIfAbsent(entry.value, () => []).add(entry.key);
     }
 
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        extendBody: true,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          title: Text('Your Space',
-              style: theme.textTheme.titleMedium
-                  ?.copyWith(fontWeight: FontWeight.bold)),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios_new_rounded,
-                color: theme.primaryColor),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          actions: [
-            IconButton(
-              icon: Icon(Icons.note_add_rounded, color: theme.primaryColor),
-              onPressed: () => showAddNoteSheet(context, ref, theme),
-              tooltip: 'Add Note',
-            ),
-            const SizedBox(width: 8),
-          ],
-          bottom: TabBar(
-            indicatorColor: theme.primaryColor,
-            labelColor: theme.primaryColor,
-            unselectedLabelColor:
-                theme.colorScheme.onSurface.withValues(alpha: 0.5),
-            dividerColor: Colors.transparent,
-            isScrollable: true,
-            tabAlignment: TabAlignment.center,
-            tabs: const [
-              Tab(text: 'Highlights'),
-              Tab(text: 'Bookmarks/Favorites'),
-              Tab(text: 'My Notes'),
-            ],
-          ),
+    return Scaffold(
+      extendBody: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text('Your Space',
+            style: theme.textTheme.titleMedium
+                ?.copyWith(fontWeight: FontWeight.bold)),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_new_rounded,
+              color: theme.primaryColor),
+          onPressed: () => Navigator.of(context).pop(),
         ),
-        body: Stack(
-          children: [
-            Positioned.fill(
-              child: AnimatedBackground(appThemeMode: appThemeMode),
-            ),
-            TabBarView(
-              children: [
-                // ── Highlights Tab ──
-                groupedHighlights.isEmpty
-                    ? _buildEmptyState(
-                        theme,
-                        Icons.auto_awesome,
-                        'No highlights yet',
-                        'Color-code a verse to see it here.',
-                      )
-                    : ListView.builder(
-                        padding: const EdgeInsets.only(
-                            top: 16, bottom: 100, left: 16, right: 16),
-                        itemCount: highlightPalette.length,
-                        itemBuilder: (context, colorIndex) {
-                          final refs = groupedHighlights[colorIndex];
-                          if (refs == null || refs.isEmpty) {
-                            return const SizedBox.shrink();
-                          }
-
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 16.0, horizontal: 8.0),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: 16,
-                                      height: 16,
-                                      decoration: BoxDecoration(
-                                        color: highlightPalette[colorIndex],
-                                        shape: BoxShape.circle,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Text(
-                                      'Highlighted',
-                                      style: theme.textTheme.titleMedium
-                                          ?.copyWith(
-                                              fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              ...refs.map((refStr) {
-                                final data =
-                                    _parseVerseRef(refStr, flatChapters);
-                                if (data == null) {
-                                  return const SizedBox.shrink();
-                                }
-                                return _buildVerseCard(
-                                    context, ref, refStr, data, theme);
-                              }),
-                            ],
-                          );
-                        },
+        actions: [
+          IconButton(
+            icon: Icon(Icons.note_add_rounded, color: theme.primaryColor),
+            onPressed: () => showAddNoteSheet(context, ref, theme),
+            tooltip: 'Add Note',
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: AnimatedBackground(appThemeMode: appThemeMode),
+          ),
+          CustomScrollView(
+            slivers: [
+              // ── Highlights Section ──
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Highlights',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.goldAccent,
+                        ),
                       ),
-
-                // ── Bookmarks / Favorites Tab ──
-                bookmarks.isEmpty
-                    ? _buildEmptyState(
-                        theme,
-                        Icons.bookmark_border,
-                        'No saved verses',
-                        'Select a verse and tap the bookmark icon to save it.',
-                      )
-                    : ListView(
-                        padding: const EdgeInsets.only(
-                            top: 16, bottom: 100, left: 16, right: 16),
-                        children: bookmarks.map((refStr) {
-                          final data = _parseVerseRef(refStr, flatChapters);
-                          if (data == null) {
-                            return const SizedBox.shrink();
-                          }
-                          return _buildVerseCard(
-                              context, ref, refStr, data, theme);
-                        }).toList(),
+                      const SizedBox(height: 6),
+                      Text(
+                        "Verses you've marked in colour — the ones that stood out and spoke to you.",
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                          height: 1.4,
+                        ),
                       ),
-
-                // ── My Notes Tab ──
-                notes.isEmpty
-                    ? _buildEmptyState(
-                        theme,
-                        Icons.edit_note_rounded,
-                        'No notes yet',
-                        'Tap the + icon above to write your first note.',
-                      )
-                    : ListView.builder(
-                        padding: const EdgeInsets.only(
-                            top: 16, bottom: 100, left: 16, right: 16),
-                        itemCount: notes.length,
-                        itemBuilder: (context, index) {
-                          final note = notes[index];
-                          return Dismissible(
-                            key: ValueKey(
-                                note.title + note.date + index.toString()),
-                            direction: DismissDirection.endToStart,
-                            background: Container(
-                              alignment: Alignment.centerRight,
-                              padding: const EdgeInsets.only(right: 20),
-                              margin: const EdgeInsets.only(bottom: 12),
-                              decoration: BoxDecoration(
-                                color: Colors.red.withValues(alpha: 0.8),
-                                borderRadius: BorderRadius.circular(16),
+                    ],
+                  ),
+                ),
+              ),
+              if (groupedHighlights.isEmpty)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 32.0),
+                    child: _buildEmptyState(theme, Icons.auto_awesome, 'No highlights yet', 'Color-code a verse to see it here.'),
+                  ),
+                )
+              else
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, colorIndex) {
+                      final refs = groupedHighlights[colorIndex];
+                      if (refs == null || refs.isEmpty) return const SizedBox.shrink();
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 16, height: 16,
+                                    decoration: BoxDecoration(color: highlightPalette[colorIndex], shape: BoxShape.circle),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    'Highlighted',
+                                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                                  ),
+                                ],
                               ),
-                              child:
-                                  const Icon(Icons.delete, color: Colors.white),
                             ),
-                            onDismissed: (_) {
-                              ref.read(notesProvider.notifier).remove(index);
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(bottom: 12.0),
-                              child: TexturedGlassContainer(
+                            ...refs.map((refStr) {
+                              final data = _parseVerseRef(refStr, flatChapters);
+                              if (data == null) return const SizedBox.shrink();
+                              return _buildVerseCard(context, ref, refStr, data, theme);
+                            }),
+                          ],
+                        ),
+                      );
+                    },
+                    childCount: highlightPalette.length,
+                  ),
+                ),
+
+              // ── Bookmarks Section ──
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 32, 20, 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Bookmarks',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.goldAccent,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        "Verses you've set aside to study more — passages to come back to, wrestle with, or understand deeper.",
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                          height: 1.4,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              if (bookmarks.isEmpty)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 32.0),
+                    child: _buildEmptyState(theme, Icons.bookmark_border, 'No saved verses', 'Select a verse and tap the bookmark icon to save it.'),
+                  ),
+                )
+              else
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final refStr = bookmarksList[index];
+                      final data = _parseVerseRef(refStr, flatChapters);
+                      if (data == null) return const SizedBox.shrink();
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: _buildVerseCard(context, ref, refStr, data, theme),
+                      );
+                    },
+                    childCount: bookmarksList.length,
+                  ),
+                ),
+
+              // ── Notes Section ──
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 32, 20, 16),
+                  child: Text(
+                    'My Notes',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.goldAccent,
+                    ),
+                  ),
+                ),
+              ),
+              if (notes.isEmpty)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 100.0),
+                    child: _buildEmptyState(theme, Icons.edit_note_rounded, 'No notes yet', 'Tap the + icon above to write your first note.'),
+                  ),
+                )
+              else
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final note = notes[index];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Dismissible(
+                          key: ValueKey(note.title + note.date + index.toString()),
+                          direction: DismissDirection.endToStart,
+                          background: Container(
+                            alignment: Alignment.centerRight,
+                            padding: const EdgeInsets.only(right: 20),
+                            margin: const EdgeInsets.only(bottom: 12),
+                            decoration: BoxDecoration(
+                              color: Colors.red.withValues(alpha: 0.8),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: const Icon(Icons.delete, color: Colors.white),
+                          ),
+                          onDismissed: (_) {
+                            ref.read(notesProvider.notifier).remove(index);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 12.0),
+                            child: TexturedGlassContainer(
+                              borderRadius: BorderRadius.circular(16),
+                              padding: EdgeInsets.zero,
+                              child: InkWell(
                                 borderRadius: BorderRadius.circular(16),
-                                padding: EdgeInsets.zero,
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(16),
-                                  onTap: () {
-                                    if (note.reference != null) {
-                                      final data = _parseVerseRef(note.reference!, flatChapters);
-                                      if (data != null) {
-                                        ref.read(readLocationProvider.notifier).updateLocation(
-                                          bookAbbrev: data.bookAbbrev,
-                                          bookName: data.bookName,
-                                          chapter: data.chapter,
-                                          verse: data.verseNum,
-                                        );
-                                        Navigator.of(context).pop();
-                                        ref.read(navProvider.notifier).setIndex(1); // Jump to read
-                                      }
+                                onTap: () {
+                                  if (note.reference != null) {
+                                    final data = _parseVerseRef(note.reference!, flatChapters);
+                                    if (data != null) {
+                                      ref.read(readLocationProvider.notifier).updateLocation(
+                                        bookAbbrev: data.bookAbbrev,
+                                        bookName: data.bookName,
+                                        chapter: data.chapter,
+                                        verse: data.verseNum,
+                                      );
+                                      Navigator.of(context).pop();
+                                      ref.read(navProvider.notifier).setIndex(1); // Jump to read
                                     }
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(16.0),
+                                  }
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Expanded(
                                             child: Text(
                                               note.title,
-                                              style: theme.textTheme.titleMedium
-                                                  ?.copyWith(
-                                                      fontWeight:
-                                                          FontWeight.bold),
+                                              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                                             ),
                                           ),
                                           Text(
                                             note.date,
-                                            style: theme.textTheme.bodySmall
-                                                ?.copyWith(
-                                              color: theme.colorScheme.onSurface
-                                                  .withValues(alpha: 0.5),
+                                            style: theme.textTheme.bodySmall?.copyWith(
+                                              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                                             ),
                                           ),
                                         ],
@@ -352,8 +386,7 @@ class YourSpaceScreen extends ConsumerWidget {
                                         const SizedBox(height: 4),
                                         Text(
                                           note.reference!,
-                                          style: theme.textTheme.bodySmall
-                                              ?.copyWith(
+                                          style: theme.textTheme.bodySmall?.copyWith(
                                             color: theme.primaryColor,
                                             fontWeight: FontWeight.w600,
                                           ),
@@ -365,8 +398,7 @@ class YourSpaceScreen extends ConsumerWidget {
                                         maxLines: 4,
                                         overflow: TextOverflow.ellipsis,
                                         style: theme.textTheme.bodyMedium?.copyWith(
-                                          color: theme.colorScheme.onSurface
-                                              .withValues(alpha: 0.8),
+                                          color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
                                           height: 1.5,
                                         ),
                                       ),
@@ -376,13 +408,18 @@ class YourSpaceScreen extends ConsumerWidget {
                               ),
                             ),
                           ),
-                        );
-                        },
-                      ),
-              ],
-            ),
-          ],
-        ),
+                        ),
+                      );
+                    },
+                    childCount: notes.length,
+                  ),
+                ),
+                
+              // Bottom padding
+              const SliverToBoxAdapter(child: SizedBox(height: 100)),
+            ],
+          ),
+        ],
       ),
     );
   }

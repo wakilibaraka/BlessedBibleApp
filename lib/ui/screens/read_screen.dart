@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import '../../theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -548,7 +549,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                                     });
                                                     
                                                     final highlights = ref.watch(highlightsProvider);
+                                                    final bookmarks = ref.watch(bookmarksProvider);
                                                     final refStr = generateVerseKey(fc.book.abbreviation, fc.chapter.number, verse.number);
+                                                    final isBookmarked = bookmarks.contains(refStr);
                                                     final savedColorIndex = highlights[refStr];
                                                     Color? highlightColor;
                                                     if (savedColorIndex != null && savedColorIndex >= 0 && savedColorIndex < highlightPalette.length) {
@@ -597,6 +600,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                                           appThemeMode,
                                                           hasCommentary: hasCommentary,
                                                           onCommentaryTap: () => _showCommentaryBottomSheet(verse.number, verse.text),
+                                                          isBookmarked: isBookmarked,
                                                         ),
                                                       ),
                                                       // Left accent bar — only visible when selected
@@ -893,11 +897,14 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
     );
   }
 
-  Widget _buildNormalVerse(BibleVerse verse, ThemeData theme, TypographyState typography, AppThemeMode appThemeMode, {bool hasCommentary = false, VoidCallback? onCommentaryTap}) {
+  Widget _buildNormalVerse(BibleVerse verse, ThemeData theme, TypographyState typography, AppThemeMode appThemeMode, {bool hasCommentary = false, VoidCallback? onCommentaryTap, bool isBookmarked = false}) {
     final fontStyle = theme.textTheme.bodyMedium?.copyWith(
       height: 1.6,
       letterSpacing: 0.15,
       color: theme.textTheme.bodyLarge?.color,
+      decoration: isBookmarked ? TextDecoration.underline : null,
+      decorationColor: isBookmarked ? AppColors.goldAccent.withValues(alpha: 0.5) : null,
+      decorationThickness: isBookmarked ? 2.0 : null,
     );
 
     Color starColor;
