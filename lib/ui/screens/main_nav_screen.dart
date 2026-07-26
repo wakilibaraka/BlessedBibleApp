@@ -447,7 +447,7 @@ class MainNavScreen extends ConsumerWidget {
         },
         behavior: HitTestBehavior.opaque,
         child: SizedBox(
-          width: 56, // >= 48dp touch target width
+          height: double.infinity,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,

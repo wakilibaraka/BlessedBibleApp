@@ -34,9 +34,6 @@ class _NewSearchScreenState extends ConsumerState<NewSearchScreen> with SingleTi
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      _focusTimer = Timer(const Duration(milliseconds: 150), () {
-        if (mounted) _focusNode.requestFocus();
-      });
       // Hydrate text field with current query if any
       final initialQuery = ref.read(searchStateProvider).query;
       if (initialQuery.isNotEmpty) {
@@ -123,6 +120,17 @@ class _NewSearchScreenState extends ConsumerState<NewSearchScreen> with SingleTi
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<int>(navProvider, (previous, next) {
+      if (next == 2 && previous != 2) {
+        // Automatically request focus when switching to the Search tab
+        if (mounted) {
+          Future.delayed(const Duration(milliseconds: 150), () {
+            if (mounted) _focusNode.requestFocus();
+          });
+        }
+      }
+    });
+
     final searchState = ref.watch(searchStateProvider);
     final theme = Theme.of(context);
     final isGlassy = ref.watch(glassUiProvider);

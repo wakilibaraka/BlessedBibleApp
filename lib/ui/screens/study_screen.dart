@@ -20,7 +20,6 @@ class StudyScreen extends ConsumerStatefulWidget {
 class _StudyScreenState extends ConsumerState<StudyScreen> {
   final List<String> _commentaryAuthors = [
     'Uriah Smith',
-    'Ellen G. White',
   ];
   int _currentAuthorIndex = 0;
   Timer? _timer;
