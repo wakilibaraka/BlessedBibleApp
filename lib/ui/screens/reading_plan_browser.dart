@@ -175,6 +175,247 @@ class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
       ),
     );
   }
+  void _showSettingsPanel(BuildContext context, WidgetRef ref) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext ctx) {
+        return Consumer(
+          builder: (context, ref, child) {
+            final theme = Theme.of(context);
+            final planState = ref.watch(readingPlanProvider);
+            final totalChapters = planState.planData.fold<int>(0, (sum, d) => sum + d.chapters.length);
+            final completedCount = planState.completedChapters.length;
+            final percent = totalChapters == 0 ? 0.0 : (completedCount / totalChapters * 100);
+
+            return TexturedGlassContainer(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+                top: 24,
+                left: 16,
+                right: 16,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        margin: const EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    Text(
+                      'Reading Plan Settings',
+                      style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Read the whole Bible in a year, in the order events happened. ~3-4 chapters a day.',
+                      style: theme.textTheme.bodyMedium?.copyWith(fontStyle: FontStyle.italic),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Progress Summary
+                    Text('Progress', style: theme.textTheme.titleSmall?.copyWith(color: theme.primaryColor)),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surface.withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: theme.primaryColor.withValues(alpha: 0.2)),
+                      ),
+                      child: Text(
+                        'Current Day: ${planState.currentDay}\nCompleted: $completedCount of $totalChapters chapters (${percent.toStringAsFixed(1)}%)',
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Start Mode
+                    Text('Start Mode', style: theme.textTheme.titleSmall?.copyWith(color: theme.primaryColor)),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text('Start today'),
+                      subtitle: const Text('Day 1 is today; read the whole Bible over the next year.'),
+                      leading: Radio<PlanStartMode>(
+                        value: PlanStartMode.startToday,
+                        groupValue: planState.startMode,
+                        onChanged: (mode) {
+                          if (mode != null) ref.read(readingPlanProvider.notifier).changeStartMode(mode);
+                        },
+                      ),
+                    ),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text('Follow calendar year'),
+                      subtitle: const Text('Day 1 is January 1; today maps to that calendar date.'),
+                      leading: Radio<PlanStartMode>(
+                        value: PlanStartMode.calendarYear,
+                        groupValue: planState.startMode,
+                        onChanged: (mode) {
+                          if (mode != null) ref.read(readingPlanProvider.notifier).changeStartMode(mode);
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Daily Reminder
+                    Text('Daily Reminder', style: theme.textTheme.titleSmall?.copyWith(color: theme.primaryColor)),
+                    SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text('Remind me to read'),
+                      subtitle: Text(planState.reminderEnabled 
+                          ? 'Reminding at ${TimeOfDay(hour: planState.reminderTimeHour, minute: planState.reminderTimeMinute).format(context)}' 
+                          : 'Get a daily nudge to read.'),
+                      value: planState.reminderEnabled,
+                      onChanged: (val) {
+                        ref.read(readingPlanProvider.notifier).setReminder(val, planState.reminderTimeHour, planState.reminderTimeMinute);
+                      },
+                    ),
+                    if (planState.reminderEnabled)
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: TextButton.icon(
+                          icon: const Icon(Icons.access_time_rounded),
+                          label: const Text('Change Time'),
+                          onPressed: () async {
+                            final time = await showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay(hour: planState.reminderTimeHour, minute: planState.reminderTimeMinute),
+                            );
+                            if (time != null) {
+                              ref.read(readingPlanProvider.notifier).setReminder(true, time.hour, time.minute);
+                            }
+                          },
+                        ),
+                      ),
+                    const SizedBox(height: 16),
+
+                    // Jump To Day
+                    Text('Navigation', style: theme.textTheme.titleSmall?.copyWith(color: theme.primaryColor)),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text('Go to today\'s reading'),
+                      subtitle: const Text('Skip to the reading for today.'),
+                      trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        int targetDay = 1;
+                        if (planState.startMode == PlanStartMode.calendarYear) {
+                          final now = DateTime.now();
+                          targetDay = now.difference(DateTime(now.year, 1, 1)).inDays + 1;
+                        } else {
+                          final now = DateTime.now();
+                          targetDay = now.difference(planState.startDate).inDays + 1;
+                        }
+                        if (targetDay < 1) targetDay = 1;
+                        if (targetDay > planState.planData.length) targetDay = planState.planData.length;
+                        ref.read(readingPlanProvider.notifier).startPlanFromDay(targetDay);
+                      },
+                    ),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text('Jump to specific day'),
+                      subtitle: const Text('Skip to a specific day.'),
+                      trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        _showJumpDialog(context, ref);
+                      },
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Restart Plan
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red.withValues(alpha: 0.1),
+                        foregroundColor: Colors.red,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (c) => AlertDialog(
+                            backgroundColor: theme.colorScheme.surface,
+                            title: const Text('Restart Plan?'),
+                            content: const Text('This clears your reading progress. Continue?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(c),
+                                child: Text('Cancel', style: TextStyle(color: theme.colorScheme.onSurface)),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  ref.read(readingPlanProvider.notifier).restartPlan();
+                                  Navigator.pop(c);
+                                  Navigator.pop(ctx);
+                                },
+                                child: const Text('Restart', style: TextStyle(color: Colors.red)),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      child: const Text('Restart Plan'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showJumpDialog(BuildContext context, WidgetRef ref) {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: const Text('Jump to Day'),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(
+            hintText: 'Enter day number (1-365)',
+            border: OutlineInputBorder(),
+          ),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(c),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final day = int.tryParse(controller.text);
+              if (day != null && day >= 1 && day <= 365) {
+                ref.read(readingPlanProvider.notifier).startPlanFromDay(day);
+                Navigator.pop(c);
+              }
+            },
+            child: const Text('Jump'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -203,42 +444,12 @@ class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
               _showSearchDialog(context, ref);
             },
           ),
-          PopupMenuButton<PlanStartMode>(
+          IconButton(
             icon: Icon(Icons.calendar_today_rounded, color: theme.primaryColor),
             tooltip: 'Plan Settings',
-            onSelected: (mode) {
-              ref.read(readingPlanProvider.notifier).changeStartMode(mode);
+            onPressed: () {
+              _showSettingsPanel(context, ref);
             },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<PlanStartMode>>[
-              PopupMenuItem<PlanStartMode>(
-                value: PlanStartMode.startToday,
-                child: Row(
-                  children: [
-                    Icon(
-                      planState.startMode == PlanStartMode.startToday ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-                      color: theme.primaryColor,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    const Text('Start Today'),
-                  ],
-                ),
-              ),
-              PopupMenuItem<PlanStartMode>(
-                value: PlanStartMode.calendarYear,
-                child: Row(
-                  children: [
-                    Icon(
-                      planState.startMode == PlanStartMode.calendarYear ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-                      color: theme.primaryColor,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    const Text('Follow Calendar Year'),
-                  ],
-                ),
-              ),
-            ],
           ),
         ],
       ),

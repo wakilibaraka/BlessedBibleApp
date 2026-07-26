@@ -72,6 +72,9 @@ class ReadingPlanState {
   final Set<String> completedChapters;
   final DateTime startDate;
   final PlanStartMode startMode;
+  final bool reminderEnabled;
+  final int reminderTimeHour;
+  final int reminderTimeMinute;
 
   ReadingPlanState({
     this.isLoading = false,
@@ -80,6 +83,9 @@ class ReadingPlanState {
     this.completedChapters = const {},
     required this.startDate,
     this.startMode = PlanStartMode.startToday,
+    this.reminderEnabled = false,
+    this.reminderTimeHour = 8,
+    this.reminderTimeMinute = 0,
   });
 
   bool get isPlanComplete => planData.isNotEmpty && completedChapters.length >= planData.fold(0, (sum, d) => sum + d.chapters.length);
@@ -115,6 +121,9 @@ class ReadingPlanState {
     Set<String>? completedChapters,
     DateTime? startDate,
     PlanStartMode? startMode,
+    bool? reminderEnabled,
+    int? reminderTimeHour,
+    int? reminderTimeMinute,
   }) {
     return ReadingPlanState(
       isLoading: isLoading ?? this.isLoading,
@@ -123,6 +132,9 @@ class ReadingPlanState {
       completedChapters: completedChapters ?? this.completedChapters,
       startDate: startDate ?? this.startDate,
       startMode: startMode ?? this.startMode,
+      reminderEnabled: reminderEnabled ?? this.reminderEnabled,
+      reminderTimeHour: reminderTimeHour ?? this.reminderTimeHour,
+      reminderTimeMinute: reminderTimeMinute ?? this.reminderTimeMinute,
     );
   }
 }
@@ -149,6 +161,9 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
       Set<String> completedChapters = {};
       DateTime startDate = DateTime.now();
       PlanStartMode startMode = PlanStartMode.startToday;
+      bool reminderEnabled = false;
+      int reminderTimeHour = 8;
+      int reminderTimeMinute = 0;
 
       if (prefsState != null) {
         currentDay = prefsState['currentDay'] as int? ?? 0;
@@ -173,6 +188,9 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
         if (prefsState['startMode'] == 'calendarYear') {
           startMode = PlanStartMode.calendarYear;
         }
+        reminderEnabled = prefsState['reminderEnabled'] as bool? ?? false;
+        reminderTimeHour = prefsState['reminderTimeHour'] as int? ?? 8;
+        reminderTimeMinute = prefsState['reminderTimeMinute'] as int? ?? 0;
       }
 
       state = state.copyWith(
@@ -182,6 +200,9 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
         completedChapters: completedChapters,
         startDate: startDate,
         startMode: startMode,
+        reminderEnabled: reminderEnabled,
+        reminderTimeHour: reminderTimeHour,
+        reminderTimeMinute: reminderTimeMinute,
       );
     } catch (e) {
       state = state.copyWith(isLoading: false);
@@ -194,6 +215,9 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
       'completedChapters': state.completedChapters.toList(),
       'startDate': state.startDate.toIso8601String(),
       'startMode': state.startMode.name,
+      'reminderEnabled': state.reminderEnabled,
+      'reminderTimeHour': state.reminderTimeHour,
+      'reminderTimeMinute': state.reminderTimeMinute,
     });
   }
 
@@ -207,7 +231,40 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
     _saveState();
     
     // Schedule daily notification
-    ref.read(notificationServiceProvider).scheduleDailyReminder();
+    if (state.reminderEnabled) {
+      ref.read(notificationServiceProvider).scheduleDailyReminder(state.reminderTimeHour, state.reminderTimeMinute);
+    }
+  }
+
+  void restartPlan() {
+    int day = 1;
+    if (state.startMode == PlanStartMode.calendarYear) {
+      final now = DateTime.now();
+      day = now.difference(DateTime(now.year, 1, 1)).inDays + 1;
+    }
+    state = state.copyWith(
+      currentDay: day, 
+      startDate: DateTime.now(),
+      completedChapters: {},
+    );
+    _saveState();
+    if (state.reminderEnabled) {
+      ref.read(notificationServiceProvider).scheduleDailyReminder(state.reminderTimeHour, state.reminderTimeMinute);
+    }
+  }
+
+  void setReminder(bool enabled, int hour, int minute) {
+    state = state.copyWith(
+      reminderEnabled: enabled,
+      reminderTimeHour: hour,
+      reminderTimeMinute: minute,
+    );
+    _saveState();
+    if (enabled) {
+      ref.read(notificationServiceProvider).scheduleDailyReminder(hour, minute);
+    } else {
+      ref.read(notificationServiceProvider).cancelReminder();
+    }
   }
 
   void changeStartMode(PlanStartMode mode) {
@@ -245,7 +302,9 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
       startDate: newStartDate,
     );
     _saveState();
-    ref.read(notificationServiceProvider).scheduleDailyReminder();
+    if (state.reminderEnabled) {
+      ref.read(notificationServiceProvider).scheduleDailyReminder(state.reminderTimeHour, state.reminderTimeMinute);
+    }
   }
 
   bool jumpToBook(String bookQuery) {

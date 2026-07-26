@@ -14,8 +14,8 @@ class NotificationService {
     debugPrint('Mock NotificationService: requestPermissions() called.');
   }
 
-  Future<void> scheduleDailyReminder() async {
-    debugPrint("Mock NotificationService: scheduleDailyReminder() called. Time for today's reading.");
+  Future<void> scheduleDailyReminder(int hour, int minute) async {
+    debugPrint("Mock NotificationService: scheduleDailyReminder() called for $hour:$minute. Time for today's reading.");
   }
 
   Future<void> cancelReminder() async {
