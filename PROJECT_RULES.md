@@ -32,3 +32,9 @@ Only report a task as complete once the build is green and nothing is broken.
   2. `flutter build apk --debug` (or the iOS simulator build) — must complete; paste the "✓ Built ..." line as proof.
 - If the build fails, fix it and re-run before committing. Do not claim success based on analyze alone.
 - When using invalid or uncertain Flutter/Dart APIs, verify the constructor/parameter names against the real Flutter API before writing them — do not invent parameter names (e.g. EdgeInsets uses .only/.all/.symmetric/.fromLTRB, not .bottom; TextButton.icon uses icon:/label:/onPressed:, not onIcon:).
+
+## Do Not Block the Task Queue
+- NEVER leave a persistent `flutter run` running at the end of a task — it stays alive for hot reload and BLOCKS the task queue, holding up queued messages.
+- Verify with `flutter analyze` and `flutter build` (which self-terminate), not a long-lived `flutter run`.
+- If you must run the app, terminate the session promptly or run it detached/backgrounded; never leave it holding the queue.
+- If a `flutter run` is active and blocking, terminate it before the next task.
