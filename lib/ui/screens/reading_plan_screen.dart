@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../widgets/textured_glass_container.dart';
 
@@ -22,10 +21,9 @@ class ReadingPlanScreen extends ConsumerWidget {
         ),
         title: Text(
           'Reading Plans',
-          style: GoogleFonts.lora(
-            textStyle: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontFamily: 'Lora',
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),
@@ -47,11 +45,10 @@ class ReadingPlanScreen extends ConsumerWidget {
               const SizedBox(height: 8),
               Text(
                 'Everything you need to immerse in the Word.',
-                style: GoogleFonts.lora(
-                  textStyle: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    height: 1.3,
-                  ),
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontFamily: 'Lora',
+                  fontWeight: FontWeight.bold,
+                  height: 1.3,
                 ),
               ),
               const SizedBox(height: 12),
@@ -166,10 +163,9 @@ class ReadingPlanScreen extends ConsumerWidget {
                     const SizedBox(height: 4),
                     Text(
                       title,
-                      style: GoogleFonts.lora(
-                        textStyle: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontFamily: 'Lora',
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],

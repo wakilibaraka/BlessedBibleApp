@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../data/models/bible_model.dart';
@@ -1659,7 +1659,7 @@ class _TypographyBottomSheet extends ConsumerWidget {
                       ),
                       child: Text(
                         font,
-                        style: GoogleFonts.getFont(font).copyWith(
+                        style: TextStyle(fontFamily: font).copyWith(
                           color: isSelected ? theme.primaryColor : theme.colorScheme.onSurface,
                           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                         ),

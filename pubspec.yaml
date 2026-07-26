@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_riverpod: ^3.3.2
-  google_fonts: ^8.2.0
+
   shared_preferences: ^2.5.5
   path_provider: ^2.1.2
   scrollable_positioned_list: ^0.3.8
@@ -28,3 +28,40 @@ flutter:
     - assets/bible/
     - assets/images/
     - assets/data/
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-400-normal.ttf
+          weight: 400
+        - asset: assets/fonts/Inter-500-normal.ttf
+          weight: 500
+        - asset: assets/fonts/Inter-600-normal.ttf
+          weight: 600
+        - asset: assets/fonts/Inter-700-normal.ttf
+          weight: 700
+    - family: Gentium Book Plus
+      fonts:
+        - asset: assets/fonts/GentiumBookPlus-400-normal.ttf
+          weight: 400
+        - asset: assets/fonts/GentiumBookPlus-700-normal.ttf
+          weight: 700
+    - family: Lora
+      fonts:
+        - asset: assets/fonts/Lora-400-normal.ttf
+          weight: 400
+        - asset: assets/fonts/Lora-500-normal.ttf
+          weight: 500
+        - asset: assets/fonts/Lora-600-normal.ttf
+          weight: 600
+        - asset: assets/fonts/Lora-700-normal.ttf
+          weight: 700
+    - family: Literata
+      fonts:
+        - asset: assets/fonts/Literata-400-normal.ttf
+          weight: 400
+        - asset: assets/fonts/Literata-500-normal.ttf
+          weight: 500
+        - asset: assets/fonts/Literata-600-normal.ttf
+          weight: 600
+        - asset: assets/fonts/Literata-700-normal.ttf
+          weight: 700
