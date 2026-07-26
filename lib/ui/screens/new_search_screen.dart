@@ -255,7 +255,7 @@ class _NewSearchScreenState extends ConsumerState<NewSearchScreen> with SingleTi
               // Add bottom padding for keyboard + safe area (bottom nav)
               padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom + 
-                        (MediaQuery.of(context).viewInsets.bottom == 0 ? 90.0 : 16.0), // 90px clears standard bottom nav
+                        (MediaQuery.of(context).viewInsets.bottom == 0 ? 116.0 : 16.0), // ~116px clears nav bar with clean unified spacing
                 left: 16,
                 right: 16,
                 top: 8,

@@ -249,33 +249,39 @@ class MainNavScreen extends ConsumerWidget {
                                         minHeight: 56,
                                         maxHeight: 380,
                                         alignment: Alignment.bottomCenter,
-                                        child: AnimatedSwitcher(
-                                          duration: const Duration(milliseconds: 300),
-                                          child: isAction
-                                              ? _buildActionMenuIcons(context, ref, Theme.of(context))
-                                              : SizedBox(
-                                                  key: const ValueKey('fab'),
-                                                  height: 56,
-                                                  child: Center(
-                                                    child: IconButton(
-                                                      icon: AnimatedSwitcher(
-                                                        duration: const Duration(milliseconds: 300),
-                                                        transitionBuilder: (Widget child, Animation<double> animation) {
-                                                          return ScaleTransition(
-                                                            scale: animation,
-                                                            child: RotationTransition(
-                                                              turns: Tween<double>(begin: 0.5, end: 1.0).animate(animation),
-                                                              child: child,
-                                                            ),
-                                                          );
-                                                        },
-                                                        child: _buildFabIcon(currentIndex, navSettings, ref),
+                                        child: Visibility(
+                                          visible: currentIndex != 2,
+                                          maintainSize: true,
+                                          maintainAnimation: true,
+                                          maintainState: true,
+                                          child: AnimatedSwitcher(
+                                            duration: const Duration(milliseconds: 300),
+                                            child: isAction
+                                                ? _buildActionMenuIcons(context, ref, Theme.of(context))
+                                                : SizedBox(
+                                                    key: const ValueKey('fab'),
+                                                    height: 56,
+                                                    child: Center(
+                                                      child: IconButton(
+                                                        icon: AnimatedSwitcher(
+                                                          duration: const Duration(milliseconds: 300),
+                                                          transitionBuilder: (Widget child, Animation<double> animation) {
+                                                            return ScaleTransition(
+                                                              scale: animation,
+                                                              child: RotationTransition(
+                                                                turns: Tween<double>(begin: 0.5, end: 1.0).animate(animation),
+                                                                child: child,
+                                                              ),
+                                                            );
+                                                          },
+                                                          child: _buildFabIcon(currentIndex, navSettings, ref),
+                                                        ),
+                                                        color: Theme.of(context).primaryColor,
+                                                        onPressed: () => _handleFabTap(currentIndex, ref, context),
                                                       ),
-                                                      color: Theme.of(context).primaryColor,
-                                                      onPressed: () => _handleFabTap(currentIndex, ref, context),
                                                     ),
                                                   ),
-                                                ),
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -355,10 +361,7 @@ class MainNavScreen extends ConsumerWidget {
         ref.read(immersiveModeProvider.notifier).toggle();
         break;
       case 2:
-        // Search -> Advanced Filters
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Advanced filters coming soon!')),
-        );
+        // Search -> FAB is hidden, so this won't be called.
         break;
       case 3:
         // Study -> Notes Popover
