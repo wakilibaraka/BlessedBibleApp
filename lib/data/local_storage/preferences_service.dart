@@ -100,6 +100,53 @@ class PreferencesService {
     }
     return null;
   }
+
+  static const String _chapterPositionsKey = 'chapter_positions';
+  static const int _expiryMillis = 10 * 60 * 1000; // 10 minutes
+
+  void saveChapterScrollPosition(String bookAbbrev, int chapter, int verseIndex) {
+    final jsonString = prefs.getString(_chapterPositionsKey);
+    Map<String, dynamic> map = {};
+    if (jsonString != null) {
+      try {
+        map = jsonDecode(jsonString);
+      } catch (_) {}
+    }
+    
+    final key = '${bookAbbrev}_$chapter';
+    map[key] = {
+      'verseIndex': verseIndex,
+      'timestamp': DateTime.now().millisecondsSinceEpoch,
+    };
+    
+    prefs.setString(_chapterPositionsKey, jsonEncode(map));
+  }
+
+  int? getChapterScrollPosition(String bookAbbrev, int chapter) {
+    final jsonString = prefs.getString(_chapterPositionsKey);
+    if (jsonString == null) return null;
+    
+    try {
+      final map = jsonDecode(jsonString) as Map<String, dynamic>;
+      final key = '${bookAbbrev}_$chapter';
+      if (!map.containsKey(key)) return null;
+      
+      final data = map[key] as Map<String, dynamic>;
+      final timestamp = data['timestamp'] as int;
+      final verseIndex = data['verseIndex'] as int;
+      
+      if (DateTime.now().millisecondsSinceEpoch - timestamp < _expiryMillis) {
+        return verseIndex;
+      } else {
+        // Expired, clean it up
+        map.remove(key);
+        prefs.setString(_chapterPositionsKey, jsonEncode(map));
+        return null;
+      }
+    } catch (_) {
+      return null;
+    }
+  }
 }
 
 final preferencesProvider = Provider<PreferencesService>((ref) => throw UnimplementedError());

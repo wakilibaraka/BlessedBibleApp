@@ -139,7 +139,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
             }
 
             if (verse != null) {
-              _scrollToVerse(verse, loc);
+              _scrollToVerse(verse, ref.read(readLocationProvider));
             }
           },
         );
@@ -285,11 +285,17 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                           final currentBookName = fc.book.name;
                                           final currentChapter = fc.chapter.number;
                                           final currentAbbrev = fc.book.abbreviation;
-                                          ref.read(preferencesProvider).saveLastReadLocation(
+                                          final prefs = ref.read(preferencesProvider);
+                                          prefs.saveLastReadLocation(
                                             bookAbbrev: currentAbbrev,
                                             bookName: currentBookName,
                                             chapter: currentChapter,
                                             verseIndex: firstVisible.index,
+                                          );
+                                          prefs.saveChapterScrollPosition(
+                                            currentAbbrev,
+                                            currentChapter,
+                                            firstVisible.index,
                                           );
                                         });
                                       }
@@ -326,6 +332,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                         child: ScrollablePositionedList.builder(
                                           itemScrollController: _itemScrollControllers[pageIndex],
                                           itemPositionsListener: _itemPositionsListeners[pageIndex],
+                                          initialScrollIndex: (pageIndex == _currentPageIndex ? _navigatedVerseIndex : null) ?? ref.read(preferencesProvider).getChapterScrollPosition(fc.book.abbreviation, fc.chapter.number) ?? 0,
                                           padding: EdgeInsets.only(
                                               top: MediaQuery.of(context).padding.top + 80.0,
                                               left: 24.0, right: 24.0, bottom: 400.0),
