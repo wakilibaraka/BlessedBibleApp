@@ -120,7 +120,7 @@ class _NoisePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final random = math.Random(42); // Fixed seed prevents jitter
-    final count = (size.width * size.height * 0.08).toInt().clamp(0, 2500);
+    final count = (size.width * size.height * 0.01).toInt().clamp(0, 500);
 
     final List<Offset> darkPoints = [];
     final List<Offset> lightPoints = [];
