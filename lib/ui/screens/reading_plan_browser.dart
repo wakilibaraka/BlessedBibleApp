@@ -20,7 +20,7 @@ class ReadingPlanBrowser extends ConsumerStatefulWidget {
 class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
   final Set<int> _expandedDays = {};
 
-  void _openReading(String reading, BuildContext context) {
+  void _openReading(String reading, int planDay, BuildContext context, WidgetRef ref) {
     final match = RegExp(r'^(\d?\s*[a-zA-Z\s]+)(?:\s+(\d+))?').firstMatch(reading);
     if (match != null) {
       String bookName = match.group(1)!.trim();
@@ -41,6 +41,7 @@ class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
           final readLoc = ref.read(readLocationProvider.notifier);
           readLoc.updateLocation(bookAbbrev: chapterMatch.first.book.abbreviation, chapter: chapterNum, verse: 1);
           ref.read(navProvider.notifier).setIndex(1);
+          ref.read(activePlanContextProvider.notifier).setContext(planDay);
           Navigator.of(context).pop(); // Close the browser and go to Read
         }
       }
@@ -141,7 +142,7 @@ class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
               title: const Text('Read passage'),
               onTap: () {
                 Navigator.of(ctx).pop();
-                _openReading(readingTitle, context);
+                _openReading(readingTitle, dayContext, context, ref);
               },
             ),
             ListTile(
@@ -406,7 +407,7 @@ class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
           final newPlanState = ref.read(readingPlanProvider);
           if (newPlanState.currentDay > 0 && newPlanState.currentDay <= newPlanState.planData.length) {
             final firstReading = newPlanState.planData[newPlanState.currentDay - 1].readings.first;
-            _openReading(firstReading, context);
+            _openReading(firstReading, newPlanState.currentDay, context, ref);
           }
         },
       ),

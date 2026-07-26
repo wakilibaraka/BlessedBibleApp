@@ -12,6 +12,7 @@ import '../../state/nav_provider.dart';
 import '../../state/study_provider.dart';
 import '../../state/read_settings_provider.dart';
 import '../../state/user_data_provider.dart';
+import '../../state/reading_plan_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../../utils/bible_sections.dart';
 import '../../services/share_service.dart';
@@ -200,6 +201,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
               bookName: name,
               chapter: chapter,
             );
+            ref.read(activePlanContextProvider.notifier).setContext(null);
             if (changedChapter) {
               // Chapter changed, list will rebuild automatically
             }
@@ -827,6 +829,105 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
         ),
           ),
 
+          // ── Plan Context Layer ──────────────────────────────────────
+          Builder(builder: (context) {
+            final activePlanDay = ref.watch(activePlanContextProvider);
+            if (activePlanDay == null) return const SizedBox.shrink();
+            
+            return Positioned(
+              left: 16,
+              right: 16,
+              bottom: 16,
+              child: SafeArea(
+                child: TexturedGlassContainer(
+                  borderRadius: BorderRadius.circular(24),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: theme.primaryColor.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(Icons.bookmark_added_rounded, color: theme.primaryColor, size: 20),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Reading Plan',
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            Text(
+                              'Day $activePlanDay',
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: theme.colorScheme.onSurface,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          final planState = ref.read(readingPlanProvider);
+                          final planNotifier = ref.read(readingPlanProvider.notifier);
+                          
+                          // Mark complete
+                          planNotifier.markDayComplete(activePlanDay);
+                          
+                          if (activePlanDay == planState.planData.length) {
+                            // Last day completed
+                            ref.read(activePlanContextProvider.notifier).setContext(null);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Plan completed! Congratulations! 🎉')),
+                            );
+                          } else {
+                            // Next day
+                            final nextDay = activePlanDay + 1;
+                            final nextFirstReading = planState.planData[nextDay - 1].readings.first;
+                            ref.read(activePlanContextProvider.notifier).setContext(nextDay);
+                            
+                            // Parse reading and jump
+                            final match = RegExp(r'^(\d?\s*[a-zA-Z\s]+)(?:\s+(\d+))?').firstMatch(nextFirstReading);
+                            if (match != null) {
+                              String bookName = match.group(1)!.trim();
+                              if (bookName.toLowerCase() == 'song of solomon') bookName = 'Song of Solomon';
+                              int chapterNum = match.group(2) != null ? (int.tryParse(match.group(2)!) ?? 1) : 1;
+                              
+                              final fcList = ref.read(flatChaptersProvider);
+                              final fc = fcList.where((c) => c.book.name.toLowerCase() == bookName.toLowerCase() || c.book.abbreviation.toLowerCase() == bookName.toLowerCase()).toList();
+                              if (fc.isNotEmpty) {
+                                final chapterMatch = fc.where((c) => c.chapter.number == chapterNum).toList();
+                                if (chapterMatch.isNotEmpty) {
+                                  ref.read(readLocationProvider.notifier).updateLocation(bookAbbrev: chapterMatch.first.book.abbreviation, chapter: chapterNum, verse: 1);
+                                }
+                              }
+                            }
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.primaryColor,
+                          foregroundColor: theme.colorScheme.onPrimary,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        ),
+                        child: const Text('Mark done & next'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }),
 
         ],
       ),

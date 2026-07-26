@@ -266,3 +266,16 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
 }
 
 final readingPlanProvider = NotifierProvider<ReadingPlanNotifier, ReadingPlanState>(ReadingPlanNotifier.new);
+
+class ActivePlanContextNotifier extends Notifier<int?> {
+  @override
+  int? build() {
+    return null;
+  }
+
+  void setContext(int? day) {
+    state = day;
+  }
+}
+
+final activePlanContextProvider = NotifierProvider<ActivePlanContextNotifier, int?>(ActivePlanContextNotifier.new);

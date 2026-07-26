@@ -7,6 +7,7 @@ import '../../state/nav_provider.dart';
 import '../../state/read_location_provider.dart';
 import '../../state/glass_ui_provider.dart';
 import '../../state/bible_provider.dart';
+import '../../state/reading_plan_provider.dart';
 
 class NewSearchScreen extends ConsumerWidget {
   const NewSearchScreen({super.key});
@@ -22,6 +23,7 @@ class NewSearchScreen extends ConsumerWidget {
         chapter: result.metadata['chapter'],
         verse: result.metadata['verse'],
       );
+      ref.read(activePlanContextProvider.notifier).setContext(null);
     } else if (result.type == SearchResultType.commentary) {
       ref.read(navProvider.notifier).setIndex(1); // Read Screen
       final books = ref.read(bibleProvider).books;
@@ -34,6 +36,7 @@ class NewSearchScreen extends ConsumerWidget {
         verse: result.metadata['verse'],
         openCommentary: true,
       );
+      ref.read(activePlanContextProvider.notifier).setContext(null);
     }
   }
 
