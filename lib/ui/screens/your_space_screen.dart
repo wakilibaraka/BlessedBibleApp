@@ -9,7 +9,6 @@ import '../../state/notes_provider.dart';
 import '../../state/journal_provider.dart';
 import '../../state/theme_provider.dart';
 import '../widgets/animated_background.dart';
-import '../widgets/textured_glass_container.dart';
 import 'notes_list_screen.dart'; // for showAddNoteSheet
 import '../widgets/journal_editor.dart'; // for showAddJournalSheet
 

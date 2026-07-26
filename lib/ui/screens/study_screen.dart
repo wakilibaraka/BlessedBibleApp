@@ -5,13 +5,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/study_provider.dart';
 import '../../state/theme_provider.dart';
 import '../widgets/textured_glass_container.dart';
-import 'verse_detail_screen.dart';
 import '../widgets/your_space_hero.dart';
 import 'votd_archive_screen.dart';
 import '../../state/study_layout_provider.dart';
 import '../widgets/jiggle_animator.dart';
 import '../../state/reading_plan_provider.dart';
 import 'reading_plans_hub_screen.dart';
+import 'commentary_hub_screen.dart';
 import '../../state/nav_provider.dart';
 import '../../state/read_location_provider.dart';
 import '../../state/bible_provider.dart';
@@ -674,7 +674,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
               borderRadius: BorderRadius.circular(28),
               onTap: () {
                 final refStr = activeVerse ?? 'Revelation 14:12';
-                Navigator.of(context).push(MaterialPageRoute(builder: (_) => VerseDetailScreen(reference: refStr)));
+                Navigator.of(context).push(MaterialPageRoute(builder: (_) => CommentaryHubScreen(reference: refStr)));
               },
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
