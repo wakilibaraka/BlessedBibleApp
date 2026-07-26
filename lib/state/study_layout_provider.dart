@@ -58,7 +58,7 @@ class StudyCardConfig {
 
 class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
   static final List<StudyCardConfig> _defaultLayout = [
-    StudyCardConfig(id: 'your_space', size: CardSize.medium),
+    StudyCardConfig(id: 'your_space', size: CardSize.large),
     StudyCardConfig(id: 'reading_plan', size: CardSize.medium),
     StudyCardConfig(id: 'commentary', size: CardSize.medium),
     StudyCardConfig(id: 'saved_verses', size: CardSize.medium),

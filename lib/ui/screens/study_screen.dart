@@ -6,7 +6,7 @@ import '../../state/study_provider.dart';
 import '../../state/theme_provider.dart';
 import '../widgets/textured_glass_container.dart';
 import 'verse_detail_screen.dart';
-import 'your_space_screen.dart' as your_space;
+import '../widgets/your_space_hero.dart';
 import '../../state/study_layout_provider.dart';
 import '../widgets/jiggle_animator.dart';
 import '../../state/reading_plan_provider.dart';
@@ -262,8 +262,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
 
                   switch (config.id) {
                     case 'your_space':
-                      cardWidget =
-                          _buildYourSpaceHero(context, theme, config.size);
+                      cardWidget = YourSpaceHero(size: config.size);
                       break;
                     case 'reading_plan':
                       cardWidget =
@@ -417,139 +416,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
     );
   }
 
-  Widget _buildYourSpaceHero(
-      BuildContext context, ThemeData theme, CardSize size) {
-    return AnimatedSize(
-      duration: const Duration(milliseconds: 250),
-      curve: Curves.easeInOut,
-      child: GestureDetector(
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-                builder: (_) => const your_space.YourSpaceScreen()),
-          );
-        },
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
-            gradient: LinearGradient(
-              colors: [
-                theme.primaryColor.withValues(alpha: 0.8),
-                theme.primaryColor.withValues(alpha: 0.4),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: theme.shadowColor.withValues(alpha: 0.1),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              )
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: Container(
-                    color: Colors.black.withValues(alpha: 0.15),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Your Space',
-                              style: theme.textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'View all your color-coded highlighted verses.',
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: Colors.white.withValues(alpha: 0.9),
-                              ),
-                            ),
-                            if (size == CardSize.medium || size == CardSize.large) ...[
-                              const SizedBox(height: 16),
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.history_rounded,
-                                        color: Colors.white70, size: 16),
-                                    const SizedBox(width: 8),
-                                    Text('12 verses highlighted this week',
-                                        style: theme.textTheme.labelSmall
-                                            ?.copyWith(color: Colors.white70)),
-                                  ],
-                                ),
-                              ),
-                            ],
-                            if (size == CardSize.large) ...[
-                              const SizedBox(height: 12),
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.auto_awesome, color: Colors.white70, size: 16),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        '"The Lord is my shepherd; I shall not want." - Psalm 23:1',
-                                        style: theme.textTheme.bodySmall?.copyWith(
-                                          color: Colors.white.withValues(alpha: 0.9),
-                                          fontStyle: FontStyle.italic,
-                                        ),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Center(
-                          child: Icon(Icons.auto_awesome, color: Colors.white),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+
 
   Widget _buildReadingPlanBanner(
       BuildContext context, ThemeData theme, CardSize size, WidgetRef ref) {

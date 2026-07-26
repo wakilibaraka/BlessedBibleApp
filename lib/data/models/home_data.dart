@@ -48,6 +48,24 @@ class PersonalNote {
         json['title'] as String,
         json['content'] as String,
         json['date'] as String,
+        reference: json['reference'] as String?,
+      );
+}
+
+class JournalEntry {
+  final String content;
+  final String date;
+
+  JournalEntry(this.content, this.date);
+
+  Map<String, dynamic> toJson() => {
+        'content': content,
+        'date': date,
+      };
+
+  factory JournalEntry.fromJson(Map<String, dynamic> json) => JournalEntry(
+        json['content'] as String,
+        json['date'] as String,
       );
 }
 
