@@ -28,6 +28,45 @@ class ReadingPlanBrowser extends ConsumerWidget {
           icon: Icon(Icons.arrow_back_ios_new_rounded, color: theme.primaryColor),
           onPressed: () => Navigator.of(context).pop(),
         ),
+        actions: [
+          PopupMenuButton<PlanStartMode>(
+            icon: Icon(Icons.settings_rounded, color: theme.primaryColor),
+            tooltip: 'Plan Settings',
+            onSelected: (mode) {
+              ref.read(readingPlanProvider.notifier).changeStartMode(mode);
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<PlanStartMode>>[
+              PopupMenuItem<PlanStartMode>(
+                value: PlanStartMode.startToday,
+                child: Row(
+                  children: [
+                    Icon(
+                      planState.startMode == PlanStartMode.startToday ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+                      color: theme.primaryColor,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    const Text('Start Today'),
+                  ],
+                ),
+              ),
+              PopupMenuItem<PlanStartMode>(
+                value: PlanStartMode.calendarYear,
+                child: Row(
+                  children: [
+                    Icon(
+                      planState.startMode == PlanStartMode.calendarYear ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+                      color: theme.primaryColor,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    const Text('Follow Calendar Year'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
       body: Stack(
         children: [
@@ -102,7 +141,7 @@ class ReadingPlanBrowser extends ConsumerWidget {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Day ${dayData.day}',
+                                        'Day ${dayData.day} · ${planState.getFormattedDateForDay(dayData.day)}',
                                         style: theme.textTheme.titleMedium?.copyWith(
                                           fontWeight: FontWeight.bold,
                                           color: isCompleted ? theme.primaryColor : null,

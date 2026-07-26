@@ -54,6 +54,59 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
     }
   }
 
+  void _showJumpToBookDialog(BuildContext context, WidgetRef ref) {
+    final textController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          title: const Text('Jump to Book'),
+          content: TextField(
+            controller: textController,
+            decoration: const InputDecoration(
+              hintText: 'e.g. Numbers, Luke',
+              border: OutlineInputBorder(),
+            ),
+            autofocus: true,
+            onSubmitted: (query) {
+              if (query.isNotEmpty) {
+                final found = ref.read(readingPlanProvider.notifier).jumpToBook(query);
+                Navigator.of(context).pop();
+                if (!found) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Book '$query' not found in plan.")),
+                  );
+                }
+              }
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final query = textController.text;
+                if (query.isNotEmpty) {
+                  final found = ref.read(readingPlanProvider.notifier).jumpToBook(query);
+                  Navigator.of(context).pop();
+                  if (!found) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Book '$query' not found in plan.")),
+                    );
+                  }
+                }
+              },
+              child: const Text('Jump'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -588,11 +641,24 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Active Reading Plan',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Active Reading Plan',
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.search_rounded, color: theme.primaryColor, size: 20),
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                onPressed: () {
+                                  _showJumpToBookDialog(context, ref);
+                                },
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 8),
                           Text(
@@ -612,7 +678,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                             Text('Plan Completed!', style: theme.textTheme.labelSmall?.copyWith(color: theme.primaryColor, fontWeight: FontWeight.w600))
                           else
                             Text(
-                              'Day ${planState.currentDay} • ${planState.planData[planState.currentDay - 1].readings.length} Reading(s)',
+                              'Day ${planState.currentDay} · ${planState.getFormattedDateForDay(planState.currentDay)} • ${planState.planData[planState.currentDay - 1].readings.length} Reading(s)',
                               style: theme.textTheme.labelSmall?.copyWith(
                                 color: theme.primaryColor,
                                 fontWeight: FontWeight.w600,
