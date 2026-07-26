@@ -148,13 +148,7 @@ IndexData _buildIndexIsolate(IndexBuildArgs args) {
           }
 
           for (final entry in verseEntry.value) {
-            // EXPLICITLY IGNORE EGW
-            if (entry.id.toLowerCase().contains('egw')) continue;
-            
-            String authorLabel = 'Commentary';
-            if (entry.id.toLowerCase().contains('uriah')) {
-              authorLabel = 'Uriah Smith Commentary';
-            }
+            String authorLabel = entry.title.isNotEmpty ? '${entry.title} Commentary' : 'Commentary';
 
             final item = SearchItem(
               id: nextId++,

@@ -38,7 +38,8 @@ void main() {
         '1': {
           '1': [
             CommentaryEntry(id: 'uriah_smith', title: 'Uriah Smith', text: 'This is a test commentary by Uriah.'),
-            CommentaryEntry(id: 'egw', title: 'EGW', text: 'This should be ignored.'),
+            CommentaryEntry(id: 'egw', title: 'EGW', text: 'This should also be indexed.'),
+            CommentaryEntry(id: 'new_author', title: 'New Author', text: 'Simulated new commentary entry.'),
           ]
         }
       }
@@ -60,16 +61,23 @@ void main() {
     expect(res2.isNotEmpty, isTrue);
     expect(res2.first.type, SearchResultType.reference);
 
-    // Test 3: Commentary query
+    // Test 3: Commentary query (Uriah)
     final res3 = await engine.search('uriah');
     expect(res3.isNotEmpty, isTrue);
     expect(res3.first.type, SearchResultType.commentary);
 
-    // Test 4: EGW query (should be ignored)
-    final res4 = await engine.search('ignored');
-    expect(res4.isEmpty, isTrue);
+    // Test 4: EGW query (should be indexed now)
+    final res4 = await engine.search('indexed');
+    expect(res4.isNotEmpty, isTrue);
+    expect(res4.first.type, SearchResultType.commentary);
+    
+    // Test 5: Simulated new author commentary
+    final resNew = await engine.search('simulated');
+    expect(resNew.isNotEmpty, isTrue);
+    expect(resNew.first.type, SearchResultType.commentary);
+    expect(resNew.first.subtitle, 'New Author Commentary');
 
-    // Test 5: Note query
+    // Test 6: Note query
     final res5 = await engine.search('creation');
     expect(res5.isNotEmpty, isTrue);
     expect(res5.first.type, SearchResultType.note);
