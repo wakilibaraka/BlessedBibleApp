@@ -1,33 +1,65 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-/// Three distinct visual modes cycling Sepia -> Dark -> Light
-enum AppThemeMode { sepia, dark, light }
+import 'package:flutter/material.dart';
+
+enum AppThemeMode { automatic, light, dark, sepia }
+
+extension AppThemeModeExtension on AppThemeMode {
+  AppThemeMode resolve(BuildContext context) {
+    if (this == AppThemeMode.automatic) {
+      return Theme.of(context).brightness == Brightness.dark 
+          ? AppThemeMode.dark 
+          : AppThemeMode.light;
+    }
+    return this;
+  }
+}
 
 class ThemeNotifier extends Notifier<AppThemeMode> {
-  @override
-  AppThemeMode build() => AppThemeMode.sepia; // Default
+  static const _themeKey = 'app_theme_mode';
 
-  /// Cycle forward through all three modes.
+  @override
+  AppThemeMode build() {
+    _loadTheme();
+    return AppThemeMode.light; // Default for new users
+  }
+
+  Future<void> _loadTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    final index = prefs.getInt(_themeKey);
+    if (index != null && index >= 0 && index < AppThemeMode.values.length) {
+      state = AppThemeMode.values[index];
+    }
+  }
+
+  Future<void> setTheme(AppThemeMode mode) async {
+    state = mode;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_themeKey, mode.index);
+  }
+
+  /// Cycle forward through all modes.
   void cycleTheme() {
     switch (state) {
-      case AppThemeMode.sepia:
-        state = AppThemeMode.dark;
-        break;
-      case AppThemeMode.dark:
-        state = AppThemeMode.light;
+      case AppThemeMode.automatic:
+        setTheme(AppThemeMode.light);
         break;
       case AppThemeMode.light:
-        state = AppThemeMode.sepia;
+        setTheme(AppThemeMode.dark);
+        break;
+      case AppThemeMode.dark:
+        setTheme(AppThemeMode.sepia);
+        break;
+      case AppThemeMode.sepia:
+        setTheme(AppThemeMode.automatic);
         break;
     }
   }
 
-  // Keep direct setters for programmatic access.
-  void setTheme(AppThemeMode mode) => state = mode;
-
-  // Legacy toggle kept for backward compatibility (Light ↔ Dark).
+  // Legacy toggle kept for backward compatibility.
   void toggleTheme() {
-    state = state == AppThemeMode.dark ? AppThemeMode.light : AppThemeMode.dark;
+    setTheme(state == AppThemeMode.dark ? AppThemeMode.light : AppThemeMode.dark);
   }
 }
 

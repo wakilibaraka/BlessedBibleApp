@@ -50,8 +50,9 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground> with Si
         final radius = isTopGlow ? 1.0 : 1.6;
 
         final List<Color> colors;
-        switch (widget.appThemeMode) {
+        switch (widget.appThemeMode.resolve(context)) {
           case AppThemeMode.dark:
+          case AppThemeMode.automatic:
             // Warm amber glow at focal point, deep charcoal edges
             colors = [
               Color.lerp(const Color(0xFF3D2B0A), const Color(0xFF251800), t)!,

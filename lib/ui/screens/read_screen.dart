@@ -714,15 +714,16 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
     );
 
     Color starColor;
-    switch (appThemeMode) {
+    switch (appThemeMode.resolve(context)) {
       case AppThemeMode.light:
         starColor = Colors.deepOrange.shade400;
         break;
-      case AppThemeMode.sepia:
-        starColor = Colors.deepOrange.shade600;
-        break;
       case AppThemeMode.dark:
-        starColor = Colors.amberAccent;
+      case AppThemeMode.automatic:
+        starColor = Colors.amber.shade400;
+        break;
+      case AppThemeMode.sepia:
+        starColor = Colors.orange.shade700;
         break;
     }
 

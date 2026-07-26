@@ -34,7 +34,10 @@ class TheBlessedBibleApp extends ConsumerWidget {
     return MaterialApp(
       title: 'The Blessed Bible',
       debugShowCheckedModeBanner: false,
+      themeAnimationDuration: const Duration(milliseconds: 250),
+      themeAnimationCurve: Curves.easeInOut,
       themeMode: switch (themeMode) {
+        AppThemeMode.automatic => ThemeMode.system,
         AppThemeMode.light => ThemeMode.light,
         AppThemeMode.sepia => ThemeMode.light,
         AppThemeMode.dark => ThemeMode.dark,

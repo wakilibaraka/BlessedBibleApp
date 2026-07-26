@@ -34,7 +34,7 @@ class TexturedGlassContainer extends ConsumerWidget {
 
     Color fillColor;
     if (isGlassy) {
-      switch (appTheme) {
+      switch (appTheme.resolve(context)) {
         case AppThemeMode.sepia:
           fillColor = Colors.white.withValues(alpha: 0.35);
           break;
@@ -42,11 +42,12 @@ class TexturedGlassContainer extends ConsumerWidget {
           fillColor = Colors.black.withValues(alpha: 0.08);
           break;
         case AppThemeMode.dark:
+        case AppThemeMode.automatic:
           fillColor = Colors.black.withValues(alpha: 0.15);
           break;
       }
     } else {
-      switch (appTheme) {
+      switch (appTheme.resolve(context)) {
         case AppThemeMode.sepia:
           fillColor = AppColors.sepiaSurface;
           break;
@@ -54,6 +55,7 @@ class TexturedGlassContainer extends ConsumerWidget {
           fillColor = AppColors.lightSurface;
           break;
         case AppThemeMode.dark:
+        case AppThemeMode.automatic:
           fillColor = AppColors.darkSurface;
           break;
       }

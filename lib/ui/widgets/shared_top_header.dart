@@ -19,7 +19,7 @@ class SharedTopHeader extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final appThemeMode = ref.watch(themeProvider);
-    final isDarkMode = appThemeMode == AppThemeMode.dark;
+    final isDarkMode = theme.brightness == Brightness.dark;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -100,21 +100,27 @@ class SharedTopHeader extends ConsumerWidget {
             child: FadeTransition(opacity: anim, child: child),
           ),
           child: switch (appThemeMode) {
+            AppThemeMode.automatic => Icon(
+                Icons.brightness_auto,
+                key: const ValueKey('automatic'),
+                size: 26,
+                color: theme.primaryColor,
+              ),
             AppThemeMode.light => Icon(
                 Icons.wb_sunny_outlined,
                 key: const ValueKey('light'),
                 size: 26,
                 color: theme.primaryColor,
               ),
-            AppThemeMode.sepia => Icon(
-                Icons.auto_awesome,
-                key: const ValueKey('sepia'),
-                size: 26,
-                color: theme.primaryColor,
-              ),
             AppThemeMode.dark => Icon(
                 Icons.nightlight_round,
                 key: const ValueKey('dark'),
+                size: 26,
+                color: theme.primaryColor,
+              ),
+            AppThemeMode.sepia => Icon(
+                Icons.auto_awesome,
+                key: const ValueKey('sepia'),
                 size: 26,
                 color: theme.primaryColor,
               ),

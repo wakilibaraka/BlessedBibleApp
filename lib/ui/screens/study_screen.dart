@@ -49,15 +49,16 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
     final appThemeMode = ref.watch(themeProvider);
     
     String subGreeting;
-    switch (appThemeMode) {
+    switch (appThemeMode.resolve(context)) {
       case AppThemeMode.light:
         subGreeting = "Embrace the light of His word.";
         break;
-      case AppThemeMode.sepia:
-        subGreeting = "Warm your heart with Scripture.";
-        break;
       case AppThemeMode.dark:
-        subGreeting = "Find peace in the quiet moments.";
+      case AppThemeMode.automatic:
+        subGreeting = "Rest in the peace of His promises.";
+        break;
+      case AppThemeMode.sepia:
+        subGreeting = "Reflect on the ancient wisdom.";
         break;
     }
 
