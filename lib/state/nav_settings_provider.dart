@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'immersive_mode_provider.dart';
+
 import 'read_selection_provider.dart';
 import 'nav_provider.dart';
 
@@ -59,7 +59,5 @@ final bottomNavVisibilityProvider = Provider<bool>((ref) {
   final hasSelection = ref.watch(readSelectionProvider).isNotEmpty;
   if (hasSelection) return false;
 
-  // 2. Immersive Mode controls the nav visibility directly (both manual toggle and scroll)
-  final isScrollHidden = ref.watch(immersiveModeProvider);
-  return !isScrollHidden;
+  return true;
 });

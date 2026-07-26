@@ -570,6 +570,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                                       AnimatedContainer(
                                                         duration:
                                                             const Duration(milliseconds: 250),
+                                                        clipBehavior: Clip.antiAlias,
                                                         padding: const EdgeInsets.only(
                                                             top: 6.0,
                                                             bottom: 6.0,
@@ -961,7 +962,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
     final isDark = theme.brightness == Brightness.dark;
 
     return Padding(
-      padding: const EdgeInsets.only(top: 80.0, bottom: 120.0), // Above nav pill
+      padding: const EdgeInsets.only(top: 80.0, bottom: 160.0), // Above nav pill
       child: Column(
         children: [
           // Divider

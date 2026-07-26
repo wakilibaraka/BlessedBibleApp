@@ -63,6 +63,7 @@ class TexturedGlassContainer extends ConsumerWidget {
 
     return Container(
       margin: margin,
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         borderRadius: radius,
         boxShadow: [

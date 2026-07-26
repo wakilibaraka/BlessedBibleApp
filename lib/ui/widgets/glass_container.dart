@@ -25,6 +25,7 @@ class GlassContainer extends StatelessWidget {
 
     return Container(
       margin: margin,
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         borderRadius: radius,
         boxShadow: [
@@ -37,6 +38,7 @@ class GlassContainer extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: radius,
+        clipBehavior: Clip.antiAlias,
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: Container(
