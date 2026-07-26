@@ -60,19 +60,15 @@ class SearchNotifier extends Notifier<SearchState> {
       }
     });
 
-    _loadRecentPlaces();
-    _loadFilters();
+    final prefs = ref.watch(preferencesProvider);
+    final history = prefs.getSearchHistory();
 
-    return SearchState();
-  }
-  
-  void _loadFilters() {
-    final prefs = ref.read(preferencesProvider).prefs;
-    state = state.copyWith(
-      filterOt: prefs.getBool('search_filter_ot') ?? true,
-      filterNt: prefs.getBool('search_filter_nt') ?? true,
-      filterCommentary: prefs.getBool('search_filter_comm') ?? true,
-      filterNotes: prefs.getBool('search_filter_notes') ?? true,
+    return SearchState(
+      recentPlaces: history,
+      filterOt: prefs.prefs.getBool('search_filter_ot') ?? true,
+      filterNt: prefs.prefs.getBool('search_filter_nt') ?? true,
+      filterCommentary: prefs.prefs.getBool('search_filter_comm') ?? true,
+      filterNotes: prefs.prefs.getBool('search_filter_notes') ?? true,
     );
   }
   
@@ -82,11 +78,6 @@ class SearchNotifier extends Notifier<SearchState> {
     prefs.setBool('search_filter_nt', state.filterNt);
     prefs.setBool('search_filter_comm', state.filterCommentary);
     prefs.setBool('search_filter_notes', state.filterNotes);
-  }
-
-  void _loadRecentPlaces() {
-    final history = ref.read(preferencesProvider).getSearchHistory();
-    state = state.copyWith(recentPlaces: history);
   }
 
   void setQuery(String query) {
