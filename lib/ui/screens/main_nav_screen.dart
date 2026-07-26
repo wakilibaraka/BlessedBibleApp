@@ -213,9 +213,9 @@ class MainNavScreen extends ConsumerWidget {
                                             const SizedBox(width: 12),
                                             ...List.generate(highlightPalette.length, (i) {
                                               final color = highlightPalette[i];
+                                              final highlights = ref.watch(highlightsProvider);
                                               final allHaveThisColor = selectedVerses.every((v) {
                                                 final refStr = '${readLoc.bookName} ${readLoc.chapter}:$v';
-                                                final highlights = ref.read(highlightsProvider);
                                                 return highlights.containsKey(refStr) && highlights[refStr] == i;
                                               });
 
@@ -505,6 +505,8 @@ class MainNavScreen extends ConsumerWidget {
   Widget _buildActionMenuIcons(BuildContext context, WidgetRef ref, ThemeData theme) {
     final readLoc = ref.watch(readLocationProvider);
     final selectedVerses = ref.watch(readSelectionProvider);
+    final bookmarks = ref.watch(bookmarksProvider);
+    final favorites = ref.watch(favoritesProvider);
 
     return SizedBox(
       key: const ValueKey('action_menu_icons'),
@@ -515,11 +517,11 @@ class MainNavScreen extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _buildActionIcon(
-              selectedVerses.every((v) => ref.read(bookmarksProvider).contains('${readLoc.bookName} ${readLoc.chapter}:$v'))
+              selectedVerses.every((v) => bookmarks.contains('${readLoc.bookName} ${readLoc.chapter}:$v'))
                   ? Icons.bookmark_rounded
                   : Icons.bookmark_border_rounded,
               'Bookmark',
-              selectedVerses.every((v) => ref.read(bookmarksProvider).contains('${readLoc.bookName} ${readLoc.chapter}:$v'))
+              selectedVerses.every((v) => bookmarks.contains('${readLoc.bookName} ${readLoc.chapter}:$v'))
                   ? theme.primaryColor
                   : theme.colorScheme.onSurface,
               () {
@@ -543,11 +545,11 @@ class MainNavScreen extends ConsumerWidget {
               },
             ),
             _buildActionIcon(
-              selectedVerses.every((v) => ref.read(favoritesProvider).contains('${readLoc.bookName} ${readLoc.chapter}:$v'))
+              selectedVerses.every((v) => favorites.contains('${readLoc.bookName} ${readLoc.chapter}:$v'))
                   ? Icons.star_rounded
                   : Icons.star_outline_rounded,
               'Favorite',
-              selectedVerses.every((v) => ref.read(favoritesProvider).contains('${readLoc.bookName} ${readLoc.chapter}:$v'))
+              selectedVerses.every((v) => favorites.contains('${readLoc.bookName} ${readLoc.chapter}:$v'))
                   ? Colors.amber
                   : theme.colorScheme.onSurface,
               () {

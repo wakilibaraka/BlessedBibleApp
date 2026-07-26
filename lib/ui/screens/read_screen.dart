@@ -498,9 +498,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                       },
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.circular(20),
-                                        child: BackdropFilter(
-                                          filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
-                                          child: Container(
+                                        child: Container(
                                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                             decoration: BoxDecoration(
                                               color: theme.colorScheme.surface.withValues(alpha: 0.6),
@@ -541,8 +539,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
                                           ),
                                         ),
                                       ),
-                                    ),
-                                    trailing: GestureDetector(
+                                      trailing: GestureDetector(
                                       onTap: _showTypographyBottomSheet,
                                       behavior: HitTestBehavior.opaque,
                                       child: Center(
@@ -751,7 +748,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen> {
           // Commentary Button
           TextButton.icon(
             onPressed: hasChapterCommentary ? () {
-              ref.read(navProvider.notifier).setIndex(3);
               Navigator.of(context).push(MaterialPageRoute(
                 builder: (_) => CommentaryListScreen(
                   bookName: fc.book.name,
