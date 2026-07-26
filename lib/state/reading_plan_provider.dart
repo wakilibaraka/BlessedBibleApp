@@ -157,6 +157,28 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
     _saveState();
   }
 
+  void startPlanFromDay(int day) {
+    final newCompleted = Set<int>.from(state.completedDays);
+    for (int i = 1; i < day; i++) {
+      newCompleted.add(i);
+    }
+    
+    DateTime newStartDate = state.startDate;
+    if (state.startMode == PlanStartMode.startToday) {
+      // Backdate the start date so that 'day' lands exactly on today.
+      final now = DateTime.now();
+      newStartDate = now.subtract(Duration(days: day - 1));
+    }
+
+    state = state.copyWith(
+      currentDay: day,
+      completedDays: newCompleted,
+      startDate: newStartDate,
+    );
+    _saveState();
+    ref.read(notificationServiceProvider).scheduleDailyReminder();
+  }
+
   bool jumpToBook(String bookQuery) {
     final query = bookQuery.trim().toLowerCase();
     
@@ -177,6 +199,36 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
       }
     }
     return false;
+  }
+
+  int? findDayForPassage(String targetBook, int targetChapter) {
+    final tBook = targetBook.toLowerCase();
+    for (int i = 0; i < state.planData.length; i++) {
+      final day = state.planData[i];
+      for (final reading in day.readings) {
+        final match = RegExp(r'^(\d?\s*[a-zA-Z\s]+)(?:\s+([\d,\-\s;a-zA-Z]+))?').firstMatch(reading);
+        if (match != null) {
+          String bName = match.group(1)!.trim().toLowerCase();
+          if (bName == 'song of solomon') bName = 'song of solomon';
+          
+          if (bName == tBook || bName.contains(tBook) || tBook.contains(bName)) {
+            final chaptersStr = match.group(2);
+            if (chaptersStr == null || chaptersStr.isEmpty) return day.day;
+            
+            final chapterRegex = RegExp(r'\b' + targetChapter.toString() + r'\b');
+            if (chapterRegex.hasMatch(chaptersStr)) return day.day;
+            
+            final rangeMatches = RegExp(r'(\d+)\s*-\s*(\d+)').allMatches(chaptersStr);
+            for (final rm in rangeMatches) {
+               final start = int.tryParse(rm.group(1)!) ?? 0;
+               final end = int.tryParse(rm.group(2)!) ?? 0;
+               if (targetChapter >= start && targetChapter <= end) return day.day;
+            }
+          }
+        }
+      }
+    }
+    return null;
   }
 
   void markDayComplete(int day) {

@@ -5,6 +5,7 @@ import '../../state/theme_provider.dart';
 import '../../state/read_location_provider.dart';
 import '../../state/nav_provider.dart';
 import '../../state/bible_provider.dart';
+import '../../state/search_engine.dart';
 import '../widgets/textured_glass_container.dart';
 import '../widgets/bouncy_entrance.dart';
 import '../widgets/animated_background.dart';
@@ -46,30 +47,24 @@ class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
     }
   }
 
-  void _showJumpToBookDialog(BuildContext context, WidgetRef ref) {
+  void _showSearchDialog(BuildContext context, WidgetRef ref) {
     final textController = TextEditingController();
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          title: const Text('Jump to Book'),
+          title: const Text('Search Plan'),
           content: TextField(
             controller: textController,
             decoration: const InputDecoration(
-              hintText: 'e.g. Numbers, Luke',
+              hintText: 'e.g. Isaiah 47, The Ten Plagues',
               border: OutlineInputBorder(),
             ),
             autofocus: true,
             onSubmitted: (query) {
               if (query.isNotEmpty) {
-                final found = ref.read(readingPlanProvider.notifier).jumpToBook(query);
-                Navigator.of(context).pop();
-                if (!found) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Book '$query' not found in plan.")),
-                  );
-                }
+                _handleSearch(context, ref, query);
               }
             },
           ),
@@ -80,22 +75,90 @@ class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
             ),
             ElevatedButton(
               onPressed: () {
-                final query = textController.text;
+                final query = textController.text.trim();
                 if (query.isNotEmpty) {
-                  final found = ref.read(readingPlanProvider.notifier).jumpToBook(query);
-                  Navigator.of(context).pop();
-                  if (!found) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Book '$query' not found in plan.")),
-                    );
-                  }
+                  _handleSearch(context, ref, query);
                 }
               },
-              child: const Text('Jump'),
+              child: const Text('Search'),
             ),
           ],
         );
       },
+    );
+  }
+
+  Future<void> _handleSearch(BuildContext context, WidgetRef ref, String query) async {
+    Navigator.of(context).pop(); // Close dialog immediately
+    
+    final planProvider = ref.read(readingPlanProvider.notifier);
+    
+    // Fallback simple book jump
+    if (planProvider.jumpToBook(query)) return;
+    
+    // Otherwise use SearchEngine
+    final engine = ref.read(searchEngineProvider);
+    final results = await engine.search(query, includeCommentary: false, includeNotes: false);
+    
+    if (results.isNotEmpty) {
+      final first = results.first;
+      final bookName = first.metadata['book'] as String?;
+      final chapterNum = first.metadata['chapter'] as int?;
+      
+      if (bookName != null && chapterNum != null) {
+        final foundDay = planProvider.findDayForPassage(bookName, chapterNum);
+        if (foundDay != null) {
+          planProvider.jumpToDay(foundDay);
+          if (context.mounted) {
+            _showReadOrStartDialog(context, ref, first.title, foundDay);
+          }
+          return;
+        }
+      }
+    }
+    
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Passage '$query' not found in plan.")),
+      );
+    }
+  }
+
+  void _showReadOrStartDialog(BuildContext context, WidgetRef ref, String readingTitle, int dayContext) {
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text('Day $dayContext: $readingTitle'),
+              subtitle: const Text('What would you like to do?'),
+            ),
+            const Divider(),
+            ListTile(
+              leading: Icon(Icons.menu_book_rounded, color: Theme.of(context).primaryColor),
+              title: const Text('Read passage'),
+              onTap: () {
+                Navigator.of(ctx).pop();
+                _openReading(readingTitle, context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.fast_forward_rounded, color: Theme.of(context).colorScheme.secondary),
+              title: const Text('Start plan from here'),
+              subtitle: const Text('Days before this will be marked complete.'),
+              onTap: () {
+                Navigator.of(ctx).pop();
+                ref.read(readingPlanProvider.notifier).startPlanFromDay(dayContext);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Plan updated to start from Day $dayContext")),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -120,10 +183,10 @@ class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.search_rounded, color: theme.primaryColor),
+            icon: const Icon(Icons.search_rounded),
             tooltip: 'Search Plan',
             onPressed: () {
-              _showJumpToBookDialog(context, ref);
+              _showSearchDialog(context, ref);
             },
           ),
           PopupMenuButton<PlanStartMode>(
@@ -295,7 +358,7 @@ class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
                                       return Padding(
                                         padding: const EdgeInsets.only(bottom: 8.0),
                                         child: InkWell(
-                                          onTap: () => _openReading(reading, context),
+                                          onTap: () => _showReadOrStartDialog(context, ref, reading, dayData.day),
                                           borderRadius: BorderRadius.circular(8),
                                           child: Padding(
                                             padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 4.0),
