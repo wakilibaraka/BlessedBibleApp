@@ -440,17 +440,14 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                                 color: Colors.white,
                               ),
                             ),
-                            if (size == CardSize.medium ||
-                                size == CardSize.large) ...[
-                              const SizedBox(height: 8),
-                              Text(
-                                'View all your color-coded highlighted verses.',
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: Colors.white.withValues(alpha: 0.9),
-                                ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'View all your color-coded highlighted verses.',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: Colors.white.withValues(alpha: 0.9),
                               ),
-                            ],
-                            if (size == CardSize.large) ...[
+                            ),
+                            if (size == CardSize.medium || size == CardSize.large) ...[
                               const SizedBox(height: 16),
                               Container(
                                 padding: const EdgeInsets.all(12),
@@ -466,6 +463,33 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                                     Text('12 verses highlighted this week',
                                         style: theme.textTheme.labelSmall
                                             ?.copyWith(color: Colors.white70)),
+                                  ],
+                                ),
+                              ),
+                            ],
+                            if (size == CardSize.large) ...[
+                              const SizedBox(height: 12),
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.auto_awesome, color: Colors.white70, size: 16),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        '"The Lord is my shepherd; I shall not want." - Psalm 23:1',
+                                        style: theme.textTheme.bodySmall?.copyWith(
+                                          color: Colors.white.withValues(alpha: 0.9),
+                                          fontStyle: FontStyle.italic,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -544,26 +568,23 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          if (size == CardSize.medium ||
-                              size == CardSize.large) ...[
-                            const SizedBox(height: 8),
-                            Text(
-                              'Chronological Bible in a Year',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.textTheme.bodySmall?.color
-                                    ?.withValues(alpha: 0.8),
-                              ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Chronological Bible in a Year',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.textTheme.bodySmall?.color
+                                  ?.withValues(alpha: 0.8),
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Day 203 • 4 Chapters',
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: theme.primaryColor,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Day 203 • 4 Chapters',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.primaryColor,
+                              fontWeight: FontWeight.w600,
                             ),
-                          ],
-                          if (size == CardSize.large) ...[
+                          ),
+                          if (size == CardSize.medium || size == CardSize.large) ...[
                             const SizedBox(height: 16),
                             ClipRRect(
                               borderRadius: BorderRadius.circular(4),
@@ -578,8 +599,55 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                             ),
                             const SizedBox(height: 8),
                             Text('55% Complete',
-                                style: theme.textTheme.labelSmall
-                                    ?.copyWith(color: theme.primaryColor)),
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                    color: theme.textTheme.labelSmall?.color
+                                        ?.withValues(alpha: 0.6))),
+                          ],
+                          if (size == CardSize.large) ...[
+                            const SizedBox(height: 16),
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Today\'s Reading',
+                                    style: theme.textTheme.labelMedium?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      Icon(Icons.check_circle_rounded, color: theme.primaryColor, size: 16),
+                                      const SizedBox(width: 8),
+                                      Text('1 Kings 10', style: theme.textTheme.bodySmall),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      Icon(Icons.circle_outlined, color: theme.colorScheme.onSurface.withValues(alpha: 0.3), size: 16),
+                                      const SizedBox(width: 8),
+                                      Text('1 Kings 11', style: theme.textTheme.bodySmall),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      Icon(Icons.circle_outlined, color: theme.colorScheme.onSurface.withValues(alpha: 0.3), size: 16),
+                                      const SizedBox(width: 8),
+                                      Text('2 Chronicles 9', style: theme.textTheme.bodySmall),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
                           ],
                         ],
                       ),
@@ -694,15 +762,37 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    if (size == CardSize.medium || size == CardSize.large) ...[
-                      const SizedBox(height: 8),
-                      Text(
-                        displaySnippet,
-                        maxLines: size == CardSize.large ? 6 : 3,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          height: 1.5,
-                          fontStyle: FontStyle.italic,
+                    const SizedBox(height: 8),
+                    Text(
+                      displaySnippet,
+                      maxLines: size == CardSize.small ? 3 : (size == CardSize.medium ? 6 : 10),
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        height: 1.5,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                    if (size == CardSize.large) ...[
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: theme.primaryColor.withValues(alpha: 0.3)),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Read Full Commentary',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: theme.primaryColor,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Icon(Icons.arrow_forward_rounded, size: 16, color: theme.primaryColor),
+                          ],
                         ),
                       ),
                     ],
@@ -764,15 +854,12 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              if (size == CardSize.medium ||
-                                  size == CardSize.large)
-                                Text(
-                                  'Your collected reflections',
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: theme.textTheme.bodySmall?.color
-                                        ?.withValues(alpha: 0.7),
-                                  ),
+                              Text(
+                                'Your collected reflections',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.textTheme.bodySmall?.color
                                 ),
+                              ),
                             ],
                           ),
                         ),
@@ -780,7 +867,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                             color: theme.primaryColor),
                       ],
                     ),
-                    if (size == CardSize.large) ...[
+                    if (size == CardSize.medium || size == CardSize.large) ...[
                       const SizedBox(height: 16),
                       Container(
                         padding: const EdgeInsets.all(12),
@@ -800,6 +887,30 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                                 style: theme.textTheme.labelSmall?.copyWith(
                                     color: theme.colorScheme.onSurface
                                         .withValues(alpha: 0.7))),
+                          ],
+                        ),
+                      ),
+                    ],
+                    if (size == CardSize.large) ...[
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: theme.primaryColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Recently Added',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text('"In the beginning God created the heaven and the earth." - Genesis 1:1', style: theme.textTheme.bodySmall, maxLines: 2, overflow: TextOverflow.ellipsis),
                           ],
                         ),
                       ),

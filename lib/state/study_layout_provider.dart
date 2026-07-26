@@ -13,6 +13,7 @@ class StudyCardConfig {
   Map<String, dynamic> toJson() => {
         'id': id,
         'size': size.name,
+        'version': 2,
       };
 
   factory StudyCardConfig.fromJson(Map<String, dynamic> json) {
@@ -21,15 +22,32 @@ class StudyCardConfig {
       final isExpanded = json['isExpanded'] as bool;
       return StudyCardConfig(
         id: json['id'] as String,
-        size: isExpanded ? CardSize.large : CardSize.small,
+        size: isExpanded ? CardSize.medium : CardSize.small,
       );
     }
 
     final sizeStr = json['size'] as String?;
-    final size = CardSize.values.firstWhere(
-      (e) => e.name == sizeStr,
-      orElse: () => CardSize.medium,
-    );
+    final version = json['version'] as int? ?? 1;
+
+    CardSize size;
+    if (version < 2) {
+      // Migrate old sizing:
+      // old Small -> new Small
+      // old Medium -> new Small
+      // old Large -> new Medium
+      if (sizeStr == 'small' || sizeStr == 'medium') {
+        size = CardSize.small;
+      } else if (sizeStr == 'large') {
+        size = CardSize.medium;
+      } else {
+        size = CardSize.medium; // Fallback
+      }
+    } else {
+      size = CardSize.values.firstWhere(
+        (e) => e.name == sizeStr,
+        orElse: () => CardSize.medium,
+      );
+    }
 
     return StudyCardConfig(
       id: json['id'] as String,
@@ -40,10 +58,10 @@ class StudyCardConfig {
 
 class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
   static final List<StudyCardConfig> _defaultLayout = [
-    StudyCardConfig(id: 'your_space', size: CardSize.large),
+    StudyCardConfig(id: 'your_space', size: CardSize.medium),
     StudyCardConfig(id: 'reading_plan', size: CardSize.medium),
     StudyCardConfig(id: 'commentary', size: CardSize.medium),
-    StudyCardConfig(id: 'saved_verses', size: CardSize.small),
+    StudyCardConfig(id: 'saved_verses', size: CardSize.medium),
   ];
 
   @override
