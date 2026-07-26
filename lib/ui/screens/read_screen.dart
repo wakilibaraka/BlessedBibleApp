@@ -1096,15 +1096,20 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                showDialog(
                                  context: context, 
                                  barrierDismissible: false,
-                                 builder: (context) => DayCompleteCelebration(
+                                 builder: (dialogContext) => DayCompleteCelebration(
                                    day: activePlanDay,
                                    onComplete: () {
-                                     Navigator.of(context).pop();
+                                     final nav = Navigator.of(dialogContext);
+                                     final messenger = ScaffoldMessenger.of(context);
+                                     
+                                     nav.pop();
+                                     if (!mounted) return;
+                                     
                                      notifier.markDayComplete(activePlanDay);
                                      
                                      final finalState = ref.read(readingPlanProvider);
                                      if (finalState.isPlanComplete) {
-                                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Plan completed! Congratulations! 🎉')));
+                                        messenger.showSnackBar(const SnackBar(content: Text('Plan completed! Congratulations! 🎉')));
                                      } else {
                                         final nextDay = finalState.currentDay;
                                         if (nextDay > 0 && nextDay <= finalState.planData.length) {
