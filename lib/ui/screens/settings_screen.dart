@@ -177,6 +177,22 @@ class SettingsScreen extends StatelessWidget {
             );
           }),
           Consumer(builder: (context, ref, _) {
+            final isRedLetterEnabled = ref.watch(readSettingsProvider.select((s) => s.isRedLetterEnabled));
+            return _AnimatedSegmentedTile<bool>(
+              title: 'Words of Jesus in red',
+              subtitle: 'Render the words of Jesus in a subtle, classic red letter format',
+              selectedValue: isRedLetterEnabled,
+              options: const [
+                MapEntry(true, 'On'),
+                MapEntry(false, 'Off'),
+              ],
+              onChanged: (val) {
+                HapticFeedback.selectionClick();
+                ref.read(readSettingsProvider.notifier).setRedLetterEnabled(val);
+              },
+            );
+          }),
+          Consumer(builder: (context, ref, _) {
             final actionStyle = ref.watch(readSettingsProvider.select((s) => s.verseActionStyle));
             return _AnimatedSegmentedTile<VerseActionStyle>(
               title: 'Verse Action Style',

@@ -19,6 +19,7 @@ class PreferencesService {
   static const String _votdViewedDaysKey = 'votd_viewed_days';
   static const String _streakCountKey = 'streak_count';
   static const String _lastReadDateKey = 'last_read_date';
+  static const String _redLetterEnabledKey = 'red_letter_enabled';
 
   // Reminder settings
   static const String _sabbathReminderEnabledKey = 'sabbath_reminder_enabled';
@@ -272,6 +273,16 @@ class PreferencesService {
 
   String? getLastReadDate() {
     return prefs.getString(_lastReadDateKey);
+  }
+
+  // --- Read Settings ---
+
+  bool getRedLetterEnabled() {
+    return prefs.getBool(_redLetterEnabledKey) ?? true;
+  }
+
+  void saveRedLetterEnabled(bool enabled) {
+    prefs.setBool(_redLetterEnabledKey, enabled);
   }
 }
 

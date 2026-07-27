@@ -817,6 +817,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                                           hasCommentary: hasCommentary,
                                                           onCommentaryTap: () => _showCommentaryBottomSheet(verse.number, verse.text),
                                                           isBookmarked: isBookmarked,
+                                                          isRedLetterEnabled: readSettings.isRedLetterEnabled,
                                                         ),
                                                       ),
                                                       // Left accent bar — only visible when selected or highlighted
@@ -1083,7 +1084,7 @@ Positioned(
     );
   }
 
-  Widget _buildNormalVerse(BibleVerse verse, ThemeData theme, TypographyState typography, AppThemeMode appThemeMode, {bool hasCommentary = false, VoidCallback? onCommentaryTap, bool isBookmarked = false}) {
+  Widget _buildNormalVerse(BibleVerse verse, ThemeData theme, TypographyState typography, AppThemeMode appThemeMode, {bool hasCommentary = false, VoidCallback? onCommentaryTap, bool isBookmarked = false, bool isRedLetterEnabled = true}) {
     final fontStyle = theme.textTheme.bodyMedium?.copyWith(
       fontFamily: typography.fontFamily == 'System' ? null : typography.fontFamily,
       fontSize: typography.fontSize,
@@ -1097,17 +1098,52 @@ Positioned(
     ) ?? const TextStyle();
 
     Color starColor;
+    Color redLetterColor;
     switch (appThemeMode.resolve(context)) {
       case AppThemeMode.light:
         starColor = Colors.deepOrange.shade400;
+        redLetterColor = const Color(0xFFB33A3A); // Soft crimson
         break;
       case AppThemeMode.dark:
       case AppThemeMode.automatic:
         starColor = Colors.amber.shade400;
+        redLetterColor = const Color(0xFFD46A6A); // Lighter muted red
         break;
       case AppThemeMode.sepia:
         starColor = Colors.orange.shade700;
+        redLetterColor = const Color(0xFFA63C3C); // Warm crimson
         break;
+    }
+
+    final redLetterStyle = fontStyle.copyWith(color: redLetterColor);
+    List<TextSpan> textSpans = [];
+    String text = verse.text;
+    int currentIndex = 0;
+    
+    while (currentIndex < text.length) {
+      int startIndex = text.indexOf('‹', currentIndex);
+      if (startIndex == -1) {
+        textSpans.add(TextSpan(text: text.substring(currentIndex), style: fontStyle));
+        break;
+      }
+      
+      if (startIndex > currentIndex) {
+        textSpans.add(TextSpan(text: text.substring(currentIndex, startIndex), style: fontStyle));
+      }
+      
+      int endIndex = text.indexOf('›', startIndex + 1);
+      if (endIndex == -1) {
+        textSpans.add(TextSpan(
+            text: text.substring(startIndex + 1), 
+            style: isRedLetterEnabled ? redLetterStyle : fontStyle));
+        break;
+      }
+      
+      textSpans.add(TextSpan(
+          text: text.substring(startIndex + 1, endIndex), 
+          style: isRedLetterEnabled ? redLetterStyle : fontStyle));
+          
+      currentIndex = endIndex + 1;
     }
 
     return RichText(
@@ -1122,10 +1158,7 @@ Positioned(
               fontSize: typography.fontSize * 0.75, // Scale number down
             ),
           ),
-          TextSpan(
-            text: verse.text,
-            style: fontStyle,
-          ),
+          ...textSpans,
           if (hasCommentary)
             WidgetSpan(
               alignment: PlaceholderAlignment.top,

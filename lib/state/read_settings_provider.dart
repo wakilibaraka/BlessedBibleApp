@@ -13,6 +13,7 @@ class ReadSettingsState {
   final int primaryHighlightColorIndex;
   final int secondaryHighlightColorIndex;
   final bool isManualNavHidden;
+  final bool isRedLetterEnabled;
 
   const ReadSettingsState({
     this.readingViewMode = ReadingViewMode.immersive,
@@ -22,6 +23,7 @@ class ReadSettingsState {
     this.primaryHighlightColorIndex = 2, // Blue
     this.secondaryHighlightColorIndex = 1, // Green
     this.isManualNavHidden = false,
+    this.isRedLetterEnabled = true,
   });
 
   ReadSettingsState copyWith({
@@ -32,6 +34,7 @@ class ReadSettingsState {
     int? primaryHighlightColorIndex,
     int? secondaryHighlightColorIndex,
     bool? isManualNavHidden,
+    bool? isRedLetterEnabled,
   }) {
     return ReadSettingsState(
       readingViewMode: readingViewMode ?? this.readingViewMode,
@@ -41,6 +44,7 @@ class ReadSettingsState {
       primaryHighlightColorIndex: primaryHighlightColorIndex ?? this.primaryHighlightColorIndex,
       secondaryHighlightColorIndex: secondaryHighlightColorIndex ?? this.secondaryHighlightColorIndex,
       isManualNavHidden: isManualNavHidden ?? this.isManualNavHidden,
+      isRedLetterEnabled: isRedLetterEnabled ?? this.isRedLetterEnabled,
     );
   }
 }
@@ -69,6 +73,7 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     final primaryHighlightIndex = prefs.getInt(_primaryHighlightColorIndexKey);
     final secondaryHighlightIndex = prefs.getInt(_secondaryHighlightColorIndexKey);
     final isManualNavHidden = prefs.getBool(_isManualNavHiddenKey) ?? false;
+    final isRedLetterEnabled = prefs.getBool('red_letter_enabled') ?? true;
     
     ReadingViewMode mode = ReadingViewMode.immersive;
     if (modeString != null) {
@@ -102,6 +107,7 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
       primaryHighlightColorIndex: primaryHighlightIndex ?? 2,
       secondaryHighlightColorIndex: secondaryHighlightIndex ?? 1,
       isManualNavHidden: isManualNavHidden,
+      isRedLetterEnabled: isRedLetterEnabled,
     );
   }
 
@@ -148,6 +154,12 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     state = state.copyWith(isManualNavHidden: isHidden);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_isManualNavHiddenKey, isHidden);
+  }
+
+  Future<void> setRedLetterEnabled(bool isEnabled) async {
+    state = state.copyWith(isRedLetterEnabled: isEnabled);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('red_letter_enabled', isEnabled);
   }
 }
 
