@@ -118,11 +118,15 @@ class MainNavScreen extends ConsumerWidget {
                                     : (isRaindropAction ? BorderRadius.circular(28) : BorderRadius.circular(32)),
                               ),
                               builder: (context, radius, child) {
-                                return TexturedGlassContainer(
-                                  borderRadius:
-                                      radius ?? BorderRadius.circular(32),
-                                  padding: EdgeInsets.zero,
-                                  child: child!,
+                                return GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: () {}, // Absorb taps so they don't fall through
+                                  child: TexturedGlassContainer(
+                                    borderRadius:
+                                        radius ?? BorderRadius.circular(32),
+                                    padding: EdgeInsets.zero,
+                                    child: child!,
+                                  ),
                                 );
                               },
                               child: AnimatedContainer(
@@ -235,12 +239,13 @@ class MainNavScreen extends ConsumerWidget {
                                       delay: const Duration(milliseconds: 40),
                                       child: GestureDetector(
                                         behavior: HitTestBehavior.opaque,
+                                        onTap: () {}, // Absorb taps so they don't fall through
                                         child: TexturedGlassContainer(
                                           borderRadius: BorderRadius.circular(28),
                                           padding: EdgeInsets.zero,
                                           child: SizedBox(
                                             width: 56,
-                                            height: 310,
+                                            height: 224, // Matched twinsies size
                                             child: _buildActionMenuIcons(context, ref, Theme.of(context), showCloseIcon: false),
                                           ),
                                         ),
@@ -646,7 +651,7 @@ class MainNavScreen extends ConsumerWidget {
 
     return SizedBox(
       key: const ValueKey('action_menu_icons'),
-      height: showCloseIcon ? 380.0 : 310.0,
+      height: showCloseIcon ? 380.0 : 224.0, // Reduced height for Raindrop
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 24.0),
         child: Column(
