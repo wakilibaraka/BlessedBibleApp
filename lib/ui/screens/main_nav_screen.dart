@@ -106,7 +106,7 @@ class MainNavScreen extends ConsumerWidget {
                               duration: const Duration(milliseconds: 400),
                               curve: Curves.easeOutCubic,
                               tween: BorderRadiusTween(
-                                begin: BorderRadius.circular(32),
+                                begin: isRaindropAction ? BorderRadius.circular(28) : BorderRadius.circular(32),
                                 end: isNavHidden
                                     ? const BorderRadius.only(
                                         topLeft: Radius.circular(32),
@@ -114,7 +114,7 @@ class MainNavScreen extends ConsumerWidget {
                                         topRight: Radius.circular(8),
                                         bottomRight: Radius.circular(8),
                                       )
-                                    : BorderRadius.circular(32),
+                                    : (isRaindropAction ? BorderRadius.circular(28) : BorderRadius.circular(32)),
                               ),
                               builder: (context, radius, child) {
                                 return TexturedGlassContainer(
@@ -127,20 +127,21 @@ class MainNavScreen extends ConsumerWidget {
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 400),
                                 curve: Curves.easeOutCubic,
-                                height: 64.0,
-                                width: isNavHidden ? 0.0 : dockMaxWidth,
+                                height: isRaindropAction ? 56.0 : 64.0,
+                                width: isNavHidden ? 0.0 : (isRaindropAction ? 180.0 : dockMaxWidth),
                                 child: ClipRect(
                                   child: OverflowBox(
                                     alignment: Alignment.centerRight,
-                                    minWidth: dockMaxWidth,
-                                    maxWidth: dockMaxWidth,
-                                    minHeight: 64.0,
-                                    maxHeight: 64.0,
+                                    minWidth: isRaindropAction ? 180.0 : dockMaxWidth,
+                                    maxWidth: isRaindropAction ? 180.0 : dockMaxWidth,
+                                    minHeight: isRaindropAction ? 56.0 : 64.0,
+                                    maxHeight: isRaindropAction ? 56.0 : 64.0,
                                     child: SizedBox(
-                                      width: dockMaxWidth,
+                                      width: isRaindropAction ? 180.0 : dockMaxWidth,
                                       child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 8.0, horizontal: 24.0),
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: isRaindropAction ? 0.0 : 8.0, 
+                                            horizontal: isRaindropAction ? 0.0 : 24.0),
                                         child: AnimatedSwitcher(
                                           duration: const Duration(milliseconds: 300),
                                           transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
@@ -890,15 +891,20 @@ class MainNavScreen extends ConsumerWidget {
   }
 
   Widget _buildRaindropColorRow(BuildContext context, WidgetRef ref, ThemeData theme) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        key: const ValueKey('nav_tabs_raindrop'),
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          _buildColorDotRow(context, ref),
-        ],
+    return SizedBox(
+      height: 56.0,
+      child: Center(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            key: const ValueKey('nav_tabs_raindrop'),
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildColorDotRow(context, ref),
+            ],
+          ),
+        ),
       ),
     );
   }
