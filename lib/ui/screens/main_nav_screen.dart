@@ -24,6 +24,10 @@ import '../../state/read_settings_provider.dart';
 import '../../state/study_provider.dart';
 import 'verse_detail_screen.dart';
 
+const double kBottomDockHeight = 64.0;
+const double kBottomDockInset = 16.0;
+const double kBottomDockGap = 12.0;
+
 class MainNavScreen extends ConsumerWidget {
   const MainNavScreen({super.key});
 
@@ -87,13 +91,13 @@ class MainNavScreen extends ConsumerWidget {
                 (currentIndex == 1 && selectedVerses.isNotEmpty && style != VerseActionStyle.horizontal) ? 420.0 : 72.0;
 
             return SizedBox(
-              height: height + 32.0,
+              height: height + (kBottomDockInset * 2),
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
                   Positioned(
                     right: rightOffset,
-                    bottom: 16.0,
+                    bottom: kBottomDockInset,
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.end,
@@ -107,7 +111,7 @@ class MainNavScreen extends ConsumerWidget {
                               duration: const Duration(milliseconds: 400),
                               curve: Curves.easeOutCubic,
                               tween: BorderRadiusTween(
-                                begin: isRaindropAction ? BorderRadius.circular(28) : BorderRadius.circular(32),
+                                begin: BorderRadius.circular(kBottomDockHeight / 2),
                                 end: effectiveNavHidden
                                     ? const BorderRadius.only(
                                         topLeft: Radius.circular(32),
@@ -115,7 +119,7 @@ class MainNavScreen extends ConsumerWidget {
                                         topRight: Radius.circular(8),
                                         bottomRight: Radius.circular(8),
                                       )
-                                    : (isRaindropAction ? BorderRadius.circular(28) : BorderRadius.circular(32)),
+                                    : BorderRadius.circular(kBottomDockHeight / 2),
                               ),
                               builder: (context, radius, child) {
                                 return GestureDetector(
@@ -123,7 +127,7 @@ class MainNavScreen extends ConsumerWidget {
                                   onTap: () {}, // Absorb taps so they don't fall through
                                   child: TexturedGlassContainer(
                                     borderRadius:
-                                        radius ?? BorderRadius.circular(32),
+                                        radius ?? BorderRadius.circular(kBottomDockHeight / 2),
                                     padding: EdgeInsets.zero,
                                     child: child!,
                                   ),
@@ -132,15 +136,15 @@ class MainNavScreen extends ConsumerWidget {
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 400),
                                 curve: Curves.easeOutCubic,
-                                height: isRaindropAction ? 56.0 : 64.0,
+                                height: kBottomDockHeight,
                                 width: effectiveNavHidden ? 0.0 : (isRaindropAction ? 180.0 : dockMaxWidth),
                                 child: ClipRect(
                                   child: OverflowBox(
                                     alignment: Alignment.centerRight,
                                     minWidth: isRaindropAction ? 180.0 : dockMaxWidth,
                                     maxWidth: isRaindropAction ? 180.0 : dockMaxWidth,
-                                    minHeight: isRaindropAction ? 56.0 : 64.0,
-                                    maxHeight: isRaindropAction ? 56.0 : 64.0,
+                                    minHeight: kBottomDockHeight,
+                                    maxHeight: kBottomDockHeight,
                                     child: SizedBox(
                                       width: isRaindropAction ? 180.0 : dockMaxWidth,
                                       child: Padding(
@@ -207,16 +211,15 @@ class MainNavScreen extends ConsumerWidget {
                         ),
                         AnimatedContainer(
                           duration: const Duration(milliseconds: 400),
-                          width:
-                              effectiveNavHidden ? 0.0 : 12.0, // Collapse the gap too!
+                          width: effectiveNavHidden ? 0.0 : kBottomDockGap, // Collapse the gap too!
                         ),
                         // ── Dynamic Contextual FAB (Right) ──
                         TweenAnimationBuilder<double>(
                           duration: const Duration(milliseconds: 400),
                           curve: Curves.easeOutCubic,
                           tween: Tween<double>(
-                            begin: 56.0,
-                            end: (currentIndex == 1 && selectedVerses.isNotEmpty && style == VerseActionStyle.classic) ? 380.0 : 56.0,
+                            begin: kBottomDockHeight,
+                            end: (currentIndex == 1 && selectedVerses.isNotEmpty && style == VerseActionStyle.classic) ? 380.0 : kBottomDockHeight,
                           ),
                           builder: (context, height, child) {
                             final bool isClassicAction = currentIndex == 1 && selectedVerses.isNotEmpty && style == VerseActionStyle.classic;
@@ -232,7 +235,7 @@ class MainNavScreen extends ConsumerWidget {
                                 // ── Raindrop Vertical Pill ──
                                 if (isRaindropAction)
                                   Positioned(
-                                    bottom: 56.0 + 12.0, // Above the FAB
+                                    bottom: kBottomDockHeight + kBottomDockGap, // Above the FAB
                                     right: 0,
                                     child: BouncyEntrance(
                                       isVisible: true,
@@ -241,10 +244,10 @@ class MainNavScreen extends ConsumerWidget {
                                         behavior: HitTestBehavior.opaque,
                                         onTap: () {}, // Absorb taps so they don't fall through
                                         child: TexturedGlassContainer(
-                                          borderRadius: BorderRadius.circular(28),
+                                          borderRadius: BorderRadius.circular(kBottomDockHeight / 2),
                                           padding: EdgeInsets.zero,
                                           child: SizedBox(
-                                            width: 56,
+                                            width: kBottomDockHeight,
                                             height: 224, // Matched twinsies size
                                             child: _buildActionMenuIcons(context, ref, Theme.of(context), showCloseIcon: false),
                                           ),
@@ -255,7 +258,7 @@ class MainNavScreen extends ConsumerWidget {
 
                                 // ── Classic Top Pill (Verse + Colors) ──
                                 Positioned(
-                                  bottom: height + 12.0,
+                                  bottom: height + kBottomDockGap,
                                   right: 0,
                                   child: IgnorePointer(
                                     ignoring: !isClassicAction,
@@ -330,14 +333,14 @@ class MainNavScreen extends ConsumerWidget {
                                 ),
                                 // ── Morphing FAB / Bottom Pill ──
                                 TexturedGlassContainer(
-                                  borderRadius: BorderRadius.circular(28),
+                                  borderRadius: BorderRadius.circular(kBottomDockHeight / 2),
                                   padding: EdgeInsets.zero,
                                   child: SizedBox(
-                                    width: 56,
+                                    width: kBottomDockHeight,
                                     height: height,
                                     child: ClipRect(
                                       child: OverflowBox(
-                                        minHeight: 56,
+                                        minHeight: kBottomDockHeight,
                                         maxHeight: 380,
                                         alignment: Alignment.bottomCenter,
                                         child: AnimatedSwitcher(
@@ -348,7 +351,7 @@ class MainNavScreen extends ConsumerWidget {
                                                   ref, Theme.of(context))
                                               : SizedBox(
                                                   key: const ValueKey('fab'),
-                                                  height: 56,
+                                                  height: kBottomDockHeight,
                                                   child: Center(
                                                     child: IconButton(
                                                       icon: AnimatedSwitcher(
@@ -898,7 +901,7 @@ class MainNavScreen extends ConsumerWidget {
 
   Widget _buildRaindropColorRow(BuildContext context, WidgetRef ref, ThemeData theme) {
     return SizedBox(
-      height: 56.0,
+      height: kBottomDockHeight,
       child: Center(
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
