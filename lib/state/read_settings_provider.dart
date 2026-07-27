@@ -14,6 +14,8 @@ class ReadSettingsState {
   final int secondaryHighlightColorIndex;
   final bool isManualNavHidden;
   final bool isRedLetterEnabled;
+  final bool showVerseNumbers;
+  final bool keepScreenAwake;
 
   const ReadSettingsState({
     this.readingViewMode = ReadingViewMode.immersive,
@@ -24,6 +26,8 @@ class ReadSettingsState {
     this.secondaryHighlightColorIndex = 1, // Green
     this.isManualNavHidden = false,
     this.isRedLetterEnabled = true,
+    this.showVerseNumbers = true,
+    this.keepScreenAwake = false,
   });
 
   ReadSettingsState copyWith({
@@ -35,6 +39,8 @@ class ReadSettingsState {
     int? secondaryHighlightColorIndex,
     bool? isManualNavHidden,
     bool? isRedLetterEnabled,
+    bool? showVerseNumbers,
+    bool? keepScreenAwake,
   }) {
     return ReadSettingsState(
       readingViewMode: readingViewMode ?? this.readingViewMode,
@@ -45,8 +51,11 @@ class ReadSettingsState {
       secondaryHighlightColorIndex: secondaryHighlightColorIndex ?? this.secondaryHighlightColorIndex,
       isManualNavHidden: isManualNavHidden ?? this.isManualNavHidden,
       isRedLetterEnabled: isRedLetterEnabled ?? this.isRedLetterEnabled,
+      showVerseNumbers: showVerseNumbers ?? this.showVerseNumbers,
+      keepScreenAwake: keepScreenAwake ?? this.keepScreenAwake,
     );
   }
+
 }
 
 class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
@@ -74,6 +83,8 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     final secondaryHighlightIndex = prefs.getInt(_secondaryHighlightColorIndexKey);
     final isManualNavHidden = prefs.getBool(_isManualNavHiddenKey) ?? false;
     final isRedLetterEnabled = prefs.getBool('red_letter_enabled') ?? true;
+    final showVerseNumbers = prefs.getBool('show_verse_numbers') ?? true;
+    final keepScreenAwake = prefs.getBool('keep_screen_awake') ?? false;
     
     ReadingViewMode mode = ReadingViewMode.immersive;
     if (modeString != null) {
@@ -108,6 +119,8 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
       secondaryHighlightColorIndex: secondaryHighlightIndex ?? 1,
       isManualNavHidden: isManualNavHidden,
       isRedLetterEnabled: isRedLetterEnabled,
+        showVerseNumbers: showVerseNumbers,
+        keepScreenAwake: keepScreenAwake,
     );
   }
 
@@ -160,6 +173,18 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     state = state.copyWith(isRedLetterEnabled: isEnabled);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('red_letter_enabled', isEnabled);
+  }
+
+  Future<void> setShowVerseNumbers(bool val) async {
+    state = state.copyWith(showVerseNumbers: val);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('show_verse_numbers', val);
+  }
+
+  Future<void> setKeepScreenAwake(bool val) async {
+    state = state.copyWith(keepScreenAwake: val);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('keep_screen_awake', val);
   }
 }
 

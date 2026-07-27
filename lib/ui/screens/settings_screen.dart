@@ -16,6 +16,13 @@ import '../../state/read_settings_provider.dart';
 import '../../services/backup_service.dart';
 import '../../state/reminders_provider.dart';
 import '../widgets/shared_app_bar.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'privacy_policy_screen.dart';
+
+final packageInfoProvider = FutureProvider<PackageInfo>((ref) async {
+  return await PackageInfo.fromPlatform();
+});
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -113,6 +120,43 @@ class SettingsScreen extends StatelessWidget {
                 },
               );
             }),
+            Consumer(builder: (context, ref, _) {
+              final isRedLetter = ref.watch(readSettingsProvider.select((s) => s.isRedLetterEnabled));
+              return SwitchListTile(
+                title: const Text('Words of Jesus in Red'),
+                subtitle: const Text('Render words spoken by Jesus in red'),
+                value: isRedLetter,
+                onChanged: (val) {
+                  HapticFeedback.selectionClick();
+                  ref.read(readSettingsProvider.notifier).setRedLetterEnabled(val);
+                },
+              );
+            }),
+            Consumer(builder: (context, ref, _) {
+              final showNumbers = ref.watch(readSettingsProvider.select((s) => s.showVerseNumbers));
+              return SwitchListTile(
+                title: const Text('Show Verse Numbers'),
+                subtitle: const Text('Display verse numbers in the text'),
+                value: showNumbers,
+                onChanged: (val) {
+                  HapticFeedback.selectionClick();
+                  ref.read(readSettingsProvider.notifier).setShowVerseNumbers(val);
+                },
+              );
+            }),
+            Consumer(builder: (context, ref, _) {
+              final keepAwake = ref.watch(readSettingsProvider.select((s) => s.keepScreenAwake));
+              return SwitchListTile(
+                title: const Text('Keep Screen Awake'),
+                subtitle: const Text('Prevent device from sleeping while reading'),
+                value: keepAwake,
+                onChanged: (val) {
+                  HapticFeedback.selectionClick();
+                  ref.read(readSettingsProvider.notifier).setKeepScreenAwake(val);
+                },
+              );
+            }),
+
             Consumer(builder: (context, ref, _) {
               final primaryIndex = ref.watch(readSettingsProvider.select((s) => s.primaryHighlightColorIndex));
               final secondaryIndex = ref.watch(readSettingsProvider.select((s) => s.secondaryHighlightColorIndex));
@@ -517,6 +561,39 @@ class SettingsScreen extends StatelessWidget {
               );
             }),
           ], titleColor: Theme.of(context).colorScheme.error),
+          
+          _buildSection(context, 'ABOUT', [
+            Consumer(builder: (context, ref, _) {
+              final packageInfoAsync = ref.watch(packageInfoProvider);
+              return ListTile(
+                title: const Text('Version'),
+                trailing: packageInfoAsync.when(
+                  data: (info) => Text(info.version, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
+                  loading: () => const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
+                  error: (_, __) => const Text('Unknown'),
+                ),
+              );
+            }),
+            ListTile(
+              title: const Text('Send Feedback'),
+              trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+              onTap: () async {
+                final uri = Uri.parse('mailto:placeholder@example.com?subject=The Blessed Bible Feedback');
+                if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri);
+                }
+              },
+            ),
+            ListTile(
+              title: const Text('Privacy Policy'),
+              trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen()));
+              },
+            ),
+          ]),
+          
+          const SizedBox(height: 100), // Bottom padding to clear nav bar and FAB
         ],
       ),
     );

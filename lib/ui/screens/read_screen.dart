@@ -135,7 +135,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
     super.initState();
     _pageController = PageController(initialPage: 0);
     WidgetsBinding.instance.addObserver(this);
-    WakelockPlus.enable(); // Keep screen on during reading
+
     
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -151,7 +151,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
         state == AppLifecycleState.inactive) {
       WakelockPlus.disable();
     } else if (state == AppLifecycleState.resumed) {
-      WakelockPlus.enable();
+      final readSettings = ref.read(readSettingsProvider);
+      if (readSettings.keepScreenAwake) WakelockPlus.enable();
     }
   }
 
@@ -953,7 +954,7 @@ Positioned(
         context,
         theme,
         Text(
-          'aA',
+          'Aa',
           style: theme.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.w600,
             color: theme.colorScheme.onSurface,
@@ -1089,7 +1090,7 @@ Positioned(
     final fontStyle = theme.textTheme.bodyMedium?.copyWith(
       fontFamily: typography.fontFamily == 'System' ? null : typography.fontFamily,
       fontSize: typography.fontSize,
-      height: 1.6,
+      height: typography.lineHeight,
       letterSpacing: 0.15,
       color: theme.textTheme.bodyLarge?.color,
       decoration: isBookmarked ? TextDecoration.underline : null,
@@ -1152,6 +1153,7 @@ Positioned(
       text: TextSpan(
         style: fontStyle,
         children: [
+          if (ref.watch(readSettingsProvider).showVerseNumbers)
           TextSpan(
             text: '${verse.number}  ',
             style: theme.textTheme.titleMedium?.copyWith(
@@ -2246,6 +2248,40 @@ class _TypographyBottomSheet extends ConsumerWidget {
                   ),
                 ],
               ),
+
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'LINE SPACING',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.primaryColor,
+                      letterSpacing: 1.2,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    typography.lineHeight <= 1.4 ? 'Compact' : (typography.lineHeight >= 1.8 ? 'Relaxed' : 'Normal'),
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: theme.primaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Center(
+                child: PillSegmentedControl(
+                  segments: const ['Compact', 'Normal', 'Relaxed'],
+                  selectedIndex: typography.lineHeight <= 1.4 ? 0 : (typography.lineHeight >= 1.8 ? 2 : 1),
+                  onSegmentSelected: (index) {
+                    HapticFeedback.selectionClick();
+                    final heights = [1.3, 1.6, 1.9];
+                    typographyNotifier.setLineHeight(heights[index]);
+                  },
+                ),
+              ),
               const SizedBox(height: 24),
               Text(
                 'FONT FAMILY',
@@ -2622,7 +2658,7 @@ class CommentaryBottomSheetContent extends ConsumerWidget {
                   VerseLinkText(
                     text: entry.text,
                     defaultStyle: theme.textTheme.bodySmall?.copyWith(
-                      height: 1.6,
+                      height: typography.lineHeight,
                       color: theme.textTheme.bodyLarge?.color?.withValues(alpha: 0.9),
                     ),
                     referenceStyle: const TextStyle(
