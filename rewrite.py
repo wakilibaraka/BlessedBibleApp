@@ -1,28 +1,69 @@
-import 'package:flutter/material.dart';
-import '../../theme/app_colors.dart';
+import re
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter/services.dart';
+def main():
+    with open('lib/ui/screens/settings_screen.dart', 'r') as f:
+        content = f.read()
 
+    # Define the new _buildSection method
+    build_section = """
+  Widget _buildSection(BuildContext context, String title, List<Widget> children, {Color? titleColor}) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
+            child: Text(
+              title.toUpperCase(),
+              style: theme.textTheme.titleSmall?.copyWith(
+                    color: titleColor ?? theme.colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              children: [
+                for (int i = 0; i < children.length; i++) ...[
+                  children[i],
+                  if (i < children.length - 1) const Divider(height: 1, indent: 16),
+                ]
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+"""
 
-import '../../state/theme_provider.dart';
-import '../../state/user_data_provider.dart';
-import '../../state/typography_provider.dart';
-import '../../state/glass_ui_provider.dart';
-import '../../state/nav_settings_provider.dart';
-import '../../state/search_settings_provider.dart';
-import '../../state/bible_nav_settings_provider.dart';
-import '../../state/read_settings_provider.dart';
-import '../../services/backup_service.dart';
-import '../../state/reminders_provider.dart';
-import '../../state/amoled_provider.dart';
-import '../widgets/shared_app_bar.dart';
-
-class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
+    # We want to replace the `body: ListView(` up to the end of its children array.
+    # The new body will use `_buildSection`.
+    
+    # Let's extract the individual Consumer blocks. We can use regex or just manual string replacement
+    # since we know exactly the order.
+    # Actually, we can just replace the entire `build` method.
+    
+    # Find `Widget build(BuildContext context) {`
+    start_idx = content.find('Widget build(BuildContext context) {')
+    end_idx = content.find('  String _weekdayName(int day) {')
+    
+    if start_idx == -1 or end_idx == -1:
+        print("Could not find bounds")
+        return
+        
+    old_build = content[start_idx:end_idx]
+    
+    # We will reconstruct the `build` method manually. It's safer.
+    # I'll just write the entire new build method.
+    new_build = """Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: const SharedAppBar(
@@ -494,7 +535,7 @@ class SettingsScreen extends StatelessWidget {
                     context: context,
                     builder: (ctx) => AlertDialog(
                       title: const Text('Reset settings?'),
-                      content: const Text('Reset all settings to default? This won\'t affect your bookmarks, notes, or highlights.'),
+                      content: const Text('Reset all settings to default? This won\\'t affect your bookmarks, notes, or highlights.'),
                       actions: [
                         TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancel')),
                         ElevatedButton(
@@ -535,185 +576,11 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
+"""
+    
+    new_content = content[:start_idx] + new_build + build_section + content[end_idx:]
+    with open('lib/ui/screens/settings_screen.dart', 'w') as f:
+        f.write(new_content)
 
-  Widget _buildSection(BuildContext context, String title, List<Widget> children, {Color? titleColor}) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
-            child: Text(
-              title.toUpperCase(),
-              style: theme.textTheme.titleSmall?.copyWith(
-                    color: titleColor ?? theme.colorScheme.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surface,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: Column(
-              children: [
-                for (int i = 0; i < children.length; i++) ...[
-                  children[i],
-                  if (i < children.length - 1) const Divider(height: 1, indent: 16),
-                ]
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-  String _weekdayName(int day) {
-    const names = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    if (day >= 1 && day <= 7) return names[day - 1];
-    return 'Unknown';
-  }
-
-  void _showLocationPicker(BuildContext context, RemindersNotifier notifier) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
-      builder: (ctx) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(ctx).viewInsets.bottom,
-            left: 16, right: 16, top: 24,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text('Set Location for Sunset', style: Theme.of(context).textTheme.titleLarge),
-              const SizedBox(height: 16),
-              ElevatedButton.icon(
-                onPressed: () {
-                  // Simulated GPS lock
-                  notifier.setSabbathLocation('Current Location (GPS)', 34.0522, -118.2437);
-                  Navigator.pop(ctx);
-                },
-                icon: const Icon(Icons.my_location),
-                label: const Text('Use my current location'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor,
-                  foregroundColor: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Center(child: Text('OR select a major city')),
-              const SizedBox(height: 16),
-              SizedBox(
-                height: 200,
-                child: ListView(
-                  children: [
-                    _cityTile(ctx, notifier, 'New York, USA', 40.7128, -74.0060),
-                    _cityTile(ctx, notifier, 'London, UK', 51.5074, -0.1278),
-                    _cityTile(ctx, notifier, 'Sydney, Australia', -33.8688, 151.2093),
-                    _cityTile(ctx, notifier, 'Tokyo, Japan', 35.6762, 139.6503),
-                    _cityTile(ctx, notifier, 'Johannesburg, SA', -26.2041, 28.0473),
-                    _cityTile(ctx, notifier, 'São Paulo, Brazil', -23.5505, -46.6333),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _cityTile(BuildContext context, RemindersNotifier notifier, String name, double lat, double lng) {
-    return ListTile(
-      title: Text(name),
-      onTap: () {
-        notifier.setSabbathLocation(name, lat, lng);
-        Navigator.pop(context);
-      },
-    );
-  }
-}
-
-class _AnimatedSegmentedTile<T> extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final T selectedValue;
-  final List<MapEntry<T, String>> options;
-  final ValueChanged<T> onChanged;
-
-  const _AnimatedSegmentedTile({
-    required this.title,
-    required this.subtitle,
-    required this.selectedValue,
-    required this.options,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: theme.textTheme.titleMedium),
-          const SizedBox(height: 4),
-          Text(subtitle, style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Row(
-              children: options.map((entry) {
-                final isSelected = entry.key == selectedValue;
-                return Expanded(
-                  child: GestureDetector(
-                    onTap: () { HapticFeedback.selectionClick(); onChanged(entry.key); },
-                    behavior: HitTestBehavior.opaque,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 250),
-                      curve: Curves.easeOutCubic,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      decoration: BoxDecoration(
-                        color: isSelected ? theme.primaryColor : Colors.transparent,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: isSelected 
-                            ? [BoxShadow(color: theme.primaryColor.withValues(alpha: 0.3), blurRadius: 4, offset: const Offset(0, 2))]
-                            : [],
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        entry.value,
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          color: isSelected ? Colors.white : theme.colorScheme.onSurface.withValues(alpha: 0.8),
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-          const SizedBox(height: 8),
-        ],
-      ),
-    );
-  }
-}
+if __name__ == '__main__':
+    main()
