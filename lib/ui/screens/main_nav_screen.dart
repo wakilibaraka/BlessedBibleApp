@@ -818,9 +818,20 @@ class MainNavScreen extends ConsumerWidget {
     final selectedVerses = ref.watch(readSelectionProvider);
     final targetVerses = selectedVerses.toList();
     final bookmarks = ref.watch(bookmarksProvider);
+    final highlights = ref.watch(highlightsProvider);
     final bookAbbrev = readLoc.bookAbbrev;
     final chapterNum = readLoc.chapter;
     final bookName = readLoc.bookName;
+    
+    final isHighlighted = targetVerses.isNotEmpty && targetVerses.every((v) {
+      final refStr = generateVerseKey(bookAbbrev, chapterNum, v);
+      return highlights.containsKey(refStr);
+    });
+
+    final isBookmarked = targetVerses.isNotEmpty && targetVerses.every((v) {
+      final refStr = generateVerseKey(bookAbbrev, chapterNum, v);
+      return bookmarks.contains(refStr);
+    });
     
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -832,13 +843,9 @@ class MainNavScreen extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildActionIcon(
-            targetVerses.every((v) => bookmarks.contains(generateVerseKey(bookAbbrev, chapterNum, v)))
-                ? Icons.bookmark_rounded
-                : Icons.bookmark_border_rounded,
+            isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
             'Bookmark',
-            targetVerses.every((v) => bookmarks.contains(generateVerseKey(bookAbbrev, chapterNum, v)))
-                ? theme.primaryColor
-                : theme.colorScheme.onSurface,
+            isBookmarked ? theme.primaryColor : theme.colorScheme.onSurface,
             () {
               VerseActionLogic.handleBookmark(context, theme, ref, bookAbbrev, chapterNum, targetVerses);
               ref.read(readSelectionProvider.notifier).clear();
@@ -863,11 +870,13 @@ class MainNavScreen extends ConsumerWidget {
             },
           ),
           _buildActionIcon(
-            Icons.lightbulb_outline_rounded,
-            'Commentary',
-            theme.colorScheme.onSurface,
+            isHighlighted ? Icons.highlight_rounded : Icons.highlight_outlined,
+            'Highlight',
+            isHighlighted ? theme.primaryColor : theme.colorScheme.onSurface,
             () {
-              VerseActionLogic.handleCommentary(context, ref, bookName, chapterNum, targetVerses.isNotEmpty ? targetVerses.first : 1, targetVerses);
+              final primaryColorIndex = readSettings.primaryHighlightColorIndex;
+              final activeIndex = (primaryColorIndex >= 0 && primaryColorIndex < 5) ? primaryColorIndex : 2;
+              VerseActionLogic.handleHighlight(context, theme, ref, bookAbbrev, chapterNum, targetVerses, activeIndex);
               ref.read(readSelectionProvider.notifier).clear();
             },
           ),
