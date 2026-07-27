@@ -195,13 +195,46 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
       final targetIndex = flatChapters.indexWhere((fc) => (fc.book.abbreviation.toLowerCase() == loc.bookAbbrev.toLowerCase() || fc.book.name.toLowerCase() == loc.bookName.toLowerCase()) && fc.chapter.number == loc.chapter);
       if (targetIndex != -1) {
         final controller = _itemScrollControllers[targetIndex];
+        final listener = _itemPositionsListeners[targetIndex];
+        
         if (controller != null && controller.isAttached) {
+          final versesCount = flatChapters[targetIndex].chapter.verses.length;
+          
           controller.scrollTo(
             index: verse - 1,
             duration: const Duration(milliseconds: 600),
             curve: Curves.easeInOutCubic,
             alignment: 0.15, // Account for top header
           );
+          
+          if (listener != null) {
+            bool adjusted = false;
+            void checkOverscroll() {
+              if (adjusted || !mounted) return;
+              
+              final positions = listener.itemPositions.value;
+              // Footer is at index == versesCount
+              final footerPos = positions.where((p) => p.index == versesCount).firstOrNull;
+              
+              if (footerPos != null && footerPos.itemTrailingEdge < 1.0) {
+                adjusted = true;
+                controller.scrollTo(
+                  index: versesCount,
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeOutCubic,
+                  alignment: 1.0,
+                );
+              }
+            }
+            
+            listener.itemPositions.addListener(checkOverscroll);
+            
+            // Clean up the listener after the initial animation is done
+            Future.delayed(const Duration(milliseconds: 650), () {
+              if (mounted) listener.itemPositions.removeListener(checkOverscroll);
+            });
+          }
+
           // Highlight it faintly upon jumping
           if (mounted) {
             setState(() {
@@ -682,7 +715,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                           initialScrollIndex: (pageIndex == _currentPageIndex ? _navigatedVerseIndex : null) ?? ref.read(preferencesProvider).getChapterScrollPosition(fc.book.abbreviation, fc.chapter.number) ?? 0,
                                           padding: EdgeInsets.only(
                                               top: MediaQuery.of(context).padding.top + 80.0,
-                                              left: 24.0, right: 24.0, bottom: 400.0),
+                                              left: 24.0, right: 24.0, bottom: MediaQuery.of(context).padding.bottom + 80.0),
                                           itemCount: verses.length + 1,
                                           itemBuilder: (context, index) {
                                             if (index == verses.length) {
