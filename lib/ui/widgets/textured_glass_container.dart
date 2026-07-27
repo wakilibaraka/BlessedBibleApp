@@ -70,9 +70,9 @@ class TexturedGlassContainer extends ConsumerWidget {
         borderRadius: radius,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.12),
-            blurRadius: 30,
-            spreadRadius: -5,
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 24,
+            spreadRadius: 0,
             offset: const Offset(0, 10),
           ),
         ],

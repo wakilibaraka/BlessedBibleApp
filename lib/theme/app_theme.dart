@@ -71,31 +71,34 @@ class AppTheme {
     );
   }
 
-  static ThemeData darkTheme(double baseFontSize) {
+  static ThemeData darkTheme(double baseFontSize, {bool isAmoled = false}) {
     final textTheme = AppTypography.getTheme(
       AppColors.darkTextPrimary,
       AppColors.darkTextSecondary,
       baseFontSize,
     );
+    
+    final backgroundColor = isAmoled ? const Color(0xFF000000) : AppColors.darkBackground;
+    final surfaceColor = isAmoled ? const Color(0xFF101010) : AppColors.darkSurface;
 
     return ThemeData(
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: AppColors.darkBackground,
+      scaffoldBackgroundColor: backgroundColor,
       primaryColor: AppColors.goldAccent,
-      colorScheme: const ColorScheme.dark(
+      colorScheme: ColorScheme.dark(
         primary: AppColors.goldAccent,
-        surface: AppColors.darkSurface,
+        surface: surfaceColor,
         onSurface: AppColors.darkTextPrimary,
       ),
       textTheme: textTheme,
-      appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.darkBackground,
+      appBarTheme: AppBarTheme(
+        backgroundColor: backgroundColor,
         foregroundColor: AppColors.darkTextPrimary,
         elevation: 0,
         centerTitle: true,
       ),
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: AppColors.darkSurface,
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: surfaceColor,
         selectedItemColor: AppColors.goldAccent,
         unselectedItemColor: AppColors.darkTextSecondary,
         type: BottomNavigationBarType.fixed,

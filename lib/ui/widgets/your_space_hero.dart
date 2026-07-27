@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import '../../theme/app_colors.dart';
 import 'textured_glass_container.dart';
 import '../screens/your_space_screen.dart';
@@ -19,7 +20,7 @@ class YourSpaceHero extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         onTap: () {
           Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const YourSpaceScreen()),
+            CupertinoPageRoute(builder: (_) => const YourSpaceScreen()),
           );
         },
         child: Container(

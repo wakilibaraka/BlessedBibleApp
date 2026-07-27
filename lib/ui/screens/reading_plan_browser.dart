@@ -9,6 +9,7 @@ import '../../state/search_engine.dart';
 import '../widgets/textured_glass_container.dart';
 import '../widgets/bouncy_entrance.dart';
 import '../widgets/animated_background.dart';
+import '../widgets/shared_app_bar.dart';
 
 class ReadingPlanBrowser extends ConsumerStatefulWidget {
   const ReadingPlanBrowser({super.key});
@@ -425,16 +426,12 @@ class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
 
     return Scaffold(
       extendBody: true,
-      appBar: AppBar(
+      appBar: SharedAppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text(
           'Chronological Plan',
           style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-        ),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: theme.primaryColor),
-          onPressed: () => Navigator.of(context).pop(),
         ),
         actions: [
           IconButton(

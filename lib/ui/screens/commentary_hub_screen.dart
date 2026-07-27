@@ -5,6 +5,8 @@ import '../../state/theme_provider.dart';
 import '../../theme/app_colors.dart';
 import '../widgets/animated_background.dart';
 import '../widgets/textured_glass_container.dart';
+import '../widgets/shared_app_bar.dart';
+import '../widgets/pinch_to_zoom_font_wrapper.dart';
 
 class CommentarySourceMetadata {
   final String id;
@@ -106,21 +108,18 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
 
     return Scaffold(
       extendBody: true,
-      appBar: AppBar(
+      appBar: SharedAppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text('Commentary', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: theme.primaryColor),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
       ),
       body: Stack(
         children: [
           Positioned.fill(
             child: AnimatedBackground(appThemeMode: appThemeMode),
           ),
-          CustomScrollView(
+          PinchToZoomFontWrapper(
+            child: CustomScrollView(
             slivers: [
               SliverToBoxAdapter(
                 child: Padding(
@@ -251,6 +250,7 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
               ),
               const SliverToBoxAdapter(child: SizedBox(height: 100)),
             ],
+          ),
           ),
         ],
       ),

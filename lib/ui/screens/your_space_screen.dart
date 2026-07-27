@@ -8,6 +8,7 @@ import '../../state/bible_provider.dart';
 import '../../state/notes_provider.dart';
 import '../../state/theme_provider.dart';
 import '../widgets/animated_background.dart';
+import '../widgets/shared_app_bar.dart';
 import 'notes_list_screen.dart'; // for showAddNoteSheet
 
 class YourSpaceScreen extends ConsumerStatefulWidget {
@@ -48,17 +49,12 @@ class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
 
     return Scaffold(
       extendBody: true,
-      appBar: AppBar(
+      appBar: SharedAppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text('Your Space',
             style: theme.textTheme.titleMedium
                 ?.copyWith(fontWeight: FontWeight.bold)),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded,
-              color: theme.primaryColor),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
       ),
       body: Stack(
         children: [
@@ -219,7 +215,7 @@ class _HighlightsSegment extends ConsumerWidget {
                             children: [
                               Container(
                                 width: 12, height: 12,
-                                decoration: BoxDecoration(color: highlightPalette[colorIndex], shape: BoxShape.circle),
+                                decoration: BoxDecoration(color: AppColors.getRenderedHighlightColor(highlightPalette[colorIndex], theme.brightness, theme.scaffoldBackgroundColor), shape: BoxShape.circle),
                               ),
                               const SizedBox(width: 10),
                               Text(
@@ -483,7 +479,7 @@ Widget _buildRealVerseCard(
     {int? highlightColorIndex, bool isBookmarked = false}) {
   final formattedRef = '${data.bookName} ${data.chapter}:${data.verseNum}';
   final highlightColor = (highlightColorIndex != null && highlightColorIndex >= 0 && highlightColorIndex < highlightPalette.length)
-      ? highlightPalette[highlightColorIndex]
+      ? AppColors.getRenderedHighlightColor(highlightPalette[highlightColorIndex], theme.brightness, theme.scaffoldBackgroundColor)
       : null;
 
   return Padding(

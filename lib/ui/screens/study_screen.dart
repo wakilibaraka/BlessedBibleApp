@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../state/study_provider.dart';
@@ -435,13 +436,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
             borderRadius: BorderRadius.circular(20),
             onTap: () {
               Navigator.of(context).push(
-                PageRouteBuilder(
-                  pageBuilder: (context, animation, secondaryAnimation) => const ReadingPlansHubScreen(),
-                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
-                  transitionDuration: const Duration(milliseconds: 300),
-                )
+                CupertinoPageRoute(builder: (_) => const ReadingPlansHubScreen())
               );
             },
             child: Container(
@@ -674,7 +669,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
               borderRadius: BorderRadius.circular(28),
               onTap: () {
                 final refStr = activeVerse ?? 'Revelation 14:12';
-                Navigator.of(context).push(MaterialPageRoute(builder: (_) => CommentaryHubScreen(reference: refStr)));
+                Navigator.of(context).push(CupertinoPageRoute(builder: (_) => CommentaryHubScreen(reference: refStr)));
               },
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
@@ -761,7 +756,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
             borderRadius: BorderRadius.circular(20),
             onTap: () {
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const VotdArchiveScreen()),
+                CupertinoPageRoute(builder: (_) => const VotdArchiveScreen()),
               );
             },
             child: Container(

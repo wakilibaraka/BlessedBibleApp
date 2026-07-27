@@ -1,5 +1,9 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import '../../theme/app_colors.dart';
+
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../state/nav_provider.dart';
@@ -313,7 +317,7 @@ class MainNavScreen extends ConsumerWidget {
                                             const SizedBox(width: 12),
                                             ...List.generate(
                                                 highlightPalette.length, (i) {
-                                              final color = highlightPalette[i];
+                                              final color = AppColors.getRenderedHighlightColor(highlightPalette[i], Theme.of(context).brightness, Theme.of(context).scaffoldBackgroundColor);
                                               final highlights =
                                                   ref.watch(highlightsProvider);
                                               final allHaveThisColor =
@@ -482,6 +486,7 @@ class MainNavScreen extends ConsumerWidget {
   }
 
   void _changeTab(int index, WidgetRef ref, BuildContext context) {
+    HapticFeedback.selectionClick();
     // 1. Clear active verse selection
     ref.read(readSelectionProvider.notifier).clear();
     // 2. Dismiss any active keyboard
@@ -611,6 +616,7 @@ class MainNavScreen extends ConsumerWidget {
                 Text(
                   label,
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        fontFamily: 'Inter',
                         color: color,
                         fontWeight:
                             isActive ? FontWeight.bold : FontWeight.normal,
@@ -790,7 +796,7 @@ class MainNavScreen extends ConsumerWidget {
               );
           ref.read(activeStudyVerseProvider.notifier).setVerse('$bookName $chapter:$verseNum');
 
-          Navigator.of(context).push(MaterialPageRoute(builder: (_) => VerseDetailScreen(reference: '$bookName $chapter:$verseNum')));
+          Navigator.of(context).push(CupertinoPageRoute(builder: (_) => VerseDetailScreen(reference: '$bookName $chapter:$verseNum')));
         } catch (_) {}
       }
     }
@@ -916,7 +922,7 @@ class MainNavScreen extends ConsumerWidget {
       children: List.generate(order.length, (i) {
         final paletteIndex = order[i];
         return _buildColorDot(
-          highlightPalette[paletteIndex],
+          AppColors.getRenderedHighlightColor(highlightPalette[paletteIndex], theme.brightness, theme.scaffoldBackgroundColor),
           isSelected: paletteIndex == activeIndex,
           onTap: () {
             ref.read(readSettingsProvider.notifier).setActiveHighlightColorIndex(paletteIndex);

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../theme/app_colors.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
 
 
 import '../../state/theme_provider.dart';
@@ -12,6 +15,8 @@ import '../../state/bible_nav_settings_provider.dart';
 import '../../state/read_settings_provider.dart';
 import '../../services/backup_service.dart';
 import '../../state/reminders_provider.dart';
+import '../../state/amoled_provider.dart';
+import '../widgets/shared_app_bar.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -20,8 +25,8 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        title: const Text('Settings'),
+      appBar: const SharedAppBar(
+        title: Text('Settings'),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -33,7 +38,22 @@ class SettingsScreen extends StatelessWidget {
               title: const Text('Frosted Glass UI'),
               subtitle: const Text('Enable ultra-thin Apple-style liquid glass'),
               value: isGlassy,
-              onChanged: (value) => ref.read(glassUiProvider.notifier).set(value),
+              onChanged: (value) {
+                HapticFeedback.selectionClick();
+                ref.read(glassUiProvider.notifier).set(value);
+              },
+            );
+          }),
+          Consumer(builder: (context, ref, _) {
+            final isAmoled = ref.watch(amoledProvider);
+            return SwitchListTile(
+              title: const Text('AMOLED dark mode'),
+              subtitle: const Text('Use pure black backgrounds to save battery on OLED screens'),
+              value: isAmoled,
+              onChanged: (value) {
+                HapticFeedback.selectionClick();
+                ref.read(amoledProvider.notifier).set(value);
+              },
             );
           }),
           Consumer(builder: (context, ref, _) {
@@ -42,7 +62,10 @@ class SettingsScreen extends StatelessWidget {
               title: const Text('Always show navigation bar'),
               subtitle: const Text('Keep bottom nav visible even when verses are selected'),
               value: alwaysShowNav,
-              onChanged: (value) => ref.read(navSettingsProvider.notifier).setAlwaysShowNav(value),
+              onChanged: (value) {
+                HapticFeedback.selectionClick();
+                ref.read(navSettingsProvider.notifier).setAlwaysShowNav(value);
+              },
             );
           }),
           Consumer(builder: (context, ref, _) {
@@ -51,7 +74,10 @@ class SettingsScreen extends StatelessWidget {
               title: const Text('Auto-open single search result'),
               subtitle: const Text('Automatically navigate when a search returns exactly one result'),
               value: autoOpen,
-              onChanged: (value) => ref.read(searchSettingsProvider.notifier).toggleAutoOpen(value),
+              onChanged: (value) {
+                HapticFeedback.selectionClick();
+                ref.read(searchSettingsProvider.notifier).toggleAutoOpen(value);
+              },
             );
           }),
           Consumer(builder: (context, ref, _) {
@@ -60,7 +86,10 @@ class SettingsScreen extends StatelessWidget {
               title: const Text('Classic Search UI'),
               subtitle: const Text('Use the old full-screen search layout'),
               value: classicSearch,
-              onChanged: (value) => ref.read(searchSettingsProvider.notifier).toggleClassicSearch(value),
+              onChanged: (value) {
+                HapticFeedback.selectionClick();
+                ref.read(searchSettingsProvider.notifier).toggleClassicSearch(value);
+              },
             );
           }),
           const Divider(),
@@ -85,7 +114,10 @@ class SettingsScreen extends StatelessWidget {
                 MapEntry(TestamentLayout.stickySections, 'Sticky sections'),
                 MapEntry(TestamentLayout.filterTabs, 'Filter tabs'),
               ],
-              onChanged: (val) => ref.read(bibleNavSettingsProvider.notifier).setLayout(val),
+              onChanged: (val) {
+                HapticFeedback.selectionClick();
+                ref.read(bibleNavSettingsProvider.notifier).setLayout(val);
+              },
             );
           }),
           Consumer(builder: (context, ref, _) {
@@ -99,7 +131,10 @@ class SettingsScreen extends StatelessWidget {
                 MapEntry(NavigationDepth.threePart, '3-part'),
                 MapEntry(NavigationDepth.fourPart, '4-part'),
               ],
-              onChanged: (val) => ref.read(bibleNavSettingsProvider.notifier).setDepth(val),
+              onChanged: (val) {
+                HapticFeedback.selectionClick();
+                ref.read(bibleNavSettingsProvider.notifier).setDepth(val);
+              },
             );
           }),
           Consumer(builder: (context, ref, _) {
@@ -108,7 +143,10 @@ class SettingsScreen extends StatelessWidget {
               title: const Text('Auto-close sheet on final selection'),
               subtitle: const Text('Automatically dismiss the picker after the last step'),
               value: autoClose,
-              onChanged: (value) => ref.read(bibleNavSettingsProvider.notifier).setAutoClose(value),
+              onChanged: (value) {
+                HapticFeedback.selectionClick();
+                ref.read(bibleNavSettingsProvider.notifier).setAutoClose(value);
+              },
             );
           }),
           const Divider(),
@@ -132,7 +170,10 @@ class SettingsScreen extends StatelessWidget {
                 MapEntry(ReadingViewMode.immersive, 'On'),
                 MapEntry(ReadingViewMode.pinned, 'Off'),
               ],
-              onChanged: (val) => ref.read(readSettingsProvider.notifier).setReadingViewMode(val),
+              onChanged: (val) {
+                HapticFeedback.selectionClick();
+                ref.read(readSettingsProvider.notifier).setReadingViewMode(val);
+              },
             );
           }),
           Consumer(builder: (context, ref, _) {
@@ -146,7 +187,10 @@ class SettingsScreen extends StatelessWidget {
                 MapEntry(VerseActionStyle.horizontal, 'Minimal'),
                 MapEntry(VerseActionStyle.raindrop, 'Raindrop'),
               ],
-              onChanged: (val) => ref.read(readSettingsProvider.notifier).setVerseActionStyle(val),
+              onChanged: (val) {
+                HapticFeedback.selectionClick();
+                ref.read(readSettingsProvider.notifier).setVerseActionStyle(val);
+              },
             );
           }),
           Consumer(builder: (context, ref, _) {
@@ -167,7 +211,7 @@ class SettingsScreen extends StatelessWidget {
                     const SizedBox(height: 12),
                     Row(
                       children: List.generate(5, (i) {
-                        final color = highlightPalette[i];
+                        final color = AppColors.getRenderedHighlightColor(highlightPalette[i], Theme.of(context).brightness, Theme.of(context).scaffoldBackgroundColor);
                         
                         final isSelected = i == selectedIndex;
                         
@@ -238,7 +282,10 @@ class SettingsScreen extends StatelessWidget {
                     MapEntry(BackgroundGlowStyle.top, 'Top glow (default)'),
                     MapEntry(BackgroundGlowStyle.full, 'Full background glow (original)'),
                   ],
-                  onChanged: (val) => ref.read(readSettingsProvider.notifier).setBackgroundGlowStyle(val),
+                  onChanged: (val) {
+                HapticFeedback.selectionClick();
+                ref.read(readSettingsProvider.notifier).setBackgroundGlowStyle(val);
+              },
                 ),
                 SwitchListTile(
                   title: Text(
@@ -251,7 +298,10 @@ class SettingsScreen extends StatelessWidget {
                   ),
                   value: swipeDown,
                   activeTrackColor: Theme.of(context).primaryColor,
-                  onChanged: (val) => ref.read(bibleNavSettingsProvider.notifier).setSwipeDown(val),
+                  onChanged: (val) {
+                HapticFeedback.selectionClick();
+                ref.read(bibleNavSettingsProvider.notifier).setSwipeDown(val);
+              },
                 ),
                 SwitchListTile(
                   title: Text(
@@ -264,7 +314,10 @@ class SettingsScreen extends StatelessWidget {
                   ),
                   value: fullScreenPicker,
                   activeTrackColor: Theme.of(context).primaryColor,
-                  onChanged: (val) => ref.read(bibleNavSettingsProvider.notifier).setFullScreenPicker(val),
+                  onChanged: (val) {
+                HapticFeedback.selectionClick();
+                ref.read(bibleNavSettingsProvider.notifier).setFullScreenPicker(val);
+              },
                 ),
               ],
             );
@@ -324,7 +377,10 @@ class SettingsScreen extends StatelessWidget {
                   ),
                   value: remindersState.dailyEnabled,
                   activeTrackColor: theme.primaryColor,
-                  onChanged: (val) => notifier.toggleDaily(val),
+                  onChanged: (val) {
+                HapticFeedback.selectionClick();
+                notifier.toggleDaily(val);
+              },
                 ),
                 if (remindersState.dailyEnabled)
                   ListTile(
@@ -353,7 +409,10 @@ class SettingsScreen extends StatelessWidget {
                   ),
                   value: remindersState.customWeeklyEnabled,
                   activeTrackColor: theme.primaryColor,
-                  onChanged: (val) => notifier.toggleCustomWeekly(val),
+                  onChanged: (val) {
+                HapticFeedback.selectionClick();
+                notifier.toggleCustomWeekly(val);
+              },
                 ),
                 if (remindersState.customWeeklyEnabled)
                   ListTile(
@@ -623,7 +682,7 @@ class _AnimatedSegmentedTile<T> extends StatelessWidget {
                 final isSelected = entry.key == selectedValue;
                 return Expanded(
                   child: GestureDetector(
-                    onTap: () => onChanged(entry.key),
+                    onTap: () { HapticFeedback.selectionClick(); onChanged(entry.key); },
                     behavior: HitTestBehavior.opaque,
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 250),
@@ -640,6 +699,7 @@ class _AnimatedSegmentedTile<T> extends StatelessWidget {
                       child: Text(
                         entry.value,
                         style: TextStyle(
+                          fontFamily: 'Inter',
                           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                           color: isSelected ? Colors.white : theme.colorScheme.onSurface.withValues(alpha: 0.8),
                         ),

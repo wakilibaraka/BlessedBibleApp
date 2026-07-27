@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../theme/app_colors.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/bible_provider.dart';
 import '../../state/study_provider.dart';
@@ -8,6 +10,7 @@ import '../../state/theme_provider.dart';
 import '../widgets/animated_background.dart';
 import '../widgets/textured_glass_container.dart';
 import 'notes_list_screen.dart'; // for showAddNoteSheet
+import '../widgets/shared_app_bar.dart';
 
 class VerseDetailScreen extends ConsumerWidget {
   final String reference;
@@ -75,17 +78,12 @@ class VerseDetailScreen extends ConsumerWidget {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
+      appBar: SharedAppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text(reference,
             style: theme.textTheme.titleMedium
                 ?.copyWith(fontWeight: FontWeight.bold)),
-        leading: IconButton(
-          icon:
-              Icon(Icons.arrow_back_ios_new_rounded, color: theme.primaryColor),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
       ),
       body: Stack(
         children: [
@@ -312,7 +310,7 @@ class _PersonalDataRow extends ConsumerWidget {
             label: highlightColorIndex != null ? 'Highlighted' : 'Highlight',
             isActive: highlightColorIndex != null,
             activeColor: highlightColorIndex != null
-                ? highlightPalette[highlightColorIndex]
+                ? AppColors.getRenderedHighlightColor(highlightPalette[highlightColorIndex], Theme.of(context).brightness, Theme.of(context).scaffoldBackgroundColor)
                 : null,
             onTap: () {
               int nextColor = 0;

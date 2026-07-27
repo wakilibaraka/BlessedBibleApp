@@ -1,6 +1,10 @@
 import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import '../../theme/app_colors.dart';
+import '../widgets/pinch_to_zoom_font_wrapper.dart';
+
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -434,9 +438,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Stack(
-        children: [
-          // ── Scripture Content Layer ──────────────────────────────────
+      body: PinchToZoomFontWrapper(
+        child: Stack(
+          children: [
+            // ── Scripture Content Layer ──────────────────────────────────
           Positioned.fill(
             child: Stack(
               children: [
@@ -733,7 +738,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                                     final savedColorIndex = highlights[refStr];
                                                     Color? highlightColor;
                                                     if (savedColorIndex != null && savedColorIndex >= 0 && savedColorIndex < highlightPalette.length) {
-                                                      highlightColor = highlightPalette[savedColorIndex];
+                                                      highlightColor = AppColors.getRenderedHighlightColor(highlightPalette[savedColorIndex], theme.brightness, theme.scaffoldBackgroundColor);
                                                     }
 
                                                     if (kHighlightDebug) {
@@ -941,7 +946,7 @@ Positioned(
             // drag from the top edge. Vanishes if they release early.
             if (bibleNavSettings.swipeDownToNav && _overscrollFraction > 0.01)
               Positioned(
-                top: MediaQuery.of(context).padding.top + 100, // Positioned below the chapter header
+                top: MediaQuery.of(context).padding.top + 65, // Positioned in the gap between header and chapter title
                 left: 0,
                 right: 0,
                 child: IgnorePointer(
@@ -952,7 +957,7 @@ Positioned(
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(20),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           decoration: BoxDecoration(
                             color: theme.primaryColor.withValues(
                                 alpha: 0.12 + 0.18 * _overscrollFraction),
@@ -967,19 +972,20 @@ Positioned(
                             children: [
                               Icon(
                                 Icons.menu_book_outlined,
-                                size: 14,
+                                size: 16,
                                 color: theme.primaryColor.withValues(
                                     alpha: 0.4 + 0.6 * _overscrollFraction),
                               ),
-                              const SizedBox(width: 6),
+                              const SizedBox(width: 8),
                               Text(
                                 _overscrollFraction >= 1.0
                                     ? 'Hold to navigate'
                                     : 'Keep holding…',
-                                style: theme.textTheme.labelSmall?.copyWith(
+                                style: theme.textTheme.labelLarge?.copyWith(
                                   color: theme.primaryColor.withValues(
                                       alpha: 0.5 + 0.5 * _overscrollFraction),
-                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14.0,
+                                  fontWeight: FontWeight.w500,
                                   letterSpacing: 0.2,
                                 ),
                               ),
@@ -1018,6 +1024,7 @@ Positioned(
         ),
           ),
         ],
+      ),
       ),
     );
   }
@@ -1151,7 +1158,7 @@ Positioned(
           // Commentary Button
           TextButton.icon(
             onPressed: hasChapterCommentary ? () {
-              Navigator.of(context).push(MaterialPageRoute(
+              Navigator.of(context).push(CupertinoPageRoute(
                 builder: (_) => CommentaryListScreen(
                   bookName: fc.book.name,
                   chapterNumber: fc.chapter.number.toString(),
@@ -2408,9 +2415,10 @@ class CommentaryBottomSheetContent extends ConsumerWidget {
       maxChildSize: 1.0,
       snap: true,
       builder: (context, scrollController) {
-        return GlassContainer(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(32.0)),
-          padding: EdgeInsets.zero,
+        return PinchToZoomFontWrapper(
+          child: GlassContainer(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(32.0)),
+            padding: EdgeInsets.zero,
           child: SafeArea(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -2545,6 +2553,7 @@ class CommentaryBottomSheetContent extends ConsumerWidget {
               ],
             ),
           ),
+        ),
         );
       },
     );
@@ -2906,7 +2915,7 @@ class _VerseContextMenuContentState extends ConsumerState<_VerseContextMenuConte
           child: _ContextMenuButton(
             icon: Icons.circle,
             label: 'Color ${i + 1}',
-            color: highlightPalette[i],
+            color: AppColors.getRenderedHighlightColor(highlightPalette[i], Theme.of(context).brightness, Theme.of(context).scaffoldBackgroundColor),
             onTap: () {
               ref.read(readSettingsProvider.notifier).setActiveHighlightColorIndex(i);
               VerseActionLogic.handleHighlight(context, theme, ref, widget.bookName, widget.chapterNum, targetVerses, i);

@@ -29,9 +29,20 @@ class AppColors {
   static const Color warmGoldAccent     = Color(0xFF9E6B00);
 
   // Dark Theme
-  static const Color darkBackground = Color(0xFF080706);
-  static const Color darkSurface = Color(0xFF2C2A28);
+  static const Color darkBackground = Color(0xFF121212);
+  static const Color darkSurface = Color(0xFF1E1E1E);
   static const Color darkTextPrimary = Color(0xFFEAE6E1);
   static const Color darkTextSecondary = Color(0xFFAFAAA3);
   static const Color darkBorder = Color(0xFF3F3C39);
+
+  /// Helper to ensure highlight colors render beautifully and with adequate WCAG AA contrast against specific backgrounds.
+  /// For example, the default yellow highlight clashes with the Sepia/Cream backgrounds.
+  static Color getRenderedHighlightColor(Color baseColor, Brightness brightness, Color scaffoldBackgroundColor) {
+    if (baseColor == Colors.yellow) {
+      if (scaffoldBackgroundColor == sepiaBackground || scaffoldBackgroundColor == warmGoldBackground) {
+        return Colors.amber.shade700; // Deeper, more saturated yellow-gold for sepia themes
+      }
+    }
+    return baseColor;
+  }
 }

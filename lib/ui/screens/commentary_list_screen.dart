@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/study_provider.dart';
 import '../../data/models/commentary_model.dart';
+import '../widgets/shared_app_bar.dart';
+import '../widgets/pinch_to_zoom_font_wrapper.dart';
 
 class CommentaryListScreen extends ConsumerWidget {
   final String bookName;
@@ -21,14 +23,10 @@ class CommentaryListScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
+      appBar: SharedAppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text('$bookName $chapterNumber Commentary', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: theme.primaryColor),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
       ),
       body: commentaryDataAsync.when(
         data: (state) {
@@ -59,8 +57,9 @@ class CommentaryListScreen extends ConsumerWidget {
             );
           }
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(24.0),
+          return PinchToZoomFontWrapper(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(24.0),
             itemCount: itemList.length,
             itemBuilder: (context, index) {
               final verseStr = itemList[index].key;
@@ -99,6 +98,7 @@ class CommentaryListScreen extends ConsumerWidget {
                 ),
               );
             },
+          ),
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),

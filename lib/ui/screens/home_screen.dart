@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/home_data.dart';
@@ -120,7 +121,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           const SizedBox(height: 10),
           GestureDetector(
             onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const TodayScreen()),
+              CupertinoPageRoute(builder: (_) => const TodayScreen()),
             ),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -223,7 +224,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         label: 'Go Deeper',
                         filled: true,
                         onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(
+                          Navigator.of(context).push(CupertinoPageRoute(
                             builder: (_) => VerseDetailScreen(reference: data.verseOfTheDay.reference)
                           ));
                         },

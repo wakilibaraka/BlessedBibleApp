@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/reading_plan_provider.dart';
 import '../../state/theme_provider.dart';
@@ -6,6 +7,7 @@ import '../../theme/app_colors.dart';
 import '../widgets/animated_background.dart';
 import '../widgets/textured_glass_container.dart';
 import 'reading_plan_browser.dart';
+import '../widgets/shared_app_bar.dart';
 
 class PlanMetadata {
   final String id;
@@ -59,14 +61,10 @@ class ReadingPlansHubScreen extends ConsumerWidget {
 
     return Scaffold(
       extendBody: true,
-      appBar: AppBar(
+      appBar: SharedAppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text('Reading Plans', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: theme.primaryColor),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
       ),
       body: Stack(
         children: [
@@ -284,13 +282,7 @@ class ReadingPlansHubScreen extends ConsumerWidget {
                 ),
                 onPressed: () {
                   Navigator.of(context).push(
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) => const ReadingPlanBrowser(),
-                      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                        return FadeTransition(opacity: animation, child: child);
-                      },
-                      transitionDuration: const Duration(milliseconds: 300),
-                    )
+                    CupertinoPageRoute(builder: (_) => const ReadingPlanBrowser())
                   );
                 },
                 child: Text(

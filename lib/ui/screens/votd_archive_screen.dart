@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../state/home_provider.dart';
@@ -91,7 +92,7 @@ class VotdArchiveScreen extends ConsumerWidget {
                           // Mark as viewed manually just in case
                           ref.read(votdTrackerProvider.notifier).markViewed(date);
                           Navigator.of(context).push(
-                            MaterialPageRoute(
+                            CupertinoPageRoute(
                               builder: (_) => VerseDetailScreen(reference: reference),
                             ),
                           );

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/notes_provider.dart';
 import '../../data/models/home_data.dart';
 import '../widgets/textured_glass_container.dart';
+import '../widgets/shared_app_bar.dart';
 
 class NotesListScreen extends ConsumerWidget {
   const NotesListScreen({super.key});
@@ -14,14 +15,10 @@ class NotesListScreen extends ConsumerWidget {
     
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
+      appBar: SharedAppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text('My Notes', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: theme.primaryColor),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
       ),
       body: notes.isEmpty
           ? Center(
