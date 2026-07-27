@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../state/study_provider.dart';
 import '../../state/theme_provider.dart';
+import '../../theme/app_colors.dart';
 import '../widgets/textured_glass_container.dart';
 import '../widgets/your_space_hero.dart';
 import 'votd_archive_screen.dart';
@@ -16,6 +17,7 @@ import 'commentary_hub_screen.dart';
 import '../../state/nav_provider.dart';
 import '../../state/read_location_provider.dart';
 import '../../state/bible_provider.dart';
+import '../../state/streak_provider.dart';
 
 class StudyScreen extends ConsumerStatefulWidget {
   const StudyScreen({super.key});
@@ -168,68 +170,83 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                             ],
                           ),
                         ),
-                        Row(
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: const Text(
-                                        'Reading streaks coming soon!'),
-                                    behavior: SnackBarBehavior.floating,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12)),
-                                  ),
-                                );
-                              },
-                              child: Row(
-                                children: [
-                                  const Icon(
-                                      Icons.local_fire_department_rounded,
-                                      color: Colors.orangeAccent,
-                                      size: 24),
-                                  const SizedBox(width: 4),
-                                  const Text('5',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold)),
-                                ],
+                        Consumer(builder: (context, ref, child) {
+                          final streak = ref.watch(streakProvider);
+                          final isLit = streak.readToday;
+                          final glowColor = isLit ? AppColors.goldAccent : Colors.grey.withValues(alpha: 0.5);
+                          final showNudge = !isLit && streak.count > 0;
+                          
+                          return Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(streak.count > 0 ? '${streak.count} Day Streak! Keep it up!' : 'Read today to start your streak!'),
+                                      behavior: SnackBarBehavior.floating,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12)),
+                                    ),
+                                  );
+                                },
+                                child: Row(
+                                  children: [
+                                    if (streak.count > 0 || isLit) ...[
+                                      Icon(
+                                          isLit ? Icons.local_fire_department_rounded : Icons.local_fire_department_outlined,
+                                          color: glowColor,
+                                          shadows: isLit ? [
+                                            Shadow(
+                                              color: glowColor.withValues(alpha: 0.6),
+                                              blurRadius: 10 + (streak.count.clamp(0, 10).toDouble()),
+                                            )
+                                          ] : null,
+                                          size: 24),
+                                      const SizedBox(width: 4),
+                                      Text('${streak.count}',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: isLit ? theme.colorScheme.onSurface : theme.colorScheme.onSurface.withValues(alpha: 0.6))),
+                                    ],
+                                  ],
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 16),
-                            GestureDetector(
-                              onTap: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: const Text(
-                                        'Notifications coming soon!'),
-                                    behavior: SnackBarBehavior.floating,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12)),
-                                  ),
-                                );
-                              },
-                              child: Stack(
-                                alignment: Alignment.topRight,
-                                children: [
-                                  Icon(Icons.notifications_none_rounded,
-                                      size: 28,
-                                      color: theme.colorScheme.onSurface),
-                                  Container(
-                                    margin:
-                                        const EdgeInsets.only(top: 2, right: 2),
-                                    width: 8,
-                                    height: 8,
-                                    decoration: const BoxDecoration(
-                                        color: Colors.red,
-                                        shape: BoxShape.circle),
-                                  ),
-                                ],
+                              if (streak.count > 0 || isLit) const SizedBox(width: 16),
+                              GestureDetector(
+                                onTap: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(showNudge ? 'Read today to save your streak!' : 'Notifications coming soon!'),
+                                      behavior: SnackBarBehavior.floating,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12)),
+                                    ),
+                                  );
+                                },
+                                child: Stack(
+                                  alignment: Alignment.topRight,
+                                  children: [
+                                    Icon(Icons.notifications_none_rounded,
+                                        size: 28,
+                                        color: theme.colorScheme.onSurface),
+                                    if (showNudge)
+                                      Container(
+                                        margin:
+                                            const EdgeInsets.only(top: 2, right: 2),
+                                        width: 8,
+                                        height: 8,
+                                        decoration: const BoxDecoration(
+                                            color: Colors.red,
+                                            shape: BoxShape.circle),
+                                      ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
+                            ],
+                          );
+                        }),
                       ],
                     ),
                     const SizedBox(height: 16),
@@ -617,7 +634,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
     String displayAuthor = 'Commentary';
     String displayReference = activeVerse ?? 'Genesis 1:1';
     String displaySnippet =
-        'Local module not found. Place JSON files in your local directory to enable this commentary.';
+        'No commentary available yet.';
 
     if (activeVerse != null &&
         commentaryAsync is AsyncData<CombinedCommentaryState>) {
