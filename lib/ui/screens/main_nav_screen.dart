@@ -74,6 +74,7 @@ class MainNavScreen extends ConsumerWidget {
             final style = ref.watch(readSettingsProvider.select((s) => s.verseActionStyle));
             final isMinimalAction = currentIndex == 1 && selectedVerses.isNotEmpty && style == VerseActionStyle.horizontal;
             final isRaindropAction = currentIndex == 1 && selectedVerses.isNotEmpty && style == VerseActionStyle.raindrop;
+            final effectiveNavHidden = isNavHidden && !isRaindropAction && !isMinimalAction;
             final double rawWidth = MediaQuery.of(context).size.width;
             final double availableWidth = rawWidth > 0 ? rawWidth : 360.0;
             final double maxDockWidth = 450.0;
@@ -99,15 +100,15 @@ class MainNavScreen extends ConsumerWidget {
                       children: [
                         AnimatedOpacity(
                           duration: const Duration(milliseconds: 250),
-                          opacity: isNavHidden ? 0.0 : 1.0,
+                          opacity: effectiveNavHidden ? 0.0 : 1.0,
                           child: IgnorePointer(
-                            ignoring: isNavHidden,
+                            ignoring: effectiveNavHidden,
                             child: TweenAnimationBuilder<BorderRadius?>(
                               duration: const Duration(milliseconds: 400),
                               curve: Curves.easeOutCubic,
                               tween: BorderRadiusTween(
                                 begin: isRaindropAction ? BorderRadius.circular(28) : BorderRadius.circular(32),
-                                end: isNavHidden
+                                end: effectiveNavHidden
                                     ? const BorderRadius.only(
                                         topLeft: Radius.circular(32),
                                         bottomLeft: Radius.circular(32),
@@ -128,7 +129,7 @@ class MainNavScreen extends ConsumerWidget {
                                 duration: const Duration(milliseconds: 400),
                                 curve: Curves.easeOutCubic,
                                 height: isRaindropAction ? 56.0 : 64.0,
-                                width: isNavHidden ? 0.0 : (isRaindropAction ? 180.0 : dockMaxWidth),
+                                width: effectiveNavHidden ? 0.0 : (isRaindropAction ? 180.0 : dockMaxWidth),
                                 child: ClipRect(
                                   child: OverflowBox(
                                     alignment: Alignment.centerRight,
@@ -203,7 +204,7 @@ class MainNavScreen extends ConsumerWidget {
                         AnimatedContainer(
                           duration: const Duration(milliseconds: 400),
                           width:
-                              isNavHidden ? 0.0 : 12.0, // Collapse the gap too!
+                              effectiveNavHidden ? 0.0 : 12.0, // Collapse the gap too!
                         ),
                         // ── Dynamic Contextual FAB (Right) ──
                         TweenAnimationBuilder<double>(
