@@ -193,65 +193,74 @@ class VerseDetailScreen extends ConsumerWidget {
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      final entry = commentaryEntries[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(
-                            bottom: 16.0, left: 16.0, right: 16.0),
-                        child: TexturedGlassContainer(
-                          borderRadius: BorderRadius.circular(16),
-                          child: Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  entry.text,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    height: 1.6,
-                                    color: theme.colorScheme.onSurface
-                                        .withValues(alpha: 0.85),
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                Row(
-                                  children: [
-                                    Icon(Icons.person_rounded,
-                                        size: 14,
-                                        color: theme.primaryColor
-                                            .withValues(alpha: 0.7)),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      entry.author,
-                                      style:
-                                          theme.textTheme.labelSmall?.copyWith(
-                                        color: theme.primaryColor
-                                            .withValues(alpha: 0.8),
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 1.2,
-                                      ),
+                      try {
+                        final entry = commentaryEntries[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(
+                              bottom: 16.0, left: 16.0, right: 16.0),
+                          child: TexturedGlassContainer(
+                            borderRadius: BorderRadius.circular(16),
+                            child: Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    entry.text,
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      height: 1.6,
+                                      color: theme.colorScheme.onSurface
+                                          .withValues(alpha: 0.85),
                                     ),
-                                    if (entry.source != null) ...[
-                                      const SizedBox(width: 8),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    children: [
+                                      Icon(Icons.library_books_rounded,
+                                          size: 14,
+                                          color: theme.primaryColor
+                                              .withValues(alpha: 0.7)),
+                                      const SizedBox(width: 6),
                                       Expanded(
                                         child: Text(
-                                          '• ${entry.source}',
-                                          style: theme.textTheme.bodySmall
-                                              ?.copyWith(
-                                            color: theme.colorScheme.onSurface
-                                                .withValues(alpha: 0.5),
-                                            fontStyle: FontStyle.italic,
+                                          entry.title,
+                                          style:
+                                              theme.textTheme.labelSmall?.copyWith(
+                                            color: theme.primaryColor
+                                                .withValues(alpha: 0.8),
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: 1.2,
                                           ),
-                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
                                     ],
-                                  ],
-                                ),
-                              ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      );
+                        );
+                      } catch (e) {
+                        return Padding(
+                          padding: const EdgeInsets.only(
+                              bottom: 16.0, left: 16.0, right: 16.0),
+                          child: TexturedGlassContainer(
+                            borderRadius: BorderRadius.circular(16),
+                            child: Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Center(
+                                child: Text(
+                                  'Content unavailable',
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: theme.primaryColor.withValues(alpha: 0.8),
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }
                     },
                     childCount: commentaryEntries.length,
                   ),

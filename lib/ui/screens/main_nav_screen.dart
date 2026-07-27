@@ -145,7 +145,8 @@ class MainNavScreen extends ConsumerWidget {
                                 curve: Curves.easeOutCubic,
                                 height: kBottomDockHeight,
                                 width: effectiveNavHidden ? 0.0 : (isRaindropAction ? 180.0 : dockMaxWidth),
-                                child: ClipRect(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(36.0),
                                   child: OverflowBox(
                                     alignment: Alignment.centerRight,
                                     minWidth: isRaindropAction ? 180.0 : dockMaxWidth,
@@ -157,7 +158,7 @@ class MainNavScreen extends ConsumerWidget {
                                       child: Padding(
                                         padding: EdgeInsets.symmetric(
                                             vertical: isRaindropAction ? 0.0 : 8.0, 
-                                            horizontal: isRaindropAction ? 0.0 : 24.0),
+                                            horizontal: (isRaindropAction || isMinimalAction) ? 0.0 : 24.0),
                                         child: AnimatedSwitcher(
                                           duration: const Duration(milliseconds: 300),
                                           transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
@@ -818,15 +819,8 @@ class MainNavScreen extends ConsumerWidget {
     final selectedVerses = ref.watch(readSelectionProvider);
     final targetVerses = selectedVerses.toList();
     final bookmarks = ref.watch(bookmarksProvider);
-    final highlights = ref.watch(highlightsProvider);
     final chapterNum = readLoc.chapter;
     final bookName = readLoc.bookName;
-    
-    final isHighlighted = targetVerses.isNotEmpty && targetVerses.every((v) {
-      final refStr = generateVerseKey(bookName, chapterNum, v);
-      return highlights.containsKey(refStr);
-    });
-
     final isBookmarked = targetVerses.isNotEmpty && targetVerses.every((v) {
       final refStr = generateVerseKey(bookName, chapterNum, v);
       return bookmarks.contains(refStr);
@@ -837,11 +831,12 @@ class MainNavScreen extends ConsumerWidget {
       onTap: () {}, // Blocks tap-through to verses
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Row(
         key: const ValueKey('nav_tabs_style3'),
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildActionIcon(
+          _buildMinimalActionIcon(
             isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
             'Bookmark',
             isBookmarked ? theme.primaryColor : theme.colorScheme.onSurface,
@@ -850,7 +845,7 @@ class MainNavScreen extends ConsumerWidget {
               ref.read(readSelectionProvider.notifier).clear();
             },
           ),
-          _buildActionIcon(
+          _buildMinimalActionIcon(
             Icons.copy_rounded,
             'Copy',
             theme.colorScheme.onSurface,
@@ -859,7 +854,7 @@ class MainNavScreen extends ConsumerWidget {
               ref.read(readSelectionProvider.notifier).clear();
             },
           ),
-          _buildActionIcon(
+          _buildMinimalActionIcon(
             Icons.edit_document,
             'Note',
             theme.colorScheme.onSurface,
@@ -868,18 +863,7 @@ class MainNavScreen extends ConsumerWidget {
               ref.read(readSelectionProvider.notifier).clear();
             },
           ),
-          _buildActionIcon(
-            isHighlighted ? Icons.highlight_rounded : Icons.highlight_outlined,
-            'Highlight',
-            isHighlighted ? theme.primaryColor : theme.colorScheme.onSurface,
-            () {
-              final primaryColorIndex = readSettings.primaryHighlightColorIndex;
-              final activeIndex = (primaryColorIndex >= 0 && primaryColorIndex < 5) ? primaryColorIndex : 2;
-              VerseActionLogic.handleHighlight(context, theme, ref, bookName, chapterNum, targetVerses, activeIndex);
-              ref.read(readSelectionProvider.notifier).clear();
-            },
-          ),
-          _buildActionIcon(
+          _buildMinimalActionIcon(
             Icons.ios_share_rounded,
             'Share',
             theme.colorScheme.onSurface,
@@ -889,7 +873,7 @@ class MainNavScreen extends ConsumerWidget {
             },
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Container(width: 1, height: 28, color: theme.colorScheme.onSurface.withValues(alpha: 0.2)),
           ),
           _buildColorDotRow(context, ref, displayOrder: [
@@ -897,7 +881,7 @@ class MainNavScreen extends ConsumerWidget {
             readSettings.secondaryHighlightColorIndex, 
             ...List.generate(5, (i) => i).where((i) => i != readSettings.primaryHighlightColorIndex && i != readSettings.secondaryHighlightColorIndex)
           ]),
-          _buildActionIcon(
+          _buildMinimalActionIcon(
             Icons.close_rounded,
             'Close',
             theme.colorScheme.onSurface.withValues(alpha: 0.5),
@@ -906,6 +890,18 @@ class MainNavScreen extends ConsumerWidget {
         ],
       ),
     ),
+    );
+  }
+
+  Widget _buildMinimalActionIcon(
+      IconData icon, String tooltip, Color color, VoidCallback onTap) {
+    return IconButton(
+      icon: Icon(icon, size: 28),
+      color: color,
+      tooltip: tooltip,
+      padding: const EdgeInsets.all(8),
+      constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+      onPressed: onTap,
     );
   }
 

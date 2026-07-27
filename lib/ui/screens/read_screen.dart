@@ -176,7 +176,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
       final flatChapters = ref.read(flatChaptersProvider);
       if (flatChapters.isEmpty) return;
       
-      final targetIndex = flatChapters.indexWhere((fc) => fc.book.abbreviation == loc.bookAbbrev && fc.chapter.number == loc.chapter);
+      final targetIndex = flatChapters.indexWhere((fc) => (fc.book.abbreviation.toLowerCase() == loc.bookAbbrev.toLowerCase() || fc.book.name.toLowerCase() == loc.bookName.toLowerCase()) && fc.chapter.number == loc.chapter);
       if (targetIndex != -1) {
         final controller = _itemScrollControllers[targetIndex];
         if (controller != null && controller.isAttached) {
@@ -358,7 +358,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
     final bibleNavSettings = ref.watch(bibleNavSettingsProvider);
 
     if (flatChapters.isNotEmpty) {
-      final targetIndex = flatChapters.indexWhere((fc) => fc.book.abbreviation == loc.bookAbbrev && fc.chapter.number == loc.chapter);
+      final targetIndex = flatChapters.indexWhere((fc) => (fc.book.abbreviation.toLowerCase() == loc.bookAbbrev.toLowerCase() || fc.book.name.toLowerCase() == loc.bookName.toLowerCase()) && fc.chapter.number == loc.chapter);
       final safeTarget = targetIndex != -1 ? targetIndex : 0;
       if (!_hasInitialJumped) {
         _hasInitialJumped = true;
@@ -380,7 +380,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
         if (flatChapters.isNotEmpty && _hasInitialJumped) {
-          final targetIndex = flatChapters.indexWhere((fc) => fc.book.abbreviation == next.bookAbbrev && fc.chapter.number == next.chapter);
+          final targetIndex = flatChapters.indexWhere((fc) => (fc.book.abbreviation.toLowerCase() == next.bookAbbrev.toLowerCase() || fc.book.name.toLowerCase() == next.bookName.toLowerCase()) && fc.chapter.number == next.chapter);
           if (targetIndex != -1 && _pageController.hasClients) {
             final currentPage = _pageController.page?.round() ?? 0;
             if (currentPage != targetIndex) {
@@ -468,7 +468,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                   if (!mounted) return;
                                   final fc = flatChapters[pageIndex];
                                   final currentLoc = ref.read(readLocationProvider);
-                                  if (currentLoc.bookAbbrev != fc.book.abbreviation || currentLoc.chapter != fc.chapter.number) {
+                                  if ((currentLoc.bookAbbrev.toLowerCase() != fc.book.abbreviation.toLowerCase() && currentLoc.bookName.toLowerCase() != fc.book.name.toLowerCase()) || currentLoc.chapter != fc.chapter.number) {
                                     ref.read(readLocationProvider.notifier).updateLocation(
                                       bookAbbrev: fc.book.abbreviation,
                                       bookName: fc.book.name,

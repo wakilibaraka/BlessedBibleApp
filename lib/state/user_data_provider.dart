@@ -45,33 +45,37 @@ final bookmarksProvider = NotifierProvider<BookmarksNotifier, Set<String>>(Bookm
 
 
 
-const bool kHighlightDebug = false;
+const bool kHighlightDebug = true;
 
 class HighlightsNotifier extends Notifier<Map<String, int>> {
   @override
   Map<String, int> build() {
-    return Map.from(ref.watch(preferencesProvider).getHighlights());
+    final prefs = ref.watch(preferencesProvider);
+    final data = prefs.getHighlights();
+    if (kHighlightDebug) {
+      debugPrint('[HIGHLIGHT_DEBUG] NOTIFIER init: loaded ${data.length} highlights');
+    }
+    return data;
   }
 
   void toggleHighlight(String reference, int colorIndex) {
     if (kHighlightDebug) {
-      debugPrint('[HIGHLIGHT_DEBUG] NOTIFIER toggleHighlight reference=$reference colorIndex=$colorIndex oldState=$state');
+      debugPrint('[HIGHLIGHT_DEBUG] NOTIFIER toggleHighlight called: ref=$reference, color=$colorIndex');
     }
-    final newState = Map<String, int>.from(state);
-    if (newState.containsKey(reference) && newState[reference] == colorIndex) {
+    final current = Map<String, int>.from(state);
+    if (current.containsKey(reference) && current[reference] == colorIndex) {
+      current.remove(reference);
       if (kHighlightDebug) debugPrint('[HIGHLIGHT_DEBUG] NOTIFIER removing highlight for $reference');
-      newState.remove(reference); // Toggle off if tapping the same color
     } else {
+      current[reference] = colorIndex;
       if (kHighlightDebug) debugPrint('[HIGHLIGHT_DEBUG] NOTIFIER adding highlight for $reference -> $colorIndex');
-      newState[reference] = colorIndex; // Update or add highlight
     }
-    state = newState;
+    state = current;
+    ref.read(preferencesProvider).saveHighlights(current);
     if (kHighlightDebug) {
-      debugPrint('[HIGHLIGHT_DEBUG] NOTIFIER state updated. newState=$state (len=${state.length})');
+      debugPrint('[HIGHLIGHT_DEBUG] NOTIFIER map after write: $current');
     }
-    ref.read(preferencesProvider).saveHighlights(newState);
   }
 }
 
 final highlightsProvider = NotifierProvider<HighlightsNotifier, Map<String, int>>(HighlightsNotifier.new);
-
