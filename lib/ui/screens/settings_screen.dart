@@ -211,13 +211,13 @@ class SettingsScreen extends StatelessWidget {
             Consumer(builder: (context, ref, _) {
               final depth = ref.watch(bibleNavSettingsProvider.select((s) => s.depth));
               return _AnimatedSegmentedTile<NavigationDepth>(
-                title: 'Navigation Depth',
-                subtitle: 'Steps to reach a verse',
+                title: 'Navigation Steps',
+                subtitle: 'How many steps to reach a verse. 2-step: Book → Chapter. 3-step: Book → Chapter → Verse. 4-step: Testament → Book → Chapter → Verse.',
                 selectedValue: depth,
                 options: const [
-                  MapEntry(NavigationDepth.twoPart, '2-part'),
-                  MapEntry(NavigationDepth.threePart, '3-part'),
-                  MapEntry(NavigationDepth.fourPart, '4-part'),
+                  MapEntry(NavigationDepth.twoPart, '2-step'),
+                  MapEntry(NavigationDepth.threePart, '3-step'),
+                  MapEntry(NavigationDepth.fourPart, '4-step'),
                 ],
                 onChanged: (val) {
                   HapticFeedback.selectionClick();
