@@ -22,7 +22,8 @@ import '../../state/reading_plan_provider.dart';
 import '../../state/streak_provider.dart';
 import '../../state/most_read_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
-
+import '../../state/hints_provider.dart';
+import '../../utils/bible_sections.dart';
 import '../../services/share_service.dart';
 import '../widgets/verse_link_text.dart';
 import 'notes_list_screen.dart';
@@ -2678,13 +2679,11 @@ class _VerseContextMenuContent extends ConsumerStatefulWidget {
 }
 
 class _VerseContextMenuContentState extends ConsumerState<_VerseContextMenuContent> {
-  static bool _hasShownHighlightHint = false;
   bool _showColors = false;
 
   @override
   Widget build(BuildContext context) {
-    if (!_hasShownHighlightHint) {
-      _hasShownHighlightHint = true;
+    ref.read(hintsProvider.notifier).maybeShowHint('highlight_long_press', () {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -2695,7 +2694,7 @@ class _VerseContextMenuContentState extends ConsumerState<_VerseContextMenuConte
           );
         }
       });
-    }
+    });
 
     final verseKey = generateVerseKey(widget.bookAbbrev, widget.chapterNum, widget.verseNumber);
     final selectedVerses = ref.watch(readSelectionProvider);

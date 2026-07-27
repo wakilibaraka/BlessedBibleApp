@@ -220,7 +220,7 @@ class PreferencesService {
   bool getDailyReminderEnabled() => prefs.getBool(_dailyReminderEnabledKey) ?? false;
   void setDailyReminderEnabled(bool val) => prefs.setBool(_dailyReminderEnabledKey, val);
 
-  int getDailyReminderHour() => prefs.getInt(_dailyReminderHourKey) ?? 8;
+  int getDailyReminderHour() => prefs.getInt(_dailyReminderHourKey) ?? 18;
   void setDailyReminderHour(int val) => prefs.setInt(_dailyReminderHourKey, val);
 
   int getDailyReminderMinute() => prefs.getInt(_dailyReminderMinuteKey) ?? 0;
@@ -283,6 +283,17 @@ class PreferencesService {
 
   void saveRedLetterEnabled(bool enabled) {
     prefs.setBool(_redLetterEnabledKey, enabled);
+  }
+
+  // --- Hints ---
+  static const String _seenHintsKey = 'seen_hints';
+
+  List<String> getSeenHints() {
+    return prefs.getStringList(_seenHintsKey) ?? [];
+  }
+
+  void saveSeenHints(List<String> hints) {
+    prefs.setStringList(_seenHintsKey, hints);
   }
 }
 

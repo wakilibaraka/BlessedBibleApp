@@ -23,6 +23,7 @@ import '../../state/user_data_provider.dart';
 import '../../state/read_location_provider.dart';
 import '../../state/bible_provider.dart';
 import '../../state/read_settings_provider.dart';
+import '../../state/hints_provider.dart';
 
 
 import '../../state/study_provider.dart';
@@ -799,11 +800,8 @@ class MainNavScreen extends ConsumerWidget {
     }
   }
 
-  static bool _hasShownStyle3Hint = false;
-
   Widget _buildStyle3ActionRow(BuildContext context, WidgetRef ref, ThemeData theme) {
-    if (!_hasShownStyle3Hint) {
-      _hasShownStyle3Hint = true;
+    ref.read(hintsProvider.notifier).maybeShowHint('style3_long_press', () {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -814,7 +812,7 @@ class MainNavScreen extends ConsumerWidget {
           );
         }
       });
-    }
+    });
 
     final readLoc = ref.watch(readLocationProvider);
     final readSettings = ref.watch(readSettingsProvider);

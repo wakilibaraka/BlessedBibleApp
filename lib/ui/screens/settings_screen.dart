@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 
 
+import '../../state/hints_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../state/user_data_provider.dart';
 import '../../state/typography_provider.dart';
@@ -501,6 +502,8 @@ class SettingsScreen extends StatelessWidget {
                             await ref.read(readSettingsProvider.notifier).setManualNavHidden(false);
                             
                               await ref.read(bibleNavSettingsProvider.notifier).setSwipeDown(true);
+                              
+                              ref.read(hintsProvider.notifier).resetHints();
                             
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Settings reset to default.')));
