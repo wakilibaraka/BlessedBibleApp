@@ -2083,7 +2083,22 @@ class _TypographyBottomSheet extends ConsumerWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 16),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Match system appearance'),
+                value: ref.watch(themeProvider) == AppThemeMode.automatic,
+                onChanged: (value) {
+                  HapticFeedback.selectionClick();
+                  if (value) {
+                    ref.read(themeProvider.notifier).setTheme(AppThemeMode.automatic);
+                  } else {
+                    final resolved = AppThemeMode.automatic.resolve(context);
+                    ref.read(themeProvider.notifier).setTheme(resolved);
+                  }
+                },
+              ),
+              const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

@@ -53,7 +53,23 @@ class SettingsScreen extends StatelessWidget {
                 },
               );
             }),
-
+            Consumer(builder: (context, ref, _) {
+              final themeMode = ref.watch(themeProvider);
+              return SwitchListTile(
+                title: const Text('Match system appearance'),
+                subtitle: const Text('Automatically switch between light and dark themes based on your device settings'),
+                value: themeMode == AppThemeMode.automatic,
+                onChanged: (value) {
+                  HapticFeedback.selectionClick();
+                  if (value) {
+                    ref.read(themeProvider.notifier).setTheme(AppThemeMode.automatic);
+                  } else {
+                    final resolved = AppThemeMode.automatic.resolve(context);
+                    ref.read(themeProvider.notifier).setTheme(resolved);
+                  }
+                },
+              );
+            }),
           ]),
           
           _buildSection(context, 'Reading', [

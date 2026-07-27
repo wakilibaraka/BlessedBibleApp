@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../state/theme_provider.dart';
+import '../../state/hints_provider.dart';
 
 class SharedTopHeader extends ConsumerWidget {
   final Widget? leading;
@@ -44,7 +45,7 @@ class SharedTopHeader extends ConsumerWidget {
           SizedBox(
             width: 48,
             height: 48,
-            child: trailing ?? _buildDefaultTrailing(ref, theme, appThemeMode),
+            child: trailing ?? _buildDefaultTrailing(context, ref, theme, appThemeMode),
           ),
         ],
       ),
@@ -65,10 +66,22 @@ class SharedTopHeader extends ConsumerWidget {
     );
   }
 
-  Widget _buildDefaultTrailing(WidgetRef ref, ThemeData theme, AppThemeMode appThemeMode) {
+  Widget _buildDefaultTrailing(BuildContext context, WidgetRef ref, ThemeData theme, AppThemeMode appThemeMode) {
     return Center(
       child: GestureDetector(
-        onTap: () => ref.read(themeProvider.notifier).cycleTheme(),
+        onTap: () {
+          ref.read(themeProvider.notifier).cycleTheme();
+          
+          ref.read(hintsProvider.notifier).maybeShowHint('theme_settings_prompt', () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Set your preferred look in Settings or the Aa menu'),
+                behavior: SnackBarBehavior.floating,
+                duration: Duration(seconds: 4),
+              ),
+            );
+          });
+        },
         child: AnimatedSwitcher(
           duration: const Duration(milliseconds: 350),
           transitionBuilder: (child, anim) => RotationTransition(
