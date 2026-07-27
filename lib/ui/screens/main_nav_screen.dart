@@ -18,6 +18,7 @@ import 'settings_screen.dart';
 import '../widgets/animated_background.dart';
 import '../widgets/bouncy_entrance.dart';
 import '../widgets/textured_glass_container.dart';
+import '../widgets/action_icon.dart';
 import '../../state/immersive_mode_provider.dart';
 import '../../state/user_data_provider.dart';
 import '../../state/read_location_provider.dart';
@@ -237,7 +238,6 @@ class MainNavScreen extends ConsumerWidget {
                                                     if (!context.mounted) return;
                                                     ref.read(readSettingsProvider.notifier).setActiveHighlightColorIndex(i);
                                                     VerseActionLogic.handleHighlight(context, currentTheme, ref, readLoc.bookName, readLoc.chapter, selectedVerses.toList(), i);
-                                                    ref.read(readSelectionProvider.notifier).clear();
                                                   });
                                                 },
                                               );
@@ -530,14 +530,12 @@ class MainNavScreen extends ConsumerWidget {
 
   Widget _buildActionIcon(
       IconData icon, String tooltip, Color color, VoidCallback onTap) {
-    return IconButton(
-      icon: Icon(icon, size: 24),
-      color: color,
+    return ActionIcon(
+      icon: icon,
       tooltip: tooltip,
-      padding: EdgeInsets.zero,
-      constraints: const BoxConstraints(),
-      visualDensity: VisualDensity.compact,
-      onPressed: onTap,
+      color: color,
+      onTap: onTap,
+      size: 24,
     );
   }
 
@@ -555,19 +553,19 @@ class MainNavScreen extends ConsumerWidget {
           child: Container(
             width: 20,
             height: 20,
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.8),
-            shape: BoxShape.circle,
-            border:
-                isSelected ? Border.all(color: Colors.white, width: 2) : null,
-            boxShadow: isSelected
-                ? [
-                    BoxShadow(
-                        color: color.withValues(alpha: 0.4),
-                        blurRadius: 4,
-                        spreadRadius: 1)
-                  ]
-                : null,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.8),
+              shape: BoxShape.circle,
+              border:
+                  isSelected ? Border.all(color: Colors.white, width: 2) : null,
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                          color: color.withValues(alpha: 0.4),
+                          blurRadius: 4,
+                          spreadRadius: 1)
+                    ]
+                  : null,
             ),
           ),
         ),
@@ -601,7 +599,6 @@ class MainNavScreen extends ConsumerWidget {
                   : theme.colorScheme.onSurface,
               () {
                 VerseActionLogic.handleBookmark(context, theme, ref, readLoc.bookName, readLoc.chapter, selectedVerses.toList());
-                ref.read(readSelectionProvider.notifier).clear();
               },
             ),
             _buildActionIcon(
@@ -610,7 +607,6 @@ class MainNavScreen extends ConsumerWidget {
               theme.colorScheme.onSurface,
               () {
                 VerseActionLogic.handleCopy(context, ref, readLoc.bookName, readLoc.chapter, selectedVerses.toList());
-                ref.read(readSelectionProvider.notifier).clear();
               },
             ),
             _buildActionIcon(
@@ -619,7 +615,6 @@ class MainNavScreen extends ConsumerWidget {
               theme.colorScheme.onSurface,
               () {
                 VerseActionLogic.handleNote(context, ref, theme, readLoc.bookName, readLoc.chapter, selectedVerses.toList());
-                ref.read(readSelectionProvider.notifier).clear();
               },
             ),
             _buildActionIcon(
@@ -628,7 +623,6 @@ class MainNavScreen extends ConsumerWidget {
               theme.colorScheme.onSurface,
               () {
                 VerseActionLogic.handleCommentary(context, ref, readLoc.bookName, readLoc.chapter, 1, selectedVerses.toList());
-                ref.read(readSelectionProvider.notifier).clear();
               },
             ),
             _buildActionIcon(
@@ -637,7 +631,6 @@ class MainNavScreen extends ConsumerWidget {
               theme.colorScheme.onSurface,
               () {
                 VerseActionLogic.handleShare(context, ref, readLoc.bookName, readLoc.chapter, selectedVerses.toList());
-                ref.read(readSelectionProvider.notifier).clear();
               },
             ),
             if (showCloseIcon)
@@ -765,7 +758,6 @@ class MainNavScreen extends ConsumerWidget {
               isBookmarked ? theme.primaryColor : iconColor,
               () {
                 VerseActionLogic.handleBookmark(context, theme, ref, bookName, chapterNum, targetVerses);
-                ref.read(readSelectionProvider.notifier).clear();
               },
             ),
             _buildMinimalActionIcon(
@@ -774,7 +766,6 @@ class MainNavScreen extends ConsumerWidget {
               iconColor,
               () {
                 VerseActionLogic.handleNote(context, ref, theme, bookName, chapterNum, targetVerses);
-                ref.read(readSelectionProvider.notifier).clear();
               },
             ),
             _buildMinimalActionIcon(
@@ -783,7 +774,6 @@ class MainNavScreen extends ConsumerWidget {
               iconColor,
               () {
                 VerseActionLogic.handleShare(context, ref, bookName, chapterNum, targetVerses);
-                ref.read(readSelectionProvider.notifier).clear();
               },
             ),
             _buildMinimalActionIcon(
@@ -794,7 +784,6 @@ class MainNavScreen extends ConsumerWidget {
                 final primaryColorIndex = readSettings.primaryHighlightColorIndex;
                 final activeIndex = (primaryColorIndex >= 0 && primaryColorIndex < highlightPalette.length) ? primaryColorIndex : 2;
                 VerseActionLogic.handleHighlight(context, theme, ref, bookName, chapterNum, targetVerses, activeIndex);
-                ref.read(readSelectionProvider.notifier).clear();
               },
               onLongPress: () {
                 showDialog(
@@ -853,18 +842,13 @@ class MainNavScreen extends ConsumerWidget {
   }
 
   Widget _buildMinimalActionIcon(IconData icon, String tooltip, Color color, VoidCallback onTap, {VoidCallback? onLongPress}) {
-    return Tooltip(
-      message: tooltip,
-      child: InkResponse(
-        onTap: onTap,
-        onLongPress: onLongPress,
-        radius: 24,
-        child: Container(
-          constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-          alignment: Alignment.center,
-          child: Icon(icon, size: 28, color: color),
-        ),
-      ),
+    return ActionIcon(
+      icon: icon,
+      tooltip: tooltip,
+      color: color,
+      onTap: onTap,
+      onLongPress: onLongPress,
+      size: 28,
     );
   }
 
@@ -892,7 +876,6 @@ class MainNavScreen extends ConsumerWidget {
                 final readLoc = ref.read(readLocationProvider);
                 final targetVerses = ref.read(readSelectionProvider).toList();
                 VerseActionLogic.handleHighlight(context, theme, ref, readLoc.bookName, readLoc.chapter, targetVerses, paletteIndex);
-                ref.read(readSelectionProvider.notifier).clear();
               });
             },
           );

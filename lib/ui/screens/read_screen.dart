@@ -2642,11 +2642,6 @@ class _ContextMenuButton extends StatelessWidget {
 
 class VerseActionLogic {
   static void _showFeedback(BuildContext context, ThemeData theme, String message) {
-    // Haptic feedback
-    try {
-      // HapticFeedback.lightImpact(); // Wait, I don't have services imported. I will just use SnackBar.
-    } catch (_) {}
-
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -2654,7 +2649,7 @@ class VerseActionLogic {
         backgroundColor: theme.colorScheme.inverseSurface,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+        margin: const EdgeInsets.only(left: 24, right: 24, bottom: 120),
         duration: const Duration(seconds: 2),
       ),
     );
@@ -2674,7 +2669,7 @@ class VerseActionLogic {
     if (kHighlightDebug) {
       debugPrint('[HIGHLIGHT_DEBUG] MAP after write: ${ref.read(highlightsProvider)}');
     }
-    _showFeedback(context, theme, 'Highlighted');
+    _showFeedback(context, theme, '${targetVerses.length} verse(s) highlighted');
   }
 
   static void handleBookmark(BuildContext context, ThemeData theme, WidgetRef ref, String canonicalBookName, int chapterNum, List<int> targetVerses) {
@@ -2821,7 +2816,6 @@ class _VerseContextMenuContentState extends ConsumerState<VerseContextMenuConten
           color: isBookmarked ? theme.primaryColor : null,
           onTap: () {
             VerseActionLogic.handleBookmark(context, theme, ref, widget.bookName, widget.chapterNum, targetVerses);
-            ref.read(readSelectionProvider.notifier).clear();
             widget.onDismiss();
           }
         ),
@@ -2833,7 +2827,6 @@ class _VerseContextMenuContentState extends ConsumerState<VerseContextMenuConten
           onTap: () {
             widget.onDismiss();
             VerseActionLogic.handleNote(context, ref, theme, widget.bookName, widget.chapterNum, targetVerses);
-            ref.read(readSelectionProvider.notifier).clear();
           }
         ),
         const SizedBox(width: 8),
@@ -2843,7 +2836,6 @@ class _VerseContextMenuContentState extends ConsumerState<VerseContextMenuConten
           onTap: () {
             widget.onDismiss();
             VerseActionLogic.handleCopy(context, ref, widget.bookName, widget.chapterNum, targetVerses);
-            ref.read(readSelectionProvider.notifier).clear();
           }
         ),
         const SizedBox(width: 8),
@@ -2853,7 +2845,6 @@ class _VerseContextMenuContentState extends ConsumerState<VerseContextMenuConten
           onTap: () {
             widget.onDismiss();
             VerseActionLogic.handleCommentary(context, ref, widget.bookName, widget.chapterNum, widget.verseNumber, targetVerses);
-            ref.read(readSelectionProvider.notifier).clear();
           }
         ),
         const SizedBox(width: 8),
@@ -2863,7 +2854,6 @@ class _VerseContextMenuContentState extends ConsumerState<VerseContextMenuConten
           onTap: () {
             widget.onDismiss();
             VerseActionLogic.handleShare(context, ref, widget.bookName, widget.chapterNum, targetVerses);
-            ref.read(readSelectionProvider.notifier).clear();
           }
         ),
       ],
@@ -2884,7 +2874,6 @@ class _VerseContextMenuContentState extends ConsumerState<VerseContextMenuConten
               ref.read(readSettingsProvider.notifier).setActiveHighlightColorIndex(i);
               VerseActionLogic.handleHighlight(context, theme, ref, widget.bookName, widget.chapterNum, targetVerses, i);
               setState(() => _showColors = false);
-              ref.read(readSelectionProvider.notifier).clear();
               widget.onDismiss();
             }
           ),
@@ -2920,7 +2909,6 @@ class _VerseContextMenuContentState extends ConsumerState<VerseContextMenuConten
                           final primaryColorIndex = ref.read(readSettingsProvider).primaryHighlightColorIndex;
                           final activeIndex = (primaryColorIndex >= 0 && primaryColorIndex < 5) ? primaryColorIndex : 2;
                           VerseActionLogic.handleHighlight(context, theme, ref, widget.bookName, widget.chapterNum, targetVerses, activeIndex);
-                          ref.read(readSelectionProvider.notifier).clear();
                           widget.onDismiss();
                         },
                         onLongPress: () {
