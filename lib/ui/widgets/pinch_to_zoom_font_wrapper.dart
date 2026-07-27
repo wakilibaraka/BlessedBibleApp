@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/typography_provider.dart';
 
@@ -15,6 +16,7 @@ class _PinchToZoomFontWrapperState extends ConsumerState<PinchToZoomFontWrapper>
   final Map<int, Offset> _activePointers = {};
   double _initialDistance = 0.0;
   double _initialFontSize = 18.0;
+  double _lastHapticFontSize = 18.0;
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +27,7 @@ class _PinchToZoomFontWrapperState extends ConsumerState<PinchToZoomFontWrapper>
           final pts = _activePointers.values.toList();
           _initialDistance = (pts[0] - pts[1]).distance;
           _initialFontSize = ref.read(typographyProvider).fontSize;
+          _lastHapticFontSize = _initialFontSize;
         }
       },
       onPointerMove: (event) {
@@ -44,6 +47,10 @@ class _PinchToZoomFontWrapperState extends ConsumerState<PinchToZoomFontWrapper>
           if ((newFontSize - currentFontSize).abs() > 0.5) {
             // Update live but debounced by distance threshold
             ref.read(typographyProvider.notifier).setFontSize(newFontSize);
+            if ((newFontSize - _lastHapticFontSize).abs() >= 1.0) {
+              HapticFeedback.selectionClick();
+              _lastHapticFontSize = newFontSize.roundToDouble();
+            }
           }
         }
       },

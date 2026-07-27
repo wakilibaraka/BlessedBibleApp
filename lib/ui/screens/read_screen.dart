@@ -96,6 +96,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
   double _scrollDownAccum   = 0.0; // total downward scroll pixels for immersive delay
   DateTime? _overscrollStart;      // when the drag crossed the first threshold
   bool _navTriggeredThisDrag = false;
+  bool _hasFiredArmedHaptic = false;
 
   /// Called from the indicator widget to provide the current pull fraction
   /// (0.0 → 1.0, capped) so a subtle indicator can be drawn.
@@ -106,6 +107,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
     _overscrollAccum      = 0.0;
     _overscrollStart      = null;
     _navTriggeredThisDrag = false;
+    _hasFiredArmedHaptic  = false;
     if (mounted) setState(() {});
   }
   // ────────────────────────────────────────────────────────────────
@@ -462,6 +464,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                               controller: _pageController,
                               itemCount: flatChapters.length,
                               onPageChanged: (pageIndex) {
+                                HapticFeedback.selectionClick();
                                 final startMs = DateTime.now().millisecondsSinceEpoch;
                                 debugPrint('STEP0: onPageChanged gesture started for page $pageIndex');
                                 setState(() {
@@ -571,16 +574,21 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                             return false;
                                           }
 
-                                          // Accumulate how far the user has dragged
+                                          // Elastic resistance (rubber-banding)
                                           final delta = -notification.overscroll;
-
-                                          // Mark the start of intentional territory once
-                                          // we've seen a first meaningful pull
+                                          final resistance = (1.0 - (_overscrollAccum / (_kOverscrollDistanceThreshold * 2.5)).clamp(0.0, 0.8));
+                                          
                                           if (_overscrollAccum == 0.0 && delta > 4.0) {
                                             _overscrollStart = DateTime.now();
                                           }
 
-                                          _overscrollAccum += delta;
+                                          _overscrollAccum += delta * resistance;
+                                          
+                                          if (_overscrollAccum >= _kOverscrollDistanceThreshold && !_hasFiredArmedHaptic) {
+                                            _hasFiredArmedHaptic = true;
+                                            HapticFeedback.mediumImpact();
+                                          }
+                                          
                                           if (mounted) setState(() {});
 
                                           // Check if both thresholds are satisfied
@@ -594,9 +602,18 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                             _resetOverscrollGate();
                                             _showSelectorBottomSheet(allBooks);
                                           }
-                                        } else {
-                                          // Drag released / scroll changed direction — reset gate
-                                          if (_overscrollAccum > 0) _resetOverscrollGate();
+                                        } else if (notification is ScrollEndNotification) {
+                                          // Drag released
+                                          if (_overscrollAccum > 0) {
+                                            if (_overscrollAccum >= _kOverscrollDistanceThreshold && !_navTriggeredThisDrag && ModalRoute.of(context)?.isCurrent == true) {
+                                              _navTriggeredThisDrag = true;
+                                              _showSelectorBottomSheet(allBooks);
+                                            }
+                                            _resetOverscrollGate();
+                                          }
+                                        } else if (notification is ScrollUpdateNotification && _overscrollAccum > 0) {
+                                          // Scroll changed direction
+                                          _resetOverscrollGate();
                                         }
                                       }
 
@@ -979,8 +996,8 @@ Positioned(
                               const SizedBox(width: 8),
                               Text(
                                 _overscrollFraction >= 1.0
-                                    ? 'Hold to navigate'
-                                    : 'Keep holding…',
+                                    ? 'Release to navigate'
+                                    : 'Pull to navigate',
                                 style: theme.textTheme.labelLarge?.copyWith(
                                   color: theme.primaryColor.withValues(
                                       alpha: 0.5 + 0.5 * _overscrollFraction),
