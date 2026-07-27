@@ -1,0 +1,38 @@
+Resolving dependencies...
+Downloading packages...
+  _fe_analyzer_shared 99.0.0 (105.0.0 available)
+  analyzer 12.1.0 (14.1.0 available)
+  flutter_riverpod 3.3.2 (3.4.1 available)
+  hooks 2.0.2 (2.1.0 available)
+  jni 1.0.0 (1.0.1 available)
+  matcher 0.12.19 (0.12.20 available)
+  meta 1.18.0 (1.19.0 available)
+  objective_c 9.4.1 (9.5.0 available)
+  package_config 2.2.0 (3.0.0 available)
+  record_use 0.6.0 (1.0.0 available)
+  riverpod 3.3.2 (3.4.1 available)
+  test 1.31.0 (1.31.2 available)
+  test_api 0.7.11 (0.7.13 available)
+  test_core 0.6.17 (0.6.19 available)
+  vector_math 2.2.0 (2.4.1 available)
+  xml 6.6.1 (7.0.1 available)
+Got dependencies!
+16 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Analyzing the_blessed_bible...                                  
+
+warning • Unused import: 'state/study_provider.dart'. Try removing the import directive • lib/main.dart:16:8 • unused_import
+   info • The 'if' statement could be replaced by a null-aware assignment. Try using the '??=' operator to conditionally assign a value • lib/services/notification_service.dart:141:5 • prefer_conditional_assignment
+warning • The value of the local variable 'startMs' isn't used. Try removing the variable or using it • lib/ui/screens/read_screen.dart:477:39 • unused_local_variable
+warning • The declaration '_StickyHeaderDelegate' isn't referenced. Try removing the declaration of '_StickyHeaderDelegate' • lib/ui/screens/read_screen.dart:1412:7 • unused_element
+   info • 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre. Try replacing the use of the deprecated member with the replacement • lib/ui/screens/reading_plan_browser.dart:255:25 • deprecated_member_use
+   info • 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre. Try replacing the use of the deprecated member with the replacement • lib/ui/screens/reading_plan_browser.dart:256:25 • deprecated_member_use
+   info • 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre. Try replacing the use of the deprecated member with the replacement • lib/ui/screens/reading_plan_browser.dart:267:25 • deprecated_member_use
+   info • 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre. Try replacing the use of the deprecated member with the replacement • lib/ui/screens/reading_plan_browser.dart:268:25 • deprecated_member_use
+  error • Expected to find ']' • lib/ui/screens/settings_screen.dart:552:5 • expected_token
+  error • Expected to find ')' • lib/ui/screens/settings_screen.dart:552:6 • expected_token
+   info • The variable name 'RA' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style • lib/utils/sunset_calculator.dart:25:12 • non_constant_identifier_names
+   info • The variable name 'Lquadrant' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style • lib/utils/sunset_calculator.dart:30:12 • non_constant_identifier_names
+   info • The variable name 'RAquadrant' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style • lib/utils/sunset_calculator.dart:31:12 • non_constant_identifier_names
+   info • The variable name 'UT' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style • lib/utils/sunset_calculator.dart:63:12 • non_constant_identifier_names
+

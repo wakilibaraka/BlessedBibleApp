@@ -445,30 +445,44 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
     return AnimatedSize(
       duration: const Duration(milliseconds: 250),
       curve: Curves.easeInOut,
-      child: TexturedGlassContainer(
-        borderRadius: BorderRadius.circular(20),
-        padding: EdgeInsets.zero,
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(20),
-            onTap: () {
-              Navigator.of(context).push(
-                CupertinoPageRoute(builder: (_) => const ReadingPlansHubScreen())
-              );
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                gradient: LinearGradient(
-                  colors: [
-                    theme.primaryColor.withValues(alpha: 0.15),
-                    Colors.transparent,
-                  ],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: theme.brightness == Brightness.dark 
+                 ? Colors.black.withValues(alpha: 0.3)
+                 : AppColors.goldAccent.withValues(alpha: 0.1),
+              blurRadius: 16,
+              spreadRadius: 2,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: TexturedGlassContainer(
+          borderRadius: BorderRadius.circular(24),
+          padding: EdgeInsets.zero,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(24),
+              onTap: () {
+                Navigator.of(context).push(
+                  CupertinoPageRoute(builder: (_) => const ReadingPlansHubScreen())
+                );
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(24),
+                  gradient: LinearGradient(
+                    colors: [
+                      theme.primaryColor.withValues(alpha: 0.15),
+                      Colors.transparent,
+                    ],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
                 ),
-              ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
                     horizontal: 20.0, vertical: 16.0),
@@ -622,6 +636,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
               ),
             ),
           ),
+        ),
         ),
       ),
     );

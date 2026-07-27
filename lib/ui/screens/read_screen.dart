@@ -1069,7 +1069,7 @@ Positioned(
                         color: Colors.black.withValues(alpha: 0.1),
                       ),
                     ),
-                    _VerseContextMenuContent(
+                    VerseContextMenuContent(
                       verseNumber: _contextMenuVerse!,
                       chapterData: _contextMenuChapterData,
                       bookName: _contextMenuBookName!,
@@ -2696,7 +2696,7 @@ class VerseActionLogic {
     showAddNoteSheet(context, ref, theme, initialReference: refStr);
   }
 
-  static dynamic _getChapterData(WidgetRef ref, String bookName, int chapterNum) {
+  static dynamic getChapterData(WidgetRef ref, String bookName, int chapterNum) {
     final flatChapters = ref.read(flatChaptersProvider);
     if (flatChapters.isNotEmpty) {
       try {
@@ -2710,7 +2710,7 @@ class VerseActionLogic {
   }
 
   static void handleCopy(BuildContext context, WidgetRef ref, String bookName, int chapterNum, List<int> targetVerses) {
-    final chapterData = _getChapterData(ref, bookName, chapterNum);
+    final chapterData = getChapterData(ref, bookName, chapterNum);
     final text = ShareService.formatVerses(
         bookName: bookName,
         chapterNumber: chapterNum,
@@ -2720,7 +2720,7 @@ class VerseActionLogic {
   }
 
   static void handleCommentary(BuildContext context, WidgetRef ref, String bookName, int chapterNum, int verseNumberFallback, List<int> targetVerses) {
-    final chapterData = _getChapterData(ref, bookName, chapterNum);
+    final chapterData = getChapterData(ref, bookName, chapterNum);
     final sorted = targetVerses.toList()..sort();
     final firstVerse = sorted.isNotEmpty ? sorted.first : verseNumberFallback;
     String vText = "";
@@ -2744,7 +2744,7 @@ class VerseActionLogic {
   }
 
   static void handleShare(BuildContext context, WidgetRef ref, String bookName, int chapterNum, List<int> targetVerses) {
-    final chapterData = _getChapterData(ref, bookName, chapterNum);
+    final chapterData = getChapterData(ref, bookName, chapterNum);
     final text = ShareService.formatVerses(
         bookName: bookName,
         chapterNumber: chapterNum,
@@ -2754,42 +2754,50 @@ class VerseActionLogic {
   }
 }
 
-class _VerseContextMenuContent extends ConsumerStatefulWidget {
+class VerseContextMenuContent extends ConsumerStatefulWidget {
   final int verseNumber;
   final dynamic chapterData;
   final String bookName;
   final int chapterNum;
   final String bookAbbrev;
   final VoidCallback onDismiss;
+  final bool initialShowColors;
 
-  const _VerseContextMenuContent({
+  const VerseContextMenuContent({
+    super.key,
     required this.verseNumber,
     required this.chapterData,
     required this.bookName,
     required this.chapterNum,
     required this.bookAbbrev,
     required this.onDismiss,
+    this.initialShowColors = false,
   });
 
   @override
-  ConsumerState<_VerseContextMenuContent> createState() => _VerseContextMenuContentState();
+  ConsumerState<VerseContextMenuContent> createState() => _VerseContextMenuContentState();
 }
 
-class _VerseContextMenuContentState extends ConsumerState<_VerseContextMenuContent> {
-  bool _showColors = false;
+class _VerseContextMenuContentState extends ConsumerState<VerseContextMenuContent> {
+  late bool _showColors;
+
+  @override
+  void initState() {
+    super.initState();
+    _showColors = widget.initialShowColors;
+  }
 
   @override
   Widget build(BuildContext context) {
-    ref.read(hintsProvider.notifier).maybeShowHint('highlight_long_press', () {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Long-press Highlight to change color'),
-              duration: Duration(seconds: 3),
-            ),
-          );
-        }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!context.mounted) return;
+      ref.read(hintsProvider.notifier).maybeShowHint('highlight_long_press', () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Long-press Highlight to change color'),
+            duration: Duration(seconds: 3),
+          ),
+        );
       });
     });
 

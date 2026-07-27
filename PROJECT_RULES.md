@@ -47,3 +47,5 @@ Only report a task as complete once the build is green and nothing is broken.
 - **No stray scratch files**: Never leave stray scratch files (`*.py`, `*.patch`, `*.txt` diffs) in the repo — delete them before committing.
 - **Mandatory Policy**: These backup & restore point rules are strictly mandatory, not optional.
 
+## Riverpod / State
+- Never modify a provider (`.notifier.method()`, `.state = ...`) during build, initState, didChangeDependencies, didUpdateWidget, dispose, or inside a builder body. Only modify providers inside user callbacks (onTap/onPressed/onLongPress/gestures) or deferred via addPostFrameCallback/Future. This causes the 'Tried to modify a provider while the widget tree was building' crash.

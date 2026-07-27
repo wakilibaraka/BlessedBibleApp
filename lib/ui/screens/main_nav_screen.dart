@@ -23,9 +23,6 @@ import '../../state/user_data_provider.dart';
 import '../../state/read_location_provider.dart';
 import '../../state/bible_provider.dart';
 import '../../state/read_settings_provider.dart';
-import '../../state/hints_provider.dart';
-
-
 import '../../state/study_provider.dart';
 import 'verse_detail_screen.dart';
 
@@ -112,113 +109,12 @@ class MainNavScreen extends ConsumerWidget {
                           opacity: effectiveNavHidden ? 0.0 : 1.0,
                           child: IgnorePointer(
                             ignoring: effectiveNavHidden,
-                            child: TweenAnimationBuilder<BorderRadius?>(
-                              duration: const Duration(milliseconds: 400),
-                              curve: Curves.easeOutCubic,
-                              tween: BorderRadiusTween(
-                                begin: BorderRadius.circular(kBottomDockHeight / 2),
-                                end: effectiveNavHidden
-                                    ? const BorderRadius.only(
-                                        topLeft: Radius.circular(32),
-                                        bottomLeft: Radius.circular(32),
-                                        topRight: Radius.circular(8),
-                                        bottomRight: Radius.circular(8),
-                                      )
-                                    : BorderRadius.circular(kBottomDockHeight / 2),
-                              ),
-                              builder: (context, radius, child) {
-                                return Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    Positioned.fill(
-                                      child: GestureDetector(
-                                        behavior: HitTestBehavior.opaque,
-                                        onTap: () {},
-                                      ),
-                                    ),
-                                    TexturedGlassContainer(
-                                      borderRadius:
-                                          radius ?? BorderRadius.circular(kBottomDockHeight / 2),
-                                      padding: EdgeInsets.zero,
-                                      child: child!,
-                                    ),
-                                  ],
-                                );
-                              },
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 400),
-                                curve: Curves.easeOutCubic,
-                                height: kBottomDockHeight,
-                                width: effectiveNavHidden ? 0.0 : (isRaindropAction ? 180.0 : dockMaxWidth),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(36.0),
-                                  child: OverflowBox(
-                                    alignment: Alignment.centerRight,
-                                    minWidth: isRaindropAction ? 180.0 : dockMaxWidth,
-                                    maxWidth: isRaindropAction ? 180.0 : dockMaxWidth,
-                                    minHeight: kBottomDockHeight,
-                                    maxHeight: kBottomDockHeight,
-                                    child: SizedBox(
-                                      width: isRaindropAction ? 180.0 : dockMaxWidth,
-                                      child: Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            vertical: isRaindropAction ? 0.0 : 8.0, 
-                                            horizontal: (isRaindropAction || isMinimalAction) ? 0.0 : 24.0),
-                                        child: AnimatedSwitcher(
-                                          duration: const Duration(milliseconds: 300),
-                                          transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
-                                          child: isMinimalAction
-                                              ? _buildStyle3ActionRow(context, ref, Theme.of(context))
-                                              : isRaindropAction
-                                                  ? _buildRaindropColorRow(context, ref, Theme.of(context))
-                                                  : Row(
-                                                      key: const ValueKey('nav_tabs'),
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: [
-                                            _buildNavItem(
-                                              context,
-                                              ref,
-                                              index: 0,
-                                              icon: Icons.home_outlined,
-                                              activeIcon: Icons.home,
-                                              label: 'Home',
-                                              currentIndex: currentIndex,
-                                            ),
-                                            _buildNavItem(
-                                              context,
-                                              ref,
-                                              index: 1,
-                                              icon: Icons.menu_book_outlined,
-                                              activeIcon: Icons.menu_book,
-                                              label: 'Read',
-                                              currentIndex: currentIndex,
-                                            ),
-                                            _buildNavItem(
-                                              context,
-                                              ref,
-                                              index: 3,
-                                              icon: Icons.school_outlined,
-                                              activeIcon: Icons.school,
-                                              label: 'Study',
-                                              currentIndex: currentIndex,
-                                            ),
-                                            _buildNavItem(
-                                              context,
-                                              ref,
-                                              index: 2,
-                                              icon: Icons.search,
-                                              activeIcon: Icons.search,
-                                              label: 'Search',
-                                              currentIndex: currentIndex,
-                                            ),
-                                          ],
-                                        ),
-                                        ), // AnimatedSwitcher
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 300),
+                              transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
+                              child: isMinimalAction
+                                  ? _buildMinimalActionBar(context, ref, Theme.of(context), dockMaxWidth)
+                                  : _buildNavBar(context, ref, Theme.of(context), dockMaxWidth, currentIndex, isRaindropAction),
                             ),
                           ),
                         ),
@@ -336,9 +232,13 @@ class MainNavScreen extends ConsumerWidget {
                                                 color,
                                                 isSelected: allHaveThisColor,
                                                 onTap: () {
-                                                  ref.read(readSettingsProvider.notifier).setActiveHighlightColorIndex(i);
-                                                  VerseActionLogic.handleHighlight(context, Theme.of(context), ref, readLoc.bookName, readLoc.chapter, selectedVerses.toList(), i);
-                                                  ref.read(readSelectionProvider.notifier).clear();
+                                                  final currentTheme = Theme.of(context);
+                                                  Future(() {
+                                                    if (!context.mounted) return;
+                                                    ref.read(readSettingsProvider.notifier).setActiveHighlightColorIndex(i);
+                                                    VerseActionLogic.handleHighlight(context, currentTheme, ref, readLoc.bookName, readLoc.chapter, selectedVerses.toList(), i);
+                                                    ref.read(readSelectionProvider.notifier).clear();
+                                                  });
                                                 },
                                               );
                                             }),
@@ -402,7 +302,7 @@ class MainNavScreen extends ConsumerWidget {
                                                               ),
                                                             );
                                                           },
-                                                          child: (isRaindropAction) 
+                                                          child: (currentIndex == 1 && selectedVerses.isNotEmpty) 
                                                               ? const Icon(Icons.close_rounded, size: 28, key: ValueKey('raindrop_close'))
                                                               : _buildFabIcon(
                                                                   currentIndex,
@@ -412,7 +312,7 @@ class MainNavScreen extends ConsumerWidget {
                                                         color: Theme.of(context)
                                                             .primaryColor,
                                                         onPressed: () {
-                                                          if (isRaindropAction) {
+                                                          if (currentIndex == 1 && selectedVerses.isNotEmpty) {
                                                             ref.read(readSelectionProvider.notifier).clear();
                                                           } else {
                                                             _handleFabTap(
@@ -470,7 +370,7 @@ class MainNavScreen extends ConsumerWidget {
         iconData = Icons.tune_rounded;
         break;
       case 3: // Study
-        iconData = Icons.auto_awesome;
+        iconData = Icons.casino_rounded;
         break;
       default:
         iconData = Icons.add_rounded;
@@ -785,38 +685,58 @@ class MainNavScreen extends ConsumerWidget {
         try {
           final fc = flatChapters.firstWhere(
               (c) => c.book.name == bookName && c.chapter.number == chapter);
-          // Just push the VerseDetailScreen without switching the active tab.
-          ref.read(readLocationProvider.notifier).updateLocation(
-                bookAbbrev: fc.book.abbreviation,
-                bookName: bookName,
-                chapter: chapter,
-                verse: verseNum,
-              );
-          ref.read(activeStudyVerseProvider.notifier).setVerse('$bookName $chapter:$verseNum');
+              
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => const CastingLotsDialog(),
+          ).then((_) {
+            if (!context.mounted) return;
+            
+            HapticFeedback.selectionClick();
+            // Just push the VerseDetailScreen without switching the active tab.
+            ref.read(readLocationProvider.notifier).updateLocation(
+                  bookAbbrev: fc.book.abbreviation,
+                  bookName: bookName,
+                  chapter: chapter,
+                  verse: verseNum,
+                );
+            ref.read(activeStudyVerseProvider.notifier).setVerse('$bookName $chapter:$verseNum');
 
-          Navigator.of(context).push(CupertinoPageRoute(builder: (_) => VerseDetailScreen(reference: '$bookName $chapter:$verseNum')));
+            Navigator.of(context).push(CupertinoPageRoute(builder: (_) => VerseDetailScreen(reference: '$bookName $chapter:$verseNum')));
+          });
         } catch (_) {}
       }
     }
   }
 
-  Widget _buildStyle3ActionRow(BuildContext context, WidgetRef ref, ThemeData theme) {
-    ref.read(hintsProvider.notifier).maybeShowHint('style3_long_press', () {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Long-press a verse for more actions'),
-              duration: Duration(seconds: 3),
-            ),
-          );
-        }
-      });
-    });
+  Widget _buildNavBar(BuildContext context, WidgetRef ref, ThemeData theme, double dockMaxWidth, int currentIndex, bool isRaindropAction) {
+    return _buildGlassWrapper(
+      key: const ValueKey('nav_bar_container'),
+      dockMaxWidth: dockMaxWidth,
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+            vertical: isRaindropAction ? 0.0 : 8.0, 
+            horizontal: isRaindropAction ? 0.0 : 24.0),
+        child: isRaindropAction
+            ? _buildRaindropColorRow(context, ref, theme)
+            : Row(
+                key: const ValueKey('nav_tabs'),
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildNavItem(context, ref, index: 0, icon: Icons.home_outlined, activeIcon: Icons.home, label: 'Home', currentIndex: currentIndex),
+                  _buildNavItem(context, ref, index: 1, icon: Icons.menu_book_outlined, activeIcon: Icons.menu_book, label: 'Read', currentIndex: currentIndex),
+                  _buildNavItem(context, ref, index: 3, icon: Icons.school_outlined, activeIcon: Icons.school, label: 'Study', currentIndex: currentIndex),
+                  _buildNavItem(context, ref, index: 2, icon: Icons.search, activeIcon: Icons.search, label: 'Search', currentIndex: currentIndex),
+                ],
+              ),
+      ),
+    );
+  }
 
+  Widget _buildMinimalActionBar(BuildContext context, WidgetRef ref, ThemeData theme, double dockMaxWidth) {
     final readLoc = ref.watch(readLocationProvider);
     final readSettings = ref.watch(readSettingsProvider);
-
     final selectedVerses = ref.watch(readSelectionProvider);
     final targetVerses = selectedVerses.toList();
     final bookmarks = ref.watch(bookmarksProvider);
@@ -826,83 +746,125 @@ class MainNavScreen extends ConsumerWidget {
       final refStr = generateVerseKey(bookName, chapterNum, v);
       return bookmarks.contains(refStr);
     });
-    
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () {}, // Blocks tap-through to verses
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
+
+    // Faint icon color to match the nav bar
+    final iconColor = theme.colorScheme.onSurface.withValues(alpha: 0.85);
+
+    return _buildGlassWrapper(
+      key: const ValueKey('minimal_action_bar_container'),
+      dockMaxWidth: dockMaxWidth,
+      child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Row(
-        key: const ValueKey('nav_tabs_style3'),
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildMinimalActionIcon(
-            isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
-            'Bookmark',
-            isBookmarked ? theme.primaryColor : theme.colorScheme.onSurface,
-            () {
-              VerseActionLogic.handleBookmark(context, theme, ref, bookName, chapterNum, targetVerses);
-              ref.read(readSelectionProvider.notifier).clear();
-            },
-          ),
-          _buildMinimalActionIcon(
-            Icons.copy_rounded,
-            'Copy',
-            theme.colorScheme.onSurface,
-            () {
-              VerseActionLogic.handleCopy(context, ref, bookName, chapterNum, targetVerses);
-              ref.read(readSelectionProvider.notifier).clear();
-            },
-          ),
-          _buildMinimalActionIcon(
-            Icons.edit_document,
-            'Note',
-            theme.colorScheme.onSurface,
-            () {
-              VerseActionLogic.handleNote(context, ref, theme, bookName, chapterNum, targetVerses);
-              ref.read(readSelectionProvider.notifier).clear();
-            },
-          ),
-          _buildMinimalActionIcon(
-            Icons.ios_share_rounded,
-            'Share',
-            theme.colorScheme.onSurface,
-            () {
-              VerseActionLogic.handleShare(context, ref, bookName, chapterNum, targetVerses);
-              ref.read(readSelectionProvider.notifier).clear();
-            },
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Container(width: 1, height: 28, color: theme.colorScheme.onSurface.withValues(alpha: 0.2)),
-          ),
-          _buildColorDotRow(context, ref, displayOrder: [
-            readSettings.primaryHighlightColorIndex, 
-            readSettings.secondaryHighlightColorIndex, 
-            ...List.generate(5, (i) => i).where((i) => i != readSettings.primaryHighlightColorIndex && i != readSettings.secondaryHighlightColorIndex)
-          ]),
-          _buildMinimalActionIcon(
-            Icons.close_rounded,
-            'Close',
-            theme.colorScheme.onSurface.withValues(alpha: 0.5),
-            () => ref.read(readSelectionProvider.notifier).clear(),
-          ),
-        ],
+          key: const ValueKey('nav_tabs_style3'),
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildMinimalActionIcon(
+              isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+              'Bookmark',
+              isBookmarked ? theme.primaryColor : iconColor,
+              () {
+                VerseActionLogic.handleBookmark(context, theme, ref, bookName, chapterNum, targetVerses);
+                ref.read(readSelectionProvider.notifier).clear();
+              },
+            ),
+            _buildMinimalActionIcon(
+              Icons.edit_document,
+              'Note',
+              iconColor,
+              () {
+                VerseActionLogic.handleNote(context, ref, theme, bookName, chapterNum, targetVerses);
+                ref.read(readSelectionProvider.notifier).clear();
+              },
+            ),
+            _buildMinimalActionIcon(
+              Icons.ios_share_rounded,
+              'Share',
+              iconColor,
+              () {
+                VerseActionLogic.handleShare(context, ref, bookName, chapterNum, targetVerses);
+                ref.read(readSelectionProvider.notifier).clear();
+              },
+            ),
+            _buildMinimalActionIcon(
+              Icons.highlight_rounded,
+              'Highlight',
+              iconColor,
+              () {
+                final primaryColorIndex = readSettings.primaryHighlightColorIndex;
+                final activeIndex = (primaryColorIndex >= 0 && primaryColorIndex < highlightPalette.length) ? primaryColorIndex : 2;
+                VerseActionLogic.handleHighlight(context, theme, ref, bookName, chapterNum, targetVerses, activeIndex);
+                ref.read(readSelectionProvider.notifier).clear();
+              },
+              onLongPress: () {
+                showDialog(
+                  context: context,
+                  barrierColor: Colors.black12,
+                  builder: (_) => VerseContextMenuContent(
+                    verseNumber: targetVerses.isNotEmpty ? targetVerses.first : 1,
+                    chapterData: null,
+                    bookName: bookName,
+                    chapterNum: chapterNum,
+                    bookAbbrev: readLoc.bookAbbrev,
+                    initialShowColors: true,
+                    onDismiss: () => Navigator.of(context).pop(),
+                  ),
+                );
+              }
+            ),
+          ],
+        ),
       ),
-    ),
     );
   }
 
-  Widget _buildMinimalActionIcon(
-      IconData icon, String tooltip, Color color, VoidCallback onTap) {
-    return IconButton(
-      icon: Icon(icon, size: 28),
-      color: color,
-      tooltip: tooltip,
-      padding: const EdgeInsets.all(8),
-      constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-      onPressed: onTap,
+  Widget _buildGlassWrapper({required Key key, required double dockMaxWidth, required Widget child}) {
+    return TweenAnimationBuilder<BorderRadius?>(
+      key: key,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeOutCubic,
+      tween: BorderRadiusTween(
+        begin: BorderRadius.circular(kBottomDockHeight / 2),
+        end: BorderRadius.circular(kBottomDockHeight / 2),
+      ),
+      builder: (context, radius, childWidget) {
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            Positioned.fill(child: GestureDetector(behavior: HitTestBehavior.opaque, onTap: () {})),
+            TexturedGlassContainer(
+              borderRadius: radius ?? BorderRadius.circular(kBottomDockHeight / 2),
+              padding: EdgeInsets.zero,
+              child: childWidget!,
+            ),
+          ],
+        );
+      },
+      child: Container(
+        height: kBottomDockHeight,
+        width: dockMaxWidth,
+        alignment: Alignment.centerRight,
+        child: SizedBox(
+          width: dockMaxWidth,
+          child: child,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMinimalActionIcon(IconData icon, String tooltip, Color color, VoidCallback onTap, {VoidCallback? onLongPress}) {
+    return Tooltip(
+      message: tooltip,
+      child: InkResponse(
+        onTap: onTap,
+        onLongPress: onLongPress,
+        radius: 24,
+        child: Container(
+          constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+          alignment: Alignment.center,
+          child: Icon(icon, size: 28, color: color),
+        ),
+      ),
     );
   }
 
@@ -912,23 +874,30 @@ class MainNavScreen extends ConsumerWidget {
     final activeIndex = readSettings.activeHighlightColorIndex;
     final order = displayOrder ?? List.generate(highlightPalette.length, (i) => i);
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(order.length, (i) {
-        final paletteIndex = order[i];
-        return _buildColorDot(
-          AppColors.getRenderedHighlightColor(highlightPalette[paletteIndex], theme.brightness, theme.scaffoldBackgroundColor),
-          isSelected: paletteIndex == activeIndex,
-          onTap: () {
-            ref.read(readSettingsProvider.notifier).setActiveHighlightColorIndex(paletteIndex);
-            
-            final readLoc = ref.read(readLocationProvider);
-            final targetVerses = ref.read(readSelectionProvider).toList();
-            VerseActionLogic.handleHighlight(context, theme, ref, readLoc.bookName, readLoc.chapter, targetVerses, paletteIndex);
-            ref.read(readSelectionProvider.notifier).clear();
-          },
-        );
-      }),
+    return Padding(
+      padding: const EdgeInsets.only(left: 16.0, right: 64.0),
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: List.generate(order.length, (i) {
+          final paletteIndex = order[i];
+          return _buildColorDot(
+            AppColors.getRenderedHighlightColor(highlightPalette[paletteIndex], theme.brightness, theme.scaffoldBackgroundColor),
+            isSelected: paletteIndex == activeIndex,
+            onTap: () {
+              Future(() {
+                if (!context.mounted) return;
+                ref.read(readSettingsProvider.notifier).setActiveHighlightColorIndex(paletteIndex);
+                
+                final readLoc = ref.read(readLocationProvider);
+                final targetVerses = ref.read(readSelectionProvider).toList();
+                VerseActionLogic.handleHighlight(context, theme, ref, readLoc.bookName, readLoc.chapter, targetVerses, paletteIndex);
+                ref.read(readSelectionProvider.notifier).clear();
+              });
+            },
+          );
+        }),
+      ),
     );
   }
 
@@ -936,14 +905,115 @@ class MainNavScreen extends ConsumerWidget {
     return SizedBox(
       height: kBottomDockHeight,
       child: Center(
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            key: const ValueKey('nav_tabs_raindrop'),
+        child: _buildColorDotRow(context, ref),
+      ),
+    );
+  }
+}
+
+class CastingLotsDialog extends StatefulWidget {
+  const CastingLotsDialog({super.key});
+
+  @override
+  State<CastingLotsDialog> createState() => _CastingLotsDialogState();
+}
+
+class _CastingLotsDialogState extends State<CastingLotsDialog>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _rotation;
+  late Animation<double> _scale;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+
+    _rotation = Tween<double>(begin: 0, end: 4 * math.pi).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic),
+    );
+
+    _scale = TweenSequence<double>([
+      TweenSequenceItem(
+          tween: Tween(begin: 1.0, end: 1.4)
+              .chain(CurveTween(curve: Curves.easeOut)),
+          weight: 30),
+      TweenSequenceItem(
+          tween: Tween(begin: 1.4, end: 1.0)
+              .chain(CurveTween(curve: Curves.bounceOut)),
+          weight: 70),
+    ]).animate(_controller);
+
+    _controller.forward().then((_) {
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      child: Center(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+          decoration: BoxDecoration(
+            color: theme.scaffoldBackgroundColor,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: AppColors.goldAccent.withValues(alpha: 0.3),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.goldAccent.withValues(alpha: 0.15),
+                blurRadius: 20,
+                spreadRadius: 2,
+              )
+            ],
+          ),
+          child: Column(
             mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildColorDotRow(context, ref),
+              AnimatedBuilder(
+                animation: _controller,
+                builder: (context, child) {
+                  return Transform.scale(
+                    scale: _scale.value,
+                    child: Transform.rotate(
+                      angle: _rotation.value,
+                      child: child,
+                    ),
+                  );
+                },
+                child: const Icon(
+                  Icons.casino_rounded,
+                  size: 48,
+                  color: AppColors.goldAccent,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Casting lots...',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.goldAccent,
+                  letterSpacing: 0.5,
+                ),
+              ),
             ],
           ),
         ),
@@ -951,4 +1021,3 @@ class MainNavScreen extends ConsumerWidget {
     );
   }
 }
-

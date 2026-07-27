@@ -11,6 +11,10 @@ import '../../state/home_provider.dart';
 import '../../state/reading_plan_provider.dart';
 import '../../state/notes_provider.dart';
 import '../../state/streak_provider.dart';
+import '../../state/nav_provider.dart';
+import 'package:flutter/cupertino.dart';
+import 'your_space_screen.dart';
+import 'verse_detail_screen.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TODAY SCREEN — static scaffold (Stage 1: design / no data wiring)
@@ -75,12 +79,14 @@ class TodayScreen extends ConsumerWidget {
 
                         // ── Shared top header ──────────────────────────────────
                         SharedTopHeader(
-                          leading: const SizedBox.shrink(),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.close_rounded),
+                          leading: IconButton(
+                            icon: const Icon(Icons.arrow_back_ios_new_rounded),
                             color: theme.colorScheme.onSurface,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
                             onPressed: () => Navigator.of(context).pop(),
                           ),
+                          trailing: const SizedBox.shrink(),
                           centerContent: Text(
                             dayLabel,
                             textAlign: TextAlign.center,
@@ -103,14 +109,7 @@ class TodayScreen extends ConsumerWidget {
 
                     const SizedBox(height: 20),
 
-                    // ═══════════════════════════════════════════════════════
-                    // 2. VERSE OF THE DAY
-                    // ═══════════════════════════════════════════════════════
-                    _SectionLabel(label: 'VERSE OF THE DAY', theme: theme),
-                    const SizedBox(height: 8),
-                    _VerseOfTheDayCard(theme: theme),
-
-                    const SizedBox(height: 20),
+                    // Verse of the Day removed from expanded hub view
 
                     // ═══════════════════════════════════════════════════════
                     // 3. TODAY'S READING
@@ -146,8 +145,25 @@ class TodayScreen extends ConsumerWidget {
                     const SizedBox(height: 8),
                     _QuickActionsRow(theme: theme),
 
+                    const SizedBox(height: 40),
+                    Center(
+                      child: TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: TextButton.styleFrom(
+                          minimumSize: const Size(88, 44),
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        ),
+                        child: Text(
+                          'Done',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: theme.colorScheme.onSurface,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
                     // Bottom padding: clears the floating bottom nav
-                    SizedBox(height: mq.padding.bottom + 96),
+                    SizedBox(height: mq.padding.bottom + 40),
                   ],
                 ),
               ),
@@ -242,71 +258,6 @@ class _GreetingHeader extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 2. Verse of the Day card
-// ─────────────────────────────────────────────────────────────────────────────
-class _VerseOfTheDayCard extends ConsumerWidget {
-  final ThemeData theme;
-  const _VerseOfTheDayCard({required this.theme});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final homeState = ref.watch(homeProvider);
-    final verseText = homeState.verseOfTheDay.text;
-    final verseRef = homeState.verseOfTheDay.reference;
-
-    return GlassContainer(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.auto_stories_rounded,
-                  color: AppColors.goldAccent, size: 18),
-              const SizedBox(width: 8),
-              Text(
-                verseRef,
-                style: theme.textTheme.labelMedium?.copyWith(
-                  color: AppColors.goldAccent,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.4,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            '\u201c$verseText\u201d',
-            style: theme.textTheme.bodyLarge?.copyWith(
-              height: 1.55,
-              fontStyle: FontStyle.italic,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-          const SizedBox(height: 14),
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton.icon(
-              onPressed: null, // Stage 2: open VerseDetailScreen
-              icon: const Icon(Icons.open_in_new_rounded, size: 14),
-              label: const Text('Explore verse'),
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.goldAccent,
-                textStyle: theme.textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 // 3. Today's Reading card
 // ─────────────────────────────────────────────────────────────────────────────
 class _TodaysReadingCard extends ConsumerWidget {
@@ -319,9 +270,10 @@ class _TodaysReadingCard extends ConsumerWidget {
     final totalDays = planState.planData.length;
     final currentDay = planState.currentDay;
     
-    final dayLabel = totalDays > 0 ? 'Day $currentDay of $totalDays' : 'No active plan';
-    final progress = totalDays > 0 ? (currentDay > 1 ? (currentDay - 1) / totalDays : 0.0) : 0.0;
-    
+    final now = DateTime.now();
+    final dayOfYear = now.difference(DateTime(now.year, 1, 1)).inDays + 1;
+    final dayLabel = 'Day $dayOfYear of 365';
+    final progress = dayOfYear / 365.0;
     List<String> chapters = [];
     if (totalDays > 0 && currentDay > 0 && currentDay <= totalDays) {
       chapters = planState.planData[currentDay - 1].chapters.map((c) => '${c.bookName} ${c.chapterNum}').toList();
@@ -409,7 +361,12 @@ class _TodaysReadingCard extends ConsumerWidget {
           SizedBox(
             width: double.infinity,
             child: FilledButton.icon(
-              onPressed: null, // Stage 2: navProvider.setIndex(1)
+              onPressed: () {
+                final homeState = ref.read(homeProvider);
+                Navigator.of(context).push(CupertinoPageRoute(
+                  builder: (_) => VerseDetailScreen(reference: homeState.verseOfTheDay.reference)
+                ));
+              },
               icon: const Icon(Icons.menu_book_outlined, size: 16),
               label: const Text("Continue Reading"),
               style: FilledButton.styleFrom(
@@ -600,32 +557,44 @@ class _StreakProgressCard extends ConsumerWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 // 6. Quick Actions row
 // ─────────────────────────────────────────────────────────────────────────────
-class _QuickActionsRow extends StatelessWidget {
+class _QuickActionsRow extends ConsumerWidget {
   final ThemeData theme;
   const _QuickActionsRow({required this.theme});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final actions = [
       (
         icon: Icons.menu_book_rounded,
         label: 'Read',
         color: const Color(0xFF4A90D9),
+        onTap: () => ref.read(navProvider.notifier).setIndex(1),
       ),
       (
         icon: Icons.search_rounded,
         label: 'Search',
         color: const Color(0xFF9B59B6),
+        onTap: () => ref.read(navProvider.notifier).setIndex(3),
       ),
       (
         icon: Icons.self_improvement_rounded,
         label: 'Your Space',
         color: const Color(0xFF27AE60),
+        onTap: () {
+          Navigator.of(context).push(
+            CupertinoPageRoute(builder: (_) => const YourSpaceScreen(initialTab: 0)),
+          );
+        },
       ),
       (
         icon: Icons.bookmark_border_rounded,
         label: 'Bookmarks',
         color: const Color(0xFFE67E22),
+        onTap: () {
+          Navigator.of(context).push(
+            CupertinoPageRoute(builder: (_) => const YourSpaceScreen(initialTab: 1)),
+          );
+        },
       ),
     ];
 
@@ -640,6 +609,7 @@ class _QuickActionsRow extends StatelessWidget {
                 label: a.label,
                 color: a.color,
                 theme: theme,
+                onTap: a.onTap,
               ),
             )
             .toList(),
@@ -653,18 +623,20 @@ class _QuickActionButton extends StatelessWidget {
   final String label;
   final Color color;
   final ThemeData theme;
+  final VoidCallback onTap;
 
   const _QuickActionButton({
     required this.icon,
     required this.label,
     required this.color,
     required this.theme,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: null, // Stage 2: wire nav / push actions
+      onTap: onTap,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

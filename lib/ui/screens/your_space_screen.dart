@@ -12,19 +12,21 @@ import '../widgets/shared_app_bar.dart';
 import 'notes_list_screen.dart'; // for showAddNoteSheet
 
 class YourSpaceScreen extends ConsumerStatefulWidget {
-  const YourSpaceScreen({super.key});
+  final int initialTab; // 0=Highlights, 1=Bookmarks, 2=Notes
+  const YourSpaceScreen({super.key, this.initialTab = 0});
 
   @override
   ConsumerState<YourSpaceScreen> createState() => _YourSpaceScreenState();
 }
 
 class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
-  int _selectedIndex = 0; // 0=Highlights, 1=Bookmarks, 2=Notes
+  late int _selectedIndex;
   late PageController _pageController;
 
   @override
   void initState() {
     super.initState();
+    _selectedIndex = widget.initialTab;
     _pageController = PageController(initialPage: _selectedIndex);
   }
 

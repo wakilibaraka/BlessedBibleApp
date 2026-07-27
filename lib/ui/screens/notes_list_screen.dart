@@ -128,14 +128,12 @@ void showAddNoteSheet(BuildContext context, WidgetRef ref, ThemeData theme, {Str
 
   showModalBottomSheet(
     context: context,
-    backgroundColor: theme.scaffoldBackgroundColor,
+    backgroundColor: Colors.transparent,
     isScrollControlled: true,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-    ),
-    builder: (context) => Padding(
+    builder: (context) => TexturedGlassContainer(
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
       padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
         left: 24,
         right: 24,
         top: 24,
@@ -154,41 +152,63 @@ void showAddNoteSheet(BuildContext context, WidgetRef ref, ThemeData theme, {Str
           const SizedBox(height: 16),
           TextField(
             controller: titleController,
+            style: TextStyle(color: theme.colorScheme.onSurface),
             decoration: InputDecoration(
               hintText: 'Note Title',
+              hintStyle: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
+              filled: true,
+              fillColor: theme.brightness == Brightness.dark 
+                  ? Colors.black.withValues(alpha: 0.25)
+                  : Colors.white.withValues(alpha: 0.6),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: theme.primaryColor.withValues(alpha: 0.3)),
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: theme.primaryColor.withValues(alpha: 0.1)),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: theme.primaryColor),
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: theme.primaryColor.withValues(alpha: 0.4)),
               ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             ),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: contentController,
+            style: TextStyle(color: theme.colorScheme.onSurface),
             decoration: InputDecoration(
               hintText: 'Start typing...',
+              hintStyle: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
+              filled: true,
+              fillColor: theme.brightness == Brightness.dark 
+                  ? Colors.black.withValues(alpha: 0.25)
+                  : Colors.white.withValues(alpha: 0.6),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: theme.primaryColor.withValues(alpha: 0.3)),
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: theme.primaryColor.withValues(alpha: 0.1)),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: theme.primaryColor),
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: theme.primaryColor.withValues(alpha: 0.4)),
               ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             ),
             maxLines: 5,
           ),
           const SizedBox(height: 16),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
+          FilledButton(
+            style: FilledButton.styleFrom(
               backgroundColor: theme.primaryColor,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(24),
               ),
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
