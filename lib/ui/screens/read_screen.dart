@@ -18,6 +18,7 @@ import '../../state/study_provider.dart';
 import '../../state/read_settings_provider.dart';
 import '../../state/user_data_provider.dart';
 import '../../state/reading_plan_provider.dart';
+import '../../state/streak_provider.dart';
 import '../../state/most_read_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../../utils/bible_sections.dart';
@@ -134,6 +135,12 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
     _pageController = PageController(initialPage: 0);
     WidgetsBinding.instance.addObserver(this);
     WakelockPlus.enable(); // Keep screen on during reading
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ref.read(streakProvider.notifier).markReadToday();
+      }
+    });
   }
 
   @override

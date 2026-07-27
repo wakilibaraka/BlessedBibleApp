@@ -17,6 +17,8 @@ class PreferencesService {
   static const String _studyLayoutKey = 'study_layout';
   static const String _readingPlanStateKey = 'reading_plan_state';
   static const String _votdViewedDaysKey = 'votd_viewed_days';
+  static const String _streakCountKey = 'streak_count';
+  static const String _lastReadDateKey = 'last_read_date';
 
   // Reminder settings
   static const String _sabbathReminderEnabledKey = 'sabbath_reminder_enabled';
@@ -254,6 +256,23 @@ class PreferencesService {
     prefs.setString(_verseVisitsKey, jsonEncode(visits));
   }
 
+  // --- Streak Tracking ---
+
+  void saveStreakCount(int count) {
+    prefs.setInt(_streakCountKey, count);
+  }
+
+  int getStreakCount() {
+    return prefs.getInt(_streakCountKey) ?? 0;
+  }
+
+  void saveLastReadDate(String date) {
+    prefs.setString(_lastReadDateKey, date);
+  }
+
+  String? getLastReadDate() {
+    return prefs.getString(_lastReadDateKey);
+  }
 }
 
 final preferencesProvider = Provider<PreferencesService>((ref) => throw UnimplementedError());

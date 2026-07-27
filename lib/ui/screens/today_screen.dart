@@ -10,6 +10,7 @@ import '../widgets/glass_container.dart';
 import '../../state/home_provider.dart';
 import '../../state/reading_plan_provider.dart';
 import '../../state/notes_provider.dart';
+import '../../state/streak_provider.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TODAY SCREEN — static scaffold (Stage 1: design / no data wiring)
@@ -96,6 +97,9 @@ class TodayScreen extends ConsumerWidget {
                     // 1. GREETING / DATE HEADER
                     // ═══════════════════════════════════════════════════════
                     _GreetingHeader(greeting: greeting, theme: theme),
+
+                    const SizedBox(height: 16),
+                    const _StreakHeroWidget(),
 
                     const SizedBox(height: 20),
 
@@ -682,6 +686,56 @@ class _QuickActionButton extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _StreakHeroWidget extends ConsumerWidget {
+  const _StreakHeroWidget();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final streak = ref.watch(streakProvider);
+    final isLit = streak.readToday;
+    final count = streak.count;
+
+    if (count == 0 && !isLit) {
+      return const SizedBox.shrink(); // Hide if no streak and haven't read
+    }
+
+    final Color glowColor = isLit ? AppColors.goldAccent : Colors.grey.withValues(alpha: 0.5);
+    final String countText = count > 0 ? '$count Day Streak' : 'Read today to start streak!';
+
+    return Center(
+      child: GlassContainer(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        borderRadius: BorderRadius.circular(30),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isLit ? Icons.local_fire_department_rounded : Icons.local_fire_department_outlined,
+              color: glowColor,
+              size: 24,
+              shadows: isLit ? [
+                Shadow(
+                  color: glowColor.withValues(alpha: 0.6),
+                  blurRadius: 10 + (count.clamp(0, 10).toDouble()),
+                )
+              ] : null,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              countText,
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: isLit ? theme.colorScheme.onSurface : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
