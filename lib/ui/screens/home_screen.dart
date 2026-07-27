@@ -5,8 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/home_data.dart';
 import '../../state/home_provider.dart';
 import '../../state/votd_tracker_provider.dart';
-
 import '../../state/theme_provider.dart';
+import '../../state/study_provider.dart';
 import '../widgets/shared_top_header.dart';
 import '../widgets/glass_container.dart';
 import '../widgets/bouncy_entrance.dart';
@@ -96,6 +96,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   Widget _buildPage(BuildContext context, HomeData data, AppThemeMode appThemeMode) {
     final theme = Theme.of(context);
 
+    // Get dynamic commentary for VOTD
+    final commentaryState = ref.watch(combinedCommentaryProvider);
+    String? excerpt;
+    if (commentaryState.hasValue && commentaryState.value != null) {
+      final refRegex = RegExp(r'^(.+?)[_\s]+(\d+):(\d+)$');
+      final match = refRegex.firstMatch(data.verseOfTheDay.reference.trim());
+      if (match != null) {
+        final bookName = match.group(1)!.trim();
+        final chapterNum = match.group(2)!;
+        final verseNum = match.group(3)!;
+        final dataMap = commentaryState.value!.data;
+        
+        final matchedBookKey = dataMap.keys.cast<String?>().firstWhere(
+            (k) => k?.toLowerCase() == bookName.toLowerCase(), orElse: () => null);
+
+        if (matchedBookKey != null &&
+            dataMap[matchedBookKey]!.containsKey(chapterNum) &&
+            dataMap[matchedBookKey]![chapterNum]!.containsKey(verseNum)) {
+          final entries = dataMap[matchedBookKey]![chapterNum]![verseNum]!;
+          if (entries.isNotEmpty) {
+            excerpt = entries.first.text;
+          }
+        }
+      }
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -204,16 +229,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Commentary text — reduced line height for compactness
-                Text(
-                  'In the opening moment of creation, God\'s first creative act was calling forth light. This wasn\'t just physical luminescence; it symbolizes the foundational impact of His Word and presence in darkness.\n\nIn our own moments of uncertainty, God continues to bring clarity and life through His voice.',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    height: 1.60,
-                    color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.82),
+                // Commentary text excerpt (fallback to omitted if none exists)
+                if (excerpt != null) ...[
+                  Text(
+                    excerpt,
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      height: 1.60,
+                      color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.82),
+                    ),
                   ),
-                ),
-
-                const SizedBox(height: 14),
+                  const SizedBox(height: 14),
+                ],
 
                 // Primary action row: Go Deeper + Share
                 Row(
