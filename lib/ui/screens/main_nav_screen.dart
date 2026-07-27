@@ -110,12 +110,10 @@ class MainNavScreen extends ConsumerWidget {
                           opacity: effectiveNavHidden ? 0.0 : 1.0,
                           child: IgnorePointer(
                             ignoring: effectiveNavHidden,
-                            child: AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 300),
-                              transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
-                              child: isMinimalAction
-                                  ? _buildMinimalActionBar(context, ref, Theme.of(context), dockMaxWidth)
-                                  : _buildNavBar(context, ref, Theme.of(context), dockMaxWidth, currentIndex, isRaindropAction),
+                            child: _buildGlassWrapper(
+                              key: const ValueKey('unified_bar_container'),
+                              dockMaxWidth: dockMaxWidth,
+                              child: _buildUnifiedDockContent(context, ref, Theme.of(context), currentIndex, isRaindropAction, isMinimalAction),
                             ),
                           ),
                         ),
@@ -422,84 +420,66 @@ class MainNavScreen extends ConsumerWidget {
     }
   }
 
-  Widget _buildNavItem(
+  Widget _buildMorphingSlot(
     BuildContext context,
     WidgetRef ref, {
-    required int index,
-    required IconData icon,
-    required IconData activeIcon,
-    required String label,
+    required bool isAction,
+    required IconData navIcon,
+    required IconData navActiveIcon,
+    required String navLabel,
+    required int navIndex,
     required int currentIndex,
+    required IconData actionIcon,
+    required String actionLabel,
+    required Color actionColor,
+    required VoidCallback onActionTap,
+    VoidCallback? onActionLongPress,
   }) {
-    final isActive = index == currentIndex;
     final theme = Theme.of(context);
-    final color = isActive
+    final isActiveNav = navIndex == currentIndex;
+    
+    final navColor = isActiveNav
         ? theme.primaryColor
         : theme.colorScheme.onSurface.withValues(alpha: 0.4);
 
-    Widget iconWidget;
-    if (label == 'Home') {
-      iconWidget = AnimatedSwitcher(
-        duration: const Duration(milliseconds: 300),
-        transitionBuilder: (child, anim) =>
-            FadeTransition(opacity: anim, child: child),
-        child: Icon(
-          isActive ? Icons.home : Icons.home_outlined,
-          key: ValueKey(isActive),
-          color: color,
-          size: 24,
-        ),
-      );
-    } else if (label == 'Read') {
-      iconWidget = AnimatedSwitcher(
-        duration: const Duration(milliseconds: 300),
-        transitionBuilder: (child, anim) =>
-            FadeTransition(opacity: anim, child: child),
-        child: Icon(
-          isActive ? Icons.auto_stories : Icons.menu_book,
-          key: ValueKey(isActive),
-          color: color,
-          size: 24,
-        ),
-      );
-    } else if (label == 'Study') {
-      iconWidget = TweenAnimationBuilder<double>(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOutCubic,
-        tween: Tween<double>(begin: 0.0, end: isActive ? 0.2 : 0.0),
-        builder: (context, rotation, child) {
-          return Transform.rotate(
-            angle: rotation,
-            child: Icon(Icons.school, color: color, size: 24),
+    final currentIcon = isAction ? actionIcon : (isActiveNav ? navActiveIcon : navIcon);
+    final currentColor = isAction ? actionColor : navColor;
+    final currentLabel = isAction ? actionLabel : navLabel;
+    final isNavActiveStyle = !isAction && isActiveNav;
+
+    Widget buildIcon() {
+      if (!isAction) {
+        if (navLabel == 'Study') {
+          return TweenAnimationBuilder<double>(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOutCubic,
+            tween: Tween<double>(begin: 0.0, end: isActiveNav ? 0.2 : 0.0),
+            builder: (context, rotation, child) => Transform.rotate(angle: rotation, child: child),
+            child: Icon(Icons.school, color: currentColor, size: 24),
           );
-        },
-      );
-    } else if (label == 'Search') {
-      iconWidget = TweenAnimationBuilder<double>(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOutBack,
-        tween: Tween<double>(begin: 1.0, end: isActive ? 1.2 : 1.0),
-        builder: (context, scale, child) {
-          return Transform.scale(
-            scale: scale,
-            child: Icon(Icons.search, color: color, size: 24),
+        } else if (navLabel == 'Search') {
+          return TweenAnimationBuilder<double>(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOutBack,
+            tween: Tween<double>(begin: 1.0, end: isActiveNav ? 1.2 : 1.0),
+            builder: (context, scale, child) => Transform.scale(scale: scale, child: child),
+            child: Icon(Icons.search, color: currentColor, size: 24),
           );
-        },
-      );
-    } else {
-      iconWidget = Icon(isActive ? activeIcon : icon, color: color, size: 24);
+        }
+      }
+      return Icon(currentIcon, color: currentColor, size: 24);
     }
 
     return Expanded(
       child: GestureDetector(
         onTap: () {
-          if (index != currentIndex) {
-            _changeTab(index, ref, context);
+          if (isAction) {
+            onActionTap();
           } else {
-            // Tapping the same tab can act as a pop-to-root, but here we just clear transient state
-            _changeTab(index, ref, context);
+            _changeTab(navIndex, ref, context);
           }
         },
+        onLongPress: isAction ? onActionLongPress : null,
         behavior: HitTestBehavior.opaque,
         child: SizedBox(
           height: double.infinity,
@@ -509,16 +489,27 @@ class MainNavScreen extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
-                iconWidget,
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  transitionBuilder: (child, anim) => FadeTransition(opacity: anim, child: child),
+                  child: KeyedSubtree(
+                    key: ValueKey('${isAction ? 'action' : 'nav'}_$currentIcon'),
+                    child: buildIcon(),
+                  ),
+                ),
                 const SizedBox(height: 4),
-                Text(
-                  label,
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        fontFamily: 'Inter',
-                        color: color,
-                        fontWeight:
-                            isActive ? FontWeight.bold : FontWeight.normal,
-                      ),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  transitionBuilder: (child, anim) => FadeTransition(opacity: anim, child: child),
+                  child: Text(
+                    currentLabel,
+                    key: ValueKey(currentLabel),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                          fontFamily: 'Inter',
+                          color: currentColor,
+                          fontWeight: isNavActiveStyle ? FontWeight.bold : FontWeight.normal,
+                        ),
+                  ),
                 ),
               ],
             ),
@@ -703,31 +694,14 @@ class MainNavScreen extends ConsumerWidget {
     }
   }
 
-  Widget _buildNavBar(BuildContext context, WidgetRef ref, ThemeData theme, double dockMaxWidth, int currentIndex, bool isRaindropAction) {
-    return _buildGlassWrapper(
-      key: const ValueKey('nav_bar_container'),
-      dockMaxWidth: dockMaxWidth,
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-            vertical: isRaindropAction ? 0.0 : 8.0, 
-            horizontal: isRaindropAction ? 0.0 : 24.0),
-        child: isRaindropAction
-            ? _buildRaindropColorRow(context, ref, theme)
-            : Row(
-                key: const ValueKey('nav_tabs'),
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildNavItem(context, ref, index: 0, icon: Icons.home_outlined, activeIcon: Icons.home, label: 'Home', currentIndex: currentIndex),
-                  _buildNavItem(context, ref, index: 1, icon: Icons.menu_book_outlined, activeIcon: Icons.menu_book, label: 'Read', currentIndex: currentIndex),
-                  _buildNavItem(context, ref, index: 3, icon: Icons.school_outlined, activeIcon: Icons.school, label: 'Study', currentIndex: currentIndex),
-                  _buildNavItem(context, ref, index: 2, icon: Icons.search, activeIcon: Icons.search, label: 'Search', currentIndex: currentIndex),
-                ],
-              ),
-      ),
-    );
-  }
+  Widget _buildUnifiedDockContent(BuildContext context, WidgetRef ref, ThemeData theme, int currentIndex, bool isRaindropAction, bool isMinimalAction) {
+    if (isRaindropAction) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 0.0),
+        child: _buildRaindropColorRow(context, ref, theme),
+      );
+    }
 
-  Widget _buildMinimalActionBar(BuildContext context, WidgetRef ref, ThemeData theme, double dockMaxWidth) {
     final readLoc = ref.watch(readLocationProvider);
     final readSettings = ref.watch(readSettingsProvider);
     final selectedVerses = ref.watch(readSelectionProvider);
@@ -740,69 +714,66 @@ class MainNavScreen extends ConsumerWidget {
       return bookmarks.contains(refStr);
     });
 
-    // Faint icon color to match the nav bar
-    final iconColor = theme.colorScheme.onSurface.withValues(alpha: 0.85);
+    final actionIconColor = theme.colorScheme.onSurface.withValues(alpha: 0.4);
 
-    return _buildGlassWrapper(
-      key: const ValueKey('minimal_action_bar_container'),
-      dockMaxWidth: dockMaxWidth,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-        child: Row(
-          key: const ValueKey('nav_tabs_style3'),
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _buildMinimalActionIcon(
-              isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
-              'Bookmark',
-              isBookmarked ? theme.primaryColor : iconColor,
-              () {
-                VerseActionLogic.handleBookmark(context, theme, ref, bookName, chapterNum, targetVerses);
-              },
-            ),
-            _buildMinimalActionIcon(
-              Icons.edit_document,
-              'Note',
-              iconColor,
-              () {
-                VerseActionLogic.handleNote(context, ref, theme, bookName, chapterNum, targetVerses);
-              },
-            ),
-            _buildMinimalActionIcon(
-              Icons.ios_share_rounded,
-              'Share',
-              iconColor,
-              () {
-                VerseActionLogic.handleShare(context, ref, bookName, chapterNum, targetVerses);
-              },
-            ),
-            _buildMinimalActionIcon(
-              Icons.highlight_rounded,
-              'Highlight',
-              iconColor,
-              () {
-                final primaryColorIndex = readSettings.primaryHighlightColorIndex;
-                final activeIndex = (primaryColorIndex >= 0 && primaryColorIndex < highlightPalette.length) ? primaryColorIndex : 2;
-                VerseActionLogic.handleHighlight(context, theme, ref, bookName, chapterNum, targetVerses, activeIndex);
-              },
-              onLongPress: () {
-                showDialog(
-                  context: context,
-                  barrierColor: Colors.black12,
-                  builder: (_) => VerseContextMenuContent(
-                    verseNumber: targetVerses.isNotEmpty ? targetVerses.first : 1,
-                    chapterData: null,
-                    bookName: bookName,
-                    chapterNum: chapterNum,
-                    bookAbbrev: readLoc.bookAbbrev,
-                    initialShowColors: true,
-                    onDismiss: () => Navigator.of(context).pop(),
-                  ),
-                );
-              }
-            ),
-          ],
-        ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 24.0),
+      child: Row(
+        key: const ValueKey('unified_tabs'),
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _buildMorphingSlot(
+            context, ref,
+            isAction: isMinimalAction,
+            navIcon: Icons.home_outlined, navActiveIcon: Icons.home, navLabel: 'Home', navIndex: 0, currentIndex: currentIndex,
+            actionIcon: isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_border_rounded, actionLabel: 'Bookmark',
+            actionColor: isBookmarked ? theme.primaryColor : actionIconColor,
+            onActionTap: () => VerseActionLogic.handleBookmark(context, theme, ref, bookName, chapterNum, targetVerses),
+          ),
+          _buildMorphingSlot(
+            context, ref,
+            isAction: isMinimalAction,
+            navIcon: Icons.menu_book_outlined, navActiveIcon: Icons.menu_book, navLabel: 'Read', navIndex: 1, currentIndex: currentIndex,
+            actionIcon: Icons.edit_document, actionLabel: 'Notes',
+            actionColor: actionIconColor,
+            onActionTap: () => VerseActionLogic.handleNote(context, ref, theme, bookName, chapterNum, targetVerses),
+          ),
+          _buildMorphingSlot(
+            context, ref,
+            isAction: isMinimalAction,
+            navIcon: Icons.school_outlined, navActiveIcon: Icons.school, navLabel: 'Study', navIndex: 3, currentIndex: currentIndex,
+            actionIcon: Icons.highlight_rounded, actionLabel: 'Highlight',
+            actionColor: actionIconColor,
+            onActionTap: () {
+              final primaryColorIndex = readSettings.primaryHighlightColorIndex;
+              final activeIndex = (primaryColorIndex >= 0 && primaryColorIndex < highlightPalette.length) ? primaryColorIndex : 2;
+              VerseActionLogic.handleHighlight(context, theme, ref, bookName, chapterNum, targetVerses, activeIndex);
+            },
+            onActionLongPress: () {
+              showDialog(
+                context: context,
+                barrierColor: Colors.black12,
+                builder: (_) => VerseContextMenuContent(
+                  verseNumber: targetVerses.isNotEmpty ? targetVerses.first : 1,
+                  chapterData: null,
+                  bookName: bookName,
+                  chapterNum: chapterNum,
+                  bookAbbrev: readLoc.bookAbbrev,
+                  initialShowColors: true,
+                  onDismiss: () => Navigator.of(context).pop(),
+                ),
+              );
+            }
+          ),
+          _buildMorphingSlot(
+            context, ref,
+            isAction: isMinimalAction,
+            navIcon: Icons.search, navActiveIcon: Icons.search, navLabel: 'Search', navIndex: 2, currentIndex: currentIndex,
+            actionIcon: Icons.ios_share_rounded, actionLabel: 'Share',
+            actionColor: actionIconColor,
+            onActionTap: () => VerseActionLogic.handleShare(context, ref, bookName, chapterNum, targetVerses),
+          ),
+        ],
       ),
     );
   }
@@ -841,16 +812,6 @@ class MainNavScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMinimalActionIcon(IconData icon, String tooltip, Color color, VoidCallback onTap, {VoidCallback? onLongPress}) {
-    return ActionIcon(
-      icon: icon,
-      tooltip: tooltip,
-      color: color,
-      onTap: onTap,
-      onLongPress: onLongPress,
-      size: 28,
-    );
-  }
 
   Widget _buildColorDotRow(BuildContext context, WidgetRef ref, {List<int>? displayOrder}) {
     final theme = Theme.of(context);

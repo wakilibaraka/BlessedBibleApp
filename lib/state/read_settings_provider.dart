@@ -20,7 +20,7 @@ class ReadSettingsState {
   const ReadSettingsState({
     this.readingViewMode = ReadingViewMode.immersive,
     this.backgroundGlowStyle = BackgroundGlowStyle.top,
-    this.verseActionStyle = VerseActionStyle.classic,
+    this.verseActionStyle = VerseActionStyle.horizontal,
     this.activeHighlightColorIndex = 2,
     this.primaryHighlightColorIndex = 2, // Blue
     this.secondaryHighlightColorIndex = 1, // Green
@@ -102,11 +102,11 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
       );
     }
     
-    VerseActionStyle verseStyle = VerseActionStyle.classic;
+    VerseActionStyle verseStyle = VerseActionStyle.horizontal;
     if (verseStyleString != null) {
       verseStyle = VerseActionStyle.values.firstWhere(
         (e) => e.name == verseStyleString,
-        orElse: () => VerseActionStyle.classic,
+        orElse: () => VerseActionStyle.horizontal,
       );
     }
     
