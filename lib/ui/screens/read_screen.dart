@@ -1977,6 +1977,46 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
 class _TypographyBottomSheet extends ConsumerWidget {
   const _TypographyBottomSheet();
 
+  Widget _buildThemeIconButton(
+    BuildContext context, 
+    WidgetRef ref, 
+    ThemeData theme, 
+    AppThemeMode currentMode, 
+    AppThemeMode buttonMode, 
+    IconData icon,
+    {Widget? customIcon}
+  ) {
+    // Treat automatic as light for visual selection if needed, or exact match
+    final isSelected = currentMode == buttonMode || (currentMode == AppThemeMode.automatic && buttonMode == AppThemeMode.light);
+    
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        ref.read(themeProvider.notifier).setTheme(buttonMode);
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: 64,
+        height: 64,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: isSelected ? theme.primaryColor.withValues(alpha: 0.15) : theme.colorScheme.onSurface.withValues(alpha: 0.05),
+          border: isSelected ? Border.all(color: theme.primaryColor, width: 2.5) : null,
+          boxShadow: isSelected 
+              ? [BoxShadow(color: theme.primaryColor.withValues(alpha: 0.4), blurRadius: 16, spreadRadius: 4)] 
+              : null,
+        ),
+        child: Center(
+          child: customIcon ?? Icon(
+            icon, 
+            color: isSelected ? theme.primaryColor : theme.colorScheme.onSurfaceVariant,
+            size: 32,
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
@@ -2018,20 +2058,29 @@ class _TypographyBottomSheet extends ConsumerWidget {
               const SizedBox(height: 24),
               // Radial Balance: Color Mode Toggles
               Center(
-                child: PillSegmentedControl(
-                  segments: const ['Light', 'Sepia', 'Dark', 'OLED'],
-                  selectedIndex: switch (ref.watch(themeProvider)) {
-                    AppThemeMode.light => 0,
-                    AppThemeMode.sepia => 1,
-                    AppThemeMode.dark => 2,
-                    AppThemeMode.oled => 3,
-                    AppThemeMode.automatic => 0,
-                  },
-                  onSegmentSelected: (index) {
-                    HapticFeedback.selectionClick();
-                    final modes = [AppThemeMode.light, AppThemeMode.sepia, AppThemeMode.dark, AppThemeMode.oled];
-                    ref.read(themeProvider.notifier).setTheme(modes[index]);
-                  },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildThemeIconButton(context, ref, theme, ref.watch(themeProvider), AppThemeMode.light, Icons.wb_sunny_rounded),
+                    const SizedBox(width: 16),
+                    _buildThemeIconButton(context, ref, theme, ref.watch(themeProvider), AppThemeMode.sepia, Icons.local_cafe_rounded),
+                    const SizedBox(width: 16),
+                    _buildThemeIconButton(context, ref, theme, ref.watch(themeProvider), AppThemeMode.dark, Icons.nightlight_round),
+                    const SizedBox(width: 16),
+                    _buildThemeIconButton(context, ref, theme, ref.watch(themeProvider), AppThemeMode.oled, Icons.nightlight_round,
+                      customIcon: Container(
+                        width: 38,
+                        height: 38,
+                        decoration: const BoxDecoration(
+                          color: Colors.black,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Center(
+                          child: Icon(Icons.nightlight_round, color: Colors.white, size: 24),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 32),
