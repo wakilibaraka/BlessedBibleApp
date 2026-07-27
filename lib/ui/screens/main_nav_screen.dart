@@ -318,7 +318,7 @@ class MainNavScreen extends ConsumerWidget {
                                               final allHaveThisColor =
                                                   selectedVerses.every((v) {
                                                 final refStr = generateVerseKey(
-                                                    readLoc.bookAbbrev,
+                                                    readLoc.bookName,
                                                     readLoc.chapter,
                                                     v);
                                                 return highlights
@@ -331,7 +331,7 @@ class MainNavScreen extends ConsumerWidget {
                                                 isSelected: allHaveThisColor,
                                                 onTap: () {
                                                   ref.read(readSettingsProvider.notifier).setActiveHighlightColorIndex(i);
-                                                  VerseActionLogic.handleHighlight(context, Theme.of(context), ref, readLoc.bookAbbrev, readLoc.chapter, selectedVerses.toList(), i);
+                                                  VerseActionLogic.handleHighlight(context, Theme.of(context), ref, readLoc.bookName, readLoc.chapter, selectedVerses.toList(), i);
                                                   ref.read(readSelectionProvider.notifier).clear();
                                                 },
                                               );
@@ -686,16 +686,16 @@ class MainNavScreen extends ConsumerWidget {
           children: [
             _buildActionIcon(
               selectedVerses.every((v) => bookmarks.contains(
-                      generateVerseKey(readLoc.bookAbbrev, readLoc.chapter, v)))
+                      generateVerseKey(readLoc.bookName, readLoc.chapter, v)))
                   ? Icons.bookmark_rounded
                   : Icons.bookmark_border_rounded,
               'Bookmark',
               selectedVerses.every((v) => bookmarks.contains(
-                      generateVerseKey(readLoc.bookAbbrev, readLoc.chapter, v)))
+                      generateVerseKey(readLoc.bookName, readLoc.chapter, v)))
                   ? theme.primaryColor
                   : theme.colorScheme.onSurface,
               () {
-                VerseActionLogic.handleBookmark(context, theme, ref, readLoc.bookAbbrev, readLoc.chapter, selectedVerses.toList());
+                VerseActionLogic.handleBookmark(context, theme, ref, readLoc.bookName, readLoc.chapter, selectedVerses.toList());
                 ref.read(readSelectionProvider.notifier).clear();
               },
             ),
@@ -819,17 +819,16 @@ class MainNavScreen extends ConsumerWidget {
     final targetVerses = selectedVerses.toList();
     final bookmarks = ref.watch(bookmarksProvider);
     final highlights = ref.watch(highlightsProvider);
-    final bookAbbrev = readLoc.bookAbbrev;
     final chapterNum = readLoc.chapter;
     final bookName = readLoc.bookName;
     
     final isHighlighted = targetVerses.isNotEmpty && targetVerses.every((v) {
-      final refStr = generateVerseKey(bookAbbrev, chapterNum, v);
+      final refStr = generateVerseKey(bookName, chapterNum, v);
       return highlights.containsKey(refStr);
     });
 
     final isBookmarked = targetVerses.isNotEmpty && targetVerses.every((v) {
-      final refStr = generateVerseKey(bookAbbrev, chapterNum, v);
+      final refStr = generateVerseKey(bookName, chapterNum, v);
       return bookmarks.contains(refStr);
     });
     
@@ -847,7 +846,7 @@ class MainNavScreen extends ConsumerWidget {
             'Bookmark',
             isBookmarked ? theme.primaryColor : theme.colorScheme.onSurface,
             () {
-              VerseActionLogic.handleBookmark(context, theme, ref, bookAbbrev, chapterNum, targetVerses);
+              VerseActionLogic.handleBookmark(context, theme, ref, bookName, chapterNum, targetVerses);
               ref.read(readSelectionProvider.notifier).clear();
             },
           ),
@@ -876,7 +875,7 @@ class MainNavScreen extends ConsumerWidget {
             () {
               final primaryColorIndex = readSettings.primaryHighlightColorIndex;
               final activeIndex = (primaryColorIndex >= 0 && primaryColorIndex < 5) ? primaryColorIndex : 2;
-              VerseActionLogic.handleHighlight(context, theme, ref, bookAbbrev, chapterNum, targetVerses, activeIndex);
+              VerseActionLogic.handleHighlight(context, theme, ref, bookName, chapterNum, targetVerses, activeIndex);
               ref.read(readSelectionProvider.notifier).clear();
             },
           ),
@@ -928,7 +927,7 @@ class MainNavScreen extends ConsumerWidget {
             
             final readLoc = ref.read(readLocationProvider);
             final targetVerses = ref.read(readSelectionProvider).toList();
-            VerseActionLogic.handleHighlight(context, theme, ref, readLoc.bookAbbrev, readLoc.chapter, targetVerses, paletteIndex);
+            VerseActionLogic.handleHighlight(context, theme, ref, readLoc.bookName, readLoc.chapter, targetVerses, paletteIndex);
             ref.read(readSelectionProvider.notifier).clear();
           },
         );

@@ -736,6 +736,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                                       highlightColor = highlightPalette[savedColorIndex];
                                                     }
 
+                                                    if (kHighlightDebug) {
+                                                      debugPrint('[HIGHLIGHT_DEBUG] RENDER verse key=$refStr found=${highlights.containsKey(refStr)} color=$savedColorIndex highlightColor=$highlightColor isBookmarked=$isBookmarked timestamp=${DateTime.now().millisecondsSinceEpoch}');
+                                                    }
+                                                    
                                                     if (isBookmarked || highlightColor != null) {
                                                       debugPrint('DEBUG RENDER: $refStr isBookmarked=$isBookmarked, highlightColor=$highlightColor');
                                                     }
@@ -2689,20 +2693,27 @@ class VerseActionLogic {
     );
   }
 
-  static void handleHighlight(BuildContext context, ThemeData theme, WidgetRef ref, String bookAbbrev, int chapterNum, List<int> targetVerses, int activeIndex) {
-    debugPrint('DEBUG handleHighlight: bookAbbrev=$bookAbbrev, chapterNum=$chapterNum, targetVerses=$targetVerses, activeIndex=$activeIndex');
+  static void handleHighlight(BuildContext context, ThemeData theme, WidgetRef ref, String canonicalBookName, int chapterNum, List<int> targetVerses, int activeIndex) {
+    if (kHighlightDebug) {
+      debugPrint('[HIGHLIGHT_DEBUG] WRITE handleHighlight: canonicalBookName=$canonicalBookName, chapterNum=$chapterNum, targetVerses=$targetVerses, activeIndex=$activeIndex');
+    }
     for (var v in targetVerses) {
-      final refStr = generateVerseKey(bookAbbrev, chapterNum, v);
-      debugPrint('DEBUG handleHighlight: applying highlight to $refStr with colorIndex=$activeIndex');
+      final refStr = generateVerseKey(canonicalBookName, chapterNum, v);
+      if (kHighlightDebug) {
+        debugPrint('[HIGHLIGHT_DEBUG] WRITE key=$refStr color=$activeIndex');
+      }
       ref.read(highlightsProvider.notifier).toggleHighlight(refStr, activeIndex);
+    }
+    if (kHighlightDebug) {
+      debugPrint('[HIGHLIGHT_DEBUG] MAP after write: ${ref.read(highlightsProvider)}');
     }
     _showFeedback(context, theme, 'Highlighted');
   }
 
-  static void handleBookmark(BuildContext context, ThemeData theme, WidgetRef ref, String bookAbbrev, int chapterNum, List<int> targetVerses) {
-    final isAllBookmarked = targetVerses.every((v) => ref.read(bookmarksProvider).contains(generateVerseKey(bookAbbrev, chapterNum, v)));
+  static void handleBookmark(BuildContext context, ThemeData theme, WidgetRef ref, String canonicalBookName, int chapterNum, List<int> targetVerses) {
+    final isAllBookmarked = targetVerses.every((v) => ref.read(bookmarksProvider).contains(generateVerseKey(canonicalBookName, chapterNum, v)));
     for (var v in targetVerses) {
-      final refStr = generateVerseKey(bookAbbrev, chapterNum, v);
+      final refStr = generateVerseKey(canonicalBookName, chapterNum, v);
       if (isAllBookmarked) {
         ref.read(bookmarksProvider.notifier).toggle(refStr);
       } else if (!ref.read(bookmarksProvider).contains(refStr)) {
@@ -2836,7 +2847,7 @@ class _VerseContextMenuContentState extends ConsumerState<_VerseContextMenuConte
           label: isBookmarked ? 'Saved' : 'Bookmark',
           color: isBookmarked ? theme.primaryColor : null,
           onTap: () {
-            VerseActionLogic.handleBookmark(context, theme, ref, widget.bookAbbrev, widget.chapterNum, targetVerses);
+            VerseActionLogic.handleBookmark(context, theme, ref, widget.bookName, widget.chapterNum, targetVerses);
             ref.read(readSelectionProvider.notifier).clear();
             widget.onDismiss();
           }
@@ -2898,7 +2909,7 @@ class _VerseContextMenuContentState extends ConsumerState<_VerseContextMenuConte
             color: highlightPalette[i],
             onTap: () {
               ref.read(readSettingsProvider.notifier).setActiveHighlightColorIndex(i);
-              VerseActionLogic.handleHighlight(context, theme, ref, widget.bookAbbrev, widget.chapterNum, targetVerses, i);
+              VerseActionLogic.handleHighlight(context, theme, ref, widget.bookName, widget.chapterNum, targetVerses, i);
               setState(() => _showColors = false);
               ref.read(readSelectionProvider.notifier).clear();
               widget.onDismiss();
@@ -2935,7 +2946,7 @@ class _VerseContextMenuContentState extends ConsumerState<_VerseContextMenuConte
                         onTap: () {
                           final primaryColorIndex = ref.read(readSettingsProvider).primaryHighlightColorIndex;
                           final activeIndex = (primaryColorIndex >= 0 && primaryColorIndex < 5) ? primaryColorIndex : 2;
-                          VerseActionLogic.handleHighlight(context, theme, ref, widget.bookAbbrev, widget.chapterNum, targetVerses, activeIndex);
+                          VerseActionLogic.handleHighlight(context, theme, ref, widget.bookName, widget.chapterNum, targetVerses, activeIndex);
                           ref.read(readSelectionProvider.notifier).clear();
                           widget.onDismiss();
                         },

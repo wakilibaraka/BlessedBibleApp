@@ -45,6 +45,8 @@ final bookmarksProvider = NotifierProvider<BookmarksNotifier, Set<String>>(Bookm
 
 
 
+const bool kHighlightDebug = false;
+
 class HighlightsNotifier extends Notifier<Map<String, int>> {
   @override
   Map<String, int> build() {
@@ -52,16 +54,21 @@ class HighlightsNotifier extends Notifier<Map<String, int>> {
   }
 
   void toggleHighlight(String reference, int colorIndex) {
-    debugPrint('DEBUG toggleHighlight: reference=$reference, colorIndex=$colorIndex, currentState=$state');
+    if (kHighlightDebug) {
+      debugPrint('[HIGHLIGHT_DEBUG] NOTIFIER toggleHighlight reference=$reference colorIndex=$colorIndex oldState=$state');
+    }
     final newState = Map<String, int>.from(state);
     if (newState.containsKey(reference) && newState[reference] == colorIndex) {
-      debugPrint('DEBUG toggleHighlight: removing highlight');
+      if (kHighlightDebug) debugPrint('[HIGHLIGHT_DEBUG] NOTIFIER removing highlight for $reference');
       newState.remove(reference); // Toggle off if tapping the same color
     } else {
-      debugPrint('DEBUG toggleHighlight: adding highlight');
+      if (kHighlightDebug) debugPrint('[HIGHLIGHT_DEBUG] NOTIFIER adding highlight for $reference -> $colorIndex');
       newState[reference] = colorIndex; // Update or add highlight
     }
     state = newState;
+    if (kHighlightDebug) {
+      debugPrint('[HIGHLIGHT_DEBUG] NOTIFIER state updated. newState=$state (len=${state.length})');
+    }
     ref.read(preferencesProvider).saveHighlights(newState);
   }
 }
