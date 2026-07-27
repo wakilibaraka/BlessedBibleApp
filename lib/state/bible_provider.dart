@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/models/bible_model.dart';
 import '../utils/isolate_parsers.dart';
-import '../main.dart'; // For startupStopwatch
+import '../utils/startup_stopwatch.dart'; // For startupStopwatch
 
 class BibleState {
   final bool isLoading;

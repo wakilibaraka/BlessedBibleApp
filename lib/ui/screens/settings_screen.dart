@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../state/journal_provider.dart';
+import '../../state/theme_provider.dart';
+import '../../state/typography_provider.dart';
 import '../../state/glass_ui_provider.dart';
 import '../../state/nav_settings_provider.dart';
 import '../../state/search_settings_provider.dart';
@@ -122,13 +125,27 @@ class SettingsScreen extends StatelessWidget {
             final viewMode = ref.watch(readSettingsProvider.select((s) => s.readingViewMode));
             return _AnimatedSegmentedTile<ReadingViewMode>(
               title: 'Immersive Reading',
-              subtitle: 'Hide navigation bars while scrolling',
+              subtitle: 'Hide navigation bars while scrolling and remove the background glow for a cleaner read',
               selectedValue: viewMode,
               options: const [
                 MapEntry(ReadingViewMode.immersive, 'On'),
                 MapEntry(ReadingViewMode.pinned, 'Off'),
               ],
               onChanged: (val) => ref.read(readSettingsProvider.notifier).setReadingViewMode(val),
+            );
+          }),
+          Consumer(builder: (context, ref, _) {
+            final actionStyle = ref.watch(readSettingsProvider.select((s) => s.verseActionStyle));
+            return _AnimatedSegmentedTile<VerseActionStyle>(
+              title: 'Verse Action Style',
+              subtitle: 'Layout for highlight & action controls when a verse is selected',
+              selectedValue: actionStyle,
+              options: const [
+                MapEntry(VerseActionStyle.classic, 'Classic'),
+                MapEntry(VerseActionStyle.horizontal, 'Minimal'),
+                MapEntry(VerseActionStyle.raindrop, 'Raindrop'),
+              ],
+              onChanged: (val) => ref.read(readSettingsProvider.notifier).setVerseActionStyle(val),
             );
           }),
           const Divider(),
@@ -368,6 +385,62 @@ class SettingsScreen extends StatelessWidget {
                   },
                 ),
               ],
+            );
+          }),
+          const Divider(),
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 8.0),
+            child: Text(
+              'System',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: Theme.of(context).colorScheme.error,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+          ),
+          Consumer(builder: (context, ref, _) {
+            return ListTile(
+              leading: Icon(Icons.restore_rounded, color: Theme.of(context).colorScheme.error),
+              title: Text('Reset to Default', style: TextStyle(color: Theme.of(context).colorScheme.error)),
+              subtitle: const Text('Restore original app settings (content is kept)'),
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('Reset settings?'),
+                    content: const Text('Reset all settings to default? This won\'t affect your bookmarks, notes, or highlights.'),
+                    actions: [
+                      TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancel')),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).colorScheme.error,
+                          foregroundColor: Theme.of(context).colorScheme.onError,
+                        ),
+                        onPressed: () async {
+                          Navigator.of(ctx).pop();
+                          await ref.read(themeProvider.notifier).setTheme(AppThemeMode.light);
+                          await ref.read(typographyProvider.notifier).setFontFamily('Lexend');
+                          await ref.read(typographyProvider.notifier).setFontSize(18.0);
+                          
+                          await ref.read(readSettingsProvider.notifier).setReadingViewMode(ReadingViewMode.immersive);
+                          await ref.read(readSettingsProvider.notifier).setBackgroundGlowStyle(BackgroundGlowStyle.top);
+                          await ref.read(readSettingsProvider.notifier).setVerseActionStyle(VerseActionStyle.classic);
+                          await ref.read(readSettingsProvider.notifier).setActiveHighlightColorIndex(2);
+                          await ref.read(readSettingsProvider.notifier).setManualNavHidden(false);
+                          
+                          await ref.read(bibleNavSettingsProvider.notifier).setSwipeDown(true);
+                          await ref.read(bibleNavSettingsProvider.notifier).setFullScreenPicker(false);
+                          
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Settings reset to default.')));
+                          }
+                        },
+                        child: const Text('Reset'),
+                      ),
+                    ],
+                  ),
+                );
+              },
             );
           }),
           const SizedBox(height: 32),

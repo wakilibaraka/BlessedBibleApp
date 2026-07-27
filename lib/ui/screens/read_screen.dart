@@ -20,6 +20,7 @@ import '../../data/local_storage/preferences_service.dart';
 import '../../utils/bible_sections.dart';
 import '../../services/share_service.dart';
 import '../widgets/verse_link_text.dart';
+import 'notes_list_screen.dart';
 import '../widgets/shared_top_header.dart';
 import '../widgets/glass_container.dart';
 import '../../state/notes_provider.dart';
@@ -38,7 +39,6 @@ import '../widgets/bouncy_entrance.dart';
 import '../../state/nav_settings_provider.dart';
 import 'commentary_list_screen.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
-import '../../state/glass_ui_provider.dart';
 
 String _toHeadingCase(String text) {
   if (text.isEmpty) return text;
@@ -70,8 +70,11 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
   int? _navigatedVerseIndex;
   Timer? _scrollDebounceTimer;
   Timer? _visitTimer;
-  final ValueNotifier<bool> _isScrolling = ValueNotifier(false);
   Timer? _scrollEndTimer;
+  Timer? _navRevealTimer;
+  Timer? _headerRevealTimer;
+  bool _delayHeaderReveal = false;
+  final ValueNotifier<bool> _isScrolling = ValueNotifier(false);
 
   // ── Deliberate-drag-to-nav gate ──────────────────────────────────
   // A fast flick must NOT open navigation. Only a slow, sustained pull
@@ -86,6 +89,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
   static const int    _kHoldMillis                  = 700;
 
   double _overscrollAccum   = 0.0; // total negative overscroll pixels seen
+  double _scrollDownAccum   = 0.0; // total downward scroll pixels for immersive delay
   DateTime? _overscrollStart;      // when the drag crossed the first threshold
   bool _navTriggeredThisDrag = false;
 
@@ -101,6 +105,22 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
     if (mounted) setState(() {});
   }
   // ────────────────────────────────────────────────────────────────
+
+  int? _contextMenuVerse;
+  dynamic _contextMenuChapterData;
+  String? _contextMenuBookName;
+  int? _contextMenuChapterNum;
+
+  void _dismissContextMenu() {
+    if (_contextMenuVerse != null && mounted) {
+      setState(() {
+        _contextMenuVerse = null;
+        _contextMenuChapterData = null;
+        _contextMenuBookName = null;
+        _contextMenuChapterNum = null;
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -126,6 +146,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
     _scrollDebounceTimer?.cancel();
     _visitTimer?.cancel();
     _scrollEndTimer?.cancel();
+    _navRevealTimer?.cancel();
+    _headerRevealTimer?.cancel();
     _isScrolling.dispose();
     _pageController.dispose();
     WidgetsBinding.instance.removeObserver(this);
@@ -222,6 +244,84 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
             if (verse != null) {
               _scrollToVerse(verse, ref.read(readLocationProvider));
             }
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildHeaderIcon(BuildContext context, ThemeData theme, Widget iconContent, VoidCallback onTap, bool isImmersiveMode) {
+    _itemPositionsListeners[_currentPageIndex] ??= ItemPositionsListener.create();
+    final listenable = _itemPositionsListeners[_currentPageIndex]!.itemPositions;
+
+    return ValueListenableBuilder<bool>(
+      valueListenable: _isScrolling,
+      builder: (context, isScrolling, _) {
+        return ValueListenableBuilder<Iterable<ItemPosition>>(
+          valueListenable: listenable,
+          builder: (context, positions, _) {
+            bool isAtTop = false;
+            if (positions.isNotEmpty) {
+              final firstPos = positions.where((p) => p.index == 0);
+              if (firstPos.isNotEmpty && firstPos.first.itemLeadingEdge >= -0.05) {
+                isAtTop = true;
+              }
+            }
+
+            final isAtTopRest = isAtTop && !isScrolling;
+            final shouldHide = (isImmersiveMode || _delayHeaderReveal) && !isAtTopRest;
+            final showBackground = !isImmersiveMode;
+
+            return AnimatedSlide(
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeOutCubic,
+              offset: shouldHide ? const Offset(0, -1) : Offset.zero,
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 500),
+                curve: Curves.easeOutCubic,
+                opacity: shouldHide ? 0.0 : 1.0,
+                child: RepaintBoundary(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: Stack(
+                      children: [
+                        if (showBackground)
+                          Positioned.fill(
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
+                              child: const SizedBox.shrink(),
+                            ),
+                          ),
+                        GestureDetector(
+                          onTap: onTap,
+                          behavior: HitTestBehavior.opaque,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: showBackground 
+                                ? theme.colorScheme.surface.withValues(alpha: 0.65)
+                                : Colors.transparent,
+                              borderRadius: BorderRadius.circular(24),
+                              border: Border.all(
+                                color: showBackground 
+                                  ? theme.colorScheme.onSurface.withValues(alpha: 0.1)
+                                  : Colors.transparent,
+                                width: 1,
+                              ),
+                            ),
+                            child: Center(
+                              child: iconContent,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
           },
         );
       },
@@ -475,9 +575,45 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                       if (navSettings.alwaysShowNav) return false;
 
                                       if (notification is UserScrollNotification) {
-                                        if (notification.direction == ScrollDirection.reverse) {
-                                          if (!isImmersive) {
-                                            Future.microtask(() => ref.read(immersiveModeProvider.notifier).set(true));
+                                        if (notification.direction == ScrollDirection.forward) {
+                                          _scrollDownAccum = 0.0;
+                                          final isManualHidden = ref.read(readSettingsProvider).isManualNavHidden;
+                                          if (isImmersive && !isManualHidden) {
+                                            if (_navRevealTimer == null || !_navRevealTimer!.isActive) {
+                                              _delayHeaderReveal = true;
+                                              _navRevealTimer = Timer(const Duration(seconds: 2), () {
+                                                if (mounted) ref.read(immersiveModeProvider.notifier).set(false);
+                                              });
+                                              _headerRevealTimer = Timer(const Duration(seconds: 3), () {
+                                                if (mounted) setState(() => _delayHeaderReveal = false);
+                                              });
+                                            }
+                                          }
+                                        }
+                                      } else if (notification is ScrollUpdateNotification) {
+                                        if (notification.scrollDelta != null && notification.scrollDelta! > 0) {
+                                          _scrollDownAccum += notification.scrollDelta!;
+                                          if (_scrollDownAccum > 150.0) {
+                                            _navRevealTimer?.cancel();
+                                            _headerRevealTimer?.cancel();
+                                            _delayHeaderReveal = false;
+                                            if (!isImmersive) {
+                                              Future.microtask(() => ref.read(immersiveModeProvider.notifier).set(true));
+                                            }
+                                          }
+                                        } else if (notification.scrollDelta != null && notification.scrollDelta! < 0) {
+                                          _scrollDownAccum = 0.0;
+                                          final isManualHidden = ref.read(readSettingsProvider).isManualNavHidden;
+                                          if (isImmersive && !isManualHidden) {
+                                            if (_navRevealTimer == null || !_navRevealTimer!.isActive) {
+                                              _delayHeaderReveal = true;
+                                              _navRevealTimer = Timer(const Duration(seconds: 2), () {
+                                                if (mounted) ref.read(immersiveModeProvider.notifier).set(false);
+                                              });
+                                              _headerRevealTimer = Timer(const Duration(seconds: 3), () {
+                                                if (mounted) setState(() => _delayHeaderReveal = false);
+                                              });
+                                            }
                                           }
                                         }
                                       }
@@ -509,7 +645,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                               return _buildEndOfChapterBlock(fc, pageIndex, theme, hasChapterCommentary);
                                             }
                                             final verse = verses[index];
-                                            final isSelected = selectedVerses.contains(index);
+                                            final isSelected = selectedVerses.contains(verse.number);
                                             final isSelectionMode = selectedVerses.isNotEmpty;
                                             
                                             final bookData = chapterTitles[fc.book.name];
@@ -578,7 +714,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                                     }
 
                                                 return GestureDetector(
-                                                  onTap: () => _toggleVerseSelection(index),
+                                                  onTap: () => _toggleVerseSelection(verse.number),
                                                   onLongPress: () {
                                                     _showVerseContextMenu(
                                                       context,
@@ -669,184 +805,104 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                               },
                             ),
                 ),
-                // Top Navigation Bar Layer (Floating above text)
+                // Top Navigation Bar Layer (Floating pills allowing text to flow behind)
 Positioned(
-                  top: 0, left: 0, right: 0,
-                  child: ValueListenableBuilder<bool>(
-                    valueListenable: _isScrolling,
-                        builder: (context, isScrolling, _) {
-                          final isGlassy = ref.watch(glassUiProvider) && !isScrolling;
-                          final double nonGlassAlpha = 0.85;
-                          return Padding(
-                            padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 8.0, left: 24.0, right: 24.0),
-                            child: SharedTopHeader(
-                              leading: AnimatedSlide(
-                                duration: const Duration(milliseconds: 350),
-                                offset: (isImmersive && readSettings.readingViewMode == ReadingViewMode.immersive) ? const Offset(0, -1) : Offset.zero,
-                                child: AnimatedOpacity(
-                                  duration: const Duration(milliseconds: 350),
-                                  opacity: (isImmersive && readSettings.readingViewMode == ReadingViewMode.immersive) ? 0.0 : 1.0,
-                                  child: RepaintBoundary(
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(24),
-                                      clipBehavior: Clip.antiAlias,
-                                      child: Stack(
-                                        children: [
-                                          if (isGlassy)
-                                            Positioned.fill(
-                                              child: BackdropFilter(
-                                                filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
-                                                child: const SizedBox.shrink(),
-                                              ),
-                                            ),
-                                          GestureDetector(
-                                            onTap: () {
-                                              ref.read(navProvider.notifier).setIndex(0);
-                                            },
-                                            behavior: HitTestBehavior.opaque,
-                                            child: Container(
-                                              width: 48,
-                                              height: 48,
-                                              decoration: BoxDecoration(
-                                                color: theme.colorScheme.surface.withValues(alpha: isGlassy ? 0.6 : nonGlassAlpha),
-                                                borderRadius: BorderRadius.circular(24),
-                                                border: Border.all(
-                                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                                                  width: 1,
-                                                ),
-                                              ),
-                                              child: Center(
-                                                child: Icon(
-                                                  Icons.book_rounded,
-                                                  size: 24,
-                                                  color: theme.primaryColor,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
+  top: 0,
+  left: 0,
+  right: 0,
+  child: Padding(
+    padding: EdgeInsets.only(
+      top: MediaQuery.of(context).padding.top + 8.0,
+      left: 24.0,
+      right: 24.0,
+    ),
+    child: SharedTopHeader(
+      leading: _buildHeaderIcon(
+        context,
+        theme,
+        Icon(Icons.book_rounded, size: 24, color: theme.primaryColor),
+        () => ref.read(navProvider.notifier).setIndex(0),
+        isImmersive && readSettings.readingViewMode == ReadingViewMode.immersive,
+      ),
+      centerContent: RepaintBoundary(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
+                  child: const SizedBox.shrink(),
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  _showSelectorBottomSheet(allBooks);
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surface.withValues(alpha: 0.65),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 180),
+                            child: MediaQuery(
+                              data: MediaQuery.of(context).copyWith(
+                                textScaler: const TextScaler.linear(1.0),
                               ),
-                              centerContent: RepaintBoundary(
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(20),
-                                  clipBehavior: Clip.antiAlias,
-                                  child: Stack(
-                                    children: [
-                                      if (isGlassy)
-                                        Positioned.fill(
-                                          child: BackdropFilter(
-                                            filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
-                                            child: const SizedBox.shrink(),
-                                          ),
-                                        ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          _showSelectorBottomSheet(allBooks);
-                                        },
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                          decoration: BoxDecoration(
-                                            color: theme.colorScheme.surface.withValues(alpha: isGlassy ? 0.6 : nonGlassAlpha),
-                                            borderRadius: BorderRadius.circular(20),
-                                            border: Border.all(
-                                              color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                                              width: 1,
-                                            ),
-                                          ),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Flexible(
-                                                child: FittedBox(
-                                                  fit: BoxFit.scaleDown,
-                                                  child: ConstrainedBox(
-                                                    constraints: const BoxConstraints(maxWidth: 180),
-                                                    child: MediaQuery(
-                                                      data: MediaQuery.of(context).copyWith(
-                                                        textScaler: const TextScaler.linear(1.0),
-                                                      ),
-                                                      child: Text(
-                                                        '$currentBookName $currentChapter',
-                                                        style: theme.textTheme.titleSmall?.copyWith(
-                                                          fontWeight: FontWeight.w700,
-                                                          fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14).clamp(12.0, 18.0),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              const SizedBox(width: 4),
-                                              Icon(Icons.keyboard_arrow_down_rounded, 
-                                                size: 16, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              trailing: AnimatedSlide(
-                                duration: const Duration(milliseconds: 350),
-                                offset: (isImmersive && readSettings.readingViewMode == ReadingViewMode.immersive) ? const Offset(0, -1) : Offset.zero,
-                                child: AnimatedOpacity(
-                                  duration: const Duration(milliseconds: 350),
-                                  opacity: (isImmersive && readSettings.readingViewMode == ReadingViewMode.immersive) ? 0.0 : 1.0,
-                                  child: RepaintBoundary(
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(24),
-                                      clipBehavior: Clip.antiAlias,
-                                      child: Stack(
-                                        children: [
-                                          if (isGlassy)
-                                            Positioned.fill(
-                                              child: BackdropFilter(
-                                                filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
-                                                child: const SizedBox.shrink(),
-                                              ),
-                                            ),
-                                          GestureDetector(
-                                            onTap: _showTypographyBottomSheet,
-                                            behavior: HitTestBehavior.opaque,
-                                            child: Container(
-                                              width: 48,
-                                              height: 48,
-                                              decoration: BoxDecoration(
-                                                color: theme.colorScheme.surface.withValues(alpha: isGlassy ? 0.6 : nonGlassAlpha),
-                                                borderRadius: BorderRadius.circular(24),
-                                                border: Border.all(
-                                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                                                  width: 1,
-                                                ),
-                                              ),
-                                              child: Center(
-                                                child: Text(
-                                                  'aA',
-                                                  style: theme.textTheme.titleLarge?.copyWith(
-                                                    fontWeight: FontWeight.w600,
-                                                    color: theme.colorScheme.onSurface,
-                                                    letterSpacing: -1.0,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
+                              child: Text(
+                                '$currentBookName $currentChapter',
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14).clamp(12.0, 18.0),
                                 ),
                               ),
                             ),
-                          );
-                        },
+                          ),
+                        ),
                       ),
-            ),
+                      const SizedBox(width: 4),
+                      Icon(
+                        Icons.keyboard_arrow_down_rounded, 
+                        size: 16, 
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      trailing: _buildHeaderIcon(
+        context,
+        theme,
+        Text(
+          'aA',
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: theme.colorScheme.onSurface,
+            letterSpacing: -1.0,
+          ),
+        ),
+        _showTypographyBottomSheet,
+        isImmersive && readSettings.readingViewMode == ReadingViewMode.immersive,
+      ),
+    ),
+  ),
+),
 
             // ── Pull-to-navigate progressive indicator ──────────────────────
             // Fades in and grows as the user sustains a deliberate downward
@@ -904,6 +960,28 @@ Positioned(
                 ),
               ),
             // ────────────────────────────────────────────────────────────────
+            if (_contextMenuVerse != null)
+              Positioned.fill(
+                child: Stack(
+                  children: [
+                    GestureDetector(
+                      behavior: HitTestBehavior.translucent,
+                      onTap: _dismissContextMenu,
+                      child: Container(
+                        color: Colors.black.withValues(alpha: 0.1),
+                      ),
+                    ),
+                    _VerseContextMenuContent(
+                      verseNumber: _contextMenuVerse!,
+                      chapterData: _contextMenuChapterData,
+                      bookName: _contextMenuBookName!,
+                      chapterNum: _contextMenuChapterNum!,
+                      bookAbbrev: ref.read(readLocationProvider).bookAbbrev,
+                      onDismiss: _dismissContextMenu,
+                    ),
+                  ],
+                ),
+              ),
           ],
         ),
           ),
@@ -915,19 +993,12 @@ Positioned(
 
 
   void _showVerseContextMenu(BuildContext context, int verseNumber, dynamic chapterData, String bookName, int chapterNum) {
-    showDialog(
-      context: context,
-      barrierColor: Colors.black.withValues(alpha: 0.1),
-      builder: (ctx) {
-        return _VerseContextMenuContent(
-          verseNumber: verseNumber,
-          chapterData: chapterData,
-          bookName: bookName,
-          chapterNum: chapterNum,
-          bookAbbrev: ref.read(readLocationProvider).bookAbbrev,
-        );
-      }
-    );
+    setState(() {
+      _contextMenuVerse = verseNumber;
+      _contextMenuChapterData = chapterData;
+      _contextMenuBookName = bookName;
+      _contextMenuChapterNum = chapterNum;
+    });
   }
 
   void _showCommentaryBottomSheet(int verseNumber, String verseText) {
@@ -939,7 +1010,7 @@ Positioned(
       isScrollControlled: true,
       useSafeArea: true,
       builder: (context) {
-        return _CommentaryBottomSheetContent(
+        return CommentaryBottomSheetContent(
           bookName: loc.bookName,
           chapter: loc.chapter,
           verseNumber: verseNumber,
@@ -2202,13 +2273,14 @@ class _TypographyBottomSheet extends ConsumerWidget {
   }
 }
 
-class _CommentaryBottomSheetContent extends ConsumerWidget {
+class CommentaryBottomSheetContent extends ConsumerWidget {
   final String bookName;
   final int chapter;
   final int verseNumber;
   final String verseText;
 
-  const _CommentaryBottomSheetContent({
+  const CommentaryBottomSheetContent({
+    super.key,
     required this.bookName,
     required this.chapter,
     required this.verseNumber,
@@ -2539,40 +2611,111 @@ class _ContextMenuButton extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
   final Color? color;
-  const _ContextMenuButton({required this.icon, required this.label, required this.onTap, this.color});
+  const _ContextMenuButton({required this.icon, required this.label, required this.onTap, this.onLongPress, this.color});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return GestureDetector(
       onTap: onTap,
+      onLongPress: onLongPress,
       behavior: HitTestBehavior.opaque,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: color != null ? color!.withValues(alpha: 0.15) : theme.colorScheme.onSurface.withValues(alpha: 0.08),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: color ?? theme.colorScheme.onSurface, size: 28),
+            child: Icon(icon, color: color ?? theme.colorScheme.onSurface, size: 26),
           ),
-          const SizedBox(height: 8),
-          Text(label, style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w600, color: color)),
+          const SizedBox(height: 6),
+          Text(label, style: theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w600, color: color)),
         ],
       ),
     );
   }
 }
 
-class _VerseContextMenuContent extends ConsumerWidget {
+class VerseActionLogic {
+  static void handleHighlight(WidgetRef ref, String bookAbbrev, int chapterNum, List<int> targetVerses, int activeIndex) {
+    for (var v in targetVerses) {
+      final refStr = generateVerseKey(bookAbbrev, chapterNum, v);
+      ref.read(highlightsProvider.notifier).toggleHighlight(refStr, activeIndex);
+    }
+  }
+
+  static void handleBookmark(WidgetRef ref, String bookAbbrev, int chapterNum, List<int> targetVerses) {
+    final isAllBookmarked = targetVerses.every((v) => ref.read(bookmarksProvider).contains(generateVerseKey(bookAbbrev, chapterNum, v)));
+    for (var v in targetVerses) {
+      final refStr = generateVerseKey(bookAbbrev, chapterNum, v);
+      if (isAllBookmarked) {
+        ref.read(bookmarksProvider.notifier).toggle(refStr);
+      } else if (!ref.read(bookmarksProvider).contains(refStr)) {
+        ref.read(bookmarksProvider.notifier).toggle(refStr);
+      }
+    }
+  }
+
+  static void handleNote(BuildContext context, WidgetRef ref, ThemeData theme, String bookName, int chapterNum, List<int> targetVerses) {
+    final sorted = targetVerses.toList()..sort();
+    final refStr = '$bookName $chapterNum:${sorted.join(', ')}';
+    showAddNoteSheet(context, ref, theme, initialReference: refStr);
+  }
+
+  static void handleCopy(BuildContext context, String bookName, int chapterNum, List<int> targetVerses, dynamic chapterData) {
+    final text = ShareService.formatVerses(
+        bookName: bookName,
+        chapterNumber: chapterNum,
+        verseNumbers: targetVerses,
+        chapterData: chapterData);
+    ShareService.copyText(context, text);
+  }
+
+  static void handleCommentary(BuildContext context, String bookName, int chapterNum, int verseNumberFallback, List<int> targetVerses, dynamic chapterData) {
+    final sorted = targetVerses.toList()..sort();
+    final firstVerse = sorted.isNotEmpty ? sorted.first : verseNumberFallback;
+    String vText = "";
+    if (firstVerse - 1 >= 0 && firstVerse - 1 < chapterData.verses.length) {
+       vText = chapterData.verses[firstVerse - 1].text;
+    }
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (context) {
+        return CommentaryBottomSheetContent(
+          bookName: bookName,
+          chapter: chapterNum,
+          verseNumber: firstVerse,
+          verseText: vText,
+        );
+      },
+    );
+  }
+
+  static void handleShare(BuildContext context, String bookName, int chapterNum, List<int> targetVerses, dynamic chapterData) {
+    final text = ShareService.formatVerses(
+        bookName: bookName,
+        chapterNumber: chapterNum,
+        verseNumbers: targetVerses,
+        chapterData: chapterData);
+    ShareService.shareText(body: text);
+  }
+}
+
+class _VerseContextMenuContent extends ConsumerStatefulWidget {
   final int verseNumber;
   final dynamic chapterData;
   final String bookName;
   final int chapterNum;
   final String bookAbbrev;
+  final VoidCallback onDismiss;
 
   const _VerseContextMenuContent({
     required this.verseNumber,
@@ -2580,15 +2723,124 @@ class _VerseContextMenuContent extends ConsumerWidget {
     required this.bookName,
     required this.chapterNum,
     required this.bookAbbrev,
+    required this.onDismiss,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final verseKey = generateVerseKey(bookAbbrev, chapterNum, verseNumber);
+  ConsumerState<_VerseContextMenuContent> createState() => _VerseContextMenuContentState();
+}
+
+class _VerseContextMenuContentState extends ConsumerState<_VerseContextMenuContent> {
+  static bool _hasShownHighlightHint = false;
+  bool _showColors = false;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_hasShownHighlightHint) {
+      _hasShownHighlightHint = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Long-press Highlight to change color'),
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+      });
+    }
+
+    final verseKey = generateVerseKey(widget.bookAbbrev, widget.chapterNum, widget.verseNumber);
+    final selectedVerses = ref.watch(readSelectionProvider);
+    final targetVerses = selectedVerses.isNotEmpty ? selectedVerses.toList() : [widget.verseNumber];
+    
     final isBookmarked = ref.watch(bookmarksProvider).contains(verseKey);
     final hasNote = ref.watch(notesProvider).any((n) => n.reference == verseKey);
     final isHighlighted = ref.watch(highlightsProvider).containsKey(verseKey);
     final theme = Theme.of(context);
+
+    // Default icon row
+    final actionRow = Row(
+      key: const ValueKey('actions'),
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _ContextMenuButton(
+          icon: isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+          label: isBookmarked ? 'Saved' : 'Bookmark',
+          color: isBookmarked ? theme.primaryColor : null,
+          onTap: () {
+            VerseActionLogic.handleBookmark(ref, widget.bookAbbrev, widget.chapterNum, targetVerses);
+            ref.read(readSelectionProvider.notifier).clear();
+            widget.onDismiss();
+          }
+        ),
+        const SizedBox(width: 8),
+        _ContextMenuButton(
+          icon: Icons.edit_document,
+          label: hasNote ? 'Edit Note' : 'Note',
+          color: hasNote ? Colors.blue.shade600 : null,
+          onTap: () {
+            widget.onDismiss();
+            VerseActionLogic.handleNote(context, ref, theme, widget.bookName, widget.chapterNum, targetVerses);
+            ref.read(readSelectionProvider.notifier).clear();
+          }
+        ),
+        const SizedBox(width: 8),
+        _ContextMenuButton(
+          icon: Icons.copy_rounded,
+          label: 'Copy',
+          onTap: () {
+            widget.onDismiss();
+            VerseActionLogic.handleCopy(context, widget.bookName, widget.chapterNum, targetVerses, widget.chapterData);
+            ref.read(readSelectionProvider.notifier).clear();
+          }
+        ),
+        const SizedBox(width: 8),
+        _ContextMenuButton(
+          icon: Icons.lightbulb_outline_rounded,
+          label: 'Commentary',
+          onTap: () {
+            widget.onDismiss();
+            VerseActionLogic.handleCommentary(context, widget.bookName, widget.chapterNum, widget.verseNumber, targetVerses, widget.chapterData);
+            ref.read(readSelectionProvider.notifier).clear();
+          }
+        ),
+        const SizedBox(width: 8),
+        _ContextMenuButton(
+          icon: Icons.ios_share_rounded,
+          label: 'Share',
+          onTap: () {
+            widget.onDismiss();
+            VerseActionLogic.handleShare(context, widget.bookName, widget.chapterNum, targetVerses, widget.chapterData);
+            ref.read(readSelectionProvider.notifier).clear();
+          }
+        ),
+      ],
+    );
+
+    // Colors row
+    // Colors row
+    final colorRow = Row(
+      key: const ValueKey('colors'),
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(highlightPalette.length, (i) {
+        return Padding(
+          padding: i == 0 ? EdgeInsets.zero : const EdgeInsets.only(left: 8.0),
+          child: _ContextMenuButton(
+            icon: Icons.circle,
+            label: 'Color ${i + 1}',
+            color: highlightPalette[i],
+            onTap: () {
+              ref.read(readSettingsProvider.notifier).setActiveHighlightColorIndex(i);
+              VerseActionLogic.handleHighlight(ref, widget.bookAbbrev, widget.chapterNum, targetVerses, i);
+              setState(() => _showColors = false);
+              ref.read(readSelectionProvider.notifier).clear();
+              widget.onDismiss();
+            }
+          ),
+        );
+      }),
+    );
 
     return Center(
       child: Material(
@@ -2596,93 +2848,40 @@ class _VerseContextMenuContent extends ConsumerWidget {
         child: TexturedGlassContainer(
           borderRadius: BorderRadius.circular(24),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  '$bookName $chapterNum:$verseNumber',
+                  '${widget.bookName} ${widget.chapterNum}:${widget.verseNumber}',
                   style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, color: theme.textTheme.titleSmall?.color?.withValues(alpha: 0.7)),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       _ContextMenuButton(
-                        icon: isHighlighted ? Icons.format_color_text_rounded : Icons.format_color_text_rounded,
+                        icon: Icons.highlight_rounded,
                         label: isHighlighted ? 'Highlighted' : 'Highlight',
                         color: isHighlighted ? Colors.amber.shade600 : null,
                         onTap: () {
-                          if (isHighlighted) {
-                            ref.read(highlightsProvider.notifier).toggleHighlight(verseKey, 0);
-                          } else {
-                            ref.read(highlightsProvider.notifier).toggleHighlight(verseKey, 0); // Default color index
-                          }
+                          final colorIndex = ref.read(readSettingsProvider).activeHighlightColorIndex;
+                          final activeIndex = (colorIndex >= 0 && colorIndex < 5) ? colorIndex : 2;
+                          VerseActionLogic.handleHighlight(ref, widget.bookAbbrev, widget.chapterNum, targetVerses, activeIndex);
+                          ref.read(readSelectionProvider.notifier).clear();
+                          widget.onDismiss();
+                        },
+                        onLongPress: () {
+                          setState(() => _showColors = !_showColors);
                         }
                       ),
-                      const SizedBox(width: 20),
-                      _ContextMenuButton(
-                        icon: isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
-                        label: isBookmarked ? 'Saved' : 'Bookmark',
-                        color: isBookmarked ? theme.primaryColor : null,
-                        onTap: () {
-                          ref.read(bookmarksProvider.notifier).toggle(verseKey);
-                        }
-                      ),
-                      const SizedBox(width: 20),
-                      _ContextMenuButton(
-                        icon: hasNote ? Icons.edit_document : Icons.edit_document,
-                        label: hasNote ? 'Edit Note' : 'Note',
-                        color: hasNote ? Colors.blue.shade600 : null,
-                        onTap: () {
-                          Navigator.of(context).pop();
-                          // Find note or create one
-                          final notes = ref.read(notesProvider);
-                          final existingNoteIndex = notes.indexWhere((n) => n.reference == verseKey);
-                          // Ideally open a note editor here
-                          // For now, we simulate saving
-                          if (existingNoteIndex == -1) {
-                             ref.read(notesProvider.notifier).add(PersonalNote(
-                               'Note on $bookName $chapterNum:$verseNumber',
-                               '',
-                               'Today',
-                               reference: verseKey
-                             ));
-                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Note added for $bookName $chapterNum:$verseNumber')));
-                          } else {
-                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Note already exists for $bookName $chapterNum:$verseNumber')));
-                          }
-                        }
-                      ),
-                      const SizedBox(width: 20),
-                      _ContextMenuButton(
-                        icon: Icons.copy_rounded,
-                        label: 'Copy',
-                        onTap: () {
-                          Navigator.of(context).pop();
-                          final text = ShareService.formatVerses(
-                              bookName: bookName,
-                              chapterNumber: chapterNum,
-                              verseNumbers: [verseNumber],
-                              chapterData: chapterData);
-                          ShareService.copyText(context, text);
-                        }
-                      ),
-                      const SizedBox(width: 20),
-                      _ContextMenuButton(
-                        icon: Icons.ios_share_rounded,
-                        label: 'Share',
-                        onTap: () {
-                          Navigator.of(context).pop();
-                          final text = ShareService.formatVerses(
-                              bookName: bookName,
-                              chapterNumber: chapterNum,
-                              verseNumbers: [verseNumber],
-                              chapterData: chapterData);
-                          ShareService.shareText(body: text);
-                        }
+                      const SizedBox(width: 8),
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 250),
+                        transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
+                        child: _showColors ? colorRow : actionRow,
                       ),
                     ],
                   ),

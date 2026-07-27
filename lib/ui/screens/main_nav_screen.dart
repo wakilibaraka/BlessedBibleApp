@@ -16,10 +16,10 @@ import '../widgets/bouncy_entrance.dart';
 import '../widgets/textured_glass_container.dart';
 import '../../state/immersive_mode_provider.dart';
 import '../../state/user_data_provider.dart';
-import '../../services/share_service.dart';
 import '../../state/read_location_provider.dart';
 import '../../state/bible_provider.dart';
-import 'notes_list_screen.dart';
+import '../../state/read_settings_provider.dart';
+
 
 import '../../state/study_provider.dart';
 import 'verse_detail_screen.dart';
@@ -71,6 +71,9 @@ class MainNavScreen extends ConsumerWidget {
       bottomNavigationBar: SafeArea(
         child: Builder(
           builder: (context) {
+            final style = ref.watch(readSettingsProvider.select((s) => s.verseActionStyle));
+            final isMinimalAction = currentIndex == 1 && selectedVerses.isNotEmpty && style == VerseActionStyle.horizontal;
+            final isRaindropAction = currentIndex == 1 && selectedVerses.isNotEmpty && style == VerseActionStyle.raindrop;
             final double rawWidth = MediaQuery.of(context).size.width;
             final double availableWidth = rawWidth > 0 ? rawWidth : 360.0;
             final double maxDockWidth = 450.0;
@@ -80,7 +83,7 @@ class MainNavScreen extends ConsumerWidget {
             final double rightOffset =
                 math.max(20.0, (availableWidth - totalExpandedWidth) / 2);
             final double height =
-                (currentIndex == 1 && selectedVerses.isNotEmpty) ? 420.0 : 72.0;
+                (currentIndex == 1 && selectedVerses.isNotEmpty && style != VerseActionStyle.horizontal) ? 420.0 : 72.0;
 
             return SizedBox(
               height: height + 32.0,
@@ -138,11 +141,17 @@ class MainNavScreen extends ConsumerWidget {
                                       child: Padding(
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 8.0, horizontal: 24.0),
-                                        child: Row(
-                                          key: const ValueKey('nav_tabs'),
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
+                                        child: AnimatedSwitcher(
+                                          duration: const Duration(milliseconds: 300),
+                                          transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
+                                          child: isMinimalAction
+                                              ? _buildStyle3ActionRow(context, ref, Theme.of(context))
+                                              : isRaindropAction
+                                                  ? _buildRaindropColorRow(context, ref, Theme.of(context))
+                                                  : Row(
+                                                      key: const ValueKey('nav_tabs'),
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
                                             _buildNavItem(
                                               context,
                                               ref,
@@ -181,6 +190,7 @@ class MainNavScreen extends ConsumerWidget {
                                             ),
                                           ],
                                         ),
+                                        ), // AnimatedSwitcher
                                       ),
                                     ),
                                   ),
@@ -200,30 +210,50 @@ class MainNavScreen extends ConsumerWidget {
                           curve: Curves.easeOutCubic,
                           tween: Tween<double>(
                             begin: 56.0,
-                            end:
-                                (currentIndex == 1 && selectedVerses.isNotEmpty)
-                                    ? 380.0
-                                    : 56.0,
+                            end: (currentIndex == 1 && selectedVerses.isNotEmpty && style == VerseActionStyle.classic) ? 380.0 : 56.0,
                           ),
                           builder: (context, height, child) {
-                            final bool isAction =
-                                currentIndex == 1 && selectedVerses.isNotEmpty;
+                            final bool isClassicAction = currentIndex == 1 && selectedVerses.isNotEmpty && style == VerseActionStyle.classic;
+                            final bool isRaindropAction = currentIndex == 1 && selectedVerses.isNotEmpty && style == VerseActionStyle.raindrop;
                             return Stack(
                               alignment: Alignment.bottomRight,
                               clipBehavior: Clip.none,
                               children: [
                                 // Expand bounds to catch Top Pill hits
-                                if (isAction)
+                                if (isClassicAction)
                                   SizedBox(width: 250, height: height + 70),
 
-                                // ── Top Pill (Verse + Colors) ──
+                                // ── Raindrop Vertical Pill ──
+                                if (isRaindropAction)
+                                  Positioned(
+                                    bottom: 56.0 + 12.0, // Above the FAB
+                                    right: 0,
+                                    child: BouncyEntrance(
+                                      isVisible: true,
+                                      delay: const Duration(milliseconds: 40),
+                                      child: GestureDetector(
+                                        behavior: HitTestBehavior.opaque,
+                                        child: TexturedGlassContainer(
+                                          borderRadius: BorderRadius.circular(28),
+                                          padding: EdgeInsets.zero,
+                                          child: SizedBox(
+                                            width: 56,
+                                            height: 310,
+                                            child: _buildActionMenuIcons(context, ref, Theme.of(context), showCloseIcon: false),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+
+                                // ── Classic Top Pill (Verse + Colors) ──
                                 Positioned(
                                   bottom: height + 12.0,
                                   right: 0,
                                   child: IgnorePointer(
-                                    ignoring: !isAction,
+                                    ignoring: !isClassicAction,
                                     child: BouncyEntrance(
-                                      isVisible: isAction,
+                                      isVisible: isClassicAction,
                                       delay: const Duration(milliseconds: 40),
                                       child: TexturedGlassContainer(
                                         borderRadius: BorderRadius.circular(36),
@@ -306,7 +336,7 @@ class MainNavScreen extends ConsumerWidget {
                                         child: AnimatedSwitcher(
                                           duration:
                                               const Duration(milliseconds: 300),
-                                          child: isAction
+                                          child: isClassicAction
                                               ? _buildActionMenuIcons(context,
                                                   ref, Theme.of(context))
                                               : SizedBox(
@@ -339,18 +369,25 @@ class MainNavScreen extends ConsumerWidget {
                                                             ),
                                                           );
                                                         },
-                                                        child: _buildFabIcon(
-                                                            currentIndex,
-                                                            navSettings,
-                                                            ref),
+                                                        child: (isRaindropAction) 
+                                                            ? const Icon(Icons.close_rounded, size: 28, key: ValueKey('raindrop_close'))
+                                                            : _buildFabIcon(
+                                                                currentIndex,
+                                                                navSettings,
+                                                                ref),
                                                       ),
                                                       color: Theme.of(context)
                                                           .primaryColor,
-                                                      onPressed: () =>
+                                                      onPressed: () {
+                                                        if (isRaindropAction) {
+                                                          ref.read(readSelectionProvider.notifier).clear();
+                                                        } else {
                                                           _handleFabTap(
                                                               currentIndex,
                                                               ref,
-                                                              context),
+                                                              context);
+                                                        }
+                                                      }
                                                     ),
                                                   ),
                                                 ),
@@ -435,7 +472,9 @@ class MainNavScreen extends ConsumerWidget {
         break;
       case 1:
         // Read -> Toggle Manual Minimize
-        ref.read(immersiveModeProvider.notifier).toggle();
+        final isHidden = ref.read(readSettingsProvider).isManualNavHidden;
+        ref.read(readSettingsProvider.notifier).setManualNavHidden(!isHidden);
+        ref.read(immersiveModeProvider.notifier).set(!isHidden);
         break;
       case 2:
         // Search tab: no FAB action (search bar is in the screen itself)
@@ -598,14 +637,14 @@ class MainNavScreen extends ConsumerWidget {
   }
 
   Widget _buildActionMenuIcons(
-      BuildContext context, WidgetRef ref, ThemeData theme) {
+      BuildContext context, WidgetRef ref, ThemeData theme, {bool showCloseIcon = true}) {
     final readLoc = ref.watch(readLocationProvider);
     final selectedVerses = ref.watch(readSelectionProvider);
     final bookmarks = ref.watch(bookmarksProvider);
 
     return SizedBox(
       key: const ValueKey('action_menu_icons'),
-      height: 380,
+      height: showCloseIcon ? 380.0 : 310.0,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 24.0),
         child: Column(
@@ -622,29 +661,7 @@ class MainNavScreen extends ConsumerWidget {
                   ? theme.primaryColor
                   : theme.colorScheme.onSurface,
               () {
-                final bookmarks = ref.read(bookmarksProvider);
-                final isAllBookmarked = selectedVerses.every((v) =>
-                    bookmarks.contains(generateVerseKey(
-                        readLoc.bookAbbrev, readLoc.chapter, v)));
-                for (var v in selectedVerses) {
-                  final refStr =
-                      generateVerseKey(readLoc.bookAbbrev, readLoc.chapter, v);
-                  if (isAllBookmarked) {
-                    ref.read(bookmarksProvider.notifier).toggle(refStr);
-                  } else {
-                    if (!bookmarks.contains(refStr)) {
-                      ref.read(bookmarksProvider.notifier).toggle(refStr);
-                    }
-                  }
-                }
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(isAllBookmarked
-                        ? 'Bookmark(s) removed'
-                        : '${selectedVerses.length} verse(s) bookmarked!'),
-                    duration: const Duration(seconds: 2),
-                  ),
-                );
+                VerseActionLogic.handleBookmark(ref, readLoc.bookAbbrev, readLoc.chapter, selectedVerses.toList());
                 ref.read(readSelectionProvider.notifier).clear();
               },
             ),
@@ -653,27 +670,14 @@ class MainNavScreen extends ConsumerWidget {
               'Copy',
               theme.colorScheme.onSurface,
               () {
+                dynamic chapterData;
                 final flatChapters = ref.read(flatChaptersProvider);
                 if (flatChapters.isNotEmpty) {
                   try {
-                    final chapter = flatChapters
-                        .firstWhere(
-                          (c) =>
-                              c.book.name == readLoc.bookName &&
-                              c.chapter.number == readLoc.chapter,
-                        )
-                        .chapter;
-
-                    final formattedText = ShareService.formatVerses(
-                      bookName: readLoc.bookName,
-                      chapterNumber: readLoc.chapter,
-                      verseNumbers: selectedVerses.toList(),
-                      chapterData: chapter,
-                    );
-
-                    ShareService.copyText(context, formattedText);
+                    chapterData = flatChapters.firstWhere((c) => c.book.name == readLoc.bookName && c.chapter.number == readLoc.chapter).chapter;
                   } catch (_) {}
                 }
+                VerseActionLogic.handleCopy(context, readLoc.bookName, readLoc.chapter, selectedVerses.toList(), chapterData);
                 ref.read(readSelectionProvider.notifier).clear();
               },
             ),
@@ -682,32 +686,36 @@ class MainNavScreen extends ConsumerWidget {
               'Note',
               theme.colorScheme.onSurface,
               () {
-                final sorted = selectedVerses.toList()..sort();
-                final refStr =
-                    '${readLoc.bookName} ${readLoc.chapter}:${sorted.join(', ')}';
-                showAddNoteSheet(context, ref, theme, initialReference: refStr);
+                VerseActionLogic.handleNote(context, ref, theme, readLoc.bookName, readLoc.chapter, selectedVerses.toList());
                 ref.read(readSelectionProvider.notifier).clear();
               },
             ),
-            IconButton(
-                icon: const Icon(Icons.auto_awesome),
-                color: Colors.redAccent,
-                tooltip: 'Deep Study',
+            _buildActionIcon(
+              Icons.lightbulb_outline_rounded,
+              'Commentary',
+              theme.colorScheme.onSurface,
+              () {
+                dynamic chapterData;
+                final flatChapters = ref.read(flatChaptersProvider);
+                if (flatChapters.isNotEmpty) {
+                  try {
+                    chapterData = flatChapters.firstWhere((c) => c.book.name == readLoc.bookName && c.chapter.number == readLoc.chapter).chapter;
+                  } catch (_) {}
+                }
+                final targetVerses = selectedVerses.toList();
+                VerseActionLogic.handleCommentary(context, readLoc.bookName, readLoc.chapter, targetVerses.isNotEmpty ? targetVerses.first : 1, targetVerses, chapterData);
+                ref.read(readSelectionProvider.notifier).clear();
+              },
+            ),
+            if (showCloseIcon)
+              IconButton(
+                icon: const Icon(Icons.close_rounded, size: 20),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
                 visualDensity: VisualDensity.compact,
-                onPressed: () {
-                  ref.read(navProvider.notifier).setIndex(3);
-                  ref.read(readSelectionProvider.notifier).clear();
-                }),
-            IconButton(
-              icon: const Icon(Icons.close_rounded, size: 20),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-              visualDensity: VisualDensity.compact,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-              onPressed: () => ref.read(readSelectionProvider.notifier).clear(),
-            ),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                onPressed: () => ref.read(readSelectionProvider.notifier).clear(),
+              ),
           ],
         ),
       ),
@@ -758,4 +766,141 @@ class MainNavScreen extends ConsumerWidget {
       }
     }
   }
+
+  static bool _hasShownStyle3Hint = false;
+
+  Widget _buildStyle3ActionRow(BuildContext context, WidgetRef ref, ThemeData theme) {
+    if (!_hasShownStyle3Hint) {
+      _hasShownStyle3Hint = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Long-press a verse for more actions'),
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+      });
+    }
+
+    final readLoc = ref.watch(readLocationProvider);
+
+    final selectedVerses = ref.watch(readSelectionProvider);
+    final targetVerses = selectedVerses.toList();
+    final bookmarks = ref.watch(bookmarksProvider);
+    final bookAbbrev = readLoc.bookAbbrev;
+    final chapterNum = readLoc.chapter;
+    final bookName = readLoc.bookName;
+    
+    dynamic chapterData;
+    final flatChapters = ref.read(flatChaptersProvider);
+    if (flatChapters.isNotEmpty) {
+      try {
+        chapterData = flatChapters.firstWhere(
+          (c) => c.book.name == bookName && c.chapter.number == chapterNum,
+          orElse: () => flatChapters.first,
+        ).chapter;
+      } catch (_) {}
+    }
+    
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        key: const ValueKey('nav_tabs_style3'),
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildActionIcon(
+            targetVerses.every((v) => bookmarks.contains(generateVerseKey(bookAbbrev, chapterNum, v)))
+                ? Icons.bookmark_rounded
+                : Icons.bookmark_border_rounded,
+            'Bookmark',
+            targetVerses.every((v) => bookmarks.contains(generateVerseKey(bookAbbrev, chapterNum, v)))
+                ? theme.primaryColor
+                : theme.colorScheme.onSurface,
+            () {
+              VerseActionLogic.handleBookmark(ref, bookAbbrev, chapterNum, targetVerses);
+              ref.read(readSelectionProvider.notifier).clear();
+            },
+          ),
+          _buildActionIcon(
+            Icons.copy_rounded,
+            'Copy',
+            theme.colorScheme.onSurface,
+            () {
+              VerseActionLogic.handleCopy(context, bookName, chapterNum, targetVerses, chapterData);
+              ref.read(readSelectionProvider.notifier).clear();
+            },
+          ),
+          _buildActionIcon(
+            Icons.edit_document,
+            'Note',
+            theme.colorScheme.onSurface,
+            () {
+              VerseActionLogic.handleNote(context, ref, theme, bookName, chapterNum, targetVerses);
+              ref.read(readSelectionProvider.notifier).clear();
+            },
+          ),
+          _buildActionIcon(
+            Icons.lightbulb_outline_rounded,
+            'Commentary',
+            theme.colorScheme.onSurface,
+            () {
+              VerseActionLogic.handleCommentary(context, bookName, chapterNum, targetVerses.isNotEmpty ? targetVerses.first : 1, targetVerses, chapterData);
+              ref.read(readSelectionProvider.notifier).clear();
+            },
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            child: Container(width: 1, height: 28, color: theme.colorScheme.onSurface.withValues(alpha: 0.2)),
+          ),
+          _buildColorDotRow(context, ref),
+          _buildActionIcon(
+            Icons.close_rounded,
+            'Close',
+            theme.colorScheme.onSurface.withValues(alpha: 0.5),
+            () => ref.read(readSelectionProvider.notifier).clear(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildColorDotRow(BuildContext context, WidgetRef ref) {
+    final readSettings = ref.watch(readSettingsProvider);
+    final activeIndex = readSettings.activeHighlightColorIndex;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(highlightPalette.length, (i) {
+        return _buildColorDot(
+          highlightPalette[i],
+          isSelected: i == activeIndex,
+          onTap: () {
+            ref.read(readSettingsProvider.notifier).setActiveHighlightColorIndex(i);
+            
+            final readLoc = ref.read(readLocationProvider);
+            final targetVerses = ref.read(readSelectionProvider).toList();
+            VerseActionLogic.handleHighlight(ref, readLoc.bookAbbrev, readLoc.chapter, targetVerses, i);
+            ref.read(readSelectionProvider.notifier).clear();
+          },
+        );
+      }),
+    );
+  }
+
+  Widget _buildRaindropColorRow(BuildContext context, WidgetRef ref, ThemeData theme) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        key: const ValueKey('nav_tabs_raindrop'),
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _buildColorDotRow(context, ref),
+        ],
+      ),
+    );
+  }
 }
+

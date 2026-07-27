@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:io' as dart_io;
 
 import 'state/theme_provider.dart';
 import 'theme/app_theme.dart';
@@ -10,10 +11,45 @@ import 'data/local_storage/preferences_service.dart';
 import 'ui/screens/splash_loading_screen.dart';
 import 'state/bible_provider.dart';
 
-const bool kStartupTrace = true;
-final startupStopwatch = Stopwatch()..start();
+import 'package:flutter/foundation.dart';
+import 'ui/widgets/app_error_fallback.dart';
+import 'utils/startup_stopwatch.dart';
 
 void main() async {
+  // Global Flutter framework error handling
+  FlutterError.onError = (FlutterErrorDetails details) {
+    if (kDebugMode) {
+      FlutterError.presentError(details);
+    } else {
+      FlutterError.dumpErrorToConsole(details);
+    }
+    try {
+      final file = dart_io.File('crash_log.txt');
+      file.writeAsStringSync('FlutterError: ${details.exception}\n${details.stack}\n', mode: dart_io.FileMode.append);
+    } catch (_) {}
+  };
+
+  // Global Platform/Async uncaught error handling
+  PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
+    if (kDebugMode) {
+      debugPrint('Uncaught async error: $error\n$stack');
+    }
+    try {
+      final file = dart_io.File('crash_log.txt');
+      file.writeAsStringSync('Uncaught async error: $error\n$stack\n', mode: dart_io.FileMode.append);
+    } catch (_) {}
+    return true; // Handled, prevent process termination
+  };
+
+
+  // Override ErrorWidget.builder to render branded fallback in release mode
+  ErrorWidget.builder = (FlutterErrorDetails details) {
+    if (kDebugMode) {
+      return ErrorWidget(details.exception);
+    }
+    return AppErrorFallback(details: details);
+  };
+
   if (kStartupTrace) debugPrint('App start: ${startupStopwatch.elapsedMilliseconds} ms');
   WidgetsFlutterBinding.ensureInitialized();
   if (kStartupTrace) debugPrint('FlutterBinding initialized: ${startupStopwatch.elapsedMilliseconds} ms');

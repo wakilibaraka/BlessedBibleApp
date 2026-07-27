@@ -48,12 +48,23 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground> with Si
       isTabActive = currentIndex == widget.tabIndex;
     }
     
-    final shouldAnimate = isRouteCurrent && isTabActive;
+    final readSettings = ref.watch(readSettingsProvider);
+    final isReadTab = widget.tabIndex == 1;
+    final isImmersiveOn = readSettings.readingViewMode == ReadingViewMode.immersive;
+    final disableGlow = isReadTab && isImmersiveOn;
+
+    final shouldAnimate = isRouteCurrent && isTabActive && !disableGlow;
     
     if (shouldAnimate && !_bgAnimation.isAnimating) {
       _bgAnimation.repeat(reverse: true);
     } else if (!shouldAnimate && _bgAnimation.isAnimating) {
       _bgAnimation.stop();
+    }
+
+    if (disableGlow) {
+      return Container(
+        color: Theme.of(context).scaffoldBackgroundColor,
+      );
     }
 
     return RepaintBoundary(
