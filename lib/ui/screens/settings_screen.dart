@@ -52,22 +52,7 @@ class SettingsScreen extends StatelessWidget {
                 },
               );
             }),
-            Consumer(builder: (context, ref, _) {
-              final glowStyle = ref.watch(readSettingsProvider.select((s) => s.backgroundGlowStyle));
-              return _AnimatedSegmentedTile<BackgroundGlowStyle>(
-                title: 'Background Glow',
-                subtitle: 'Position of the animated background glow in Read view',
-                selectedValue: glowStyle,
-                options: const [
-                  MapEntry(BackgroundGlowStyle.top, 'Top glow (default)'),
-                  MapEntry(BackgroundGlowStyle.full, 'Full background glow (original)'),
-                ],
-                onChanged: (val) {
-                  HapticFeedback.selectionClick();
-                  ref.read(readSettingsProvider.notifier).setBackgroundGlowStyle(val);
-                },
-              );
-            }),
+
           ]),
           
           _buildSection(context, 'Reading', [
@@ -234,116 +219,7 @@ class SettingsScreen extends StatelessWidget {
             }),
           ]),
 
-          _buildSection(context, 'Bible Navigation', [
-            Consumer(builder: (context, ref, _) {
-              final layout = ref.watch(bibleNavSettingsProvider.select((s) => s.layout));
-              return _AnimatedSegmentedTile<TestamentLayout>(
-                title: 'Testament Layout',
-                subtitle: 'How Old/New Testament books are arranged',
-                selectedValue: layout,
-                options: const [
-                  MapEntry(TestamentLayout.sideBySide, 'Side-by-side'),
-                  MapEntry(TestamentLayout.stickySections, 'Sticky sections'),
-                  MapEntry(TestamentLayout.filterTabs, 'Filter tabs'),
-                ],
-                onChanged: (val) {
-                  HapticFeedback.selectionClick();
-                  ref.read(bibleNavSettingsProvider.notifier).setLayout(val);
-                },
-              );
-            }),
-            Consumer(builder: (context, ref, _) {
-              final depth = ref.watch(bibleNavSettingsProvider.select((s) => s.depth));
-              return _AnimatedSegmentedTile<NavigationDepth>(
-                title: 'Navigation Steps',
-                subtitle: 'How many steps to reach a verse. 2-step: Book → Chapter. 3-step: Book → Chapter → Verse. 4-step: Testament → Book → Chapter → Verse.',
-                selectedValue: depth,
-                options: const [
-                  MapEntry(NavigationDepth.twoPart, '2-step'),
-                  MapEntry(NavigationDepth.threePart, '3-step'),
-                  MapEntry(NavigationDepth.fourPart, '4-step'),
-                ],
-                onChanged: (val) {
-                  HapticFeedback.selectionClick();
-                  ref.read(bibleNavSettingsProvider.notifier).setDepth(val);
-                },
-              );
-            }),
-            Consumer(builder: (context, ref, _) {
-              final swipeDown = ref.watch(bibleNavSettingsProvider.select((s) => s.swipeDownToNav));
-              return SwitchListTile(
-                title: Text(
-                  'Swipe Down to Open Navigation',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                subtitle: Text(
-                  'Pull down at the top of a chapter to quickly open the Book/Chapter selector.',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-                value: swipeDown,
-                activeTrackColor: Theme.of(context).primaryColor,
-                onChanged: (val) {
-                  HapticFeedback.selectionClick();
-                  ref.read(bibleNavSettingsProvider.notifier).setSwipeDown(val);
-                },
-              );
-            }),
-            Consumer(builder: (context, ref, _) {
-              final fullScreenPicker = ref.watch(bibleNavSettingsProvider.select((s) => s.fullScreenNavigationVersePicker));
-              return SwitchListTile(
-                title: Text(
-                  'Full-screen Book Navigation',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                subtitle: Text(
-                  'Cover the whole screen when choosing a book. Off shows a shorter sheet so the chapter pill stays visible.',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-                value: fullScreenPicker,
-                activeTrackColor: Theme.of(context).primaryColor,
-                onChanged: (val) {
-                  HapticFeedback.selectionClick();
-                  ref.read(bibleNavSettingsProvider.notifier).setFullScreenPicker(val);
-                },
-              );
-            }),
-            Consumer(builder: (context, ref, _) {
-              final autoClose = ref.watch(bibleNavSettingsProvider.select((s) => s.autoCloseOnFinalSelection));
-              return SwitchListTile(
-                title: const Text('Auto-close sheet on final selection'),
-                subtitle: const Text('Automatically dismiss the picker after the last step'),
-                value: autoClose,
-                onChanged: (value) {
-                  HapticFeedback.selectionClick();
-                  ref.read(bibleNavSettingsProvider.notifier).setAutoClose(value);
-                },
-              );
-            }),
-            Consumer(builder: (context, ref, _) {
-              final autoOpen = ref.watch(searchSettingsProvider.select((s) => s.autoOpenSingleSearchResult));
-              return SwitchListTile(
-                title: const Text('Auto-open single search result'),
-                subtitle: const Text('Automatically navigate when a search returns exactly one result'),
-                value: autoOpen,
-                onChanged: (value) {
-                  HapticFeedback.selectionClick();
-                  ref.read(searchSettingsProvider.notifier).toggleAutoOpen(value);
-                },
-              );
-            }),
-            Consumer(builder: (context, ref, _) {
-              final classicSearch = ref.watch(searchSettingsProvider.select((s) => s.useClassicSearch));
-              return SwitchListTile(
-                title: const Text('Classic Search UI'),
-                subtitle: const Text('Use the old full-screen search layout'),
-                value: classicSearch,
-                onChanged: (value) {
-                  HapticFeedback.selectionClick();
-                  ref.read(searchSettingsProvider.notifier).toggleClassicSearch(value);
-                },
-              );
-            }),
-          ]),
+
 
           _buildSection(context, 'Reminders', [
             Consumer(builder: (context, ref, _) {
@@ -461,6 +337,85 @@ class SettingsScreen extends StatelessWidget {
             }),
           ]),
 
+          _buildSection(context, 'Advanced', [
+            Consumer(builder: (context, ref, _) {
+              final depth = ref.watch(bibleNavSettingsProvider.select((s) => s.depth));
+              return _AnimatedSegmentedTile<NavigationDepth>(
+                title: 'Navigation Steps',
+                subtitle: 'How many steps to reach a verse. 2-step: Book → Chapter. 3-step: Book → Chapter → Verse. 4-step: Testament → Book → Chapter → Verse.',
+                selectedValue: depth,
+                options: const [
+                  MapEntry(NavigationDepth.twoPart, '2-step'),
+                  MapEntry(NavigationDepth.threePart, '3-step'),
+                  MapEntry(NavigationDepth.fourPart, '4-step'),
+                ],
+                onChanged: (val) {
+                  HapticFeedback.selectionClick();
+                  ref.read(bibleNavSettingsProvider.notifier).setDepth(val);
+                },
+              );
+            }),
+            Consumer(builder: (context, ref, _) {
+              final swipeDown = ref.watch(bibleNavSettingsProvider.select((s) => s.swipeDownToNav));
+              return SwitchListTile(
+                title: Text(
+                  'Swipe Down to Open Navigation',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                subtitle: Text(
+                  'Pull down at the top of a chapter to quickly open the Book/Chapter selector.',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                value: swipeDown,
+                activeTrackColor: Theme.of(context).primaryColor,
+                onChanged: (val) {
+                  HapticFeedback.selectionClick();
+                  ref.read(bibleNavSettingsProvider.notifier).setSwipeDown(val);
+                },
+              );
+            }),
+            Consumer(builder: (context, ref, _) {
+              final autoClose = ref.watch(bibleNavSettingsProvider.select((s) => s.autoCloseOnFinalSelection));
+              return SwitchListTile(
+                title: const Text('Auto-close sheet on final selection'),
+                subtitle: const Text('Automatically dismiss the picker after the last step'),
+                value: autoClose,
+                onChanged: (value) {
+                  HapticFeedback.selectionClick();
+                  ref.read(bibleNavSettingsProvider.notifier).setAutoClose(value);
+                },
+              );
+            }),
+            Consumer(builder: (context, ref, _) {
+              final autoOpen = ref.watch(searchSettingsProvider.select((s) => s.autoOpenSingleSearchResult));
+              return SwitchListTile(
+                title: const Text('Auto-open single search result'),
+                subtitle: const Text('Automatically navigate when a search returns exactly one result'),
+                value: autoOpen,
+                onChanged: (value) {
+                  HapticFeedback.selectionClick();
+                  ref.read(searchSettingsProvider.notifier).toggleAutoOpen(value);
+                },
+              );
+            }),
+            Consumer(builder: (context, ref, _) {
+              final glowStyle = ref.watch(readSettingsProvider.select((s) => s.backgroundGlowStyle));
+              return _AnimatedSegmentedTile<BackgroundGlowStyle>(
+                title: 'Background Glow',
+                subtitle: 'Position of the animated background glow in Read view',
+                selectedValue: glowStyle,
+                options: const [
+                  MapEntry(BackgroundGlowStyle.top, 'Top glow (default)'),
+                  MapEntry(BackgroundGlowStyle.full, 'Full background glow (original)'),
+                ],
+                onChanged: (val) {
+                  HapticFeedback.selectionClick();
+                  ref.read(readSettingsProvider.notifier).setBackgroundGlowStyle(val);
+                },
+              );
+            }),
+          ]),
+
           _buildSection(context, 'Data & Backup', [
             Consumer(builder: (context, ref, _) {
               return Column(
@@ -545,8 +500,7 @@ class SettingsScreen extends StatelessWidget {
                             await ref.read(readSettingsProvider.notifier).setActiveHighlightColorIndex(2);
                             await ref.read(readSettingsProvider.notifier).setManualNavHidden(false);
                             
-                            await ref.read(bibleNavSettingsProvider.notifier).setSwipeDown(true);
-                            await ref.read(bibleNavSettingsProvider.notifier).setFullScreenPicker(false);
+                              await ref.read(bibleNavSettingsProvider.notifier).setSwipeDown(true);
                             
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Settings reset to default.')));

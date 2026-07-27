@@ -13,7 +13,7 @@ import 'state/bible_provider.dart';
 
 import 'package:flutter/foundation.dart';
 import 'ui/widgets/app_error_fallback.dart';
-import 'state/study_provider.dart';
+
 import 'utils/startup_stopwatch.dart';
 
 void main() async {
