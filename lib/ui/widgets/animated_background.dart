@@ -62,7 +62,9 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground> with Si
     }
 
     if (disableGlow) {
-      return Container(
+      return AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
         color: Theme.of(context).scaffoldBackgroundColor,
       );
     }
@@ -89,7 +91,7 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground> with Si
               colors = [
                 Color.lerp(const Color(0xFF3D2B0A), const Color(0xFF251800), t)!,
                 Color.lerp(const Color(0xFF1E1C1A), const Color(0xFF0F0D0B), t)!,
-                const Color(0xFF080706),
+                Theme.of(context).scaffoldBackgroundColor,
               ];
               break;
             case AppThemeMode.sepia:
@@ -109,13 +111,19 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground> with Si
               ];
           }
 
-          return Container(
-            decoration: BoxDecoration(
-              gradient: RadialGradient(
-                center: Alignment(cx!, cy!),
-                radius: radius,
-                colors: colors,
-                stops: const [0.0, 0.5, 1.0],
+          return AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            switchInCurve: Curves.easeOut,
+            switchOutCurve: Curves.easeOut,
+            child: Container(
+              key: ValueKey(widget.appThemeMode.resolve(context)),
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  center: Alignment(cx!, cy!),
+                  radius: radius,
+                  colors: colors,
+                  stops: const [0.0, 0.5, 1.0],
+                ),
               ),
             ),
           );

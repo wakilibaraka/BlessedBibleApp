@@ -122,15 +122,22 @@ class MainNavScreen extends ConsumerWidget {
                                     : BorderRadius.circular(kBottomDockHeight / 2),
                               ),
                               builder: (context, radius, child) {
-                                return GestureDetector(
-                                  behavior: HitTestBehavior.opaque,
-                                  onTap: () {}, // Absorb taps so they don't fall through
-                                  child: TexturedGlassContainer(
-                                    borderRadius:
-                                        radius ?? BorderRadius.circular(kBottomDockHeight / 2),
-                                    padding: EdgeInsets.zero,
-                                    child: child!,
-                                  ),
+                                return Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    Positioned.fill(
+                                      child: GestureDetector(
+                                        behavior: HitTestBehavior.opaque,
+                                        onTap: () {},
+                                      ),
+                                    ),
+                                    TexturedGlassContainer(
+                                      borderRadius:
+                                          radius ?? BorderRadius.circular(kBottomDockHeight / 2),
+                                      padding: EdgeInsets.zero,
+                                      child: child!,
+                                    ),
+                                  ],
                                 );
                               },
                               child: AnimatedContainer(
@@ -219,7 +226,7 @@ class MainNavScreen extends ConsumerWidget {
                           curve: Curves.easeOutCubic,
                           tween: Tween<double>(
                             begin: kBottomDockHeight,
-                            end: (currentIndex == 1 && selectedVerses.isNotEmpty && style == VerseActionStyle.classic) ? 380.0 : kBottomDockHeight,
+                            end: (currentIndex == 1 && selectedVerses.isNotEmpty && style == VerseActionStyle.classic) ? 400.0 : kBottomDockHeight,
                           ),
                           builder: (context, height, child) {
                             final bool isClassicAction = currentIndex == 1 && selectedVerses.isNotEmpty && style == VerseActionStyle.classic;
@@ -240,18 +247,25 @@ class MainNavScreen extends ConsumerWidget {
                                     child: BouncyEntrance(
                                       isVisible: true,
                                       delay: const Duration(milliseconds: 40),
-                                      child: GestureDetector(
-                                        behavior: HitTestBehavior.opaque,
-                                        onTap: () {}, // Absorb taps so they don't fall through
-                                        child: TexturedGlassContainer(
-                                          borderRadius: BorderRadius.circular(kBottomDockHeight / 2),
-                                          padding: EdgeInsets.zero,
-                                          child: SizedBox(
-                                            width: kBottomDockHeight,
-                                            height: 224, // Matched twinsies size
-                                            child: _buildActionMenuIcons(context, ref, Theme.of(context), showCloseIcon: false),
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Positioned.fill(
+                                            child: GestureDetector(
+                                              behavior: HitTestBehavior.opaque,
+                                              onTap: () {},
+                                            ),
                                           ),
-                                        ),
+                                          TexturedGlassContainer(
+                                            borderRadius: BorderRadius.circular(kBottomDockHeight / 2),
+                                            padding: EdgeInsets.zero,
+                                            child: SizedBox(
+                                              width: kBottomDockHeight,
+                                              height: 280, // Accommodate 5 icons (56 * 5)
+                                              child: _buildActionMenuIcons(context, ref, Theme.of(context), showCloseIcon: false),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
@@ -265,13 +279,25 @@ class MainNavScreen extends ConsumerWidget {
                                     child: BouncyEntrance(
                                       isVisible: isClassicAction,
                                       delay: const Duration(milliseconds: 40),
-                                      child: TexturedGlassContainer(
-                                        borderRadius: BorderRadius.circular(36),
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 16.0, vertical: 12.0),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Positioned.fill(
+                                            child: GestureDetector(
+                                              behavior: HitTestBehavior.opaque,
+                                              onTap: () {}, // Eat taps on the background
+                                            ),
+                                          ),
+                                          GestureDetector(
+                                            behavior: HitTestBehavior.opaque,
+                                            onTap: () {}, // Also eat taps inside the container bounds
+                                            child: TexturedGlassContainer(
+                                            borderRadius: BorderRadius.circular(36),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 16.0, vertical: 12.0),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                            children: [
                                             Text(
                                               '${selectedVerses.length}',
                                               style: Theme.of(context)
@@ -304,103 +330,95 @@ class MainNavScreen extends ConsumerWidget {
                                                 color,
                                                 isSelected: allHaveThisColor,
                                                 onTap: () {
-                                                  for (var v
-                                                      in selectedVerses) {
-                                                    final refStr =
-                                                        generateVerseKey(
-                                                            readLoc.bookAbbrev,
-                                                            readLoc.chapter,
-                                                            v);
-                                                    ref
-                                                        .read(highlightsProvider
-                                                            .notifier)
-                                                        .toggleHighlight(
-                                                            refStr, i);
-                                                  }
-                                                  ref
-                                                      .read(
-                                                          readSelectionProvider
-                                                              .notifier)
-                                                      .clear();
+                                                  ref.read(readSettingsProvider.notifier).setActiveHighlightColorIndex(i);
+                                                  VerseActionLogic.handleHighlight(context, Theme.of(context), ref, readLoc.bookAbbrev, readLoc.chapter, selectedVerses.toList(), i);
+                                                  ref.read(readSelectionProvider.notifier).clear();
                                                 },
                                               );
                                             }),
                                           ],
                                         ),
+                                        ),
                                       ),
-                                    ),
+                                    ],
                                   ),
                                 ),
+                              ),
+                              ),
                                 // ── Morphing FAB / Bottom Pill ──
-                                TexturedGlassContainer(
-                                  borderRadius: BorderRadius.circular(kBottomDockHeight / 2),
-                                  padding: EdgeInsets.zero,
-                                  child: SizedBox(
-                                    width: kBottomDockHeight,
-                                    height: height,
-                                    child: ClipRect(
-                                      child: OverflowBox(
-                                        minHeight: kBottomDockHeight,
-                                        maxHeight: 380,
-                                        alignment: Alignment.bottomCenter,
-                                        child: AnimatedSwitcher(
-                                          duration:
-                                              const Duration(milliseconds: 300),
-                                          child: isClassicAction
-                                              ? _buildActionMenuIcons(context,
-                                                  ref, Theme.of(context))
-                                              : SizedBox(
-                                                  key: const ValueKey('fab'),
-                                                  height: kBottomDockHeight,
-                                                  child: Center(
-                                                    child: IconButton(
-                                                      icon: AnimatedSwitcher(
-                                                        duration:
-                                                            const Duration(
-                                                                milliseconds:
-                                                                    300),
-                                                        transitionBuilder:
-                                                            (Widget child,
-                                                                Animation<
-                                                                        double>
-                                                                    animation) {
-                                                          return ScaleTransition(
-                                                            scale: animation,
-                                                            child:
-                                                                RotationTransition(
-                                                              turns: Tween<
-                                                                          double>(
-                                                                      begin:
-                                                                          0.5,
-                                                                      end: 1.0)
-                                                                  .animate(
-                                                                      animation),
-                                                              child: child,
-                                                            ),
-                                                          );
-                                                        },
-                                                        child: (isRaindropAction) 
-                                                            ? const Icon(Icons.close_rounded, size: 28, key: ValueKey('raindrop_close'))
-                                                            : _buildFabIcon(
+                                GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: () {},
+                                  child: TexturedGlassContainer(
+                                    borderRadius: BorderRadius.circular(kBottomDockHeight / 2),
+                                    padding: EdgeInsets.zero,
+                                    child: SizedBox(
+                                      width: kBottomDockHeight,
+                                      height: height,
+                                      child: ClipRect(
+                                        child: OverflowBox(
+                                          minHeight: kBottomDockHeight,
+                                          maxHeight: 400,
+                                          alignment: Alignment.bottomCenter,
+                                          child: AnimatedSwitcher(
+                                            duration:
+                                                const Duration(milliseconds: 300),
+                                            child: isClassicAction
+                                                ? _buildActionMenuIcons(context,
+                                                    ref, Theme.of(context))
+                                                : SizedBox(
+                                                    key: const ValueKey('fab'),
+                                                    height: kBottomDockHeight,
+                                                    child: Center(
+                                                      child: IconButton(
+                                                        icon: AnimatedSwitcher(
+                                                          duration:
+                                                              const Duration(
+                                                                  milliseconds:
+                                                                      300),
+                                                          transitionBuilder:
+                                                              (Widget child,
+                                                                  Animation<
+                                                                          double>
+                                                                      animation) {
+                                                            return ScaleTransition(
+                                                              scale: animation,
+                                                              child:
+                                                                  RotationTransition(
+                                                                turns: Tween<
+                                                                            double>(
+                                                                        begin:
+                                                                            0.5,
+                                                                        end: 1.0)
+                                                                    .animate(
+                                                                        animation),
+                                                                child: child,
+                                                              ),
+                                                            );
+                                                          },
+                                                          child: (isRaindropAction) 
+                                                              ? const Icon(Icons.close_rounded, size: 28, key: ValueKey('raindrop_close'))
+                                                              : _buildFabIcon(
+                                                                  currentIndex,
+                                                                  navSettings,
+                                                                  ref),
+                                                        ),
+                                                        color: Theme.of(context)
+                                                            .primaryColor,
+                                                        onPressed: () {
+                                                          if (isRaindropAction) {
+                                                            ref.read(readSelectionProvider.notifier).clear();
+                                                          } else {
+                                                            _handleFabTap(
                                                                 currentIndex,
-                                                                navSettings,
-                                                                ref),
-                                                      ),
-                                                      color: Theme.of(context)
-                                                          .primaryColor,
-                                                      onPressed: () {
-                                                        if (isRaindropAction) {
-                                                          ref.read(readSelectionProvider.notifier).clear();
-                                                        } else {
-                                                          _handleFabTap(
-                                                              currentIndex,
-                                                              ref,
-                                                              context);
+                                                                ref,
+                                                                context);
+                                                          }
                                                         }
-                                                      }
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -623,10 +641,15 @@ class MainNavScreen extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4.0),
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: Container(
-          width: 20,
-          height: 20,
+          width: 32,
+          height: 32,
+          alignment: Alignment.center,
+          child: Container(
+            width: 20,
+            height: 20,
           decoration: BoxDecoration(
             color: color.withValues(alpha: 0.8),
             shape: BoxShape.circle,
@@ -640,6 +663,7 @@ class MainNavScreen extends ConsumerWidget {
                         spreadRadius: 1)
                   ]
                 : null,
+            ),
           ),
         ),
       ),
@@ -654,7 +678,7 @@ class MainNavScreen extends ConsumerWidget {
 
     return SizedBox(
       key: const ValueKey('action_menu_icons'),
-      height: showCloseIcon ? 380.0 : 224.0, // Reduced height for Raindrop
+      height: showCloseIcon ? 400.0 : 280.0, // Reduced height for Raindrop
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 24.0),
         child: Column(
@@ -671,7 +695,7 @@ class MainNavScreen extends ConsumerWidget {
                   ? theme.primaryColor
                   : theme.colorScheme.onSurface,
               () {
-                VerseActionLogic.handleBookmark(ref, readLoc.bookAbbrev, readLoc.chapter, selectedVerses.toList());
+                VerseActionLogic.handleBookmark(context, theme, ref, readLoc.bookAbbrev, readLoc.chapter, selectedVerses.toList());
                 ref.read(readSelectionProvider.notifier).clear();
               },
             ),
@@ -680,14 +704,7 @@ class MainNavScreen extends ConsumerWidget {
               'Copy',
               theme.colorScheme.onSurface,
               () {
-                dynamic chapterData;
-                final flatChapters = ref.read(flatChaptersProvider);
-                if (flatChapters.isNotEmpty) {
-                  try {
-                    chapterData = flatChapters.firstWhere((c) => c.book.name == readLoc.bookName && c.chapter.number == readLoc.chapter).chapter;
-                  } catch (_) {}
-                }
-                VerseActionLogic.handleCopy(context, readLoc.bookName, readLoc.chapter, selectedVerses.toList(), chapterData);
+                VerseActionLogic.handleCopy(context, ref, readLoc.bookName, readLoc.chapter, selectedVerses.toList());
                 ref.read(readSelectionProvider.notifier).clear();
               },
             ),
@@ -705,15 +722,16 @@ class MainNavScreen extends ConsumerWidget {
               'Commentary',
               theme.colorScheme.onSurface,
               () {
-                dynamic chapterData;
-                final flatChapters = ref.read(flatChaptersProvider);
-                if (flatChapters.isNotEmpty) {
-                  try {
-                    chapterData = flatChapters.firstWhere((c) => c.book.name == readLoc.bookName && c.chapter.number == readLoc.chapter).chapter;
-                  } catch (_) {}
-                }
-                final targetVerses = selectedVerses.toList();
-                VerseActionLogic.handleCommentary(context, readLoc.bookName, readLoc.chapter, targetVerses.isNotEmpty ? targetVerses.first : 1, targetVerses, chapterData);
+                VerseActionLogic.handleCommentary(context, ref, readLoc.bookName, readLoc.chapter, 1, selectedVerses.toList());
+                ref.read(readSelectionProvider.notifier).clear();
+              },
+            ),
+            _buildActionIcon(
+              Icons.ios_share_rounded,
+              'Share',
+              theme.colorScheme.onSurface,
+              () {
+                VerseActionLogic.handleShare(context, ref, readLoc.bookName, readLoc.chapter, selectedVerses.toList());
                 ref.read(readSelectionProvider.notifier).clear();
               },
             ),
@@ -795,6 +813,7 @@ class MainNavScreen extends ConsumerWidget {
     }
 
     final readLoc = ref.watch(readLocationProvider);
+    final readSettings = ref.watch(readSettingsProvider);
 
     final selectedVerses = ref.watch(readSelectionProvider);
     final targetVerses = selectedVerses.toList();
@@ -803,20 +822,12 @@ class MainNavScreen extends ConsumerWidget {
     final chapterNum = readLoc.chapter;
     final bookName = readLoc.bookName;
     
-    dynamic chapterData;
-    final flatChapters = ref.read(flatChaptersProvider);
-    if (flatChapters.isNotEmpty) {
-      try {
-        chapterData = flatChapters.firstWhere(
-          (c) => c.book.name == bookName && c.chapter.number == chapterNum,
-          orElse: () => flatChapters.first,
-        ).chapter;
-      } catch (_) {}
-    }
-    
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {}, // Blocks tap-through to verses
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
         key: const ValueKey('nav_tabs_style3'),
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -829,7 +840,7 @@ class MainNavScreen extends ConsumerWidget {
                 ? theme.primaryColor
                 : theme.colorScheme.onSurface,
             () {
-              VerseActionLogic.handleBookmark(ref, bookAbbrev, chapterNum, targetVerses);
+              VerseActionLogic.handleBookmark(context, theme, ref, bookAbbrev, chapterNum, targetVerses);
               ref.read(readSelectionProvider.notifier).clear();
             },
           ),
@@ -838,7 +849,7 @@ class MainNavScreen extends ConsumerWidget {
             'Copy',
             theme.colorScheme.onSurface,
             () {
-              VerseActionLogic.handleCopy(context, bookName, chapterNum, targetVerses, chapterData);
+              VerseActionLogic.handleCopy(context, ref, bookName, chapterNum, targetVerses);
               ref.read(readSelectionProvider.notifier).clear();
             },
           ),
@@ -856,7 +867,16 @@ class MainNavScreen extends ConsumerWidget {
             'Commentary',
             theme.colorScheme.onSurface,
             () {
-              VerseActionLogic.handleCommentary(context, bookName, chapterNum, targetVerses.isNotEmpty ? targetVerses.first : 1, targetVerses, chapterData);
+              VerseActionLogic.handleCommentary(context, ref, bookName, chapterNum, targetVerses.isNotEmpty ? targetVerses.first : 1, targetVerses);
+              ref.read(readSelectionProvider.notifier).clear();
+            },
+          ),
+          _buildActionIcon(
+            Icons.ios_share_rounded,
+            'Share',
+            theme.colorScheme.onSurface,
+            () {
+              VerseActionLogic.handleShare(context, ref, bookName, chapterNum, targetVerses);
               ref.read(readSelectionProvider.notifier).clear();
             },
           ),
@@ -864,7 +884,11 @@ class MainNavScreen extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 4.0),
             child: Container(width: 1, height: 28, color: theme.colorScheme.onSurface.withValues(alpha: 0.2)),
           ),
-          _buildColorDotRow(context, ref),
+          _buildColorDotRow(context, ref, displayOrder: [
+            readSettings.primaryHighlightColorIndex, 
+            readSettings.secondaryHighlightColorIndex, 
+            ...List.generate(5, (i) => i).where((i) => i != readSettings.primaryHighlightColorIndex && i != readSettings.secondaryHighlightColorIndex)
+          ]),
           _buildActionIcon(
             Icons.close_rounded,
             'Close',
@@ -873,25 +897,29 @@ class MainNavScreen extends ConsumerWidget {
           ),
         ],
       ),
+    ),
     );
   }
 
-  Widget _buildColorDotRow(BuildContext context, WidgetRef ref) {
+  Widget _buildColorDotRow(BuildContext context, WidgetRef ref, {List<int>? displayOrder}) {
+    final theme = Theme.of(context);
     final readSettings = ref.watch(readSettingsProvider);
     final activeIndex = readSettings.activeHighlightColorIndex;
+    final order = displayOrder ?? List.generate(highlightPalette.length, (i) => i);
 
     return Row(
       mainAxisSize: MainAxisSize.min,
-      children: List.generate(highlightPalette.length, (i) {
+      children: List.generate(order.length, (i) {
+        final paletteIndex = order[i];
         return _buildColorDot(
-          highlightPalette[i],
-          isSelected: i == activeIndex,
+          highlightPalette[paletteIndex],
+          isSelected: paletteIndex == activeIndex,
           onTap: () {
-            ref.read(readSettingsProvider.notifier).setActiveHighlightColorIndex(i);
+            ref.read(readSettingsProvider.notifier).setActiveHighlightColorIndex(paletteIndex);
             
             final readLoc = ref.read(readLocationProvider);
             final targetVerses = ref.read(readSelectionProvider).toList();
-            VerseActionLogic.handleHighlight(ref, readLoc.bookAbbrev, readLoc.chapter, targetVerses, i);
+            VerseActionLogic.handleHighlight(context, theme, ref, readLoc.bookAbbrev, readLoc.chapter, targetVerses, paletteIndex);
             ref.read(readSelectionProvider.notifier).clear();
           },
         );

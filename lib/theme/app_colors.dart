@@ -29,7 +29,7 @@ class AppColors {
   static const Color warmGoldAccent     = Color(0xFF9E6B00);
 
   // Dark Theme
-  static const Color darkBackground = Color(0xFF1E1C1A);
+  static const Color darkBackground = Color(0xFF080706);
   static const Color darkSurface = Color(0xFF2C2A28);
   static const Color darkTextPrimary = Color(0xFFEAE6E1);
   static const Color darkTextSecondary = Color(0xFFAFAAA3);

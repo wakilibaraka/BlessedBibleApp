@@ -61,7 +61,9 @@ class TexturedGlassContainer extends ConsumerWidget {
       }
     }
 
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
       margin: margin,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(

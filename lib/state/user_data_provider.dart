@@ -6,7 +6,7 @@ import '../data/local_storage/preferences_service.dart';
 /// Uses the 3-letter abbreviation (e.g. 'GEN', '1CO') which is unique and
 /// collision-free — avoids the '1 Corinthians' vs '1 Chronicles' problem.
 String generateVerseKey(String bookAbbrev, int chapterNum, int verseNum) {
-  return '${bookAbbrev}_$chapterNum:$verseNum';
+  return '${bookAbbrev.toUpperCase()}_$chapterNum:$verseNum';
 }
 
 const List<Color> highlightPalette = [
@@ -52,10 +52,13 @@ class HighlightsNotifier extends Notifier<Map<String, int>> {
   }
 
   void toggleHighlight(String reference, int colorIndex) {
+    debugPrint('DEBUG toggleHighlight: reference=$reference, colorIndex=$colorIndex, currentState=$state');
     final newState = Map<String, int>.from(state);
     if (newState.containsKey(reference) && newState[reference] == colorIndex) {
+      debugPrint('DEBUG toggleHighlight: removing highlight');
       newState.remove(reference); // Toggle off if tapping the same color
     } else {
+      debugPrint('DEBUG toggleHighlight: adding highlight');
       newState[reference] = colorIndex; // Update or add highlight
     }
     state = newState;

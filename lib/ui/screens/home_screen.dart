@@ -11,6 +11,7 @@ import '../widgets/glass_container.dart';
 import '../widgets/bouncy_entrance.dart';
 import 'verse_detail_screen.dart';
 import 'today_screen.dart';
+import '../../services/share_service.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -235,9 +236,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         label: 'Share',
                         filled: false,
                         onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Share dialog opened')),
-                          );
+                          ShareService.shareText(body: '"${data.verseOfTheDay.text}" — ${data.verseOfTheDay.reference}');
                         },
                       ),
                     ),

@@ -10,6 +10,8 @@ class ReadSettingsState {
   final BackgroundGlowStyle backgroundGlowStyle;
   final VerseActionStyle verseActionStyle;
   final int activeHighlightColorIndex;
+  final int primaryHighlightColorIndex;
+  final int secondaryHighlightColorIndex;
   final bool isManualNavHidden;
 
   const ReadSettingsState({
@@ -17,6 +19,8 @@ class ReadSettingsState {
     this.backgroundGlowStyle = BackgroundGlowStyle.top,
     this.verseActionStyle = VerseActionStyle.classic,
     this.activeHighlightColorIndex = 2,
+    this.primaryHighlightColorIndex = 2, // Blue
+    this.secondaryHighlightColorIndex = 1, // Green
     this.isManualNavHidden = false,
   });
 
@@ -25,6 +29,8 @@ class ReadSettingsState {
     BackgroundGlowStyle? backgroundGlowStyle,
     VerseActionStyle? verseActionStyle,
     int? activeHighlightColorIndex,
+    int? primaryHighlightColorIndex,
+    int? secondaryHighlightColorIndex,
     bool? isManualNavHidden,
   }) {
     return ReadSettingsState(
@@ -32,6 +38,8 @@ class ReadSettingsState {
       backgroundGlowStyle: backgroundGlowStyle ?? this.backgroundGlowStyle,
       verseActionStyle: verseActionStyle ?? this.verseActionStyle,
       activeHighlightColorIndex: activeHighlightColorIndex ?? this.activeHighlightColorIndex,
+      primaryHighlightColorIndex: primaryHighlightColorIndex ?? this.primaryHighlightColorIndex,
+      secondaryHighlightColorIndex: secondaryHighlightColorIndex ?? this.secondaryHighlightColorIndex,
       isManualNavHidden: isManualNavHidden ?? this.isManualNavHidden,
     );
   }
@@ -42,6 +50,8 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
   static const _backgroundGlowStyleKey = 'read_settings_bg_glow_style';
   static const _verseActionStyleKey = 'read_settings_verse_action_style';
   static const _activeHighlightColorIndexKey = 'read_settings_active_highlight_color';
+  static const _primaryHighlightColorIndexKey = 'read_settings_primary_highlight_color';
+  static const _secondaryHighlightColorIndexKey = 'read_settings_secondary_highlight_color';
   static const _isManualNavHiddenKey = 'read_settings_is_manual_nav_hidden';
 
   @override
@@ -56,6 +66,8 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     final glowString = prefs.getString(_backgroundGlowStyleKey);
     final verseStyleString = prefs.getString(_verseActionStyleKey);
     final activeHighlightIndex = prefs.getInt(_activeHighlightColorIndexKey);
+    final primaryHighlightIndex = prefs.getInt(_primaryHighlightColorIndexKey);
+    final secondaryHighlightIndex = prefs.getInt(_secondaryHighlightColorIndexKey);
     final isManualNavHidden = prefs.getBool(_isManualNavHiddenKey) ?? false;
     
     ReadingViewMode mode = ReadingViewMode.immersive;
@@ -82,13 +94,13 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
       );
     }
     
-    int activeColor = activeHighlightIndex ?? 3;
-
     state = state.copyWith(
       readingViewMode: mode,
       backgroundGlowStyle: glowStyle,
       verseActionStyle: verseStyle,
-      activeHighlightColorIndex: activeColor,
+      activeHighlightColorIndex: activeHighlightIndex ?? 2,
+      primaryHighlightColorIndex: primaryHighlightIndex ?? 2,
+      secondaryHighlightColorIndex: secondaryHighlightIndex ?? 1,
       isManualNavHidden: isManualNavHidden,
     );
   }
@@ -118,6 +130,18 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     state = state.copyWith(activeHighlightColorIndex: index);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_activeHighlightColorIndexKey, index);
+  }
+
+  Future<void> setPrimaryHighlightColorIndex(int index) async {
+    state = state.copyWith(primaryHighlightColorIndex: index);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_primaryHighlightColorIndexKey, index);
+  }
+
+  Future<void> setSecondaryHighlightColorIndex(int index) async {
+    state = state.copyWith(secondaryHighlightColorIndex: index);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_secondaryHighlightColorIndexKey, index);
   }
 
   Future<void> setManualNavHidden(bool isHidden) async {

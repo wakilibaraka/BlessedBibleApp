@@ -90,8 +90,8 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
     return MaterialApp(
       title: 'The Blessed Bible',
       debugShowCheckedModeBanner: false,
-      themeAnimationDuration: const Duration(milliseconds: 250),
-      themeAnimationCurve: Curves.easeInOut,
+      themeAnimationDuration: const Duration(milliseconds: 300),
+      themeAnimationCurve: Curves.easeOut,
       themeMode: switch (themeMode) {
         AppThemeMode.automatic => ThemeMode.system,
         AppThemeMode.light => ThemeMode.light,

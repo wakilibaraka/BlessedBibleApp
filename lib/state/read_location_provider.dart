@@ -10,7 +10,7 @@ class ReadLocationState {
   final bool openCommentary;
 
   const ReadLocationState({
-    this.bookAbbrev = 'GEN',
+    this.bookAbbrev = 'gn', // Matches JSON abbrev field (always lowercase)
     this.bookName = 'Genesis',
     this.chapter = 1,
     this.requestedVerse,
@@ -44,7 +44,7 @@ class ReadLocationNotifier extends Notifier<ReadLocationState> {
     
     if (lastLoc != null) {
       return ReadLocationState(
-        bookAbbrev: lastLoc['bookAbbrev'] as String? ?? 'GEN',
+        bookAbbrev: (lastLoc['bookAbbrev'] as String? ?? 'gn').toLowerCase(),
         bookName: lastLoc['bookName'] as String? ?? 'Genesis',
         chapter: lastLoc['chapter'] as int? ?? 1,
         requestedVerse: (lastLoc['verseIndex'] as int? ?? 0) + 1,

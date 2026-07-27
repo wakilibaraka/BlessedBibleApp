@@ -38,3 +38,12 @@ Only report a task as complete once the build is green and nothing is broken.
 - Verify with `flutter analyze` and `flutter build` (which self-terminate), not a long-lived `flutter run`.
 - If you must run the app, terminate the session promptly or run it detached/backgrounded; never leave it holding the queue.
 - If a `flutter run` is active and blocking, terminate it before the next task.
+
+## Backup & Restore Points (Mandatory)
+
+- **Commit after every VERIFIED-WORKING change**: The moment a change passes `flutter analyze` (0 errors) + `flutter build apk --debug` (✓ Built) AND is confirmed working, run: `git add -A && git commit -m "WORKING: <short description>"`.
+- **Create a restore point at least every 3 edits**: After roughly every 3 file edits (or before starting any risky/multi-file change), commit the current state — even if mid-feature — with `git commit -m "checkpoint: <what's in progress>"`. This guarantees a rollback point at most 3 edits back.
+- **Checkpoint before major changes**: Before any change described as “major,” “refactor,” “unify,” “rework,” or touching 2+ screens/providers: commit a checkpoint FIRST (`git commit -m "checkpoint before <change>"`) so the pre-change state is recoverable.
+- **No stray scratch files**: Never leave stray scratch files (`*.py`, `*.patch`, `*.txt` diffs) in the repo — delete them before committing.
+- **Mandatory Policy**: These backup & restore point rules are strictly mandatory, not optional.
+

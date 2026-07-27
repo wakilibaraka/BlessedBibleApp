@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import '../../theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -24,7 +23,7 @@ import 'notes_list_screen.dart';
 import '../widgets/shared_top_header.dart';
 import '../widgets/glass_container.dart';
 import '../../state/notes_provider.dart';
-import '../../data/models/home_data.dart';
+
 import '../widgets/day_complete_celebration.dart';
 import '../../data/models/commentary_model.dart';
 import '../../state/theme_provider.dart';
@@ -73,6 +72,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
   Timer? _scrollEndTimer;
   Timer? _navRevealTimer;
   Timer? _headerRevealTimer;
+  Timer? _pageDebounceTimer;
   bool _delayHeaderReveal = false;
   final ValueNotifier<bool> _isScrolling = ValueNotifier(false);
 
@@ -148,6 +148,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
     _scrollEndTimer?.cancel();
     _navRevealTimer?.cancel();
     _headerRevealTimer?.cancel();
+    _pageDebounceTimer?.cancel();
     _isScrolling.dispose();
     _pageController.dispose();
     WidgetsBinding.instance.removeObserver(this);
@@ -189,6 +190,14 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
           if (mounted) {
             setState(() {
               _navigatedVerseIndex = verse - 1;
+            });
+            // Clear navigated verse after a short delay so the highlight fades out
+            Future.delayed(const Duration(seconds: 2), () {
+              if (mounted) {
+                setState(() {
+                  _navigatedVerseIndex = null;
+                });
+              }
             });
           }
         } else if (retries < 20) {
@@ -448,23 +457,36 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                               controller: _pageController,
                               itemCount: flatChapters.length,
                               onPageChanged: (pageIndex) {
+                                final startMs = DateTime.now().millisecondsSinceEpoch;
+                                debugPrint('STEP0: onPageChanged gesture started for page $pageIndex');
                                 setState(() {
                                   _currentPageIndex = pageIndex;
                                 });
-                                final fc = flatChapters[pageIndex];
-                                final currentLoc = ref.read(readLocationProvider);
-                                if (currentLoc.bookAbbrev != fc.book.abbreviation || currentLoc.chapter != fc.chapter.number) {
-                                  ref.read(readLocationProvider.notifier).updateLocation(
-                                    bookAbbrev: fc.book.abbreviation,
-                                    bookName: fc.book.name,
-                                    chapter: fc.chapter.number,
-                                  );
-                                }
+                                
+                                _pageDebounceTimer?.cancel();
+                                _pageDebounceTimer = Timer(const Duration(milliseconds: 300), () {
+                                  if (!mounted) return;
+                                  final fc = flatChapters[pageIndex];
+                                  final currentLoc = ref.read(readLocationProvider);
+                                  if (currentLoc.bookAbbrev != fc.book.abbreviation || currentLoc.chapter != fc.chapter.number) {
+                                    ref.read(readLocationProvider.notifier).updateLocation(
+                                      bookAbbrev: fc.book.abbreviation,
+                                      bookName: fc.book.name,
+                                      chapter: fc.chapter.number,
+                                    );
+                                  }
+                                });
                                 _clearSelection();
                               },
                               itemBuilder: (context, pageIndex) {
+                                final buildStartMs = DateTime.now().millisecondsSinceEpoch;
                                 final fc = flatChapters[pageIndex];
                                 final verses = fc.chapter.verses;
+                                
+                                WidgetsBinding.instance.addPostFrameCallback((_) {
+                                  final paintMs = DateTime.now().millisecondsSinceEpoch - buildStartMs;
+                                  debugPrint('STEP0: Chapter ${fc.book.abbreviation} ${fc.chapter.number} painted in $paintMs ms');
+                                });
                                 _itemScrollControllers[pageIndex] ??= ItemScrollController();
                                 if (!_itemPositionsListeners.containsKey(pageIndex)) {
                                   final listener = ItemPositionsListener.create();
@@ -508,7 +530,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                   });
                                 }
                                 
-                                return GestureDetector(
+                                return RepaintBoundary(
+                                  child: GestureDetector(
                                   onTap: () {
                                     if (selectedVerses.isNotEmpty) {
                                       _clearSelection();
@@ -713,6 +736,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                                       highlightColor = highlightPalette[savedColorIndex];
                                                     }
 
+                                                    if (isBookmarked || highlightColor != null) {
+                                                      debugPrint('DEBUG RENDER: $refStr isBookmarked=$isBookmarked, highlightColor=$highlightColor');
+                                                    }
+
                                                 return GestureDetector(
                                                   onTap: () => _toggleVerseSelection(verse.number),
                                                   onLongPress: () {
@@ -742,10 +769,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                                                   : Colors.amber.withValues(alpha: 0.15))
                                                               : (_navigatedVerseIndex == index
                                                                   ? (isDark
-                                                                      ? Colors.amber.withValues(alpha: 0.15)
-                                                                      : Colors.amber.withValues(alpha: 0.10))
+                                                                      ? Colors.amber.withValues(alpha: 0.20)
+                                                                      : Colors.amber.withValues(alpha: 0.15))
                                                                   : (highlightColor != null
-                                                                      ? highlightColor.withValues(alpha: isDark ? 0.20 : 0.15)
+                                                                      ? highlightColor.withValues(alpha: isDark ? 0.35 : 0.25)
                                                                       : Colors.transparent)),
                                                           borderRadius: BorderRadius.circular(12),
                                                         ),
@@ -759,8 +786,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                                           isBookmarked: isBookmarked,
                                                         ),
                                                       ),
-                                                      // Left accent bar — only visible when selected
-                                                      if (isSelected)
+                                                      // Left accent bar — only visible when selected or highlighted
+                                                      if (isSelected || highlightColor != null)
                                                         Positioned(
                                                           left: 4,
                                                           top: 10,
@@ -773,14 +800,14 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                                                 begin: Alignment.topCenter,
                                                                 end: Alignment.bottomCenter,
                                                                 colors: [
-                                                                  theme.primaryColor.withValues(alpha: 0.3),
-                                                                  theme.primaryColor,
-                                                                  theme.primaryColor.withValues(alpha: 0.3),
+                                                                  (isSelected ? theme.primaryColor : highlightColor!).withValues(alpha: 0.3),
+                                                                  (isSelected ? theme.primaryColor : highlightColor!),
+                                                                  (isSelected ? theme.primaryColor : highlightColor!).withValues(alpha: 0.3),
                                                                 ],
                                                               ),
                                                               boxShadow: [
                                                                 BoxShadow(
-                                                                  color: theme.primaryColor.withValues(alpha: 0.2),
+                                                                  color: (isSelected ? theme.primaryColor : highlightColor!).withValues(alpha: 0.2),
                                                                   blurRadius: 4,
                                                                   offset: const Offset(1, 0),
                                                                 ),
@@ -793,17 +820,18 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                                 );
                                               }
                                             ),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    ),
+                                          ),
+                                        ],
+                                      );
+                                    },
                                   ),
                                 ),
-                                  ),
-                                );
-                              },
+                              ),
                             ),
+                          ),
+                        );
+                      },
+                    ),
                 ),
                 // Top Navigation Bar Layer (Floating pills allowing text to flow behind)
 Positioned(
@@ -909,7 +937,7 @@ Positioned(
             // drag from the top edge. Vanishes if they release early.
             if (bibleNavSettings.swipeDownToNav && _overscrollFraction > 0.01)
               Positioned(
-                top: MediaQuery.of(context).padding.top + 64,
+                top: MediaQuery.of(context).padding.top + 100, // Positioned below the chapter header
                 left: 0,
                 right: 0,
                 child: IgnorePointer(
@@ -942,7 +970,7 @@ Positioned(
                               const SizedBox(width: 6),
                               Text(
                                 _overscrollFraction >= 1.0
-                                    ? 'Release to navigate'
+                                    ? 'Hold to navigate'
                                     : 'Keep holding…',
                                 style: theme.textTheme.labelSmall?.copyWith(
                                   color: theme.primaryColor.withValues(
@@ -1028,9 +1056,10 @@ Positioned(
       letterSpacing: 0.15,
       color: theme.textTheme.bodyLarge?.color,
       decoration: isBookmarked ? TextDecoration.underline : null,
-      decorationColor: isBookmarked ? AppColors.goldAccent.withValues(alpha: 0.5) : null,
+      decorationColor: isBookmarked ? theme.primaryColor : null,
+      decorationStyle: isBookmarked ? TextDecorationStyle.solid : null,
       decorationThickness: isBookmarked ? 2.0 : null,
-    );
+    ) ?? const TextStyle();
 
     Color starColor;
     switch (appThemeMode.resolve(context)) {
@@ -1048,6 +1077,7 @@ Positioned(
 
     return RichText(
       text: TextSpan(
+        style: fontStyle,
         children: [
           TextSpan(
             text: '${verse.number}  ',
@@ -2349,9 +2379,7 @@ class CommentaryBottomSheetContent extends ConsumerWidget {
                     label: const Text('Share to other apps', style: TextStyle(fontWeight: FontWeight.bold)),
                     onPressed: () {
                       Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Share dialog opened')),
-                      );
+                      ShareService.shareText(body: '"$verseText" — $bookName $chapter:$verseNumber');
                     },
                   ),
                 ),
@@ -2642,14 +2670,36 @@ class _ContextMenuButton extends StatelessWidget {
 }
 
 class VerseActionLogic {
-  static void handleHighlight(WidgetRef ref, String bookAbbrev, int chapterNum, List<int> targetVerses, int activeIndex) {
-    for (var v in targetVerses) {
-      final refStr = generateVerseKey(bookAbbrev, chapterNum, v);
-      ref.read(highlightsProvider.notifier).toggleHighlight(refStr, activeIndex);
-    }
+  static void _showFeedback(BuildContext context, ThemeData theme, String message) {
+    // Haptic feedback
+    try {
+      // HapticFeedback.lightImpact(); // Wait, I don't have services imported. I will just use SnackBar.
+    } catch (_) {}
+
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onInverseSurface, fontWeight: FontWeight.bold)),
+        backgroundColor: theme.colorScheme.inverseSurface,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
-  static void handleBookmark(WidgetRef ref, String bookAbbrev, int chapterNum, List<int> targetVerses) {
+  static void handleHighlight(BuildContext context, ThemeData theme, WidgetRef ref, String bookAbbrev, int chapterNum, List<int> targetVerses, int activeIndex) {
+    debugPrint('DEBUG handleHighlight: bookAbbrev=$bookAbbrev, chapterNum=$chapterNum, targetVerses=$targetVerses, activeIndex=$activeIndex');
+    for (var v in targetVerses) {
+      final refStr = generateVerseKey(bookAbbrev, chapterNum, v);
+      debugPrint('DEBUG handleHighlight: applying highlight to $refStr with colorIndex=$activeIndex');
+      ref.read(highlightsProvider.notifier).toggleHighlight(refStr, activeIndex);
+    }
+    _showFeedback(context, theme, 'Highlighted');
+  }
+
+  static void handleBookmark(BuildContext context, ThemeData theme, WidgetRef ref, String bookAbbrev, int chapterNum, List<int> targetVerses) {
     final isAllBookmarked = targetVerses.every((v) => ref.read(bookmarksProvider).contains(generateVerseKey(bookAbbrev, chapterNum, v)));
     for (var v in targetVerses) {
       final refStr = generateVerseKey(bookAbbrev, chapterNum, v);
@@ -2659,6 +2709,7 @@ class VerseActionLogic {
         ref.read(bookmarksProvider.notifier).toggle(refStr);
       }
     }
+    _showFeedback(context, theme, isAllBookmarked ? '${targetVerses.length} verse(s) removed from bookmarks' : '${targetVerses.length} verse(s) bookmarked!');
   }
 
   static void handleNote(BuildContext context, WidgetRef ref, ThemeData theme, String bookName, int chapterNum, List<int> targetVerses) {
@@ -2667,7 +2718,21 @@ class VerseActionLogic {
     showAddNoteSheet(context, ref, theme, initialReference: refStr);
   }
 
-  static void handleCopy(BuildContext context, String bookName, int chapterNum, List<int> targetVerses, dynamic chapterData) {
+  static dynamic _getChapterData(WidgetRef ref, String bookName, int chapterNum) {
+    final flatChapters = ref.read(flatChaptersProvider);
+    if (flatChapters.isNotEmpty) {
+      try {
+        return flatChapters.firstWhere(
+          (c) => c.book.name == bookName && c.chapter.number == chapterNum,
+          orElse: () => flatChapters.first,
+        ).chapter;
+      } catch (_) {}
+    }
+    return null;
+  }
+
+  static void handleCopy(BuildContext context, WidgetRef ref, String bookName, int chapterNum, List<int> targetVerses) {
+    final chapterData = _getChapterData(ref, bookName, chapterNum);
     final text = ShareService.formatVerses(
         bookName: bookName,
         chapterNumber: chapterNum,
@@ -2676,11 +2741,12 @@ class VerseActionLogic {
     ShareService.copyText(context, text);
   }
 
-  static void handleCommentary(BuildContext context, String bookName, int chapterNum, int verseNumberFallback, List<int> targetVerses, dynamic chapterData) {
+  static void handleCommentary(BuildContext context, WidgetRef ref, String bookName, int chapterNum, int verseNumberFallback, List<int> targetVerses) {
+    final chapterData = _getChapterData(ref, bookName, chapterNum);
     final sorted = targetVerses.toList()..sort();
     final firstVerse = sorted.isNotEmpty ? sorted.first : verseNumberFallback;
     String vText = "";
-    if (firstVerse - 1 >= 0 && firstVerse - 1 < chapterData.verses.length) {
+    if (chapterData != null && firstVerse - 1 >= 0 && firstVerse - 1 < chapterData.verses.length) {
        vText = chapterData.verses[firstVerse - 1].text;
     }
     showModalBottomSheet(
@@ -2699,7 +2765,8 @@ class VerseActionLogic {
     );
   }
 
-  static void handleShare(BuildContext context, String bookName, int chapterNum, List<int> targetVerses, dynamic chapterData) {
+  static void handleShare(BuildContext context, WidgetRef ref, String bookName, int chapterNum, List<int> targetVerses) {
+    final chapterData = _getChapterData(ref, bookName, chapterNum);
     final text = ShareService.formatVerses(
         bookName: bookName,
         chapterNumber: chapterNum,
@@ -2769,7 +2836,7 @@ class _VerseContextMenuContentState extends ConsumerState<_VerseContextMenuConte
           label: isBookmarked ? 'Saved' : 'Bookmark',
           color: isBookmarked ? theme.primaryColor : null,
           onTap: () {
-            VerseActionLogic.handleBookmark(ref, widget.bookAbbrev, widget.chapterNum, targetVerses);
+            VerseActionLogic.handleBookmark(context, theme, ref, widget.bookAbbrev, widget.chapterNum, targetVerses);
             ref.read(readSelectionProvider.notifier).clear();
             widget.onDismiss();
           }
@@ -2791,7 +2858,7 @@ class _VerseContextMenuContentState extends ConsumerState<_VerseContextMenuConte
           label: 'Copy',
           onTap: () {
             widget.onDismiss();
-            VerseActionLogic.handleCopy(context, widget.bookName, widget.chapterNum, targetVerses, widget.chapterData);
+            VerseActionLogic.handleCopy(context, ref, widget.bookName, widget.chapterNum, targetVerses);
             ref.read(readSelectionProvider.notifier).clear();
           }
         ),
@@ -2801,7 +2868,7 @@ class _VerseContextMenuContentState extends ConsumerState<_VerseContextMenuConte
           label: 'Commentary',
           onTap: () {
             widget.onDismiss();
-            VerseActionLogic.handleCommentary(context, widget.bookName, widget.chapterNum, widget.verseNumber, targetVerses, widget.chapterData);
+            VerseActionLogic.handleCommentary(context, ref, widget.bookName, widget.chapterNum, widget.verseNumber, targetVerses);
             ref.read(readSelectionProvider.notifier).clear();
           }
         ),
@@ -2811,14 +2878,13 @@ class _VerseContextMenuContentState extends ConsumerState<_VerseContextMenuConte
           label: 'Share',
           onTap: () {
             widget.onDismiss();
-            VerseActionLogic.handleShare(context, widget.bookName, widget.chapterNum, targetVerses, widget.chapterData);
+            VerseActionLogic.handleShare(context, ref, widget.bookName, widget.chapterNum, targetVerses);
             ref.read(readSelectionProvider.notifier).clear();
           }
         ),
       ],
     );
 
-    // Colors row
     // Colors row
     final colorRow = Row(
       key: const ValueKey('colors'),
@@ -2832,7 +2898,7 @@ class _VerseContextMenuContentState extends ConsumerState<_VerseContextMenuConte
             color: highlightPalette[i],
             onTap: () {
               ref.read(readSettingsProvider.notifier).setActiveHighlightColorIndex(i);
-              VerseActionLogic.handleHighlight(ref, widget.bookAbbrev, widget.chapterNum, targetVerses, i);
+              VerseActionLogic.handleHighlight(context, theme, ref, widget.bookAbbrev, widget.chapterNum, targetVerses, i);
               setState(() => _showColors = false);
               ref.read(readSelectionProvider.notifier).clear();
               widget.onDismiss();
@@ -2867,9 +2933,9 @@ class _VerseContextMenuContentState extends ConsumerState<_VerseContextMenuConte
                         label: isHighlighted ? 'Highlighted' : 'Highlight',
                         color: isHighlighted ? Colors.amber.shade600 : null,
                         onTap: () {
-                          final colorIndex = ref.read(readSettingsProvider).activeHighlightColorIndex;
-                          final activeIndex = (colorIndex >= 0 && colorIndex < 5) ? colorIndex : 2;
-                          VerseActionLogic.handleHighlight(ref, widget.bookAbbrev, widget.chapterNum, targetVerses, activeIndex);
+                          final primaryColorIndex = ref.read(readSettingsProvider).primaryHighlightColorIndex;
+                          final activeIndex = (primaryColorIndex >= 0 && primaryColorIndex < 5) ? primaryColorIndex : 2;
+                          VerseActionLogic.handleHighlight(context, theme, ref, widget.bookAbbrev, widget.chapterNum, targetVerses, activeIndex);
                           ref.read(readSelectionProvider.notifier).clear();
                           widget.onDismiss();
                         },
@@ -2885,13 +2951,12 @@ class _VerseContextMenuContentState extends ConsumerState<_VerseContextMenuConte
                       ),
                     ],
                   ),
-                )
-              ]
-            )
-          )
-        )
-      )
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
-

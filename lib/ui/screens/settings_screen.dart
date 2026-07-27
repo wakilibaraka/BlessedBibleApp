@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../state/journal_provider.dart';
+
 import '../../state/theme_provider.dart';
+import '../../state/user_data_provider.dart';
 import '../../state/typography_provider.dart';
 import '../../state/glass_ui_provider.dart';
 import '../../state/nav_settings_provider.dart';
@@ -146,6 +147,69 @@ class SettingsScreen extends StatelessWidget {
                 MapEntry(VerseActionStyle.raindrop, 'Raindrop'),
               ],
               onChanged: (val) => ref.read(readSettingsProvider.notifier).setVerseActionStyle(val),
+            );
+          }),
+          Consumer(builder: (context, ref, _) {
+            final primaryIndex = ref.watch(readSettingsProvider.select((s) => s.primaryHighlightColorIndex));
+            final secondaryIndex = ref.watch(readSettingsProvider.select((s) => s.secondaryHighlightColorIndex));
+            
+            Widget buildColorPicker(String title, String subtitle, int selectedIndex, Function(int) onChanged) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: Theme.of(context).textTheme.titleMedium),
+                    if (subtitle.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(subtitle, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
+                    ],
+                    const SizedBox(height: 12),
+                    Row(
+                      children: List.generate(5, (i) {
+                        final color = highlightPalette[i];
+                        
+                        final isSelected = i == selectedIndex;
+                        
+                        return GestureDetector(
+                          onTap: () => onChanged(i),
+                          child: Container(
+                            margin: const EdgeInsets.only(right: 12),
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              color: color,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: isSelected ? Theme.of(context).primaryColor : Colors.black12,
+                                width: isSelected ? 2 : 1,
+                              ),
+                            ),
+                            child: isSelected ? Icon(Icons.check, size: 16, color: Theme.of(context).primaryColor) : null,
+                          ),
+                        );
+                      }),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            return Column(
+              children: [
+                buildColorPicker(
+                  'Primary Highlight Color',
+                  'Default color applied when tapping the Highlight action',
+                  primaryIndex,
+                  (i) => ref.read(readSettingsProvider.notifier).setPrimaryHighlightColorIndex(i)
+                ),
+                buildColorPicker(
+                  'Secondary Highlight Color',
+                  'Second color presented in quick action menus',
+                  secondaryIndex,
+                  (i) => ref.read(readSettingsProvider.notifier).setSecondaryHighlightColorIndex(i)
+                ),
+              ],
             );
           }),
           const Divider(),

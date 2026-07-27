@@ -6,11 +6,9 @@ import '../../state/nav_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../state/bible_provider.dart';
 import '../../state/notes_provider.dart';
-import '../../state/journal_provider.dart';
 import '../../state/theme_provider.dart';
 import '../widgets/animated_background.dart';
 import 'notes_list_screen.dart'; // for showAddNoteSheet
-import '../widgets/journal_editor.dart'; // for showAddJournalSheet
 
 class YourSpaceScreen extends ConsumerStatefulWidget {
   const YourSpaceScreen({super.key});
@@ -20,7 +18,28 @@ class YourSpaceScreen extends ConsumerStatefulWidget {
 }
 
 class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
-  int _selectedIndex = 0; // 0=Highlights, 1=Bookmarks, 2=Notes, 3=Journal
+  int _selectedIndex = 0; // 0=Highlights, 1=Bookmarks, 2=Notes
+  late PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _selectedIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _onTabTapped(int index) {
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,36 +71,33 @@ class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
               // ── Segmented Control Header ──
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      _SegmentTab(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _SegmentTab(
                         label: 'Highlights',
                         isSelected: _selectedIndex == 0,
-                        onTap: () => setState(() => _selectedIndex = 0),
+                        onTap: () => _onTabTapped(0),
                         theme: theme,
                       ),
-                      _SegmentTab(
+                    ),
+                    Expanded(
+                      child: _SegmentTab(
                         label: 'Bookmarks',
                         isSelected: _selectedIndex == 1,
-                        onTap: () => setState(() => _selectedIndex = 1),
+                        onTap: () => _onTabTapped(1),
                         theme: theme,
                       ),
-                      _SegmentTab(
+                    ),
+                    Expanded(
+                      child: _SegmentTab(
                         label: 'Notes',
                         isSelected: _selectedIndex == 2,
-                        onTap: () => setState(() => _selectedIndex = 2),
+                        onTap: () => _onTabTapped(2),
                         theme: theme,
                       ),
-                      _SegmentTab(
-                        label: 'Journal',
-                        isSelected: _selectedIndex == 3,
-                        onTap: () => setState(() => _selectedIndex = 3),
-                        theme: theme,
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
               
@@ -93,23 +109,23 @@ class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
               
               // ── Segment Content ──
               Expanded(
-                child: _buildSelectedContent(context, ref, theme),
+                child: PageView(
+                  controller: _pageController,
+                  onPageChanged: (index) {
+                    setState(() => _selectedIndex = index);
+                  },
+                  children: [
+                    _HighlightsSegment(theme: theme),
+                    _BookmarksSegment(theme: theme),
+                    _NotesSegment(theme: theme),
+                  ],
+                ),
               ),
             ],
           ),
         ],
       ),
     );
-  }
-
-  Widget _buildSelectedContent(BuildContext context, WidgetRef ref, ThemeData theme) {
-    switch (_selectedIndex) {
-      case 0: return _HighlightsSegment(theme: theme);
-      case 1: return _BookmarksSegment(theme: theme);
-      case 2: return _NotesSegment(theme: theme);
-      case 3: return _JournalSegment(theme: theme);
-      default: return const SizedBox.shrink();
-    }
   }
 }
 
@@ -133,8 +149,9 @@ class _SegmentTab extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        margin: const EdgeInsets.only(right: 8),
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        alignment: Alignment.center,
         decoration: BoxDecoration(
           color: isSelected ? AppColors.goldAccent.withValues(alpha: 0.15) : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
@@ -185,17 +202,7 @@ class _HighlightsSegment extends ConsumerWidget {
         ),
         Expanded(
           child: groupedHighlights.isEmpty
-              ? ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    _buildSampleVerseCard(
-                      context, ref, theme, 
-                      'Genesis 1:1', 
-                      'In the beginning God created the heaven and the earth.',
-                      colorIndex: 0 // sample color
-                    ),
-                  ],
-                )
+              ? const SizedBox.shrink()
               : ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   itemCount: highlightPalette.length,
@@ -225,7 +232,7 @@ class _HighlightsSegment extends ConsumerWidget {
                         ...refs.map((refStr) {
                           final data = _parseVerseRef(refStr, flatChapters);
                           if (data == null) return const SizedBox.shrink();
-                          return _buildRealVerseCard(context, ref, refStr, data, theme);
+                          return _buildRealVerseCard(context, ref, refStr, data, theme, highlightColorIndex: colorIndex);
                         }),
                       ],
                     );
@@ -263,16 +270,7 @@ class _BookmarksSegment extends ConsumerWidget {
         ),
         Expanded(
           child: bookmarks.isEmpty
-              ? ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    _buildSampleVerseCard(
-                      context, ref, theme, 
-                      'Genesis 1:2', 
-                      'And the earth was without form, and void; and darkness was upon the face of the deep.',
-                    ),
-                  ],
-                )
+              ? const SizedBox.shrink()
               : ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   itemCount: bookmarks.length,
@@ -280,7 +278,7 @@ class _BookmarksSegment extends ConsumerWidget {
                     final refStr = bookmarks[index];
                     final data = _parseVerseRef(refStr, flatChapters);
                     if (data == null) return const SizedBox.shrink();
-                    return _buildRealVerseCard(context, ref, refStr, data, theme);
+                    return _buildRealVerseCard(context, ref, refStr, data, theme, isBookmarked: true);
                   },
                 ),
         ),
@@ -420,142 +418,12 @@ class _NotesSegment extends ConsumerWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// JOURNAL SEGMENT
-// ─────────────────────────────────────────────────────────────────────────────
-class _JournalSegment extends ConsumerWidget {
-  final ThemeData theme;
-  const _JournalSegment({required this.theme});
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final journalEntries = ref.watch(journalProvider);
-
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  'Things you want to journal — with your own reflections.',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                    height: 1.4,
-                  ),
-                ),
-              ),
-              IconButton(
-                icon: Icon(Icons.add_circle_outline, color: theme.primaryColor),
-                onPressed: () => showAddJournalSheet(context, ref, theme),
-              ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: journalEntries.isEmpty
-              ? Center(
-                  child: Text(
-                    'No journal entries yet.\nTap + to write your thoughts.',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
-                  ),
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  itemCount: journalEntries.length,
-                  itemBuilder: (context, index) {
-                    final entry = journalEntries[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 12.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.surface.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                entry.date,
-                                style: theme.textTheme.labelSmall?.copyWith(
-                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                entry.content,
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.9),
-                                  height: 1.5,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-        ),
-      ],
-    );
-  }
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
-Widget _buildSampleVerseCard(BuildContext context, WidgetRef ref, ThemeData theme, String reference, String text, {int? colorIndex}) {
-  return Padding(
-    padding: const EdgeInsets.only(bottom: 12.0),
-    child: Container(
-      decoration: BoxDecoration(
-        color: colorIndex != null 
-            ? highlightPalette[colorIndex].withValues(alpha: 0.15)
-            : theme.colorScheme.surface.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(
-                reference,
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.primaryColor,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text('SAMPLE', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface.withValues(alpha: 0.5))),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Text(
-            text,
-            style: theme.textTheme.bodySmall?.copyWith(height: 1.4, color: theme.colorScheme.onSurface.withValues(alpha: 0.8)),
-          ),
-        ],
-      ),
-    ),
-  );
-}
+
 
 class _ParsedVerseData {
   final String bookAbbrev;
@@ -573,22 +441,28 @@ class _ParsedVerseData {
   });
 }
 
+/// Parses a verse reference key in the format produced by generateVerseKey:
+/// "ABBREV_chapter:verse" (e.g. "GN_1:1", "MT_5:3").
+/// Returns null if the key is malformed or the verse cannot be found in flatChapters.
 _ParsedVerseData? _parseVerseRef(String refStr, List<FlatChapter> flatChapters) {
-  final parts = refStr.split(' ');
-  if (parts.length < 2) return null;
+  // Format: "ABBREV_chapter:verse"
+  final underscoreIdx = refStr.indexOf('_');
+  if (underscoreIdx == -1) return null;
 
-  final verseStr = parts.last;
-  final bookAbbrev = parts.sublist(0, parts.length - 1).join(' ');
+  final abbrevUpper = refStr.substring(0, underscoreIdx); // e.g. "GN"
+  final cvStr = refStr.substring(underscoreIdx + 1);       // e.g. "1:1"
 
-  final cvParts = verseStr.split(':');
+  final cvParts = cvStr.split(':');
   if (cvParts.length != 2) return null;
 
   final chapter = int.tryParse(cvParts[0]);
   final verseNum = int.tryParse(cvParts[1]);
-
   if (chapter == null || verseNum == null) return null;
 
-  final fcIndex = flatChapters.indexWhere((c) => c.book.abbreviation == bookAbbrev && c.chapter.number == chapter);
+  // Match by abbreviation case-insensitively (JSON stores lowercase, key stores uppercase)
+  final fcIndex = flatChapters.indexWhere(
+    (c) => c.book.abbreviation.toUpperCase() == abbrevUpper && c.chapter.number == chapter,
+  );
   if (fcIndex == -1) return null;
 
   final fc = flatChapters[fcIndex];
@@ -596,7 +470,7 @@ _ParsedVerseData? _parseVerseRef(String refStr, List<FlatChapter> flatChapters) 
   if (vIndex == -1) return null;
 
   return _ParsedVerseData(
-    bookAbbrev: bookAbbrev,
+    bookAbbrev: fc.book.abbreviation, // canonical lowercase from JSON
     bookName: fc.book.name,
     chapter: chapter,
     verseNum: verseNum,
@@ -605,16 +479,26 @@ _ParsedVerseData? _parseVerseRef(String refStr, List<FlatChapter> flatChapters) 
 }
 
 Widget _buildRealVerseCard(
-    BuildContext context, WidgetRef ref, String refStr, _ParsedVerseData data, ThemeData theme) {
+    BuildContext context, WidgetRef ref, String refStr, _ParsedVerseData data, ThemeData theme,
+    {int? highlightColorIndex, bool isBookmarked = false}) {
   final formattedRef = '${data.bookName} ${data.chapter}:${data.verseNum}';
+  final highlightColor = (highlightColorIndex != null && highlightColorIndex >= 0 && highlightColorIndex < highlightPalette.length)
+      ? highlightPalette[highlightColorIndex]
+      : null;
 
   return Padding(
     padding: const EdgeInsets.only(bottom: 12.0),
     child: Container(
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface.withValues(alpha: 0.5),
+        color: highlightColor != null
+            ? highlightColor.withValues(alpha: 0.18)
+            : theme.colorScheme.surface.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
+        border: Border.all(
+          color: highlightColor != null
+              ? highlightColor.withValues(alpha: 0.35)
+              : theme.dividerColor.withValues(alpha: 0.1),
+        ),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
@@ -633,12 +517,28 @@ Widget _buildRealVerseCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                formattedRef,
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.primaryColor,
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      formattedRef,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.primaryColor,
+                      ),
+                    ),
+                  ),
+                  if (isBookmarked)
+                    Icon(Icons.bookmark_rounded, size: 16, color: theme.primaryColor.withValues(alpha: 0.7)),
+                  if (highlightColor != null)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 6),
+                      child: Container(
+                        width: 12, height: 12,
+                        decoration: BoxDecoration(color: highlightColor, shape: BoxShape.circle),
+                      ),
+                    ),
+                ],
               ),
               const SizedBox(height: 6),
               Text(
@@ -646,6 +546,8 @@ Widget _buildRealVerseCard(
                 style: theme.textTheme.bodySmall?.copyWith(
                   height: 1.4,
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                  decoration: isBookmarked ? TextDecoration.underline : null,
+                  decorationColor: isBookmarked ? theme.primaryColor : null,
                 ),
               ),
             ],
@@ -655,3 +557,4 @@ Widget _buildRealVerseCard(
     ),
   );
 }
+
