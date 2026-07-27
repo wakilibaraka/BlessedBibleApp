@@ -56,31 +56,10 @@ class SharedTopHeader extends ConsumerWidget {
       child: SizedBox(
         width: 26,
         height: 26,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Icon(
-              Icons.menu_book_rounded,
-              size: 26,
-              color: theme.primaryColor,
-            ),
-            Positioned(
-              right: -2,
-              bottom: -2,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: isDarkMode ? const Color(0xFF1C1C1E) : const Color(0xFFFAF9F6),
-                  shape: BoxShape.circle,
-                ),
-                padding: const EdgeInsets.all(2),
-                child: Icon(
-                  Icons.add_rounded,
-                  size: 10,
-                  color: theme.primaryColor,
-                ),
-              ),
-            ),
-          ],
+        child: Icon(
+          Icons.menu_book_rounded,
+          size: 26,
+          color: theme.primaryColor,
         ),
       ),
     );

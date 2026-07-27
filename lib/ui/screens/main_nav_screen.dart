@@ -448,13 +448,10 @@ class MainNavScreen extends ConsumerWidget {
   Widget _buildFabIcon(
       int currentIndex, NavSettingsState navSettings, WidgetRef ref) {
     if (currentIndex == 0) {
-      return Stack(
-        key: const ValueKey('settings_entry'),
-        alignment: Alignment.center,
-        children: const [
-          Icon(Icons.settings, size: 28),
-          Icon(Icons.add, size: 18), // A prominent cross
-        ],
+      return const Icon(
+        Icons.settings,
+        size: 28,
+        key: ValueKey('settings_entry'),
       );
     } else if (currentIndex == 4) {
       return const Icon(Icons.close_rounded,
