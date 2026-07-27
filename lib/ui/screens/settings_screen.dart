@@ -15,7 +15,6 @@ import '../../state/bible_nav_settings_provider.dart';
 import '../../state/read_settings_provider.dart';
 import '../../services/backup_service.dart';
 import '../../state/reminders_provider.dart';
-import '../../state/amoled_provider.dart';
 import '../widgets/shared_app_bar.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -43,18 +42,6 @@ class SettingsScreen extends StatelessWidget {
                 onChanged: (value) {
                   HapticFeedback.selectionClick();
                   ref.read(glassUiProvider.notifier).set(value);
-                },
-              );
-            }),
-            Consumer(builder: (context, ref, _) {
-              final isAmoled = ref.watch(amoledProvider);
-              return SwitchListTile(
-                title: const Text('AMOLED dark mode'),
-                subtitle: const Text('Use pure black backgrounds to save battery on OLED screens'),
-                value: isAmoled,
-                onChanged: (value) {
-                  HapticFeedback.selectionClick();
-                  ref.read(amoledProvider.notifier).set(value);
                 },
               );
             }),

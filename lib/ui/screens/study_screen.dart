@@ -90,6 +90,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
         subGreeting = "Embrace the light of His word.";
         break;
       case AppThemeMode.dark:
+      case AppThemeMode.oled:
       case AppThemeMode.automatic:
         subGreeting = "Rest in the peace of His promises.";
         break;

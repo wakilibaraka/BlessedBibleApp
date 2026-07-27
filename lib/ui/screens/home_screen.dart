@@ -65,7 +65,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   Widget build(BuildContext context) {
     final homeState = ref.watch(homeProvider);
     final appThemeMode = ref.watch(themeProvider);
-    final isDark    = appThemeMode == AppThemeMode.dark;
+    final isDark    = (appThemeMode == AppThemeMode.dark || appThemeMode == AppThemeMode.oled);
 
 
     return Scaffold(

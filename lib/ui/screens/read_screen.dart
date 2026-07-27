@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import '../../theme/app_colors.dart';
 import '../widgets/pinch_to_zoom_font_wrapper.dart';
+import '../widgets/pill_segmented_control.dart';
 
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -354,7 +355,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final appThemeMode = ref.watch(themeProvider);
-    final isDark = appThemeMode == AppThemeMode.dark;
+    final isDark = appThemeMode == AppThemeMode.dark || appThemeMode == AppThemeMode.oled;
     final typography = ref.watch(typographyProvider);
     final chapterTitles = ref.watch(chapterTitlesProvider);
     final readSettings = ref.watch(readSettingsProvider);
@@ -1105,6 +1106,7 @@ Positioned(
         redLetterColor = const Color(0xFFB33A3A); // Soft crimson
         break;
       case AppThemeMode.dark:
+      case AppThemeMode.oled:
       case AppThemeMode.automatic:
         starColor = Colors.amber.shade400;
         redLetterColor = const Color(0xFFD46A6A); // Lighter muted red
@@ -2153,15 +2155,20 @@ class _TypographyBottomSheet extends ConsumerWidget {
               const SizedBox(height: 24),
               // Radial Balance: Color Mode Toggles
               Center(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _buildColorModeToggle(context, ref, AppThemeMode.light, Icons.light_mode),
-                    const SizedBox(width: 24),
-                    _buildColorModeToggle(context, ref, AppThemeMode.sepia, Icons.auto_awesome),
-                    const SizedBox(width: 24),
-                    _buildColorModeToggle(context, ref, AppThemeMode.dark, Icons.dark_mode),
-                  ],
+                child: PillSegmentedControl(
+                  segments: const ['Light', 'Sepia', 'Dark', 'OLED'],
+                  selectedIndex: switch (ref.watch(themeProvider)) {
+                    AppThemeMode.light => 0,
+                    AppThemeMode.sepia => 1,
+                    AppThemeMode.dark => 2,
+                    AppThemeMode.oled => 3,
+                    AppThemeMode.automatic => 0,
+                  },
+                  onSegmentSelected: (index) {
+                    HapticFeedback.selectionClick();
+                    final modes = [AppThemeMode.light, AppThemeMode.sepia, AppThemeMode.dark, AppThemeMode.oled];
+                    ref.read(themeProvider.notifier).setTheme(modes[index]);
+                  },
                 ),
               ),
               const SizedBox(height: 32),
@@ -2302,73 +2309,6 @@ class _TypographyBottomSheet extends ConsumerWidget {
     );
   }
 
-  Widget _buildColorModeToggle(
-      BuildContext context, WidgetRef ref, AppThemeMode mode, IconData icon) {
-    final currentMode = ref.watch(themeProvider);
-    final themeNotifier = ref.read(themeProvider.notifier);
-    final isSelected = currentMode == mode;
-    final theme = Theme.of(context);
-
-    Color bgColor;
-    Color iconColor;
-    if (mode == AppThemeMode.light) {
-      bgColor = Colors.white;
-      iconColor = Colors.orangeAccent;
-    } else if (mode == AppThemeMode.sepia) {
-      bgColor = const Color(0xFFF4ECD8);
-      iconColor = Colors.brown;
-    } else {
-      bgColor = const Color(0xFF1E1E1E);
-      iconColor = Colors.white70;
-    }
-
-    return GestureDetector(
-      onTap: () => themeNotifier.setTheme(mode),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOutCubic,
-        width: isSelected ? 64 : 56,
-        height: isSelected ? 64 : 56,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: bgColor,
-          border: Border.all(
-            color: isSelected ? theme.primaryColor : Colors.transparent,
-            width: 2,
-          ),
-          gradient: isSelected
-              ? RadialGradient(
-                  colors: [
-                    theme.primaryColor.withValues(alpha: 0.25),
-                    bgColor,
-                  ],
-                  stops: const [0.1, 0.9],
-                )
-              : null,
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: theme.primaryColor.withValues(alpha: 0.3),
-                    blurRadius: 20,
-                    spreadRadius: 4,
-                  )
-                ]
-              : [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 8,
-                    spreadRadius: 2,
-                  )
-                ],
-        ),
-        child: Icon(
-          icon,
-          color: isSelected ? theme.primaryColor : iconColor,
-          size: isSelected ? 30 : 26,
-        ),
-      ),
-    );
-  }
 }
 
 class CommentaryBottomSheetContent extends ConsumerWidget {

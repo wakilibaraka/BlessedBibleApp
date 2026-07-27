@@ -86,6 +86,7 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground> with Si
           final List<Color> colors;
           switch (widget.appThemeMode.resolve(context)) {
             case AppThemeMode.dark:
+      case AppThemeMode.oled:
             case AppThemeMode.automatic:
               // Warm amber glow at focal point, deep charcoal edges
               colors = [

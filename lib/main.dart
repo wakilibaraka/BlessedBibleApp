@@ -14,7 +14,6 @@ import 'state/bible_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'ui/widgets/app_error_fallback.dart';
 import 'state/study_provider.dart';
-import 'state/amoled_provider.dart';
 import 'utils/startup_stopwatch.dart';
 
 void main() async {
@@ -88,7 +87,6 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
   Widget build(BuildContext context) {
     final themeMode = ref.watch(themeProvider);
     final isBibleLoading = ref.watch(bibleProvider.select((s) => s.isLoading));
-    final isAmoled = ref.watch(amoledProvider);
 
     return MaterialApp(
       title: 'The Blessed Bible',
@@ -100,11 +98,12 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
         AppThemeMode.light => ThemeMode.light,
         AppThemeMode.sepia => ThemeMode.light,
         AppThemeMode.dark => ThemeMode.dark,
+        AppThemeMode.oled => ThemeMode.dark,
       },
       theme: themeMode == AppThemeMode.sepia 
           ? AppTheme.sepiaTheme(14.0)
           : AppTheme.lightTheme(14.0),
-      darkTheme: AppTheme.darkTheme(14.0, isAmoled: isAmoled),
+      darkTheme: AppTheme.darkTheme(14.0, isAmoled: themeMode == AppThemeMode.oled),
       home: isBibleLoading ? const SplashLoadingScreen() : const MainNavScreen(),
     );
   }

@@ -89,6 +89,11 @@ class SharedTopHeader extends ConsumerWidget {
                 color: theme.primaryColor,
               ),
             AppThemeMode.dark => Icon(
+              Icons.dark_mode_rounded,
+              color: theme.colorScheme.onSurface,
+              size: 20,
+            ),
+            AppThemeMode.oled => Icon(
                 Icons.nightlight_round,
                 key: const ValueKey('dark'),
                 size: 26,

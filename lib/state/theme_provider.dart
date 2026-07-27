@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:flutter/material.dart';
 
-enum AppThemeMode { automatic, light, dark, sepia }
+enum AppThemeMode { automatic, light, dark, sepia, oled }
 
 extension AppThemeModeExtension on AppThemeMode {
   AppThemeMode resolve(BuildContext context) {
@@ -31,6 +31,16 @@ class ThemeNotifier extends Notifier<AppThemeMode> {
     if (index != null && index >= 0 && index < AppThemeMode.values.length) {
       state = AppThemeMode.values[index];
     }
+    
+    // Migrate old AMOLED flag
+    final amoledOn = prefs.getBool('amoled_dark_mode');
+    if (amoledOn != null) {
+      if (amoledOn == true && (state == AppThemeMode.dark || state == AppThemeMode.automatic)) {
+        state = AppThemeMode.oled;
+        await prefs.setInt(_themeKey, state.index);
+      }
+      await prefs.remove('amoled_dark_mode');
+    }
   }
 
   Future<void> setTheme(AppThemeMode mode) async {
@@ -52,6 +62,9 @@ class ThemeNotifier extends Notifier<AppThemeMode> {
         setTheme(AppThemeMode.sepia);
         break;
       case AppThemeMode.sepia:
+        setTheme(AppThemeMode.oled);
+        break;
+      case AppThemeMode.oled:
         setTheme(AppThemeMode.automatic);
         break;
     }
@@ -59,7 +72,7 @@ class ThemeNotifier extends Notifier<AppThemeMode> {
 
   // Legacy toggle kept for backward compatibility.
   void toggleTheme() {
-    setTheme(state == AppThemeMode.dark ? AppThemeMode.light : AppThemeMode.dark);
+    setTheme(state == AppThemeMode.dark || state == AppThemeMode.oled ? AppThemeMode.light : AppThemeMode.dark);
   }
 }
 
