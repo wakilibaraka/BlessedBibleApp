@@ -90,3 +90,12 @@ flutter:
           weight: 600
         - asset: assets/fonts/Lexend-700-normal.ttf
           weight: 700
+    - family: EB Garamond
+      fonts:
+        - asset: assets/fonts/EBGaramond-Regular.ttf
+        - asset: assets/fonts/EBGaramond-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/EBGaramond-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/EBGaramond-Italic.ttf
+          style: italic

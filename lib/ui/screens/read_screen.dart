@@ -749,7 +749,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                                       style: theme.textTheme.titleSmall?.copyWith(
                                                         color: theme.primaryColor,
                                                         fontSize: typography.fontSize * 1.25,
-                                                        fontFamily: typography.fontFamily == 'System' ? null : typography.fontFamily,
+                                                        fontFamily: typography.fontFamily,
                                                         fontWeight: FontWeight.w700,
                                                         letterSpacing: 0.2,
                                                       ),
@@ -1121,7 +1121,7 @@ Positioned(
 
   Widget _buildNormalVerse(BibleVerse verse, ThemeData theme, TypographyState typography, AppThemeMode appThemeMode, {bool hasCommentary = false, VoidCallback? onCommentaryTap, bool isBookmarked = false, bool isRedLetterEnabled = true}) {
     final fontStyle = theme.textTheme.bodyMedium?.copyWith(
-      fontFamily: typography.fontFamily == 'System' ? null : typography.fontFamily,
+      fontFamily: typography.fontFamily,
       fontSize: typography.fontSize,
       height: typography.lineHeight,
       letterSpacing: 0.15,
@@ -2023,7 +2023,7 @@ class _TypographyBottomSheet extends ConsumerWidget {
     final typography = ref.watch(typographyProvider);
     final typographyNotifier = ref.read(typographyProvider.notifier);
 
-    final fonts = ['System', 'Inter', 'Gentium Book Plus', 'Lora', 'Literata', 'Lexend'];
+    final fonts = ['EB Garamond', 'Inter', 'Gentium Book Plus', 'Lora', 'Literata', 'Lexend'];
 
     return BouncyEntrance(
       delay: const Duration(milliseconds: 50),
@@ -2251,7 +2251,7 @@ class _TypographyBottomSheet extends ConsumerWidget {
                       ),
                       child: Text(
                         font,
-                        style: TextStyle(fontFamily: font == 'System' ? null : font).copyWith(
+                        style: TextStyle(fontFamily: font).copyWith(
                           color: isSelected ? theme.primaryColor : theme.colorScheme.onSurface,
                           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                         ),
