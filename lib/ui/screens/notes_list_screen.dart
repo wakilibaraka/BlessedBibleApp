@@ -122,11 +122,11 @@ class NotesListScreen extends ConsumerWidget {
   }
 }
 
-void showAddNoteSheet(BuildContext context, WidgetRef ref, ThemeData theme, {String? initialReference}) {
+Future<void> showAddNoteSheet(BuildContext context, WidgetRef ref, ThemeData theme, {String? initialReference}) async {
   final titleController = TextEditingController();
   final contentController = TextEditingController();
 
-  showModalBottomSheet(
+  await showModalBottomSheet(
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,

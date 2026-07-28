@@ -760,7 +760,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                                 // Check for commentary
                                                 AnimatedOpacity(
                                                   duration: const Duration(milliseconds: 250),
-                                                  opacity: (isSelectionMode && !isSelected) ? 0.25 : 1.0,
+                                                  opacity: (isSelectionMode && !isSelected) ? 0.85 : 1.0,
                                                   child: Builder(
                                                   builder: (context) {
                                                     bool hasCommentary = false;
@@ -828,21 +828,26 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                                         padding: const EdgeInsets.only(
                                                             top: 6.0,
                                                             bottom: 6.0,
-                                                            left: 15.0,  // extra left space for accent bar
+                                                            left: 12.0,
                                                             right: 12.0),
                                                         decoration: BoxDecoration(
                                                           color: isSelected
-                                                              ? (isDark
-                                                                  ? Colors.amber.withValues(alpha: 0.20)
-                                                                  : Colors.amber.withValues(alpha: 0.15))
+                                                              ? (highlightColor != null
+                                                                  ? highlightColor.withValues(alpha: 0.35)
+                                                                  : (isDark
+                                                                      ? theme.primaryColor.withValues(alpha: 0.20)
+                                                                      : theme.primaryColor.withValues(alpha: 0.15)))
                                                               : (_navigatedVerseIndex == index
                                                                   ? (isDark
-                                                                      ? Colors.amber.withValues(alpha: 0.20)
-                                                                      : Colors.amber.withValues(alpha: 0.15))
+                                                                      ? theme.primaryColor.withValues(alpha: 0.20)
+                                                                      : theme.primaryColor.withValues(alpha: 0.15))
                                                                   : (highlightColor != null
-                                                                      ? highlightColor.withValues(alpha: isDark ? 0.35 : 0.25)
+                                                                      ? highlightColor.withValues(alpha: 0.35)
                                                                       : Colors.transparent)),
                                                           borderRadius: BorderRadius.circular(12),
+                                                          border: (isSelected && highlightColor != null)
+                                                              ? Border.all(color: theme.primaryColor.withValues(alpha: 0.5), width: 1.5)
+                                                              : Border.all(color: Colors.transparent, width: 1.5),
                                                         ),
                                                         child: _buildNormalVerse(
                                                           verse,
@@ -855,35 +860,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                                           isRedLetterEnabled: readSettings.isRedLetterEnabled,
                                                         ),
                                                       ),
-                                                      // Left accent bar — only visible when selected or highlighted
-                                                      if (isSelected || highlightColor != null)
-                                                        Positioned(
-                                                          left: 4,
-                                                          top: 10,
-                                                          bottom: 10,
-                                                          child: Container(
-                                                            width: 4.0,
-                                                            decoration: BoxDecoration(
-                                                              borderRadius: BorderRadius.circular(4),
-                                                              gradient: LinearGradient(
-                                                                begin: Alignment.topCenter,
-                                                                end: Alignment.bottomCenter,
-                                                                colors: [
-                                                                  (isSelected ? theme.primaryColor : highlightColor!).withValues(alpha: 0.3),
-                                                                  (isSelected ? theme.primaryColor : highlightColor!),
-                                                                  (isSelected ? theme.primaryColor : highlightColor!).withValues(alpha: 0.3),
-                                                                ],
-                                                              ),
-                                                              boxShadow: [
-                                                                BoxShadow(
-                                                                  color: (isSelected ? theme.primaryColor : highlightColor!).withValues(alpha: 0.2),
-                                                                  blurRadius: 4,
-                                                                  offset: const Offset(1, 0),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        ),
                                                     ],
                                                   ),
                                                 );
@@ -2659,6 +2635,11 @@ class VerseActionLogic {
     if (kHighlightDebug) {
       debugPrint('[HIGHLIGHT_DEBUG] WRITE handleHighlight: canonicalBookName=$canonicalBookName, chapterNum=$chapterNum, targetVerses=$targetVerses, activeIndex=$activeIndex');
     }
+    bool isRemoving = targetVerses.every((v) {
+      final refStr = generateVerseKey(canonicalBookName, chapterNum, v);
+      return ref.read(highlightsProvider)[refStr] == activeIndex;
+    });
+
     for (var v in targetVerses) {
       final refStr = generateVerseKey(canonicalBookName, chapterNum, v);
       if (kHighlightDebug) {
@@ -2669,7 +2650,8 @@ class VerseActionLogic {
     if (kHighlightDebug) {
       debugPrint('[HIGHLIGHT_DEBUG] MAP after write: ${ref.read(highlightsProvider)}');
     }
-    _showFeedback(context, theme, '${targetVerses.length} verse(s) highlighted');
+    final count = targetVerses.length;
+    _showFeedback(context, theme, isRemoving ? '$count Highlight(s) removed' : '$count verse(s) highlighted');
   }
 
   static void handleBookmark(BuildContext context, ThemeData theme, WidgetRef ref, String canonicalBookName, int chapterNum, List<int> targetVerses) {
@@ -2685,10 +2667,10 @@ class VerseActionLogic {
     _showFeedback(context, theme, isAllBookmarked ? '${targetVerses.length} verse(s) removed from bookmarks' : '${targetVerses.length} verse(s) bookmarked!');
   }
 
-  static void handleNote(BuildContext context, WidgetRef ref, ThemeData theme, String bookName, int chapterNum, List<int> targetVerses) {
+  static Future<void> handleNote(BuildContext context, WidgetRef ref, ThemeData theme, String bookName, int chapterNum, List<int> targetVerses) async {
     final sorted = targetVerses.toList()..sort();
     final refStr = '$bookName $chapterNum:${sorted.join(', ')}';
-    showAddNoteSheet(context, ref, theme, initialReference: refStr);
+    await showAddNoteSheet(context, ref, theme, initialReference: refStr);
   }
 
   static dynamic getChapterData(WidgetRef ref, String bookName, int chapterNum) {
@@ -2738,14 +2720,14 @@ class VerseActionLogic {
     );
   }
 
-  static void handleShare(BuildContext context, WidgetRef ref, String bookName, int chapterNum, List<int> targetVerses) {
+  static Future<void> handleShare(BuildContext context, WidgetRef ref, String bookName, int chapterNum, List<int> targetVerses) async {
     final chapterData = getChapterData(ref, bookName, chapterNum);
     final text = ShareService.formatVerses(
         bookName: bookName,
         chapterNumber: chapterNum,
         verseNumbers: targetVerses,
         chapterData: chapterData);
-    ShareService.shareText(body: text);
+    await ShareService.shareText(body: text);
   }
 }
 
@@ -2794,6 +2776,12 @@ class _VerseContextMenuContentState extends ConsumerState<VerseContextMenuConten
           ),
         );
       });
+    });
+
+    ref.listen(readSelectionProvider, (previous, next) {
+      if (previous != null && previous.isNotEmpty && next.isEmpty) {
+        widget.onDismiss();
+      }
     });
 
     final verseKey = generateVerseKey(widget.bookAbbrev, widget.chapterNum, widget.verseNumber);
@@ -2892,7 +2880,9 @@ class _VerseContextMenuContentState extends ConsumerState<VerseContextMenuConten
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  '${widget.bookName} ${widget.chapterNum}:${widget.verseNumber}',
+                  selectedVerses.isNotEmpty 
+                      ? '${selectedVerses.length} verse${selectedVerses.length > 1 ? 's' : ''} selected' 
+                      : '${widget.bookName} ${widget.chapterNum}:${widget.verseNumber}',
                   style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, color: theme.textTheme.titleSmall?.color?.withValues(alpha: 0.7)),
                 ),
                 const SizedBox(height: 20),

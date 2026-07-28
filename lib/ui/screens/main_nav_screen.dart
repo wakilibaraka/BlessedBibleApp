@@ -590,6 +590,7 @@ class MainNavScreen extends ConsumerWidget {
                   : theme.colorScheme.onSurface,
               () {
                 VerseActionLogic.handleBookmark(context, theme, ref, readLoc.bookName, readLoc.chapter, selectedVerses.toList());
+                ref.read(readSelectionProvider.notifier).clear();
               },
             ),
             _buildActionIcon(
@@ -598,14 +599,16 @@ class MainNavScreen extends ConsumerWidget {
               theme.colorScheme.onSurface,
               () {
                 VerseActionLogic.handleCopy(context, ref, readLoc.bookName, readLoc.chapter, selectedVerses.toList());
+                ref.read(readSelectionProvider.notifier).clear();
               },
             ),
             _buildActionIcon(
               Icons.note_add_outlined,
               'Note',
               theme.colorScheme.onSurface,
-              () {
-                VerseActionLogic.handleNote(context, ref, theme, readLoc.bookName, readLoc.chapter, selectedVerses.toList());
+              () async {
+                await VerseActionLogic.handleNote(context, ref, theme, readLoc.bookName, readLoc.chapter, selectedVerses.toList());
+                ref.read(readSelectionProvider.notifier).clear();
               },
             ),
             _buildActionIcon(
@@ -620,8 +623,9 @@ class MainNavScreen extends ConsumerWidget {
               Icons.ios_share_rounded,
               'Share',
               theme.colorScheme.onSurface,
-              () {
-                VerseActionLogic.handleShare(context, ref, readLoc.bookName, readLoc.chapter, selectedVerses.toList());
+              () async {
+                await VerseActionLogic.handleShare(context, ref, readLoc.bookName, readLoc.chapter, selectedVerses.toList());
+                ref.read(readSelectionProvider.notifier).clear();
               },
             ),
             if (showCloseIcon)
@@ -728,7 +732,10 @@ class MainNavScreen extends ConsumerWidget {
             navIcon: Icons.home_outlined, navActiveIcon: Icons.home, navLabel: 'Home', navIndex: 0, currentIndex: currentIndex,
             actionIcon: isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_border_rounded, actionLabel: 'Bookmark',
             actionColor: isBookmarked ? theme.primaryColor : actionIconColor,
-            onActionTap: () => VerseActionLogic.handleBookmark(context, theme, ref, bookName, chapterNum, targetVerses),
+            onActionTap: () {
+              VerseActionLogic.handleBookmark(context, theme, ref, bookName, chapterNum, targetVerses);
+              ref.read(readSelectionProvider.notifier).clear();
+            },
           ),
           _buildMorphingSlot(
             context, ref,
@@ -736,7 +743,10 @@ class MainNavScreen extends ConsumerWidget {
             navIcon: Icons.menu_book_outlined, navActiveIcon: Icons.menu_book, navLabel: 'Read', navIndex: 1, currentIndex: currentIndex,
             actionIcon: Icons.edit_document, actionLabel: 'Notes',
             actionColor: actionIconColor,
-            onActionTap: () => VerseActionLogic.handleNote(context, ref, theme, bookName, chapterNum, targetVerses),
+            onActionTap: () async {
+              await VerseActionLogic.handleNote(context, ref, theme, bookName, chapterNum, targetVerses);
+              ref.read(readSelectionProvider.notifier).clear();
+            },
           ),
           _buildMorphingSlot(
             context, ref,
@@ -748,6 +758,7 @@ class MainNavScreen extends ConsumerWidget {
               final primaryColorIndex = readSettings.primaryHighlightColorIndex;
               final activeIndex = (primaryColorIndex >= 0 && primaryColorIndex < highlightPalette.length) ? primaryColorIndex : 2;
               VerseActionLogic.handleHighlight(context, theme, ref, bookName, chapterNum, targetVerses, activeIndex);
+              ref.read(readSelectionProvider.notifier).clear();
             },
             onActionLongPress: () {
               showDialog(
@@ -771,7 +782,10 @@ class MainNavScreen extends ConsumerWidget {
             navIcon: Icons.search, navActiveIcon: Icons.search, navLabel: 'Search', navIndex: 2, currentIndex: currentIndex,
             actionIcon: Icons.ios_share_rounded, actionLabel: 'Share',
             actionColor: actionIconColor,
-            onActionTap: () => VerseActionLogic.handleShare(context, ref, bookName, chapterNum, targetVerses),
+            onActionTap: () async {
+              await VerseActionLogic.handleShare(context, ref, bookName, chapterNum, targetVerses);
+              ref.read(readSelectionProvider.notifier).clear();
+            },
           ),
         ],
       ),
@@ -815,8 +829,9 @@ class MainNavScreen extends ConsumerWidget {
 
   Widget _buildColorDotRow(BuildContext context, WidgetRef ref, {List<int>? displayOrder}) {
     final theme = Theme.of(context);
-    final readSettings = ref.watch(readSettingsProvider);
-    final activeIndex = readSettings.activeHighlightColorIndex;
+    final readLoc = ref.watch(readLocationProvider);
+    final selectedVerses = ref.watch(readSelectionProvider);
+    final highlights = ref.watch(highlightsProvider);
     final order = displayOrder ?? List.generate(highlightPalette.length, (i) => i);
 
     return Padding(
@@ -826,17 +841,22 @@ class MainNavScreen extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: List.generate(order.length, (i) {
           final paletteIndex = order[i];
+          final allHaveThisColor = selectedVerses.isNotEmpty && selectedVerses.every((v) {
+            final refStr = generateVerseKey(readLoc.bookName, readLoc.chapter, v);
+            return highlights.containsKey(refStr) && highlights[refStr] == paletteIndex;
+          });
+
           return _buildColorDot(
             AppColors.getRenderedHighlightColor(highlightPalette[paletteIndex], theme.brightness, theme.scaffoldBackgroundColor),
-            isSelected: paletteIndex == activeIndex,
+            isSelected: allHaveThisColor,
             onTap: () {
               Future(() {
                 if (!context.mounted) return;
                 ref.read(readSettingsProvider.notifier).setActiveHighlightColorIndex(paletteIndex);
                 
-                final readLoc = ref.read(readLocationProvider);
                 final targetVerses = ref.read(readSelectionProvider).toList();
                 VerseActionLogic.handleHighlight(context, theme, ref, readLoc.bookName, readLoc.chapter, targetVerses, paletteIndex);
+                ref.read(readSelectionProvider.notifier).clear();
               });
             },
           );

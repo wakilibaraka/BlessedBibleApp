@@ -138,9 +138,7 @@ class NotificationService {
     DateTime? sunset = SunsetCalculator.getSunset(lat, lng, friday);
     
     // If no sunset (extreme latitudes), default to 6:00 PM
-    if (sunset == null) {
-      sunset = DateTime(friday.year, friday.month, friday.day, 18, 0);
-    }
+    sunset ??= DateTime(friday.year, friday.month, friday.day, 18, 0);
     
     if (sunset.isBefore(now)) {
       // If sunset already passed today, schedule for next Friday

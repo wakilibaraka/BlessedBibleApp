@@ -38,7 +38,7 @@ class AppColors {
   /// Helper to ensure highlight colors render beautifully and with adequate WCAG AA contrast against specific backgrounds.
   /// For example, the default yellow highlight clashes with the Sepia/Cream backgrounds.
   static Color getRenderedHighlightColor(Color baseColor, Brightness brightness, Color scaffoldBackgroundColor) {
-    if (baseColor == Colors.yellow) {
+    if (baseColor == const Color(0xFFFEF08A)) {
       if (scaffoldBackgroundColor == sepiaBackground || scaffoldBackgroundColor == warmGoldBackground) {
         return Colors.amber.shade700; // Deeper, more saturated yellow-gold for sepia themes
       }
