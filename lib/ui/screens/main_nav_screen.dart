@@ -53,11 +53,52 @@ class MainNavScreen extends ConsumerWidget {
 
     final appThemeMode = ref.watch(themeProvider);
 
-    return Scaffold(
-      extendBody: true,
-      body: Stack(
-        children: [
-          IndexedStack(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        
+        final selectedVerses = ref.read(readSelectionProvider);
+        if (selectedVerses.isNotEmpty) {
+          ref.read(readSelectionProvider.notifier).clear();
+          return;
+        }
+
+        if (currentIndex != 0) {
+          _changeTab(0, ref, context);
+          return;
+        }
+
+        final shouldExit = await showDialog<bool>(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('Exit The Blessed Bible?'),
+              content: const Text('Are you sure you want to exit the app?'),
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text('Cancel', style: TextStyle(color: Theme.of(context).primaryColor)),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: Text('Exit', style: TextStyle(color: Theme.of(context).primaryColor)),
+                ),
+              ],
+            );
+          },
+        );
+        
+        if (shouldExit == true) {
+          SystemNavigator.pop();
+        }
+      },
+      child: Scaffold(
+        extendBody: true,
+        body: Stack(
+          children: [
+            IndexedStack(
             index: currentIndex,
             children: screens.asMap().entries.map((entry) {
               return Stack(
@@ -110,10 +151,37 @@ class MainNavScreen extends ConsumerWidget {
                           opacity: effectiveNavHidden ? 0.0 : 1.0,
                           child: IgnorePointer(
                             ignoring: effectiveNavHidden,
-                            child: _buildGlassWrapper(
-                              key: const ValueKey('unified_bar_container'),
-                              dockMaxWidth: dockMaxWidth,
-                              child: _buildUnifiedDockContent(context, ref, Theme.of(context), currentIndex, isRaindropAction, isMinimalAction),
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              alignment: Alignment.bottomCenter,
+                              children: [
+                                _buildGlassWrapper(
+                                  key: const ValueKey('unified_bar_container'),
+                                  dockMaxWidth: dockMaxWidth,
+                                  child: _buildUnifiedDockContent(context, ref, Theme.of(context), currentIndex, isRaindropAction, isMinimalAction),
+                                ),
+                                if ((isMinimalAction || isRaindropAction) && selectedVerses.isNotEmpty)
+                                  Positioned(
+                                    top: -18,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.9),
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(color: Theme.of(context).primaryColor.withValues(alpha: 0.2)),
+                                      ),
+                                      child: Text(
+                                        selectedVerses.length == 1 ? '1 verse selected' : '${selectedVerses.length} verses selected',
+                                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                          color: Theme.of(context).primaryColor,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 10,
+                                          letterSpacing: 0.2,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
                           ),
                         ),
@@ -341,7 +409,7 @@ class MainNavScreen extends ConsumerWidget {
           },
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildFabIcon(

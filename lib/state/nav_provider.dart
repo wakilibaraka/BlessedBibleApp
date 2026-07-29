@@ -5,8 +5,8 @@ class NavNotifier extends Notifier<int> {
   @override
   int build() {
     // 0 = Home, 1 = Read, 2 = Search, 3 = Study, 4 = Settings
-    // First ever launch defaults to 0 (Home tab)
-    return ref.watch(preferencesProvider).getLastTab() ?? 0;
+    // On app launch, use the default start tab from settings (defaults to 0: Home)
+    return ref.watch(preferencesProvider).getDefaultStartTab();
   }
 
   void setIndex(int index) {

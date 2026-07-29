@@ -2856,7 +2856,7 @@ class _VerseContextMenuContentState extends ConsumerState<VerseContextMenuConten
           padding: i == 0 ? EdgeInsets.zero : const EdgeInsets.only(left: 8.0),
           child: _ContextMenuButton(
             icon: Icons.circle,
-            label: 'Color ${i + 1}',
+            label: highlightPaletteNames[i],
             color: AppColors.getRenderedHighlightColor(highlightPalette[i], Theme.of(context).brightness, Theme.of(context).scaffoldBackgroundColor),
             onTap: () {
               ref.read(readSettingsProvider.notifier).setActiveHighlightColorIndex(i);

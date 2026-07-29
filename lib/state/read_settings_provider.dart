@@ -16,6 +16,7 @@ class ReadSettingsState {
   final bool isRedLetterEnabled;
   final bool showVerseNumbers;
   final bool keepScreenAwake;
+  final int defaultStartTab; // 0=Home, 1=Read, 2=Search, 3=Study
 
   const ReadSettingsState({
     this.readingViewMode = ReadingViewMode.immersive,
@@ -28,6 +29,7 @@ class ReadSettingsState {
     this.isRedLetterEnabled = true,
     this.showVerseNumbers = true,
     this.keepScreenAwake = false,
+    this.defaultStartTab = 0,
   });
 
   ReadSettingsState copyWith({
@@ -41,6 +43,7 @@ class ReadSettingsState {
     bool? isRedLetterEnabled,
     bool? showVerseNumbers,
     bool? keepScreenAwake,
+    int? defaultStartTab,
   }) {
     return ReadSettingsState(
       readingViewMode: readingViewMode ?? this.readingViewMode,
@@ -53,6 +56,7 @@ class ReadSettingsState {
       isRedLetterEnabled: isRedLetterEnabled ?? this.isRedLetterEnabled,
       showVerseNumbers: showVerseNumbers ?? this.showVerseNumbers,
       keepScreenAwake: keepScreenAwake ?? this.keepScreenAwake,
+      defaultStartTab: defaultStartTab ?? this.defaultStartTab,
     );
   }
 
@@ -85,6 +89,7 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     final isRedLetterEnabled = prefs.getBool('red_letter_enabled') ?? true;
     final showVerseNumbers = prefs.getBool('show_verse_numbers') ?? true;
     final keepScreenAwake = prefs.getBool('keep_screen_awake') ?? false;
+    final defaultStartTab = prefs.getInt('default_start_tab') ?? 0;
     
     ReadingViewMode mode = ReadingViewMode.immersive;
     if (modeString != null) {
@@ -119,8 +124,9 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
       secondaryHighlightColorIndex: secondaryHighlightIndex ?? 1,
       isManualNavHidden: isManualNavHidden,
       isRedLetterEnabled: isRedLetterEnabled,
-        showVerseNumbers: showVerseNumbers,
-        keepScreenAwake: keepScreenAwake,
+      showVerseNumbers: showVerseNumbers,
+      keepScreenAwake: keepScreenAwake,
+      defaultStartTab: defaultStartTab,
     );
   }
 
@@ -181,10 +187,16 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     await prefs.setBool('show_verse_numbers', val);
   }
 
-  Future<void> setKeepScreenAwake(bool val) async {
-    state = state.copyWith(keepScreenAwake: val);
+  Future<void> setKeepScreenAwake(bool value) async {
+    state = state.copyWith(keepScreenAwake: value);
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('keep_screen_awake', val);
+    await prefs.setBool('keep_screen_awake', value);
+  }
+
+  Future<void> setDefaultStartTab(int index) async {
+    state = state.copyWith(defaultStartTab: index);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('default_start_tab', index);
   }
 }
 

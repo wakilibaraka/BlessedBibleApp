@@ -70,6 +70,24 @@ class SettingsScreen extends StatelessWidget {
                 },
               );
             }),
+            Consumer(builder: (context, ref, _) {
+              final defaultStartTab = ref.watch(readSettingsProvider.select((s) => s.defaultStartTab));
+              return _AnimatedSegmentedTile<int>(
+                title: 'Default start page',
+                subtitle: 'Choose which page the app opens to on launch',
+                selectedValue: defaultStartTab,
+                options: const [
+                  MapEntry(0, 'Home'),
+                  MapEntry(1, 'Read'),
+                  MapEntry(3, 'Study'),
+                  MapEntry(2, 'Search'),
+                ],
+                onChanged: (val) {
+                  HapticFeedback.selectionClick();
+                  ref.read(readSettingsProvider.notifier).setDefaultStartTab(val);
+                },
+              );
+            }),
           ]),
           
           _buildSection(context, 'Reading', [
@@ -181,21 +199,32 @@ class SettingsScreen extends StatelessWidget {
                           
                           final isSelected = i == selectedIndex;
                           
-                          return GestureDetector(
-                            onTap: () => onChanged(i),
-                            child: Container(
-                              margin: const EdgeInsets.only(right: 12),
-                              width: 32,
-                              height: 32,
-                              decoration: BoxDecoration(
-                                color: color,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: isSelected ? Theme.of(context).primaryColor : Colors.black12,
-                                  width: isSelected ? 2 : 1,
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 12),
+                            child: Column(
+                              children: [
+                                GestureDetector(
+                                  onTap: () => onChanged(i),
+                                  child: Container(
+                                    width: 32,
+                                    height: 32,
+                                    decoration: BoxDecoration(
+                                      color: color,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: isSelected ? Theme.of(context).primaryColor : Colors.black12,
+                                        width: isSelected ? 2 : 1,
+                                      ),
+                                    ),
+                                    child: isSelected ? Icon(Icons.check, size: 16, color: Theme.of(context).primaryColor) : null,
+                                  ),
                                 ),
-                              ),
-                              child: isSelected ? Icon(Icons.check, size: 16, color: Theme.of(context).primaryColor) : null,
+                                const SizedBox(height: 4),
+                                Text(
+                                  highlightPaletteNames[i],
+                                  style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 10, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
+                                ),
+                              ],
                             ),
                           );
                         }),

@@ -10,11 +10,19 @@ String generateVerseKey(String bookAbbrev, int chapterNum, int verseNum) {
 }
 
 const List<Color> highlightPalette = [
-  Color(0xFFFEF08A), // Yellow pastel
+  Color(0xFFE9D5FF), // Purple pastel
   Color(0xFFBBF7D0), // Green pastel
   Color(0xFFBAE6FD), // Blue pastel
   Color(0xFFFBCFE8), // Pink pastel
-  Color(0xFFFED7AA), // Orange pastel
+  Color(0xFFFECACA), // Red pastel
+];
+
+const List<String> highlightPaletteNames = [
+  'Purple',
+  'Green',
+  'Blue',
+  'Pink',
+  'Red',
 ];
 
 class BookmarksNotifier extends Notifier<Set<String>> {

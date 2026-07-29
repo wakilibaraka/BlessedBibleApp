@@ -20,6 +20,7 @@ class PreferencesService {
   static const String _streakCountKey = 'streak_count';
   static const String _lastReadDateKey = 'last_read_date';
   static const String _redLetterEnabledKey = 'red_letter_enabled';
+  static const String _defaultStartTabKey = 'default_start_tab';
 
   // Reminder settings
   static const String _sabbathReminderEnabledKey = 'sabbath_reminder_enabled';
@@ -95,6 +96,14 @@ class PreferencesService {
 
   int? getLastTab() {
     return prefs.getInt(_lastTabKey);
+  }
+
+  void saveDefaultStartTab(int index) {
+    prefs.setInt(_defaultStartTabKey, index);
+  }
+
+  int getDefaultStartTab() {
+    return prefs.getInt(_defaultStartTabKey) ?? 0;
   }
 
   void saveLastReadLocation({
