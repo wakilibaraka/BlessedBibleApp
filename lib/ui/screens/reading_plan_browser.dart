@@ -6,6 +6,7 @@ import 'package:confetti/confetti.dart';
 import '../../state/reading_plan_provider.dart';
 import '../../theme/app_colors.dart';
 import '../widgets/shared_app_bar.dart';
+import 'plan_reader_screen.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HELPERS
@@ -954,7 +955,15 @@ class _DayViewState extends ConsumerState<DayView> with TickerProviderStateMixin
                           borderRadius: BorderRadius.circular(12),
                           child: InkWell(
                             onTap: () {
-                              debugPrint('TODO: open passage ${passage.label} in Step 2c');
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => PlanReaderScreen(
+                                    dayNum: _currentDayNum,
+                                    initialPassageIndex: entry.key,
+                                  ),
+                                ),
+                              );
                             },
                             borderRadius: BorderRadius.circular(12),
                             child: Container(
