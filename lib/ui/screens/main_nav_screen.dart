@@ -207,6 +207,10 @@ class MainNavScreen extends ConsumerWidget {
                                 // Expand bounds to catch Top Pill hits
                                 if (isClassicAction)
                                   SizedBox(width: 250, height: height + 70),
+                                  
+                                // Expand bounds to catch Raindrop Vertical Pill hits
+                                if (isRaindropAction)
+                                  SizedBox(width: kBottomDockHeight, height: 260),
 
                                 // ── Raindrop Vertical Pill ──
                                 if (isRaindropAction)
@@ -635,7 +639,7 @@ class MainNavScreen extends ConsumerWidget {
 
     return Padding(
       key: const ValueKey('action_menu_icons'),
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      padding: const EdgeInsets.symmetric(vertical: 12.0),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -654,7 +658,7 @@ class MainNavScreen extends ConsumerWidget {
                 ref.read(readSelectionProvider.notifier).clear();
               },
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 2),
             _buildActionIcon(
               Icons.copy_rounded,
               'Copy',
@@ -664,7 +668,7 @@ class MainNavScreen extends ConsumerWidget {
                 ref.read(readSelectionProvider.notifier).clear();
               },
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 2),
             _buildActionIcon(
               Icons.note_add_outlined,
               'Note',
@@ -674,7 +678,7 @@ class MainNavScreen extends ConsumerWidget {
                 ref.read(readSelectionProvider.notifier).clear();
               },
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 2),
             _buildActionIcon(
               Icons.lightbulb_outline_rounded,
               'Commentary',
@@ -683,7 +687,7 @@ class MainNavScreen extends ConsumerWidget {
                 VerseActionLogic.handleCommentary(context, ref, readLoc.bookName, readLoc.chapter, 1, selectedVerses.toList());
               },
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 2),
             _buildActionIcon(
               Icons.ios_share_rounded,
               'Share',
@@ -694,7 +698,7 @@ class MainNavScreen extends ConsumerWidget {
               },
             ),
             if (showCloseIcon) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: 2),
               IconButton(
                 icon: const Icon(Icons.close_rounded, size: 20),
                 padding: EdgeInsets.zero,

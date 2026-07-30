@@ -44,7 +44,7 @@ class _ActionIconState extends State<ActionIcon> {
         onLongPress: widget.onLongPress,
         radius: 24,
         child: Container(
-          constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+          constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
           alignment: Alignment.center,
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 200),
