@@ -7,6 +7,7 @@ import '../../state/reading_plan_provider.dart';
 import '../../theme/app_colors.dart';
 import '../widgets/shared_app_bar.dart';
 import 'plan_reader_screen.dart';
+import '../../state/streak_provider.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HELPERS
@@ -124,6 +125,47 @@ Map<String, int> _buildDateToReadingMap(ReadingPlanState s) {
     d = d.add(const Duration(days: 1));
   }
   return map;
+}
+
+const _restDayReflections = [
+  {"prompt": "Reflect on God's peace today.", "verse": "Be still, and know that I am God.", "reference": "Psalm 46:10"},
+  {"prompt": "Find rest in Him.", "verse": "Come unto me, all ye that labour and are heavy laden, and I will give you rest.", "reference": "Matthew 11:28"},
+  {"prompt": "Trust in His provision.", "verse": "The LORD is my shepherd; I shall not want.", "reference": "Psalm 23:1"},
+  {"prompt": "Renew your strength.", "verse": "But they that wait upon the LORD shall renew their strength; they shall mount up with wings as eagles...", "reference": "Isaiah 40:31"},
+  {"prompt": "Remember His mercies.", "verse": "It is of the LORD's mercies that we are not consumed, because his compassions fail not. They are new every morning: great is thy faithfulness.", "reference": "Lamentations 3:22-23"},
+  {"prompt": "Rest your soul.", "verse": "Return unto thy rest, O my soul; for the LORD hath dealt bountifully with thee.", "reference": "Psalm 116:7"},
+  {"prompt": "Cast your cares.", "verse": "Casting all your care upon him; for he careth for you.", "reference": "1 Peter 5:7"},
+  {"prompt": "Abide in peace.", "verse": "Peace I leave with you, my peace I give unto you...", "reference": "John 14:27"},
+  {"prompt": "Rejoice in today.", "verse": "This is the day which the LORD hath made; we will rejoice and be glad in it.", "reference": "Psalm 118:24"},
+  {"prompt": "Wait patiently.", "verse": "Rest in the LORD, and wait patiently for him...", "reference": "Psalm 37:7"},
+  {"prompt": "He is our refuge.", "verse": "God is our refuge and strength, a very present help in trouble.", "reference": "Psalm 46:1"},
+  {"prompt": "Dwell in safety.", "verse": "I will both lay me down in peace, and sleep: for thou, LORD, only makest me dwell in safety.", "reference": "Psalm 4:8"},
+]; // TODO: replace with curated content file
+
+int _logicalDayForReadingDay(int readingDay, ReadingPlanState s) {
+  if (s.paceMode != 'scheduled' || s.restDay == null || s.planStartedOn == null) return readingDay;
+  final date = _dateForReadingDay(s.planStartedOn!, readingDay, s.restDay);
+  return date.difference(DateTime.utc(s.planStartedOn!.year, s.planStartedOn!.month, s.planStartedOn!.day)).inDays + 1;
+}
+
+int _totalLogicalDays(ReadingPlanState s) {
+  if (s.paceMode != 'scheduled' || s.restDay == null || s.planStartedOn == null) return s.planData.length;
+  final date = _dateForReadingDay(s.planStartedOn!, s.planData.length, s.restDay);
+  return date.difference(DateTime.utc(s.planStartedOn!.year, s.planStartedOn!.month, s.planStartedOn!.day)).inDays + 1;
+}
+
+int? _readingDayForLogicalDay(int logicalDay, ReadingPlanState s) {
+  if (s.paceMode != 'scheduled' || s.restDay == null || s.planStartedOn == null) return logicalDay;
+  final d = DateTime.utc(s.planStartedOn!.year, s.planStartedOn!.month, s.planStartedOn!.day).add(Duration(days: logicalDay - 1));
+  if (appWeekday(d) == s.restDay) return null; // Rest day
+  
+  int readingDay = 0;
+  DateTime curr = DateTime.utc(s.planStartedOn!.year, s.planStartedOn!.month, s.planStartedOn!.day);
+  for (int i = 0; i < logicalDay; i++) {
+    if (appWeekday(curr) != s.restDay) readingDay++;
+    curr = curr.add(const Duration(days: 1));
+  }
+  return readingDay;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -835,12 +877,15 @@ class _DayViewState extends ConsumerState<DayView> with TickerProviderStateMixin
   late AnimationController _glowController;
   late Animation<double> _glowAnimation;
   late ConfettiController _confettiController;
-  late int _currentDayNum;
+  late int _currentLogicalDay;
+  late int _totalLogicalDaysCount;
 
   @override
   void initState() {
     super.initState();
-    _currentDayNum = widget.dayNum;
+    final planState = ref.read(readingPlanProvider);
+    _currentLogicalDay = _logicalDayForReadingDay(widget.dayNum, planState);
+    _totalLogicalDaysCount = _totalLogicalDays(planState);
     _glowController = AnimationController(vsync: this, duration: const Duration(milliseconds: 400));
     _glowAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _glowController, curve: Curves.easeOut));
     _confettiController = ConfettiController(duration: const Duration(seconds: 3));
@@ -854,29 +899,28 @@ class _DayViewState extends ConsumerState<DayView> with TickerProviderStateMixin
   }
 
   void _nextDay() {
-    final maxDay = ref.read(readingPlanProvider).planData.length;
-    if (_currentDayNum < maxDay) {
+    if (_currentLogicalDay < _totalLogicalDaysCount) {
       HapticFeedback.lightImpact();
       _glowController.reset();
-      setState(() => _currentDayNum++);
+      setState(() => _currentLogicalDay++);
     }
   }
 
   void _prevDay() {
-    if (_currentDayNum > 1) {
+    if (_currentLogicalDay > 1) {
       HapticFeedback.lightImpact();
       _glowController.reset();
-      setState(() => _currentDayNum--);
+      setState(() => _currentLogicalDay--);
     }
   }
 
-  void _toggleDone(bool isDone) {
+  void _toggleDone(bool isDone, int readingDay) {
     if (!isDone) {
       HapticFeedback.mediumImpact();
       _glowController.forward().then((_) => _glowController.reverse());
       
       final previousCompleted = ref.read(readingPlanProvider).completedReadings;
-      ref.read(readingPlanProvider.notifier).markReadingComplete(_currentDayNum);
+      ref.read(readingPlanProvider.notifier).markReadingComplete(readingDay);
       final newCompleted = ref.read(readingPlanProvider).completedReadings;
       final planData = ref.read(readingPlanProvider).planData;
       
@@ -887,34 +931,146 @@ class _DayViewState extends ConsumerState<DayView> with TickerProviderStateMixin
         debugPrint('Celebrations triggered: $celebrations');
       }
     } else {
-      ref.read(readingPlanProvider.notifier).markReadingIncomplete(_currentDayNum);
+      HapticFeedback.lightImpact();
+      ref.read(readingPlanProvider.notifier).markReadingIncomplete(readingDay);
     }
-  }
-
-  String _buildDateHeader(ReadingPlanState s) {
-    if (s.paceMode == 'scheduled' && s.planStartedOn != null) {
-      final d = _dateForReadingDay(s.planStartedOn!, _currentDayNum, s.restDay);
-      return '${_weekdayShort[d.weekday - 1]}, ${_monthNamesShort[d.month - 1]} ${d.day}, ${d.year}';
-    }
-    return 'Reading $_currentDayNum';
   }
 
   @override
   Widget build(BuildContext context) {
     final planState = ref.watch(readingPlanProvider);
-    if (planState.planData.isEmpty || _currentDayNum < 1 || _currentDayNum > planState.planData.length) {
+    if (planState.planData.isEmpty || _currentLogicalDay < 1 || _currentLogicalDay > _totalLogicalDaysCount) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    final dayData = planState.planData[_currentDayNum - 1];
-    final isDone = planState.completedReadings.contains(_currentDayNum);
+    final readingDay = _readingDayForLogicalDay(_currentLogicalDay, planState);
+    final isRestDay = readingDay == null;
     final theme = Theme.of(context);
     final gold = AppColors.goldAccent;
-    final dateHeader = _buildDateHeader(planState);
+
+    final navBar = SafeArea(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              iconSize: 32,
+              padding: const EdgeInsets.all(12),
+              icon: const Icon(Icons.chevron_left_rounded),
+              color: gold,
+              disabledColor: theme.disabledColor,
+              onPressed: _currentLogicalDay > 1 ? _prevDay : null,
+            ),
+            Text(
+              isRestDay ? 'Rest Day' : '${planState.paceMode == 'scheduled' ? 'Reading' : 'Day'} $readingDay of ${planState.planData.length}',
+              style: theme.textTheme.titleMedium?.copyWith(
+                letterSpacing: 0.8,
+                color: gold.withValues(alpha: 0.75),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            IconButton(
+              iconSize: 32,
+              padding: const EdgeInsets.all(12),
+              icon: const Icon(Icons.chevron_right_rounded),
+              color: gold,
+              disabledColor: theme.disabledColor,
+              onPressed: _currentLogicalDay < _totalLogicalDaysCount ? _nextDay : null,
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (isRestDay) {
+      final date = DateTime.utc(planState.planStartedOn!.year, planState.planStartedOn!.month, planState.planStartedOn!.day).add(Duration(days: _currentLogicalDay - 1));
+      final dateHeader = '${_weekdayShort[date.weekday - 1]}, ${_monthNamesShort[date.month - 1]} ${date.day}, ${date.year}';
+      
+      String? weekTitle;
+      final prevReadingDay = _readingDayForLogicalDay(_currentLogicalDay - 1, planState);
+      if (prevReadingDay != null && prevReadingDay >= 1 && prevReadingDay <= planState.planData.length) {
+         weekTitle = planState.planData[prevReadingDay - 1].title;
+      }
+      
+      final weekIndex = ((_currentLogicalDay - 1) / 7).floor();
+      final reflection = _restDayReflections[weekIndex % _restDayReflections.length];
+
+      return Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: SharedAppBar(title: const Text(''), backgroundColor: Colors.transparent, elevation: 0),
+        bottomNavigationBar: navBar,
+        body: GestureDetector(
+          onHorizontalDragEnd: (details) {
+            if (details.primaryVelocity == null) return;
+            if (details.primaryVelocity! < -300) {
+              _nextDay();
+            } else if (details.primaryVelocity! > 300) {
+              _prevDay();
+            }
+          },
+          child: Container(
+            color: theme.scaffoldBackgroundColor,
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(dateHeader, style: theme.textTheme.labelMedium?.copyWith(letterSpacing: 1.1, color: gold.withValues(alpha: 0.8))),
+                const SizedBox(height: 16),
+                const Text('Rest & Reflect', style: TextStyle(fontFamily: 'EB Garamond', fontSize: 32, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                if (weekTitle != null) ...[
+                  const SizedBox(height: 12),
+                  Text("You've journeyed through:\n$weekTitle", textAlign: TextAlign.center, style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
+                ],
+                const SizedBox(height: 48),
+                Text(reflection['prompt']!, style: theme.textTheme.titleMedium?.copyWith(color: gold), textAlign: TextAlign.center),
+                const SizedBox(height: 24),
+                Text('“${reflection['verse']!}”', style: const TextStyle(fontFamily: 'EB Garamond', fontSize: 24, fontStyle: FontStyle.italic, height: 1.3), textAlign: TextAlign.center),
+                const SizedBox(height: 16),
+                Text(reflection['reference']!, style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.5))),
+                const SizedBox(height: 64),
+                
+                OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: gold,
+                    side: BorderSide(color: gold.withValues(alpha: 0.5)),
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  ),
+                  onPressed: () {
+                    HapticFeedback.lightImpact();
+                    ref.read(streakProvider.notifier).markReadToday();
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: const Text('Streak maintained!'),
+                      backgroundColor: gold.withValues(alpha: 0.9),
+                      duration: const Duration(seconds: 2),
+                      behavior: SnackBarBehavior.floating,
+                    ));
+                  },
+                  child: const Text('I reflected today', style: TextStyle(letterSpacing: 1.0)),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    final dayData = planState.planData[readingDay - 1];
+    final isDone = planState.completedReadings.contains(readingDay);
+    
+    String dateHeader = 'Reading $readingDay';
+    if (planState.paceMode == 'scheduled' && planState.planStartedOn != null) {
+      final d = DateTime.utc(planState.planStartedOn!.year, planState.planStartedOn!.month, planState.planStartedOn!.day).add(Duration(days: _currentLogicalDay - 1));
+      dateHeader = '${_weekdayShort[d.weekday - 1]}, ${_monthNamesShort[d.month - 1]} ${d.day}, ${d.year}';
+    }
 
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: SharedAppBar(title: const Text(''), backgroundColor: Colors.transparent, elevation: 0),
+      bottomNavigationBar: navBar,
       body: GestureDetector(
         onHorizontalDragEnd: (details) {
           if (details.primaryVelocity == null) return;
@@ -954,16 +1110,22 @@ class _DayViewState extends ConsumerState<DayView> with TickerProviderStateMixin
                           color: theme.cardColor,
                           borderRadius: BorderRadius.circular(12),
                           child: InkWell(
-                            onTap: () {
-                              Navigator.push(
+                            onTap: () async {
+                              final markedComplete = await Navigator.push<bool>(
                                 context,
                                 MaterialPageRoute(
                                   builder: (_) => PlanReaderScreen(
-                                    dayNum: _currentDayNum,
+                                    dayNum: readingDay,
                                     initialPassageIndex: entry.key,
                                   ),
                                 ),
                               );
+                              if (markedComplete == true && mounted) {
+                                final isDoneNow = ref.read(readingPlanProvider).completedReadings.contains(readingDay);
+                                if (!isDoneNow) {
+                                  _toggleDone(false, readingDay);
+                                }
+                              }
                             },
                             borderRadius: BorderRadius.circular(12),
                             child: Container(
@@ -1020,7 +1182,7 @@ class _DayViewState extends ConsumerState<DayView> with TickerProviderStateMixin
                             padding: const EdgeInsets.symmetric(vertical: 20),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                           ),
-                          onPressed: () => _toggleDone(isDone),
+                          onPressed: () => _toggleDone(isDone, readingDay),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -1055,18 +1217,6 @@ class _DayViewState extends ConsumerState<DayView> with TickerProviderStateMixin
                         ],
                       ),
                     ),
-                    const SizedBox(height: 32),
-                    Center(
-                      child: Text(
-                        '${planState.paceMode == 'scheduled' ? 'Reading' : 'Day'} $_currentDayNum of ${planState.planData.length}',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          letterSpacing: 0.8,
-                          color: gold.withValues(alpha: 0.55),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
                   ],
                 ),
               ),

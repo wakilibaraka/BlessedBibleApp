@@ -1034,28 +1034,49 @@ Positioned(
                 ),
               ),
             // ────────────────────────────────────────────────────────────────
-            if (_contextMenuVerse != null)
-              Positioned.fill(
-                child: Stack(
-                  children: [
-                    GestureDetector(
-                      behavior: HitTestBehavior.translucent,
-                      onTap: _dismissContextMenu,
-                      child: Container(
-                        color: Colors.black.withValues(alpha: 0.1),
+            // ────────────────────────────────────────────────────────────────
+            Positioned.fill(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                switchInCurve: Curves.easeOutCubic,
+                switchOutCurve: Curves.easeInCubic,
+                transitionBuilder: (child, animation) {
+                  if (child.key == const ValueKey('empty')) return const SizedBox.shrink();
+                  return Stack(
+                    children: [
+                      FadeTransition(
+                        opacity: animation,
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onTap: _dismissContextMenu,
+                          child: Container(
+                            color: Colors.black.withValues(alpha: 0.1),
+                          ),
+                        ),
                       ),
-                    ),
-                    VerseContextMenuContent(
-                      verseNumber: _contextMenuVerse!,
-                      chapterData: _contextMenuChapterData,
-                      bookName: _contextMenuBookName!,
-                      chapterNum: _contextMenuChapterNum!,
-                      bookAbbrev: ref.read(readLocationProvider).bookAbbrev,
-                      onDismiss: _dismissContextMenu,
-                    ),
-                  ],
-                ),
+                      SlideTransition(
+                        position: Tween<Offset>(
+                          begin: const Offset(0, 1),
+                          end: Offset.zero,
+                        ).animate(animation),
+                        child: child,
+                      ),
+                    ],
+                  );
+                },
+                child: _contextMenuVerse != null
+                    ? VerseContextMenuContent(
+                        key: ValueKey('content_$_contextMenuVerse'),
+                        verseNumber: _contextMenuVerse!,
+                        chapterData: _contextMenuChapterData,
+                        bookName: _contextMenuBookName!,
+                        chapterNum: _contextMenuChapterNum!,
+                        bookAbbrev: ref.read(readLocationProvider).bookAbbrev,
+                        onDismiss: _dismissContextMenu,
+                      )
+                    : const SizedBox.shrink(key: ValueKey('empty')),
               ),
+            ),
           ],
         ),
           ),
@@ -2631,6 +2652,88 @@ class VerseActionLogic {
     );
   }
 
+  static void showHighlightPaletteModal(BuildContext context, ThemeData theme, WidgetRef ref, String bookName, int chapterNum, List<int> targetVerses, VoidCallback onClearSelection) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Container(
+          margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          decoration: BoxDecoration(
+            color: theme.cardColor,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Choose Highlight Color',
+                  style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: List.generate(highlightPalette.length, (i) {
+                  final color = AppColors.getRenderedHighlightColor(
+                      highlightPaletteSwatches[i], theme.brightness, theme.scaffoldBackgroundColor);
+                  return GestureDetector(
+                    onTap: () {
+                      ref.read(readSettingsProvider.notifier).setActiveHighlightColorIndex(i);
+                      VerseActionLogic.handleHighlight(ctx, theme, ref, bookName, chapterNum, targetVerses, i);
+                      Navigator.of(ctx).pop();
+                      onClearSelection();
+                    },
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: color,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.black.withValues(alpha: 0.2), width: 1.5),
+                            boxShadow: [ BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4, spreadRadius: 1) ],
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(highlightPaletteNames[i],
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                            )),
+                      ],
+                    ),
+                  );
+                }),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  static void handleHighlightInteraction({
+    required BuildContext context,
+    required WidgetRef ref,
+    required ThemeData theme,
+    required String bookName,
+    required int chapterNum,
+    required List<int> targetVerses,
+    required bool isLongPress,
+    required VoidCallback onClearSelection,
+  }) {
+    final primaryIndex = ref.read(readSettingsProvider).primaryHighlightColorIndex;
+    
+    if (primaryIndex == -1 || isLongPress) {
+      showHighlightPaletteModal(context, theme, ref, bookName, chapterNum, targetVerses, onClearSelection);
+    } else {
+      // Guard against invalid array accesses for primaryIndex if it somehow became out of bounds (but not -1)
+      final safeIndex = (primaryIndex >= 0 && primaryIndex < highlightPalette.length) ? primaryIndex : 0;
+      handleHighlight(context, theme, ref, bookName, chapterNum, targetVerses, safeIndex);
+      onClearSelection();
+    }
+  }
+
   static void handleHighlight(BuildContext context, ThemeData theme, WidgetRef ref, String canonicalBookName, int chapterNum, List<int> targetVerses, int activeIndex) {
     if (kHighlightDebug) {
       debugPrint('[HIGHLIGHT_DEBUG] WRITE handleHighlight: canonicalBookName=$canonicalBookName, chapterNum=$chapterNum, targetVerses=$targetVerses, activeIndex=$activeIndex');
@@ -2738,7 +2841,6 @@ class VerseContextMenuContent extends ConsumerStatefulWidget {
   final int chapterNum;
   final String bookAbbrev;
   final VoidCallback onDismiss;
-  final bool initialShowColors;
 
   const VerseContextMenuContent({
     super.key,
@@ -2748,7 +2850,6 @@ class VerseContextMenuContent extends ConsumerStatefulWidget {
     required this.chapterNum,
     required this.bookAbbrev,
     required this.onDismiss,
-    this.initialShowColors = false,
   });
 
   @override
@@ -2756,14 +2857,6 @@ class VerseContextMenuContent extends ConsumerStatefulWidget {
 }
 
 class _VerseContextMenuContentState extends ConsumerState<VerseContextMenuContent> {
-  late bool _showColors;
-
-  @override
-  void initState() {
-    super.initState();
-    _showColors = widget.initialShowColors;
-  }
-
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -2794,10 +2887,7 @@ class _VerseContextMenuContentState extends ConsumerState<VerseContextMenuConten
     final theme = Theme.of(context);
 
     // Default icon row
-    final actionRow = Row(
-      key: const ValueKey('actions'),
-      mainAxisSize: MainAxisSize.min,
-      children: [
+    final actionButtons = [
         _ContextMenuButton(
           icon: isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
           label: isBookmarked ? 'Saved' : 'Bookmark',
@@ -2807,7 +2897,6 @@ class _VerseContextMenuContentState extends ConsumerState<VerseContextMenuConten
             widget.onDismiss();
           }
         ),
-        const SizedBox(width: 8),
         _ContextMenuButton(
           icon: Icons.edit_document,
           label: hasNote ? 'Edit Note' : 'Note',
@@ -2817,7 +2906,6 @@ class _VerseContextMenuContentState extends ConsumerState<VerseContextMenuConten
             VerseActionLogic.handleNote(context, ref, theme, widget.bookName, widget.chapterNum, targetVerses);
           }
         ),
-        const SizedBox(width: 8),
         _ContextMenuButton(
           icon: Icons.copy_rounded,
           label: 'Copy',
@@ -2826,7 +2914,6 @@ class _VerseContextMenuContentState extends ConsumerState<VerseContextMenuConten
             VerseActionLogic.handleCopy(context, ref, widget.bookName, widget.chapterNum, targetVerses);
           }
         ),
-        const SizedBox(width: 8),
         _ContextMenuButton(
           icon: Icons.lightbulb_outline_rounded,
           label: 'Commentary',
@@ -2835,7 +2922,6 @@ class _VerseContextMenuContentState extends ConsumerState<VerseContextMenuConten
             VerseActionLogic.handleCommentary(context, ref, widget.bookName, widget.chapterNum, widget.verseNumber, targetVerses);
           }
         ),
-        const SizedBox(width: 8),
         _ContextMenuButton(
           icon: Icons.ios_share_rounded,
           label: 'Share',
@@ -2844,81 +2930,81 @@ class _VerseContextMenuContentState extends ConsumerState<VerseContextMenuConten
             VerseActionLogic.handleShare(context, ref, widget.bookName, widget.chapterNum, targetVerses);
           }
         ),
-      ],
-    );
+    ];
 
-    // Colors row
-    final colorRow = Row(
-      key: const ValueKey('colors'),
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(highlightPalette.length, (i) {
-        return Padding(
-          padding: i == 0 ? EdgeInsets.zero : const EdgeInsets.only(left: 8.0),
-          child: _ContextMenuButton(
-            icon: Icons.circle,
-            label: highlightPaletteNames[i],
-            color: AppColors.getRenderedHighlightColor(highlightPalette[i], Theme.of(context).brightness, Theme.of(context).scaffoldBackgroundColor),
-            onTap: () {
-              ref.read(readSettingsProvider.notifier).setActiveHighlightColorIndex(i);
-              VerseActionLogic.handleHighlight(context, theme, ref, widget.bookName, widget.chapterNum, targetVerses, i);
-              setState(() => _showColors = false);
-              widget.onDismiss();
-            }
-          ),
-        );
-      }),
-    );
-
-    return Center(
-      child: Material(
-        color: Colors.transparent,
-        child: TexturedGlassContainer(
-          borderRadius: BorderRadius.circular(24),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-            child: Column(
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 24.0, left: 16, right: 16),
+          child: TexturedGlassContainer(
+            borderRadius: BorderRadius.circular(32),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  selectedVerses.isNotEmpty 
-                      ? '${selectedVerses.length} verse${selectedVerses.length > 1 ? 's' : ''} selected' 
-                      : '${widget.bookName} ${widget.chapterNum}:${widget.verseNumber}',
-                  style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, color: theme.textTheme.titleSmall?.color?.withValues(alpha: 0.7)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      selectedVerses.isNotEmpty 
+                          ? '${selectedVerses.length} verse${selectedVerses.length > 1 ? 's' : ''} selected' 
+                          : '${widget.bookName} ${widget.chapterNum}:${widget.verseNumber}',
+                      style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, color: theme.textTheme.titleSmall?.color?.withValues(alpha: 0.7)),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded, size: 20),
+                      onPressed: widget.onDismiss,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 20),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _ContextMenuButton(
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    _ContextMenuButton(
                         icon: Icons.highlight_rounded,
                         label: isHighlighted ? 'Highlighted' : 'Highlight',
                         color: isHighlighted ? Colors.amber.shade600 : null,
                         onTap: () {
-                          final primaryColorIndex = ref.read(readSettingsProvider).primaryHighlightColorIndex;
-                          final activeIndex = (primaryColorIndex >= 0 && primaryColorIndex < 5) ? primaryColorIndex : 2;
-                          VerseActionLogic.handleHighlight(context, theme, ref, widget.bookName, widget.chapterNum, targetVerses, activeIndex);
-                          widget.onDismiss();
+                          VerseActionLogic.handleHighlightInteraction(
+                            context: context,
+                            ref: ref,
+                            theme: theme,
+                            bookName: widget.bookName,
+                            chapterNum: widget.chapterNum,
+                            targetVerses: targetVerses,
+                            isLongPress: false,
+                            onClearSelection: widget.onDismiss,
+                          );
                         },
                         onLongPress: () {
-                          setState(() => _showColors = !_showColors);
+                          VerseActionLogic.handleHighlightInteraction(
+                            context: context,
+                            ref: ref,
+                            theme: theme,
+                            bookName: widget.bookName,
+                            chapterNum: widget.chapterNum,
+                            targetVerses: targetVerses,
+                            isLongPress: true,
+                            onClearSelection: widget.onDismiss,
+                          );
                         }
                       ),
-                      const SizedBox(width: 8),
-                      AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 250),
-                        transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
-                        child: _showColors ? colorRow : actionRow,
-                      ),
+                      ...actionButtons,
                     ],
                   ),
-                ),
               ],
             ),
           ),
         ),
       ),
+    ),
     );
   }
 }

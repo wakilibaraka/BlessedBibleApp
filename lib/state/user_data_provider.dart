@@ -14,7 +14,15 @@ const List<Color> highlightPalette = [
   Color(0xFFBBF7D0), // Green pastel
   Color(0xFFBAE6FD), // Blue pastel
   Color(0xFFFBCFE8), // Pink pastel
-  Color(0xFFFECACA), // Red pastel
+  Color(0xFFDC143C), // Crimson
+];
+
+const List<Color> highlightPaletteSwatches = [
+  Color(0xFFE9D5FF), // Purple pastel
+  Color(0xFFBBF7D0), // Green pastel
+  Color(0xFFBAE6FD), // Blue pastel
+  Color(0xFFFBCFE8), // Pink pastel
+  Color(0xFFFECACA), // Red pastel (used for swatch rendering only)
 ];
 
 const List<String> highlightPaletteNames = [

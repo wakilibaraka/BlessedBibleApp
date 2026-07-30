@@ -230,7 +230,6 @@ class MainNavScreen extends ConsumerWidget {
                                             padding: EdgeInsets.zero,
                                             child: SizedBox(
                                               width: kBottomDockHeight,
-                                              height: 280, // Accommodate 5 icons (56 * 5)
                                               child: _buildActionMenuIcons(context, ref, Theme.of(context), showCloseIcon: false),
                                             ),
                                           ),
@@ -242,7 +241,8 @@ class MainNavScreen extends ConsumerWidget {
                                 // ── Classic Top Pill (Verse + Colors) ──
                                 Positioned(
                                   bottom: height + kBottomDockGap,
-                                  right: 0,
+                                  left: 16,
+                                  right: 16,
                                   child: IgnorePointer(
                                     ignoring: !isClassicAction,
                                     child: BouncyEntrance(
@@ -265,9 +265,10 @@ class MainNavScreen extends ConsumerWidget {
                                             padding: const EdgeInsets.symmetric(
                                                 horizontal: 16.0, vertical: 12.0),
                                             child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                            Text(
+                                              mainAxisSize: MainAxisSize.max,
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Text(
                                               '${selectedVerses.length}',
                                               style: Theme.of(context)
                                                   .textTheme
@@ -281,7 +282,7 @@ class MainNavScreen extends ConsumerWidget {
                                             const SizedBox(width: 12),
                                             ...List.generate(
                                                 highlightPalette.length, (i) {
-                                              final color = AppColors.getRenderedHighlightColor(highlightPalette[i], Theme.of(context).brightness, Theme.of(context).scaffoldBackgroundColor);
+                                              final color = AppColors.getRenderedHighlightColor(highlightPaletteSwatches[i], Theme.of(context).brightness, Theme.of(context).scaffoldBackgroundColor);
                                               final highlights =
                                                   ref.watch(highlightsProvider);
                                               final allHaveThisColor =
@@ -310,8 +311,8 @@ class MainNavScreen extends ConsumerWidget {
                                             }),
                                           ],
                                         ),
-                                        ),
                                       ),
+                                    ),
                                     ],
                                   ),
                                 ),
@@ -600,32 +601,26 @@ class MainNavScreen extends ConsumerWidget {
 
   Widget _buildColorDot(Color color,
       {bool isSelected = false, VoidCallback? onTap}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4.0),
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: onTap,
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Container(
+        width: 32,
+        height: 32,
+        alignment: Alignment.center,
         child: Container(
-          width: 32,
-          height: 32,
-          alignment: Alignment.center,
-          child: Container(
-            width: 20,
-            height: 20,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.8),
-              shape: BoxShape.circle,
-              border:
-                  isSelected ? Border.all(color: Colors.white, width: 2) : null,
-              boxShadow: isSelected
-                  ? [
-                      BoxShadow(
-                          color: color.withValues(alpha: 0.4),
-                          blurRadius: 4,
-                          spreadRadius: 1)
-                    ]
-                  : null,
+          width: 20,
+          height: 20,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.8),
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: isSelected ? Colors.white : Colors.black.withValues(alpha: 0.2), 
+              width: isSelected ? 2 : 1,
             ),
+            boxShadow: isSelected
+                ? [ BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 4, spreadRadius: 2) ]
+                : [ BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4, spreadRadius: 1) ],
           ),
         ),
       ),
@@ -638,14 +633,12 @@ class MainNavScreen extends ConsumerWidget {
     final selectedVerses = ref.watch(readSelectionProvider);
     final bookmarks = ref.watch(bookmarksProvider);
 
-    return SizedBox(
+    return Padding(
       key: const ValueKey('action_menu_icons'),
-      height: showCloseIcon ? 400.0 : 280.0, // Reduced height for Raindrop
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
             _buildActionIcon(
               selectedVerses.every((v) => bookmarks.contains(
                       generateVerseKey(readLoc.bookName, readLoc.chapter, v)))
@@ -661,6 +654,7 @@ class MainNavScreen extends ConsumerWidget {
                 ref.read(readSelectionProvider.notifier).clear();
               },
             ),
+            const SizedBox(height: 8),
             _buildActionIcon(
               Icons.copy_rounded,
               'Copy',
@@ -670,6 +664,7 @@ class MainNavScreen extends ConsumerWidget {
                 ref.read(readSelectionProvider.notifier).clear();
               },
             ),
+            const SizedBox(height: 8),
             _buildActionIcon(
               Icons.note_add_outlined,
               'Note',
@@ -679,6 +674,7 @@ class MainNavScreen extends ConsumerWidget {
                 ref.read(readSelectionProvider.notifier).clear();
               },
             ),
+            const SizedBox(height: 8),
             _buildActionIcon(
               Icons.lightbulb_outline_rounded,
               'Commentary',
@@ -687,6 +683,7 @@ class MainNavScreen extends ConsumerWidget {
                 VerseActionLogic.handleCommentary(context, ref, readLoc.bookName, readLoc.chapter, 1, selectedVerses.toList());
               },
             ),
+            const SizedBox(height: 8),
             _buildActionIcon(
               Icons.ios_share_rounded,
               'Share',
@@ -696,7 +693,8 @@ class MainNavScreen extends ConsumerWidget {
                 ref.read(readSelectionProvider.notifier).clear();
               },
             ),
-            if (showCloseIcon)
+            if (showCloseIcon) ...[
+              const SizedBox(height: 8),
               IconButton(
                 icon: const Icon(Icons.close_rounded, size: 20),
                 padding: EdgeInsets.zero,
@@ -705,9 +703,9 @@ class MainNavScreen extends ConsumerWidget {
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                 onPressed: () => ref.read(readSelectionProvider.notifier).clear(),
               ),
+            ],
           ],
         ),
-      ),
     );
   }
 
@@ -775,7 +773,6 @@ class MainNavScreen extends ConsumerWidget {
     }
 
     final readLoc = ref.watch(readLocationProvider);
-    final readSettings = ref.watch(readSettingsProvider);
     final selectedVerses = ref.watch(readSelectionProvider);
     final targetVerses = selectedVerses.toList();
     final bookmarks = ref.watch(bookmarksProvider);
@@ -823,24 +820,27 @@ class MainNavScreen extends ConsumerWidget {
             actionIcon: Icons.highlight_rounded, actionLabel: 'Highlight',
             actionColor: actionIconColor,
             onActionTap: () {
-              final primaryColorIndex = readSettings.primaryHighlightColorIndex;
-              final activeIndex = (primaryColorIndex >= 0 && primaryColorIndex < highlightPalette.length) ? primaryColorIndex : 2;
-              VerseActionLogic.handleHighlight(context, theme, ref, bookName, chapterNum, targetVerses, activeIndex);
-              ref.read(readSelectionProvider.notifier).clear();
+              VerseActionLogic.handleHighlightInteraction(
+                context: context,
+                ref: ref,
+                theme: theme,
+                bookName: bookName,
+                chapterNum: chapterNum,
+                targetVerses: targetVerses,
+                isLongPress: false,
+                onClearSelection: () => ref.read(readSelectionProvider.notifier).clear(),
+              );
             },
             onActionLongPress: () {
-              showDialog(
+              VerseActionLogic.handleHighlightInteraction(
                 context: context,
-                barrierColor: Colors.black12,
-                builder: (_) => VerseContextMenuContent(
-                  verseNumber: targetVerses.isNotEmpty ? targetVerses.first : 1,
-                  chapterData: null,
-                  bookName: bookName,
-                  chapterNum: chapterNum,
-                  bookAbbrev: readLoc.bookAbbrev,
-                  initialShowColors: true,
-                  onDismiss: () => Navigator.of(context).pop(),
-                ),
+                ref: ref,
+                theme: theme,
+                bookName: bookName,
+                chapterNum: chapterNum,
+                targetVerses: targetVerses,
+                isLongPress: true,
+                onClearSelection: () => ref.read(readSelectionProvider.notifier).clear(),
               );
             }
           ),
@@ -906,7 +906,7 @@ class MainNavScreen extends ConsumerWidget {
       padding: const EdgeInsets.only(left: 16.0, right: 64.0),
       child: Row(
         mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: List.generate(order.length, (i) {
           final paletteIndex = order[i];
           final allHaveThisColor = selectedVerses.isNotEmpty && selectedVerses.every((v) {
@@ -915,7 +915,7 @@ class MainNavScreen extends ConsumerWidget {
           });
 
           return _buildColorDot(
-            AppColors.getRenderedHighlightColor(highlightPalette[paletteIndex], theme.brightness, theme.scaffoldBackgroundColor),
+            AppColors.getRenderedHighlightColor(highlightPaletteSwatches[paletteIndex], theme.brightness, theme.scaffoldBackgroundColor),
             isSelected: allHaveThisColor,
             onTap: () {
               Future(() {

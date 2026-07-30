@@ -193,41 +193,56 @@ class SettingsScreen extends StatelessWidget {
                         Text(subtitle, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
                       ],
                       const SizedBox(height: 12),
-                      Row(
-                        children: List.generate(5, (i) {
-                          final color = AppColors.getRenderedHighlightColor(highlightPalette[i], Theme.of(context).brightness, Theme.of(context).scaffoldBackgroundColor);
-                          
-                          final isSelected = i == selectedIndex;
-                          
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 12),
-                            child: Column(
-                              children: [
-                                GestureDetector(
-                                  onTap: () => onChanged(i),
-                                  child: Container(
-                                    width: 32,
-                                    height: 32,
-                                    decoration: BoxDecoration(
-                                      color: color,
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: isSelected ? Theme.of(context).primaryColor : Colors.black12,
-                                        width: isSelected ? 2 : 1,
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: List.generate(6, (index) {
+                            final i = index - 1;
+                            
+                            Color color;
+                            if (i == -1) {
+                              color = Theme.of(context).cardColor;
+                            } else {
+                              color = AppColors.getRenderedHighlightColor(highlightPaletteSwatches[i], Theme.of(context).brightness, Theme.of(context).scaffoldBackgroundColor);
+                            }
+                            
+                            final isSelected = i == selectedIndex;
+                            
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 12),
+                              child: Column(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () => onChanged(i),
+                                    child: Container(
+                                      width: 32,
+                                      height: 32,
+                                      decoration: BoxDecoration(
+                                        color: color,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: isSelected ? Theme.of(context).primaryColor : (i == -1 ? Theme.of(context).dividerColor : Colors.black.withValues(alpha: 0.2)),
+                                          width: isSelected ? 2 : 1,
+                                        ),
+                                        boxShadow: (isSelected || i == -1)
+                                            ? null
+                                            : [ BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4, spreadRadius: 1) ],
                                       ),
+                                      child: i == -1 
+                                          ? Icon(Icons.question_mark_rounded, size: 16, color: Theme.of(context).colorScheme.onSurface)
+                                          : (isSelected ? Icon(Icons.check, size: 16, color: Theme.of(context).primaryColor) : null),
                                     ),
-                                    child: isSelected ? Icon(Icons.check, size: 16, color: Theme.of(context).primaryColor) : null,
                                   ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  highlightPaletteNames[i],
-                                  style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 10, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
-                                ),
-                              ],
-                            ),
-                          );
-                        }),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    i == -1 ? 'Ask' : highlightPaletteNames[i],
+                                    style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 10, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
+                        ),
                       ),
                     ],
                   ),

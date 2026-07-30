@@ -23,7 +23,7 @@ class ReadSettingsState {
     this.backgroundGlowStyle = BackgroundGlowStyle.top,
     this.verseActionStyle = VerseActionStyle.horizontal,
     this.activeHighlightColorIndex = 2,
-    this.primaryHighlightColorIndex = 2, // Blue
+    this.primaryHighlightColorIndex = -1, // Ask every time
     this.secondaryHighlightColorIndex = 1, // Green
     this.isManualNavHidden = false,
     this.isRedLetterEnabled = true,
@@ -120,7 +120,7 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
       backgroundGlowStyle: glowStyle,
       verseActionStyle: verseStyle,
       activeHighlightColorIndex: activeHighlightIndex ?? 2,
-      primaryHighlightColorIndex: primaryHighlightIndex ?? 2,
+      primaryHighlightColorIndex: primaryHighlightIndex ?? -1,
       secondaryHighlightColorIndex: secondaryHighlightIndex ?? 1,
       isManualNavHidden: isManualNavHidden,
       isRedLetterEnabled: isRedLetterEnabled,

@@ -23,6 +23,7 @@ import '../../data/models/bible_model.dart';
 import '../../state/bible_provider.dart';
 import '../../state/reading_plan_provider.dart';
 import '../../state/read_settings_provider.dart';
+import '../widgets/textured_glass_container.dart';
 import '../../state/typography_provider.dart';
 import '../../state/user_data_provider.dart';
 import '../../state/theme_provider.dart';
@@ -194,8 +195,12 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
 
   void _markReadAndPop() {
     HapticFeedback.mediumImpact();
-    ref.read(readingPlanProvider.notifier).markReadingComplete(widget.dayNum);
-    if (mounted) Navigator.of(context).pop();
+    Navigator.of(context).pop(true);
+  }
+
+  void _unmarkRead() {
+    HapticFeedback.lightImpact();
+    ref.read(readingPlanProvider.notifier).markReadingIncomplete(widget.dayNum);
   }
 
   void _toggleVerseSelection(int verseNum) {
@@ -222,72 +227,6 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
         verseNumber: verseNum,
         verseText: verseText,
       ),
-    );
-  }
-
-  // ── Color palette bottom sheet (highlight bug fix) ─────────────────────────
-  // Root cause: the _VerseActionBar used a single IconButton that called
-  // handleHighlight with a fixed color index — the palette was never shown.
-  // Fix: show a palette sheet with the same colors as the main reader.
-  void _showHighlightPalette(List<int> targetVerses, String bookName, int chapterNum) {
-    final theme = Theme.of(context);
-    final gold = AppColors.goldAccent;
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) {
-        return Container(
-          margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-          decoration: BoxDecoration(
-            color: theme.cardColor,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Choose Highlight Color',
-                  style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: List.generate(highlightPalette.length, (i) {
-                  final color = AppColors.getRenderedHighlightColor(
-                      highlightPalette[i], theme.brightness, theme.scaffoldBackgroundColor);
-                  return GestureDetector(
-                    onTap: () {
-                      ref.read(readSettingsProvider.notifier).setActiveHighlightColorIndex(i);
-                      VerseActionLogic.handleHighlight(ctx, theme, ref, bookName, chapterNum, targetVerses, i);
-                      Navigator.of(ctx).pop();
-                      _clearSelection();
-                    },
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color: color,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: gold.withValues(alpha: 0.3), width: 1.5),
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(highlightPaletteNames[i],
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                            )),
-                      ],
-                    ),
-                  );
-                }),
-              ),
-              const SizedBox(height: 8),
-            ],
-          ),
-        );
-      },
     );
   }
 
@@ -355,7 +294,7 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-                    onPressed: isDone ? null : _markReadAndPop,
+                    onPressed: isDone ? _unmarkRead : _markReadAndPop,
                     child: Text(
                       isDone ? '✓ Completed' : 'Mark as Read',
                       style: const TextStyle(
@@ -387,8 +326,10 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
     );
 
     return Scaffold(
-      body: Column(
+      body: Stack(
         children: [
+          Column(
+            children: [
           // ── Compact top bar ──────────────────────────────────────────────
           Container(
             color: theme.scaffoldBackgroundColor,
@@ -396,109 +337,90 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Passage counter — centered single line
-                if (_passages.length > 1)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 2),
-                    child: Text(
-                      'Passage ${_passageIndex + 1} of ${_passages.length}',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: gold.withValues(alpha: 0.75),
-                        letterSpacing: 1.0,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                // Main row: back | reference+KJV | full-chapter toggle
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                Stack(
+                  alignment: Alignment.center,
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back_rounded, size: 22),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                    Expanded(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.baseline,
-                        textBaseline: TextBaseline.alphabetic,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              passage.label,
-                              style: TextStyle(
-                                fontFamily: 'EB Garamond',
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: theme.textTheme.bodyLarge?.color,
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back_rounded, size: 22),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          onPressed: () => Navigator.of(context).pop(),
+                        ),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                passage.label,
+                                style: TextStyle(
+                                  fontFamily: 'EB Garamond',
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: theme.textTheme.bodyLarge?.color,
+                                  height: 1.1,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                              Text(
+                                'KJV',
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                                  letterSpacing: 1.0,
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'KJV',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
-                              letterSpacing: 1.0,
-                              fontSize: 10,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Full chapter toggle — compact pill
-                    GestureDetector(
-                      onTap: () => setState(() => _showFullChapter = !_showFullChapter),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        margin: const EdgeInsets.only(right: 12),
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: _showFullChapter ? gold.withValues(alpha: 0.15) : Colors.transparent,
-                          border: Border.all(
-                              color: _showFullChapter ? gold : theme.dividerColor, width: 1),
-                          borderRadius: BorderRadius.circular(16),
                         ),
+                        const SizedBox(width: 90), // Clear center area
+                        // Full chapter toggle — compact pill
+                        GestureDetector(
+                          onTap: () => setState(() => _showFullChapter = !_showFullChapter),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            margin: const EdgeInsets.only(right: 12),
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: _showFullChapter ? gold.withValues(alpha: 0.15) : Colors.transparent,
+                              border: Border.all(
+                                  color: _showFullChapter ? gold : theme.dividerColor, width: 1),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Text(
+                              'Full chapter',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: _showFullChapter
+                                    ? gold
+                                    : theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (_passages.length > 1)
+                      IgnorePointer(
                         child: Text(
-                          'Full chapter',
-                          style: TextStyle(
-                            fontSize: 11,
+                          'Passage ${_passageIndex + 1} of ${_passages.length}',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: gold.withValues(alpha: 0.75),
+                            letterSpacing: 1.0,
                             fontWeight: FontWeight.w600,
-                            color: _showFullChapter
-                                ? gold
-                                : theme.colorScheme.onSurface.withValues(alpha: 0.5),
                           ),
                         ),
                       ),
-                    ),
                   ],
                 ),
                 const Divider(height: 1, thickness: 0.5),
               ],
             ),
           ),
-
-          // ── Verse action bar (visible only when verses selected) ─────────
-          if (_selectedVerses.isNotEmpty)
-            _VerseActionBar(
-              selectedVerses: _selectedVerses.toList()..sort(),
-              bookName: passage.book.name,
-              bookAbbrev: passage.book.abbreviation,
-              chapterNum: passage.chapterNum,
-              onDismiss: _clearSelection,
-              onHighlight: () => _showHighlightPalette(
-                  _selectedVerses.toList()..sort(), passage.book.name, passage.chapterNum),
-              onCommentary: (verseNum) {
-                final vIdx = verseNum - 1;
-                final verseText = vIdx >= 0 && vIdx < passage.chapter.verses.length
-                    ? passage.chapter.verses[vIdx].text
-                    : '';
-                _showCommentary(verseNum, verseText, passage.book.name, passage.chapterNum);
-                _clearSelection();
-              },
-            ),
 
           // ── Verse list + nav footer ──────────────────────────────────────
           Expanded(
@@ -542,9 +464,16 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
                     onLongPress: () {
                       HapticFeedback.mediumImpact();
                       setState(() => _selectedVerses.add(verse.number));
-                      // Immediately show palette on long-press (same as main reader)
-                      _showHighlightPalette(
-                          [verse.number], passage.book.name, passage.chapterNum);
+                      VerseActionLogic.handleHighlightInteraction(
+                        context: context,
+                        ref: ref,
+                        theme: Theme.of(context),
+                        bookName: passage.book.name,
+                        chapterNum: passage.chapterNum,
+                        targetVerses: [verse.number],
+                        isLongPress: true,
+                        onClearSelection: _clearSelection,
+                      );
                     },
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
@@ -622,6 +551,69 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
               ),
             ),
           ),
+            ],
+          ),
+          
+          // ── Verse action bar (bottom anchored) ───────────────────────────
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              switchInCurve: Curves.easeOutCubic,
+              switchOutCurve: Curves.easeInCubic,
+              transitionBuilder: (child, animation) {
+                if (child.key == const ValueKey('empty')) return const SizedBox.shrink();
+                return SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(0, 1),
+                    end: Offset.zero,
+                  ).animate(animation),
+                  child: child,
+                );
+              },
+              child: _selectedVerses.isNotEmpty
+                  ? SafeArea(
+                      top: false,
+                      key: const ValueKey('content'),
+                      child: _VerseActionBar(
+                        selectedVerses: _selectedVerses.toList()..sort(),
+                        bookName: passage.book.name,
+                          bookAbbrev: passage.book.abbreviation,
+                          chapterNum: passage.chapterNum,
+                          onDismiss: _clearSelection,
+                          onHighlight: () => VerseActionLogic.handleHighlightInteraction(
+                            context: context,
+                            ref: ref,
+                            theme: theme,
+                            bookName: passage.book.name,
+                            chapterNum: passage.chapterNum,
+                            targetVerses: _selectedVerses.toList()..sort(),
+                            isLongPress: false,
+                            onClearSelection: _clearSelection,
+                          ),
+                          onHighlightLongPress: () => VerseActionLogic.handleHighlightInteraction(
+                            context: context,
+                            ref: ref,
+                            theme: theme,
+                            bookName: passage.book.name,
+                            chapterNum: passage.chapterNum,
+                            targetVerses: _selectedVerses.toList()..sort(),
+                            isLongPress: true,
+                            onClearSelection: _clearSelection,
+                          ),
+                          onCommentary: (verseNum) {
+                            final vIdx = verseNum - 1;
+                            final verseText = vIdx >= 0 && vIdx < passage.chapter.verses.length
+                                ? passage.chapter.verses[vIdx].text
+                                : '';
+                            _showCommentary(verseNum, verseText, passage.book.name, passage.chapterNum);
+                            _clearSelection();
+                          },
+                        ),
+                    )
+                  : const SizedBox.shrink(key: ValueKey('empty')),
+            ),
+          ),
         ],
       ),
     );
@@ -639,6 +631,7 @@ class _VerseActionBar extends ConsumerWidget {
   final int chapterNum;
   final VoidCallback onDismiss;
   final VoidCallback onHighlight;
+  final VoidCallback onHighlightLongPress;
   final void Function(int verseNum) onCommentary;
 
   const _VerseActionBar({
@@ -648,6 +641,7 @@ class _VerseActionBar extends ConsumerWidget {
     required this.chapterNum,
     required this.onDismiss,
     required this.onHighlight,
+    required this.onHighlightLongPress,
     required this.onCommentary,
   });
 
@@ -656,21 +650,27 @@ class _VerseActionBar extends ConsumerWidget {
     final theme = Theme.of(context);
     final gold = AppColors.goldAccent;
 
-    return Container(
-      color: theme.cardColor,
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-      child: Row(
-        children: [
-          IconButton(
-              icon: const Icon(Icons.close_rounded, size: 20), onPressed: onDismiss),
-          Text('${selectedVerses.length} selected', style: theme.textTheme.labelMedium),
-          const Spacer(),
-          // Highlight — opens color palette sheet
-          IconButton(
-            tooltip: 'Highlight',
-            icon: Icon(Icons.highlight_rounded, color: gold),
-            onPressed: onHighlight,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 24.0, left: 16, right: 16),
+      child: TexturedGlassContainer(
+        borderRadius: BorderRadius.circular(32),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Text('${selectedVerses.length} selected', style: theme.textTheme.labelMedium),
           ),
+                  // Highlight — opens color palette sheet
+                  GestureDetector(
+                    onLongPress: onHighlightLongPress,
+                    child: IconButton(
+                      tooltip: 'Highlight',
+                      icon: Icon(Icons.highlight_rounded, color: gold),
+                      onPressed: onHighlight,
+                    ),
+                  ),
           // Bookmark
           IconButton(
             tooltip: 'Bookmark',
@@ -704,7 +704,12 @@ class _VerseActionBar extends ConsumerWidget {
               onDismiss();
             },
           ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded, size: 20), 
+                    onPressed: onDismiss,
+                  ),
         ],
+      ),
       ),
     );
   }
