@@ -21,6 +21,7 @@ dependencies:
   timezone: ^0.11.1
   package_info_plus: ^10.2.1
   url_launcher: ^6.3.2
+  confetti: ^0.8.0
 
 dev_dependencies:
   flutter_test:

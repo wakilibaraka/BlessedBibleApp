@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../services/notification_service.dart';
 import '../data/local_storage/preferences_service.dart';
 
 /// App weekday: 1=Sunday, 2=Monday, ..., 7=Saturday
@@ -198,6 +199,9 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
       String paceMode = 'scheduled';
       int? restDay = 7;
       Set<int> completedReadings = {};
+      bool reminderEnabled = false;
+      int reminderTimeHour = 8;
+      int reminderTimeMinute = 0;
 
       if (prefsState != null) {
         // Safe migration: ignore legacy completedChapters string set
@@ -218,6 +222,12 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
         if (prefsState['planId'] != null) {
           planId = prefsState['planId'] as String;
         }
+        
+        if (prefsState.containsKey('reminderEnabled')) {
+          reminderEnabled = prefsState['reminderEnabled'] as bool;
+          reminderTimeHour = prefsState['reminderTimeHour'] as int;
+          reminderTimeMinute = prefsState['reminderTimeMinute'] as int;
+        }
       }
 
       state = state.copyWith(
@@ -228,6 +238,9 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
         paceMode: paceMode,
         restDay: restDay,
         completedReadings: completedReadings,
+        reminderEnabled: reminderEnabled,
+        reminderTimeHour: reminderTimeHour,
+        reminderTimeMinute: reminderTimeMinute,
       );
     } catch (e) {
       state = state.copyWith(isLoading: false);
@@ -241,6 +254,9 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
       'paceMode': s.paceMode,
       'restDay': s.restDay,
       'completedReadings': s.completedReadings.toList(),
+      'reminderEnabled': s.reminderEnabled,
+      'reminderTimeHour': s.reminderTimeHour,
+      'reminderTimeMinute': s.reminderTimeMinute,
     });
   }
 
@@ -254,6 +270,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
     );
     state = next;
     _saveToPrefs(next);
+    ref.read(notificationServiceProvider).syncReadingPlanReminder(next.reminderEnabled, next.reminderTimeHour, next.reminderTimeMinute, next.restDay);
   }
 
   void markReadingComplete(int day) {
@@ -280,6 +297,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
     final next = state.copyWith(restDay: day);
     state = next;
     _saveToPrefs(next);
+    ref.read(notificationServiceProvider).syncReadingPlanReminder(next.reminderEnabled, next.reminderTimeHour, next.reminderTimeMinute, next.restDay);
   }
 
   void restartPlan() {
@@ -294,7 +312,16 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
   // --- LEGACY ALIASES FOR UI TO COMPILE ---
   void startPlanFromDay(int day) {}
   void changeStartMode(dynamic mode) {}
-  void setReminder(bool enabled, int hour, int minute) {}
+  void setReminder(bool enabled, int hour, int minute) {
+    final next = state.copyWith(
+      reminderEnabled: enabled,
+      reminderTimeHour: hour,
+      reminderTimeMinute: minute,
+    );
+    state = next;
+    _saveToPrefs(next);
+    ref.read(notificationServiceProvider).syncReadingPlanReminder(enabled, hour, minute, next.restDay);
+  }
   void jumpToDay(int day) {}
   bool jumpToBook(String book) => false;
   int? findDayForPassage(String book, int chapter) => 1;

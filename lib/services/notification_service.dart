@@ -195,4 +195,58 @@ class NotificationService {
   Future<void> cancelReminder() async {
     await cancelDailyReminder();
   }
+
+  Future<void> syncReadingPlanReminder(bool enabled, int hour, int minute, int? restDay) async {
+    // Cancel all previously scheduled reading plan reminders (IDs 100-107)
+    for (int i = 100; i <= 107; i++) {
+      await _flutterLocalNotificationsPlugin.cancel(id: i);
+    }
+
+    if (!enabled) return;
+    await requestPermissions();
+
+    final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
+
+    if (restDay == null || restDay == -1) {
+      // Schedule daily reminder
+      tz.TZDateTime scheduledDate = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
+      if (scheduledDate.isBefore(now)) scheduledDate = scheduledDate.add(const Duration(days: 1));
+
+      await _flutterLocalNotificationsPlugin.zonedSchedule(
+        id: 100,
+        title: 'Time to Read',
+        body: 'Take a moment to read your daily passage.',
+        scheduledDate: scheduledDate,
+        notificationDetails: const NotificationDetails(
+          android: AndroidNotificationDetails('reading_plan_channel', 'Reading Plan', importance: Importance.high, priority: Priority.high),
+        ),
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        matchDateTimeComponents: DateTimeComponents.time,
+      );
+      debugPrint("NotificationService: scheduled daily reading plan reminder at $hour:$minute");
+    } else {
+      // Schedule weekly reminder for the 6 non-rest days
+      for (int i = 1; i <= 7; i++) {
+        if (i == restDay) continue;
+        tz.TZDateTime scheduledDate = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
+        while (scheduledDate.weekday != i) {
+          scheduledDate = scheduledDate.add(const Duration(days: 1));
+        }
+        if (scheduledDate.isBefore(now)) scheduledDate = scheduledDate.add(const Duration(days: 7));
+
+        await _flutterLocalNotificationsPlugin.zonedSchedule(
+          id: 100 + i,
+          title: 'Time to Read',
+          body: 'Take a moment to read your daily passage.',
+          scheduledDate: scheduledDate,
+          notificationDetails: const NotificationDetails(
+            android: AndroidNotificationDetails('reading_plan_channel', 'Reading Plan', importance: Importance.high, priority: Priority.high),
+          ),
+          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+          matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
+        );
+      }
+      debugPrint("NotificationService: scheduled 6 weekly reading plan reminders at $hour:$minute (skipping rest day $restDay)");
+    }
+  }
 }
