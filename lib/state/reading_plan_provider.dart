@@ -3,426 +3,311 @@ import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/local_storage/preferences_service.dart';
-import '../services/notification_service.dart';
-enum PlanStartMode { startToday, calendarYear }
 
+/// App weekday: 1=Sunday, 2=Monday, ..., 7=Saturday
+int appWeekday(DateTime date) {
+  return (date.weekday % 7) + 1;
+}
+
+// --- LEGACY FOR UI ---
+enum PlanStartMode { startToday, calendarYear }
 class PlanChapter {
+  final String id = '';
   final String bookName;
   final int chapterNum;
-
-  PlanChapter({required this.bookName, required this.chapterNum});
-
-  String get id => '${bookName}_$chapterNum';
+  PlanChapter({this.bookName = '', this.chapterNum = 1});
 }
+// ---------------------
 
-List<PlanChapter> _expandReadings(List<String> readings) {
-  List<PlanChapter> result = [];
-  for (String reading in readings) {
-    final match = RegExp(r'^(\d?\s*[a-zA-Z\s]+)(?:\s+([\d,\-\s;]+))?').firstMatch(reading);
-    if (match != null) {
-      String bookName = match.group(1)!.trim();
-      if (bookName.toLowerCase() == 'song of solomon') bookName = 'Song of Solomon';
-      
-      String? chaptersStr = match.group(2);
-      if (chaptersStr == null || chaptersStr.isEmpty) {
-        result.add(PlanChapter(bookName: bookName, chapterNum: 1));
-      } else {
-        final parts = chaptersStr.split(RegExp(r'[,;]'));
-        for (var part in parts) {
-          part = part.trim();
-          if (part.isEmpty) continue;
-          if (part.contains('-')) {
-            final rangeParts = part.split('-');
-            int start = int.tryParse(rangeParts[0]) ?? 1;
-            int end = int.tryParse(rangeParts[1]) ?? 1;
-            for (int i = start; i <= end; i++) {
-              result.add(PlanChapter(bookName: bookName, chapterNum: i));
-            }
-          } else {
-            int num = int.tryParse(part) ?? 1;
-            result.add(PlanChapter(bookName: bookName, chapterNum: num));
-          }
-        }
-      }
-    }
-  }
-  return result;
-}
-
-class ChronologicalDay {
-  final int day;
-  final List<String> readings;
-  final List<PlanChapter> chapters;
-
-  ChronologicalDay({required this.day, required this.readings, required this.chapters});
-
-  factory ChronologicalDay.fromJson(Map<String, dynamic> json) {
-    final rawReadings = List<String>.from(json['readings'] as List);
-    return ChronologicalDay(
-      day: json['day'] as int,
-      readings: rawReadings,
-      chapters: _expandReadings(rawReadings),
+class PlanPassage {
+  final String label;
+  final List<String> refs;
+  PlanPassage({required this.label, required this.refs});
+  factory PlanPassage.fromJson(Map<String, dynamic> json) {
+    return PlanPassage(
+      label: json['label'] as String,
+      refs: List<String>.from(json['refs']),
     );
   }
 }
 
+class PlanDayData {
+  final int day;
+  final int week;
+  final String title;
+  final List<PlanPassage> passages;
+
+  PlanDayData({required this.day, required this.week, required this.title, required this.passages});
+  
+  factory PlanDayData.fromJson(Map<String, dynamic> json) {
+    return PlanDayData(
+      day: json['day'] as int,
+      week: json['week'] as int,
+      title: json['title'] as String,
+      passages: (json['passages'] as List).map((e) => PlanPassage.fromJson(e)).toList(),
+    );
+  }
+
+  // --- LEGACY FOR UI ---
+  List<PlanChapter> get chapters => [];
+  List<String> get readings => [];
+}
+
 class ReadingPlanState {
   final bool isLoading;
-  final List<ChronologicalDay> planData;
-  final int currentDay; // 0 means not started
-  final Set<String> completedChapters;
-  final DateTime startDate;
-  final PlanStartMode startMode;
+  final String planId;
+  final DateTime? planStartedOn;
+  final String paceMode; // 'scheduled' | 'flexible'
+  final int? restDay; // 1=Sun .. 7=Sat, null = no rest
+  final Set<int> completedReadings; // Set of day numbers
+  final List<PlanDayData> planData;
+
+  // Additional legacy state preserved so UI compiles during step 1
   final bool reminderEnabled;
   final int reminderTimeHour;
   final int reminderTimeMinute;
 
   ReadingPlanState({
     this.isLoading = false,
+    this.planId = '',
+    this.planStartedOn,
+    this.paceMode = 'scheduled',
+    this.restDay = 7,
+    this.completedReadings = const {},
     this.planData = const [],
-    this.currentDay = 0,
-    this.completedChapters = const {},
-    required this.startDate,
-    this.startMode = PlanStartMode.startToday,
     this.reminderEnabled = false,
     this.reminderTimeHour = 8,
     this.reminderTimeMinute = 0,
   });
 
-  bool get isPlanComplete => planData.isNotEmpty && completedChapters.length >= planData.fold(0, (sum, d) => sum + d.chapters.length);
+  bool get isActive => planStartedOn != null;
   
-  double get completionPercentage => planData.isEmpty ? 0 : completedChapters.length / planData.fold(0, (sum, d) => sum + d.chapters.length);
+  bool get isComplete => planData.isNotEmpty && completedReadings.length >= planData.length;
+  
+  double get percentComplete => planData.isEmpty ? 0.0 : completedReadings.length / planData.length;
 
-  bool isDayComplete(int day) {
-    if (planData.isEmpty || day < 1 || day > planData.length) return false;
-    final target = planData[day - 1];
-    return target.chapters.every((c) => completedChapters.contains(c.id));
+  int get oldestUnread {
+    if (planData.isEmpty) return 1;
+    for (int i = 1; i <= planData.length; i++) {
+      if (!completedReadings.contains(i)) return i;
+    }
+    return planData.length;
   }
 
-  DateTime getDateForDay(int day) {
-    if (startMode == PlanStartMode.calendarYear) {
-      final now = DateTime.now();
-      return DateTime(now.year, 1, 1).add(Duration(days: day - 1));
+  int? get todayReadingDay {
+    if (planData.isEmpty || planStartedOn == null) return 1;
+    if (isComplete) return null;
+
+    if (paceMode == 'flexible') {
+      return oldestUnread;
     } else {
-      // For startToday, startDate maps to day 1
-      return startDate.add(Duration(days: day - 1));
+      // Mode A: scheduled
+      final s = DateTime.utc(planStartedOn!.year, planStartedOn!.month, planStartedOn!.day);
+      final now = DateTime.now();
+      final t = DateTime.utc(now.year, now.month, now.day);
+      
+      if (t.isBefore(s)) return 1;
+
+      int elapsedReadingDays = 0;
+      DateTime current = s;
+      while (!current.isAfter(t)) {
+        if (restDay == null || appWeekday(current) != restDay) {
+          elapsedReadingDays++;
+        }
+        current = current.add(const Duration(days: 1));
+      }
+      
+      // If elapsedReadingDays is 0 (e.g. started today and today is a rest day), it's day 1
+      return elapsedReadingDays.clamp(1, planData.length);
     }
   }
 
-  String getFormattedDateForDay(int day) {
-    final date = getDateForDay(day);
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return '${months[date.month - 1]} ${date.day}';
+  Set<int> get missedDays {
+    if (paceMode == 'flexible' || planData.isEmpty || planStartedOn == null || isComplete) return {};
+    
+    final today = todayReadingDay;
+    if (today == null) return {};
+
+    final Set<int> missed = {};
+    for (int i = 1; i < today; i++) {
+      if (!completedReadings.contains(i)) {
+        missed.add(i);
+      }
+    }
+    return missed;
   }
 
   ReadingPlanState copyWith({
     bool? isLoading,
-    List<ChronologicalDay>? planData,
-    int? currentDay,
-    Set<String>? completedChapters,
-    DateTime? startDate,
-    PlanStartMode? startMode,
+    String? planId,
+    DateTime? planStartedOn,
+    String? paceMode,
+    int? restDay,
+    Set<int>? completedReadings,
+    List<PlanDayData>? planData,
     bool? reminderEnabled,
     int? reminderTimeHour,
     int? reminderTimeMinute,
   }) {
     return ReadingPlanState(
       isLoading: isLoading ?? this.isLoading,
+      planId: planId ?? this.planId,
+      planStartedOn: planStartedOn ?? this.planStartedOn,
+      paceMode: paceMode ?? this.paceMode,
+      restDay: restDay ?? this.restDay,
+      completedReadings: completedReadings ?? this.completedReadings,
       planData: planData ?? this.planData,
-      currentDay: currentDay ?? this.currentDay,
-      completedChapters: completedChapters ?? this.completedChapters,
-      startDate: startDate ?? this.startDate,
-      startMode: startMode ?? this.startMode,
       reminderEnabled: reminderEnabled ?? this.reminderEnabled,
       reminderTimeHour: reminderTimeHour ?? this.reminderTimeHour,
       reminderTimeMinute: reminderTimeMinute ?? this.reminderTimeMinute,
     );
   }
+
+  // --- LEGACY ALIASES FOR UI TO COMPILE ---
+  int get currentDay => todayReadingDay ?? planData.length;
+  DateTime get startDate => planStartedOn ?? DateTime.now();
+  Set<String> get completedChapters => {};
+  bool isDayComplete(int day) => completedReadings.contains(day);
+  double get completionPercentage => percentComplete;
+  bool get isPlanComplete => isComplete;
+  PlanStartMode get startMode => PlanStartMode.startToday; 
+  String getFormattedDateForDay(int day) => '';
 }
 
 class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
   @override
   ReadingPlanState build() {
-    // Initial sync state before async load
     _loadData();
-    return ReadingPlanState(isLoading: true, startDate: DateTime.now());
+    return ReadingPlanState(isLoading: true);
   }
 
   Future<void> _loadData() async {
-    // We defer loading to allow constructor to return. This is called manually or via FutureProvider ideally, 
-    // but riverpod Notifier can just call this from build. Wait, since it's an async method called from build without await, 
-    // we need to be careful. The user already tested it and it worked.
     try {
-      final jsonString = await rootBundle.loadString('assets/data/chronological_plan.json');
-      // Parse on a background isolate — this JSON is ~27KB with complex per-day expansion
-      final List<dynamic> decoded = await compute<String, List<dynamic>>(
-        (s) => jsonDecode(s) as List<dynamic>,
+      final jsonString = await rootBundle.loadString('assets/reading_plans/chronological_1yr.json');
+      final Map<String, dynamic> decoded = await compute<String, Map<String, dynamic>>(
+        (s) => jsonDecode(s) as Map<String, dynamic>,
         jsonString,
       );
-      final planData = decoded.map((e) => ChronologicalDay.fromJson(e)).toList();
+      final rawReadings = decoded['readings'] as List;
+      final planData = rawReadings.map((e) => PlanDayData.fromJson(e)).toList();
 
       final prefsState = ref.read(preferencesProvider).getReadingPlanState();
-      int currentDay = 0;
-      Set<String> completedChapters = {};
-      DateTime startDate = DateTime.now();
-      PlanStartMode startMode = PlanStartMode.startToday;
-      bool reminderEnabled = false;
-      int reminderTimeHour = 8;
-      int reminderTimeMinute = 0;
+      
+      String planId = 'chronological_1yr';
+      DateTime? planStartedOn;
+      String paceMode = 'scheduled';
+      int? restDay = 7;
+      Set<int> completedReadings = {};
 
       if (prefsState != null) {
-        currentDay = prefsState['currentDay'] as int? ?? 0;
+        // Safe migration: ignore legacy completedChapters string set
+        if (prefsState.containsKey('completedReadings')) {
+          final list = prefsState['completedReadings'] as List;
+          completedReadings = list.map((e) => e as int).toSet();
+        }
         
-        if (prefsState.containsKey('completedChapters')) {
-          final chaptersList = prefsState['completedChapters'] as List;
-          completedChapters = chaptersList.map((e) => e.toString()).toSet();
-        } else if (prefsState.containsKey('completedDays')) {
-          // Migration!
-          final completedDays = Set<int>.from(prefsState['completedDays']);
-          for (final d in completedDays) {
-            if (d >= 1 && d <= planData.length) {
-              for (final c in planData[d - 1].chapters) {
-                completedChapters.add(c.id);
-              }
-            }
-          }
+        if (prefsState['planStartedOn'] != null) {
+          planStartedOn = DateTime.tryParse(prefsState['planStartedOn'] as String);
         }
-        if (prefsState['startDate'] != null) {
-          startDate = DateTime.parse(prefsState['startDate'] as String);
+        if (prefsState['paceMode'] != null) {
+          paceMode = prefsState['paceMode'] as String;
         }
-        if (prefsState['startMode'] == 'calendarYear') {
-          startMode = PlanStartMode.calendarYear;
+        if (prefsState.containsKey('restDay')) {
+          restDay = prefsState['restDay'] as int?;
         }
-        reminderEnabled = prefsState['reminderEnabled'] as bool? ?? false;
-        reminderTimeHour = prefsState['reminderTimeHour'] as int? ?? 8;
-        reminderTimeMinute = prefsState['reminderTimeMinute'] as int? ?? 0;
+        if (prefsState['planId'] != null) {
+          planId = prefsState['planId'] as String;
+        }
       }
 
       state = state.copyWith(
         isLoading: false,
         planData: planData,
-        currentDay: currentDay,
-        completedChapters: completedChapters,
-        startDate: startDate,
-        startMode: startMode,
-        reminderEnabled: reminderEnabled,
-        reminderTimeHour: reminderTimeHour,
-        reminderTimeMinute: reminderTimeMinute,
+        planId: planId,
+        planStartedOn: planStartedOn,
+        paceMode: paceMode,
+        restDay: restDay,
+        completedReadings: completedReadings,
       );
     } catch (e) {
       state = state.copyWith(isLoading: false);
     }
   }
 
-  void _saveState() {
+  void _saveToPrefs(ReadingPlanState s) {
     ref.read(preferencesProvider).saveReadingPlanState({
-      'currentDay': state.currentDay,
-      'completedChapters': state.completedChapters.toList(),
-      'startDate': state.startDate.toIso8601String(),
-      'startMode': state.startMode.name,
-      'reminderEnabled': state.reminderEnabled,
-      'reminderTimeHour': state.reminderTimeHour,
-      'reminderTimeMinute': state.reminderTimeMinute,
+      'planId': s.planId,
+      'planStartedOn': s.planStartedOn?.toIso8601String(),
+      'paceMode': s.paceMode,
+      'restDay': s.restDay,
+      'completedReadings': s.completedReadings.toList(),
     });
   }
 
-  void startPlan() {
-    int day = 1;
-    if (state.startMode == PlanStartMode.calendarYear) {
-      final now = DateTime.now();
-      day = now.difference(DateTime(now.year, 1, 1)).inDays + 1;
-    }
-    state = state.copyWith(currentDay: day, startDate: DateTime.now());
-    _saveState();
-    
-    // Schedule daily notification
-    if (state.reminderEnabled) {
-      ref.read(notificationServiceProvider).scheduleDailyReminder(state.reminderTimeHour, state.reminderTimeMinute);
-    }
+  void startPlan({String planId = 'chronological_1yr', String paceMode = 'scheduled', int? restDay = 7}) {
+    final next = state.copyWith(
+      planId: planId,
+      planStartedOn: DateTime.now(),
+      paceMode: paceMode,
+      restDay: restDay,
+      completedReadings: {},
+    );
+    state = next;
+    _saveToPrefs(next);
+  }
+
+  void markReadingComplete(int day) {
+    final newCompleted = Set<int>.from(state.completedReadings)..add(day);
+    final next = state.copyWith(completedReadings: newCompleted);
+    state = next;
+    _saveToPrefs(next);
+  }
+
+  void markReadingIncomplete(int day) {
+    final newCompleted = Set<int>.from(state.completedReadings)..remove(day);
+    final next = state.copyWith(completedReadings: newCompleted);
+    state = next;
+    _saveToPrefs(next);
+  }
+
+  void setPaceMode(String mode) {
+    final next = state.copyWith(paceMode: mode);
+    state = next;
+    _saveToPrefs(next);
+  }
+
+  void setRestDay(int? day) {
+    final next = state.copyWith(restDay: day);
+    state = next;
+    _saveToPrefs(next);
   }
 
   void restartPlan() {
-    int day = 1;
-    if (state.startMode == PlanStartMode.calendarYear) {
-      final now = DateTime.now();
-      day = now.difference(DateTime(now.year, 1, 1)).inDays + 1;
-    }
-    state = state.copyWith(
-      currentDay: day, 
-      startDate: DateTime.now(),
-      completedChapters: {},
+    final next = state.copyWith(
+      planStartedOn: DateTime.now(),
+      completedReadings: {},
     );
-    _saveState();
-    if (state.reminderEnabled) {
-      ref.read(notificationServiceProvider).scheduleDailyReminder(state.reminderTimeHour, state.reminderTimeMinute);
-    }
+    state = next;
+    _saveToPrefs(next);
   }
 
-  void setReminder(bool enabled, int hour, int minute) {
-    state = state.copyWith(
-      reminderEnabled: enabled,
-      reminderTimeHour: hour,
-      reminderTimeMinute: minute,
-    );
-    _saveState();
-    if (enabled) {
-      ref.read(notificationServiceProvider).scheduleDailyReminder(hour, minute);
-    } else {
-      ref.read(notificationServiceProvider).cancelReminder();
-    }
-  }
-
-  void changeStartMode(PlanStartMode mode) {
-    int newCurrentDay = state.currentDay;
-    if (state.currentDay == 0 || state.completedChapters.isEmpty) {
-      if (mode == PlanStartMode.calendarYear) {
-        final now = DateTime.now();
-        newCurrentDay = now.difference(DateTime(now.year, 1, 1)).inDays + 1;
-      } else {
-        newCurrentDay = state.currentDay == 0 ? 0 : 1;
-      }
-    }
-    state = state.copyWith(startMode: mode, startDate: DateTime.now(), currentDay: newCurrentDay);
-    _saveState();
-  }
-
-  void startPlanFromDay(int day) {
-    final newCompleted = Set<String>.from(state.completedChapters);
-    for (int i = 1; i < day; i++) {
-      for (final c in state.planData[i - 1].chapters) {
-        newCompleted.add(c.id);
-      }
-    }
-    
-    DateTime newStartDate = state.startDate;
-    if (state.startMode == PlanStartMode.startToday) {
-      // Backdate the start date so that 'day' lands exactly on today.
-      final now = DateTime.now();
-      newStartDate = now.subtract(Duration(days: day - 1));
-    }
-
-    state = state.copyWith(
-      currentDay: day,
-      completedChapters: newCompleted,
-      startDate: newStartDate,
-    );
-    _saveState();
-    if (state.reminderEnabled) {
-      ref.read(notificationServiceProvider).scheduleDailyReminder(state.reminderTimeHour, state.reminderTimeMinute);
-    }
-  }
-
-  bool jumpToBook(String bookQuery) {
-    final query = bookQuery.trim().toLowerCase();
-    
-    // As per instruction: "It finds the FIRST plan day where that book appears in the chronological sequence"
-    for (int i = 0; i < state.planData.length; i++) {
-      final day = state.planData[i];
-      for (final reading in day.readings) {
-        final match = RegExp(r'^(\d?\s*[a-zA-Z\s]+)(?:\s+(\d+))?').firstMatch(reading);
-        if (match != null) {
-          String bookName = match.group(1)!.trim().toLowerCase();
-          if (bookName == 'song of solomon') bookName = 'song of solomon'; // normalize
-          
-          if (bookName == query || bookName.contains(query) || query.contains(bookName)) {
-            jumpToDay(day.day);
-            return true;
-          }
-        }
-      }
-    }
-    return false;
-  }
-
-  int? findDayForPassage(String targetBook, int targetChapter) {
-    final tBook = targetBook.toLowerCase();
-    for (int i = 0; i < state.planData.length; i++) {
-      final day = state.planData[i];
-      for (final reading in day.readings) {
-        final match = RegExp(r'^(\d?\s*[a-zA-Z\s]+)(?:\s+([\d,\-\s;a-zA-Z]+))?').firstMatch(reading);
-        if (match != null) {
-          String bName = match.group(1)!.trim().toLowerCase();
-          if (bName == 'song of solomon') bName = 'song of solomon';
-          
-          if (bName == tBook || bName.contains(tBook) || tBook.contains(bName)) {
-            final chaptersStr = match.group(2);
-            if (chaptersStr == null || chaptersStr.isEmpty) return day.day;
-            
-            final chapterRegex = RegExp(r'\b' + targetChapter.toString() + r'\b');
-            if (chapterRegex.hasMatch(chaptersStr)) return day.day;
-            
-            final rangeMatches = RegExp(r'(\d+)\s*-\s*(\d+)').allMatches(chaptersStr);
-            for (final rm in rangeMatches) {
-               final start = int.tryParse(rm.group(1)!) ?? 0;
-               final end = int.tryParse(rm.group(2)!) ?? 0;
-               if (targetChapter >= start && targetChapter <= end) return day.day;
-            }
-          }
-        }
-      }
-    }
-    return null;
-  }
-
-  void markDayComplete(int day) {
-    if (day < 1 || day > state.planData.length) return;
-    final newCompleted = Set<String>.from(state.completedChapters);
-    for (final c in state.planData[day - 1].chapters) {
-      newCompleted.add(c.id);
-    }
-    
-    int nextDay = state.currentDay;
-    if (day == state.currentDay && day < state.planData.length) {
-      nextDay = day + 1;
-      while (nextDay < state.planData.length && state.planData[nextDay - 1].chapters.every((c) => newCompleted.contains(c.id))) {
-        nextDay++;
-      }
-    }
-
-    state = state.copyWith(
-      completedChapters: newCompleted,
-      currentDay: nextDay,
-    );
-    _saveState();
-
-    if (state.isPlanComplete) {
-      ref.read(notificationServiceProvider).cancelReminder();
-    }
-  }
-
-  void markDayIncomplete(int day) {
-    if (day < 1 || day > state.planData.length) return;
-    final newCompleted = Set<String>.from(state.completedChapters);
-    for (final c in state.planData[day - 1].chapters) {
-      newCompleted.remove(c.id);
-    }
-    state = state.copyWith(completedChapters: newCompleted);
-    _saveState();
-  }
-
-  void markChapterComplete(PlanChapter chapter) {
-    final newCompleted = Set<String>.from(state.completedChapters)..add(chapter.id);
-    state = state.copyWith(completedChapters: newCompleted);
-    _saveState();
-  }
-
-  void jumpToDay(int day) {
-    state = state.copyWith(currentDay: day);
-    _saveState();
-  }
+  // --- LEGACY ALIASES FOR UI TO COMPILE ---
+  void startPlanFromDay(int day) {}
+  void changeStartMode(dynamic mode) {}
+  void setReminder(bool enabled, int hour, int minute) {}
+  void jumpToDay(int day) {}
+  bool jumpToBook(String book) => false;
+  int? findDayForPassage(String book, int chapter) => 1;
+  void markDayComplete(int day) => markReadingComplete(day);
+  void markDayIncomplete(int day) => markReadingIncomplete(day);
+  void markChapterComplete(PlanChapter c) {}
 }
 
 final readingPlanProvider = NotifierProvider<ReadingPlanNotifier, ReadingPlanState>(ReadingPlanNotifier.new);
 
 class ActivePlanContextNotifier extends Notifier<int?> {
   @override
-  int? build() {
-    return null;
-  }
-
-  void setContext(int? day) {
-    state = day;
-  }
+  int? build() => null;
+  void setContext(int? day) => state = day;
 }
-
 final activePlanContextProvider = NotifierProvider<ActivePlanContextNotifier, int?>(ActivePlanContextNotifier.new);
