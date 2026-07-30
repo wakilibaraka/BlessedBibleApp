@@ -16,6 +16,9 @@ class PreferencesService {
   static const String _lastReadLocKey = 'last_read_loc';
   static const String _studyLayoutKey = 'study_layout';
   static const String _readingPlanStateKey = 'reading_plan_state';
+  /// Key for the user's chosen rest day in the reading plan.
+  /// Sunday-first convention: 1=Sunday … 7=Saturday (default).
+  static const String _readingPlanRestDayKey = 'reading_plan_rest_day';
   static const String _votdViewedDaysKey = 'votd_viewed_days';
   static const String _streakCountKey = 'streak_count';
   static const String _lastReadDateKey = 'last_read_date';
@@ -156,6 +159,13 @@ class PreferencesService {
     }
     return null;
   }
+
+  /// Returns the persisted rest-day preference (Sunday-first, 1=Sun … 7=Sat).
+  /// Default is 7 (Saturday / Sabbath).
+  int getReadingPlanRestDay() => prefs.getInt(_readingPlanRestDayKey) ?? 7;
+
+  /// Persists the rest-day preference. [value] must be 1–7 (Sunday-first).
+  void setReadingPlanRestDay(int value) => prefs.setInt(_readingPlanRestDayKey, value);
 
   void saveVotdViewedDays(List<String> days) {
     prefs.setStringList(_votdViewedDaysKey, days);

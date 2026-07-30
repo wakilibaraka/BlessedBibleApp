@@ -43,6 +43,8 @@ flutter:
     - assets/images/
     - assets/data/
     - assets/icon/
+    - assets/reading_plans/
+    - assets/reading_plans/source/
   fonts:
     - family: Inter
       fonts:
