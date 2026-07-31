@@ -65,26 +65,23 @@ class MainNavScreen extends ConsumerWidget {
           return;
         }
 
-        if (currentIndex != 0) {
-          _changeTab(0, ref, context);
-          return;
-        }
+        if (!context.mounted) return;
 
         final shouldExit = await showDialog<bool>(
           context: context,
-          builder: (context) {
+          builder: (dialogContext) {
             return AlertDialog(
               title: const Text('Exit The Blessed Bible?'),
               content: const Text('Are you sure you want to exit the app?'),
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              backgroundColor: Theme.of(dialogContext).scaffoldBackgroundColor,
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: Text('Cancel', style: TextStyle(color: Theme.of(context).primaryColor)),
+                  onPressed: () => Navigator.of(dialogContext).pop(false),
+                  child: Text('Cancel', style: TextStyle(color: Theme.of(dialogContext).primaryColor)),
                 ),
                 TextButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  child: Text('Exit', style: TextStyle(color: Theme.of(context).primaryColor)),
+                  onPressed: () => Navigator.of(dialogContext).pop(true),
+                  child: Text('Exit', style: TextStyle(color: Theme.of(dialogContext).primaryColor)),
                 ),
               ],
             );
