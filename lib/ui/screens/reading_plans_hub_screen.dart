@@ -58,6 +58,16 @@ class ReadingPlansHubScreen extends ConsumerWidget {
     final activePlanIds = ref.watch(activePlanIdsProvider);
     final prefs = ref.watch(preferencesProvider);
     
+    final inProgressPlanIds = <String>[];
+    final completedPlanIds = <String>[];
+    for (final id in activePlanIds) {
+      if (ref.watch(readingPlanProvider(id)).isPlanComplete) {
+        completedPlanIds.add(id);
+      } else {
+        inProgressPlanIds.add(id);
+      }
+    }
+
     // Preset plans not currently active — show in Discover section
     final fixedPlans = availablePlans.where((p) => !activePlanIds.contains(p.id)).toList();
 
@@ -80,7 +90,7 @@ class ReadingPlansHubScreen extends ConsumerWidget {
           CustomScrollView(
             slivers: [
               // ── ACTIVE PLANS (Top) ──
-              if (activePlanIds.isNotEmpty) ...[
+              if (inProgressPlanIds.isNotEmpty) ...[
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
@@ -96,7 +106,7 @@ class ReadingPlansHubScreen extends ConsumerWidget {
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      final planId = activePlanIds[index];
+                      final planId = inProgressPlanIds[index];
                       final planState = ref.watch(readingPlanProvider(planId));
                       if (planState.planData.isEmpty && !planState.isLoading) return const SizedBox.shrink();
                       return Padding(
@@ -104,10 +114,41 @@ class ReadingPlansHubScreen extends ConsumerWidget {
                         child: _buildActivePlanCard(context, ref, theme, planId, planState),
                       );
                     },
-                    childCount: activePlanIds.length,
+                    childCount: inProgressPlanIds.length,
                   ),
                 ),
               ],
+
+              // ── COMPLETED PLANS ──
+              if (completedPlanIds.isNotEmpty) ...[
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+                    child: Text(
+                      'Completed Plans',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: theme.primaryColor,
+                      ),
+                    ),
+                  ),
+                ),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final planId = completedPlanIds[index];
+                      final planState = ref.watch(readingPlanProvider(planId));
+                      if (planState.planData.isEmpty && !planState.isLoading) return const SizedBox.shrink();
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                        child: _buildActivePlanCard(context, ref, theme, planId, planState),
+                      );
+                    },
+                    childCount: completedPlanIds.length,
+                  ),
+                ),
+              ],
+
               
               // ── MY CUSTOM PLANS ──
               SliverToBoxAdapter(
@@ -315,7 +356,67 @@ class ReadingPlansHubScreen extends ConsumerWidget {
               if (planState.isLoading)
                 Text('Loading...', style: theme.textTheme.bodySmall)
               else if (planState.isPlanComplete)
-                Text('Plan Completed 🎉', style: theme.textTheme.bodyMedium?.copyWith(color: theme.primaryColor, fontWeight: FontWeight.bold))
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Plan Completed 🎉', style: theme.textTheme.bodyMedium?.copyWith(color: theme.primaryColor, fontWeight: FontWeight.bold)),
+                    Row(
+                      children: [
+                        OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          ),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (c) => CupertinoAlertDialog(
+                                title: const Text('Restart Plan'),
+                                content: const Text('Are you sure you want to restart this plan? All progress will be reset to Day 1.'),
+                                actions: [
+                                  CupertinoDialogAction(
+                                    child: const Text('Cancel'),
+                                    onPressed: () => Navigator.pop(c),
+                                  ),
+                                  CupertinoDialogAction(
+                                    isDestructiveAction: true,
+                                    onPressed: () {
+                                      ref.read(readingPlanProvider(planId).notifier).restartPlan();
+                                      Navigator.pop(c);
+                                    },
+                                    child: const Text('Restart'),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                          child: Text('Restart', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: theme.colorScheme.onSurface)),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: theme.primaryColor,
+                            foregroundColor: theme.colorScheme.onPrimary,
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            elevation: 0,
+                          ),
+                          onPressed: () {
+                            ref.read(currentActivePlanIdProvider.notifier).setContext(planId);
+                            Navigator.of(context).push(
+                              CupertinoPageRoute(builder: (_) => ReadingPlanBrowser(planId: planId))
+                            );
+                          },
+                          child: const Text('Re-read', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                        ),
+                      ],
+                    ),
+                  ],
+                )
               else ...[
                 Row(
                   children: [

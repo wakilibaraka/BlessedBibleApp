@@ -14,10 +14,10 @@ import '../widgets/jiggle_animator.dart';
 import '../../state/reading_plan_provider.dart';
 import 'reading_plans_hub_screen.dart';
 import 'commentary_hub_screen.dart';
-import '../../state/nav_provider.dart';
-import '../../state/read_location_provider.dart';
-import '../../state/bible_provider.dart';
 import '../../state/streak_provider.dart';
+import 'plan_reader_screen.dart';
+import 'reading_plan_browser.dart';
+import '../../data/local_storage/preferences_service.dart';
 
 class StudyScreen extends ConsumerStatefulWidget {
   const StudyScreen({super.key});
@@ -31,32 +31,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
   final List<String> _commentaryAuthors = ['Uriah Smith'];
   Timer? _timer;
   bool _isEditing = false;
-
-  void _openReading(String reading, BuildContext context, WidgetRef ref) {
-    final match = RegExp(r'^(\d?\s*[a-zA-Z\s]+)(?:\s+(\d+))?').firstMatch(reading);
-    if (match != null) {
-      String bookName = match.group(1)!.trim();
-      if (bookName.toLowerCase() == 'song of solomon') {
-        bookName = 'Song of Solomon';
-      }
-      int chapterNum = 1;
-      if (match.group(2) != null) {
-        chapterNum = int.tryParse(match.group(2)!) ?? 1;
-      }
-      
-      final flatChapters = ref.read(flatChaptersProvider);
-      final fc = flatChapters.where((c) => c.book.name.toLowerCase() == bookName.toLowerCase() || c.book.abbreviation.toLowerCase() == bookName.toLowerCase()).toList();
-      
-      if (fc.isNotEmpty) {
-        final chapterMatch = fc.where((c) => c.chapter.number == chapterNum).toList();
-        if (chapterMatch.isNotEmpty) {
-          final readLoc = ref.read(readLocationProvider.notifier);
-          readLoc.updateLocation(bookAbbrev: chapterMatch.first.book.abbreviation, chapter: chapterNum, verse: 1);
-          ref.read(navProvider.notifier).setIndex(1);
-        }
-      }
-    }
-  }
 
 
   @override
@@ -438,11 +412,252 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
 
 
 
-  Widget _buildReadingPlanBanner(
-      BuildContext context, ThemeData theme, CardSize size, WidgetRef ref) {
+  String _getPlanTitle(String planId, WidgetRef ref) {
+    if (planId == 'chronological_1yr') return 'Chronological Bible in a Year';
+    if (planId == 'great_controversy') return 'The Great Controversy';
+    if (planId == 'prophetic_timeline') return 'Prophetic Timeline';
+    final customPlan = ref.read(preferencesProvider).getCustomPlan(planId);
+    return customPlan?['title'] ?? 'Custom Plan';
+  }
+
+  Widget _buildCircularProgress(double pct, Color color) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: pct),
+      duration: const Duration(milliseconds: 800),
+      curve: Curves.easeOutCubic,
+      builder: (context, value, _) {
+        return SizedBox(
+          width: 48,
+          height: 48,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              CircularProgressIndicator(
+                value: 1.0,
+                strokeWidth: 4,
+                valueColor: AlwaysStoppedAnimation(color.withValues(alpha: 0.15)),
+              ),
+              CircularProgressIndicator(
+                value: value,
+                strokeWidth: 4,
+                valueColor: AlwaysStoppedAnimation(color),
+                strokeCap: StrokeCap.round,
+              ),
+              Center(
+                child: Text(
+                  '${(value * 100).toStringAsFixed(0)}%',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: color),
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+    );
+  }
+
+  Widget _buildPlanRow(BuildContext context, ThemeData theme, WidgetRef ref, String planId, {required bool isHero}) {
+    final planState = ref.watch(readingPlanProvider(planId));
+    final title = _getPlanTitle(planId, ref);
+    final pct = planState.percentComplete;
+    
+    bool isRestDayToday = false;
+    if (planState.currentDay > 0 && planState.currentDay <= planState.planData.length) {
+      final dayData = planState.planData[planState.currentDay - 1];
+      isRestDayToday = dayData.passages.isEmpty;
+    }
+
+    if (isHero) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(20),
+            onTap: () {
+              Navigator.of(context).push(CupertinoPageRoute(
+                builder: (_) => ReadingPlanBrowser(planId: planId),
+              ));
+            },
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: theme.primaryColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: theme.primaryColor.withValues(alpha: 0.2)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(title, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Day ${planState.currentDay} of ${planState.planData.length}',
+                              style: theme.textTheme.bodySmall?.copyWith(color: theme.primaryColor, fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      _buildCircularProgress(pct, theme.primaryColor),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  if (planState.isLoading)
+                    Text('Loading...', style: theme.textTheme.bodyMedium)
+                  else if (planState.currentDay == 0)
+                    Text('Not Started', style: theme.textTheme.bodyMedium?.copyWith(color: theme.primaryColor, fontWeight: FontWeight.w600))
+                  else if (planState.isPlanComplete)
+                    Text('Plan Completed!', style: theme.textTheme.bodyMedium?.copyWith(color: theme.primaryColor, fontStyle: FontStyle.italic, fontWeight: FontWeight.w600))
+                  else if (isRestDayToday)
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surface.withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.self_improvement_rounded, color: theme.primaryColor, size: 20),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text('Rest & Reflection Day', style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold)),
+                          ),
+                        ],
+                      ),
+                    )
+                  else
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surface.withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Today\'s Reading', style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.7))),
+                          const SizedBox(height: 8),
+                          ...planState.planData[planState.currentDay - 1].passages.take(2).map((p) => 
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 3.0),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 2.0),
+                                    child: Icon(Icons.menu_book_rounded, color: theme.primaryColor, size: 14),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(child: Text(p.label, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600))),
+                                ],
+                              ),
+                            )
+                          ),
+                          if (planState.planData[planState.currentDay - 1].passages.length > 2)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4.0),
+                              child: Text('+ ${planState.planData[planState.currentDay - 1].passages.length - 2} more', style: theme.textTheme.labelSmall?.copyWith(color: theme.primaryColor)),
+                            ),
+                        ],
+                      ),
+                    ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (planState.currentDay == 0) {
+                        ref.read(readingPlanProvider(planId).notifier).startPlan();
+                        Navigator.of(context).push(CupertinoPageRoute(
+                          builder: (_) => PlanReaderScreen(planId: planId, dayNum: 1, initialPassageIndex: 0),
+                        ));
+                      } else if (planState.isPlanComplete) {
+                         Navigator.of(context).push(CupertinoPageRoute(
+                          builder: (_) => ReadingPlanBrowser(planId: planId),
+                        ));
+                      } else {
+                        Navigator.of(context).push(CupertinoPageRoute(
+                          builder: (_) => PlanReaderScreen(planId: planId, dayNum: planState.currentDay, initialPassageIndex: 0),
+                        ));
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.primaryColor,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 44),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      elevation: 0,
+                    ),
+                    child: Text(planState.currentDay == 0 ? 'Start Plan' : (planState.isPlanComplete ? 'View Plan' : 'Today\'s Reading')),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    } else {
+      // Compact Row
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: () {
+              Navigator.of(context).push(CupertinoPageRoute(
+                builder: (_) => ReadingPlanBrowser(planId: planId),
+              ));
+            },
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
+              ),
+              child: Row(
+                children: [
+                  _buildCircularProgress(pct, theme.primaryColor),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(title, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
+                        const SizedBox(height: 4),
+                        if (planState.isLoading)
+                          Text('Loading...', style: theme.textTheme.bodySmall)
+                        else if (planState.currentDay == 0)
+                          Text('Not Started', style: theme.textTheme.bodySmall?.copyWith(color: theme.primaryColor))
+                        else if (planState.isPlanComplete)
+                          Text('Completed', style: theme.textTheme.bodySmall?.copyWith(color: theme.primaryColor, fontStyle: FontStyle.italic))
+                        else if (isRestDayToday)
+                          Text('Rest Day', style: theme.textTheme.bodySmall?.copyWith(color: theme.primaryColor))
+                        else
+                          Text(planState.planData[planState.currentDay - 1].passages.map((p) => p.label).join(', '), style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.7)), maxLines: 1, overflow: TextOverflow.ellipsis),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Icon(Icons.chevron_right_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.3)),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+  }
+
+  Widget _buildReadingPlanBanner(BuildContext context, ThemeData theme, CardSize size, WidgetRef ref) {
     final activePlanIds = ref.watch(activePlanIdsProvider);
-    final primaryPlanId = activePlanIds.isNotEmpty ? activePlanIds.first : 'chronological_1yr';
-    final planState = ref.watch(readingPlanProvider(primaryPlanId));
     
     return AnimatedSize(
       duration: const Duration(milliseconds: 250),
@@ -464,181 +679,74 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
         child: TexturedGlassContainer(
           borderRadius: BorderRadius.circular(24),
           padding: EdgeInsets.zero,
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(24),
-              onTap: () {
-                Navigator.of(context).push(
-                  CupertinoPageRoute(builder: (_) => const ReadingPlansHubScreen())
-                );
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(24),
-                  gradient: LinearGradient(
-                    colors: [
-                      theme.primaryColor.withValues(alpha: 0.15),
-                      Colors.transparent,
-                    ],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      CupertinoPageRoute(builder: (_) => const ReadingPlansHubScreen())
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Reading Plans',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Icon(Icons.arrow_forward_ios_rounded, size: 16, color: theme.primaryColor.withValues(alpha: 0.5)),
+                      ],
+                    ),
                   ),
                 ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 20.0, vertical: 16.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Reading Plans',
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Icon(Icons.arrow_forward_ios_rounded, size: 16, color: theme.primaryColor.withValues(alpha: 0.5)),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Chronological Bible in a Year',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.textTheme.bodySmall?.color
-                                  ?.withValues(alpha: 0.8),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          
-                          if (planState.isLoading)
-                            Text('Loading...', style: theme.textTheme.labelSmall)
-                          else if (planState.currentDay == 0)
-                            Text('Not Started', style: theme.textTheme.labelSmall?.copyWith(color: theme.primaryColor, fontWeight: FontWeight.w600))
-                          else if (planState.isPlanComplete)
-                            Text('Plan Completed!', style: theme.textTheme.labelSmall?.copyWith(color: theme.primaryColor, fontWeight: FontWeight.w600))
-                          else
-                            Text(
-                              'Day ${planState.currentDay} · ${planState.getFormattedDateForDay(planState.currentDay)} • ${planState.planData[planState.currentDay - 1].readings.length} Reading(s)',
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: theme.primaryColor,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-
-                          if (size == CardSize.medium || size == CardSize.large) ...[
-                            const SizedBox(height: 16),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(4),
-                              child: LinearProgressIndicator(
-                                value: planState.completionPercentage,
-                                backgroundColor:
-                                    theme.primaryColor.withValues(alpha: 0.2),
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                    theme.primaryColor),
-                                minHeight: 6,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text('${(planState.completionPercentage * 100).toStringAsFixed(1)}% Complete',
-                                style: theme.textTheme.labelSmall?.copyWith(
-                                    color: theme.textTheme.labelSmall?.color
-                                        ?.withValues(alpha: 0.6))),
-                          ],
-                          if (size == CardSize.large && planState.currentDay > 0 && !planState.isPlanComplete) ...[
-                            const SizedBox(height: 16),
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Today\'s Reading',
-                                    style: theme.textTheme.labelMedium?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  ...planState.planData[planState.currentDay - 1].readings.map((reading) {
-                                    return InkWell(
-                                      onTap: () {
-                                        _openReading(reading, context, ref);
-                                      },
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 4.0),
-                                        child: Row(
-                                          children: [
-                                            Icon(Icons.menu_book_rounded, color: theme.primaryColor, size: 16),
-                                            const SizedBox(width: 8),
-                                            Text(reading, style: theme.textTheme.bodySmall?.copyWith(color: theme.primaryColor, decoration: TextDecoration.underline)),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  }),
-                                ],
-                              ),
-                            ),
-                          ],
-                          if (size == CardSize.large && planState.currentDay == 0) ...[
-                            const SizedBox(height: 16),
-                            ElevatedButton(
-                              onPressed: () {
-                                ref.read(readingPlanProvider(primaryPlanId).notifier).startPlan();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: theme.primaryColor,
-                                foregroundColor: Colors.white,
-                                minimumSize: const Size(double.infinity, 36),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                              ),
-                              child: const Text('Start Day 1'),
-                            ),
-                          ],
-                          if (size == CardSize.large && planState.isPlanComplete) ...[
-                            const SizedBox(height: 16),
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: theme.primaryColor.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                'You\'ve completed the Bible! Praise God for this milestone.',
-                                style: theme.textTheme.bodySmall?.copyWith(color: theme.primaryColor, fontStyle: FontStyle.italic),
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: theme.primaryColor.withValues(alpha: 0.2),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(Icons.play_arrow_rounded,
-                          color: theme.primaryColor, size: 28),
-                    ),
-                  ],
-                ),
               ),
-            ),
+              
+              if (activePlanIds.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: () {
+                        Navigator.of(context).push(CupertinoPageRoute(builder: (_) => const ReadingPlansHubScreen()));
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: theme.primaryColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: theme.primaryColor.withValues(alpha: 0.2)),
+                        ),
+                        child: Column(
+                          children: [
+                            Icon(Icons.menu_book_rounded, size: 40, color: theme.primaryColor.withValues(alpha: 0.8)),
+                            const SizedBox(height: 16),
+                            Text('Start a reading plan', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: theme.primaryColor)),
+                            const SizedBox(height: 4),
+                            Text('Grow in the Word daily.', style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.7))),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              else ...[
+                ...activePlanIds.asMap().entries.map((entry) {
+                  return _buildPlanRow(context, theme, ref, entry.value, isHero: entry.key == 0);
+                }),
+                const SizedBox(height: 8),
+              ],
+            ],
           ),
-        ),
         ),
       ),
     );

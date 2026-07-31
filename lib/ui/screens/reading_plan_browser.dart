@@ -8,6 +8,8 @@ import '../../theme/app_colors.dart';
 import '../widgets/shared_app_bar.dart';
 import 'plan_reader_screen.dart';
 import '../../state/streak_provider.dart';
+import '../../data/local_storage/preferences_service.dart';
+import 'package:flutter/cupertino.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HELPERS
@@ -738,24 +740,34 @@ class _PlanMonthCalendar extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 7,
-              mainAxisSpacing: 4,
-              crossAxisSpacing: 2,
-              childAspectRatio: 0.85,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 4,
+              childAspectRatio: 0.9,
             ),
-            itemCount: firstDaySundayFirst + daysInMonth,
+            itemCount: 42,
             itemBuilder: (context, index) {
-              if (index < firstDaySundayFirst) return const SizedBox.shrink();
-              final day = index - firstDaySundayFirst + 1;
-              final cellDate = DateTime(year, month, day);
+              DateTime cellDate;
+              bool isCurrentMonth = true;
+
+              if (index < firstDaySundayFirst) {
+                isCurrentMonth = false;
+                cellDate = DateTime(year, month, 1 - (firstDaySundayFirst - index));
+              } else if (index >= firstDaySundayFirst + daysInMonth) {
+                isCurrentMonth = false;
+                cellDate = DateTime(year, month, index - firstDaySundayFirst + 1);
+              } else {
+                cellDate = DateTime(year, month, index - firstDaySundayFirst + 1);
+              }
+
               final isRealToday = cellDate.year == realToday.year && cellDate.month == realToday.month && cellDate.day == realToday.day;
               final cellAppWeekday = appWeekday(cellDate);
               final isRestDay = restDay != null && cellAppWeekday == restDay;
 
               int? readingDay;
-              if (isScheduled) readingDay = scheduledMap['${cellDate.year}-${cellDate.month}-${cellDate.day}'];
+              if (isScheduled && isCurrentMonth) readingDay = scheduledMap['${cellDate.year}-${cellDate.month}-${cellDate.day}'];
 
               return _DayCell(
-                dayNum: day,
+                dayNum: cellDate.day,
                 isRealToday: isRealToday,
                 isRestDay: isRestDay,
                 readingDay: readingDay,
@@ -763,15 +775,16 @@ class _PlanMonthCalendar extends StatelessWidget {
                 isMissed: readingDay != null && planState.missedDays.contains(readingDay),
                 isToday: readingDay != null && readingDay == planState.todayReadingDay,
                 isScheduled: isScheduled,
+                isCurrentMonth: isCurrentMonth,
                 gold: gold,
                 theme: theme,
-                onTap: readingDay != null ? () => onDayTap(readingDay!) : null,
+                onTap: (readingDay != null && isCurrentMonth) ? () => onDayTap(readingDay!) : null,
               );
             },
           ),
           if (!isScheduled) ...[
-            const SizedBox(height: 12),
-            Text('Flexible mode: dates assigned as you read.', style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.45)), textAlign: TextAlign.center),
+            const SizedBox(height: 16),
+            Text('Flexible mode: dates assigned as you read.', style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.45)), textAlign: TextAlign.center),
           ],
         ],
       ),
@@ -788,6 +801,7 @@ class _DayCell extends StatelessWidget {
   final bool isMissed;
   final bool isToday;
   final bool isScheduled;
+  final bool isCurrentMonth;
   final Color gold;
   final ThemeData theme;
   final VoidCallback? onTap;
@@ -795,34 +809,42 @@ class _DayCell extends StatelessWidget {
   const _DayCell({
     required this.dayNum, required this.isRealToday, required this.isRestDay,
     required this.readingDay, required this.isCompleted, required this.isMissed,
-    required this.isToday, required this.isScheduled, required this.gold,
-    required this.theme, this.onTap,
+    required this.isToday, required this.isScheduled, required this.isCurrentMonth,
+    required this.gold, required this.theme, this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     Color? circleBg;
     Color? circleBorder;
-    Color textColor = theme.colorScheme.onSurface.withValues(alpha: 0.7);
+    Color textColor = theme.colorScheme.onSurface;
     Widget? indicator;
 
-    if (isRealToday && !isRestDay) {
-      circleBg = gold;
-      textColor = Colors.white;
-    } else if (isCompleted) {
-      circleBg = gold.withValues(alpha: 0.15);
-      textColor = gold;
-      indicator = Icon(Icons.check_rounded, size: 8, color: gold);
-    } else if (isToday && isScheduled) {
-      circleBorder = gold;
-      textColor = gold;
-    } else if (isMissed) {
-      circleBorder = theme.colorScheme.onSurface.withValues(alpha: 0.3);
-      textColor = theme.colorScheme.onSurface.withValues(alpha: 0.45);
-    } else if (isRestDay) {
-      textColor = theme.colorScheme.onSurface.withValues(alpha: 0.28);
-    } else if (readingDay != null) {
-      textColor = theme.colorScheme.onSurface.withValues(alpha: 0.55);
+    if (!isCurrentMonth) {
+      textColor = theme.colorScheme.onSurface.withValues(alpha: 0.15);
+      if (isRestDay) {
+        circleBorder = gold.withValues(alpha: 0.1);
+      }
+    } else {
+      if (isRealToday && !isRestDay) {
+        circleBg = gold;
+        textColor = theme.colorScheme.surface; // high contrast on gold
+      } else if (isCompleted) {
+        circleBg = gold.withValues(alpha: 0.2);
+        textColor = gold;
+        indicator = Icon(Icons.check_rounded, size: 10, color: gold);
+      } else if (isToday && isScheduled) {
+        circleBorder = gold;
+        textColor = gold;
+      } else if (isMissed) {
+        circleBorder = theme.colorScheme.onSurface.withValues(alpha: 0.4);
+        textColor = theme.colorScheme.onSurface.withValues(alpha: 0.6);
+      } else if (isRestDay) {
+        textColor = theme.colorScheme.onSurface.withValues(alpha: 0.35);
+        circleBorder = gold.withValues(alpha: 0.3); // Subtle border for rest day
+      } else if (readingDay != null) {
+        textColor = theme.colorScheme.onSurface.withValues(alpha: 0.85);
+      }
     }
 
     return GestureDetector(
@@ -832,8 +854,8 @@ class _DayCell extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: 30,
-            height: 30,
+            width: 38,
+            height: 38,
             decoration: BoxDecoration(
               color: circleBg,
               shape: BoxShape.circle,
@@ -841,19 +863,19 @@ class _DayCell extends StatelessWidget {
             ),
             child: Center(
               child: isRestDay
-                  ? Icon(Icons.self_improvement_rounded, size: 11, color: theme.colorScheme.onSurface.withValues(alpha: 0.25))
-                  : Text('$dayNum', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: textColor)),
+                  ? Icon(Icons.self_improvement_rounded, size: 14, color: isCurrentMonth ? theme.colorScheme.onSurface.withValues(alpha: 0.35) : theme.colorScheme.onSurface.withValues(alpha: 0.15))
+                  : Text('$dayNum', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: textColor)),
             ),
           ),
           if (indicator != null) ...[
-            const SizedBox(height: 2),
+            const SizedBox(height: 4),
             indicator,
-          ] else if (readingDay != null && !isCompleted && !isRestDay)
+          ] else if (readingDay != null && !isCompleted && !isRestDay && isCurrentMonth)
             Container(
-              margin: const EdgeInsets.only(top: 3),
-              width: 4,
-              height: 4,
-              decoration: BoxDecoration(shape: BoxShape.circle, color: theme.colorScheme.onSurface.withValues(alpha: 0.2)),
+              margin: const EdgeInsets.only(top: 4),
+              width: 5,
+              height: 5,
+              decoration: BoxDecoration(shape: BoxShape.circle, color: theme.colorScheme.onSurface.withValues(alpha: 0.25)),
             ),
         ],
       ),
@@ -930,6 +952,36 @@ class _DayViewState extends ConsumerState<DayView> with TickerProviderStateMixin
       if (celebrations.isNotEmpty) {
         _confettiController.play();
         debugPrint('Celebrations triggered: $celebrations');
+        
+        if (celebrations.contains('Plan 100% complete') && mounted) {
+          String planTitle = 'Custom Plan';
+          if (widget.planId == 'chronological_1yr') {
+            planTitle = 'Chronological Bible in a Year';
+          } else if (widget.planId == 'great_controversy') {
+            planTitle = 'The Great Controversy';
+          } else if (widget.planId == 'prophetic_timeline') {
+            planTitle = 'Prophetic Timeline';
+          } else {
+            final customPlan = ref.read(preferencesProvider).getCustomPlan(widget.planId);
+            if (customPlan != null) {
+              planTitle = customPlan['title'] ?? 'Custom Plan';
+            }
+          }
+
+          showDialog(
+            context: context,
+            builder: (c) => CupertinoAlertDialog(
+              title: const Text('Congratulations! 🎉'),
+              content: Text('You\'ve completed $planTitle! Well done.'),
+              actions: [
+                CupertinoDialogAction(
+                  child: const Text('OK'),
+                  onPressed: () => Navigator.pop(c),
+                ),
+              ],
+            ),
+          );
+        }
       }
     } else {
       HapticFeedback.lightImpact();
