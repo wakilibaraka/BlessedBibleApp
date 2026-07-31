@@ -440,7 +440,9 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
 
   Widget _buildReadingPlanBanner(
       BuildContext context, ThemeData theme, CardSize size, WidgetRef ref) {
-    final planState = ref.watch(readingPlanProvider);
+    final activePlanIds = ref.watch(activePlanIdsProvider);
+    final primaryPlanId = activePlanIds.isNotEmpty ? activePlanIds.first : 'chronological_1yr';
+    final planState = ref.watch(readingPlanProvider(primaryPlanId));
     
     return AnimatedSize(
       duration: const Duration(milliseconds: 250),
@@ -592,7 +594,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                             const SizedBox(height: 16),
                             ElevatedButton(
                               onPressed: () {
-                                ref.read(readingPlanProvider.notifier).startPlan();
+                                ref.read(readingPlanProvider(primaryPlanId).notifier).startPlan();
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: theme.primaryColor,

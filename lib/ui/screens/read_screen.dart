@@ -1312,7 +1312,10 @@ Positioned(
               final activePlanDay = ref.watch(activePlanContextProvider);
               if (activePlanDay == null) return const SizedBox.shrink();
               
-              final planState = ref.watch(readingPlanProvider);
+              final activePlanIds = ref.watch(activePlanIdsProvider);
+              if (activePlanIds.isEmpty) return const SizedBox.shrink();
+              final primaryPlanId = activePlanIds.first;
+              final planState = ref.watch(readingPlanProvider(primaryPlanId));
               if (activePlanDay < 1 || activePlanDay > planState.planData.length) return const SizedBox.shrink();
               
               final dayTarget = planState.planData[activePlanDay - 1];
@@ -1350,11 +1353,11 @@ Positioned(
                         child: ElevatedButton.icon(
                           icon: const Icon(Icons.check_circle_outline_rounded),
                           onPressed: () {
-                            final notifier = ref.read(readingPlanProvider.notifier);
+                            final notifier = ref.read(readingPlanProvider(primaryPlanId).notifier);
                             final chapterToMark = PlanChapter(bookName: fc.book.name, chapterNum: fc.chapter.number);
                             notifier.markChapterComplete(chapterToMark);
                             
-                            final updatedPlanState = ref.read(readingPlanProvider);
+                            final updatedPlanState = ref.read(readingPlanProvider(primaryPlanId));
                             if (updatedPlanState.isDayComplete(activePlanDay)) {
                                ref.read(activePlanContextProvider.notifier).setContext(null);
                                showDialog(
@@ -1371,7 +1374,7 @@ Positioned(
                                      
                                      notifier.markDayComplete(activePlanDay);
                                      
-                                     final finalState = ref.read(readingPlanProvider);
+                                     final finalState = ref.read(readingPlanProvider(primaryPlanId));
                                      if (finalState.isPlanComplete) {
                                         messenger.showSnackBar(const SnackBar(content: Text('Plan completed! Congratulations! 🎉')));
                                      } else {

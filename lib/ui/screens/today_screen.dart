@@ -266,7 +266,9 @@ class _TodaysReadingCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final planState = ref.watch(readingPlanProvider);
+    final activePlanIds = ref.watch(activePlanIdsProvider);
+    final primaryPlanId = activePlanIds.isNotEmpty ? activePlanIds.first : 'chronological_1yr';
+    final planState = ref.watch(readingPlanProvider(primaryPlanId));
     final totalDays = planState.planData.length;
     final currentDay = planState.currentDay;
     
@@ -470,7 +472,9 @@ class _StreakProgressCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final planState = ref.watch(readingPlanProvider);
+    final activePlanIds = ref.watch(activePlanIdsProvider);
+    final primaryPlanId = activePlanIds.isNotEmpty ? activePlanIds.first : 'chronological_1yr';
+    final planState = ref.watch(readingPlanProvider(primaryPlanId));
     final streakDays = planState.currentDay > 1 ? planState.currentDay - 1 : 0;
     final totalDays = planState.planData.length;
     final totalCompleted = planState.currentDay > 1 && totalDays > 0 ? planState.currentDay - 1 : 0;

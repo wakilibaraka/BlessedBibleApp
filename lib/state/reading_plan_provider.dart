@@ -186,13 +186,17 @@ class ReadingPlanState {
 }
 
 class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
+  /// The planId this notifier instance is keyed for (injected via factory).
+  final String _planId;
+  ReadingPlanNotifier(this._planId);
+
   @override
   ReadingPlanState build() {
-    _loadData();
-    return ReadingPlanState(isLoading: true);
+    _loadData(_planId);
+    return ReadingPlanState(isLoading: true, planId: _planId);
   }
 
-  Future<void> _loadData() async {
+  Future<void> _loadData(String targetPlanId) async {
     try {
       final jsonString = await rootBundle.loadString('assets/reading_plans/chronological_1yr.json');
       final Map<String, dynamic> decoded = await compute<String, Map<String, dynamic>>(
@@ -202,9 +206,9 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
       final rawReadings = decoded['readings'] as List;
       final planData = rawReadings.map((e) => PlanDayData.fromJson(e)).toList();
 
-final prefsState = ref.read(preferencesProvider).getReadingPlanState();
+      final prefsState = ref.read(preferencesProvider).getReadingPlanState(targetPlanId);
       
-      String planId = 'chronological_1yr';
+      String planId = targetPlanId;
       DateTime? planStartedOn;
       String paceMode = 'scheduled';
       int? restDay = 7;
@@ -275,7 +279,7 @@ final prefsState = ref.read(preferencesProvider).getReadingPlanState();
   }
 
   void _saveToPrefs(ReadingPlanState s) {
-    ref.read(preferencesProvider).saveReadingPlanState({
+    ref.read(preferencesProvider).saveReadingPlanState(s.planId, {
       'planId': s.planId,
       'planStartedOn': s.planStartedOn?.toIso8601String(),
       'paceMode': s.paceMode,
@@ -287,9 +291,9 @@ final prefsState = ref.read(preferencesProvider).getReadingPlanState();
     });
   }
 
-  void startPlan({String planId = 'chronological_1yr', String paceMode = 'scheduled', int? restDay = 7, List<PlanDayData>? customPlanData}) {
+  void startPlan({String? planId, String paceMode = 'scheduled', int? restDay = 7, List<PlanDayData>? customPlanData}) {
     final next = state.copyWith(
-      planId: planId,
+      planId: planId ?? _planId,
       planStartedOn: DateTime.now(),
       paceMode: paceMode,
       restDay: restDay,
@@ -358,7 +362,39 @@ final prefsState = ref.read(preferencesProvider).getReadingPlanState();
   void markChapterComplete(PlanChapter c) {}
 }
 
-final readingPlanProvider = NotifierProvider<ReadingPlanNotifier, ReadingPlanState>(ReadingPlanNotifier.new);
+final readingPlanProvider = NotifierProvider.family<ReadingPlanNotifier, ReadingPlanState, String>(
+  (planId) => ReadingPlanNotifier(planId),
+);
+
+class ActivePlanIdsNotifier extends Notifier<List<String>> {
+  @override
+  List<String> build() {
+    return ref.read(preferencesProvider).getActivePlanIds();
+  }
+
+  bool addPlan(String id) {
+    if (state.contains(id)) return true;
+    if (state.length >= 3) return false; // Enforce block-not-evict
+    final next = [...state, id];
+    state = next;
+    ref.read(preferencesProvider).saveActivePlanIds(next);
+    return true;
+  }
+
+  void removePlan(String id) {
+    final next = state.where((e) => e != id).toList();
+    state = next;
+    ref.read(preferencesProvider).saveActivePlanIds(next);
+  }
+}
+final activePlanIdsProvider = NotifierProvider<ActivePlanIdsNotifier, List<String>>(ActivePlanIdsNotifier.new);
+
+class CurrentActivePlanIdNotifier extends Notifier<String?> {
+  @override
+  String? build() => null;
+  void setContext(String? id) => state = id;
+}
+final currentActivePlanIdProvider = NotifierProvider<CurrentActivePlanIdNotifier, String?>(CurrentActivePlanIdNotifier.new);
 
 class ActivePlanContextNotifier extends Notifier<int?> {
   @override

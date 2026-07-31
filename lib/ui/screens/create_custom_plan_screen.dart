@@ -86,17 +86,21 @@ class _CreateCustomPlanScreenState extends ConsumerState<CreateCustomPlanScreen>
     ref.read(preferencesProvider).saveCustomPlan(planId, planData);
 
     // Start plan instantly and inject the planData directly to avoid async loading gaps
-    ref.read(readingPlanProvider.notifier).startPlan(
+    ref.read(readingPlanProvider(planId).notifier).startPlan(
       planId: planId,
       paceMode: _paceMode,
       restDay: _restDay,
       customPlanData: schedule,
     );
 
+    // Make it active
+    ref.read(activePlanIdsProvider.notifier).addPlan(planId);
+    ref.read(currentActivePlanIdProvider.notifier).setContext(planId);
+
     // Pop the creation screen and push the browser
     Navigator.of(context).pop();
     Navigator.of(context).pushReplacement(
-      CupertinoPageRoute(builder: (_) => const ReadingPlanBrowser())
+      CupertinoPageRoute(builder: (_) => ReadingPlanBrowser(planId: planId))
     );
   }
 

@@ -119,7 +119,13 @@ class BackupService {
       ref.invalidate(bookmarksProvider);
       ref.invalidate(highlightsProvider);
       ref.invalidate(notesProvider);
-      ref.invalidate(readingPlanProvider);
+      // Invalidate all active plan family instances, then the ids list
+      final activePlanIds = ref.read(activePlanIdsProvider);
+      for (final planId in activePlanIds) {
+        ref.invalidate(readingPlanProvider(planId));
+      }
+      ref.invalidate(activePlanIdsProvider);
+      ref.invalidate(currentActivePlanIdProvider);
       ref.invalidate(searchStateProvider);
       ref.invalidate(searchSettingsProvider);
       ref.invalidate(navSettingsProvider);

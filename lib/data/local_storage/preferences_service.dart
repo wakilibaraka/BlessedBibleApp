@@ -144,17 +144,38 @@ class PreferencesService {
     return prefs.getString(_studyLayoutKey);
   }
 
-  void saveReadingPlanState(Map<String, dynamic> state) {
-    prefs.setString(_readingPlanStateKey, jsonEncode(state));
+  static const String _activePlanIdsKey = 'active_plan_ids';
+
+  void saveActivePlanIds(List<String> planIds) {
+    prefs.setStringList(_activePlanIdsKey, planIds);
   }
 
-  Map<String, dynamic>? getReadingPlanState() {
-    final jsonString = prefs.getString(_readingPlanStateKey);
+  List<String> getActivePlanIds() {
+    return prefs.getStringList(_activePlanIdsKey) ?? [];
+  }
+
+  void saveReadingPlanState(String planId, Map<String, dynamic> state) {
+    prefs.setString('${_readingPlanStateKey}_$planId', jsonEncode(state));
+  }
+
+  Map<String, dynamic>? getReadingPlanState(String planId) {
+    final jsonString = prefs.getString('${_readingPlanStateKey}_$planId');
     if (jsonString != null) {
       try {
         return jsonDecode(jsonString) as Map<String, dynamic>;
       } catch (e) {
         // ignore
+      }
+    }
+    // Fallback to legacy single-plan state for migration
+    if (planId == 'chronological_1yr') {
+      final legacyString = prefs.getString(_readingPlanStateKey);
+      if (legacyString != null) {
+        try {
+          return jsonDecode(legacyString) as Map<String, dynamic>;
+        } catch (e) {
+          // ignore
+        }
       }
     }
     return null;

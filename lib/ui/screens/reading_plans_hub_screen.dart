@@ -29,7 +29,7 @@ class PlanMetadata {
 // When real plans are added, just flip isAvailable to true and wire up the provider accordingly.
 const List<PlanMetadata> availablePlans = [
   PlanMetadata(
-    id: 'chronological',
+    id: 'chronological_1yr',
     title: 'Chronological Bible in a Year',
     description: 'Read the Bible in the order events occurred.',
     isAvailable: true,
@@ -55,14 +55,14 @@ class ReadingPlansHubScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final appThemeMode = ref.watch(themeProvider);
-    final planState = ref.watch(readingPlanProvider);
+    final activePlanIds = ref.watch(activePlanIdsProvider);
     final prefs = ref.watch(preferencesProvider);
     
-    // In this MVP, only chronological is active.
-    final otherPlans = availablePlans.where((p) => p.id != 'chronological').toList();
+    // Preset plans not currently active — show in Discover section
+    final fixedPlans = availablePlans.where((p) => !activePlanIds.contains(p.id)).toList();
 
-    // Load custom plans
-    final customPlanIds = prefs.getCustomPlanIds();
+    // Load custom plans, filter out active ones
+    final customPlanIds = prefs.getCustomPlanIds().where((id) => !activePlanIds.contains(id)).toList();
     final customPlans = customPlanIds.map((id) => prefs.getCustomPlan(id)).whereType<Map<String, dynamic>>().toList();
     
     return Scaffold(
@@ -79,13 +79,13 @@ class ReadingPlansHubScreen extends ConsumerWidget {
           ),
           CustomScrollView(
             slivers: [
-              // ── ACTIVE PLAN (Top) ──
-              if (planState.planData.isNotEmpty) ...[
+              // ── ACTIVE PLANS (Top) ──
+              if (activePlanIds.isNotEmpty) ...[
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
                     child: Text(
-                      'Active Plan',
+                      'Active Plans',
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w700,
                         color: AppColors.goldAccent,
@@ -93,10 +93,18 @@ class ReadingPlansHubScreen extends ConsumerWidget {
                     ),
                   ),
                 ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                    child: _buildActivePlanCard(context, ref, theme, planState.planId, planState),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final planId = activePlanIds[index];
+                      final planState = ref.watch(readingPlanProvider(planId));
+                      if (planState.planData.isEmpty && !planState.isLoading) return const SizedBox.shrink();
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                        child: _buildActivePlanCard(context, ref, theme, planId, planState),
+                      );
+                    },
+                    childCount: activePlanIds.length,
                   ),
                 ),
               ],
@@ -150,15 +158,13 @@ class ReadingPlansHubScreen extends ConsumerWidget {
                   ),
                 ),
               
-              // ── PRE-AUTHORED PLANS ──
-
-              // ── OTHER PLANS (Bottom) ──
-              if (otherPlans.isNotEmpty) ...[
+              // ── DISCOVER / FIXED PLANS ──
+              if (fixedPlans.isNotEmpty) ...[
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(20, 32, 20, 16),
                     child: Text(
-                      'Other Plans',
+                      'Fixed Plans',
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w700,
                         color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
@@ -169,13 +175,15 @@ class ReadingPlansHubScreen extends ConsumerWidget {
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      final plan = otherPlans[index];
+                      final plan = fixedPlans[index];
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                        child: _buildOtherPlanCard(theme, plan),
+                        child: plan.isAvailable
+                            ? _buildFixedPlanCard(context, ref, theme, plan)
+                            : _buildOtherPlanCard(theme, plan),
                       );
                     },
-                    childCount: otherPlans.length,
+                    childCount: fixedPlans.length,
                   ),
                 ),
               ],
@@ -189,13 +197,15 @@ class ReadingPlansHubScreen extends ConsumerWidget {
   }
 
   Widget _buildActivePlanCard(BuildContext context, WidgetRef ref, ThemeData theme, String planId, ReadingPlanState planState) {
-    String title = 'Chronological Bible in a Year';
-    String description = 'Read the Bible in the order events occurred.';
-    if (planId != 'chronological_1yr') {
+    final String effectivePlanId = planId == 'chronological' ? 'chronological_1yr' : planId;
+    final preset = availablePlans.where((p) => p.id == effectivePlanId).firstOrNull;
+    String title = preset?.title ?? 'Custom Plan';
+    String description = preset?.description ?? '';
+    if (preset == null) {
       final customPlan = ref.read(preferencesProvider).getCustomPlan(planId);
       if (customPlan != null) {
         title = customPlan['title'] ?? 'Custom Plan';
-        description = customPlan['description'] ?? 'A custom reading plan.';
+        description = _getPlanDescription(customPlan);
       }
     }
 
@@ -210,149 +220,190 @@ class ReadingPlansHubScreen extends ConsumerWidget {
       }
     }
 
-    return TexturedGlassContainer(
-      borderRadius: BorderRadius.circular(24),
-      padding: EdgeInsets.zero,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
-          gradient: LinearGradient(
-            colors: [
-              theme.primaryColor.withValues(alpha: 0.15),
-              Colors.transparent,
+    return GestureDetector(
+      onLongPress: () {
+        showDialog(
+          context: context,
+          builder: (c) => CupertinoAlertDialog(
+            title: Text(preset == null ? 'Delete Active Plan' : 'Deactivate Plan'),
+            content: Text(preset == null 
+              ? 'Are you sure you want to delete this custom plan? It will be permanently removed.'
+              : 'Are you sure you want to deactivate this plan? You can reactivate it later from the Fixed Plans section.'),
+            actions: [
+              CupertinoDialogAction(
+                child: const Text('Cancel'),
+                onPressed: () => Navigator.pop(c),
+              ),
+              CupertinoDialogAction(
+                isDestructiveAction: true,
+                onPressed: () {
+                  if (preset == null) {
+                    ref.read(preferencesProvider).deleteCustomPlan(planId);
+                  }
+                  ref.read(activePlanIdsProvider.notifier).removePlan(planId);
+                  ref.invalidate(preferencesProvider);
+                  Navigator.pop(c);
+                },
+                child: Text(preset == null ? 'Delete' : 'Deactivate'),
+              ),
             ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
           ),
-        ),
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        description,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppColors.goldAccent.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    'Active',
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: AppColors.goldAccent,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+        );
+      },
+      child: TexturedGlassContainer(
+        borderRadius: BorderRadius.circular(16),
+        padding: EdgeInsets.zero,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: LinearGradient(
+              colors: [
+                theme.primaryColor.withValues(alpha: 0.15),
+                Colors.transparent,
               ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-            const SizedBox(height: 24),
-            
-            // Status row
-            if (planState.isLoading)
-              Text('Loading...', style: theme.textTheme.bodyMedium)
-            else if (planState.currentDay == 0)
-              Text('Not Started', style: theme.textTheme.titleMedium?.copyWith(color: theme.primaryColor, fontWeight: FontWeight.bold))
-            else if (planState.isPlanComplete)
-              Text('Plan Completed 🎉', style: theme.textTheme.titleMedium?.copyWith(color: theme.primaryColor, fontWeight: FontWeight.bold))
-            else ...[
+          ),
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Day ${planState.currentDay}',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: theme.primaryColor,
-                      fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  Text(
-                    '${(planState.completionPercentage * 100).toStringAsFixed(1)}% completed',
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: AppColors.goldAccent.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      'Active',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: AppColors.goldAccent,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: LinearProgressIndicator(
-                  value: planState.completionPercentage,
-                  backgroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                  valueColor: AlwaysStoppedAnimation<Color>(theme.primaryColor),
-                  minHeight: 8,
+              if (description.isNotEmpty) ...[
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              if (missedDays > 0) ...[
-                const SizedBox(height: 12),
+              ],
+              const SizedBox(height: 12),
+              
+              // Status row
+              if (planState.isLoading)
+                Text('Loading...', style: theme.textTheme.bodySmall)
+              else if (planState.isPlanComplete)
+                Text('Plan Completed 🎉', style: theme.textTheme.bodyMedium?.copyWith(color: theme.primaryColor, fontWeight: FontWeight.bold))
+              else ...[
                 Row(
                   children: [
-                    Icon(Icons.warning_amber_rounded, size: 16, color: Colors.orange.withValues(alpha: 0.8)),
-                    const SizedBox(width: 6),
                     Expanded(
-                      child: Text(
-                        'You are $missedDays day${missedDays == 1 ? '' : 's'} behind schedule.',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: Colors.orange.withValues(alpha: 0.8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (planState.currentDay == 0)
+                            Text('Not Started', style: theme.textTheme.bodyMedium?.copyWith(color: theme.primaryColor, fontWeight: FontWeight.bold))
+                          else ...[
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Day ${planState.currentDay}',
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: theme.primaryColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  '${(planState.completionPercentage * 100).toStringAsFixed(0)}%',
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: LinearProgressIndicator(
+                                value: planState.completionPercentage,
+                                backgroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                                valueColor: AlwaysStoppedAnimation<Color>(theme.primaryColor),
+                                minHeight: 4,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: theme.primaryColor,
+                        foregroundColor: theme.colorScheme.onPrimary,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
+                        elevation: 0,
+                      ),
+                      onPressed: () {
+                        ref.read(currentActivePlanIdProvider.notifier).setContext(planId);
+                        Navigator.of(context).push(
+                          CupertinoPageRoute(builder: (_) => ReadingPlanBrowser(planId: planId))
+                        );
+                      },
+                      child: Text(
+                        (planState.currentDay == 0) ? 'Start' : 'Continue',
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                       ),
                     ),
                   ],
                 ),
+                if (missedDays > 0) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(Icons.warning_amber_rounded, size: 14, color: Colors.orange.withValues(alpha: 0.8)),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          'Behind schedule by $missedDays day${missedDays == 1 ? '' : 's'}.',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: Colors.orange.withValues(alpha: 0.8),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ],
-
-            const SizedBox(height: 24),
-            
-            // Action Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.primaryColor,
-                  foregroundColor: theme.colorScheme.onPrimary,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  elevation: 0,
-                ),
-                onPressed: () {
-                  Navigator.of(context).push(
-                    CupertinoPageRoute(builder: (_) => const ReadingPlanBrowser())
-                  );
-                },
-                child: Text(
-                  (planState.currentDay == 0) ? 'Start Plan' : 'Continue Plan',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -414,11 +465,9 @@ class ReadingPlansHubScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildCustomPlanCard(BuildContext context, WidgetRef ref, ThemeData theme, Map<String, dynamic> customPlan, PreferencesService prefs) {
-    String id = customPlan['id'] ?? '';
-    String title = customPlan['title'] ?? 'Custom Plan';
-    String description = customPlan['description'] ?? '';
-    
+
+  Widget _buildFixedPlanCard(BuildContext context, WidgetRef ref, ThemeData theme, PlanMetadata plan) {
+
     return TexturedGlassContainer(
       borderRadius: BorderRadius.circular(20),
       padding: EdgeInsets.zero,
@@ -432,55 +481,27 @@ class ReadingPlansHubScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: Text(
-                    title,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        plan.title,
+                        style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        plan.description,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20),
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (c) => CupertinoAlertDialog(
-                        title: const Text('Delete Plan'),
-                        content: const Text('Are you sure you want to delete this custom plan?'),
-                        actions: [
-                          CupertinoDialogAction(
-                            child: const Text('Cancel'),
-                            onPressed: () => Navigator.pop(c),
-                          ),
-                          CupertinoDialogAction(
-                            isDestructiveAction: true,
-                            onPressed: () {
-                              prefs.deleteCustomPlan(id);
-                              // Simple state refresh hack by forcing UI rebuild or reloading provider
-                              // We just rely on watch rebuilds or navigate
-                              Navigator.pop(c);
-                              // We can trigger a rebuild by restarting the active plan if it was deleted, but for now just pop
-                            },
-                            child: const Text('Delete'),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                )
               ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              description,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-              ),
             ),
             const SizedBox(height: 16),
             SizedBox(
@@ -489,25 +510,169 @@ class ReadingPlansHubScreen extends ConsumerWidget {
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  side: BorderSide(color: AppColors.goldAccent.withValues(alpha: 0.6)),
                 ),
                 onPressed: () {
-                  // Make this plan active
-                  // Note: The custom plan is loaded asynchronously, but we can pass the data directly
-                  // Or let the provider handle loading it from prefs since it has the ID
-                  ref.read(readingPlanProvider.notifier).startPlan(
-                    planId: id,
-                    paceMode: customPlan['paceMode'] ?? 'scheduled',
-                    restDay: customPlan['restDay'] as int?,
+                  final added = ref.read(activePlanIdsProvider.notifier).addPlan(plan.id);
+                  if (!added) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('You have 3 active plans. Deactivate one to add another.')),
+                    );
+                    return;
+                  }
+                  ref.read(readingPlanProvider(plan.id).notifier).startPlan(
+                    planId: plan.id,
+                    paceMode: 'scheduled',
+                    restDay: 7,
                   );
-                  // Reload the page or show toast
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Plan activated!')));
+                  ref.read(currentActivePlanIdProvider.notifier).setContext(plan.id);
+                  Navigator.of(context).push(
+                    CupertinoPageRoute(builder: (_) => ReadingPlanBrowser(planId: plan.id)),
+                  );
                 },
-                child: const Text('Set as Active Plan'),
+                child: Text(
+                  'Start Plan',
+                  style: TextStyle(color: AppColors.goldAccent, fontWeight: FontWeight.w600),
+                ),
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+
+  String _getPlanDescription(Map<String, dynamic> customPlan) {
+    String desc = customPlan['description'] ?? '';
+    if (desc.isNotEmpty && desc != 'A custom reading plan.') {
+      return desc;
+    }
+    final readings = customPlan['readings'] as List?;
+    if (readings != null && readings.isNotEmpty) {
+      try {
+        final firstDay = readings.first['chapters'] as List?;
+        final lastDay = readings.last['chapters'] as List?;
+        if (firstDay != null && firstDay.isNotEmpty && lastDay != null && lastDay.isNotEmpty) {
+          final firstChap = firstDay.first;
+          final lastChap = lastDay.last;
+          
+          final String firstBook = firstChap['bookName'];
+          final int firstNum = firstChap['chapterNum'];
+          final String lastBook = lastChap['bookName'];
+          final int lastNum = lastChap['chapterNum'];
+          
+          if (firstBook == lastBook) {
+            return '$firstBook $firstNum – $lastNum';
+          } else {
+            return '$firstBook $firstNum – $lastBook $lastNum';
+          }
+        }
+      } catch (_) {}
+    }
+    return 'A custom reading plan.';
+  }
+
+  Widget _buildCustomPlanCard(BuildContext context, WidgetRef ref, ThemeData theme, Map<String, dynamic> customPlan, PreferencesService prefs) {
+
+    String id = customPlan['id'] ?? '';
+    String title = customPlan['title'] ?? 'Custom Plan';
+    String description = _getPlanDescription(customPlan);
+    
+    return GestureDetector(
+      onLongPress: () {
+        showDialog(
+          context: context,
+          builder: (c) => CupertinoAlertDialog(
+            title: const Text('Delete Plan'),
+            content: const Text('Are you sure you want to delete this custom plan?'),
+            actions: [
+              CupertinoDialogAction(
+                child: const Text('Cancel'),
+                onPressed: () => Navigator.pop(c),
+              ),
+              CupertinoDialogAction(
+                isDestructiveAction: true,
+                onPressed: () {
+                  prefs.deleteCustomPlan(id);
+                  if (ref.read(activePlanIdsProvider).contains(id)) {
+                    ref.read(activePlanIdsProvider.notifier).removePlan(id);
+                  }
+                  ref.invalidate(preferencesProvider);
+                  Navigator.pop(c);
+                },
+                child: const Text('Delete'),
+              ),
+            ],
+          ),
+        );
+      },
+      child: TexturedGlassContainer(
+        borderRadius: BorderRadius.circular(16),
+        padding: EdgeInsets.zero,
+        child: Container(
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                description,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                ),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  onPressed: () {
+                  // Try to make this plan active
+                  final added = ref.read(activePlanIdsProvider.notifier).addPlan(id);
+                  if (!added) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('You have 3 active plans. Deactivate one to add another.'))
+                    );
+                    return;
+                  }
+                  
+                  ref.read(readingPlanProvider(id).notifier).startPlan(
+                    planId: id,
+                    paceMode: customPlan['paceMode'] ?? 'scheduled',
+                    restDay: customPlan['restDay'] as int?,
+                  );
+                  ref.read(currentActivePlanIdProvider.notifier).setContext(id);
+                  Navigator.of(context).push(
+                    CupertinoPageRoute(builder: (_) => ReadingPlanBrowser(planId: id))
+                  );
+                },
+                child: const Text('Activate Plan'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ));
   }
 }

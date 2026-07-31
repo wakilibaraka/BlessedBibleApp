@@ -88,11 +88,13 @@ _ParsedRef? _parseRef(String ref) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 class PlanReaderScreen extends ConsumerStatefulWidget {
+  final String planId;
   final int dayNum;
   final int initialPassageIndex;
 
   const PlanReaderScreen({
     super.key,
+    required this.planId,
     required this.dayNum,
     required this.initialPassageIndex,
   });
@@ -118,7 +120,7 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
   }
 
   void _resolvePassages() {
-    final planState = ref.read(readingPlanProvider);
+    final planState = ref.read(readingPlanProvider(widget.planId));
     if (planState.planData.isEmpty || widget.dayNum > planState.planData.length) return;
     final dayData = planState.planData[widget.dayNum - 1];
     final flatChapters = ref.read(flatChaptersProvider);
@@ -200,7 +202,7 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
 
   void _unmarkRead() {
     HapticFeedback.lightImpact();
-    ref.read(readingPlanProvider.notifier).markReadingIncomplete(widget.dayNum);
+    ref.read(readingPlanProvider(widget.planId).notifier).markReadingIncomplete(widget.dayNum);
   }
 
   void _toggleVerseSelection(int verseNum) {
@@ -237,7 +239,7 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
     final typography = ref.watch(typographyProvider);
     final readSettings = ref.watch(readSettingsProvider);
     final appThemeMode = ref.watch(themeProvider);
-    final isDone = ref.watch(readingPlanProvider).completedReadings.contains(widget.dayNum);
+    final isDone = ref.watch(readingPlanProvider(widget.planId)).completedReadings.contains(widget.dayNum);
 
     final resolvedMode = appThemeMode.resolve(context);
     final Color redLetterColor = resolvedMode == AppThemeMode.light

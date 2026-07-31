@@ -531,9 +531,9 @@ class _TodayViewBody extends ConsumerWidget {
         initialState: planState,
         isEditing: true,
         onConfirm: (pace, rest, remEnabled, remH, remM) {
-          ref.read(readingPlanProvider.notifier).setPaceMode(pace);
-          ref.read(readingPlanProvider.notifier).setRestDay(rest);
-          ref.read(readingPlanProvider.notifier).setReminder(remEnabled, remH, remM);
+          ref.read(readingPlanProvider(planState.planId).notifier).setPaceMode(pace);
+          ref.read(readingPlanProvider(planState.planId).notifier).setRestDay(rest);
+          ref.read(readingPlanProvider(planState.planId).notifier).setReminder(remEnabled, remH, remM);
         },
       ),
     );
@@ -601,7 +601,7 @@ class _TodayViewBody extends ConsumerWidget {
               final summary = dayData.passages.map((p) => _expandLabel(p)).join(', ');
               return InkWell(
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => DayView(dayNum: today)));
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => DayView(planId: planState.planId, dayNum: today)));
                 },
                 borderRadius: BorderRadius.circular(16),
                 child: Container(
@@ -635,7 +635,7 @@ class _TodayViewBody extends ConsumerWidget {
                 label: Text('Catch up · Day ${planState.oldestUnread}'),
                 style: TextButton.styleFrom(foregroundColor: theme.textTheme.bodyMedium?.color),
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => DayView(dayNum: planState.oldestUnread)));
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => DayView(planId: planState.planId, dayNum: planState.oldestUnread)));
                 },
               ),
             ],
@@ -662,7 +662,7 @@ class _TodayViewBody extends ConsumerWidget {
                 gold: gold,
                 onDayTap: (dayNum) {
                   HapticFeedback.selectionClick();
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => DayView(dayNum: dayNum)));
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => DayView(planId: planState.planId, dayNum: dayNum)));
                 },
               ),
             ),
@@ -866,8 +866,9 @@ class _DayCell extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 
 class DayView extends ConsumerStatefulWidget {
+  final String planId;
   final int dayNum;
-  const DayView({super.key, required this.dayNum});
+  const DayView({super.key, required this.planId, required this.dayNum});
 
   @override
   ConsumerState<DayView> createState() => _DayViewState();
@@ -883,7 +884,7 @@ class _DayViewState extends ConsumerState<DayView> with TickerProviderStateMixin
   @override
   void initState() {
     super.initState();
-    final planState = ref.read(readingPlanProvider);
+    final planState = ref.read(readingPlanProvider(widget.planId));
     _currentLogicalDay = _logicalDayForReadingDay(widget.dayNum, planState);
     _totalLogicalDaysCount = _totalLogicalDays(planState);
     _glowController = AnimationController(vsync: this, duration: const Duration(milliseconds: 400));
@@ -919,10 +920,10 @@ class _DayViewState extends ConsumerState<DayView> with TickerProviderStateMixin
       HapticFeedback.mediumImpact();
       _glowController.forward().then((_) => _glowController.reverse());
       
-      final previousCompleted = ref.read(readingPlanProvider).completedReadings;
-      ref.read(readingPlanProvider.notifier).markReadingComplete(readingDay);
-      final newCompleted = ref.read(readingPlanProvider).completedReadings;
-      final planData = ref.read(readingPlanProvider).planData;
+      final previousCompleted = ref.read(readingPlanProvider(widget.planId)).completedReadings;
+      ref.read(readingPlanProvider(widget.planId).notifier).markReadingComplete(readingDay);
+      final newCompleted = ref.read(readingPlanProvider(widget.planId)).completedReadings;
+      final planData = ref.read(readingPlanProvider(widget.planId)).planData;
       
       final celebrations = celebrationMilestones(previousCompleted, newCompleted, planData);
       
@@ -932,13 +933,13 @@ class _DayViewState extends ConsumerState<DayView> with TickerProviderStateMixin
       }
     } else {
       HapticFeedback.lightImpact();
-      ref.read(readingPlanProvider.notifier).markReadingIncomplete(readingDay);
+      ref.read(readingPlanProvider(widget.planId).notifier).markReadingIncomplete(readingDay);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final planState = ref.watch(readingPlanProvider);
+    final planState = ref.watch(readingPlanProvider(widget.planId));
     if (planState.planData.isEmpty || _currentLogicalDay < 1 || _currentLogicalDay > _totalLogicalDaysCount) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -1115,13 +1116,14 @@ class _DayViewState extends ConsumerState<DayView> with TickerProviderStateMixin
                                 context,
                                 MaterialPageRoute(
                                   builder: (_) => PlanReaderScreen(
+                                    planId: widget.planId,
                                     dayNum: readingDay,
                                     initialPassageIndex: entry.key,
                                   ),
                                 ),
                               );
                               if (markedComplete == true && mounted) {
-                                final isDoneNow = ref.read(readingPlanProvider).completedReadings.contains(readingDay);
+                                final isDoneNow = ref.read(readingPlanProvider(widget.planId)).completedReadings.contains(readingDay);
                                 if (!isDoneNow) {
                                   _toggleDone(false, readingDay);
                                 }
@@ -1245,7 +1247,8 @@ class _DayViewState extends ConsumerState<DayView> with TickerProviderStateMixin
 // ─────────────────────────────────────────────────────────────────────────────
 
 class ReadingPlanBrowser extends ConsumerStatefulWidget {
-  const ReadingPlanBrowser({super.key});
+  final String planId;
+  const ReadingPlanBrowser({super.key, required this.planId});
 
   @override
   ConsumerState<ReadingPlanBrowser> createState() => _ReadingPlanBrowserState();
@@ -1268,7 +1271,7 @@ class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
 
   @override
   Widget build(BuildContext context) {
-    final planState = ref.watch(readingPlanProvider);
+    final planState = ref.watch(readingPlanProvider(widget.planId));
     final gold = AppColors.goldAccent;
 
     if (planState.isLoading) {
@@ -1306,12 +1309,12 @@ class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
                         initialState: planState,
                         isEditing: false,
                         onConfirm: (pace, rest, remEnabled, remH, remM) {
-                          ref.read(readingPlanProvider.notifier).startPlan(
-                            planId: 'chronological_1yr',
+                          ref.read(readingPlanProvider(widget.planId).notifier).startPlan(
+                            planId: widget.planId,
                             paceMode: pace,
                             restDay: rest,
                           );
-                          ref.read(readingPlanProvider.notifier).setReminder(remEnabled, remH, remM);
+                          ref.read(readingPlanProvider(widget.planId).notifier).setReminder(remEnabled, remH, remM);
                           _confettiController.play();
                         },
                       ),
