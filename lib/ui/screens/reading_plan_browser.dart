@@ -560,11 +560,6 @@ class _TodayViewBody extends ConsumerWidget {
         title: const Text('Reading Plan', style: TextStyle(fontFamily: 'EB Garamond', fontSize: 20)),
         actions: [
           IconButton(
-            icon: Icon(planState.reminderEnabled ? Icons.notifications_active_rounded : Icons.notifications_none_rounded),
-            tooltip: 'Reminder Settings',
-            onPressed: () => _openSettings(context, ref, planState),
-          ),
-          IconButton(
             icon: const Icon(Icons.settings_rounded),
             tooltip: 'Plan Settings',
             onPressed: () => _openSettings(context, ref, planState),

@@ -83,6 +83,41 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
   bool _delayHeaderReveal = false;
   final ValueNotifier<bool> _isScrolling = ValueNotifier(false);
 
+  // ── Hints ────────────────────────────────────────────────────────
+  String? _currentHintId;
+  String? _currentHintMessage;
+  Timer? _hintTimer;
+
+  void _showHint(String id, String message) {
+    if (mounted && _currentHintId == null) {
+      setState(() {
+        _currentHintId = id;
+        _currentHintMessage = message;
+      });
+      _hintTimer?.cancel();
+      _hintTimer = Timer(const Duration(seconds: 8), _dismissHint);
+    }
+  }
+
+  void _dismissHint() {
+    if (mounted && _currentHintId != null) {
+      ref.read(hintsProvider.notifier).markSeen(_currentHintId!);
+      setState(() {
+        _currentHintId = null;
+        _currentHintMessage = null;
+      });
+    }
+  }
+
+  void _tryShowHint(String id, String message) {
+    if (ref.read(preferencesProvider).showReadingTips) {
+      ref.read(hintsProvider.notifier).maybeShowHint(id, () {
+        Future.microtask(() => _showHint(id, message));
+      });
+    }
+  }
+  // ────────────────────────────────────────────────────────────────
+
   // ── Deliberate-drag-to-nav gate ──────────────────────────────────
   // A fast flick must NOT open navigation. Only a slow, sustained pull
   // past a distance threshold that has been held for a minimum duration
@@ -141,6 +176,21 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         ref.read(streakProvider.notifier).markReadToday();
+        
+        Future.delayed(const Duration(seconds: 2), () {
+          if (!mounted) return;
+          final prefs = ref.read(preferencesProvider);
+          if (!prefs.showReadingTips) return;
+          
+          final hints = ref.read(hintsProvider);
+          if (!hints.contains('seen_swipe_hint')) {
+            _tryShowHint('seen_swipe_hint', 'Swipe to change passage');
+          } else if (!hints.contains('seen_highlight_hint')) {
+            _tryShowHint('seen_highlight_hint', 'Long-press a verse to highlight or take notes');
+          } else if (!hints.contains('seen_commentary_hint')) {
+            _tryShowHint('seen_commentary_hint', 'Tap the bulb icon next to a verse for commentary');
+          }
+        });
       }
     });
   }
@@ -1077,6 +1127,44 @@ Positioned(
                     : const SizedBox.shrink(key: ValueKey('empty')),
               ),
             ),
+            
+            // ── Hints UI ──────────────────────────────────────────────────
+            if (_currentHintMessage != null)
+              Positioned(
+                bottom: 80,
+                left: 20,
+                right: 20,
+                child: AnimatedOpacity(
+                  opacity: _currentHintMessage != null ? 1.0 : 0.0,
+                  duration: const Duration(milliseconds: 300),
+                  child: GlassContainer(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    borderRadius: BorderRadius.circular(16),
+                    child: Row(
+                      children: [
+                        Icon(Icons.lightbulb_rounded, color: AppColors.goldAccent, size: 20),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            _currentHintMessage!,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurface,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.close_rounded, size: 18, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                          onPressed: _dismissHint,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              
           ],
         ),
           ),

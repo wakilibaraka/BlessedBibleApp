@@ -25,6 +25,9 @@ class PreferencesService {
   static const String _redLetterEnabledKey = 'red_letter_enabled';
   static const String _defaultStartTabKey = 'default_start_tab';
 
+  // Reading tips
+  static const String _showReadingTipsKey = 'show_reading_tips';
+
   // Reminder settings
   static const String _sabbathReminderEnabledKey = 'sabbath_reminder_enabled';
   static const String _sabbathLocationLatKey = 'sabbath_location_lat';
@@ -376,6 +379,11 @@ class PreferencesService {
   void saveSeenHints(List<String> hints) {
     prefs.setStringList(_seenHintsKey, hints);
   }
+  
+  bool get showReadingTips => prefs.getBool(_showReadingTipsKey) ?? true;
+  void setShowReadingTips(bool value) => prefs.setBool(_showReadingTipsKey, value);
 }
 
-final preferencesProvider = Provider<PreferencesService>((ref) => throw UnimplementedError());
+final preferencesProvider = Provider<PreferencesService>((ref) {
+  throw UnimplementedError();
+});

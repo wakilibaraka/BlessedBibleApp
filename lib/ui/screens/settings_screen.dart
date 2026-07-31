@@ -20,6 +20,7 @@ import '../widgets/shared_app_bar.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'privacy_policy_screen.dart';
+import '../../data/local_storage/preferences_service.dart';
 
 final packageInfoProvider = FutureProvider<PackageInfo>((ref) async {
   return await PackageInfo.fromPlatform();
@@ -174,6 +175,26 @@ class SettingsScreen extends StatelessWidget {
                   HapticFeedback.selectionClick();
                   ref.read(readSettingsProvider.notifier).setKeepScreenAwake(val);
                 },
+              );
+            }),
+            Consumer(builder: (context, ref, _) {
+              final prefs = ref.watch(preferencesProvider);
+              return StatefulBuilder(
+                builder: (context, setState) {
+                  return SwitchListTile(
+                    title: const Text('Show reading tips'),
+                    subtitle: const Text('Show guided hints for reading actions like highlighting and swiping'),
+                    value: prefs.showReadingTips,
+                    onChanged: (val) {
+                      HapticFeedback.selectionClick();
+                      prefs.setShowReadingTips(val);
+                      setState(() {});
+                      if (val) {
+                         ref.read(hintsProvider.notifier).resetHints();
+                      }
+                    },
+                  );
+                }
               );
             }),
 
