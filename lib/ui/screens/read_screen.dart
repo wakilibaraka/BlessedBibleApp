@@ -15,7 +15,6 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../../data/models/bible_model.dart';
 import '../../state/bible_provider.dart';
 import '../../state/nav_provider.dart';
-import '../../state/study_provider.dart';
 import '../../state/read_settings_provider.dart';
 import '../../state/user_data_provider.dart';
 import '../../state/reading_plan_provider.dart';
@@ -25,25 +24,24 @@ import '../../data/local_storage/preferences_service.dart';
 import '../../state/hints_provider.dart';
 import '../../utils/bible_sections.dart';
 import '../../services/share_service.dart';
-import '../widgets/verse_link_text.dart';
 import 'notes_list_screen.dart';
 import '../widgets/shared_top_header.dart';
 import '../widgets/glass_container.dart';
 import '../../state/notes_provider.dart';
 
 import '../widgets/day_complete_celebration.dart';
-import '../../data/models/commentary_model.dart';
 import '../../state/theme_provider.dart';
 import '../../state/typography_provider.dart';
 import '../../state/chapter_titles_provider.dart';
 import '../../state/immersive_mode_provider.dart';
 import '../../state/read_selection_provider.dart';
+import '../../state/commentary_provider.dart';
 import '../../state/bible_nav_settings_provider.dart';
 import '../../state/read_location_provider.dart';
 import '../widgets/textured_glass_container.dart';
 import '../widgets/bouncy_entrance.dart';
 import '../../state/nav_settings_provider.dart';
-import 'commentary_list_screen.dart';
+import 'commentary_hub_screen.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 String _toHeadingCase(String text) {
@@ -446,7 +444,23 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
     final readSettings = ref.watch(readSettingsProvider);
     final selectedVerses = ref.watch(readSelectionProvider);
     final isImmersive = ref.watch(immersiveModeProvider);
-    final commentaryDataAsync = ref.watch(combinedCommentaryProvider);
+
+    final commentaryState = ref.watch(commentaryProvider);
+    final Set<String> versesWithCommentary = {};
+    final Set<String> chaptersWithCommentary = {};
+    if (commentaryState.value != null) {
+      for (final entry in commentaryState.value!) {
+        final b = entry.scope.book;
+        final c = entry.scope.chapter;
+        final v = entry.scope.verse;
+        if (b != null && c != null) {
+          chaptersWithCommentary.add('$b|$c');
+          if (v != null) {
+            versesWithCommentary.add('$b|$c|$v');
+          }
+        }
+      }
+    }
 
     final bibleState = ref.watch(bibleProvider);
     final isLoading = bibleState.isLoading;
@@ -769,16 +783,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                           itemCount: verses.length + 1,
                                           itemBuilder: (context, index) {
                                             if (index == verses.length) {
-                                              bool hasChapterCommentary = false;
-                                              commentaryDataAsync.whenData((state) {
-                                                final bookCommentary = state.data[fc.book.name];
-                                                if (bookCommentary != null) {
-                                                  final chapterCommentary = bookCommentary[fc.chapter.number.toString()];
-                                                  if (chapterCommentary != null && chapterCommentary.isNotEmpty) {
-                                                    hasChapterCommentary = true;
-                                                  }
-                                                }
-                                              });
+                                              bool hasChapterCommentary = chaptersWithCommentary.contains('${fc.book.name}|${fc.chapter.number}');
                                               return _buildEndOfChapterBlock(fc, pageIndex, theme, hasChapterCommentary);
                                             }
                                             final verse = verses[index];
@@ -813,32 +818,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                                   opacity: (isSelectionMode && !isSelected) ? 0.85 : 1.0,
                                                   child: Consumer(
                                                   builder: (context, itemRef, _) {
-                                                    bool hasCommentary = false;
-                                                    commentaryDataAsync.whenData((state) {
-                                                      final bookCommentary = state.data[fc.book.name];
-                                                      if (bookCommentary != null) {
-                                                        final chapterCommentary = bookCommentary[fc.chapter.number.toString()];
-                                                        if (chapterCommentary != null) {
-                                                          final targetVerse = verse.number;
-                                                          for (final key in chapterCommentary.keys) {
-                                                            if (key == targetVerse.toString()) {
-                                                              hasCommentary = true;
-                                                              break;
-                                                            } else if (key.contains('-')) {
-                                                              final parts = key.split('-');
-                                                              if (parts.length == 2) {
-                                                                final start = int.tryParse(parts[0]);
-                                                                final end = int.tryParse(parts[1]);
-                                                                if (start != null && end != null && targetVerse >= start && targetVerse <= end) {
-                                                                  hasCommentary = true;
-                                                                  break;
-                                                                }
-                                                              }
-                                                            }
-                                                          }
-                                                        }
-                                                      }
-                                                    });
+                                                    bool hasCommentary = versesWithCommentary.contains('${fc.book.name}|${fc.chapter.number}|${verse.number}');
                                                     
                                                     final highlights = itemRef.watch(highlightsProvider);
                                                     final bookmarks = itemRef.watch(bookmarksProvider);
@@ -1188,20 +1168,13 @@ Positioned(
   void _showCommentaryBottomSheet(int verseNumber, String verseText) {
     if (!mounted) return;
     final loc = ref.read(readLocationProvider);
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      useSafeArea: true,
-      builder: (context) {
-        return CommentaryBottomSheetContent(
-          bookName: loc.bookName,
-          chapter: loc.chapter,
-          verseNumber: verseNumber,
-          verseText: verseText,
-        );
-      },
-    );
+    Navigator.of(context).push(CupertinoPageRoute(
+      builder: (_) => CommentaryHubScreen(
+        book: loc.bookName,
+        chapter: loc.chapter,
+        verse: verseNumber,
+      ),
+    ));
   }
 
   Widget _buildNormalVerse(BibleVerse verse, ThemeData theme, TypographyState typography, AppThemeMode appThemeMode, {bool hasCommentary = false, VoidCallback? onCommentaryTap, bool isBookmarked = false, bool isRedLetterEnabled = true}) {
@@ -1334,16 +1307,17 @@ Positioned(
           ),
           const SizedBox(height: 32),
           
-          // Commentary Button
-          TextButton.icon(
-            onPressed: hasChapterCommentary ? () {
-              Navigator.of(context).push(CupertinoPageRoute(
-                builder: (_) => CommentaryListScreen(
-                  bookName: fc.book.name,
-                  chapterNumber: fc.chapter.number.toString(),
-                ),
-              ));
-            } : null,
+              // Commentary Button
+            TextButton.icon(
+              onPressed: hasChapterCommentary ? () {
+                Navigator.of(context).push(CupertinoPageRoute(
+                  builder: (_) => CommentaryHubScreen(
+                    book: fc.book.name,
+                    chapter: fc.chapter.number,
+                    verse: null,
+                  ),
+                ));
+              } : null,
             icon: Icon(Icons.school_rounded, color: hasChapterCommentary ? theme.primaryColor : theme.disabledColor),
             label: Text(
               'Read commentary on this chapter',
@@ -2360,339 +2334,7 @@ class _TypographyBottomSheet extends ConsumerWidget {
 
 }
 
-class CommentaryBottomSheetContent extends ConsumerWidget {
-  final String bookName;
-  final int chapter;
-  final int verseNumber;
-  final String verseText;
 
-  const CommentaryBottomSheetContent({
-    super.key,
-    required this.bookName,
-    required this.chapter,
-    required this.verseNumber,
-    required this.verseText,
-  });
-
-  void _showShareMenu(BuildContext context, ThemeData theme) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) {
-        return TexturedGlassContainer(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24.0)),
-          child: SafeArea(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SizedBox(height: 12),
-                Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                const SizedBox(height: 32),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.colorScheme.surface,
-                      foregroundColor: theme.primaryColor,
-                      elevation: 0,
-                      minimumSize: const Size(double.infinity, 56),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-                        side: BorderSide(color: theme.colorScheme.onSurface.withValues(alpha: 0.1)),
-                      ),
-                    ),
-                    icon: Icon(Icons.bookmark_add_rounded, color: theme.primaryColor),
-                    label: const Text('Save to Notes', style: TextStyle(fontWeight: FontWeight.bold)),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Saved $bookName $chapter:$verseNumber to Notes')),
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.colorScheme.surface,
-                      foregroundColor: theme.primaryColor,
-                      elevation: 0,
-                      minimumSize: const Size(double.infinity, 56),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-                        side: BorderSide(color: theme.colorScheme.onSurface.withValues(alpha: 0.1)),
-                      ),
-                    ),
-                    icon: Icon(Icons.ios_share_rounded, color: theme.primaryColor),
-                    label: const Text('Share to other apps', style: TextStyle(fontWeight: FontWeight.bold)),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      ShareService.shareText(body: '"$verseText" — $bookName $chapter:$verseNumber');
-                    },
-                  ),
-                ),
-                const SizedBox(height: 32),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final typography = ref.watch(typographyProvider);
-    final commentaryDataAsync = ref.watch(combinedCommentaryProvider);
-
-    return DraggableScrollableSheet(
-      initialChildSize: 0.9,
-      minChildSize: 0.5,
-      maxChildSize: 1.0,
-      snap: true,
-      builder: (context, scrollController) {
-        return PinchToZoomFontWrapper(
-          child: GlassContainer(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(32.0)),
-            padding: EdgeInsets.zero,
-          child: SafeArea(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 16),
-                // Handlebar
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                
-                // Header Row (Title)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Text(
-                    '$bookName $chapter:$verseNumber',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      color: theme.primaryColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                
-                // Highlighted Verse Container
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: GlassContainer(
-                    padding: const EdgeInsets.all(20.0),
-                    borderRadius: BorderRadius.circular(24),
-                    child: Text(
-                      '$verseNumber "$verseText"',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        height: 1.5,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                
-                // Content & Floating CTA
-                Expanded(
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                          child: _buildCommentaryContent(commentaryDataAsync, theme, typography, scrollController),
-                        ),
-                      ),
-                      
-                      // Floating Action Bar
-                      Positioned(
-                        left: 24,
-                        right: 24,
-                        bottom: 16,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            // LEFT — Save Pill
-                            Expanded(
-                              child: GlassContainer(
-                                padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 12.0),
-                                borderRadius: BorderRadius.circular(30),
-                                child: TextButton.icon(
-                                  onPressed: () {
-                                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved to Notes')));
-                                  },
-                                  style: TextButton.styleFrom(
-                                    padding: EdgeInsets.zero,
-                                    minimumSize: const Size(0, 48),
-                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                  ),
-                                  icon: Icon(Icons.bookmark_add_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.8), size: 20),
-                                  label: Text('Save', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.8), fontWeight: FontWeight.bold)),
-                                ),
-                              ),
-                            ),
-                            
-                            const SizedBox(width: 16),
-                            
-                            // CENTER — Close (in its own circle)
-                            GlassContainer(
-                              padding: EdgeInsets.zero,
-                              borderRadius: BorderRadius.circular(30),
-                              child: SizedBox(
-                                width: 48,
-                                height: 48,
-                                child: IconButton(
-                                  onPressed: () => Navigator.of(context).pop(),
-                                  icon: Icon(Icons.keyboard_arrow_down_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.8), size: 24),
-                                  padding: EdgeInsets.zero,
-                                ),
-                              ),
-                            ),
-                            
-                            const SizedBox(width: 16),
-                            
-                            // RIGHT — Share Pill
-                            Expanded(
-                              child: GlassContainer(
-                                padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 12.0),
-                                borderRadius: BorderRadius.circular(30),
-                                child: TextButton.icon(
-                                  onPressed: () => _showShareMenu(context, theme),
-                                  style: TextButton.styleFrom(
-                                    padding: EdgeInsets.zero,
-                                    minimumSize: const Size(0, 48),
-                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                  ),
-                                  icon: Icon(Icons.ios_share_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.8), size: 20),
-                                  label: Text('Share', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.8), fontWeight: FontWeight.bold)),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        );
-      },
-    );
-  }
-
-  Widget _buildCommentaryContent(AsyncValue<CombinedCommentaryState> commentaryDataAsync, ThemeData theme, TypographyState typography, ScrollController scrollController) {
-    return commentaryDataAsync.when(
-      data: (state) {
-        final chapterData = state.data[bookName]?[chapter.toString()];
-        final List<CommentaryEntry> entries = [];
-        if (chapterData != null) {
-          for (final key in chapterData.keys) {
-            if (key == verseNumber.toString()) {
-              entries.addAll(chapterData[key]!);
-            } else if (key.contains('-')) {
-              final parts = key.split('-');
-              if (parts.length == 2) {
-                final start = int.tryParse(parts[0]);
-                final end = int.tryParse(parts[1]);
-                if (start != null && end != null && verseNumber >= start && verseNumber <= end) {
-                  entries.addAll(chapterData[key]!);
-                }
-              }
-            }
-          }
-        }
-        
-        if (entries.isEmpty) {
-          return ListView(
-            controller: scrollController,
-            children: [
-              const SizedBox(height: 60),
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Text(
-                    'No commentary available for this verse yet.',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontStyle: FontStyle.italic,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          );
-        }
-        return ListView.builder(
-          controller: scrollController,
-          padding: const EdgeInsets.only(top: 8.0, bottom: 100.0),
-          itemCount: entries.length,
-          itemBuilder: (context, index) {
-            final entry = entries[index];
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 32.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    entry.title.replaceAll(RegExp(r'^Title:\s*', caseSensitive: false), '').toUpperCase(),
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.primaryColor,
-                      letterSpacing: 1.2,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  VerseLinkText(
-                    text: entry.text,
-                    defaultStyle: theme.textTheme.bodySmall?.copyWith(
-                      height: typography.lineHeight,
-                      color: theme.textTheme.bodyLarge?.color?.withValues(alpha: 0.9),
-                    ),
-                    referenceStyle: const TextStyle(
-                      decoration: TextDecoration.underline,
-                    ),
-                    numberStyle: TextStyle(
-                      color: theme.primaryColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-      loading: () => ListView(controller: scrollController, children: const [SizedBox(height: 40), Center(child: CircularProgressIndicator())]),
-      error: (error, stack) => ListView(controller: scrollController, children: const [SizedBox(height: 40), Center(child: Text('Error loading commentary'))]),
-    );
-  }
-}
 
 class _ContextMenuButton extends StatelessWidget {
   final IconData icon;
@@ -2891,27 +2533,15 @@ class VerseActionLogic {
   }
 
   static void handleCommentary(BuildContext context, WidgetRef ref, String bookName, int chapterNum, int verseNumberFallback, List<int> targetVerses) {
-    final chapterData = getChapterData(ref, bookName, chapterNum);
     final sorted = targetVerses.toList()..sort();
     final firstVerse = sorted.isNotEmpty ? sorted.first : verseNumberFallback;
-    String vText = "";
-    if (chapterData != null && firstVerse - 1 >= 0 && firstVerse - 1 < chapterData.verses.length) {
-       vText = chapterData.verses[firstVerse - 1].text;
-    }
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      useSafeArea: true,
-      builder: (context) {
-        return CommentaryBottomSheetContent(
-          bookName: bookName,
-          chapter: chapterNum,
-          verseNumber: firstVerse,
-          verseText: vText,
-        );
-      },
-    );
+    Navigator.of(context).push(CupertinoPageRoute(
+      builder: (_) => CommentaryHubScreen(
+        book: bookName,
+        chapter: chapterNum,
+        verse: firstVerse,
+      ),
+    ));
   }
 
   static Future<void> handleShare(BuildContext context, WidgetRef ref, String bookName, int chapterNum, List<int> targetVerses) async {

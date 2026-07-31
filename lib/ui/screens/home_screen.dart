@@ -6,7 +6,7 @@ import '../../data/models/home_data.dart';
 import '../../state/home_provider.dart';
 import '../../state/votd_tracker_provider.dart';
 import '../../state/theme_provider.dart';
-import '../../state/study_provider.dart';
+import '../../state/commentary_provider.dart';
 import '../widgets/shared_top_header.dart';
 import '../widgets/glass_container.dart';
 import '../widgets/bouncy_entrance.dart';
@@ -97,27 +97,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final theme = Theme.of(context);
 
     // Get dynamic commentary for VOTD
-    final commentaryState = ref.watch(combinedCommentaryProvider);
+    final commentaryState = ref.watch(commentaryProvider);
     String? excerpt;
-    if (commentaryState.hasValue && commentaryState.value != null) {
+    if (commentaryState.value != null) {
       final refRegex = RegExp(r'^(.+?)[_\s]+(\d+):(\d+)$');
       final match = refRegex.firstMatch(data.verseOfTheDay.reference.trim());
       if (match != null) {
         final bookName = match.group(1)!.trim();
-        final chapterNum = match.group(2)!;
-        final verseNum = match.group(3)!;
-        final dataMap = commentaryState.value!.data;
+        final chapterNum = int.tryParse(match.group(2)!);
+        final verseNum = int.tryParse(match.group(3)!);
+        final entries = commentaryState.value!;
         
-        final matchedBookKey = dataMap.keys.cast<String?>().firstWhere(
-            (k) => k?.toLowerCase() == bookName.toLowerCase(), orElse: () => null);
+        final matchingEntries = entries.where((e) => 
+          e.scope.book?.toLowerCase() == bookName.toLowerCase() && 
+          e.scope.chapter == chapterNum && 
+          e.scope.verse == verseNum
+        ).toList();
 
-        if (matchedBookKey != null &&
-            dataMap[matchedBookKey]!.containsKey(chapterNum) &&
-            dataMap[matchedBookKey]![chapterNum]!.containsKey(verseNum)) {
-          final entries = dataMap[matchedBookKey]![chapterNum]![verseNum]!;
-          if (entries.isNotEmpty) {
-            excerpt = entries.first.text;
-          }
+        if (matchingEntries.isNotEmpty) {
+          excerpt = matchingEntries.first.text;
         }
       }
     }

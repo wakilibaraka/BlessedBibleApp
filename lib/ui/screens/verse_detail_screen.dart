@@ -3,7 +3,7 @@ import '../../theme/app_colors.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/bible_provider.dart';
-import '../../state/study_provider.dart';
+import '../../state/commentary_provider.dart';
 import '../../state/user_data_provider.dart';
 import '../../state/notes_provider.dart';
 import '../../state/theme_provider.dart';
@@ -62,18 +62,15 @@ class VerseDetailScreen extends ConsumerWidget {
     }
 
     // Commentary Data
-    final commentaryAsync = ref.watch(combinedCommentaryProvider);
+    final commentaryAsync = ref.watch(commentaryProvider);
     List<dynamic> commentaryEntries = [];
-    if (commentaryAsync is AsyncData<CombinedCommentaryState>) {
-      final data = commentaryAsync.value.data;
-      if (data.containsKey(bookName) &&
-          data[bookName]!.containsKey(chapterNum.toString())) {
-        if (data[bookName]![chapterNum.toString()]!
-            .containsKey(verseNum.toString())) {
-          commentaryEntries =
-              data[bookName]![chapterNum.toString()]![verseNum.toString()]!;
-        }
-      }
+    if (commentaryAsync.value != null) {
+      final entries = commentaryAsync.value!;
+      commentaryEntries = entries.where((e) => 
+        e.scope.book?.toLowerCase() == bookName.toLowerCase() &&
+        e.scope.chapter == chapterNum &&
+        e.scope.verse == verseNum
+      ).toList();
     }
 
     return Scaffold(

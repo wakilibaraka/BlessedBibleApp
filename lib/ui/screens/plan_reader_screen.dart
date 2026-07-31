@@ -28,7 +28,8 @@ import '../../state/typography_provider.dart';
 import '../../state/user_data_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../theme/app_colors.dart';
-import 'read_screen.dart' show VerseActionLogic, CommentaryBottomSheetContent;
+import 'read_screen.dart' show VerseActionLogic;
+import 'commentary_hub_screen.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Data model for one resolved passage
@@ -218,16 +219,13 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
   void _clearSelection() => setState(() => _selectedVerses.clear());
 
   void _showCommentary(int verseNum, String verseText, String bookName, int chapterNum) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      useSafeArea: true,
-      builder: (_) => CommentaryBottomSheetContent(
-        bookName: bookName,
-        chapter: chapterNum,
-        verseNumber: verseNum,
-        verseText: verseText,
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => CommentaryHubScreen(
+          book: bookName,
+          chapter: chapterNum,
+          verse: verseNum,
+        ),
       ),
     );
   }

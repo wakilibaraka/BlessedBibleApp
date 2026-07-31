@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:the_blessed_bible/data/models/bible_model.dart';
-import 'package:the_blessed_bible/data/models/commentary_model.dart';
+import 'package:the_blessed_bible/models/commentary_entry.dart';
 import 'package:the_blessed_bible/data/models/home_data.dart';
 import 'package:the_blessed_bible/state/search_engine.dart';
 
@@ -34,17 +34,29 @@ void main() {
       )
     ];
 
-    final commentary = {
-      'Daniel': {
-        '1': {
-          '1': [
-            CommentaryEntry(id: 'uriah_smith', title: 'Uriah Smith', text: 'This is a test commentary by Uriah.'),
-            CommentaryEntry(id: 'egw', title: 'EGW', text: 'This should also be indexed.'),
-            CommentaryEntry(id: 'new_author', title: 'New Author', text: 'Simulated new commentary entry.'),
-          ]
-        }
-      }
-    };
+    final commentary = [
+      CommentaryEntry(
+        id: 'uriah',
+        author: 'Uriah Smith',
+        source: 'Daniel and the Revelation',
+        scope: CommentaryScope(type: 'verse', book: 'Daniel', chapter: 1, verse: 1),
+        text: 'This is a test commentary by Uriah.',
+      ),
+      CommentaryEntry(
+        id: 'egw',
+        author: 'EGW',
+        source: 'Unknown',
+        scope: CommentaryScope(type: 'verse', book: 'Daniel', chapter: 1, verse: 1),
+        text: 'This should also be indexed.',
+      ),
+      CommentaryEntry(
+        id: 'new',
+        author: 'New Author',
+        source: 'Simulated',
+        scope: CommentaryScope(type: 'verse', book: 'Daniel', chapter: 1, verse: 1),
+        text: 'Simulated new commentary entry.',
+      ),
+    ];
 
     final notes = [
       PersonalNote('My Note', 'This is a test note about creation.', '2026-07-26'),

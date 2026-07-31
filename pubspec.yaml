@@ -46,6 +46,7 @@ flutter:
     - assets/icon/
     - assets/reading_plans/
     - assets/reading_plans/source/
+    - assets/commentary/
   fonts:
     - family: Inter
       fonts:

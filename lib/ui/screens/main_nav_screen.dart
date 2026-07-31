@@ -25,6 +25,7 @@ import '../../state/read_location_provider.dart';
 import '../../state/bible_provider.dart';
 import '../../state/read_settings_provider.dart';
 import '../../state/study_provider.dart';
+import '../../state/commentary_provider.dart';
 import 'verse_detail_screen.dart';
 
 const double kBottomDockHeight = 64.0;
@@ -714,18 +715,14 @@ class MainNavScreen extends ConsumerWidget {
   }
 
   void _handleImFeelingLucky(BuildContext context, WidgetRef ref) {
-    final commentaryAsync = ref.read(combinedCommentaryProvider);
-    if (commentaryAsync is AsyncData<CombinedCommentaryState>) {
-      final state = commentaryAsync.value;
+    final commentaryAsync = ref.read(commentaryProvider);
+    if (commentaryAsync.value != null && commentaryAsync.value!.isNotEmpty) {
+      final entries = commentaryAsync.value!;
 
       List<String> availableVerses = [];
-      for (var book in state.data.keys) {
-        for (var chapter in state.data[book]!.keys) {
-          for (var verse in state.data[book]![chapter]!.keys) {
-            if (state.data[book]![chapter]![verse]!.isNotEmpty) {
-              availableVerses.add('$book $chapter:$verse');
-            }
-          }
+      for (final entry in entries) {
+        if (entry.scope.book != null && entry.scope.chapter != null && entry.scope.verse != null) {
+          availableVerses.add('${entry.scope.book} ${entry.scope.chapter}:${entry.scope.verse}');
         }
       }
 

@@ -2,11 +2,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/models/bible_model.dart';
-import '../data/models/commentary_model.dart';
+import '../models/commentary_entry.dart';
 import '../data/models/home_data.dart';
 import 'bible_provider.dart';
-import 'study_provider.dart';
 import 'notes_provider.dart';
+import 'commentary_provider.dart';
 
 enum SearchResultType { reference, bible, commentary, history, note }
 
@@ -72,7 +72,7 @@ class IndexData {
 
 class IndexBuildArgs {
   final List<BibleBook>? bibleBooks;
-  final Map<String, Map<String, Map<String, List<CommentaryEntry>>>>? commentaryData;
+  final List<CommentaryEntry>? commentaryData;
   final List<PersonalNote> notes;
   
   IndexBuildArgs(this.bibleBooks, this.commentaryData, this.notes);
@@ -140,40 +140,31 @@ IndexData buildIndexIsolate(IndexBuildArgs args) {
 
   // 2. Commentary
   if (args.commentaryData != null) {
-    for (final bookEntry in args.commentaryData!.entries) {
-      final bookName = bookEntry.key;
-      for (final chapterEntry in bookEntry.value.entries) {
-        final chapterNum = chapterEntry.key;
-        for (final verseEntry in chapterEntry.value.entries) {
-          final verseNum = verseEntry.key;
-          int parsedVerse = 1;
-          if (verseNum.contains('-')) {
-            parsedVerse = int.tryParse(verseNum.split('-').first) ?? 1;
-          } else {
-            parsedVerse = int.tryParse(verseNum) ?? 1;
-          }
+    for (final entry in args.commentaryData!) {
+      final scope = entry.scope;
+      final bookName = scope.book ?? 'Commentary';
+      final chapterNum = scope.chapter;
+      final verseNum = scope.verse;
 
-          for (final entry in verseEntry.value) {
-            String authorLabel = entry.title.isNotEmpty ? '${entry.title} Commentary' : 'Commentary';
+      String authorLabel = entry.author.isNotEmpty ? '${entry.author} Commentary' : 'Commentary';
+      String locTitle = bookName;
+      if (chapterNum != null) locTitle += ' $chapterNum';
+      if (verseNum != null) locTitle += ':$verseNum';
 
-            final item = SearchItem(
-              id: nextId++,
-              type: SearchResultType.commentary,
-              title: '$bookName $chapterNum:$verseNum',
-              subtitle: authorLabel,
-              text: (entry.title.isNotEmpty ? '«${entry.title}» ' : '') + entry.text,
-              metadata: {
-                'book': bookName,
-                'chapter': int.tryParse(chapterNum) ?? 1,
-                'verse': parsedVerse,
-                'author': entry.title,
-              },
-            );
-            corpus.add(item);
-            addTokens(item.id, '${item.title} ${item.text}');
-          }
-        }
-      }
+      final item = SearchItem(
+        id: nextId++,
+        type: SearchResultType.commentary,
+        title: locTitle,
+        subtitle: authorLabel,
+        text: (entry.author.isNotEmpty ? '«${entry.author}» ' : '') + entry.text,
+        metadata: {
+          'bookName': bookName,
+          if (chapterNum != null) 'chapter': chapterNum,
+          if (verseNum != null) 'verse': verseNum,
+        },
+      );
+      corpus.add(item);
+      addTokens(item.id, '${item.title} ${item.text}');
     }
   }
 
@@ -427,11 +418,11 @@ final baseSearchIndexProvider = FutureProvider<IndexData>((ref) async {
   }
 
   // Commentary is optional — use whatever is already available without blocking
-  final commentaryAsync = ref.watch(combinedCommentaryProvider);
+  final commentaryAsync = ref.watch(commentaryProvider);
 
   final args = IndexBuildArgs(
     bibleState.books,
-    commentaryAsync.asData?.value.data,
+    commentaryAsync.asData?.value,
     [], // Notes handled dynamically
   );
   return await compute(buildIndexIsolate, args);
