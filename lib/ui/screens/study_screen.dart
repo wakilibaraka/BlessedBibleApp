@@ -15,7 +15,6 @@ import '../../state/reading_plan_provider.dart';
 import 'reading_plans_hub_screen.dart';
 import 'commentary_hub_screen.dart';
 import '../../state/streak_provider.dart';
-import 'plan_reader_screen.dart';
 import 'reading_plan_browser.dart';
 import '../../data/local_storage/preferences_service.dart';
 
@@ -574,7 +573,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                       if (planState.currentDay == 0) {
                         ref.read(readingPlanProvider(planId).notifier).startPlan();
                         Navigator.of(context).push(CupertinoPageRoute(
-                          builder: (_) => PlanReaderScreen(planId: planId, dayNum: 1, initialPassageIndex: 0),
+                          builder: (_) => DayView(planId: planId, dayNum: 1),
                         ));
                       } else if (planState.isPlanComplete) {
                          Navigator.of(context).push(CupertinoPageRoute(
@@ -582,7 +581,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                         ));
                       } else {
                         Navigator.of(context).push(CupertinoPageRoute(
-                          builder: (_) => PlanReaderScreen(planId: planId, dayNum: planState.currentDay, initialPassageIndex: 0),
+                          builder: (_) => DayView(planId: planId, dayNum: planState.currentDay),
                         ));
                       }
                     },
@@ -1222,7 +1221,7 @@ class _PlanRowWidgetState extends ConsumerState<_PlanRowWidget> {
             if (planState.currentDay == 0) {
               ref.read(readingPlanProvider(planId).notifier).startPlan();
               Navigator.of(context).push(CupertinoPageRoute(
-                builder: (_) => PlanReaderScreen(planId: planId, dayNum: 1, initialPassageIndex: 0),
+                builder: (_) => DayView(planId: planId, dayNum: 1),
               ));
             } else if (planState.isPlanComplete) {
                Navigator.of(context).push(CupertinoPageRoute(
@@ -1230,7 +1229,7 @@ class _PlanRowWidgetState extends ConsumerState<_PlanRowWidget> {
               ));
             } else {
               Navigator.of(context).push(CupertinoPageRoute(
-                builder: (_) => PlanReaderScreen(planId: planId, dayNum: planState.currentDay, initialPassageIndex: 0),
+                builder: (_) => DayView(planId: planId, dayNum: planState.currentDay),
               ));
             }
           },
