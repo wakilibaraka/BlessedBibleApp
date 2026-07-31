@@ -26,7 +26,7 @@ import '../../state/bible_provider.dart';
 import '../../state/read_settings_provider.dart';
 import '../../state/study_provider.dart';
 import '../../state/commentary_provider.dart';
-import 'verse_detail_screen.dart';
+import 'commentary_hub_screen.dart';
 
 const double kBottomDockHeight = 64.0;
 const double kBottomDockInset = 16.0;
@@ -712,26 +712,17 @@ class MainNavScreen extends ConsumerWidget {
   }
 
   void _handleImFeelingLucky(BuildContext context, WidgetRef ref) {
-    final commentaryAsync = ref.read(commentaryProvider);
-    if (commentaryAsync.value != null && commentaryAsync.value!.isNotEmpty) {
-      final entries = commentaryAsync.value!;
+    final availableVerses = ref.read(commentaryProvider.notifier).versesWithCommentary;
 
-      List<String> availableVerses = [];
-      for (final entry in entries) {
-        if (entry.scope.book != null && entry.scope.chapter != null && entry.scope.verse != null) {
-          availableVerses.add('${entry.scope.book} ${entry.scope.chapter}:${entry.scope.verse}');
-        }
-      }
+    if (availableVerses.isNotEmpty) {
+      final randomVerse =
+          availableVerses[math.Random().nextInt(availableVerses.length)];
 
-      if (availableVerses.isNotEmpty) {
-        final randomVerse =
-            availableVerses[math.Random().nextInt(availableVerses.length)];
-
-        final lastSpaceIdx = randomVerse.lastIndexOf(' ');
-        final bookName = randomVerse.substring(0, lastSpaceIdx);
-        final refParts = randomVerse.substring(lastSpaceIdx + 1).split(':');
-        final chapter = int.parse(refParts[0]);
-        final verseNum = int.parse(refParts[1]);
+      final lastSpaceIdx = randomVerse.lastIndexOf(' ');
+      final bookName = randomVerse.substring(0, lastSpaceIdx);
+      final refParts = randomVerse.substring(lastSpaceIdx + 1).split(':');
+      final chapter = int.parse(refParts[0]);
+      final verseNum = int.parse(refParts[1]);
 
         final flatChapters = ref.read(flatChaptersProvider);
         try {
@@ -755,11 +746,15 @@ class MainNavScreen extends ConsumerWidget {
                 );
             ref.read(activeStudyVerseProvider.notifier).setVerse('$bookName $chapter:$verseNum');
 
-            Navigator.of(context).push(CupertinoPageRoute(builder: (_) => VerseDetailScreen(reference: '$bookName $chapter:$verseNum')));
+            Navigator.of(context).push(CupertinoPageRoute(builder: (_) => CommentaryHubScreen(
+              book: bookName,
+              chapter: chapter,
+              verse: verseNum,
+              verseText: fc.chapter.verses[verseNum - 1].text,
+            )));
           });
         } catch (_) {}
       }
-    }
   }
 
   Widget _buildUnifiedDockContent(BuildContext context, WidgetRef ref, ThemeData theme, int currentIndex, bool isRaindropAction, bool isMinimalAction) {

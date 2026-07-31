@@ -27,9 +27,9 @@ import '../widgets/textured_glass_container.dart';
 import '../../state/typography_provider.dart';
 import '../../state/user_data_provider.dart';
 import '../../state/theme_provider.dart';
+import '../widgets/commentary_view.dart';
 import '../../theme/app_colors.dart';
 import 'read_screen.dart' show VerseActionLogic;
-import 'commentary_hub_screen.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Data model for one resolved passage
@@ -219,14 +219,12 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
   void _clearSelection() => setState(() => _selectedVerses.clear());
 
   void _showCommentary(int verseNum, String verseText, String bookName, int chapterNum) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => CommentaryHubScreen(
-          book: bookName,
-          chapter: chapterNum,
-          verse: verseNum,
-        ),
-      ),
+    showCommentaryBottomSheet(
+      context,
+      book: bookName,
+      chapter: chapterNum,
+      verse: verseNum,
+      verseText: verseText,
     );
   }
 

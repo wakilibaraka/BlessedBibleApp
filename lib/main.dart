@@ -97,12 +97,21 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
         AppThemeMode.automatic => ThemeMode.system,
         AppThemeMode.light => ThemeMode.light,
         AppThemeMode.sepia => ThemeMode.light,
+        AppThemeMode.pop => ThemeMode.light,
+        AppThemeMode.dusk => ThemeMode.dark,
+        AppThemeMode.fresh => ThemeMode.dark,
         AppThemeMode.dark => ThemeMode.dark,
         AppThemeMode.oled => ThemeMode.dark,
       },
-      theme: themeMode == AppThemeMode.sepia 
-          ? AppTheme.sepiaTheme(14.0)
-          : AppTheme.lightTheme(14.0),
+      theme: themeMode == AppThemeMode.pop
+          ? AppTheme.popTheme(14.0)
+          : themeMode == AppThemeMode.dusk
+            ? AppTheme.duskTheme(14.0)
+            : themeMode == AppThemeMode.fresh
+              ? AppTheme.freshTheme(14.0)
+              : themeMode == AppThemeMode.sepia 
+                ? AppTheme.sepiaTheme(14.0)
+                : AppTheme.lightTheme(14.0),
       darkTheme: AppTheme.darkTheme(14.0, isAmoled: themeMode == AppThemeMode.oled),
       home: isBibleLoading ? const SplashLoadingScreen() : const MainNavScreen(),
     );

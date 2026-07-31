@@ -5,7 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/home_provider.dart';
 import '../../state/votd_tracker_provider.dart';
 import '../widgets/textured_glass_container.dart';
-import 'verse_detail_screen.dart';
+import 'commentary_hub_screen.dart';
+import '../../theme/reading_tokens.dart';
 
 class VotdArchiveScreen extends ConsumerWidget {
   const VotdArchiveScreen({super.key});
@@ -13,6 +14,7 @@ class VotdArchiveScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final tokens = theme.extension<ReadingTokens>()!;
 
     // Compute past 7 days
     final now = DateTime.now();
@@ -113,11 +115,21 @@ class VotdArchiveScreen extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(20),
                             onTap: () {
                               ref.read(votdTrackerProvider.notifier).markViewed(date);
-                              Navigator.of(context).push(
-                                CupertinoPageRoute(
-                                  builder: (_) => VerseDetailScreen(reference: reference),
+                              final refStr = reference;
+                              final lastSpaceIdx = refStr.lastIndexOf(' ');
+                              final bookName = lastSpaceIdx != -1 ? refStr.substring(0, lastSpaceIdx) : refStr;
+                              final refParts = lastSpaceIdx != -1 ? refStr.substring(lastSpaceIdx + 1).split(':') : [];
+                              final chapterNum = refParts.isNotEmpty ? (int.tryParse(refParts[0]) ?? 1) : 1;
+                              final verseNum = refParts.length > 1 ? int.tryParse(refParts[1]) : null;
+
+                              Navigator.of(context).push(CupertinoPageRoute(
+                                builder: (_) => CommentaryHubScreen(
+                                  book: bookName,
+                                  chapter: chapterNum,
+                                  verse: verseNum,
+                                  verseText: null, // text is fetched inside if needed
                                 ),
-                              );
+                              ));
                             },
                             child: Container(
                               padding: const EdgeInsets.all(20),
@@ -134,7 +146,7 @@ class VotdArchiveScreen extends ConsumerWidget {
                                       Text(
                                         displayDate,
                                         style: theme.textTheme.labelMedium?.copyWith(
-                                          color: isToday ? theme.primaryColor : theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                                          color: isToday ? tokens.readingAccent : tokens.readingInkMuted,
                                           fontWeight: isToday ? FontWeight.bold : FontWeight.w500,
                                         ),
                                       ),
@@ -147,7 +159,7 @@ class VotdArchiveScreen extends ConsumerWidget {
                                         child: Text(
                                           bookTag,
                                           style: theme.textTheme.labelSmall?.copyWith(
-                                            color: theme.primaryColor,
+                                            color: tokens.readingAccent,
                                             fontWeight: FontWeight.bold,
                                             letterSpacing: 0.5,
                                           ),
@@ -160,6 +172,7 @@ class VotdArchiveScreen extends ConsumerWidget {
                                     reference,
                                     style: theme.textTheme.titleLarge?.copyWith(
                                       fontWeight: FontWeight.bold,
+                                      color: tokens.readingInk,
                                     ),
                                   ),
                                   const SizedBox(height: 8),
@@ -168,7 +181,7 @@ class VotdArchiveScreen extends ConsumerWidget {
                                     maxLines: 3,
                                     overflow: TextOverflow.ellipsis,
                                     style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                                      color: tokens.readingInkMuted,
                                       height: 1.5,
                                     ),
                                   ),

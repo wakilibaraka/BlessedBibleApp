@@ -10,6 +10,7 @@ class PreferencesService {
 
   static const String _searchHistoryKey = 'search_history';
   static const String _bookmarksKey = 'bookmarks';
+  static const String _commentaryBookmarksKey = 'commentary_bookmarks';
   static const String _favoritesKey = 'favorites';
   static const String _highlightsKey = 'highlights';
   static const String _lastTabKey = 'last_tab';
@@ -69,6 +70,14 @@ class PreferencesService {
 
   List<String> getBookmarks() {
     return prefs.getStringList(_bookmarksKey) ?? [];
+  }
+
+  void saveCommentaryBookmarks(List<String> bookmarks) {
+    prefs.setStringList(_commentaryBookmarksKey, bookmarks);
+  }
+
+  List<String> getCommentaryBookmarks() {
+    return prefs.getStringList(_commentaryBookmarksKey) ?? [];
   }
 
   void saveFavorites(List<String> favorites) {

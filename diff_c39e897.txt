@@ -1,0 +1,868 @@
+diff --git a/lib/ui/screens/commentary_hub_screen.dart b/lib/ui/screens/commentary_hub_screen.dart
+index 74530fe..12efc66 100644
+--- a/lib/ui/screens/commentary_hub_screen.dart
++++ b/lib/ui/screens/commentary_hub_screen.dart
+@@ -1,280 +1,55 @@
+ import 'package:flutter/material.dart';
+ import 'package:flutter_riverpod/flutter_riverpod.dart';
++import '../../theme/reading_tokens.dart';
+ import '../../state/theme_provider.dart';
+-import '../../state/commentary_provider.dart';
+-import '../../models/commentary_entry.dart';
+-import '../../theme/app_colors.dart';
+ import '../widgets/animated_background.dart';
+-import '../widgets/textured_glass_container.dart';
+ import '../widgets/shared_app_bar.dart';
+-import '../widgets/pinch_to_zoom_font_wrapper.dart';
++import '../widgets/commentary_view.dart';
+ 
+-class CommentaryHubScreen extends ConsumerStatefulWidget {
++class CommentaryHubScreen extends ConsumerWidget {
+   final String book;
+   final int chapter;
+   final int? verse;
++  final String? verseText;
+ 
+   const CommentaryHubScreen({
+     super.key,
+     required this.book,
+     required this.chapter,
+     this.verse,
++    this.verseText,
+   });
+ 
+   @override
+-  ConsumerState<CommentaryHubScreen> createState() => _CommentaryHubScreenState();
+-}
+-
+-class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
+-  bool _showChapter = false;
+-  bool _showBook = false;
+-
+-  @override
+-  Widget build(BuildContext context) {
+-    final theme = Theme.of(context);
++  Widget build(BuildContext context, WidgetRef ref) {
+     final appThemeMode = ref.watch(themeProvider);
+-    final commentaryAsync = ref.watch(commentaryProvider);
+-    
+-    final bookName = widget.book;
+-    final chapterNum = widget.chapter;
+-    final verseNum = widget.verse;
+-    
+-    final referenceString = verseNum != null 
+-        ? '$bookName $chapterNum:$verseNum' 
+-        : '$bookName $chapterNum';
+-
+-    final commentaryNotifier = ref.read(commentaryProvider.notifier);
+-    
+-    List<CommentaryEntry> verseEntries = [];
+-    List<CommentaryEntry> chapterEntries = [];
+-    List<CommentaryEntry> bookEntries = [];
+-    
+-    if (verseNum != null) {
+-      verseEntries = commentaryNotifier.commentaryForVerse(bookName, chapterNum, verseNum);
+-    }
+-    chapterEntries = commentaryNotifier.commentaryForChapter(bookName, chapterNum);
+-    bookEntries = commentaryNotifier.commentaryForBook(bookName);
++    final tokens = Theme.of(context).extension<ReadingTokens>()!;
+ 
+     return Scaffold(
++      backgroundColor: tokens.readingPaper,
+       extendBody: true,
+-      appBar: SharedAppBar(
++      extendBodyBehindAppBar: true,
++      appBar: const SharedAppBar(
+         backgroundColor: Colors.transparent,
+         elevation: 0,
+-        title: Text('Commentary', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+       ),
+       body: Stack(
+         children: [
+           Positioned.fill(
+             child: AnimatedBackground(appThemeMode: appThemeMode),
+           ),
+-          PinchToZoomFontWrapper(
+-            child: CustomScrollView(
+-              slivers: [
+-                SliverToBoxAdapter(
+-                  child: Padding(
+-                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+-                    child: Text(
+-                      referenceString,
+-                      style: theme.textTheme.headlineSmall?.copyWith(
+-                        fontWeight: FontWeight.bold,
+-                        color: AppColors.goldAccent,
+-                      ),
+-                    ),
+-                  ),
+-                ),
+-                
+-                if (commentaryAsync.isLoading)
+-                  const SliverToBoxAdapter(
+-                    child: Padding(
+-                      padding: EdgeInsets.all(32.0),
+-                      child: Center(child: CircularProgressIndicator()),
+-                    ),
+-                  )
+-                else if (verseEntries.isEmpty)
+-                  SliverToBoxAdapter(
+-                    child: Padding(
+-                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+-                      child: _buildEmptyState(theme),
+-                    ),
+-                  )
+-                else
+-                  SliverList(
+-                    delegate: SliverChildBuilderDelegate(
+-                      (context, index) {
+-                        return Padding(
+-                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+-                          child: _buildEntryCard(theme, verseEntries[index]),
+-                        );
+-                      },
+-                      childCount: verseEntries.length,
+-                    ),
+-                  ),
+-                  
+-                if (chapterEntries.isNotEmpty)
+-                  SliverToBoxAdapter(
+-                    child: _buildCollapsibleSection(
+-                      theme: theme,
+-                      title: 'On this chapter',
+-                      isExpanded: _showChapter,
+-                      entries: chapterEntries,
+-                      onToggle: () => setState(() => _showChapter = !_showChapter),
+-                    ),
+-                  ),
+-                  
+-                if (bookEntries.isNotEmpty)
+-                  SliverToBoxAdapter(
+-                    child: _buildCollapsibleSection(
+-                      theme: theme,
+-                      title: 'On this book',
+-                      isExpanded: _showBook,
+-                      entries: bookEntries,
+-                      onToggle: () => setState(() => _showBook = !_showBook),
+-                    ),
+-                  ),
+-
+-                const SliverToBoxAdapter(child: SizedBox(height: 100)),
+-              ],
++          SafeArea(
++            top: false,
++            child: CommentaryView(
++              book: book,
++              chapter: chapter,
++              verse: verse,
++              verseText: verseText,
++              isCompact: false,
+             ),
+           ),
+         ],
+       ),
+     );
+   }
+-
+-  Widget _buildEmptyState(ThemeData theme) {
+-    return RepaintBoundary(
+-      child: TexturedGlassContainer(
+-        isScrollable: true,
+-        borderRadius: BorderRadius.circular(20),
+-        child: Padding(
+-          padding: const EdgeInsets.symmetric(vertical: 32.0, horizontal: 24.0),
+-          child: Column(
+-            children: [
+-              Icon(Icons.library_books_rounded, size: 48, color: theme.primaryColor.withValues(alpha: 0.3)),
+-              const SizedBox(height: 16),
+-              Text(
+-                'No commentary yet',
+-                style: theme.textTheme.titleMedium?.copyWith(
+-                  fontWeight: FontWeight.bold,
+-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+-                ),
+-              ),
+-              const SizedBox(height: 8),
+-              Text(
+-                'There is no commentary available for this specific passage.',
+-                textAlign: TextAlign.center,
+-                style: theme.textTheme.bodyMedium?.copyWith(
+-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+-                ),
+-              ),
+-            ],
+-          ),
+-        ),
+-      ),
+-    );
+-  }
+-
+-  Widget _buildCollapsibleSection({
+-    required ThemeData theme,
+-    required String title,
+-    required bool isExpanded,
+-    required List<CommentaryEntry> entries,
+-    required VoidCallback onToggle,
+-  }) {
+-    return Padding(
+-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+-      child: RepaintBoundary(
+-        child: TexturedGlassContainer(
+-          isScrollable: true,
+-          borderRadius: BorderRadius.circular(20),
+-          child: Column(
+-            crossAxisAlignment: CrossAxisAlignment.stretch,
+-            children: [
+-              InkWell(
+-                onTap: onToggle,
+-                borderRadius: BorderRadius.circular(20),
+-                child: Padding(
+-                  padding: const EdgeInsets.all(20.0),
+-                  child: Row(
+-                    children: [
+-                      Expanded(
+-                        child: Text(
+-                          title,
+-                          style: theme.textTheme.titleMedium?.copyWith(
+-                            fontWeight: FontWeight.bold,
+-                          ),
+-                        ),
+-                      ),
+-                      Icon(isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, color: theme.primaryColor),
+-                    ],
+-                  ),
+-                ),
+-              ),
+-              if (isExpanded)
+-                Padding(
+-                  padding: const EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0),
+-                  child: Column(
+-                    children: entries.map((entry) => Padding(
+-                      padding: const EdgeInsets.only(top: 16.0),
+-                      child: _buildEntryContent(theme, entry),
+-                    )).toList(),
+-                  ),
+-                ),
+-            ],
+-          ),
+-        ),
+-      ),
+-    );
+-  }
+-
+-  Widget _buildEntryCard(ThemeData theme, CommentaryEntry entry) {
+-    return RepaintBoundary(
+-      child: TexturedGlassContainer(
+-        isScrollable: true,
+-        borderRadius: BorderRadius.circular(20),
+-        child: Padding(
+-          padding: const EdgeInsets.all(20.0),
+-          child: _buildEntryContent(theme, entry),
+-        ),
+-      ),
+-    );
+-  }
+-
+-  Widget _buildEntryContent(ThemeData theme, CommentaryEntry entry) {
+-    final paragraphs = entry.text.split('\n\n');
+-    
+-    return Column(
+-      crossAxisAlignment: CrossAxisAlignment.start,
+-      children: [
+-        ...paragraphs.map((p) => Padding(
+-          padding: const EdgeInsets.only(bottom: 16.0),
+-          child: Text(
+-            p.trim(),
+-            style: theme.textTheme.bodyLarge?.copyWith(
+-              fontFamily: 'Lora', 
+-              height: 1.6,
+-              color: theme.colorScheme.onSurface.withValues(alpha: 0.9),
+-            ),
+-          ),
+-        )),
+-        const Divider(height: 24),
+-        Text(
+-          entry.author,
+-          style: theme.textTheme.titleSmall?.copyWith(
+-            fontWeight: FontWeight.bold,
+-            color: theme.primaryColor,
+-          ),
+-        ),
+-        if (entry.source.isNotEmpty) ...[
+-          const SizedBox(height: 2),
+-          Text(
+-            entry.source,
+-            style: theme.textTheme.labelMedium?.copyWith(
+-              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+-            ),
+-          ),
+-        ],
+-      ],
+-    );
+-  }
+ }
+diff --git a/lib/ui/screens/read_screen.dart b/lib/ui/screens/read_screen.dart
+index 81891f1..292534a 100644
+--- a/lib/ui/screens/read_screen.dart
++++ b/lib/ui/screens/read_screen.dart
+@@ -1,7 +1,6 @@
+ import 'dart:async';
+ import 'dart:ui';
+ import 'package:flutter/material.dart';
+-import 'package:flutter/cupertino.dart';
+ import '../../theme/app_colors.dart';
+ import '../widgets/pinch_to_zoom_font_wrapper.dart';
+ import '../widgets/pill_segmented_control.dart';
+@@ -41,7 +40,8 @@ import '../../state/read_location_provider.dart';
+ import '../widgets/textured_glass_container.dart';
+ import '../widgets/bouncy_entrance.dart';
+ import '../../state/nav_settings_provider.dart';
+-import 'commentary_hub_screen.dart';
++import '../../theme/reading_tokens.dart';
++import '../widgets/commentary_view.dart';
+ import 'package:wakelock_plus/wakelock_plus.dart';
+ 
+ String _toHeadingCase(String text) {
+@@ -438,7 +438,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
+   Widget build(BuildContext context) {
+     final theme = Theme.of(context);
+     final appThemeMode = ref.watch(themeProvider);
+-    final isDark = appThemeMode == AppThemeMode.dark || appThemeMode == AppThemeMode.oled;
+     final typography = ref.watch(typographyProvider);
+     final chapterTitles = ref.watch(chapterTitlesProvider);
+     final readSettings = ref.watch(readSettingsProvider);
+@@ -545,8 +544,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
+       currentChapter = fc.chapter.number;
+     }
+ 
++    final tokens = theme.extension<ReadingTokens>()!;
+     return Scaffold(
+-      backgroundColor: Colors.transparent,
++      backgroundColor: tokens.readingPaper,
+       body: PinchToZoomFontWrapper(
+         child: Stack(
+           children: [
+@@ -864,13 +864,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
+                                                           color: isSelected
+                                                               ? (highlightColor != null
+                                                                   ? highlightColor.withValues(alpha: 0.35)
+-                                                                  : (isDark
+-                                                                      ? theme.primaryColor.withValues(alpha: 0.20)
+-                                                                      : theme.primaryColor.withValues(alpha: 0.15)))
++                                                                  : theme.primaryColor.withValues(alpha: 0.15))
+                                                               : (_navigatedVerseIndex == index
+-                                                                  ? (isDark
+-                                                                      ? theme.primaryColor.withValues(alpha: 0.20)
+-                                                                      : theme.primaryColor.withValues(alpha: 0.15))
++                                                                  ? theme.primaryColor.withValues(alpha: 0.15)
+                                                                   : (highlightColor != null
+                                                                       ? highlightColor.withValues(alpha: 0.35)
+                                                                       : Colors.transparent)),
+@@ -1168,22 +1164,23 @@ Positioned(
+   void _showCommentaryBottomSheet(int verseNumber, String verseText) {
+     if (!mounted) return;
+     final loc = ref.read(readLocationProvider);
+-    Navigator.of(context).push(CupertinoPageRoute(
+-      builder: (_) => CommentaryHubScreen(
+-        book: loc.bookName,
+-        chapter: loc.chapter,
+-        verse: verseNumber,
+-      ),
+-    ));
++    showCommentaryBottomSheet(
++      context,
++      book: loc.bookName,
++      chapter: loc.chapter,
++      verse: verseNumber,
++      verseText: verseText,
++    );
+   }
+ 
+   Widget _buildNormalVerse(BibleVerse verse, ThemeData theme, TypographyState typography, AppThemeMode appThemeMode, {bool hasCommentary = false, VoidCallback? onCommentaryTap, bool isBookmarked = false, bool isRedLetterEnabled = true}) {
++    final tokens = theme.extension<ReadingTokens>()!;
+     final fontStyle = theme.textTheme.bodyMedium?.copyWith(
+       fontFamily: typography.fontFamily,
+       fontSize: typography.fontSize,
+       height: typography.lineHeight,
+       letterSpacing: 0.15,
+-      color: theme.textTheme.bodyLarge?.color,
++      color: tokens.readingInk,
+       decoration: isBookmarked ? TextDecoration.underline : null,
+       decorationColor: isBookmarked ? theme.primaryColor : null,
+       decorationStyle: isBookmarked ? TextDecorationStyle.solid : null,
+@@ -1194,11 +1191,14 @@ Positioned(
+     Color redLetterColor;
+     switch (appThemeMode.resolve(context)) {
+       case AppThemeMode.light:
++      case AppThemeMode.pop:
++      case AppThemeMode.fresh:
+         starColor = Colors.deepOrange.shade400;
+         redLetterColor = const Color(0xFFB33A3A); // Soft crimson
+         break;
+       case AppThemeMode.dark:
+       case AppThemeMode.oled:
++      case AppThemeMode.dusk:
+       case AppThemeMode.automatic:
+         starColor = Colors.amber.shade400;
+         redLetterColor = const Color(0xFFD46A6A); // Lighter muted red
+@@ -1248,7 +1248,7 @@ Positioned(
+           TextSpan(
+             text: '${verse.number}  ',
+             style: theme.textTheme.titleMedium?.copyWith(
+-              color: theme.primaryColor,
++              color: tokens.readingAccent,
+               fontWeight: FontWeight.bold,
+               fontSize: typography.fontSize * 0.75, // Scale number down
+             ),
+@@ -1280,7 +1280,7 @@ Positioned(
+     final flatChapters = ref.read(flatChaptersProvider);
+     final hasPrevious = pageIndex > 0;
+     final hasNext = pageIndex < flatChapters.length - 1;
+-    final isDark = theme.brightness == Brightness.dark;
++    final tokens = theme.extension<ReadingTokens>()!;
+ 
+     return Padding(
+       padding: const EdgeInsets.only(top: 80.0, bottom: 160.0), // Above nav pill
+@@ -1290,7 +1290,7 @@ Positioned(
+           Row(
+             mainAxisAlignment: MainAxisAlignment.center,
+             children: [
+-              Container(width: 40, height: 1, color: theme.colorScheme.onSurface.withValues(alpha: 0.2)),
++              Container(width: 40, height: 1, color: tokens.readingBorder),
+               Padding(
+                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                 child: Text(
+@@ -1310,25 +1310,24 @@ Positioned(
+               // Commentary Button
+             TextButton.icon(
+               onPressed: hasChapterCommentary ? () {
+-                Navigator.of(context).push(CupertinoPageRoute(
+-                  builder: (_) => CommentaryHubScreen(
+-                    book: fc.book.name,
+-                    chapter: fc.chapter.number,
+-                    verse: null,
+-                  ),
+-                ));
++                showCommentaryBottomSheet(
++                  context,
++                  book: fc.book.name,
++                  chapter: fc.chapter.number,
++                  verse: null,
++                );
+               } : null,
+-            icon: Icon(Icons.school_rounded, color: hasChapterCommentary ? theme.primaryColor : theme.disabledColor),
++            icon: Icon(Icons.school_rounded, color: hasChapterCommentary ? tokens.readingAccent : theme.disabledColor),
+             label: Text(
+               'Read commentary on this chapter',
+               style: theme.textTheme.titleSmall?.copyWith(
+-                color: hasChapterCommentary ? theme.colorScheme.onSurface : theme.disabledColor,
++                color: hasChapterCommentary ? tokens.readingInk : theme.disabledColor,
+                 fontWeight: FontWeight.w600,
+               ),
+             ),
+             style: TextButton.styleFrom(
+               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+-              backgroundColor: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.05),
++              backgroundColor: tokens.readingInk.withValues(alpha: 0.05),
+               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+             ),
+           ),
+@@ -1346,7 +1345,7 @@ Positioned(
+                   style: TextButton.styleFrom(
+                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                   ),
+-                  child: Text('‹ Previous', style: theme.textTheme.titleMedium?.copyWith(color: theme.primaryColor)),
++                  child: Text('‹ Previous', style: theme.textTheme.titleMedium?.copyWith(color: tokens.readingAccent)),
+                 )
+               else
+                 const SizedBox(width: 100),
+@@ -1361,7 +1360,7 @@ Positioned(
+                   style: TextButton.styleFrom(
+                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                   ),
+-                  child: Text('Next ›', style: theme.textTheme.titleMedium?.copyWith(color: theme.primaryColor)),
++                  child: Text('Next ›', style: theme.textTheme.titleMedium?.copyWith(color: tokens.readingAccent)),
+                 )
+               else
+                 const SizedBox(width: 100),
+@@ -2039,46 +2038,6 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
+ class _TypographyBottomSheet extends ConsumerWidget {
+   const _TypographyBottomSheet();
+ 
+-  Widget _buildThemeIconButton(
+-    BuildContext context, 
+-    WidgetRef ref, 
+-    ThemeData theme, 
+-    AppThemeMode currentMode, 
+-    AppThemeMode buttonMode, 
+-    IconData icon,
+-    {Widget? customIcon}
+-  ) {
+-    // Treat automatic as light for visual selection if needed, or exact match
+-    final isSelected = currentMode == buttonMode || (currentMode == AppThemeMode.automatic && buttonMode == AppThemeMode.light);
+-    
+-    return GestureDetector(
+-      onTap: () {
+-        HapticFeedback.selectionClick();
+-        ref.read(themeProvider.notifier).setTheme(buttonMode);
+-      },
+-      child: AnimatedContainer(
+-        duration: const Duration(milliseconds: 200),
+-        width: 64,
+-        height: 64,
+-        decoration: BoxDecoration(
+-          shape: BoxShape.circle,
+-          color: isSelected ? theme.primaryColor.withValues(alpha: 0.15) : theme.colorScheme.onSurface.withValues(alpha: 0.05),
+-          border: isSelected ? Border.all(color: theme.primaryColor, width: 2.5) : null,
+-          boxShadow: isSelected 
+-              ? [BoxShadow(color: theme.primaryColor.withValues(alpha: 0.4), blurRadius: 16, spreadRadius: 4)] 
+-              : null,
+-        ),
+-        child: Center(
+-          child: customIcon ?? Icon(
+-            icon, 
+-            color: isSelected ? theme.primaryColor : theme.colorScheme.onSurfaceVariant,
+-            size: 32,
+-          ),
+-        ),
+-      ),
+-    );
+-  }
+-
+   @override
+   Widget build(BuildContext context, WidgetRef ref) {
+     final theme = Theme.of(context);
+@@ -2117,49 +2076,6 @@ class _TypographyBottomSheet extends ConsumerWidget {
+                 'Typography',
+                 style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+               ),
+-              const SizedBox(height: 24),
+-              // Radial Balance: Color Mode Toggles
+-              Center(
+-                child: Row(
+-                  mainAxisAlignment: MainAxisAlignment.center,
+-                  children: [
+-                    _buildThemeIconButton(context, ref, theme, ref.watch(themeProvider), AppThemeMode.light, Icons.wb_sunny_rounded),
+-                    const SizedBox(width: 16),
+-                    _buildThemeIconButton(context, ref, theme, ref.watch(themeProvider), AppThemeMode.sepia, Icons.local_cafe_rounded),
+-                    const SizedBox(width: 16),
+-                    _buildThemeIconButton(context, ref, theme, ref.watch(themeProvider), AppThemeMode.dark, Icons.nightlight_round),
+-                    const SizedBox(width: 16),
+-                    _buildThemeIconButton(context, ref, theme, ref.watch(themeProvider), AppThemeMode.oled, Icons.nightlight_round,
+-                      customIcon: Container(
+-                        width: 38,
+-                        height: 38,
+-                        decoration: const BoxDecoration(
+-                          color: Colors.black,
+-                          shape: BoxShape.circle,
+-                        ),
+-                        child: const Center(
+-                          child: Icon(Icons.nightlight_round, color: Colors.white, size: 24),
+-                        ),
+-                      ),
+-                    ),
+-                  ],
+-                ),
+-              ),
+-              const SizedBox(height: 16),
+-              SwitchListTile(
+-                contentPadding: EdgeInsets.zero,
+-                title: const Text('Match system appearance'),
+-                value: ref.watch(themeProvider) == AppThemeMode.automatic,
+-                onChanged: (value) {
+-                  HapticFeedback.selectionClick();
+-                  if (value) {
+-                    ref.read(themeProvider.notifier).setTheme(AppThemeMode.automatic);
+-                  } else {
+-                    final resolved = AppThemeMode.automatic.resolve(context);
+-                    ref.read(themeProvider.notifier).setTheme(resolved);
+-                  }
+-                },
+-              ),
+               const SizedBox(height: 16),
+               Row(
+                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+@@ -2535,13 +2451,12 @@ class VerseActionLogic {
+   static void handleCommentary(BuildContext context, WidgetRef ref, String bookName, int chapterNum, int verseNumberFallback, List<int> targetVerses) {
+     final sorted = targetVerses.toList()..sort();
+     final firstVerse = sorted.isNotEmpty ? sorted.first : verseNumberFallback;
+-    Navigator.of(context).push(CupertinoPageRoute(
+-      builder: (_) => CommentaryHubScreen(
+-        book: bookName,
+-        chapter: chapterNum,
+-        verse: firstVerse,
+-      ),
+-    ));
++    showCommentaryBottomSheet(
++      context,
++      book: bookName,
++      chapter: chapterNum,
++      verse: firstVerse,
++    );
+   }
+ 
+   static Future<void> handleShare(BuildContext context, WidgetRef ref, String bookName, int chapterNum, List<int> targetVerses) async {
+diff --git a/lib/ui/screens/votd_archive_screen.dart b/lib/ui/screens/votd_archive_screen.dart
+index a3fc09b..04e6b1c 100644
+--- a/lib/ui/screens/votd_archive_screen.dart
++++ b/lib/ui/screens/votd_archive_screen.dart
+@@ -5,7 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
+ import '../../state/home_provider.dart';
+ import '../../state/votd_tracker_provider.dart';
+ import '../widgets/textured_glass_container.dart';
+-import 'verse_detail_screen.dart';
++import 'commentary_hub_screen.dart';
++import '../../theme/reading_tokens.dart';
+ 
+ class VotdArchiveScreen extends ConsumerWidget {
+   const VotdArchiveScreen({super.key});
+@@ -13,6 +14,7 @@ class VotdArchiveScreen extends ConsumerWidget {
+   @override
+   Widget build(BuildContext context, WidgetRef ref) {
+     final theme = Theme.of(context);
++    final tokens = theme.extension<ReadingTokens>()!;
+ 
+     // Compute past 7 days
+     final now = DateTime.now();
+@@ -113,11 +115,21 @@ class VotdArchiveScreen extends ConsumerWidget {
+                             borderRadius: BorderRadius.circular(20),
+                             onTap: () {
+                               ref.read(votdTrackerProvider.notifier).markViewed(date);
+-                              Navigator.of(context).push(
+-                                CupertinoPageRoute(
+-                                  builder: (_) => VerseDetailScreen(reference: reference),
++                              final refStr = reference;
++                              final lastSpaceIdx = refStr.lastIndexOf(' ');
++                              final bookName = lastSpaceIdx != -1 ? refStr.substring(0, lastSpaceIdx) : refStr;
++                              final refParts = lastSpaceIdx != -1 ? refStr.substring(lastSpaceIdx + 1).split(':') : [];
++                              final chapterNum = refParts.isNotEmpty ? (int.tryParse(refParts[0]) ?? 1) : 1;
++                              final verseNum = refParts.length > 1 ? int.tryParse(refParts[1]) : null;
++
++                              Navigator.of(context).push(CupertinoPageRoute(
++                                builder: (_) => CommentaryHubScreen(
++                                  book: bookName,
++                                  chapter: chapterNum,
++                                  verse: verseNum,
++                                  verseText: null, // text is fetched inside if needed
+                                 ),
+-                              );
++                              ));
+                             },
+                             child: Container(
+                               padding: const EdgeInsets.all(20),
+@@ -134,7 +146,7 @@ class VotdArchiveScreen extends ConsumerWidget {
+                                       Text(
+                                         displayDate,
+                                         style: theme.textTheme.labelMedium?.copyWith(
+-                                          color: isToday ? theme.primaryColor : theme.colorScheme.onSurface.withValues(alpha: 0.5),
++                                          color: isToday ? tokens.readingAccent : tokens.readingInkMuted,
+                                           fontWeight: isToday ? FontWeight.bold : FontWeight.w500,
+                                         ),
+                                       ),
+@@ -147,7 +159,7 @@ class VotdArchiveScreen extends ConsumerWidget {
+                                         child: Text(
+                                           bookTag,
+                                           style: theme.textTheme.labelSmall?.copyWith(
+-                                            color: theme.primaryColor,
++                                            color: tokens.readingAccent,
+                                             fontWeight: FontWeight.bold,
+                                             letterSpacing: 0.5,
+                                           ),
+@@ -160,6 +172,7 @@ class VotdArchiveScreen extends ConsumerWidget {
+                                     reference,
+                                     style: theme.textTheme.titleLarge?.copyWith(
+                                       fontWeight: FontWeight.bold,
++                                      color: tokens.readingInk,
+                                     ),
+                                   ),
+                                   const SizedBox(height: 8),
+@@ -168,7 +181,7 @@ class VotdArchiveScreen extends ConsumerWidget {
+                                     maxLines: 3,
+                                     overflow: TextOverflow.ellipsis,
+                                     style: theme.textTheme.bodyMedium?.copyWith(
+-                                      color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
++                                      color: tokens.readingInkMuted,
+                                       height: 1.5,
+                                     ),
+                                   ),
+diff --git a/lib/ui/widgets/glass_container.dart b/lib/ui/widgets/glass_container.dart
+index a00ff94..e6cb3b3 100644
+--- a/lib/ui/widgets/glass_container.dart
++++ b/lib/ui/widgets/glass_container.dart
+@@ -1,7 +1,7 @@
+ import 'dart:ui';
+ import 'package:flutter/material.dart';
+ 
+-import '../../theme/app_colors.dart';
++import '../../theme/reading_tokens.dart';
+ 
+ class GlassContainer extends StatelessWidget {
+   final Widget child;
+@@ -21,8 +21,7 @@ class GlassContainer extends StatelessWidget {
+ 
+   @override
+   Widget build(BuildContext context) {
+-    final isDark = Theme.of(context).brightness == Brightness.dark;
+-    final isWarmGold = Theme.of(context).scaffoldBackgroundColor == AppColors.warmGoldBackground;
++    final tokens = Theme.of(context).extension<ReadingTokens>()!;
+     final radius = borderRadius ?? BorderRadius.circular(24);
+ 
+     return Container(
+@@ -46,16 +45,10 @@ class GlassContainer extends StatelessWidget {
+             ? Container(
+                 padding: padding,
+                 decoration: BoxDecoration(
+-                  color: isDark
+-                      ? Colors.black.withValues(alpha: 0.55)
+-                      : isWarmGold
+-                          ? const Color(0xFFF4ECD8).withValues(alpha: 0.85) // cream
+-                          : Colors.white.withValues(alpha: 0.85),
++                  color: tokens.readingSurface,
+                   borderRadius: radius,
+                   border: Border.all(
+-                    color: isDark
+-                        ? Colors.white.withValues(alpha: 0.15)
+-                        : Colors.white.withValues(alpha: 0.50),
++                    color: tokens.readingBorder,
+                     width: 1.0,
+                   ),
+                 ),
+@@ -67,18 +60,10 @@ class GlassContainer extends StatelessWidget {
+                   child: Container(
+                     padding: padding,
+                     decoration: BoxDecoration(
+-                      color: isDark
+-                          ? Colors.black.withValues(alpha: 0.35)
+-                          : isWarmGold
+-                              ? Colors.white.withValues(alpha: 0.65)
+-                              : Colors.white.withValues(alpha: 0.65),
++                      color: tokens.readingSurface.withValues(alpha: 0.85),
+                       borderRadius: radius,
+                       border: Border.all(
+-                        color: isDark
+-                            ? Colors.white.withValues(alpha: 0.12)
+-                            : isWarmGold
+-                                ? Colors.white.withValues(alpha: 0.40)
+-                                : Colors.white.withValues(alpha: 0.40),
++                        color: tokens.readingBorder,
+                         width: 1.0,
+                       ),
+                     ),
+diff --git a/lib/ui/widgets/textured_glass_container.dart b/lib/ui/widgets/textured_glass_container.dart
+index 0f6ac28..fb9f749 100644
+--- a/lib/ui/widgets/textured_glass_container.dart
++++ b/lib/ui/widgets/textured_glass_container.dart
+@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
+ import 'package:flutter_riverpod/flutter_riverpod.dart';
+ import '../../state/theme_provider.dart';
+ import '../../state/glass_ui_provider.dart';
+-import '../../theme/app_colors.dart';
++import '../../theme/reading_tokens.dart';
+ 
+ class TexturedGlassContainer extends ConsumerWidget {
+   final Widget child;
+@@ -36,6 +36,7 @@ class TexturedGlassContainer extends ConsumerWidget {
+ 
+     final useBlur = isGlassy && !isScrollable;
+ 
++    final tokens = Theme.of(context).extension<ReadingTokens>()!;
+     Color fillColor;
+     if (useBlur) {
+       switch (appTheme.resolve(context)) {
+@@ -43,6 +44,9 @@ class TexturedGlassContainer extends ConsumerWidget {
+           fillColor = Colors.white.withValues(alpha: 0.35);
+           break;
+         case AppThemeMode.light:
++        case AppThemeMode.pop:
++        case AppThemeMode.dusk:
++        case AppThemeMode.fresh:
+           fillColor = Colors.black.withValues(alpha: 0.08);
+           break;
+         case AppThemeMode.dark:
+@@ -52,33 +56,9 @@ class TexturedGlassContainer extends ConsumerWidget {
+           break;
+       }
+     } else if (isGlassy && isScrollable) {
+-      switch (appTheme.resolve(context)) {
+-        case AppThemeMode.sepia:
+-          fillColor = const Color(0xFFF4ECD8).withValues(alpha: 0.85); // cream
+-          break;
+-        case AppThemeMode.light:
+-          fillColor = Colors.white.withValues(alpha: 0.85);
+-          break;
+-        case AppThemeMode.dark:
+-        case AppThemeMode.oled:
+-        case AppThemeMode.automatic:
+-          fillColor = Colors.black.withValues(alpha: 0.55);
+-          break;
+-      }
++      fillColor = tokens.readingSurface.withValues(alpha: 0.85);
+     } else {
+-      switch (appTheme.resolve(context)) {
+-        case AppThemeMode.sepia:
+-          fillColor = AppColors.sepiaSurface;
+-          break;
+-        case AppThemeMode.light:
+-          fillColor = AppColors.lightSurface;
+-          break;
+-        case AppThemeMode.dark:
+-      case AppThemeMode.oled:
+-        case AppThemeMode.automatic:
+-          fillColor = AppColors.darkSurface;
+-          break;
+-      }
++      fillColor = tokens.readingSurface;
+     }
+ 
+     return AnimatedContainer(
+@@ -88,14 +68,31 @@ class TexturedGlassContainer extends ConsumerWidget {
+       clipBehavior: Clip.antiAlias,
+       decoration: BoxDecoration(
+         borderRadius: radius,
+-        boxShadow: [
+-          BoxShadow(
+-            color: Colors.black.withValues(alpha: 0.08),
+-            blurRadius: 24,
+-            spreadRadius: 0,
+-            offset: const Offset(0, 10),
+-          ),
+-        ],
++        boxShadow: (appTheme.resolve(context) == AppThemeMode.pop || 
++                    appTheme.resolve(context) == AppThemeMode.dusk || 
++                    appTheme.resolve(context) == AppThemeMode.fresh) && !isGlassy
++            ? [
++                BoxShadow(
++                  color: Colors.black.withValues(alpha: 0.1),
++                  blurRadius: 20,
++                  spreadRadius: 0,
++                  offset: const Offset(8, 8),
++                ),
++                BoxShadow(
++                  color: Colors.white.withValues(alpha: 0.8),
++                  blurRadius: 20,
++                  spreadRadius: 0,
++                  offset: const Offset(-8, -8),
++                ),
++              ]
++            : [
++                BoxShadow(
++                  color: Colors.black.withValues(alpha: 0.08),
++                  blurRadius: 24,
++                  spreadRadius: 0,
++                  offset: const Offset(0, 10),
++                ),
++              ],
+       ),
+       child: ClipRRect(
+         borderRadius: radius,
+@@ -111,8 +108,8 @@ class TexturedGlassContainer extends ConsumerWidget {
+                       decoration: BoxDecoration(
+                         color: fillColor,
+                         border: Border.all(
+-                          width: 0.5,
+-                          color: Colors.white.withValues(alpha: 0.15),
++                          width: 1.0,
++                          color: tokens.readingBorder,
+                         ),
+                         borderRadius: radius,
+                       ),

@@ -10,7 +10,7 @@ import '../../state/commentary_provider.dart';
 import '../widgets/shared_top_header.dart';
 import '../widgets/glass_container.dart';
 import '../widgets/bouncy_entrance.dart';
-import 'verse_detail_screen.dart';
+import 'commentary_hub_screen.dart';
 import 'today_screen.dart';
 import '../../services/share_service.dart';
 
@@ -251,8 +251,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         label: 'Go Deeper',
                         filled: true,
                         onPressed: () {
+                          final refStr = data.verseOfTheDay.reference;
+                          final lastSpaceIdx = refStr.lastIndexOf(' ');
+                          final bookName = lastSpaceIdx != -1 ? refStr.substring(0, lastSpaceIdx) : refStr;
+                          final refParts = lastSpaceIdx != -1 ? refStr.substring(lastSpaceIdx + 1).split(':') : [];
+                          final chapterNum = refParts.isNotEmpty ? (int.tryParse(refParts[0]) ?? 1) : 1;
+                          final verseNum = refParts.length > 1 ? int.tryParse(refParts[1]) : null;
+
                           Navigator.of(context).push(CupertinoPageRoute(
-                            builder: (_) => VerseDetailScreen(reference: data.verseOfTheDay.reference)
+                            builder: (_) => CommentaryHubScreen(
+                              book: bookName,
+                              chapter: chapterNum,
+                              verse: verseNum,
+                              verseText: data.verseOfTheDay.text,
+                            )
                           ));
                         },
                       ),

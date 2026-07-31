@@ -110,6 +110,28 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground> with Si
                 const Color(0xFFFAF9F6), // Fades to Pure Ivory
                 const Color(0xFFFAF9F6),
               ];
+              break;
+            case AppThemeMode.pop:
+              colors = [
+                Color.lerp(const Color(0xFFEBE3FF), const Color(0xFFD6C2FF), t)!,
+                const Color(0xFFF4F5F7),
+                const Color(0xFFF4F5F7),
+              ];
+              break;
+            case AppThemeMode.dusk:
+              colors = [
+                Color.lerp(const Color(0xFF48426D), const Color(0xFF312C51), t)!,
+                const Color(0xFF312C51),
+                const Color(0xFF312C51),
+              ];
+              break;
+            case AppThemeMode.fresh:
+              colors = [
+                Color.lerp(const Color(0xFF1C404A), const Color(0xFF132C33), t)!,
+                const Color(0xFF132C33),
+                const Color(0xFF132C33),
+              ];
+              break;
           }
 
           return AnimatedSwitcher(

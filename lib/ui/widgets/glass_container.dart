@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
-import '../../theme/app_colors.dart';
+import '../../theme/reading_tokens.dart';
 
 class GlassContainer extends StatelessWidget {
   final Widget child;
@@ -21,8 +21,7 @@ class GlassContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isWarmGold = Theme.of(context).scaffoldBackgroundColor == AppColors.warmGoldBackground;
+    final tokens = Theme.of(context).extension<ReadingTokens>()!;
     final radius = borderRadius ?? BorderRadius.circular(24);
 
     return Container(
@@ -46,16 +45,10 @@ class GlassContainer extends StatelessWidget {
             ? Container(
                 padding: padding,
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? Colors.black.withValues(alpha: 0.55)
-                      : isWarmGold
-                          ? const Color(0xFFF4ECD8).withValues(alpha: 0.85) // cream
-                          : Colors.white.withValues(alpha: 0.85),
+                  color: tokens.readingSurface,
                   borderRadius: radius,
                   border: Border.all(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.15)
-                        : Colors.white.withValues(alpha: 0.50),
+                    color: tokens.readingBorder,
                     width: 1.0,
                   ),
                 ),
@@ -67,18 +60,10 @@ class GlassContainer extends StatelessWidget {
                   child: Container(
                     padding: padding,
                     decoration: BoxDecoration(
-                      color: isDark
-                          ? Colors.black.withValues(alpha: 0.35)
-                          : isWarmGold
-                              ? Colors.white.withValues(alpha: 0.65)
-                              : Colors.white.withValues(alpha: 0.65),
+                      color: tokens.readingSurface.withValues(alpha: 0.85),
                       borderRadius: radius,
                       border: Border.all(
-                        color: isDark
-                            ? Colors.white.withValues(alpha: 0.12)
-                            : isWarmGold
-                                ? Colors.white.withValues(alpha: 0.40)
-                                : Colors.white.withValues(alpha: 0.40),
+                        color: tokens.readingBorder,
                         width: 1.0,
                       ),
                     ),

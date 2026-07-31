@@ -80,10 +80,13 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
     String subGreeting;
     switch (appThemeMode.resolve(context)) {
       case AppThemeMode.light:
+      case AppThemeMode.pop:
+      case AppThemeMode.fresh:
         subGreeting = "Embrace the light of His word.";
         break;
       case AppThemeMode.dark:
       case AppThemeMode.oled:
+      case AppThemeMode.dusk:
       case AppThemeMode.automatic:
         subGreeting = "Rest in the peace of His promises.";
         break;
@@ -771,27 +774,24 @@ class CommentaryBanner extends ConsumerWidget {
     final commentaryAsync = ref.watch(commentaryProvider);
 
     String displayAuthor = 'Commentary';
-    String displayReference = activeVerse ?? 'Genesis 1:1';
-    String displaySnippet =
-        'No commentary available yet.';
+    String displayReference = activeVerse != null ? '${_parseReference(activeVerse).book} ${_parseReference(activeVerse).chapter}' : 'Genesis 1';
+    String displaySnippet = 'Explore commentary for this chapter.';
 
     if (activeVerse != null && commentaryAsync.value != null) {
       final entries = commentaryAsync.value!;
       final parsed = _parseReference(activeVerse);
       
       final matchingEntries = entries.where((e) => 
-        e.scope.book == parsed.book && 
-        e.scope.chapter == parsed.chapter && 
-        e.scope.verse == (parsed.verse ?? 1)
+        e.scope.book?.toLowerCase() == parsed.book.toLowerCase() && 
+        e.scope.chapter == parsed.chapter
       ).toList();
 
       if (matchingEntries.isNotEmpty) {
         final entry = matchingEntries.first;
-        displayAuthor = 'Commentary';
-        displaySnippet =
-            '"${entry.text.split('. ').take(2).join('. ')}..."';
+        displayAuthor = entry.author;
+        displaySnippet = '"${entry.text.split('. ').take(2).join('. ')}..."';
       } else {
-        displaySnippet = 'No commentary available for this verse.';
+        displaySnippet = 'Explore commentary for ${parsed.book} ${parsed.chapter}.';
       }
     }
 
@@ -821,23 +821,22 @@ class CommentaryBanner extends ConsumerWidget {
             child: InkWell(
               borderRadius: BorderRadius.circular(28),
               onTap: () {
-                final refStr = activeVerse ?? 'Revelation 14:12';
+                final refStr = activeVerse ?? 'Genesis 1';
                 String bookName = '';
                 int chapterNum = 1;
-                int? verseNum;
                 final lastSpaceIdx = refStr.lastIndexOf(' ');
                 if (lastSpaceIdx != -1) {
                   bookName = refStr.substring(0, lastSpaceIdx);
                   final refParts = refStr.substring(lastSpaceIdx + 1).split(':');
                   if (refParts.isNotEmpty) chapterNum = int.tryParse(refParts[0]) ?? 1;
-                  if (refParts.length > 1) verseNum = int.tryParse(refParts[1]);
                 } else {
                   bookName = refStr;
                 }
+                
                 Navigator.of(context).push(CupertinoPageRoute(builder: (_) => CommentaryHubScreen(
                   book: bookName,
                   chapter: chapterNum,
-                  verse: verseNum,
+                  verse: null, // Force chapter-level browse view
                 )));
               },
               child: Padding(

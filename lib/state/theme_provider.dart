@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:flutter/material.dart';
 
-enum AppThemeMode { automatic, light, dark, sepia, oled }
+enum AppThemeMode { automatic, light, dark, sepia, oled, pop, dusk, fresh }
 
 extension AppThemeModeExtension on AppThemeMode {
   AppThemeMode resolve(BuildContext context) {
@@ -65,6 +65,15 @@ class ThemeNotifier extends Notifier<AppThemeMode> {
         setTheme(AppThemeMode.oled);
         break;
       case AppThemeMode.oled:
+        setTheme(AppThemeMode.pop);
+        break;
+      case AppThemeMode.pop:
+        setTheme(AppThemeMode.dusk);
+        break;
+      case AppThemeMode.dusk:
+        setTheme(AppThemeMode.fresh);
+        break;
+      case AppThemeMode.fresh:
         setTheme(AppThemeMode.automatic);
         break;
     }

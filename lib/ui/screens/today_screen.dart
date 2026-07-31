@@ -14,7 +14,7 @@ import '../../state/streak_provider.dart';
 import '../../state/nav_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'your_space_screen.dart';
-import 'verse_detail_screen.dart';
+import 'commentary_hub_screen.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TODAY SCREEN — static scaffold (Stage 1: design / no data wiring)
@@ -365,8 +365,20 @@ class _TodaysReadingCard extends ConsumerWidget {
             child: FilledButton.icon(
               onPressed: () {
                 final homeState = ref.read(homeProvider);
+                final refStr = homeState.verseOfTheDay.reference;
+                final lastSpaceIdx = refStr.lastIndexOf(' ');
+                final bookName = lastSpaceIdx != -1 ? refStr.substring(0, lastSpaceIdx) : refStr;
+                final refParts = lastSpaceIdx != -1 ? refStr.substring(lastSpaceIdx + 1).split(':') : [];
+                final chapterNum = refParts.isNotEmpty ? (int.tryParse(refParts[0]) ?? 1) : 1;
+                final verseNum = refParts.length > 1 ? int.tryParse(refParts[1]) : null;
+
                 Navigator.of(context).push(CupertinoPageRoute(
-                  builder: (_) => VerseDetailScreen(reference: homeState.verseOfTheDay.reference)
+                  builder: (_) => CommentaryHubScreen(
+                    book: bookName,
+                    chapter: chapterNum,
+                    verse: verseNum,
+                    verseText: homeState.verseOfTheDay.text,
+                  )
                 ));
               },
               icon: const Icon(Icons.menu_book_outlined, size: 16),

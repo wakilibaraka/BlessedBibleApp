@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/theme_provider.dart';
 import '../../state/glass_ui_provider.dart';
-import '../../theme/app_colors.dart';
+import '../../theme/reading_tokens.dart';
 
 class TexturedGlassContainer extends ConsumerWidget {
   final Widget child;
@@ -36,6 +36,7 @@ class TexturedGlassContainer extends ConsumerWidget {
 
     final useBlur = isGlassy && !isScrollable;
 
+    final tokens = Theme.of(context).extension<ReadingTokens>()!;
     Color fillColor;
     if (useBlur) {
       switch (appTheme.resolve(context)) {
@@ -43,6 +44,9 @@ class TexturedGlassContainer extends ConsumerWidget {
           fillColor = Colors.white.withValues(alpha: 0.35);
           break;
         case AppThemeMode.light:
+        case AppThemeMode.pop:
+        case AppThemeMode.dusk:
+        case AppThemeMode.fresh:
           fillColor = Colors.black.withValues(alpha: 0.08);
           break;
         case AppThemeMode.dark:
@@ -52,33 +56,9 @@ class TexturedGlassContainer extends ConsumerWidget {
           break;
       }
     } else if (isGlassy && isScrollable) {
-      switch (appTheme.resolve(context)) {
-        case AppThemeMode.sepia:
-          fillColor = const Color(0xFFF4ECD8).withValues(alpha: 0.85); // cream
-          break;
-        case AppThemeMode.light:
-          fillColor = Colors.white.withValues(alpha: 0.85);
-          break;
-        case AppThemeMode.dark:
-        case AppThemeMode.oled:
-        case AppThemeMode.automatic:
-          fillColor = Colors.black.withValues(alpha: 0.55);
-          break;
-      }
+      fillColor = tokens.readingSurface.withValues(alpha: 0.85);
     } else {
-      switch (appTheme.resolve(context)) {
-        case AppThemeMode.sepia:
-          fillColor = AppColors.sepiaSurface;
-          break;
-        case AppThemeMode.light:
-          fillColor = AppColors.lightSurface;
-          break;
-        case AppThemeMode.dark:
-      case AppThemeMode.oled:
-        case AppThemeMode.automatic:
-          fillColor = AppColors.darkSurface;
-          break;
-      }
+      fillColor = tokens.readingSurface;
     }
 
     return AnimatedContainer(
@@ -88,14 +68,31 @@ class TexturedGlassContainer extends ConsumerWidget {
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         borderRadius: radius,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 24,
-            spreadRadius: 0,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        boxShadow: (appTheme.resolve(context) == AppThemeMode.pop || 
+                    appTheme.resolve(context) == AppThemeMode.dusk || 
+                    appTheme.resolve(context) == AppThemeMode.fresh) && !isGlassy
+            ? [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 20,
+                  spreadRadius: 0,
+                  offset: const Offset(8, 8),
+                ),
+                BoxShadow(
+                  color: Colors.white.withValues(alpha: 0.8),
+                  blurRadius: 20,
+                  spreadRadius: 0,
+                  offset: const Offset(-8, -8),
+                ),
+              ]
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.08),
+                  blurRadius: 24,
+                  spreadRadius: 0,
+                  offset: const Offset(0, 10),
+                ),
+              ],
       ),
       child: ClipRRect(
         borderRadius: radius,
@@ -111,8 +108,8 @@ class TexturedGlassContainer extends ConsumerWidget {
                       decoration: BoxDecoration(
                         color: fillColor,
                         border: Border.all(
-                          width: 0.5,
-                          color: Colors.white.withValues(alpha: 0.15),
+                          width: 1.0,
+                          color: tokens.readingBorder,
                         ),
                         borderRadius: radius,
                       ),

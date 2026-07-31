@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import '../../theme/app_colors.dart';
 import '../widgets/pinch_to_zoom_font_wrapper.dart';
 import '../widgets/pill_segmented_control.dart';
@@ -41,7 +40,8 @@ import '../../state/read_location_provider.dart';
 import '../widgets/textured_glass_container.dart';
 import '../widgets/bouncy_entrance.dart';
 import '../../state/nav_settings_provider.dart';
-import 'commentary_hub_screen.dart';
+import '../../theme/reading_tokens.dart';
+import '../widgets/commentary_view.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 String _toHeadingCase(String text) {
@@ -438,7 +438,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final appThemeMode = ref.watch(themeProvider);
-    final isDark = appThemeMode == AppThemeMode.dark || appThemeMode == AppThemeMode.oled;
     final typography = ref.watch(typographyProvider);
     final chapterTitles = ref.watch(chapterTitlesProvider);
     final readSettings = ref.watch(readSettingsProvider);
@@ -545,8 +544,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
       currentChapter = fc.chapter.number;
     }
 
+    final tokens = theme.extension<ReadingTokens>()!;
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: tokens.readingPaper,
       body: PinchToZoomFontWrapper(
         child: Stack(
           children: [
@@ -864,13 +864,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                                           color: isSelected
                                                               ? (highlightColor != null
                                                                   ? highlightColor.withValues(alpha: 0.35)
-                                                                  : (isDark
-                                                                      ? theme.primaryColor.withValues(alpha: 0.20)
-                                                                      : theme.primaryColor.withValues(alpha: 0.15)))
+                                                                  : theme.primaryColor.withValues(alpha: 0.15))
                                                               : (_navigatedVerseIndex == index
-                                                                  ? (isDark
-                                                                      ? theme.primaryColor.withValues(alpha: 0.20)
-                                                                      : theme.primaryColor.withValues(alpha: 0.15))
+                                                                  ? theme.primaryColor.withValues(alpha: 0.15)
                                                                   : (highlightColor != null
                                                                       ? highlightColor.withValues(alpha: 0.35)
                                                                       : Colors.transparent)),
@@ -1168,22 +1164,23 @@ Positioned(
   void _showCommentaryBottomSheet(int verseNumber, String verseText) {
     if (!mounted) return;
     final loc = ref.read(readLocationProvider);
-    Navigator.of(context).push(CupertinoPageRoute(
-      builder: (_) => CommentaryHubScreen(
-        book: loc.bookName,
-        chapter: loc.chapter,
-        verse: verseNumber,
-      ),
-    ));
+    showCommentaryBottomSheet(
+      context,
+      book: loc.bookName,
+      chapter: loc.chapter,
+      verse: verseNumber,
+      verseText: verseText,
+    );
   }
 
   Widget _buildNormalVerse(BibleVerse verse, ThemeData theme, TypographyState typography, AppThemeMode appThemeMode, {bool hasCommentary = false, VoidCallback? onCommentaryTap, bool isBookmarked = false, bool isRedLetterEnabled = true}) {
+    final tokens = theme.extension<ReadingTokens>()!;
     final fontStyle = theme.textTheme.bodyMedium?.copyWith(
       fontFamily: typography.fontFamily,
       fontSize: typography.fontSize,
       height: typography.lineHeight,
       letterSpacing: 0.15,
-      color: theme.textTheme.bodyLarge?.color,
+      color: tokens.readingInk,
       decoration: isBookmarked ? TextDecoration.underline : null,
       decorationColor: isBookmarked ? theme.primaryColor : null,
       decorationStyle: isBookmarked ? TextDecorationStyle.solid : null,
@@ -1194,11 +1191,14 @@ Positioned(
     Color redLetterColor;
     switch (appThemeMode.resolve(context)) {
       case AppThemeMode.light:
+      case AppThemeMode.pop:
+      case AppThemeMode.fresh:
         starColor = Colors.deepOrange.shade400;
         redLetterColor = const Color(0xFFB33A3A); // Soft crimson
         break;
       case AppThemeMode.dark:
       case AppThemeMode.oled:
+      case AppThemeMode.dusk:
       case AppThemeMode.automatic:
         starColor = Colors.amber.shade400;
         redLetterColor = const Color(0xFFD46A6A); // Lighter muted red
@@ -1248,7 +1248,7 @@ Positioned(
           TextSpan(
             text: '${verse.number}  ',
             style: theme.textTheme.titleMedium?.copyWith(
-              color: theme.primaryColor,
+              color: tokens.readingAccent,
               fontWeight: FontWeight.bold,
               fontSize: typography.fontSize * 0.75, // Scale number down
             ),
@@ -1280,7 +1280,7 @@ Positioned(
     final flatChapters = ref.read(flatChaptersProvider);
     final hasPrevious = pageIndex > 0;
     final hasNext = pageIndex < flatChapters.length - 1;
-    final isDark = theme.brightness == Brightness.dark;
+    final tokens = theme.extension<ReadingTokens>()!;
 
     return Padding(
       padding: const EdgeInsets.only(top: 80.0, bottom: 160.0), // Above nav pill
@@ -1290,7 +1290,7 @@ Positioned(
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(width: 40, height: 1, color: theme.colorScheme.onSurface.withValues(alpha: 0.2)),
+              Container(width: 40, height: 1, color: tokens.readingBorder),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Text(
@@ -1310,25 +1310,24 @@ Positioned(
               // Commentary Button
             TextButton.icon(
               onPressed: hasChapterCommentary ? () {
-                Navigator.of(context).push(CupertinoPageRoute(
-                  builder: (_) => CommentaryHubScreen(
-                    book: fc.book.name,
-                    chapter: fc.chapter.number,
-                    verse: null,
-                  ),
-                ));
+                showCommentaryBottomSheet(
+                  context,
+                  book: fc.book.name,
+                  chapter: fc.chapter.number,
+                  verse: null,
+                );
               } : null,
-            icon: Icon(Icons.school_rounded, color: hasChapterCommentary ? theme.primaryColor : theme.disabledColor),
+            icon: Icon(Icons.school_rounded, color: hasChapterCommentary ? tokens.readingAccent : theme.disabledColor),
             label: Text(
               'Read commentary on this chapter',
               style: theme.textTheme.titleSmall?.copyWith(
-                color: hasChapterCommentary ? theme.colorScheme.onSurface : theme.disabledColor,
+                color: hasChapterCommentary ? tokens.readingInk : theme.disabledColor,
                 fontWeight: FontWeight.w600,
               ),
             ),
             style: TextButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              backgroundColor: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.05),
+              backgroundColor: tokens.readingInk.withValues(alpha: 0.05),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
           ),
@@ -1346,7 +1345,7 @@ Positioned(
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   ),
-                  child: Text('‹ Previous', style: theme.textTheme.titleMedium?.copyWith(color: theme.primaryColor)),
+                  child: Text('‹ Previous', style: theme.textTheme.titleMedium?.copyWith(color: tokens.readingAccent)),
                 )
               else
                 const SizedBox(width: 100),
@@ -1361,7 +1360,7 @@ Positioned(
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   ),
-                  child: Text('Next ›', style: theme.textTheme.titleMedium?.copyWith(color: theme.primaryColor)),
+                  child: Text('Next ›', style: theme.textTheme.titleMedium?.copyWith(color: tokens.readingAccent)),
                 )
               else
                 const SizedBox(width: 100),
@@ -2039,46 +2038,6 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
 class _TypographyBottomSheet extends ConsumerWidget {
   const _TypographyBottomSheet();
 
-  Widget _buildThemeIconButton(
-    BuildContext context, 
-    WidgetRef ref, 
-    ThemeData theme, 
-    AppThemeMode currentMode, 
-    AppThemeMode buttonMode, 
-    IconData icon,
-    {Widget? customIcon}
-  ) {
-    // Treat automatic as light for visual selection if needed, or exact match
-    final isSelected = currentMode == buttonMode || (currentMode == AppThemeMode.automatic && buttonMode == AppThemeMode.light);
-    
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.selectionClick();
-        ref.read(themeProvider.notifier).setTheme(buttonMode);
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        width: 64,
-        height: 64,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: isSelected ? theme.primaryColor.withValues(alpha: 0.15) : theme.colorScheme.onSurface.withValues(alpha: 0.05),
-          border: isSelected ? Border.all(color: theme.primaryColor, width: 2.5) : null,
-          boxShadow: isSelected 
-              ? [BoxShadow(color: theme.primaryColor.withValues(alpha: 0.4), blurRadius: 16, spreadRadius: 4)] 
-              : null,
-        ),
-        child: Center(
-          child: customIcon ?? Icon(
-            icon, 
-            color: isSelected ? theme.primaryColor : theme.colorScheme.onSurfaceVariant,
-            size: 32,
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
@@ -2116,49 +2075,6 @@ class _TypographyBottomSheet extends ConsumerWidget {
               Text(
                 'Typography',
                 style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 24),
-              // Radial Balance: Color Mode Toggles
-              Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildThemeIconButton(context, ref, theme, ref.watch(themeProvider), AppThemeMode.light, Icons.wb_sunny_rounded),
-                    const SizedBox(width: 16),
-                    _buildThemeIconButton(context, ref, theme, ref.watch(themeProvider), AppThemeMode.sepia, Icons.local_cafe_rounded),
-                    const SizedBox(width: 16),
-                    _buildThemeIconButton(context, ref, theme, ref.watch(themeProvider), AppThemeMode.dark, Icons.nightlight_round),
-                    const SizedBox(width: 16),
-                    _buildThemeIconButton(context, ref, theme, ref.watch(themeProvider), AppThemeMode.oled, Icons.nightlight_round,
-                      customIcon: Container(
-                        width: 38,
-                        height: 38,
-                        decoration: const BoxDecoration(
-                          color: Colors.black,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Center(
-                          child: Icon(Icons.nightlight_round, color: Colors.white, size: 24),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const Text('Match system appearance'),
-                value: ref.watch(themeProvider) == AppThemeMode.automatic,
-                onChanged: (value) {
-                  HapticFeedback.selectionClick();
-                  if (value) {
-                    ref.read(themeProvider.notifier).setTheme(AppThemeMode.automatic);
-                  } else {
-                    final resolved = AppThemeMode.automatic.resolve(context);
-                    ref.read(themeProvider.notifier).setTheme(resolved);
-                  }
-                },
               ),
               const SizedBox(height: 16),
               Row(
@@ -2535,13 +2451,12 @@ class VerseActionLogic {
   static void handleCommentary(BuildContext context, WidgetRef ref, String bookName, int chapterNum, int verseNumberFallback, List<int> targetVerses) {
     final sorted = targetVerses.toList()..sort();
     final firstVerse = sorted.isNotEmpty ? sorted.first : verseNumberFallback;
-    Navigator.of(context).push(CupertinoPageRoute(
-      builder: (_) => CommentaryHubScreen(
-        book: bookName,
-        chapter: chapterNum,
-        verse: firstVerse,
-      ),
-    ));
+    showCommentaryBottomSheet(
+      context,
+      book: bookName,
+      chapter: chapterNum,
+      verse: firstVerse,
+    );
   }
 
   static Future<void> handleShare(BuildContext context, WidgetRef ref, String bookName, int chapterNum, List<int> targetVerses) async {

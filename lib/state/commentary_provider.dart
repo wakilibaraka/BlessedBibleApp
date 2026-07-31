@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/commentary_entry.dart';
+import '../data/local_storage/preferences_service.dart';
 
 class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
   @override
@@ -40,6 +41,17 @@ class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
     ).toList();
   }
 
+  List<CommentaryEntry> commentaryForChapterVerses(String book, int chapter) {
+    final list = state.value ?? [];
+    final entries = list.where((e) =>
+      e.scope.type == 'verse' &&
+      e.scope.book?.toLowerCase() == book.toLowerCase() &&
+      e.scope.chapter == chapter
+    ).toList();
+    entries.sort((a, b) => (a.scope.verse ?? 0).compareTo(b.scope.verse ?? 0));
+    return entries;
+  }
+
   List<CommentaryEntry> commentaryForChapter(String book, int chapter) {
     final list = state.value ?? [];
     return list.where((e) =>
@@ -64,8 +76,59 @@ class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
       e.scope.topic?.toLowerCase() == topic.toLowerCase()
     ).toList();
   }
+
+  bool hasCommentary(String book, int chapter, int? verse) {
+    final list = state.value ?? [];
+    return list.any((e) =>
+      (e.scope.type == 'verse' && e.scope.book?.toLowerCase() == book.toLowerCase() && e.scope.chapter == chapter && e.scope.verse == verse) ||
+      (e.scope.type == 'chapter' && e.scope.book?.toLowerCase() == book.toLowerCase() && e.scope.chapter == chapter) ||
+      (e.scope.type == 'book' && e.scope.book?.toLowerCase() == book.toLowerCase())
+    );
+  }
+
+  List<String> get versesWithCommentary {
+    final list = state.value ?? [];
+    final verses = <String>{};
+    for (final e in list) {
+      if (e.scope.type == 'verse' && e.scope.book != null && e.scope.chapter != null && e.scope.verse != null) {
+        // Format exactly like standard references
+        verses.add('${e.scope.book} ${e.scope.chapter}:${e.scope.verse}');
+      }
+    }
+    final sorted = verses.toList()..sort();
+    return sorted;
+  }
 }
 
 final commentaryProvider = AsyncNotifierProvider<CommentaryNotifier, List<CommentaryEntry>>(
   CommentaryNotifier.new,
+);
+
+class CommentaryBookmarksNotifier extends Notifier<Set<String>> {
+  @override
+  Set<String> build() {
+    final prefs = ref.watch(preferencesProvider);
+    return prefs.getCommentaryBookmarks().toSet();
+  }
+
+  void toggleBookmark(String book, int chapter, int? verse) {
+    final key = '$book|$chapter|${verse ?? "all"}';
+    final current = Set<String>.from(state);
+    if (current.contains(key)) {
+      current.remove(key);
+    } else {
+      current.add(key);
+    }
+    state = current;
+    ref.read(preferencesProvider).saveCommentaryBookmarks(current.toList());
+  }
+
+  bool isBookmarked(String book, int chapter, int? verse) {
+    final key = '$book|$chapter|${verse ?? "all"}';
+    return state.contains(key);
+  }
+}
+
+final commentaryBookmarksProvider = NotifierProvider<CommentaryBookmarksNotifier, Set<String>>(
+  CommentaryBookmarksNotifier.new,
 );

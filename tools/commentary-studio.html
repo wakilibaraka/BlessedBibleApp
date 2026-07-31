@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Commentary Studio</title>
+<style>
+  /* ============================================================
+     Commentary Studio — "Clean / Bear" treatment
+     Single centered flowing column, generous breathing space,
+     muted neutral palette, soft dividers, one restrained accent.
+     ============================================================ */
+  :root {
+    --bg: #faf9f7;              /* warm off-white page */
+    --surface: #ffffff;
+    --surface-2: #f4f3f0;      /* subtle fill (inputs, chips) */
+    --line: #ecebe7;           /* hairline dividers */
+    --line-2: #e2e0da;
+    --ink: #2b2a28;            /* near-black, soft */
+    --ink-2: #6b6a66;
+    --ink-3: #9c9a94;
+    --accent: #c1502e;         /* muted terracotta (Bear-ish) */
+    --accent-hover: #a8451f;
+    --accent-soft: #f7ece7;
+    --radius: 14px;
+    --radius-sm: 10px;
+    --shadow-sm: 0 1px 2px rgba(43,42,40,0.04);
+    --shadow: 0 2px 8px rgba(43,42,40,0.05);
+    --shadow-lg: 0 12px 40px rgba(43,42,40,0.12);
+    --sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif;
+    --serif: "Iowan Old Style", "Palatino", Georgia, serif;
+    --measure: 640px;          /* the flowing column width */
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ---------- PIN GATE ---------- */
+  #gate {
+    position: fixed; inset: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: center; background: var(--bg);
+  }
+  .gate-card {
+    width: 380px; max-width: 90vw; text-align: center; padding: 20px;
+  }
+  .gate-logo {
+    width: 46px; height: 46px; border-radius: 13px; margin: 0 auto 22px;
+    background: var(--accent); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 21px;
+  }
+  .gate-card h1 { font-family: var(--serif); font-size: 24px; font-weight: 600; margin-bottom: 6px; }
+  .gate-card p { font-size: 14px; color: var(--ink-3); margin-bottom: 26px; }
+  .pin-input {
+    width: 100%; text-align: center; letter-spacing: 8px; font-size: 21px;
+    padding: 13px 0; font-family: var(--sans);
+    border: 1px solid var(--line-2); border-radius: var(--radius-sm);
+    background: var(--surface); color: var(--ink); outline: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .pin-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .pin-error { color: var(--accent); font-size: 13px; height: 18px; margin-top: 10px; }
+  .set-note { font-size: 12.5px; color: var(--ink-3); margin-top: 18px; }
+
+  /* ---------- FLOWING SHELL ---------- */
+  .hidden { display: none !important; }
+  .app { min-height: 100vh; }
+
+  /* sticky top bar, but content flows in one column beneath */
+  header.top {
+    position: sticky; top: 0; z-index: 20;
+    background: rgba(250,249,247,0.85); backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .top-inner {
+    max-width: var(--measure); margin: 0 auto; padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand .logo {
+    width: 26px; height: 26px; border-radius: 8px; background: var(--accent);
+    color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px;
+  }
+  .brand h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.1px; }
+  .top-actions { display: flex; gap: 6px; align-items: center; }
+
+  .btn {
+    font-family: var(--sans); font-size: 13px; font-weight: 500;
+    border-radius: var(--radius-sm); padding: 8px 14px; cursor: pointer;
+    border: 1px solid transparent; background: transparent; color: var(--ink-2);
+    transition: background .12s, color .12s, border-color .12s;
+    display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  }
+  .btn:hover { background: var(--surface-2); color: var(--ink); }
+  .btn.solid { border-color: var(--line-2); background: var(--surface); color: var(--ink); box-shadow: var(--shadow-sm); }
+  .btn.solid:hover { background: var(--surface-2); }
+  .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  /* sync chip in top bar */
+  .sync-chip {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--surface-2); border-radius: var(--radius-sm); padding: 3px 8px 3px 10px;
+  }
+  .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-3); flex: none; transition: background .2s; }
+  .sync-dot.linked { background: #1f9d57; }
+  .sync-dot.dirty { background: var(--accent); }
+  .sync-chip select { border: none; background: transparent; font-size: 12.5px; font-weight: 500; color: var(--ink-2); padding: 4px 20px 4px 2px; cursor: pointer; width: auto; min-width: 0; box-shadow: none; }
+  .sync-chip select:focus { box-shadow: none; }
+
+  /* the single flowing column */
+  .column { max-width: var(--measure); margin: 0 auto; padding: 40px 24px 100px; }
+
+  .section-label {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.4px; text-transform: uppercase;
+    color: var(--ink-3); margin-bottom: 20px;
+  }
+  .lede { font-family: var(--serif); font-size: 27px; font-weight: 600; letter-spacing: -0.4px; margin-bottom: 6px; }
+  .sub-lede { font-size: 14.5px; color: var(--ink-3); margin-bottom: 40px; }
+
+  /* ---------- COMPOSER (flows, no card walls) ---------- */
+  .compose { margin-bottom: 56px; }
+  .field { margin-bottom: 26px; }
+  .field > label {
+    display: block; font-size: 12.5px; font-weight: 600; color: var(--ink-2); margin-bottom: 10px;
+  }
+  .field > label .opt { color: var(--ink-3); font-weight: 400; }
+  input[type=text], input[type=number], select, textarea {
+    width: 100%; font-family: var(--sans); font-size: 15px; color: var(--ink);
+    background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--radius-sm);
+    padding: 11px 13px; outline: none; transition: border-color .12s, box-shadow .12s;
+  }
+  input::placeholder, textarea::placeholder { color: var(--ink-3); }
+  textarea { resize: vertical; min-height: 170px; line-height: 1.7; font-family: var(--serif); font-size: 16.5px; padding: 15px; }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  select { appearance: none; -webkit-appearance: none; cursor: pointer;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' stroke='%239c9a94' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+
+  .segment { display: flex; gap: 3px; background: var(--surface-2); border-radius: var(--radius-sm); padding: 4px; }
+  .segment button {
+    flex: 1; border: none; background: transparent; cursor: pointer;
+    font-family: var(--sans); font-size: 13px; font-weight: 500; color: var(--ink-2);
+    padding: 8px 4px; border-radius: 7px; transition: background .12s, color .12s, box-shadow .12s;
+  }
+  .segment button.active { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-sm); font-weight: 600; }
+
+  .row3 { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 10px; }
+  .hint { font-size: 12.5px; color: var(--ink-3); margin-top: 8px; }
+
+  .compose-actions { display: flex; gap: 10px; align-items: center; }
+  .compose-actions .grow { flex: 1; }
+
+  .edit-banner {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--accent-soft); color: var(--accent-hover); font-size: 13px; font-weight: 500;
+    padding: 11px 14px; border-radius: var(--radius-sm); margin-bottom: 26px;
+  }
+  .edit-banner button { border: none; background: transparent; cursor: pointer; color: var(--accent-hover); font-size: 12.5px; font-weight: 600; }
+
+  /* divider between compose and library */
+  .rule { height: 1px; background: var(--line); border: none; margin: 8px 0 44px; }
+
+  /* ---------- LIBRARY (flowing list) ---------- */
+  .lib-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 22px; }
+  .lib-head .section-label { margin-bottom: 0; }
+  .lib-count { font-size: 12.5px; color: var(--ink-3); }
+  .lib-tools { display: flex; gap: 10px; margin-bottom: 30px; }
+  .search-wrap { position: relative; flex: 1; }
+  .search-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+  .search-wrap input { padding-left: 34px; background: var(--surface-2); border-color: transparent; }
+  .search-wrap input:focus { background: var(--surface); }
+  .lib-tools select { width: auto; min-width: 120px; background: var(--surface-2); border-color: transparent; }
+
+  .entries { display: flex; flex-direction: column; }
+
+  /* entries are separated by hairlines, not boxed cards — Bear/Obsidian feel */
+  .entry { padding: 26px 4px; border-top: 1px solid var(--line); position: relative; }
+  .entry:first-child { border-top: none; }
+  .entry .ref-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .entry .scope { font-family: var(--serif); font-size: 18px; font-weight: 600; color: var(--ink); letter-spacing: -0.2px; }
+  .entry .badge {
+    font-size: 10.5px; text-transform: capitalize; font-weight: 600; color: var(--ink-2);
+    background: var(--surface-2); padding: 3px 9px; border-radius: 999px;
+  }
+  .entry .text { font-family: var(--serif); font-size: 16px; color: var(--ink); line-height: 1.7;
+    max-height: 5.1em; overflow: hidden; position: relative; }
+  .entry.expanded .text { max-height: none; }
+  .entry .text.clamped::after { content: ""; position: absolute; bottom: 0; left: 0; right: 0; height: 1.7em;
+    background: linear-gradient(transparent, var(--bg)); }
+  .entry .who { font-size: 13px; color: var(--ink-3); margin-top: 14px; }
+  .entry .who b { color: var(--ink-2); font-weight: 600; }
+  .entry .acts { display: flex; gap: 2px; margin-top: 12px; opacity: 0; transition: opacity .12s; }
+  .entry:hover .acts, .entry.expanded .acts { opacity: 1; }
+  .entry .acts button {
+    font-size: 12.5px; border: none; background: transparent; cursor: pointer; color: var(--ink-3);
+    padding: 5px 9px; border-radius: 7px; font-weight: 500;
+  }
+  .entry .acts button:hover { color: var(--ink); background: var(--surface-2); }
+  .entry .acts button.del:hover { color: var(--accent); background: var(--accent-soft); }
+
+  .empty { text-align: center; color: var(--ink-3); padding: 70px 20px; }
+  .empty .icon {
+    width: 46px; height: 46px; border-radius: 13px; background: var(--surface-2);
+    display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: var(--ink-3); font-size: 19px;
+  }
+  .empty p { font-size: 14px; line-height: 1.7; }
+
+  .toast {
+    position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: var(--ink); color: #fff; font-size: 13.5px; font-weight: 500;
+    padding: 11px 20px; border-radius: 999px; box-shadow: var(--shadow-lg);
+    opacity: 0; transition: transform .26s cubic-bezier(.2,.9,.3,1), opacity .26s; z-index: 200;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- ================= PIN GATE ================= -->
+<div id="gate">
+  <div class="gate-card">
+    <div class="gate-logo">✦</div>
+    <h1>Commentary Studio</h1>
+    <p id="gateSub">Enter your PIN to continue</p>
+    <input class="pin-input" id="pinInput" type="password" inputmode="numeric" maxlength="8" autocomplete="off" placeholder="••••" />
+    <div class="pin-error" id="pinError"></div>
+    <div class="set-note" id="setNote"></div>
+  </div>
+</div>
+
+<!-- ================= APP ================= -->
+<div class="app hidden" id="app">
+  <header class="top">
+    <div class="top-inner">
+      <div class="brand">
+        <div class="logo">✦</div>
+        <h1>Commentary Studio</h1>
+      </div>
+      <div class="top-actions">
+        <input type="file" id="importFile" accept="application/json" class="hidden" />
+        <div class="sync-chip" id="syncChip" title="Where new entries are saved">
+          <span class="sync-dot" id="syncDot"></span>
+          <select id="syncMode">
+            <option value="draft">Draft only</option>
+            <option value="autosave">Auto-save</option>
+            <option value="publish">Publish on button</option>
+          </select>
+        </div>
+        <button class="btn" id="linkFileBtn" title="Link the app's commentary.json once">Link file…</button>
+        <button class="btn solid hidden" id="publishBtn">Publish</button>
+        <button class="btn" id="importBtn">Import</button>
+        <button class="btn" id="exportBtn">Export</button>
+        <button class="btn" id="lockBtn">Lock</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="column">
+    <!-- ===== COMPOSER ===== -->
+    <section class="compose">
+      <div class="section-label">Compose</div>
+      <div class="lede">Add commentary</div>
+      <div class="sub-lede">Attach a note to a verse, chapter, book, topic, or custom scope.</div>
+
+      <div class="edit-banner hidden" id="editBanner">
+        <span id="editBannerText">Editing entry</span>
+        <button id="cancelEdit">Cancel</button>
+      </div>
+
+      <div class="field">
+        <label>Scope</label>
+        <div class="segment" id="scopeSeg">
+          <button data-scope="verse" class="active">Verse</button>
+          <button data-scope="chapter">Chapter</button>
+          <button data-scope="book">Book</button>
+          <button data-scope="topic">Topic</button>
+          <button data-scope="custom">Custom</button>
+        </div>
+      </div>
+
+      <div class="field" id="refFields">
+        <label>Reference</label>
+        <div class="row3">
+          <select id="bookSel"></select>
+          <input type="number" id="chapterInp" placeholder="Chapter" min="1" />
+          <input type="number" id="verseInp" placeholder="Verse" min="1" />
+        </div>
+        <div class="hint" id="refHint">Pick a book, chapter, and verse.</div>
+      </div>
+
+      <div class="field hidden" id="topicField">
+        <label>Topic</label>
+        <input type="text" id="topicInp" placeholder="e.g. The Sanctuary, The Second Coming" />
+      </div>
+
+      <div class="field hidden" id="customField">
+        <label>Custom label</label>
+        <input type="text" id="customInp" placeholder="e.g. Introduction to Daniel" />
+      </div>
+
+      <div class="field">
+        <label>Author</label>
+        <select id="authorSel"></select>
+      </div>
+
+      <div class="field hidden" id="authorCustomField">
+        <label>Author name</label>
+        <input type="text" id="authorCustomInp" placeholder="Full name of author" />
+      </div>
+
+      <div class="field">
+        <label>Source <span class="opt">(optional)</span></label>
+        <input type="text" id="sourceInp" placeholder="e.g. Daniel and the Revelation, p. 33" />
+      </div>
+
+      <div class="field">
+        <label>Commentary</label>
+        <textarea id="textInp" placeholder="Paste or type the commentary text verbatim…"></textarea>
+        <div class="hint">Transcribe faithfully — attributed to the author above. ⌘/Ctrl + Enter to save.</div>
+      </div>
+
+      <div class="compose-actions">
+        <button class="btn primary" id="saveBtn">Add entry</button>
+        <button class="btn" id="clearBtn">Clear</button>
+      </div>
+    </section>
+
+    <hr class="rule" />
+
+    <!-- ===== LIBRARY ===== -->
+    <section>
+      <div class="lib-head">
+        <span class="section-label">Library</span>
+        <span class="lib-count" id="libCount">0 entries</span>
+      </div>
+
+      <div class="lib-tools">
+        <div class="search-wrap">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="#9c9a94" stroke-width="1.5"/><path d="M11 11l3 3" stroke="#9c9a94" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <input type="text" id="searchInp" placeholder="Search text, reference, author…" />
+        </div>
+        <select id="filterScope">
+          <option value="">All scopes</option>
+          <option value="verse">Verse</option>
+          <option value="chapter">Chapter</option>
+          <option value="book">Book</option>
+          <option value="topic">Topic</option>
+          <option value="custom">Custom</option>
+        </select>
+        <select id="filterAuthor"><option value="">All authors</option></select>
+      </div>
+
+      <div class="entries" id="entries"></div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   Commentary Studio — local authoring tool
+   Data in localStorage; JSON export/import to disk.
+   ========================================================= */
+const STORE_KEY = "tbb_commentary_v1";
+const PIN_KEY   = "tbb_commentary_pin";
+
+const BOOKS = [
+  "Genesis","Exodus","Leviticus","Numbers","Deuteronomy","Joshua","Judges","Ruth",
+  "1 Samuel","2 Samuel","1 Kings","2 Kings","1 Chronicles","2 Chronicles","Ezra",
+  "Nehemiah","Esther","Job","Psalms","Proverbs","Ecclesiastes","Song of Solomon",
+  "Isaiah","Jeremiah","Lamentations","Ezekiel","Daniel","Hosea","Joel","Amos",
+  "Obadiah","Jonah","Micah","Nahum","Habakkuk","Zephaniah","Haggai","Zechariah",
+  "Malachi","Matthew","Mark","Luke","John","Acts","Romans","1 Corinthians",
+  "2 Corinthians","Galatians","Ephesians","Philippians","Colossians",
+  "1 Thessalonians","2 Thessalonians","1 Timothy","2 Timothy","Titus","Philemon",
+  "Hebrews","James","1 Peter","2 Peter","1 John","2 John","3 John","Jude","Revelation"
+];
+const AUTHORS = [
+  "Ellen G. White","Uriah Smith","E. J. Waggoner","S. N. Haskell",
+  "M. L. Andreasen","J. N. Andrews","__custom__"
+];
+
+let entries = [];
+let editingId = null;
+let currentScope = "verse";
+const $ = id => document.getElementById(id);
+
+/* =================== PIN GATE =================== */
+function initGate() {
+  const stored = localStorage.getItem(PIN_KEY);
+  if (!stored) {
+    $("gateSub").textContent = "Set a PIN to protect your workspace";
+    $("setNote").textContent = "Stored only on this computer.";
+  }
+  $("pinInput").focus();
+  $("pinInput").addEventListener("keydown", e => {
+    if (e.key !== "Enter") return;
+    const val = $("pinInput").value.trim(), err = $("pinError");
+    if (!val) { err.textContent = "Please enter a PIN."; return; }
+    const cur = localStorage.getItem(PIN_KEY);
+    if (!cur) {
+      if (val.length < 4) { err.textContent = "Use at least 4 digits."; return; }
+      localStorage.setItem(PIN_KEY, val); unlock();
+    } else if (val === cur) { unlock(); }
+    else { err.textContent = "Incorrect PIN."; $("pinInput").value = ""; }
+  });
+}
+function unlock() {
+  $("gate").classList.add("hidden");
+  $("app").classList.remove("hidden");
+  loadData(); buildStaticUI(); render();
+}
+$("lockBtn").addEventListener("click", () => {
+  $("app").classList.add("hidden");
+  $("gate").classList.remove("hidden");
+  $("pinInput").value = ""; $("pinError").textContent = ""; $("pinInput").focus();
+});
+
+/* =================== DATA =================== */
+function loadData() {
+  try { const raw = localStorage.getItem(STORE_KEY); entries = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(entries)) entries = []; } catch { entries = []; }
+}
+function persist() { localStorage.setItem(STORE_KEY, JSON.stringify(entries)); if (typeof onDataChanged === "function") onDataChanged(); }
+function uid() { return "c_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2,7); }
+
+/* =================== STATIC UI =================== */
+function buildStaticUI() {
+  $("bookSel").innerHTML = '<option value="">Book…</option>' +
+    BOOKS.map(b => `<option value="${b}">${b}</option>`).join("");
+  $("authorSel").innerHTML = AUTHORS.map(a =>
+    a === "__custom__" ? '<option value="__custom__">Other (type name)…</option>'
+                       : `<option value="${a}">${a}</option>`).join("");
+  refreshAuthorFilter();
+}
+function refreshAuthorFilter() {
+  const used = [...new Set(entries.map(e => e.author).filter(Boolean))].sort();
+  const sel = $("filterAuthor"), prev = sel.value;
+  sel.innerHTML = '<option value="">All authors</option>' +
+    used.map(a => `<option value="${a}">${a}</option>`).join("");
+  sel.value = prev;
+}
+
+/* =================== SCOPE SWITCHING =================== */
+$("scopeSeg").addEventListener("click", e => {
+  const btn = e.target.closest("button"); if (!btn) return;
+  currentScope = btn.dataset.scope;
+  [...$("scopeSeg").children].forEach(b => b.classList.toggle("active", b === btn));
+  applyScopeVisibility();
+});
+function applyScopeVisibility() {
+  const s = currentScope;
+  const showRef = (s === "verse" || s === "chapter" || s === "book");
+  $("refFields").classList.toggle("hidden", !showRef);
+  $("topicField").classList.toggle("hidden", s !== "topic");
+  $("customField").classList.toggle("hidden", s !== "custom");
+  const chap = $("chapterInp"), verse = $("verseInp"), hint = $("refHint");
+  if (s === "book")    { chap.classList.add("hidden");  verse.classList.add("hidden");  hint.textContent = "Book-level note — applies to the whole book."; }
+  if (s === "chapter") { chap.classList.remove("hidden"); verse.classList.add("hidden"); hint.textContent = "Chapter-level note — pick book and chapter."; }
+  if (s === "verse")   { chap.classList.remove("hidden"); verse.classList.remove("hidden"); hint.textContent = "Verse-level note — pick book, chapter, and verse."; }
+}
+$("authorSel").addEventListener("change", () => {
+  $("authorCustomField").classList.toggle("hidden", $("authorSel").value !== "__custom__");
+});
+
+/* =================== SAVE / EDIT =================== */
+function readForm() {
+  const s = currentScope;
+  const scope = { type: s, book: null, chapter: null, verse: null, topic: null, custom: null };
+  if (s === "verse" || s === "chapter" || s === "book") {
+    scope.book = $("bookSel").value || null;
+    if (!scope.book) return { error: "Please choose a book." };
+    if (s === "chapter" || s === "verse") {
+      const c = parseInt($("chapterInp").value, 10);
+      if (!c) return { error: "Please enter a chapter number." };
+      scope.chapter = c;
+    }
+    if (s === "verse") {
+      const v = parseInt($("verseInp").value, 10);
+      if (!v) return { error: "Please enter a verse number." };
+      scope.verse = v;
+    }
+  } else if (s === "topic")  { scope.topic  = $("topicInp").value.trim();  if (!scope.topic)  return { error: "Please enter a topic." }; }
+  else if (s === "custom") { scope.custom = $("customInp").value.trim(); if (!scope.custom) return { error: "Please enter a custom label." }; }
+
+  let author = $("authorSel").value;
+  if (author === "__custom__") { author = $("authorCustomInp").value.trim(); if (!author) return { error: "Please enter the author name." }; }
+  const text = $("textInp").value.trim();
+  if (!text) return { error: "Commentary text is empty." };
+  return { author, source: $("sourceInp").value.trim(), scope, text };
+}
+$("saveBtn").addEventListener("click", () => {
+  const data = readForm();
+  if (data.error) { toast(data.error); return; }
+  if (editingId) {
+    const idx = entries.findIndex(e => e.id === editingId);
+    if (idx > -1) entries[idx] = { ...entries[idx], ...data, dateModified: new Date().toISOString() };
+    toast("Entry updated"); exitEdit();
+  } else {
+    entries.unshift({ id: uid(), ...data, dateAdded: new Date().toISOString() });
+    toast("Entry added");
+  }
+  persist(); refreshAuthorFilter(); clearForm(true); render();
+});
+function clearForm(keepScope) {
+  $("chapterInp").value = ""; $("verseInp").value = "";
+  $("topicInp").value = ""; $("customInp").value = "";
+  $("sourceInp").value = ""; $("textInp").value = ""; $("authorCustomInp").value = "";
+  if (!keepScope) $("bookSel").value = "";
+}
+$("clearBtn").addEventListener("click", () => { clearForm(false); exitEdit(); });
+
+function startEdit(id) {
+  const e = entries.find(x => x.id === id); if (!e) return;
+  editingId = id; currentScope = e.scope.type;
+  [...$("scopeSeg").children].forEach(b => b.classList.toggle("active", b.dataset.scope === currentScope));
+  applyScopeVisibility();
+  $("bookSel").value = e.scope.book || ""; $("chapterInp").value = e.scope.chapter || "";
+  $("verseInp").value = e.scope.verse || ""; $("topicInp").value = e.scope.topic || "";
+  $("customInp").value = e.scope.custom || "";
+  if (AUTHORS.includes(e.author)) { $("authorSel").value = e.author; $("authorCustomField").classList.add("hidden"); }
+  else { $("authorSel").value = "__custom__"; $("authorCustomField").classList.remove("hidden"); $("authorCustomInp").value = e.author; }
+  $("sourceInp").value = e.source || ""; $("textInp").value = e.text || "";
+  $("editBanner").classList.remove("hidden");
+  $("editBannerText").textContent = "Editing: " + scopeLabel(e.scope);
+  $("saveBtn").textContent = "Save changes";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+function exitEdit() { editingId = null; $("editBanner").classList.add("hidden"); $("saveBtn").textContent = "Add entry"; }
+$("cancelEdit").addEventListener("click", () => { exitEdit(); clearForm(false); });
+
+function deleteEntry(id) {
+  const e = entries.find(x => x.id === id); if (!e) return;
+  if (!confirm("Delete this commentary on " + scopeLabel(e.scope) + "?")) return;
+  entries = entries.filter(x => x.id !== id);
+  if (editingId === id) exitEdit();
+  persist(); refreshAuthorFilter(); render(); toast("Entry deleted");
+}
+
+/* =================== RENDER =================== */
+function scopeLabel(scope) {
+  switch (scope.type) {
+    case "verse":   return `${scope.book} ${scope.chapter}:${scope.verse}`;
+    case "chapter": return `${scope.book} ${scope.chapter}`;
+    case "book":    return `${scope.book}`;
+    case "topic":   return scope.topic;
+    case "custom":  return scope.custom;
+    default: return "—";
+  }
+}
+function render() {
+  const q = $("searchInp").value.trim().toLowerCase();
+  const fScope = $("filterScope").value, fAuthor = $("filterAuthor").value;
+  const list = entries.filter(e => {
+    if (fScope && e.scope.type !== fScope) return false;
+    if (fAuthor && e.author !== fAuthor) return false;
+    if (q) { const hay = (scopeLabel(e.scope) + " " + e.author + " " + (e.source||"") + " " + e.text).toLowerCase();
+             if (!hay.includes(q)) return false; }
+    return true;
+  });
+  $("libCount").textContent = entries.length + (entries.length === 1 ? " entry" : " entries") +
+    (list.length !== entries.length ? ` · ${list.length} shown` : "");
+  const wrap = $("entries");
+  if (list.length === 0) {
+    wrap.innerHTML = `<div class="empty"><div class="icon">✦</div><p>${
+      entries.length === 0 ? "No commentary yet.<br>Add your first entry above."
+                           : "No entries match your filters."}</p></div>`;
+    return;
+  }
+  wrap.innerHTML = list.map(e => `
+    <div class="entry" data-id="${e.id}">
+      <div class="ref-row">
+        <span class="scope">${escapeHtml(scopeLabel(e.scope))}</span>
+        <span class="badge">${e.scope.type}</span>
+      </div>
+      <div class="text clamped">${escapeHtml(e.text)}</div>
+      <div class="who"><b>${escapeHtml(e.author)}</b>${e.source ? " · " + escapeHtml(e.source) : ""}</div>
+      <div class="acts">
+        <button data-act="expand">Expand</button>
+        <button data-act="edit">Edit</button>
+        <button data-act="del" class="del">Delete</button>
+      </div>
+    </div>`).join("");
+}
+function escapeHtml(s){ return (s||"").replace(/[&<>"']/g,c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])); }
+
+$("entries").addEventListener("click", e => {
+  const card = e.target.closest(".entry"); if (!card) return;
+  const id = card.dataset.id, act = e.target.dataset.act;
+  if (act === "edit") startEdit(id);
+  else if (act === "del") deleteEntry(id);
+  else if (act === "expand") {
+    card.classList.toggle("expanded");
+    card.querySelector(".text").classList.toggle("clamped", !card.classList.contains("expanded"));
+    e.target.textContent = card.classList.contains("expanded") ? "Collapse" : "Expand";
+  }
+});
+["searchInp","filterScope","filterAuthor"].forEach(id => $(id).addEventListener("input", render));
+
+/* =================== EXPORT / IMPORT =================== */
+function buildPayload() {
+  return { format: "the-blessed-bible.commentary", version: 1,
+    exportedAt: new Date().toISOString(), count: entries.length, entries };
+}
+$("exportBtn").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify(buildPayload(), null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob), a = document.createElement("a");
+  a.href = url; a.download = `commentary_${new Date().toISOString().slice(0,10)}.json`; a.click();
+  URL.revokeObjectURL(url); toast(`Exported ${entries.length} entries`);
+});
+$("importBtn").addEventListener("click", () => $("importFile").click());
+$("importFile").addEventListener("change", e => {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const parsed = JSON.parse(reader.result);
+      const incoming = Array.isArray(parsed) ? parsed : parsed.entries;
+      if (!Array.isArray(incoming)) throw new Error("bad");
+      const ids = new Set(entries.map(x => x.id)); let added = 0;
+      incoming.forEach(item => {
+        if (!item || !item.scope || !item.text) return;
+        if (!item.id) item.id = uid();
+        if (ids.has(item.id)) return;
+        entries.push(item); ids.add(item.id); added++;
+      });
+      persist(); refreshAuthorFilter(); render();
+      toast(`Imported ${added} entries` + (added !== incoming.length ? " (dupes skipped)" : ""));
+    } catch { toast("Couldn't read that file — is it a Commentary Studio JSON?"); }
+    e.target.value = "";
+  };
+  reader.readAsText(file);
+});
+
+/* =================== TOAST =================== */
+let toastTimer;
+function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show");
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),2200); }
+
+document.addEventListener("keydown", e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === "Enter" && !$("app").classList.contains("hidden")) $("saveBtn").click();
+});
+
+/* =================== SYNC TO APP FILE ===================
+   Uses the File System Access API to write directly into the app's
+   commentary.json after a one-time file pick. The file handle is
+   persisted in IndexedDB so the link survives page reloads.
+   Modes:
+     draft    — localStorage only (never touches the app file)
+     autosave — write to the linked file on every change
+     publish  — write to the linked file only when Publish is pressed
+========================================================= */
+const SYNC_MODE_KEY = "tbb_commentary_syncmode";
+const supportsFS = "showSaveFilePicker" in window;
+let fileHandle = null;
+let syncMode = localStorage.getItem(SYNC_MODE_KEY) || "draft";
+let dirtySincePublish = false;
+
+/* --- tiny IndexedDB store for the file handle --- */
+function idb(op, val) {
+  return new Promise((resolve) => {
+    const req = indexedDB.open("tbb_commentary_fs", 1);
+    req.onupgradeneeded = () => req.result.createObjectStore("handles");
+    req.onsuccess = () => {
+      const db = req.result;
+      const tx = db.transaction("handles", op === "get" ? "readonly" : "readwrite");
+      const store = tx.objectStore("handles");
+      let r;
+      if (op === "get") r = store.get("commentary");
+      else if (op === "set") r = store.put(val, "commentary");
+      else if (op === "del") r = store.delete("commentary");
+      r.onsuccess = () => resolve(op === "get" ? r.result : true);
+      r.onerror = () => resolve(null);
+    };
+    req.onerror = () => resolve(null);
+  });
+}
+
+async function verifyPermission(handle) {
+  const opts = { mode: "readwrite" };
+  if ((await handle.queryPermission(opts)) === "granted") return true;
+  if ((await handle.requestPermission(opts)) === "granted") return true;
+  return false;
+}
+
+async function writeToLinkedFile(silent) {
+  if (!fileHandle) return false;
+  try {
+    if (!(await verifyPermission(fileHandle))) { toast("Permission to the file was denied."); return false; }
+    const w = await fileHandle.createWritable();
+    await w.write(JSON.stringify(buildPayload(), null, 2));
+    await w.close();
+    dirtySincePublish = false;
+    updateSyncUI();
+    if (!silent) toast(`Published ${entries.length} entries to the app file`);
+    return true;
+  } catch (err) {
+    toast("Couldn't write to the linked file.");
+    return false;
+  }
+}
+
+/* called by persist() whenever data changes */
+async function onDataChanged() {
+  if (!fileHandle) return;
+  if (syncMode === "autosave") { await writeToLinkedFile(true); toast("Auto-saved to app file"); }
+  else if (syncMode === "publish") { dirtySincePublish = true; updateSyncUI(); }
+}
+
+function updateSyncUI() {
+  const dot = $("syncDot"), publishBtn = $("publishBtn"), linkBtn = $("linkFileBtn");
+  dot.classList.toggle("linked", !!fileHandle);
+  dot.classList.toggle("dirty", !!fileHandle && syncMode === "publish" && dirtySincePublish);
+  publishBtn.classList.toggle("hidden", syncMode !== "publish");
+  if (fileHandle) {
+    linkBtn.textContent = "Relink…";
+    linkBtn.title = "Linked to " + (fileHandle.name || "commentary.json");
+    $("syncChip").title = "Linked to " + (fileHandle.name || "commentary.json");
+  } else {
+    linkBtn.textContent = "Link file…";
+    linkBtn.title = "Link the app's commentary.json once";
+  }
+  if (syncMode === "publish" && dirtySincePublish) publishBtn.textContent = "Publish •";
+  else publishBtn.textContent = "Publish";
+}
+
+async function initSync() {
+  const modeSel = $("syncMode");
+  if (!supportsFS) {
+    // Fallback: no File System Access API (e.g. some browsers) — keep export only.
+    $("linkFileBtn").classList.add("hidden");
+    $("syncChip").classList.add("hidden");
+    return;
+  }
+  modeSel.value = syncMode;
+  // restore a previously linked handle
+  const saved = await idb("get");
+  if (saved) { fileHandle = saved; }
+  updateSyncUI();
+
+  modeSel.addEventListener("change", () => {
+    syncMode = modeSel.value;
+    localStorage.setItem(SYNC_MODE_KEY, syncMode);
+    if (syncMode !== "draft" && !fileHandle) toast("Pick the app's commentary.json — click “Link file…”");
+    dirtySincePublish = false;
+    updateSyncUI();
+  });
+
+  $("linkFileBtn").addEventListener("click", async () => {
+    try {
+      [fileHandle] = await window.showOpenFilePicker({
+        types: [{ description: "Commentary JSON", accept: { "application/json": [".json"] } }],
+        multiple: false
+      });
+      await idb("set", fileHandle);
+      updateSyncUI();
+      toast("Linked to " + fileHandle.name);
+      // if a mode is already active, do an initial write so the file matches now
+      if (syncMode === "autosave") writeToLinkedFile(true);
+      if (syncMode === "publish") { dirtySincePublish = true; updateSyncUI(); }
+    } catch { /* user cancelled */ }
+  });
+
+  $("publishBtn").addEventListener("click", async () => {
+    if (!fileHandle) { toast("Link the app file first."); return; }
+    await writeToLinkedFile(false);
+  });
+}
+
+/* =================== INIT =================== */
+initGate();
+applyScopeVisibility();
+initSync();
+</script>
+</body>
+</html>
