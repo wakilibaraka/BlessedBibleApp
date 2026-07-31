@@ -24,7 +24,7 @@ class CustomPlanScheduler {
     return chapters;
   }
 
-  List<BookChapter> buildCorpus(String type, {String? startBook, int? startChapter}) {
+  List<BookChapter> buildCorpus(String type, {String? startBook, int? startChapter, List<String>? selectedBooks}) {
     final whole = _getWholeBible();
     if (type == 'whole') return whole;
     if (type == 'ot') return whole.where((c) => _isOT(c.bookName)).toList();
@@ -34,6 +34,9 @@ class CustomPlanScheduler {
       int idx = whole.indexWhere((c) => c.bookName == startBook && c.chapterNum == startChapter);
       if (idx == -1) return [];
       return whole.sublist(idx);
+    }
+    if (type == 'multi' && selectedBooks != null) {
+      return whole.where((c) => selectedBooks.contains(c.bookName)).toList();
     }
     return [];
   }
