@@ -13,7 +13,6 @@ class VotdArchiveScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final viewedDays = ref.watch(votdTrackerProvider);
 
     // Compute past 7 days
     final now = DateTime.now();
@@ -74,48 +73,56 @@ class VotdArchiveScreen extends ConsumerWidget {
                   final reference = votdEntry[0];
                   final text = votdEntry[1];
                   
-                  // Format date string
-                  final String dateString = '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-                  
-                  final isViewed = viewedDays.contains(dateString);
-                  
-                  final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                  final displayDate = isToday ? 'Today' : '${months[date.month - 1]} ${date.day}, ${date.year}';
+                  String displayDate;
+                  if (index == 0) {
+                    displayDate = 'Today';
+                  } else if (index == 1) {
+                    displayDate = 'Yesterday';
+                  } else if (index == 2) {
+                    displayDate = '2 days ago';
+                  } else {
+                    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                    displayDate = '${months[date.month - 1]} ${date.day}, ${date.year}';
+                  }
+
+                  final bookName = reference.split(' ').first;
+                  final bookTag = bookName.toUpperCase();
                   
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: 12.0),
-                    child: TexturedGlassContainer(
-                      borderRadius: BorderRadius.circular(16),
-                      padding: const EdgeInsets.all(16),
-                      child: InkWell(
-                        onTap: () {
-                          // Mark as viewed manually just in case
-                          ref.read(votdTrackerProvider.notifier).markViewed(date);
-                          Navigator.of(context).push(
-                            CupertinoPageRoute(
-                              builder: (_) => VerseDetailScreen(reference: reference),
-                            ),
-                          );
-                        },
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Viewed Indicator
-                            Padding(
-                              padding: const EdgeInsets.only(top: 4.0, right: 12.0),
-                              child: Container(
-                                width: 10,
-                                height: 10,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: isViewed 
-                                      ? theme.colorScheme.onSurface.withValues(alpha: 0.2)
-                                      : theme.primaryColor,
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: isToday ? [
+                          BoxShadow(
+                            color: theme.primaryColor.withValues(alpha: 0.15),
+                            blurRadius: 12,
+                            spreadRadius: 2,
+                            offset: const Offset(0, 4),
+                          )
+                        ] : [],
+                      ),
+                      child: TexturedGlassContainer(
+                        borderRadius: BorderRadius.circular(20),
+                        padding: EdgeInsets.zero,
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(20),
+                            onTap: () {
+                              ref.read(votdTrackerProvider.notifier).markViewed(date);
+                              Navigator.of(context).push(
+                                CupertinoPageRoute(
+                                  builder: (_) => VerseDetailScreen(reference: reference),
                                 ),
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                border: isToday ? Border.all(color: theme.primaryColor.withValues(alpha: 0.3), width: 1) : null,
                               ),
-                            ),
-                            
-                            Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -123,36 +130,50 @@ class VotdArchiveScreen extends ConsumerWidget {
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        reference,
-                                        style: theme.textTheme.titleMedium?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                          color: isViewed 
-                                              ? theme.colorScheme.onSurface 
-                                              : theme.primaryColor,
+                                        displayDate,
+                                        style: theme.textTheme.labelMedium?.copyWith(
+                                          color: isToday ? theme.primaryColor : theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                                          fontWeight: isToday ? FontWeight.bold : FontWeight.w500,
                                         ),
                                       ),
-                                      Text(
-                                        displayDate,
-                                        style: theme.textTheme.labelSmall?.copyWith(
-                                          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: theme.primaryColor.withValues(alpha: 0.1),
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: Text(
+                                          bookTag,
+                                          style: theme.textTheme.labelSmall?.copyWith(
+                                            color: theme.primaryColor,
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: 0.5,
+                                          ),
                                         ),
                                       ),
                                     ],
                                   ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    reference,
+                                    style: theme.textTheme.titleLarge?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                   const SizedBox(height: 8),
                                   Text(
                                     text,
-                                    maxLines: 2,
+                                    maxLines: 3,
                                     overflow: TextOverflow.ellipsis,
                                     style: theme.textTheme.bodyMedium?.copyWith(
                                       color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
-                                      height: 1.4,
+                                      height: 1.5,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                          ],
+                          ),
                         ),
                       ),
                     ),

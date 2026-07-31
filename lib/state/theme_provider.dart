@@ -22,7 +22,7 @@ class ThemeNotifier extends Notifier<AppThemeMode> {
   @override
   AppThemeMode build() {
     _loadTheme();
-    return AppThemeMode.automatic; // Default for new users
+    return AppThemeMode.sepia; // Default for new users
   }
 
   Future<void> _loadTheme() async {

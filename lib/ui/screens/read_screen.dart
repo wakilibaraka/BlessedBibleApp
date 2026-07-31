@@ -811,8 +811,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                                 AnimatedOpacity(
                                                   duration: const Duration(milliseconds: 250),
                                                   opacity: (isSelectionMode && !isSelected) ? 0.85 : 1.0,
-                                                  child: Builder(
-                                                  builder: (context) {
+                                                  child: Consumer(
+                                                  builder: (context, itemRef, _) {
                                                     bool hasCommentary = false;
                                                     commentaryDataAsync.whenData((state) {
                                                       final bookCommentary = state.data[fc.book.name];
@@ -840,8 +840,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                                       }
                                                     });
                                                     
-                                                    final highlights = ref.watch(highlightsProvider);
-                                                    final bookmarks = ref.watch(bookmarksProvider);
+                                                    final highlights = itemRef.watch(highlightsProvider);
+                                                    final bookmarks = itemRef.watch(bookmarksProvider);
                                                     final refStr = generateVerseKey(fc.book.abbreviation, fc.chapter.number, verse.number);
                                                     final isBookmarked = bookmarks.contains(refStr);
                                                     final savedColorIndex = highlights[refStr];
