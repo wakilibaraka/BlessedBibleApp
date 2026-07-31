@@ -151,6 +151,21 @@ class _CreateCustomPlanScreenState extends ConsumerState<CreateCustomPlanScreen>
       durationDays = int.tryParse(_durationController.text);
     }
     
+    int requestedReadingDays = 0;
+    if (_useDuration && durationDays != null) {
+      requestedReadingDays = durationDays;
+    } else if (!_useDuration && !_targetEndDate.isBefore(DateTime.now())) {
+      DateTime current = DateTime.utc(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+      DateTime end = DateTime.utc(_targetEndDate.year, _targetEndDate.month, _targetEndDate.day);
+      while (!current.isAfter(end)) {
+        int weekday = (current.weekday % 7) + 1;
+        if (_restDay == null || weekday != _restDay) {
+          requestedReadingDays++;
+        }
+        current = current.add(const Duration(days: 1));
+      }
+    }
+    
     final schedule = scheduler.generateSchedule(
       corpus,
       durationDays: _useDuration ? durationDays : null,
@@ -252,7 +267,7 @@ class _CreateCustomPlanScreenState extends ConsumerState<CreateCustomPlanScreen>
           ], theme),
 
           const SizedBox(height: 24),
-          _buildPreviewBox(corpus, isValid, avgPerDay, totalReadingDays, theme),
+          _buildPreviewBox(corpus, isValid, avgPerDay, totalReadingDays, requestedReadingDays, theme),
         ],
       ),
       bottomNavigationBar: SafeArea(
@@ -391,7 +406,8 @@ class _CreateCustomPlanScreenState extends ConsumerState<CreateCustomPlanScreen>
     );
   }
 
-  Widget _buildPreviewBox(List<dynamic> corpus, bool isValid, double avgPerDay, int totalReadingDays, ThemeData theme) {
+  Widget _buildPreviewBox(List<dynamic> corpus, bool isValid, double avgPerDay, int totalReadingDays, int requestedReadingDays, ThemeData theme) {
+    String planNameStr = _corpusType == 'book' ? (_selectedBook ?? 'This plan') : 'This plan';
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: TexturedGlassContainer(
@@ -418,6 +434,27 @@ class _CreateCustomPlanScreenState extends ConsumerState<CreateCustomPlanScreen>
                 Text('• ${corpus.length} chapters total', style: theme.textTheme.bodyMedium),
                 const SizedBox(height: 4),
                 Text('• ~${avgPerDay.toStringAsFixed(1)} chapters per reading day', style: theme.textTheme.bodyMedium),
+                
+                if (requestedReadingDays > corpus.length)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12.0),
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.info_outline, color: Colors.blue, size: 20),
+                          const SizedBox(width: 8),
+                          Expanded(child: Text('$planNameStr has ${corpus.length} chapters — this plan will run $totalReadingDays reading days (shorter than the $requestedReadingDays you entered).', style: const TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 13))),
+                        ],
+                      ),
+                    ),
+                  ),
+
                 if (avgPerDay > 8)
                   Padding(
                     padding: const EdgeInsets.only(top: 12.0),

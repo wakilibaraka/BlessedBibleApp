@@ -75,6 +75,10 @@ class CustomPlanScheduler {
     if (totalReadingDays <= 0) return [];
     if (corpus.isEmpty) return [];
 
+    if (totalReadingDays > corpus.length) {
+      totalReadingDays = corpus.length;
+    }
+
     int basePerDay = corpus.length ~/ totalReadingDays;
     int remainder = corpus.length % totalReadingDays;
     
