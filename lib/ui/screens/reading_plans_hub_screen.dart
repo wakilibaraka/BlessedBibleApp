@@ -7,6 +7,8 @@ import '../../theme/app_colors.dart';
 import '../widgets/animated_background.dart';
 import '../widgets/textured_glass_container.dart';
 import 'reading_plan_browser.dart';
+import 'create_custom_plan_screen.dart';
+import '../../data/local_storage/preferences_service.dart';
 import '../widgets/shared_app_bar.dart';
 
 class PlanMetadata {
@@ -54,11 +56,15 @@ class ReadingPlansHubScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final appThemeMode = ref.watch(themeProvider);
     final planState = ref.watch(readingPlanProvider);
+    final prefs = ref.watch(preferencesProvider);
     
     // In this MVP, only chronological is active.
-    final activePlans = availablePlans.where((p) => p.id == 'chronological').toList();
     final otherPlans = availablePlans.where((p) => p.id != 'chronological').toList();
 
+    // Load custom plans
+    final customPlanIds = prefs.getCustomPlanIds();
+    final customPlans = customPlanIds.map((id) => prefs.getCustomPlan(id)).whereType<Map<String, dynamic>>().toList();
+    
     return Scaffold(
       extendBody: true,
       appBar: SharedAppBar(
@@ -73,8 +79,8 @@ class ReadingPlansHubScreen extends ConsumerWidget {
           ),
           CustomScrollView(
             slivers: [
-              // ── ACTIVE PLANS (Top) ──
-              if (activePlans.isNotEmpty) ...[
+              // ── ACTIVE PLAN (Top) ──
+              if (planState.planData.isNotEmpty) ...[
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
@@ -87,20 +93,65 @@ class ReadingPlansHubScreen extends ConsumerWidget {
                     ),
                   ),
                 ),
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final plan = activePlans[index];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                        child: _buildActivePlanCard(context, ref, theme, plan, planState),
-                      );
-                    },
-                    childCount: activePlans.length,
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    child: _buildActivePlanCard(context, ref, theme, planState.planId, planState),
                   ),
                 ),
               ],
               
+              // ── MY CUSTOM PLANS ──
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 32, 20, 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'My Custom Plans',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                      ),
+                      TextButton.icon(
+                        onPressed: () {
+                          Navigator.of(context).push(CupertinoPageRoute(builder: (_) => const CreateCustomPlanScreen()));
+                        },
+                        icon: const Icon(Icons.add, size: 18),
+                        label: const Text('Create'),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              if (customPlans.isEmpty)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+                    child: Text(
+                      'Create your own reading plan by selecting books, chapters, and setting your preferred pace.',
+                      style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                    ),
+                  ),
+                )
+              else
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final customPlan = customPlans[index];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                        child: _buildCustomPlanCard(context, ref, theme, customPlan, prefs),
+                      );
+                    },
+                    childCount: customPlans.length,
+                  ),
+                ),
+              
+              // ── PRE-AUTHORED PLANS ──
+
               // ── OTHER PLANS (Bottom) ──
               if (otherPlans.isNotEmpty) ...[
                 SliverToBoxAdapter(
@@ -137,7 +188,17 @@ class ReadingPlansHubScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildActivePlanCard(BuildContext context, WidgetRef ref, ThemeData theme, PlanMetadata plan, ReadingPlanState planState) {
+  Widget _buildActivePlanCard(BuildContext context, WidgetRef ref, ThemeData theme, String planId, ReadingPlanState planState) {
+    String title = 'Chronological Bible in a Year';
+    String description = 'Read the Bible in the order events occurred.';
+    if (planId != 'chronological_1yr') {
+      final customPlan = ref.read(preferencesProvider).getCustomPlan(planId);
+      if (customPlan != null) {
+        title = customPlan['title'] ?? 'Custom Plan';
+        description = customPlan['description'] ?? 'A custom reading plan.';
+      }
+    }
+
     int missedDays = 0;
     if (planState.currentDay > 0) {
       final now = DateTime.now();
@@ -177,14 +238,14 @@ class ReadingPlansHubScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        plan.title,
+                        title,
                         style: theme.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        plan.description,
+                        description,
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                         ),
@@ -345,6 +406,103 @@ class ReadingPlansHubScreen extends ConsumerWidget {
               plan.description,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.5), // greyed out
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCustomPlanCard(BuildContext context, WidgetRef ref, ThemeData theme, Map<String, dynamic> customPlan, PreferencesService prefs) {
+    String id = customPlan['id'] ?? '';
+    String title = customPlan['title'] ?? 'Custom Plan';
+    String description = customPlan['description'] ?? '';
+    
+    return TexturedGlassContainer(
+      borderRadius: BorderRadius.circular(20),
+      padding: EdgeInsets.zero,
+      child: Container(
+        padding: const EdgeInsets.all(20.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    title,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (c) => CupertinoAlertDialog(
+                        title: const Text('Delete Plan'),
+                        content: const Text('Are you sure you want to delete this custom plan?'),
+                        actions: [
+                          CupertinoDialogAction(
+                            child: const Text('Cancel'),
+                            onPressed: () => Navigator.pop(c),
+                          ),
+                          CupertinoDialogAction(
+                            isDestructiveAction: true,
+                            onPressed: () {
+                              prefs.deleteCustomPlan(id);
+                              // Simple state refresh hack by forcing UI rebuild or reloading provider
+                              // We just rely on watch rebuilds or navigate
+                              Navigator.pop(c);
+                              // We can trigger a rebuild by restarting the active plan if it was deleted, but for now just pop
+                            },
+                            child: const Text('Delete'),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                )
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              description,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                onPressed: () {
+                  // Make this plan active
+                  // Note: The custom plan is loaded asynchronously, but we can pass the data directly
+                  // Or let the provider handle loading it from prefs since it has the ID
+                  ref.read(readingPlanProvider.notifier).startPlan(
+                    planId: id,
+                    paceMode: customPlan['paceMode'] ?? 'scheduled',
+                    restDay: customPlan['restDay'] as int?,
+                  );
+                  // Reload the page or show toast
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Plan activated!')));
+                },
+                child: const Text('Set as Active Plan'),
               ),
             ),
           ],

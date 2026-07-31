@@ -30,6 +30,10 @@ class PlanPassage {
       refs: List<String>.from(json['refs']),
     );
   }
+  Map<String, dynamic> toJson() => {
+    'label': label,
+    'refs': refs,
+  };
 }
 
 class PlanDayData {
@@ -48,6 +52,12 @@ class PlanDayData {
       passages: (json['passages'] as List).map((e) => PlanPassage.fromJson(e)).toList(),
     );
   }
+  Map<String, dynamic> toJson() => {
+    'day': day,
+    'week': week,
+    'title': title,
+    'passages': passages.map((p) => p.toJson()).toList(),
+  };
 
   // --- LEGACY FOR UI ---
   List<PlanChapter> get chapters => [];
@@ -192,7 +202,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
       final rawReadings = decoded['readings'] as List;
       final planData = rawReadings.map((e) => PlanDayData.fromJson(e)).toList();
 
-      final prefsState = ref.read(preferencesProvider).getReadingPlanState();
+final prefsState = ref.read(preferencesProvider).getReadingPlanState();
       
       String planId = 'chronological_1yr';
       DateTime? planStartedOn;
@@ -204,12 +214,10 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
       int reminderTimeMinute = 0;
 
       if (prefsState != null) {
-        // Safe migration: ignore legacy completedChapters string set
         if (prefsState.containsKey('completedReadings')) {
           final list = prefsState['completedReadings'] as List;
           completedReadings = list.map((e) => e as int).toSet();
         }
-        
         if (prefsState['planStartedOn'] != null) {
           planStartedOn = DateTime.tryParse(prefsState['planStartedOn'] as String);
         }
@@ -222,7 +230,6 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
         if (prefsState['planId'] != null) {
           planId = prefsState['planId'] as String;
         }
-        
         if (prefsState.containsKey('reminderEnabled')) {
           reminderEnabled = prefsState['reminderEnabled'] as bool;
           reminderTimeHour = prefsState['reminderTimeHour'] as int;
@@ -230,9 +237,29 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
         }
       }
 
+      List<PlanDayData> finalPlanData = planData;
+      if (planId != 'chronological_1yr') {
+        final customPlan = ref.read(preferencesProvider).getCustomPlan(planId);
+        if (customPlan != null) {
+          final rawReadings = customPlan['readings'] as List;
+          finalPlanData = rawReadings.map((e) => PlanDayData.fromJson(e)).toList();
+          
+          // Restore paceMode and restDay saved inside the plan definition
+          if (customPlan.containsKey('paceMode')) {
+            paceMode = customPlan['paceMode'] as String;
+          }
+          if (customPlan.containsKey('restDay')) {
+            restDay = customPlan['restDay'] as int?;
+          }
+        } else {
+          // Custom plan not found, fallback to chronological
+          planId = 'chronological_1yr';
+        }
+      }
+
       state = state.copyWith(
         isLoading: false,
-        planData: planData,
+        planData: finalPlanData,
         planId: planId,
         planStartedOn: planStartedOn,
         paceMode: paceMode,
@@ -260,13 +287,14 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
     });
   }
 
-  void startPlan({String planId = 'chronological_1yr', String paceMode = 'scheduled', int? restDay = 7}) {
+  void startPlan({String planId = 'chronological_1yr', String paceMode = 'scheduled', int? restDay = 7, List<PlanDayData>? customPlanData}) {
     final next = state.copyWith(
       planId: planId,
       planStartedOn: DateTime.now(),
       paceMode: paceMode,
       restDay: restDay,
       completedReadings: {},
+      planData: customPlanData,
     );
     state = next;
     _saveToPrefs(next);

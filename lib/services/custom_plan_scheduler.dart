@@ -1,3 +1,4 @@
+import '../data/models/bible_model.dart';
 import '../state/reading_plan_provider.dart';
 
 class BookChapter {
@@ -7,15 +8,15 @@ class BookChapter {
 }
 
 class CustomPlanScheduler {
-  final List<Map<String, dynamic>> kjvData;
+  final List<BibleBook> kjvData;
 
   CustomPlanScheduler(this.kjvData);
 
   List<BookChapter> _getWholeBible() {
     List<BookChapter> chapters = [];
     for (var book in kjvData) {
-      String name = book['name'];
-      int chapterCount = (book['chapters'] as List).length;
+      String name = book.name;
+      int chapterCount = book.chapters.length;
       for (int i = 1; i <= chapterCount; i++) {
         chapters.add(BookChapter(name, i));
       }
