@@ -147,6 +147,7 @@ class MainNavScreen extends ConsumerWidget {
                         AnimatedOpacity(
                           duration: const Duration(milliseconds: 250),
                           opacity: effectiveNavHidden ? 0.0 : 1.0,
+                          alwaysIncludeSemantics: true,
                           child: IgnorePointer(
                             ignoring: effectiveNavHidden,
                             child: Stack(
@@ -562,7 +563,7 @@ class MainNavScreen extends ConsumerWidget {
               children: [
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
-                  transitionBuilder: (child, anim) => FadeTransition(opacity: anim, child: child),
+                  transitionBuilder: (child, anim) => FadeTransition(opacity: anim, alwaysIncludeSemantics: true, child: child),
                   child: KeyedSubtree(
                     key: ValueKey('${isAction ? 'action' : 'nav'}_$currentIcon'),
                     child: buildIcon(),
@@ -571,7 +572,7 @@ class MainNavScreen extends ConsumerWidget {
                 const SizedBox(height: 4),
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
-                  transitionBuilder: (child, anim) => FadeTransition(opacity: anim, child: child),
+                  transitionBuilder: (child, anim) => FadeTransition(opacity: anim, alwaysIncludeSemantics: true, child: child),
                   child: Text(
                     currentLabel,
                     key: ValueKey(currentLabel),

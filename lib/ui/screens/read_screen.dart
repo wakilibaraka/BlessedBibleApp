@@ -386,6 +386,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                 duration: const Duration(milliseconds: 500),
                 curve: Curves.easeOutCubic,
                 opacity: shouldHide ? 0.0 : 1.0,
+                alwaysIncludeSemantics: true,
                 child: RepaintBoundary(
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(24),
@@ -545,8 +546,21 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
     }
 
     final tokens = theme.extension<ReadingTokens>()!;
+    Color getThemeBackgroundColor() {
+      switch (appThemeMode) {
+        case AppThemeMode.pop:
+          return const Color(0xFFF4F5F7);
+        case AppThemeMode.dusk:
+          return const Color(0xFF312C51);
+        case AppThemeMode.fresh:
+          return const Color(0xFF132C33);
+        default:
+          return tokens.readingPaper;
+      }
+    }
+
     return Scaffold(
-      backgroundColor: tokens.readingPaper,
+      backgroundColor: getThemeBackgroundColor(),
       body: PinchToZoomFontWrapper(
         child: Stack(
           children: [
@@ -816,6 +830,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                                 AnimatedOpacity(
                                                   duration: const Duration(milliseconds: 250),
                                                   opacity: (isSelectionMode && !isSelected) ? 0.85 : 1.0,
+                                                  alwaysIncludeSemantics: true,
                                                   child: Consumer(
                                                   builder: (context, itemRef, _) {
                                                     bool hasCommentary = versesWithCommentary.contains('${fc.book.name}|${fc.chapter.number}|${verse.number}');
@@ -1013,8 +1028,9 @@ Positioned(
                 right: 0,
                 child: IgnorePointer(
                   child: AnimatedOpacity(
-                    duration: const Duration(milliseconds: 80),
+                    duration: const Duration(milliseconds: 200),
                     opacity: _overscrollFraction,
+                    alwaysIncludeSemantics: true,
                     child: Center(
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(20),
@@ -1072,6 +1088,7 @@ Positioned(
                     children: [
                       FadeTransition(
                         opacity: animation,
+                        alwaysIncludeSemantics: true,
                         child: GestureDetector(
                           behavior: HitTestBehavior.translucent,
                           onTap: _dismissContextMenu,

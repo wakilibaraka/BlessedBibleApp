@@ -5,7 +5,7 @@ import '../../theme/reading_tokens.dart';
 import '../../state/commentary_provider.dart';
 import '../../state/bible_provider.dart';
 import '../../models/commentary_entry.dart';
-import 'textured_glass_container.dart';
+
 import 'pinch_to_zoom_font_wrapper.dart';
 import '../screens/commentary_hub_screen.dart';
 
@@ -106,12 +106,21 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
         children: [
           // Pinned Header Section
           Container(
-            color: tokens.readingSurface, // Ensure header is opaque
+            decoration: BoxDecoration(
+              color: tokens.readingSurface, // Ensure header is opaque
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                )
+              ],
+            ),
             padding: EdgeInsets.fromLTRB(
-              widget.isCompact ? 20 : 68, // Leave room for back button if full screen
-              widget.isCompact ? 16 : MediaQuery.paddingOf(context).top + 8, 
-              20, 
-              16
+              widget.isCompact ? 24 : 68, // Leave room for back button if full screen
+              widget.isCompact ? 24 : MediaQuery.paddingOf(context).top + 16, 
+              24, 
+              24
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,17 +162,8 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                   ],
                 ),
                 if (fetchedVerseText != null)
-                  Container(
-                    margin: const EdgeInsets.only(top: 16),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: tokens.readingSurface,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: tokens.readingBorder,
-                        width: 1,
-                      ),
-                    ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16),
                     child: Text(
                       '"$fetchedVerseText"',
                       style: theme.textTheme.bodyMedium?.copyWith(
@@ -238,9 +238,8 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                         delegate: SliverChildBuilderDelegate(
                           (context, index) {
                             final key = _entryKeys.putIfAbsent(index, () => GlobalKey());
-                            return Padding(
+                            return KeyedSubtree(
                               key: key,
-                              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                               child: _buildEntryCard(theme, tokens, verseEntries[index]),
                             );
                           },
@@ -273,7 +272,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                       ),
                   ],
 
-                  const SliverToBoxAdapter(child: SizedBox(height: 60)),
+                  // Removed bottom padding to allow text to flow to the edge
                 ],
               ),
             ),
@@ -326,62 +325,50 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
     required VoidCallback onToggle,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: RepaintBoundary(
-        child: TexturedGlassContainer(
-          isScrollable: true,
-          borderRadius: BorderRadius.circular(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              InkWell(
-                onTap: onToggle,
-                borderRadius: BorderRadius.circular(20),
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          title,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: tokens.readingInk,
-                          ),
-                        ),
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          InkWell(
+            onTap: onToggle,
+            borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: tokens.readingInk,
                       ),
-                      Icon(isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, color: tokens.readingAccent),
-                    ],
+                    ),
                   ),
-                ),
+                  Icon(isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, color: tokens.readingAccent),
+                ],
               ),
-              if (isExpanded)
-                Padding(
-                  padding: const EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0),
-                  child: Column(
-                    children: entries.map((entry) => Padding(
-                      padding: const EdgeInsets.only(top: 16.0),
-                      child: _buildEntryContent(theme, tokens, entry),
-                    )).toList(),
-                  ),
-                ),
-            ],
+            ),
           ),
-        ),
+          if (isExpanded)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20.0),
+              child: Column(
+                children: entries.map((entry) => Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: _buildEntryContent(theme, tokens, entry),
+                )).toList(),
+              ),
+            ),
+        ],
       ),
     );
   }
 
   Widget _buildEntryCard(ThemeData theme, ReadingTokens tokens, CommentaryEntry entry) {
-    return RepaintBoundary(
-      child: TexturedGlassContainer(
-        isScrollable: true,
-        borderRadius: BorderRadius.circular(20),
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: _buildEntryContent(theme, tokens, entry),
-        ),
-      ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+      child: _buildEntryContent(theme, tokens, entry),
     );
   }
 
@@ -452,6 +439,7 @@ void showCommentaryBottomSheet(
             ),
             child: SafeArea(
               top: false,
+              bottom: false,
               child: Column(
                 children: [
                   // Drag handle bar

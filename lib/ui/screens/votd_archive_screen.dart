@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../state/home_provider.dart';
 import '../../state/votd_tracker_provider.dart';
-import '../widgets/textured_glass_container.dart';
+import '../../state/theme_provider.dart';
 import 'commentary_hub_screen.dart';
 import '../../theme/reading_tokens.dart';
 
@@ -26,15 +26,33 @@ class VotdArchiveScreen extends ConsumerWidget {
     // Epoch used for VotD calculation
     final epoch = DateTime(2026, 1, 1);
     
+    final appThemeMode = ref.watch(themeProvider);
+    final is3DTheme = appThemeMode == AppThemeMode.pop || 
+                      appThemeMode == AppThemeMode.dusk || 
+                      appThemeMode == AppThemeMode.fresh;
+
+    Color getThemeBackgroundColor() {
+      switch (appThemeMode) {
+        case AppThemeMode.pop:
+          return const Color(0xFFF4F5F7);
+        case AppThemeMode.dusk:
+          return const Color(0xFF312C51);
+        case AppThemeMode.fresh:
+          return const Color(0xFF132C33);
+        default:
+          return theme.scaffoldBackgroundColor;
+      }
+    }
+
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: getThemeBackgroundColor(),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
             expandedHeight: 180.0,
             floating: false,
             pinned: true,
-            backgroundColor: theme.scaffoldBackgroundColor,
+            backgroundColor: getThemeBackgroundColor(),
             elevation: 0,
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsets.only(left: 16, bottom: 16),
@@ -50,7 +68,7 @@ class VotdArchiveScreen extends ConsumerWidget {
                   gradient: LinearGradient(
                     colors: [
                       theme.primaryColor.withValues(alpha: 0.1),
-                      theme.scaffoldBackgroundColor,
+                      getThemeBackgroundColor(),
                     ],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
@@ -104,11 +122,27 @@ class VotdArchiveScreen extends ConsumerWidget {
                           )
                         ] : [],
                       ),
-                      child: RepaintBoundary(
-                        child: TexturedGlassContainer(
-                          isScrollable: true,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: is3DTheme ? theme.colorScheme.surface : tokens.readingSurface,
                           borderRadius: BorderRadius.circular(20),
-                          padding: EdgeInsets.zero,
+                          border: Border.all(
+                            width: 0.5,
+                            color: is3DTheme ? Colors.white.withValues(alpha: 0.15) : tokens.readingBorder,
+                          ),
+                          boxShadow: (appThemeMode == AppThemeMode.pop || 
+                                      appThemeMode == AppThemeMode.dusk || 
+                                      appThemeMode == AppThemeMode.fresh)
+                              ? [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.08),
+                                    blurRadius: 24,
+                                    spreadRadius: 0,
+                                    offset: const Offset(0, 10),
+                                  ),
+                                ]
+                              : [],
+                        ),
                         child: Material(
                           color: Colors.transparent,
                           child: InkWell(

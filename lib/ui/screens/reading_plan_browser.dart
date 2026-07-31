@@ -578,7 +578,25 @@ class _TodayViewBody extends ConsumerWidget {
 
     final isScheduled = planState.paceMode == 'scheduled';
 
+    final is3DTheme = appThemeMode == AppThemeMode.pop || 
+                      appThemeMode == AppThemeMode.dusk || 
+                      appThemeMode == AppThemeMode.fresh;
+
+    Color getThemeBackgroundColor() {
+      switch (appThemeMode) {
+        case AppThemeMode.pop:
+          return const Color(0xFFF4F5F7);
+        case AppThemeMode.dusk:
+          return const Color(0xFF312C51);
+        case AppThemeMode.fresh:
+          return const Color(0xFF132C33);
+        default:
+          return theme.scaffoldBackgroundColor;
+      }
+    }
+
     return Scaffold(
+      backgroundColor: getThemeBackgroundColor(),
       appBar: SharedAppBar(
         title: const Text('Reading Plan', style: TextStyle(fontFamily: 'EB Garamond', fontSize: 20)),
         actions: [
@@ -1062,6 +1080,7 @@ class _DayViewState extends ConsumerState<DayView> with TickerProviderStateMixin
       final reflection = _restDayReflections[weekIndex % _restDayReflections.length];
 
       return Scaffold(
+        backgroundColor: getThemeBackgroundColor(),
         extendBodyBehindAppBar: true,
         appBar: SharedAppBar(title: const Text(''), backgroundColor: Colors.transparent, elevation: 0),
         bottomNavigationBar: navBar,
@@ -1075,7 +1094,7 @@ class _DayViewState extends ConsumerState<DayView> with TickerProviderStateMixin
             }
           },
           child: Container(
-            color: theme.scaffoldBackgroundColor,
+            color: Colors.transparent,
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 32),
             child: Column(
@@ -1133,6 +1152,7 @@ class _DayViewState extends ConsumerState<DayView> with TickerProviderStateMixin
     }
 
     return Scaffold(
+      backgroundColor: getThemeBackgroundColor(),
       extendBodyBehindAppBar: true,
       appBar: SharedAppBar(title: const Text(''), backgroundColor: Colors.transparent, elevation: 0),
       bottomNavigationBar: navBar,
@@ -1344,6 +1364,7 @@ class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
 
     if (!planState.isActive) {
       return Scaffold(
+        backgroundColor: getThemeBackgroundColor(),
         appBar: const SharedAppBar(title: Text('Reading Plan', style: TextStyle(fontFamily: 'EB Garamond'))),
         body: Center(
           child: Padding(

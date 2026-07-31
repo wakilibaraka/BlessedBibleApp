@@ -323,14 +323,32 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
       ),
     );
 
+    final is3DTheme = appThemeMode == AppThemeMode.pop || 
+                      appThemeMode == AppThemeMode.dusk || 
+                      appThemeMode == AppThemeMode.fresh;
+
+    Color getThemeBackgroundColor() {
+      switch (appThemeMode) {
+        case AppThemeMode.pop:
+          return const Color(0xFFF4F5F7);
+        case AppThemeMode.dusk:
+          return const Color(0xFF312C51);
+        case AppThemeMode.fresh:
+          return const Color(0xFF132C33);
+        default:
+          return theme.scaffoldBackgroundColor;
+      }
+    }
+
     return Scaffold(
+      backgroundColor: getThemeBackgroundColor(),
       body: Stack(
         children: [
           Column(
             children: [
           // ── Compact top bar ──────────────────────────────────────────────
           Container(
-            color: theme.scaffoldBackgroundColor,
+            color: getThemeBackgroundColor(),
             padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 4),
             child: Column(
               mainAxisSize: MainAxisSize.min,

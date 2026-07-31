@@ -40,6 +40,7 @@ class CommentaryHubScreen extends ConsumerWidget {
           ),
           SafeArea(
             top: false,
+            bottom: false,
             child: CommentaryView(
               book: book,
               chapter: chapter,

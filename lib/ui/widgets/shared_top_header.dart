@@ -76,7 +76,7 @@ class SharedTopHeader extends ConsumerWidget {
           duration: const Duration(milliseconds: 350),
           transitionBuilder: (child, anim) => RotationTransition(
             turns: Tween<double>(begin: 0.75, end: 1.0).animate(anim),
-            child: FadeTransition(opacity: anim, child: child),
+            child: FadeTransition(opacity: anim, alwaysIncludeSemantics: true, child: child),
           ),
           child: switch (appThemeMode) {
             AppThemeMode.automatic => Icon(
