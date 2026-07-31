@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/bible_provider.dart';
 import '../../state/reading_plan_provider.dart';
+import '../../state/theme_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../../services/custom_plan_scheduler.dart';
 import '../widgets/shared_app_bar.dart';
@@ -181,17 +182,52 @@ class _CreateCustomPlanScreenState extends ConsumerState<CreateCustomPlanScreen>
     int totalReadingDays = schedule.length;
     double avgPerDay = totalReadingDays > 0 ? (corpus.length / totalReadingDays) : 0;
 
+    final appThemeMode = ref.watch(themeProvider);
+
+    Color getThemeBackgroundColor() {
+      switch (appThemeMode) {
+        case AppThemeMode.pop:
+          return const Color(0xFFF4F5F7);
+        case AppThemeMode.dusk:
+          return const Color(0xFF312C51);
+        case AppThemeMode.fresh:
+          return const Color(0xFF132C33);
+        default:
+          return theme.scaffoldBackgroundColor;
+      }
+    }
+
+    Color getThemeSurfaceColor() {
+      switch (appThemeMode) {
+        case AppThemeMode.pop:
+          return Colors.white;
+        case AppThemeMode.dusk:
+          return const Color(0xFF3F3965);
+        case AppThemeMode.fresh:
+          return const Color(0xFF1D3B42);
+        default:
+          return theme.colorScheme.surface.withValues(alpha: 0.6);
+      }
+    }
+
     return Scaffold(
-      appBar: SharedAppBar(
-        title: const Text('Create Plan'),
+      backgroundColor: getThemeBackgroundColor(),
+      extendBodyBehindAppBar: true,
+      appBar: const SharedAppBar(
+        title: Text('Create Plan'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
       body: ListView(
-        padding: const EdgeInsets.only(bottom: 40),
+        padding: EdgeInsets.only(
+          top: MediaQuery.paddingOf(context).top + kToolbarHeight + 16,
+          bottom: 40,
+        ),
         children: [
           _buildSectionHeader('Plan Name', theme),
           _buildIOSBox([
             _buildIOSInputRow(placeholder: 'e.g. John in 30 Days', controller: _nameController, theme: theme),
-          ], theme),
+          ], theme, surfaceColor: getThemeSurfaceColor()),
 
           _buildSectionHeader('What to read', theme),
           _buildIOSBox([
@@ -231,7 +267,7 @@ class _CreateCustomPlanScreenState extends ConsumerState<CreateCustomPlanScreen>
               _buildIOSRow('Select Books', value: '${_selectedBooks.length} selected', onTap: () {
                 _showMultiBookPicker(context, bibleState.books.map((b) => b.name).toList());
               }, theme: theme),
-          ], theme),
+          ], theme, surfaceColor: getThemeSurfaceColor()),
 
           _buildSectionHeader('How long', theme),
           _buildIOSBox([
@@ -249,7 +285,7 @@ class _CreateCustomPlanScreenState extends ConsumerState<CreateCustomPlanScreen>
                 );
                 if (date != null) setState(() => _targetEndDate = date);
               }, theme: theme),
-          ], theme),
+          ], theme, surfaceColor: getThemeSurfaceColor()),
 
           _buildSectionHeader('Rest Day', theme),
           _buildIOSBox([
@@ -258,13 +294,13 @@ class _CreateCustomPlanScreenState extends ConsumerState<CreateCustomPlanScreen>
               _showRestDayPicker();
             }, theme),
             _buildCheckRow('None', _restDay == null, () => setState(() => _restDay = null), theme),
-          ], theme),
+          ], theme, surfaceColor: getThemeSurfaceColor()),
 
           _buildSectionHeader('Reading style', theme),
           _buildIOSBox([
             _buildCheckRow('Scheduled (Assigned to dates)', _paceMode == 'scheduled', () => setState(() => _paceMode = 'scheduled'), theme),
             _buildCheckRow('Flexible (Read at own pace)', _paceMode == 'flexible', () => setState(() => _paceMode = 'flexible'), theme),
-          ], theme),
+          ], theme, surfaceColor: getThemeSurfaceColor()),
 
           const SizedBox(height: 24),
           _buildPreviewBox(corpus, isValid, avgPerDay, totalReadingDays, requestedReadingDays, theme),
@@ -296,12 +332,12 @@ class _CreateCustomPlanScreenState extends ConsumerState<CreateCustomPlanScreen>
     );
   }
 
-  Widget _buildIOSBox(List<Widget> children, ThemeData theme) {
+  Widget _buildIOSBox(List<Widget> children, ThemeData theme, {Color? surfaceColor}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Container(
         decoration: BoxDecoration(
-          color: theme.colorScheme.surface.withValues(alpha: 0.6),
+          color: surfaceColor ?? theme.colorScheme.surface.withValues(alpha: 0.6),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
         ),
@@ -343,8 +379,8 @@ class _CreateCustomPlanScreenState extends ConsumerState<CreateCustomPlanScreen>
                     const SizedBox(height: 2),
                     Text(
                       subtitle,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ),
                   ],
@@ -477,7 +513,7 @@ class _CreateCustomPlanScreenState extends ConsumerState<CreateCustomPlanScreen>
                 if (avgPerDay < 0.2)
                   Padding(
                     padding: const EdgeInsets.only(top: 12.0),
-                    child: Text('Note: This plan is very relaxed, with many rest days.', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.7), fontStyle: FontStyle.italic)),
+                    child: Text('Note: This plan is very relaxed, with many rest days.', style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.7), fontStyle: FontStyle.italic)),
                   ),
               ]
             ],

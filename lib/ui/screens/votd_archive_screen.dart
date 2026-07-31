@@ -226,9 +226,8 @@ class VotdArchiveScreen extends ConsumerWidget {
                         ),
                       ),
                     ),
-                  ),
-                );
-                },
+                  );
+                  },
                 childCount: dates.length,
               ),
             ),

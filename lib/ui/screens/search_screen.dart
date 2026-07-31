@@ -9,6 +9,7 @@ import '../../state/glass_ui_provider.dart';
 import '../../state/bible_provider.dart';
 import '../../state/search_settings_provider.dart';
 import '../../state/most_read_provider.dart';
+import '../../data/local_storage/preferences_service.dart';
 import '../widgets/textured_glass_container.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
@@ -27,6 +28,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
+  bool _showSwipeHint = false;
+  double _dragStartY = 0;
+  bool _isDragging = false;
+  bool _isAtTop = true;
 
   @override
   void initState() {
@@ -54,6 +59,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
+      
+      final prefs = ref.read(preferencesProvider);
+      final seenHints = prefs.getSeenHints();
+      if (!seenHints.contains('search_swipe_hint')) {
+        setState(() => _showSwipeHint = true);
+      }
+      
       _animationController.forward();
       _focusTimer = Timer(const Duration(milliseconds: 150), () {
         if (mounted) _focusNode.requestFocus();
@@ -305,9 +317,94 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
 
                     // ── Results ────────────────────────────────────────────
                     Expanded(
-                      child: searchState.query.isEmpty
-                          ? _buildRecentPlaces(searchState, theme)
-                          : _buildSearchResults(searchState, theme),
+                      child: Listener(
+                        onPointerDown: (e) {
+                          _dragStartY = e.position.dy;
+                          _isDragging = true;
+                        },
+                        onPointerMove: (e) {
+                          if (!_isDragging || !_isAtTop) return;
+                          
+                          final dy = e.position.dy - _dragStartY;
+                          if (dy > 40) { // 40px downward drag threshold
+                            _isDragging = false;
+                            if (!_focusNode.hasFocus) {
+                              _focusNode.requestFocus();
+                            }
+                            if (_showSwipeHint) {
+                              setState(() => _showSwipeHint = false);
+                              final prefs = ref.read(preferencesProvider);
+                              final seen = prefs.getSeenHints();
+                              if (!seen.contains('search_swipe_hint')) {
+                                prefs.saveSeenHints([...seen, 'search_swipe_hint']);
+                              }
+                            }
+                          }
+                        },
+                        onPointerUp: (e) => _isDragging = false,
+                        onPointerCancel: (e) => _isDragging = false,
+                        child: NotificationListener<ScrollNotification>(
+                          onNotification: (notification) {
+                            if (notification.metrics.axis == Axis.vertical) {
+                              _isAtTop = notification.metrics.pixels <= 0;
+                            }
+                            return false;
+                          },
+                          child: Stack(
+                            children: [
+                              searchState.query.isEmpty
+                                  ? _buildRecentPlaces(searchState, theme)
+                                  : _buildSearchResults(searchState, theme),
+                              Positioned(
+                                top: 16,
+                                left: 0,
+                                right: 0,
+                                child: IgnorePointer(
+                                  child: AnimatedOpacity(
+                                    duration: const Duration(milliseconds: 300),
+                                    opacity: _showSwipeHint ? 1.0 : 0.0,
+                                    child: Center(
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                        decoration: BoxDecoration(
+                                          color: theme.colorScheme.surface.withValues(alpha: isGlassy ? 0.7 : 1.0),
+                                          borderRadius: BorderRadius.circular(20),
+                                          border: Border.all(
+                                            color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withValues(alpha: 0.05),
+                                              blurRadius: 10,
+                                            )
+                                          ],
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              Icons.keyboard_arrow_down_rounded, 
+                                              size: 16, 
+                                              color: theme.colorScheme.onSurface.withValues(alpha: 0.6)
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              'Swipe down for keyboard',
+                                              style: theme.textTheme.labelMedium?.copyWith(
+                                                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),

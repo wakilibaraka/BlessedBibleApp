@@ -25,7 +25,6 @@ import '../../utils/bible_sections.dart';
 import '../../services/share_service.dart';
 import 'notes_list_screen.dart';
 import '../widgets/shared_top_header.dart';
-import '../widgets/glass_container.dart';
 import '../../state/notes_provider.dart';
 
 import '../widgets/day_complete_celebration.dart';
@@ -129,7 +128,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
   static const int    _kHoldMillis                  = 700;
 
   double _overscrollAccum   = 0.0; // total negative overscroll pixels seen
-  double _scrollDownAccum   = 0.0; // total downward scroll pixels for immersive delay
+  Timer? _continuousScrollTimerStage1;
+  Timer? _continuousScrollTimerStage2;
+  bool _isScrollingDown = false;
   DateTime? _overscrollStart;      // when the drag crossed the first threshold
   bool _navTriggeredThisDrag = false;
   bool _hasFiredArmedHaptic = false;
@@ -741,46 +742,56 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
 
                                       if (notification is UserScrollNotification) {
                                         if (notification.direction == ScrollDirection.forward) {
-                                          _scrollDownAccum = 0.0;
+                                          _isScrollingDown = false;
+                                          _continuousScrollTimerStage1?.cancel();
+                                          _continuousScrollTimerStage2?.cancel();
                                           final isManualHidden = ref.read(readSettingsProvider).isManualNavHidden;
-                                          if (isImmersive && !isManualHidden) {
-                                            if (_navRevealTimer == null || !_navRevealTimer!.isActive) {
-                                              _delayHeaderReveal = true;
-                                              _navRevealTimer = Timer(const Duration(seconds: 2), () {
-                                                if (mounted) ref.read(immersiveModeProvider.notifier).set(false);
-                                              });
-                                              _headerRevealTimer = Timer(const Duration(seconds: 3), () {
-                                                if (mounted) setState(() => _delayHeaderReveal = false);
-                                              });
-                                            }
-                                          }
-                                        }
-                                      } else if (notification is ScrollUpdateNotification) {
-                                        if (notification.scrollDelta != null && notification.scrollDelta! > 0) {
-                                          _scrollDownAccum += notification.scrollDelta!;
-                                          if (_scrollDownAccum > 150.0) {
-                                            _navRevealTimer?.cancel();
+                                          
+                                          // Reveal nav immediately if not manually hidden
+                                          if (!isManualHidden) {
+                                            if (mounted) ref.read(navHiddenProvider.notifier).set(false);
+                                            
+                                            // Delay the top header chrome slightly so it's not jarring
+                                            _delayHeaderReveal = true;
                                             _headerRevealTimer?.cancel();
-                                            _delayHeaderReveal = false;
-                                            if (!isImmersive) {
-                                              Future.microtask(() => ref.read(immersiveModeProvider.notifier).set(true));
+                                            _headerRevealTimer = Timer(const Duration(seconds: 1), () {
+                                              if (mounted) setState(() => _delayHeaderReveal = false);
+                                            });
+                                          }
+                                          // Always exit full immersive when scrolling up
+                                          if (mounted) ref.read(immersiveModeProvider.notifier).set(false);
+                                        } else if (notification.direction == ScrollDirection.reverse) {
+                                          _isScrollingDown = true;
+                                          
+                                          // Start stage 1 timer (3 seconds -> hide nav)
+                                          if (_continuousScrollTimerStage1 == null || !_continuousScrollTimerStage1!.isActive) {
+                                            _continuousScrollTimerStage1 = Timer(const Duration(seconds: 3), () {
+                                              if (mounted && _isScrollingDown) {
+                                                ref.read(navHiddenProvider.notifier).set(true);
+                                                _delayHeaderReveal = false;
+                                              }
+                                            });
+                                          }
+                                          
+                                          // Start stage 2 timer (5 seconds -> full immersive)
+                                          if (ref.read(readSettingsProvider).readingViewMode == ReadingViewMode.immersive) {
+                                            if (_continuousScrollTimerStage2 == null || !_continuousScrollTimerStage2!.isActive) {
+                                              _continuousScrollTimerStage2 = Timer(const Duration(seconds: 5), () {
+                                                if (mounted && _isScrollingDown) {
+                                                  ref.read(immersiveModeProvider.notifier).set(true);
+                                                }
+                                              });
                                             }
                                           }
-                                        } else if (notification.scrollDelta != null && notification.scrollDelta! < 0) {
-                                          _scrollDownAccum = 0.0;
-                                          final isManualHidden = ref.read(readSettingsProvider).isManualNavHidden;
-                                          if (isImmersive && !isManualHidden) {
-                                            if (_navRevealTimer == null || !_navRevealTimer!.isActive) {
-                                              _delayHeaderReveal = true;
-                                              _navRevealTimer = Timer(const Duration(seconds: 2), () {
-                                                if (mounted) ref.read(immersiveModeProvider.notifier).set(false);
-                                              });
-                                              _headerRevealTimer = Timer(const Duration(seconds: 3), () {
-                                                if (mounted) setState(() => _delayHeaderReveal = false);
-                                              });
-                                            }
-                                          }
+                                        } else if (notification.direction == ScrollDirection.idle) {
+                                          _isScrollingDown = false;
+                                          _continuousScrollTimerStage1?.cancel();
+                                          _continuousScrollTimerStage2?.cancel();
                                         }
+                                      } else if (notification is ScrollEndNotification) {
+                                        _isScrollingDown = false;
+                                        _continuousScrollTimerStage1?.cancel();
+                                        _continuousScrollTimerStage2?.cancel();
                                       }
                                       return false;
                                     },
@@ -1130,24 +1141,35 @@ Positioned(
                 child: AnimatedOpacity(
                   opacity: _currentHintMessage != null ? 1.0 : 0.0,
                   duration: const Duration(milliseconds: 300),
-                  child: GlassContainer(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    borderRadius: BorderRadius.circular(16),
+                  alwaysIncludeSemantics: true,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surface,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        )
+                      ],
+                    ),
                     child: Row(
                       children: [
-                        Icon(Icons.lightbulb_rounded, color: AppColors.goldAccent, size: 20),
-                        const SizedBox(width: 12),
+                        Icon(Icons.lightbulb_rounded, color: AppColors.goldAccent, size: 18),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: Text(
                             _currentHintMessage!,
-                            style: theme.textTheme.bodyMedium?.copyWith(
+                            style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onSurface,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
                         IconButton(
-                          icon: Icon(Icons.close_rounded, size: 18, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                          icon: Icon(Icons.close_rounded, size: 16, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                           onPressed: _dismissHint,
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
@@ -1669,13 +1691,28 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
       return const SizedBox.shrink();
     }
 
+    final appThemeMode = ref.watch(themeProvider);
+
+    Color getThemeBackgroundColor() {
+      switch (appThemeMode) {
+        case AppThemeMode.pop:
+          return const Color(0xFFF4F5F7);
+        case AppThemeMode.dusk:
+          return const Color(0xFF312C51);
+        case AppThemeMode.fresh:
+          return const Color(0xFF132C33);
+        default:
+          return theme.scaffoldBackgroundColor;
+      }
+    }
+
     return Material(
       color: Colors.transparent, // Let AnimatedContainer handle the color
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeInOut,
         decoration: BoxDecoration(
-          color: theme.scaffoldBackgroundColor,
+          color: getThemeBackgroundColor(),
           borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
         ),
         clipBehavior: Clip.antiAlias,

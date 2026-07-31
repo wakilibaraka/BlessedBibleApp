@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../theme/reading_tokens.dart';
 import '../../state/commentary_provider.dart';
 import '../../state/bible_provider.dart';
+import '../../state/typography_provider.dart';
+import '../../state/theme_provider.dart';
 import '../../models/commentary_entry.dart';
 
 import 'pinch_to_zoom_font_wrapper.dart';
@@ -75,8 +77,14 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
     final commentaryAsync = ref.watch(commentaryProvider);
     ref.watch(commentaryBookmarksProvider);
     final commentaryNotifier = ref.read(commentaryProvider.notifier);
+    final typography = ref.watch(typographyProvider);
 
     final bookName = widget.book;
+    final appThemeMode = ref.watch(themeProvider);
+    final is3DTheme = appThemeMode == AppThemeMode.pop || 
+                      appThemeMode == AppThemeMode.dusk || 
+                      appThemeMode == AppThemeMode.fresh;
+
     final chapterNum = widget.chapter;
     final displayVerse = widget.verse ?? _currentVerseNum;
 
@@ -105,189 +113,277 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
       child: Column(
         children: [
           // Pinned Header Section
-          Container(
-            decoration: BoxDecoration(
-              color: tokens.readingSurface, // Ensure header is opaque
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                )
-              ],
-            ),
-            padding: EdgeInsets.fromLTRB(
-              widget.isCompact ? 24 : 68, // Leave room for back button if full screen
-              widget.isCompact ? 24 : MediaQuery.paddingOf(context).top + 16, 
-              24, 
-              24
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        referenceString,
-                        style: theme.textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: tokens.readingAccent,
-                        ),
-                      ),
-                    ),
-                    // Bookmark toggle button
-                    IconButton(
-                      icon: Icon(
-                        isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded,
-                        color: isBookmarked ? tokens.readingAccent : tokens.readingInkMuted,
-                      ),
-                      tooltip: isBookmarked ? 'Remove Bookmark' : 'Bookmark Commentary',
-                      onPressed: () {
-                        ref.read(commentaryBookmarksProvider.notifier).toggleBookmark(bookName, chapterNum, displayVerse);
-                      },
-                    ),
-                    // Expand button in compact mode
-                    if (widget.isCompact && widget.onExpand != null)
-                      IconButton(
-                        icon: Icon(
-                          Icons.open_in_full_rounded,
-                          color: tokens.readingAccent,
-                          size: 20,
-                        ),
-                        tooltip: 'Expand to full screen',
-                        onPressed: widget.onExpand,
-                      ),
-                  ],
-                ),
-                if (fetchedVerseText != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16),
-                    child: Text(
-                      '"$fetchedVerseText"',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        fontSize: 16,
-                        height: 1.6,
-                        fontStyle: FontStyle.italic,
-                        color: tokens.readingInk,
-                      ),
-                    ),
+          widget.isCompact
+              ? Container(
+                  margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: tokens.readingSurface,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      )
+                    ],
                   ),
-              ],
-            ),
-          ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: tokens.readingSurface,
+                              borderRadius: BorderRadius.circular(30),
+                              border: Border.all(color: tokens.readingInkMuted.withValues(alpha: 0.2)),
+                            ),
+                            child: Text(
+                              referenceString,
+                              style: theme.textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: tokens.readingAccent,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: Icon(
+                                    isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded,
+                                    color: isBookmarked ? tokens.readingAccent : tokens.readingInkMuted,
+                                    size: 20,
+                                  ),
+                                  tooltip: isBookmarked ? 'Remove Bookmark' : 'Bookmark Commentary',
+                                  onPressed: () {
+                                    ref.read(commentaryBookmarksProvider.notifier).toggleBookmark(bookName, chapterNum, displayVerse);
+                                  },
+                                ),
+                                if (widget.onExpand != null)
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.open_in_full_rounded,
+                                      color: tokens.readingAccent,
+                                      size: 20,
+                                    ),
+                                    tooltip: 'Expand to full screen',
+                                    onPressed: widget.onExpand,
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (fetchedVerseText != null) ...[
+                        const SizedBox(height: 12),
+                        Text(
+                          '"$fetchedVerseText"',
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontSize: typography.fontSize * 0.9,
+                            height: typography.lineHeight,
+                            fontStyle: FontStyle.italic,
+                            fontFamily: typography.fontFamily,
+                            color: tokens.readingInk,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                )
+              : Container(
+                  padding: EdgeInsets.fromLTRB(24, MediaQuery.paddingOf(context).top + 16, 24, 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Text(
+                            referenceString,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              color: theme.primaryColor,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: IconButton(
+                              icon: Icon(
+                                isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded,
+                                color: isBookmarked ? theme.primaryColor : tokens.readingInkMuted,
+                              ),
+                              tooltip: isBookmarked ? 'Remove Bookmark' : 'Bookmark Commentary',
+                              onPressed: () {
+                                ref.read(commentaryBookmarksProvider.notifier).toggleBookmark(bookName, chapterNum, displayVerse);
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (fetchedVerseText != null) ...[
+                        const SizedBox(height: 16),
+                        Text(
+                          '\u201c$fetchedVerseText\u201d',
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            height: 1.42,
+                            fontSize: typography.fontSize * 1.1,
+                            fontFamily: typography.fontFamily,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
           
           // Scrollable Content
           Expanded(
-            child: NotificationListener<ScrollNotification>(
-              onNotification: (scrollNotification) {
-                if (widget.verse == null && verseEntries.isNotEmpty) {
-                  int? topVerse;
-                  double minDy = double.infinity;
-                  
-                  for (final entry in _entryKeys.entries) {
-                    final context = entry.value.currentContext;
-                    if (context != null) {
-                      final box = context.findRenderObject() as RenderBox?;
-                      if (box != null) {
-                        final position = box.localToGlobal(Offset.zero).dy;
-                        if (position > 0 && position < minDy) {
-                          minDy = position;
-                          topVerse = verseEntries[entry.key].scope.verse;
-                        } else if (position <= 0 && position > -box.size.height) {
-                          topVerse = verseEntries[entry.key].scope.verse;
-                          break;
-                        }
-                      }
-                    }
-                  }
-                  
-                  if (topVerse != null && topVerse != _currentVerseNum) {
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      if (mounted && _currentVerseNum != topVerse) {
-                        setState(() {
-                          _currentVerseNum = topVerse;
-                        });
-                      }
-                    });
-                  }
-                }
-                return false;
-              },
-              child: CustomScrollView(
-                controller: widget.scrollController,
-                slivers: [
-                  if (commentaryAsync.isLoading)
-                    const SliverToBoxAdapter(
-                      child: Padding(
-                        padding: EdgeInsets.all(32.0),
-                        child: Center(child: CircularProgressIndicator()),
-                      ),
-                    )
-                  else if (!hasContent)
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                        child: _buildEmptyState(theme, tokens),
-                      ),
-                    )
-                  else ...[
-                    if (verseEntries.isNotEmpty)
-                      SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            final key = _entryKeys.putIfAbsent(index, () => GlobalKey());
-                            return KeyedSubtree(
-                              key: key,
-                              child: _buildEntryCard(theme, tokens, verseEntries[index]),
-                            );
-                          },
-                          childCount: verseEntries.length,
-                        ),
-                      ),
-
-                    if (chapterEntries.isNotEmpty)
-                      SliverToBoxAdapter(
-                        child: _buildCollapsibleSection(
-                          theme: theme,
-                          tokens: tokens,
-                          title: 'On this chapter',
-                          isExpanded: _showChapter,
-                          entries: chapterEntries,
-                          onToggle: () => setState(() => _showChapter = !_showChapter),
-                        ),
-                      ),
-
-                    if (bookEntries.isNotEmpty)
-                      SliverToBoxAdapter(
-                        child: _buildCollapsibleSection(
-                          theme: theme,
-                          tokens: tokens,
-                          title: 'On this book',
-                          isExpanded: _showBook,
-                          entries: bookEntries,
-                          onToggle: () => setState(() => _showBook = !_showBook),
-                        ),
-                      ),
-                  ],
-
-                  // Removed bottom padding to allow text to flow to the edge
-                ],
-              ),
-            ),
+            child: widget.isCompact
+                ? ShaderMask(
+                    shaderCallback: (Rect bounds) {
+                      return const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Colors.transparent, Colors.white, Colors.white, Colors.white],
+                        stops: [0.0, 0.05, 0.95, 1.0],
+                      ).createShader(bounds);
+                    },
+                    blendMode: BlendMode.dstIn,
+                    child: _buildScrollableContent(verseEntries, chapterEntries, bookEntries, commentaryAsync, hasContent, theme, tokens, is3DTheme, typography),
+                  )
+                : _buildScrollableContent(verseEntries, chapterEntries, bookEntries, commentaryAsync, hasContent, theme, tokens, is3DTheme, typography),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildEmptyState(ThemeData theme, ReadingTokens tokens) {
+  Widget _buildScrollableContent(
+    List<CommentaryEntry> verseEntries, 
+    List<CommentaryEntry> chapterEntries, 
+    List<CommentaryEntry> bookEntries, 
+    AsyncValue<void> commentaryAsync, 
+    bool hasContent, 
+    ThemeData theme, 
+    ReadingTokens tokens, 
+    bool is3DTheme,
+    TypographyState typography,
+  ) {
+    return NotificationListener<ScrollNotification>(
+      onNotification: (scrollNotification) {
+        if (widget.verse == null && verseEntries.isNotEmpty) {
+          int? topVerse;
+          double minDy = double.infinity;
+          
+          for (final entry in _entryKeys.entries) {
+            final context = entry.value.currentContext;
+            if (context != null) {
+              final box = context.findRenderObject() as RenderBox?;
+              if (box != null) {
+                final position = box.localToGlobal(Offset.zero).dy;
+                if (position > 0 && position < minDy) {
+                  minDy = position;
+                  topVerse = verseEntries[entry.key].scope.verse;
+                } else if (position <= 0 && position > -box.size.height) {
+                  topVerse = verseEntries[entry.key].scope.verse;
+                  break;
+                }
+              }
+            }
+          }
+          
+          if (topVerse != null && topVerse != _currentVerseNum) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted && _currentVerseNum != topVerse) {
+                setState(() {
+                  _currentVerseNum = topVerse;
+                });
+              }
+            });
+          }
+        }
+        return false;
+      },
+      child: CustomScrollView(
+        controller: widget.scrollController,
+        slivers: [
+          if (commentaryAsync.isLoading)
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.all(32.0),
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            )
+          else if (!hasContent)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: _buildEmptyState(theme, tokens, is3DTheme),
+              ),
+            )
+          else ...[
+            if (verseEntries.isNotEmpty)
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final key = _entryKeys.putIfAbsent(index, () => GlobalKey());
+                    return KeyedSubtree(
+                      key: key,
+                      child: _buildEntryCard(theme, tokens, verseEntries[index], typography),
+                    );
+                  },
+                  childCount: verseEntries.length,
+                ),
+              ),
+
+            if (chapterEntries.isNotEmpty)
+              SliverToBoxAdapter(
+                child: _buildCollapsibleSection(
+                  theme: theme,
+                  tokens: tokens,
+                  title: 'On this chapter',
+                  isExpanded: _showChapter,
+                  entries: chapterEntries,
+                  typography: typography,
+                  onToggle: () => setState(() => _showChapter = !_showChapter),
+                ),
+              ),
+
+            if (bookEntries.isNotEmpty)
+              SliverToBoxAdapter(
+                child: _buildCollapsibleSection(
+                  theme: theme,
+                  tokens: tokens,
+                  title: 'On this book',
+                  isExpanded: _showBook,
+                  entries: bookEntries,
+                  typography: typography,
+                  onToggle: () => setState(() => _showBook = !_showBook),
+                ),
+              ),
+          ],
+        ],
+      ),
+    );
+  }
+
+
+  Widget _buildEmptyState(ThemeData theme, ReadingTokens tokens, bool is3DTheme) {
     return Container(
       decoration: BoxDecoration(
-        color: tokens.readingSurface,
+        color: is3DTheme ? theme.colorScheme.surface : tokens.readingSurface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: tokens.readingBorder),
+        border: Border.all(color: is3DTheme ? Colors.white.withValues(alpha: 0.15) : tokens.readingBorder),
       ),
       padding: const EdgeInsets.symmetric(vertical: 40.0, horizontal: 24.0),
       child: Column(
@@ -322,6 +418,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
     required String title,
     required bool isExpanded,
     required List<CommentaryEntry> entries,
+    required TypographyState typography,
     required VoidCallback onToggle,
   }) {
     return Padding(
@@ -356,7 +453,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
               child: Column(
                 children: entries.map((entry) => Padding(
                   padding: const EdgeInsets.only(top: 16.0),
-                  child: _buildEntryContent(theme, tokens, entry),
+                  child: _buildEntryContent(theme, tokens, entry, typography),
                 )).toList(),
               ),
             ),
@@ -365,14 +462,14 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
     );
   }
 
-  Widget _buildEntryCard(ThemeData theme, ReadingTokens tokens, CommentaryEntry entry) {
+  Widget _buildEntryCard(ThemeData theme, ReadingTokens tokens, CommentaryEntry entry, TypographyState typography) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-      child: _buildEntryContent(theme, tokens, entry),
+      child: _buildEntryContent(theme, tokens, entry, typography),
     );
   }
 
-  Widget _buildEntryContent(ThemeData theme, ReadingTokens tokens, CommentaryEntry entry) {
+  Widget _buildEntryContent(ThemeData theme, ReadingTokens tokens, CommentaryEntry entry, TypographyState typography) {
     final paragraphs = entry.text.split('\n\n');
 
     return Column(
@@ -383,8 +480,9 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
           child: Text(
             p.trim(),
             style: theme.textTheme.bodyLarge?.copyWith(
-              fontSize: 16,
-              height: 1.7,
+              fontSize: typography.fontSize,
+              height: typography.lineHeight,
+              fontFamily: typography.fontFamily,
               color: tokens.readingInk,
             ),
           ),

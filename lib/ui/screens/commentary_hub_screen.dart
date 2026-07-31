@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../theme/reading_tokens.dart';
 import '../../state/theme_provider.dart';
-import '../widgets/animated_background.dart';
 import '../widgets/shared_app_bar.dart';
 import '../widgets/commentary_view.dart';
 
@@ -25,8 +24,21 @@ class CommentaryHubScreen extends ConsumerWidget {
     final appThemeMode = ref.watch(themeProvider);
     final tokens = Theme.of(context).extension<ReadingTokens>()!;
 
+    Color getThemeBackgroundColor() {
+      switch (appThemeMode) {
+        case AppThemeMode.pop:
+          return const Color(0xFFF4F5F7);
+        case AppThemeMode.dusk:
+          return const Color(0xFF312C51);
+        case AppThemeMode.fresh:
+          return const Color(0xFF132C33);
+        default:
+          return tokens.readingPaper;
+      }
+    }
+
     return Scaffold(
-      backgroundColor: tokens.readingPaper,
+      backgroundColor: getThemeBackgroundColor(),
       extendBody: true,
       extendBodyBehindAppBar: true,
       appBar: const SharedAppBar(
@@ -35,9 +47,6 @@ class CommentaryHubScreen extends ConsumerWidget {
       ),
       body: Stack(
         children: [
-          Positioned.fill(
-            child: AnimatedBackground(appThemeMode: appThemeMode),
-          ),
           SafeArea(
             top: false,
             bottom: false,

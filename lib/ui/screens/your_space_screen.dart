@@ -51,6 +51,7 @@ class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
 
     return Scaffold(
       extendBody: true,
+      extendBodyBehindAppBar: true,
       appBar: SharedAppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -63,9 +64,11 @@ class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
           Positioned.fill(
             child: AnimatedBackground(appThemeMode: appThemeMode),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+          SafeArea(
+            bottom: false,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
               // ── Segmented Control Header ──
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
@@ -120,6 +123,7 @@ class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
                 ),
               ),
             ],
+          ),
           ),
         ],
       ),

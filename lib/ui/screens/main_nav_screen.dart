@@ -432,7 +432,7 @@ class MainNavScreen extends ConsumerWidget {
     IconData iconData;
     switch (currentIndex) {
       case 1: // Read
-        iconData = ref.watch(immersiveModeProvider)
+        iconData = ref.watch(navHiddenProvider)
             ? Icons.fullscreen_exit_rounded
             : Icons.fullscreen_rounded;
         break;
@@ -448,7 +448,7 @@ class MainNavScreen extends ConsumerWidget {
     return Icon(
       iconData,
       key: ValueKey<int>(
-          currentIndex * 10 + (ref.watch(immersiveModeProvider) ? 1 : 0)),
+          currentIndex * 10 + (ref.watch(navHiddenProvider) ? 1 : 0)),
       size: 24,
     );
   }
@@ -473,10 +473,11 @@ class MainNavScreen extends ConsumerWidget {
         _changeTab(4, ref, context);
         break;
       case 1:
-        // Read -> Toggle Manual Minimize
-        final isHidden = ref.read(readSettingsProvider).isManualNavHidden;
-        ref.read(readSettingsProvider.notifier).setManualNavHidden(!isHidden);
-        ref.read(immersiveModeProvider.notifier).set(!isHidden);
+        // Read -> Toggle actual visibility
+        final isCurrentlyHidden = ref.read(navHiddenProvider);
+        ref.read(readSettingsProvider.notifier).setManualNavHidden(!isCurrentlyHidden);
+        ref.read(navHiddenProvider.notifier).set(!isCurrentlyHidden);
+        ref.read(immersiveModeProvider.notifier).set(!isCurrentlyHidden);
         break;
       case 2:
         // Search tab: no FAB action (search bar is in the screen itself)

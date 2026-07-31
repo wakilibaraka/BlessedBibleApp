@@ -8,6 +8,7 @@ import '../../theme/app_colors.dart';
 import '../widgets/shared_app_bar.dart';
 import 'plan_reader_screen.dart';
 import '../../state/streak_provider.dart';
+import '../../state/theme_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -578,9 +579,7 @@ class _TodayViewBody extends ConsumerWidget {
 
     final isScheduled = planState.paceMode == 'scheduled';
 
-    final is3DTheme = appThemeMode == AppThemeMode.pop || 
-                      appThemeMode == AppThemeMode.dusk || 
-                      appThemeMode == AppThemeMode.fresh;
+    final appThemeMode = ref.watch(themeProvider);
 
     Color getThemeBackgroundColor() {
       switch (appThemeMode) {
@@ -1066,6 +1065,21 @@ class _DayViewState extends ConsumerState<DayView> with TickerProviderStateMixin
       ),
     );
 
+    final appThemeMode = ref.watch(themeProvider);
+
+    Color getThemeBackgroundColor() {
+      switch (appThemeMode) {
+        case AppThemeMode.pop:
+          return const Color(0xFFF4F5F7);
+        case AppThemeMode.dusk:
+          return const Color(0xFF312C51);
+        case AppThemeMode.fresh:
+          return const Color(0xFF132C33);
+        default:
+          return theme.scaffoldBackgroundColor;
+      }
+    }
+
     if (isRestDay) {
       final date = DateTime.utc(planState.planStartedOn!.year, planState.planStartedOn!.month, planState.planStartedOn!.day).add(Duration(days: _currentLogicalDay - 1));
       final dateHeader = '${_weekdayShort[date.weekday - 1]}, ${_monthNamesShort[date.month - 1]} ${date.day}, ${date.year}';
@@ -1357,6 +1371,20 @@ class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
   Widget build(BuildContext context) {
     final planState = ref.watch(readingPlanProvider(widget.planId));
     final gold = AppColors.goldAccent;
+    final appThemeMode = ref.watch(themeProvider);
+
+    Color getThemeBackgroundColor() {
+      switch (appThemeMode) {
+        case AppThemeMode.pop:
+          return const Color(0xFFF4F5F7);
+        case AppThemeMode.dusk:
+          return const Color(0xFF312C51);
+        case AppThemeMode.fresh:
+          return const Color(0xFF132C33);
+        default:
+          return Theme.of(context).scaffoldBackgroundColor;
+      }
+    }
 
     if (planState.isLoading) {
       return Scaffold(body: Center(child: CircularProgressIndicator(color: gold)));

@@ -323,10 +323,6 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
       ),
     );
 
-    final is3DTheme = appThemeMode == AppThemeMode.pop || 
-                      appThemeMode == AppThemeMode.dusk || 
-                      appThemeMode == AppThemeMode.fresh;
-
     Color getThemeBackgroundColor() {
       switch (appThemeMode) {
         case AppThemeMode.pop:
