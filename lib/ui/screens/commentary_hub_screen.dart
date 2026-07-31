@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../theme/reading_tokens.dart';
 import '../../state/theme_provider.dart';
-import '../widgets/shared_app_bar.dart';
 import '../widgets/commentary_view.dart';
 
 class CommentaryHubScreen extends ConsumerWidget {
@@ -41,10 +40,6 @@ class CommentaryHubScreen extends ConsumerWidget {
       backgroundColor: getThemeBackgroundColor(),
       extendBody: true,
       extendBodyBehindAppBar: true,
-      appBar: const SharedAppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
       body: Stack(
         children: [
           SafeArea(

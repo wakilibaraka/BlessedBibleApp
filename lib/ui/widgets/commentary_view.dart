@@ -5,7 +5,9 @@ import '../../theme/reading_tokens.dart';
 import '../../state/commentary_provider.dart';
 import '../../state/bible_provider.dart';
 import '../../state/typography_provider.dart';
+
 import '../../state/theme_provider.dart';
+
 import '../../models/commentary_entry.dart';
 
 import 'pinch_to_zoom_font_wrapper.dart';
@@ -110,158 +112,116 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
     final hasContent = verseEntries.isNotEmpty || chapterEntries.isNotEmpty || bookEntries.isNotEmpty;
 
     return PinchToZoomFontWrapper(
-      child: Column(
+      child: Stack(
         children: [
-          // Pinned Header Section
-          widget.isCompact
-              ? Container(
-                  margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: tokens.readingSurface,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      )
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: tokens.readingSurface,
-                              borderRadius: BorderRadius.circular(30),
-                              border: Border.all(color: tokens.readingInkMuted.withValues(alpha: 0.2)),
-                            ),
-                            child: Text(
-                              referenceString,
-                              style: theme.textTheme.headlineSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: tokens.readingAccent,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: Icon(
-                                    isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded,
-                                    color: isBookmarked ? tokens.readingAccent : tokens.readingInkMuted,
-                                    size: 20,
-                                  ),
-                                  tooltip: isBookmarked ? 'Remove Bookmark' : 'Bookmark Commentary',
-                                  onPressed: () {
-                                    ref.read(commentaryBookmarksProvider.notifier).toggleBookmark(bookName, chapterNum, displayVerse);
-                                  },
-                                ),
-                                if (widget.onExpand != null)
-                                  IconButton(
-                                    icon: Icon(
-                                      Icons.open_in_full_rounded,
-                                      color: tokens.readingAccent,
-                                      size: 20,
-                                    ),
-                                    tooltip: 'Expand to full screen',
-                                    onPressed: widget.onExpand,
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      if (fetchedVerseText != null) ...[
-                        const SizedBox(height: 12),
-                        Text(
-                          '"$fetchedVerseText"',
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontSize: typography.fontSize * 0.9,
-                            height: typography.lineHeight,
-                            fontStyle: FontStyle.italic,
-                            fontFamily: typography.fontFamily,
-                            color: tokens.readingInk,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                )
-              : Container(
-                  padding: EdgeInsets.fromLTRB(24, MediaQuery.paddingOf(context).top + 16, 24, 24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Text(
-                            referenceString,
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              color: theme.primaryColor,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: IconButton(
-                              icon: Icon(
-                                isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded,
-                                color: isBookmarked ? theme.primaryColor : tokens.readingInkMuted,
-                              ),
-                              tooltip: isBookmarked ? 'Remove Bookmark' : 'Bookmark Commentary',
-                              onPressed: () {
-                                ref.read(commentaryBookmarksProvider.notifier).toggleBookmark(bookName, chapterNum, displayVerse);
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                      if (fetchedVerseText != null) ...[
-                        const SizedBox(height: 16),
-                        Text(
-                          '\u201c$fetchedVerseText\u201d',
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            height: 1.42,
-                            fontSize: typography.fontSize * 1.1,
-                            fontFamily: typography.fontFamily,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
+          // Base: Scrollable Content
+          _buildScrollableContent(verseEntries, chapterEntries, bookEntries, commentaryAsync, hasContent, theme, tokens, is3DTheme, typography),
           
-          // Scrollable Content
-          Expanded(
-            child: widget.isCompact
-                ? ShaderMask(
-                    shaderCallback: (Rect bounds) {
-                      return const LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [Colors.transparent, Colors.white, Colors.white, Colors.white],
-                        stops: [0.0, 0.05, 0.95, 1.0],
-                      ).createShader(bounds);
-                    },
-                    blendMode: BlendMode.dstIn,
-                    child: _buildScrollableContent(verseEntries, chapterEntries, bookEntries, commentaryAsync, hasContent, theme, tokens, is3DTheme, typography),
-                  )
-                : _buildScrollableContent(verseEntries, chapterEntries, bookEntries, commentaryAsync, hasContent, theme, tokens, is3DTheme, typography),
+          // Floating Top Header
+          Positioned(
+            top: widget.isCompact ? 16 : MediaQuery.paddingOf(context).top + 16,
+            left: 16, 
+            right: 16,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+
+                // 1. TOP ROW
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: IconButton(
+                        icon: Icon(Icons.arrow_back_ios_new_rounded, color: theme.primaryColor),
+                        onPressed: () {
+                          if (widget.isCompact) {
+                            Navigator.pop(context);
+                          } else {
+                            Navigator.pop(context);
+                          }
+                        },
+                        tooltip: 'Back',
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(color: tokens.readingAccent.withValues(alpha: 0.5)),
+                      ),
+                      child: Text(
+                        referenceString,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          color: tokens.readingAccent,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: Icon(
+                              isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded,
+                              color: isBookmarked ? tokens.readingAccent : tokens.readingInkMuted,
+                            ),
+                            tooltip: isBookmarked ? 'Remove Bookmark' : 'Bookmark Commentary',
+                            onPressed: () {
+                              ref.read(commentaryBookmarksProvider.notifier).toggleBookmark(bookName, chapterNum, displayVerse);
+                            },
+                          ),
+                          if (widget.onExpand != null)
+                            IconButton(
+                              icon: Icon(
+                                Icons.open_in_full_rounded,
+                                color: tokens.readingAccent,
+                                size: 20,
+                              ),
+                              tooltip: 'Expand to full screen',
+                              onPressed: widget.onExpand,
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                
+                // 2. FLOATING VERSE CARD
+                if (fetchedVerseText != null)
+                  Container(
+                    margin: const EdgeInsets.only(top: 12),
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+                    decoration: BoxDecoration(
+                      color: is3DTheme ? theme.colorScheme.surface : theme.scaffoldBackgroundColor,
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: tokens.readingInkMuted.withValues(alpha: 0.15)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.08),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
+                        )
+                      ],
+                    ),
+                    child: Text(
+                      '\u201c$fetchedVerseText\u201d',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        height: 1.42,
+                        fontSize: typography.fontSize * 1.05,
+                        fontFamily: typography.fontFamily,
+                        color: tokens.readingInk,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ],
       ),
@@ -317,6 +277,14 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
       child: CustomScrollView(
         controller: widget.scrollController,
         slivers: [
+          // Spacer for floating header
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: widget.isCompact 
+                  ? 240.0 
+                  : MediaQuery.paddingOf(context).top + 240.0,
+            ),
+          ),
           if (commentaryAsync.isLoading)
             const SliverToBoxAdapter(
               child: Padding(
@@ -523,60 +491,70 @@ void showCommentaryBottomSheet(
     backgroundColor: Colors.transparent,
     barrierColor: Colors.black.withValues(alpha: 0.5),
     builder: (context) {
-      final tokens = Theme.of(context).extension<ReadingTokens>()!;
-      return DraggableScrollableSheet(
-        initialChildSize: 0.65,
-        minChildSize: 0.35,
-        maxChildSize: 0.92,
-        expand: false,
-        builder: (context, scrollController) {
-          return Container(
-            decoration: BoxDecoration(
-              color: tokens.readingSurface,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-            ),
-            child: SafeArea(
-              top: false,
-              bottom: false,
-              child: Column(
-                children: [
-                  // Drag handle bar
-                  Center(
-                    child: Container(
-                      margin: const EdgeInsets.only(top: 12, bottom: 4),
-                      width: 36,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: tokens.readingBorder,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: CommentaryView(
-                      book: book,
-                      chapter: chapter,
-                      verse: verse,
-                      verseText: verseText,
-                      isCompact: true,
-                      scrollController: scrollController,
-                      onExpand: () {
-                        Navigator.of(context).pop(); // dismiss sheet
-                        Navigator.of(context).push(
-                          CupertinoPageRoute(
-                            builder: (_) => CommentaryHubScreen(
-                              book: book,
-                              chapter: chapter,
-                              verse: verse,
-                            ),
+      return Consumer(
+        builder: (context, ref, _) {
+          final tokens = Theme.of(context).extension<ReadingTokens>()!;
+          final theme = Theme.of(context);
+          final appThemeMode = ref.watch(themeProvider);
+          final is3DTheme = appThemeMode == AppThemeMode.pop || 
+                            appThemeMode == AppThemeMode.dusk || 
+                            appThemeMode == AppThemeMode.fresh;
+
+          return DraggableScrollableSheet(
+            initialChildSize: 0.65,
+            minChildSize: 0.35,
+            maxChildSize: 0.92,
+            expand: false,
+            builder: (context, scrollController) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: theme.bottomSheetTheme.backgroundColor ?? (is3DTheme ? theme.colorScheme.surface : tokens.readingSurface),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                ),
+                child: SafeArea(
+                  top: false,
+                  bottom: false,
+                  child: Column(
+                    children: [
+                      // Drag handle bar
+                      Center(
+                        child: Container(
+                          margin: const EdgeInsets.only(top: 12, bottom: 4),
+                          width: 36,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: tokens.readingBorder,
+                            borderRadius: BorderRadius.circular(2),
                           ),
-                        );
-                      },
-                    ),
+                        ),
+                      ),
+                      Expanded(
+                        child: CommentaryView(
+                          book: book,
+                          chapter: chapter,
+                          verse: verse,
+                          verseText: verseText,
+                          isCompact: true,
+                          scrollController: scrollController,
+                          onExpand: () {
+                            Navigator.of(context).pop(); // dismiss sheet
+                            Navigator.of(context).push(
+                              CupertinoPageRoute(
+                                builder: (_) => CommentaryHubScreen(
+                                  book: book,
+                                  chapter: chapter,
+                                  verse: verse,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           );
         },
       );

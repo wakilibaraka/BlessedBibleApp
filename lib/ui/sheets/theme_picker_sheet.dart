@@ -22,8 +22,17 @@ class ThemePickerSheet extends ConsumerWidget {
     final theme = Theme.of(context);
     final currentMode = ref.watch(themeProvider);
 
+    Color getSheetSurface() {
+      switch (currentMode) {
+        case AppThemeMode.pop: return const Color(0xFFF4F5F7);
+        case AppThemeMode.dusk: return const Color(0xFF312C51);
+        case AppThemeMode.fresh: return const Color(0xFF132C33);
+        default: return theme.scaffoldBackgroundColor;
+      }
+    }
+
     return Material(
-      color: theme.scaffoldBackgroundColor,
+      color: getSheetSurface(),
       borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
       clipBehavior: Clip.antiAlias,
       child: SafeArea(
@@ -40,7 +49,9 @@ class ThemePickerSheet extends ConsumerWidget {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                    color: currentMode == AppThemeMode.dusk || currentMode == AppThemeMode.fresh || currentMode == AppThemeMode.pop
+                        ? theme.primaryColor
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),

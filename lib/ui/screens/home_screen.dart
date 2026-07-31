@@ -109,6 +109,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         final entries = commentaryState.value!;
         
         final matchingEntries = entries.where((e) => 
+          e.scope.type == 'verse' &&
           e.scope.book?.toLowerCase() == bookName.toLowerCase() && 
           e.scope.chapter == chapterNum && 
           e.scope.verse == verseNum
@@ -232,7 +233,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 if (excerpt != null) ...[
                   Text(
                     excerpt,
-                    maxLines: 4,
+                    maxLines: 8,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodySmall?.copyWith(
                       height: 1.60,

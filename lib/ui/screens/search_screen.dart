@@ -31,7 +31,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
   bool _showSwipeHint = false;
   double _dragStartY = 0;
   bool _isDragging = false;
-  bool _isAtTop = true;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -80,6 +80,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     _controller.dispose();
     _focusNode.dispose();
     _animationController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -128,8 +129,46 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
             child: Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 800),
-                child: Column(
-                  children: [
+                child: Listener(
+                  onPointerDown: (e) {
+                    _dragStartY = e.position.dy;
+                    _isDragging = true;
+                  },
+                  onPointerMove: (e) {
+                    if (!_isDragging) return;
+                    
+                    bool isAtTop = true;
+                    if (_scrollController.hasClients) {
+                      isAtTop = _scrollController.offset <= 16.0;
+                    }
+                    
+                    if (!isAtTop) return;
+                    
+                    final dy = e.position.dy - _dragStartY;
+                    if (dy < -10) {
+                      _isDragging = false;
+                      return;
+                    }
+                    
+                    if (dy > 40) {
+                      _isDragging = false;
+                      if (!_focusNode.hasFocus) {
+                        _focusNode.requestFocus();
+                      }
+                      if (_showSwipeHint) {
+                        setState(() => _showSwipeHint = false);
+                        final prefs = ref.read(preferencesProvider);
+                        final seen = prefs.getSeenHints();
+                        if (!seen.contains('search_swipe_hint')) {
+                          prefs.saveSeenHints([...seen, 'search_swipe_hint']);
+                        }
+                      }
+                    }
+                  },
+                  onPointerUp: (e) => _isDragging = false,
+                  onPointerCancel: (e) => _isDragging = false,
+                  child: Column(
+                    children: [
                     const SizedBox(height: 24),
 
                     // ── Search bar + filter chips ─────────────────────────
@@ -317,41 +356,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
 
                     // ── Results ────────────────────────────────────────────
                     Expanded(
-                      child: Listener(
-                        onPointerDown: (e) {
-                          _dragStartY = e.position.dy;
-                          _isDragging = true;
-                        },
-                        onPointerMove: (e) {
-                          if (!_isDragging || !_isAtTop) return;
-                          
-                          final dy = e.position.dy - _dragStartY;
-                          if (dy > 40) { // 40px downward drag threshold
-                            _isDragging = false;
-                            if (!_focusNode.hasFocus) {
-                              _focusNode.requestFocus();
-                            }
-                            if (_showSwipeHint) {
-                              setState(() => _showSwipeHint = false);
-                              final prefs = ref.read(preferencesProvider);
-                              final seen = prefs.getSeenHints();
-                              if (!seen.contains('search_swipe_hint')) {
-                                prefs.saveSeenHints([...seen, 'search_swipe_hint']);
-                              }
-                            }
-                          }
-                        },
-                        onPointerUp: (e) => _isDragging = false,
-                        onPointerCancel: (e) => _isDragging = false,
-                        child: NotificationListener<ScrollNotification>(
-                          onNotification: (notification) {
-                            if (notification.metrics.axis == Axis.vertical) {
-                              _isAtTop = notification.metrics.pixels <= 0;
-                            }
-                            return false;
-                          },
-                          child: Stack(
-                            children: [
+                      child: Stack(
+                        children: [
                               searchState.query.isEmpty
                                   ? _buildRecentPlaces(searchState, theme)
                                   : _buildSearchResults(searchState, theme),
@@ -404,8 +410,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                             ],
                           ),
                         ),
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -413,8 +417,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   // ── Filter chip ────────────────────────────────────────────────────────
   Widget _buildFilterChip({
@@ -497,6 +502,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     }
     
     return ListView(
+      controller: _scrollController,
       padding: const EdgeInsets.symmetric(
           horizontal: 24.0, vertical: 8.0),
       children: [
@@ -581,6 +587,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
         .toList();
 
     return ListView(
+      controller: _scrollController,
       padding: const EdgeInsets.symmetric(
           horizontal: 24.0, vertical: 8.0),
       children: [

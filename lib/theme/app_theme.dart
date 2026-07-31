@@ -149,6 +149,7 @@ class AppTheme {
     return ThemeData(
       brightness: Brightness.light,
       scaffoldBackgroundColor: AppColors.popBackground,
+      canvasColor: AppColors.popSurface,
       primaryColor: AppColors.popPrimary,
       colorScheme: const ColorScheme.light(
         primary: AppColors.popPrimary,
@@ -162,6 +163,13 @@ class AppTheme {
         foregroundColor: AppColors.popTextPrimary,
         elevation: 0,
         centerTitle: true,
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: AppColors.popSurface,
+        modalBackgroundColor: AppColors.popSurface,
+      ),
+      dialogTheme: const DialogThemeData(
+        backgroundColor: AppColors.popSurface,
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: AppColors.popSurface,
@@ -194,6 +202,7 @@ class AppTheme {
     return ThemeData(
       brightness: Brightness.dark,
       scaffoldBackgroundColor: AppColors.duskBackground,
+      canvasColor: AppColors.duskSurface,
       primaryColor: AppColors.duskPrimary,
       colorScheme: const ColorScheme.dark(
         primary: AppColors.duskPrimary,
@@ -207,6 +216,13 @@ class AppTheme {
         foregroundColor: AppColors.duskTextPrimary,
         elevation: 0,
         centerTitle: true,
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: AppColors.duskSurface,
+        modalBackgroundColor: AppColors.duskSurface,
+      ),
+      dialogTheme: const DialogThemeData(
+        backgroundColor: AppColors.duskSurface,
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: AppColors.duskSurface,
@@ -239,6 +255,7 @@ class AppTheme {
     return ThemeData(
       brightness: Brightness.dark,
       scaffoldBackgroundColor: AppColors.freshBackground,
+      canvasColor: AppColors.freshSurface,
       primaryColor: AppColors.freshPrimary,
       colorScheme: const ColorScheme.dark(
         primary: AppColors.freshPrimary,
@@ -252,6 +269,13 @@ class AppTheme {
         foregroundColor: AppColors.freshTextPrimary,
         elevation: 0,
         centerTitle: true,
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: AppColors.freshSurface,
+        modalBackgroundColor: AppColors.freshSurface,
+      ),
+      dialogTheme: const DialogThemeData(
+        backgroundColor: AppColors.freshSurface,
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: AppColors.freshSurface,

@@ -455,8 +455,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
         final c = entry.scope.chapter;
         final v = entry.scope.verse;
         if (b != null && c != null) {
-          chaptersWithCommentary.add('$b|$c');
-          if (v != null) {
+          if (entry.scope.type == 'chapter') {
+            chaptersWithCommentary.add('$b|$c');
+          }
+          if (entry.scope.type == 'verse' && v != null) {
             versesWithCommentary.add('$b|$c|$v');
           }
         }
@@ -2097,13 +2099,23 @@ class _TypographyBottomSheet extends ConsumerWidget {
     final theme = Theme.of(context);
     final typography = ref.watch(typographyProvider);
     final typographyNotifier = ref.read(typographyProvider.notifier);
+    final appThemeMode = ref.watch(themeProvider);
+
+    Color getSheetSurface() {
+      switch (appThemeMode) {
+        case AppThemeMode.pop: return const Color(0xFFF4F5F7);
+        case AppThemeMode.dusk: return const Color(0xFF312C51);
+        case AppThemeMode.fresh: return const Color(0xFF132C33);
+        default: return theme.scaffoldBackgroundColor;
+      }
+    }
 
     final fonts = ['EB Garamond', 'Inter', 'Gentium Book Plus', 'Lora', 'Literata', 'Lexend'];
 
     return BouncyEntrance(
       delay: const Duration(milliseconds: 50),
       child: Material(
-        color: theme.scaffoldBackgroundColor,
+        color: getSheetSurface(),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
         clipBehavior: Clip.antiAlias,
         child: SafeArea(
@@ -2120,7 +2132,9 @@ class _TypographyBottomSheet extends ConsumerWidget {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                    color: appThemeMode == AppThemeMode.dusk || appThemeMode == AppThemeMode.fresh || appThemeMode == AppThemeMode.pop
+                        ? theme.primaryColor
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -2575,6 +2589,9 @@ class _VerseContextMenuContentState extends ConsumerState<VerseContextMenuConten
     final hasNote = ref.watch(notesProvider).any((n) => n.reference == verseKey);
     final isHighlighted = ref.watch(highlightsProvider).containsKey(verseKey);
     final theme = Theme.of(context);
+    
+    final commentaryNotifier = ref.read(commentaryProvider.notifier);
+    final bool hasCommentary = targetVerses.any((v) => commentaryNotifier.commentaryForVerse(widget.bookName, widget.chapterNum, v).isNotEmpty);
 
     // Default icon row
     final actionButtons = [
@@ -2604,14 +2621,15 @@ class _VerseContextMenuContentState extends ConsumerState<VerseContextMenuConten
             VerseActionLogic.handleCopy(context, ref, widget.bookName, widget.chapterNum, targetVerses);
           }
         ),
-        _ContextMenuButton(
-          icon: Icons.lightbulb_outline_rounded,
-          label: 'Commentary',
-          onTap: () {
-            widget.onDismiss();
-            VerseActionLogic.handleCommentary(context, ref, widget.bookName, widget.chapterNum, widget.verseNumber, targetVerses);
-          }
-        ),
+        if (hasCommentary)
+          _ContextMenuButton(
+            icon: Icons.lightbulb_outline_rounded,
+            label: 'Commentary',
+            onTap: () {
+              widget.onDismiss();
+              VerseActionLogic.handleCommentary(context, ref, widget.bookName, widget.chapterNum, widget.verseNumber, targetVerses);
+            }
+          ),
         _ContextMenuButton(
           icon: Icons.ios_share_rounded,
           label: 'Share',
