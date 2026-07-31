@@ -482,6 +482,7 @@ class TodayView extends StatefulWidget {
 
 class _TodayViewState extends State<TodayView> {
   late DateTime _displayMonth;
+  bool _isYearView = false;
 
   @override
   void initState() {
@@ -500,13 +501,29 @@ class _TodayViewState extends State<TodayView> {
     setState(() => _displayMonth = DateTime(_displayMonth.year, _displayMonth.month + 1, 1));
   }
 
+  void _jumpToMonth(DateTime month) {
+    HapticFeedback.lightImpact();
+    setState(() {
+      _displayMonth = month;
+      _isYearView = false;
+    });
+  }
+
+  void _toggleYearView() {
+    HapticFeedback.selectionClick();
+    setState(() => _isYearView = !_isYearView);
+  }
+
   @override
   Widget build(BuildContext context) {
     return _TodayViewBody(
       planState: widget.planState,
       displayMonth: _displayMonth,
+      isYearView: _isYearView,
       onPrevMonth: _prevMonth,
       onNextMonth: _nextMonth,
+      onJumpToMonth: _jumpToMonth,
+      onToggleYearView: _toggleYearView,
     );
   }
 }
@@ -514,14 +531,20 @@ class _TodayViewState extends State<TodayView> {
 class _TodayViewBody extends ConsumerWidget {
   final ReadingPlanState planState;
   final DateTime displayMonth;
+  final bool isYearView;
   final VoidCallback onPrevMonth;
   final VoidCallback onNextMonth;
+  final void Function(DateTime) onJumpToMonth;
+  final VoidCallback onToggleYearView;
 
   const _TodayViewBody({
     required this.planState,
     required this.displayMonth,
+    required this.isYearView,
     required this.onPrevMonth,
     required this.onNextMonth,
+    required this.onJumpToMonth,
+    required this.onToggleYearView,
   });
 
   void _openSettings(BuildContext context, WidgetRef ref, ReadingPlanState planState) {
@@ -639,29 +662,23 @@ class _TodayViewBody extends ConsumerWidget {
 
             const SizedBox(height: 28),
 
-            GestureDetector(
-              onHorizontalDragEnd: (details) {
-                if (details.primaryVelocity == null) return;
-                if (details.primaryVelocity! < -300) {
-                  onNextMonth();
-                } else if (details.primaryVelocity! > 300) {
-                  onPrevMonth();
-                }
+            _AdaptivePlanCalendar(
+              planState: planState,
+              displayMonth: displayMonth,
+              isYearView: isYearView,
+              onPrevMonth: onPrevMonth,
+              onNextMonth: onNextMonth,
+              onJumpToMonth: onJumpToMonth,
+              onToggleYearView: onToggleYearView,
+              scheduledMap: scheduledMap,
+              realToday: realNow,
+              isScheduled: isScheduled,
+              gold: gold,
+              theme: theme,
+              onDayTap: (dayNum) {
+                HapticFeedback.selectionClick();
+                Navigator.push(context, MaterialPageRoute(builder: (_) => DayView(planId: planState.planId, dayNum: dayNum)));
               },
-              child: _PlanMonthCalendar(
-                planState: planState,
-                displayMonth: displayMonth,
-                onPrevMonth: onPrevMonth,
-                onNextMonth: onNextMonth,
-                scheduledMap: scheduledMap,
-                realToday: realNow,
-                isScheduled: isScheduled,
-                gold: gold,
-                onDayTap: (dayNum) {
-                  HapticFeedback.selectionClick();
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => DayView(planId: planState.planId, dayNum: dayNum)));
-                },
-              ),
             ),
           ],
         ),
@@ -1391,6 +1408,338 @@ class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _AdaptivePlanCalendar extends StatelessWidget {
+  final ReadingPlanState planState;
+  final DateTime displayMonth;
+  final bool isYearView;
+  final VoidCallback onPrevMonth;
+  final VoidCallback onNextMonth;
+  final void Function(DateTime) onJumpToMonth;
+  final VoidCallback onToggleYearView;
+  final Map<String, int> scheduledMap;
+  final DateTime realToday;
+  final bool isScheduled;
+  final Color gold;
+  final ThemeData theme;
+  final void Function(int dayNum) onDayTap;
+
+  const _AdaptivePlanCalendar({
+    required this.planState,
+    required this.displayMonth,
+    required this.isYearView,
+    required this.onPrevMonth,
+    required this.onNextMonth,
+    required this.onJumpToMonth,
+    required this.onToggleYearView,
+    required this.scheduledMap,
+    required this.realToday,
+    required this.isScheduled,
+    required this.gold,
+    required this.theme,
+    required this.onDayTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final totalDays = planState.planData.length;
+
+    if (totalDays <= 14) {
+      return _PlanCompactCalendar(
+        planState: planState,
+        gold: gold,
+        theme: theme,
+        onDayTap: onDayTap,
+      );
+    } else if (totalDays <= 90) {
+      return GestureDetector(
+        onHorizontalDragEnd: (details) {
+          if (details.primaryVelocity == null) return;
+          if (details.primaryVelocity! < -300) {
+            onNextMonth();
+          } else if (details.primaryVelocity! > 300) {
+            onPrevMonth();
+          }
+        },
+        child: _PlanMonthCalendar(
+          planState: planState,
+          displayMonth: displayMonth,
+          onPrevMonth: onPrevMonth,
+          onNextMonth: onNextMonth,
+          scheduledMap: scheduledMap,
+          realToday: realToday,
+          isScheduled: isScheduled,
+          gold: gold,
+          onDayTap: onDayTap,
+        ),
+      );
+    } else {
+      final startedOn = planState.planStartedOn ?? DateTime.now();
+      int currentMonthNum = (displayMonth.year - startedOn.year) * 12 + displayMonth.month - startedOn.month + 1;
+      if (currentMonthNum < 1) currentMonthNum = 1;
+
+      final totalMonths = (totalDays / (planState.restDay != null ? 26 : 30)).ceil();
+      final displayTotalMonths = totalMonths > 12 && totalDays <= 366 ? 12 : totalMonths;
+      final pct = totalDays > 0 ? (planState.completedReadings.length / totalDays * 100).floor() : 0;
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Month $currentMonthNum of $displayTotalMonths · $pct% complete',
+                style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.6), fontWeight: FontWeight.bold),
+              ),
+              ToggleButtons(
+                isSelected: [!isYearView, isYearView],
+                onPressed: (index) {
+                  if ((index == 0 && isYearView) || (index == 1 && !isYearView)) {
+                    onToggleYearView();
+                  }
+                },
+                borderRadius: BorderRadius.circular(8),
+                constraints: const BoxConstraints(minHeight: 28, minWidth: 48),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                selectedColor: gold,
+                fillColor: gold.withValues(alpha: 0.15),
+                children: const [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    child: Text('Month', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    child: Text('Year', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          if (isYearView)
+            _PlanYearCalendar(
+              planState: planState,
+              startedOn: startedOn,
+              currentDisplayMonth: displayMonth,
+              gold: gold,
+              theme: theme,
+              onMonthTap: onJumpToMonth,
+            )
+          else
+            GestureDetector(
+              onHorizontalDragEnd: (details) {
+                if (details.primaryVelocity == null) return;
+                if (details.primaryVelocity! < -300) {
+                  onNextMonth();
+                } else if (details.primaryVelocity! > 300) {
+                  onPrevMonth();
+                }
+              },
+              child: _PlanMonthCalendar(
+                planState: planState,
+                displayMonth: displayMonth,
+                onPrevMonth: onPrevMonth,
+                onNextMonth: onNextMonth,
+                scheduledMap: scheduledMap,
+                realToday: realToday,
+                isScheduled: isScheduled,
+                gold: gold,
+                onDayTap: onDayTap,
+              ),
+            ),
+        ],
+      );
+    }
+  }
+}
+
+class _PlanCompactCalendar extends StatelessWidget {
+  final ReadingPlanState planState;
+  final Color gold;
+  final ThemeData theme;
+  final void Function(int dayNum) onDayTap;
+
+  const _PlanCompactCalendar({
+    required this.planState,
+    required this.gold,
+    required this.theme,
+    required this.onDayTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: theme.dividerColor.withValues(alpha: 0.5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'Full Plan View',
+            style: TextStyle(fontFamily: 'EB Garamond', fontSize: 20, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface),
+          ),
+          const SizedBox(height: 16),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 7,
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+            ),
+            itemCount: planState.planData.length,
+            itemBuilder: (context, index) {
+              final readingDay = index + 1;
+              final isCompleted = planState.completedReadings.contains(readingDay);
+              final isMissed = planState.missedDays.contains(readingDay);
+              final isToday = planState.todayReadingDay == readingDay;
+
+              Color? circleBg;
+              Color? circleBorder;
+              Color textColor = theme.colorScheme.onSurface;
+              Widget? indicator;
+
+              if (isCompleted) {
+                circleBg = gold.withValues(alpha: 0.2);
+                textColor = gold;
+                indicator = Icon(Icons.check_rounded, size: 10, color: gold);
+              } else if (isToday) {
+                circleBg = gold;
+                textColor = theme.colorScheme.surface;
+              } else if (isMissed) {
+                circleBorder = theme.colorScheme.onSurface.withValues(alpha: 0.4);
+                textColor = theme.colorScheme.onSurface.withValues(alpha: 0.6);
+              } else {
+                textColor = theme.colorScheme.onSurface.withValues(alpha: 0.85);
+              }
+
+              return GestureDetector(
+                onTap: () => onDayTap(readingDay),
+                behavior: HitTestBehavior.opaque,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        color: circleBg,
+                        shape: BoxShape.circle,
+                        border: circleBorder != null ? Border.all(color: circleBorder, width: 1.5) : null,
+                      ),
+                      child: Center(
+                        child: Text(
+                          '$readingDay',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: textColor),
+                        ),
+                      ),
+                    ),
+                    if (indicator != null) ...[
+                      const SizedBox(height: 4),
+                      indicator,
+                    ],
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PlanYearCalendar extends StatelessWidget {
+  final ReadingPlanState planState;
+  final DateTime startedOn;
+  final DateTime currentDisplayMonth;
+  final Color gold;
+  final ThemeData theme;
+  final void Function(DateTime) onMonthTap;
+
+  const _PlanYearCalendar({
+    required this.planState,
+    required this.startedOn,
+    required this.currentDisplayMonth,
+    required this.gold,
+    required this.theme,
+    required this.onMonthTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final now = DateTime.now();
+    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        childAspectRatio: 1.4,
+        mainAxisSpacing: 12,
+        crossAxisSpacing: 12,
+      ),
+      itemCount: 12,
+      itemBuilder: (context, index) {
+        final targetMonth = DateTime(startedOn.year, startedOn.month + index, 1);
+
+        final isCurrentMonth = targetMonth.year == now.year && targetMonth.month == now.month;
+        final isPast = targetMonth.isBefore(DateTime(now.year, now.month, 1));
+        final isSelected = targetMonth.year == currentDisplayMonth.year && targetMonth.month == currentDisplayMonth.month;
+
+        Color bgColor = theme.colorScheme.surface;
+        Color textColor = theme.colorScheme.onSurface;
+        Color borderColor = theme.dividerColor.withValues(alpha: 0.3);
+
+        if (isSelected) {
+          borderColor = gold;
+          bgColor = gold.withValues(alpha: 0.1);
+          textColor = gold;
+        } else if (isCurrentMonth) {
+          borderColor = gold.withValues(alpha: 0.5);
+          textColor = gold;
+        } else if (isPast) {
+          bgColor = theme.colorScheme.onSurface.withValues(alpha: 0.05);
+          textColor = theme.colorScheme.onSurface.withValues(alpha: 0.5);
+        }
+
+        return GestureDetector(
+          onTap: () => onMonthTap(targetMonth),
+          child: Container(
+            decoration: BoxDecoration(
+              color: bgColor,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: borderColor, width: isSelected ? 2 : 1),
+            ),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    months[targetMonth.month - 1],
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: textColor),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '${targetMonth.year}',
+                    style: TextStyle(fontSize: 11, color: textColor.withValues(alpha: 0.7)),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
