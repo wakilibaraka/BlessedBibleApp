@@ -160,6 +160,47 @@ class PreferencesService {
     return null;
   }
 
+  // --- Custom Reading Plans ---
+  static const String _customPlansKeyPrefix = 'custom_plan_';
+  static const String _customPlanIdsKey = 'custom_plan_ids';
+
+  void saveCustomPlan(String id, Map<String, dynamic> data) {
+    // Save the plan data
+    prefs.setString('$_customPlansKeyPrefix$id', jsonEncode(data));
+    
+    // Add to the list of IDs if not present
+    List<String> ids = getCustomPlanIds();
+    if (!ids.contains(id)) {
+      ids.add(id);
+      prefs.setStringList(_customPlanIdsKey, ids);
+    }
+  }
+
+  Map<String, dynamic>? getCustomPlan(String id) {
+    final jsonString = prefs.getString('$_customPlansKeyPrefix$id');
+    if (jsonString != null) {
+      try {
+        return jsonDecode(jsonString) as Map<String, dynamic>;
+      } catch (_) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  List<String> getCustomPlanIds() {
+    return prefs.getStringList(_customPlanIdsKey) ?? [];
+  }
+  
+  void deleteCustomPlan(String id) {
+    prefs.remove('$_customPlansKeyPrefix$id');
+    List<String> ids = getCustomPlanIds();
+    if (ids.contains(id)) {
+      ids.remove(id);
+      prefs.setStringList(_customPlanIdsKey, ids);
+    }
+  }
+
   /// Returns the persisted rest-day preference (Sunday-first, 1=Sun … 7=Sat).
   /// Default is 7 (Saturday / Sabbath).
   int getReadingPlanRestDay() => prefs.getInt(_readingPlanRestDayKey) ?? 7;
