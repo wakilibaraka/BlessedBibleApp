@@ -1081,10 +1081,12 @@ class _ReadingPlanBannerState extends ConsumerState<ReadingPlanBanner> with Auto
             ),
           ],
         ),
-        child: TexturedGlassContainer(
-          borderRadius: BorderRadius.circular(24),
-          padding: EdgeInsets.zero,
-          child: Column(
+        child: RepaintBoundary(
+          child: TexturedGlassContainer(
+            isScrollable: true,
+            borderRadius: BorderRadius.circular(24),
+            padding: EdgeInsets.zero,
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Material(
@@ -1153,13 +1155,22 @@ class _ReadingPlanBannerState extends ConsumerState<ReadingPlanBanner> with Auto
           ),
         ),
       ),
+      ),
     );
   }
 }
 
-class _PlanRowWidget extends ConsumerWidget {
+class _PlanRowWidget extends ConsumerStatefulWidget {
   final String planId;
   const _PlanRowWidget({super.key, required this.planId});
+
+  @override
+  ConsumerState<_PlanRowWidget> createState() => _PlanRowWidgetState();
+}
+
+class _PlanRowWidgetState extends ConsumerState<_PlanRowWidget> {
+  double _lastPct = 0.0;
+  bool _isInit = false;
 
   String _getPlanTitle(String planId, WidgetRef ref) {
     if (planId == 'chronological_1yr') return 'Chronological Bible in a Year';
@@ -1170,12 +1181,20 @@ class _PlanRowWidget extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final planId = widget.planId;
     final planState = ref.watch(readingPlanProvider(planId));
     final title = _getPlanTitle(planId, ref);
     final pct = planState.percentComplete;
     
+    if (!_isInit) {
+      _lastPct = pct;
+      _isInit = true;
+    }
+    final beginPct = _lastPct;
+    _lastPct = pct;
+
     String subtitle = 'Day ${planState.currentDay} of ${planState.planData.length}';
     if (planState.currentDay > 0 && planState.currentDay <= planState.planData.length) {
       final dayData = planState.planData[planState.currentDay - 1];
@@ -1236,7 +1255,7 @@ class _PlanRowWidget extends ConsumerWidget {
                 ),
                 const SizedBox(width: 12),
                 TweenAnimationBuilder<double>(
-                  tween: Tween<double>(begin: 0, end: pct),
+                  tween: Tween<double>(begin: beginPct, end: pct),
                   duration: const Duration(milliseconds: 800),
                   curve: Curves.easeOutCubic,
                   builder: (context, value, _) {
@@ -1320,10 +1339,12 @@ class CommentaryBanner extends ConsumerWidget {
     return AnimatedSize(
       duration: const Duration(milliseconds: 250),
       curve: Curves.easeInOut,
-      child: TexturedGlassContainer(
-        borderRadius: BorderRadius.circular(28),
-        padding: EdgeInsets.zero,
-        child: Container(
+      child: RepaintBoundary(
+        child: TexturedGlassContainer(
+          isScrollable: true,
+          borderRadius: BorderRadius.circular(28),
+          padding: EdgeInsets.zero,
+          child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(28),
             gradient: LinearGradient(
@@ -1414,6 +1435,7 @@ class CommentaryBanner extends ConsumerWidget {
           ),
         ),
       ),
+      ),
     );
   }
 }
@@ -1428,10 +1450,12 @@ class VotdArchiveBanner extends ConsumerWidget {
     return AnimatedSize(
       duration: const Duration(milliseconds: 250),
       curve: Curves.easeInOut,
-      child: TexturedGlassContainer(
-        borderRadius: BorderRadius.circular(20),
-        padding: EdgeInsets.zero,
-        child: Material(
+      child: RepaintBoundary(
+        child: TexturedGlassContainer(
+          isScrollable: true,
+          borderRadius: BorderRadius.circular(20),
+          padding: EdgeInsets.zero,
+          child: Material(
           color: Colors.transparent,
           child: InkWell(
             borderRadius: BorderRadius.circular(20),
@@ -1509,6 +1533,7 @@ class VotdArchiveBanner extends ConsumerWidget {
             ),
           ),
         ),
+      ),
       ),
     );
   }

@@ -222,6 +222,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           BouncyEntrance(
             delay: const Duration(milliseconds: 400),
             child: GlassContainer(
+              isScrollable: true,
               borderRadius: BorderRadius.circular(24),
             // Tighter vertical padding so the card fits without nav overlap
             padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
@@ -408,6 +409,7 @@ class _PillGlassButton extends StatelessWidget {
       child: SizedBox(
         height: 48,
         child: GlassContainer(
+          isScrollable: true,
           borderRadius: BorderRadius.circular(50),
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(

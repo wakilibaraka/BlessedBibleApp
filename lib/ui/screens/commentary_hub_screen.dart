@@ -138,8 +138,10 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                  child: TexturedGlassContainer(
-                    borderRadius: BorderRadius.circular(20),
+                  child: RepaintBoundary(
+                    child: TexturedGlassContainer(
+                      isScrollable: true,
+                      borderRadius: BorderRadius.circular(20),
                     child: Padding(
                       padding: const EdgeInsets.all(20),
                       child: Column(
@@ -218,6 +220,7 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
                         ],
                       ),
                     ),
+                    ),
                   ),
                 ),
               ),
@@ -264,9 +267,11 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
           _selectedSourceId = source.id;
         });
       } : null,
-      child: TexturedGlassContainer(
-        borderRadius: BorderRadius.circular(16),
-        padding: EdgeInsets.zero,
+      child: RepaintBoundary(
+        child: TexturedGlassContainer(
+          isScrollable: true,
+          borderRadius: BorderRadius.circular(16),
+          padding: EdgeInsets.zero,
         child: Container(
           padding: const EdgeInsets.all(16.0),
           decoration: BoxDecoration(
@@ -318,6 +323,7 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
             ],
           ),
         ),
+      ),
       ),
     );
   }

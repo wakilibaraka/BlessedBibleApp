@@ -14,6 +14,7 @@ class TexturedGlassContainer extends ConsumerWidget {
   final double sigmaX;
   final double sigmaY;
   final double borderOpacity;
+  final bool isScrollable;
 
   const TexturedGlassContainer({
     super.key,
@@ -24,6 +25,7 @@ class TexturedGlassContainer extends ConsumerWidget {
     this.sigmaX = 35.0,
     this.sigmaY = 35.0,
     this.borderOpacity = 0.5,
+    this.isScrollable = false,
   });
 
   @override
@@ -32,8 +34,10 @@ class TexturedGlassContainer extends ConsumerWidget {
     final isGlassy = ref.watch(glassUiProvider);
     final radius = borderRadius ?? BorderRadius.circular(24);
 
+    final useBlur = isGlassy && !isScrollable;
+
     Color fillColor;
-    if (isGlassy) {
+    if (useBlur) {
       switch (appTheme.resolve(context)) {
         case AppThemeMode.sepia:
           fillColor = Colors.white.withValues(alpha: 0.35);
@@ -42,9 +46,23 @@ class TexturedGlassContainer extends ConsumerWidget {
           fillColor = Colors.black.withValues(alpha: 0.08);
           break;
         case AppThemeMode.dark:
-      case AppThemeMode.oled:
+        case AppThemeMode.oled:
         case AppThemeMode.automatic:
           fillColor = Colors.black.withValues(alpha: 0.15);
+          break;
+      }
+    } else if (isGlassy && isScrollable) {
+      switch (appTheme.resolve(context)) {
+        case AppThemeMode.sepia:
+          fillColor = const Color(0xFFF4ECD8).withValues(alpha: 0.85); // cream
+          break;
+        case AppThemeMode.light:
+          fillColor = Colors.white.withValues(alpha: 0.85);
+          break;
+        case AppThemeMode.dark:
+        case AppThemeMode.oled:
+        case AppThemeMode.automatic:
+          fillColor = Colors.black.withValues(alpha: 0.55);
           break;
       }
     } else {
@@ -82,7 +100,7 @@ class TexturedGlassContainer extends ConsumerWidget {
       child: ClipRRect(
         borderRadius: radius,
         clipBehavior: Clip.antiAlias,
-        child: isGlassy
+        child: useBlur
             ? RepaintBoundary(
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: sigmaX, sigmaY: sigmaY),
@@ -103,7 +121,20 @@ class TexturedGlassContainer extends ConsumerWidget {
                   ),
                 ),
               )
-            : Container(
+            : isGlassy && isScrollable
+                ? Container(
+                    padding: padding,
+                    decoration: BoxDecoration(
+                      color: fillColor,
+                      border: Border.all(
+                        width: 0.5,
+                        color: Colors.white.withValues(alpha: 0.2), // slightly more visible border
+                      ),
+                      borderRadius: radius,
+                    ),
+                    child: child,
+                  )
+                : Container(
                 padding: padding,
                 decoration: BoxDecoration(
                   color: fillColor,

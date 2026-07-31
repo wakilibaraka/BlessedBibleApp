@@ -102,9 +102,11 @@ class VotdArchiveScreen extends ConsumerWidget {
                           )
                         ] : [],
                       ),
-                      child: TexturedGlassContainer(
-                        borderRadius: BorderRadius.circular(20),
-                        padding: EdgeInsets.zero,
+                      child: RepaintBoundary(
+                        child: TexturedGlassContainer(
+                          isScrollable: true,
+                          borderRadius: BorderRadius.circular(20),
+                          padding: EdgeInsets.zero,
                         child: Material(
                           color: Colors.transparent,
                           child: InkWell(
@@ -177,7 +179,8 @@ class VotdArchiveScreen extends ConsumerWidget {
                         ),
                       ),
                     ),
-                  );
+                  ),
+                );
                 },
                 childCount: dates.length,
               ),

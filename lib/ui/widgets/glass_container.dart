@@ -8,6 +8,7 @@ class GlassContainer extends StatelessWidget {
   final BorderRadius? borderRadius;
   final EdgeInsetsGeometry? padding;
   final EdgeInsetsGeometry? margin;
+  final bool isScrollable;
 
   const GlassContainer({
     super.key,
@@ -15,6 +16,7 @@ class GlassContainer extends StatelessWidget {
     this.borderRadius,
     this.padding,
     this.margin,
+    this.isScrollable = false,
   });
 
   @override
@@ -40,31 +42,50 @@ class GlassContainer extends StatelessWidget {
       child: ClipRRect(
         borderRadius: radius,
         clipBehavior: Clip.antiAlias,
-        child: RepaintBoundary(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-            child: Container(
-              padding: padding,
-              decoration: BoxDecoration(
-                color: isDark
-                    ? Colors.black.withValues(alpha: 0.35)
-                    : isWarmGold
-                        ? Colors.white.withValues(alpha: 0.65)
-                        : Colors.white.withValues(alpha: 0.65),
-                borderRadius: radius,
-                border: Border.all(
+        child: isScrollable
+            ? Container(
+                padding: padding,
+                decoration: BoxDecoration(
                   color: isDark
-                      ? Colors.white.withValues(alpha: 0.12)
+                      ? Colors.black.withValues(alpha: 0.55)
                       : isWarmGold
-                          ? Colors.white.withValues(alpha: 0.40)
-                          : Colors.white.withValues(alpha: 0.40),
-                  width: 1.0,
+                          ? const Color(0xFFF4ECD8).withValues(alpha: 0.85) // cream
+                          : Colors.white.withValues(alpha: 0.85),
+                  borderRadius: radius,
+                  border: Border.all(
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.15)
+                        : Colors.white.withValues(alpha: 0.50),
+                    width: 1.0,
+                  ),
+                ),
+                child: child,
+              )
+            : RepaintBoundary(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                  child: Container(
+                    padding: padding,
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? Colors.black.withValues(alpha: 0.35)
+                          : isWarmGold
+                              ? Colors.white.withValues(alpha: 0.65)
+                              : Colors.white.withValues(alpha: 0.65),
+                      borderRadius: radius,
+                      border: Border.all(
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.12)
+                            : isWarmGold
+                                ? Colors.white.withValues(alpha: 0.40)
+                                : Colors.white.withValues(alpha: 0.40),
+                        width: 1.0,
+                      ),
+                    ),
+                    child: child,
+                  ),
                 ),
               ),
-              child: child,
-            ),
-          ),
-        ),
       ),
     );
   }
