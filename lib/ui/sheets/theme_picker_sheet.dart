@@ -97,24 +97,35 @@ class ThemePickerSheet extends ConsumerWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: _ModeTogglePill(
-                          label: 'Single Theme',
-                          icon: Icons.lock_outline,
-                          isActive: isSingleTheme,
-                          onTap: () {
-                            HapticFeedback.selectionClick();
-                            ref.read(themeProvider.notifier).setSingleTheme(!isSingleTheme);
-                          },
+                        child: Builder(
+                          builder: (context) {
+                            final previewProps = _getThemeProperties(currentMode, theme);
+                            return _ThemePill(
+                              label: isSingleTheme ? 'Locked:\n${previewProps.name.replaceAll('\n', ' ')}' : 'Single:\n${previewProps.name.replaceAll('\n', ' ')}',
+                              mode: currentMode,
+                              currentMode: currentMode,
+                              fillColor: previewProps.fill,
+                              textColor: previewProps.text,
+                              swatchColors: previewProps.swatches,
+                              overrideIsSelected: isSingleTheme,
+                              onTap: () {
+                                ref.read(themeProvider.notifier).setSingleTheme(!isSingleTheme);
+                              },
+                            );
+                          }
                         ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
-                        child: _ModeTogglePill(
+                        child: _ThemePill(
                           label: 'Match System',
-                          icon: Icons.brightness_auto_rounded,
-                          isActive: isMatchSystem,
+                          mode: AppThemeMode.automatic,
+                          currentMode: currentMode,
+                          fillColor: theme.colorScheme.primaryContainer,
+                          textColor: theme.colorScheme.onPrimaryContainer,
+                          swatchColors: [theme.primaryColor, theme.colorScheme.secondary, theme.colorScheme.surface],
+                          overrideIsSelected: isMatchSystem,
                           onTap: () {
-                            HapticFeedback.selectionClick();
                             ref.read(themeProvider.notifier).setMatchSystem(!isMatchSystem);
                           },
                         ),
@@ -365,6 +376,8 @@ class _ThemePill extends ConsumerStatefulWidget {
   final Color fillColor;
   final Color textColor;
   final List<Color> swatchColors;
+  final bool? overrideIsSelected;
+  final VoidCallback? onTap;
 
   const _ThemePill({
     required this.label,
@@ -373,6 +386,8 @@ class _ThemePill extends ConsumerStatefulWidget {
     required this.fillColor,
     required this.textColor,
     required this.swatchColors,
+    this.overrideIsSelected,
+    this.onTap,
   });
 
   @override
@@ -404,10 +419,10 @@ class _ThemePillState extends ConsumerState<_ThemePill> with SingleTickerProvide
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isSelected = widget.currentMode == widget.mode ||
+    final isSelected = widget.overrideIsSelected ?? (widget.currentMode == widget.mode ||
         (widget.currentMode == AppThemeMode.automatic &&
             widget.mode == AppThemeMode.automatic.resolve(context) &&
-            widget.mode != AppThemeMode.automatic);
+            widget.mode != AppThemeMode.automatic));
 
     final bgLuminance = (isSelected ? widget.fillColor : theme.colorScheme.surface).computeLuminance();
     final isDarkBg = bgLuminance < 0.4;
@@ -444,7 +459,11 @@ class _ThemePillState extends ConsumerState<_ThemePill> with SingleTickerProvide
       onTap: () {
         HapticFeedback.selectionClick();
         _triggerSparkle();
-        ref.read(themeProvider.notifier).setTheme(widget.mode);
+        if (widget.onTap != null) {
+          widget.onTap!();
+        } else {
+          ref.read(themeProvider.notifier).setTheme(widget.mode);
+        }
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
@@ -787,68 +806,22 @@ class _SparkleSpec {
   const _SparkleSpec(this.relX, this.relY, this.dirX, this.dirY);
 }
 
-class _ModeTogglePill extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final bool isActive;
-  final VoidCallback onTap;
-
-  const _ModeTogglePill({
-    required this.label,
-    required this.icon,
-    required this.isActive,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        height: 52,
-        decoration: BoxDecoration(
-          color: isActive ? theme.colorScheme.primaryContainer : theme.colorScheme.onSurface.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(26),
-          border: Border.all(
-            color: isActive ? theme.primaryColor : theme.colorScheme.onSurface.withValues(alpha: 0.1),
-            width: isActive ? 2 : 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.white.withValues(alpha: 0.12),
-              offset: const Offset(-2, -2),
-              blurRadius: 4,
-            ),
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.15),
-              offset: const Offset(3, 3),
-              blurRadius: 6,
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 16,
-              color: isActive ? theme.colorScheme.onPrimaryContainer : theme.colorScheme.onSurface,
-            ),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: TextStyle(
-                color: isActive ? theme.colorScheme.onPrimaryContainer : theme.colorScheme.onSurface,
-                fontWeight: isActive ? FontWeight.w900 : FontWeight.w600,
-                fontSize: 11,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+({String name, Color fill, Color text, List<Color> swatches}) _getThemeProperties(AppThemeMode mode, ThemeData theme) {
+  switch (mode) {
+    case AppThemeMode.light: return (name: 'Light', fill: AppColors.lightBackground, text: AppColors.lightTextPrimary, swatches: const [AppColors.lightBackground, AppColors.lightSurface, AppColors.lightAccent]);
+    case AppThemeMode.sepia: return (name: 'Sepia', fill: AppColors.sepiaBackground, text: AppColors.sepiaTextPrimary, swatches: const [AppColors.sepiaBackground, AppColors.sepiaSurface, AppColors.sepiaTextPrimary]);
+    case AppThemeMode.dark: return (name: 'Dark', fill: const Color(0xFF333333), text: AppColors.darkTextPrimary, swatches: const [Color(0xFF444444), Color(0xFF222222), Color(0xFF555555)]);
+    case AppThemeMode.oled: return (name: 'OLED', fill: Colors.black, text: AppColors.darkTextPrimary, swatches: const [Colors.black, Color(0xFF222222), Colors.black]);
+    case AppThemeMode.dawn: return (name: 'Dawn', fill: AppColors.dawnBackground, text: AppColors.dawnTextPrimary, swatches: const [AppColors.dawnPrimary, AppColors.dawnAccent, AppColors.dawnBackground]);
+    case AppThemeMode.fresh: return (name: 'Fresh', fill: AppColors.freshBackground, text: AppColors.freshTextPrimary, swatches: const [AppColors.freshPrimary, AppColors.freshAccent, AppColors.freshBackground]);
+    case AppThemeMode.dusk: return (name: 'Dusk', fill: AppColors.duskBackground, text: AppColors.duskTextPrimary, swatches: const [AppColors.duskPrimary, AppColors.duskAccent, AppColors.duskBackground]);
+    case AppThemeMode.lilies: return (name: 'Lilies', fill: AppColors.liliesBackground, text: AppColors.liliesTextPrimary, swatches: const [AppColors.liliesPrimary, AppColors.liliesAccent, AppColors.liliesBackground]);
+    case AppThemeMode.roses: return (name: 'Roses', fill: AppColors.rosesBackground, text: AppColors.rosesTextPrimary, swatches: const [AppColors.rosesPrimary, AppColors.rosesAccent, AppColors.rosesBackground]);
+    case AppThemeMode.olives: return (name: 'Olives', fill: AppColors.olivesBackground, text: AppColors.olivesTextPrimary, swatches: const [AppColors.olivesPrimary, AppColors.olivesAccent, AppColors.olivesBackground]);
+    case AppThemeMode.priestlyPurple: return (name: 'Priestly\nPurple', fill: AppColors.lightBackground, text: const Color(0xFF673AB7), swatches: const [Color(0xFF673AB7), Color(0xFF9575CD), AppColors.lightBackground]);
+    case AppThemeMode.galileeBlue: return (name: 'Galilee\nBlue', fill: AppColors.lightBackground, text: const Color(0xFF2196F3), swatches: const [Color(0xFF2196F3), Color(0xFF64B5F6), AppColors.lightBackground]);
+    case AppThemeMode.scarletRed: return (name: 'Scarlet\nRed', fill: AppColors.lightBackground, text: const Color(0xFFE53935), swatches: const [Color(0xFFE53935), Color(0xFFEF5350), AppColors.lightBackground]);
+    case AppThemeMode.automatic: return (name: 'Match\nSystem', fill: theme.colorScheme.primaryContainer, text: theme.colorScheme.onPrimaryContainer, swatches: [theme.primaryColor, theme.colorScheme.secondary, theme.colorScheme.surface]);
   }
 }
 
