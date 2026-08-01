@@ -42,6 +42,11 @@ class ThemePickerSheet extends ConsumerWidget {
       }
     }
 
+    final isSingleTheme = ref.watch(isSingleThemeProvider);
+    final isMatchSystem = ref.watch(isMatchSystemProvider);
+    final rotationPool = ref.watch(rotationPoolProvider);
+    final isRotationActive = !isSingleTheme && !isMatchSystem;
+
     return Container(
       decoration: BoxDecoration(
         color: getSheetSurface(),
@@ -89,14 +94,78 @@ class ThemePickerSheet extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _ThemePill(
-                    label: 'Match System',
-                    mode: AppThemeMode.automatic,
-                    currentMode: currentMode,
-                    fillColor: theme.colorScheme.primaryContainer,
-                    textColor: theme.colorScheme.onPrimaryContainer,
-                    swatchColors: [theme.primaryColor, theme.colorScheme.secondary, theme.colorScheme.surface],
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _ModeTogglePill(
+                          label: 'Single Theme',
+                          icon: Icons.lock_outline,
+                          isActive: isSingleTheme,
+                          onTap: () {
+                            HapticFeedback.selectionClick();
+                            ref.read(themeProvider.notifier).setSingleTheme(!isSingleTheme);
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _ModeTogglePill(
+                          label: 'Match System',
+                          icon: Icons.brightness_auto_rounded,
+                          isActive: isMatchSystem,
+                          onTap: () {
+                            HapticFeedback.selectionClick();
+                            ref.read(themeProvider.notifier).setMatchSystem(!isMatchSystem);
+                          },
+                        ),
+                      ),
+                    ],
                   ),
+                  if (isRotationActive) ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: theme.primaryColor.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: theme.primaryColor.withValues(alpha: 0.2)),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.auto_mode_rounded, size: 16, color: theme.primaryColor),
+                              const SizedBox(width: 6),
+                              Text(
+                                'Daily Rotation: Active (${rotationPool.length} themes)',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: theme.primaryColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                          InkWell(
+                            onTap: () => _showRotationPoolDialog(context, ref),
+                            child: Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: Text(
+                                'Edit Pool',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w900,
+                                  color: theme.primaryColor,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 16),
 
                   Text(
@@ -716,4 +785,141 @@ class _SparkleSpec {
   final double dirY;
 
   const _SparkleSpec(this.relX, this.relY, this.dirX, this.dirY);
+}
+
+class _ModeTogglePill extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  const _ModeTogglePill({
+    required this.label,
+    required this.icon,
+    required this.isActive,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        height: 52,
+        decoration: BoxDecoration(
+          color: isActive ? theme.colorScheme.primaryContainer : theme.colorScheme.onSurface.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(26),
+          border: Border.all(
+            color: isActive ? theme.primaryColor : theme.colorScheme.onSurface.withValues(alpha: 0.1),
+            width: isActive ? 2 : 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.white.withValues(alpha: 0.12),
+              offset: const Offset(-2, -2),
+              blurRadius: 4,
+            ),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.15),
+              offset: const Offset(3, 3),
+              blurRadius: 6,
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 16,
+              color: isActive ? theme.colorScheme.onPrimaryContainer : theme.colorScheme.onSurface,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                color: isActive ? theme.colorScheme.onPrimaryContainer : theme.colorScheme.onSurface,
+                fontWeight: isActive ? FontWeight.w900 : FontWeight.w600,
+                fontSize: 11,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+void _showRotationPoolDialog(BuildContext context, WidgetRef ref) {
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Theme.of(context).colorScheme.surface,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (context) {
+      return Consumer(
+        builder: (context, ref, child) {
+          final pool = ref.watch(rotationPoolProvider);
+          final notifier = ref.read(themeProvider.notifier);
+
+          final candidateThemes = [
+            (AppThemeMode.dawn, 'Dawn'),
+            (AppThemeMode.fresh, 'Fresh'),
+            (AppThemeMode.dusk, 'Dusk'),
+            (AppThemeMode.lilies, 'Lilies'),
+            (AppThemeMode.roses, 'Roses'),
+            (AppThemeMode.olives, 'Olives'),
+            (AppThemeMode.priestlyPurple, 'Priestly Purple'),
+            (AppThemeMode.galileeBlue, 'Galilee Blue'),
+            (AppThemeMode.scarletRed, 'Scarlet Red'),
+            (AppThemeMode.sepia, 'Sepia'),
+          ];
+
+          return Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Customize Daily Rotation Pool',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Select which themes to include in your daily rotation.',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: candidateThemes.map((item) {
+                    final isSelected = pool.contains(item.$1);
+                    return FilterChip(
+                      selected: isSelected,
+                      label: Text(item.$2),
+                      selectedColor: Theme.of(context).primaryColor.withValues(alpha: 0.2),
+                      onSelected: (_) {
+                        HapticFeedback.selectionClick();
+                        notifier.toggleThemeInPool(item.$1);
+                      },
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  );
 }
