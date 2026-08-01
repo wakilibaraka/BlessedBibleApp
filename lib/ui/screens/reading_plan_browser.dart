@@ -583,8 +583,14 @@ class _TodayViewBody extends ConsumerWidget {
 
     Color getThemeBackgroundColor() {
       switch (appThemeMode) {
-        case AppThemeMode.pop:
-          return const Color(0xFFF4F5F7);
+        case AppThemeMode.dawn:
+          return AppColors.dawnBackground;
+        case AppThemeMode.lilies:
+          return AppColors.liliesBackground;
+        case AppThemeMode.roses:
+          return AppColors.rosesBackground;
+        case AppThemeMode.olives:
+          return AppColors.olivesBackground;
         case AppThemeMode.dusk:
           return const Color(0xFF312C51);
         case AppThemeMode.fresh:
@@ -1069,8 +1075,14 @@ class _DayViewState extends ConsumerState<DayView> with TickerProviderStateMixin
 
     Color getThemeBackgroundColor() {
       switch (appThemeMode) {
-        case AppThemeMode.pop:
-          return const Color(0xFFF4F5F7);
+        case AppThemeMode.dawn:
+          return AppColors.dawnBackground;
+        case AppThemeMode.lilies:
+          return AppColors.liliesBackground;
+        case AppThemeMode.roses:
+          return AppColors.rosesBackground;
+        case AppThemeMode.olives:
+          return AppColors.olivesBackground;
         case AppThemeMode.dusk:
           return const Color(0xFF312C51);
         case AppThemeMode.fresh:
@@ -1375,8 +1387,14 @@ class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
 
     Color getThemeBackgroundColor() {
       switch (appThemeMode) {
-        case AppThemeMode.pop:
-          return const Color(0xFFF4F5F7);
+        case AppThemeMode.dawn:
+          return AppColors.dawnBackground;
+        case AppThemeMode.lilies:
+          return AppColors.liliesBackground;
+        case AppThemeMode.roses:
+          return AppColors.rosesBackground;
+        case AppThemeMode.olives:
+          return AppColors.olivesBackground;
         case AppThemeMode.dusk:
           return const Color(0xFF312C51);
         case AppThemeMode.fresh:

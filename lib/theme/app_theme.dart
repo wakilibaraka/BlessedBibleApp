@@ -139,54 +139,206 @@ class AppTheme {
     );
   }
 
-  static ThemeData popTheme(double baseFontSize) {
+  static ThemeData dawnTheme(double baseFontSize) {
     final textTheme = AppTypography.getTheme(
-      AppColors.popTextPrimary,
-      AppColors.popTextSecondary,
+      AppColors.dawnTextPrimary,
+      AppColors.dawnTextSecondary,
+      baseFontSize,
+    );
+
+    return ThemeData(
+      brightness: Brightness.dark,
+      scaffoldBackgroundColor: AppColors.dawnBackground,
+      canvasColor: AppColors.dawnSurface,
+      primaryColor: AppColors.dawnPrimary,
+      colorScheme: const ColorScheme.dark(
+        primary: AppColors.dawnPrimary,
+        secondary: AppColors.dawnAccent,
+        surface: AppColors.dawnSurface,
+        onSurface: AppColors.dawnTextPrimary,
+      ),
+      textTheme: textTheme,
+      appBarTheme: const AppBarTheme(
+        backgroundColor: AppColors.dawnBackground,
+        foregroundColor: AppColors.dawnTextPrimary,
+        elevation: 0,
+        centerTitle: true,
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: AppColors.dawnSurface,
+        modalBackgroundColor: AppColors.dawnSurface,
+      ),
+      dialogTheme: const DialogThemeData(
+        backgroundColor: AppColors.dawnSurface,
+      ),
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: AppColors.dawnSurface,
+        selectedItemColor: AppColors.dawnPrimary,
+        unselectedItemColor: AppColors.dawnTextSecondary,
+        type: BottomNavigationBarType.fixed,
+        elevation: 16,
+      ),
+      dividerTheme: const DividerThemeData(color: AppColors.dawnBorder),
+      extensions: const [
+        ReadingTokens(
+          readingPaper: Color(0xFF26232F),
+          readingSurface: Color(0xFF302C3A),
+          readingInk: Color(0xFFE8E4EC),
+          readingInkMuted: Color(0xFF9E97AA),
+          readingAccent: Color(0xFFE8A87C),
+          readingBorder: Color(0xFF3A3546),
+        ),
+      ],
+    );
+  }
+
+  static ThemeData liliesTheme(double baseFontSize) {
+    final textTheme = AppTypography.getTheme(
+      AppColors.liliesTextPrimary,
+      AppColors.liliesTextSecondary,
       baseFontSize,
     );
 
     return ThemeData(
       brightness: Brightness.light,
-      scaffoldBackgroundColor: AppColors.popBackground,
-      canvasColor: AppColors.popSurface,
-      primaryColor: AppColors.popPrimary,
+      scaffoldBackgroundColor: AppColors.liliesBackground,
+      canvasColor: AppColors.liliesSurface,
+      primaryColor: AppColors.liliesPrimary,
       colorScheme: const ColorScheme.light(
-        primary: AppColors.popPrimary,
-        secondary: AppColors.popAccent,
-        surface: AppColors.popSurface,
-        onSurface: AppColors.popTextPrimary,
+        primary: AppColors.liliesPrimary,
+        secondary: AppColors.liliesAccent,
+        surface: AppColors.liliesSurface,
+        onSurface: AppColors.liliesTextPrimary,
       ),
       textTheme: textTheme,
       appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.popBackground,
-        foregroundColor: AppColors.popTextPrimary,
+        backgroundColor: AppColors.liliesBackground,
+        foregroundColor: AppColors.liliesTextPrimary,
         elevation: 0,
         centerTitle: true,
       ),
       bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: AppColors.popSurface,
-        modalBackgroundColor: AppColors.popSurface,
+        backgroundColor: AppColors.liliesSurface,
+        modalBackgroundColor: AppColors.liliesSurface,
       ),
       dialogTheme: const DialogThemeData(
-        backgroundColor: AppColors.popSurface,
+        backgroundColor: AppColors.liliesSurface,
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: AppColors.popSurface,
-        selectedItemColor: AppColors.popPrimary,
-        unselectedItemColor: AppColors.popTextSecondary,
+        backgroundColor: AppColors.liliesSurface,
+        selectedItemColor: AppColors.liliesPrimary,
+        unselectedItemColor: AppColors.liliesTextSecondary,
         type: BottomNavigationBarType.fixed,
         elevation: 16,
       ),
-      dividerTheme: const DividerThemeData(color: AppColors.popBorder),
+      dividerTheme: const DividerThemeData(color: AppColors.liliesBorder),
       extensions: const [
         ReadingTokens(
-          readingPaper: Color(0xFFFAFAFC),
-          readingSurface: Color(0xFFFFFFFF),
-          readingInk: Color(0xFF23222B),
-          readingInkMuted: Color(0xFF696873),
-          readingAccent: Color(0xFF6320E0), // Adjusted
-          readingBorder: Color(0xFFE8E8EE),
+          readingPaper: AppColors.liliesBackground,
+          readingSurface: AppColors.liliesSurface,
+          readingInk: AppColors.liliesTextPrimary,
+          readingInkMuted: AppColors.liliesTextSecondary,
+          readingAccent: AppColors.liliesPrimary,
+          readingBorder: AppColors.liliesBorder,
+        ),
+      ],
+    );
+  }
+
+  static ThemeData rosesTheme(double baseFontSize) {
+    final textTheme = AppTypography.getTheme(
+      AppColors.rosesTextPrimary,
+      AppColors.rosesTextSecondary,
+      baseFontSize,
+    );
+
+    return ThemeData(
+      brightness: Brightness.light,
+      scaffoldBackgroundColor: AppColors.rosesBackground,
+      canvasColor: AppColors.rosesSurface,
+      primaryColor: AppColors.rosesPrimary,
+      colorScheme: const ColorScheme.light(
+        primary: AppColors.rosesPrimary,
+        secondary: AppColors.rosesAccent,
+        surface: AppColors.rosesSurface,
+        onSurface: AppColors.rosesTextPrimary,
+      ),
+      textTheme: textTheme,
+      appBarTheme: const AppBarTheme(
+        backgroundColor: AppColors.rosesBackground,
+        foregroundColor: AppColors.rosesTextPrimary,
+        elevation: 0,
+        centerTitle: true,
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: AppColors.rosesSurface,
+        modalBackgroundColor: AppColors.rosesSurface,
+      ),
+      dialogTheme: const DialogThemeData(
+        backgroundColor: AppColors.rosesSurface,
+      ),
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: AppColors.rosesSurface,
+        selectedItemColor: AppColors.rosesPrimary,
+        unselectedItemColor: AppColors.rosesTextSecondary,
+        type: BottomNavigationBarType.fixed,
+        elevation: 16,
+      ),
+      dividerTheme: const DividerThemeData(color: AppColors.rosesBorder),
+      extensions: const [
+        ReadingTokens(
+          readingPaper: AppColors.rosesBackground,
+          readingSurface: AppColors.rosesSurface,
+          readingInk: AppColors.rosesTextPrimary,
+          readingInkMuted: AppColors.rosesTextSecondary,
+          readingAccent: AppColors.rosesPrimary,
+          readingBorder: AppColors.rosesBorder,
+        ),
+      ],
+    );
+  }
+
+  static ThemeData olivesTheme(double baseFontSize) {
+    final textTheme = AppTypography.getTheme(
+      AppColors.olivesTextPrimary,
+      AppColors.olivesTextSecondary,
+      baseFontSize,
+    );
+
+    return ThemeData(
+      brightness: Brightness.light,
+      scaffoldBackgroundColor: AppColors.olivesBackground,
+      canvasColor: AppColors.olivesSurface,
+      primaryColor: AppColors.olivesPrimary,
+      colorScheme: const ColorScheme.light(
+        primary: AppColors.olivesPrimary,
+        secondary: AppColors.olivesAccent,
+        surface: AppColors.olivesSurface,
+        onSurface: AppColors.olivesTextPrimary,
+      ),
+      textTheme: textTheme,
+      appBarTheme: const AppBarTheme(
+        backgroundColor: AppColors.olivesBackground,
+        foregroundColor: AppColors.olivesTextPrimary,
+        elevation: 0,
+        centerTitle: true,
+      ),
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: AppColors.olivesSurface,
+        selectedItemColor: AppColors.olivesPrimary,
+        unselectedItemColor: AppColors.olivesTextSecondary,
+        type: BottomNavigationBarType.fixed,
+        elevation: 16,
+      ),
+      dividerTheme: const DividerThemeData(color: AppColors.olivesBorder),
+      extensions: const [
+        ReadingTokens(
+          readingPaper: AppColors.olivesBackground,
+          readingSurface: AppColors.olivesSurface,
+          readingInk: AppColors.olivesTextPrimary,
+          readingInkMuted: AppColors.olivesTextSecondary,
+          readingAccent: AppColors.olivesPrimary,
+          readingBorder: AppColors.olivesBorder,
         ),
       ],
     );
@@ -297,4 +449,53 @@ class AppTheme {
       ],
     );
   }
+
+  static ThemeData customAccentTheme(double baseFontSize, Color accentColor) {
+    final textTheme = AppTypography.getTheme(
+      AppColors.lightTextPrimary,
+      AppColors.lightTextSecondary,
+      baseFontSize,
+    );
+
+    return ThemeData(
+      brightness: Brightness.light,
+      scaffoldBackgroundColor: AppColors.lightBackground,
+      primaryColor: accentColor,
+      colorScheme: ColorScheme.light(
+        primary: accentColor,
+        secondary: accentColor,
+        surface: AppColors.lightSurface,
+        onSurface: AppColors.lightTextPrimary,
+      ),
+      textTheme: textTheme,
+      appBarTheme: AppBarTheme(
+        backgroundColor: AppColors.lightBackground,
+        foregroundColor: AppColors.lightTextPrimary,
+        elevation: 0,
+        centerTitle: true,
+      ),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: AppColors.lightSurface,
+        selectedItemColor: accentColor,
+        unselectedItemColor: AppColors.lightTextSecondary,
+        type: BottomNavigationBarType.fixed,
+        elevation: 8,
+      ),
+      dividerTheme: const DividerThemeData(color: AppColors.lightBorder),
+      extensions: [
+        ReadingTokens(
+          readingPaper: AppColors.lightBackground,
+          readingSurface: AppColors.lightSurface,
+          readingInk: AppColors.lightTextPrimary,
+          readingInkMuted: AppColors.lightTextSecondary,
+          readingAccent: accentColor,
+          readingBorder: AppColors.lightBorder,
+        ),
+      ],
+    );
+  }
+
+  static ThemeData priestlyPurpleTheme(double baseFontSize) => customAccentTheme(baseFontSize, const Color(0xFF673AB7));
+  static ThemeData galileeBlueTheme(double baseFontSize) => customAccentTheme(baseFontSize, const Color(0xFF2196F3));
+  static ThemeData scarletRedTheme(double baseFontSize) => customAccentTheme(baseFontSize, const Color(0xFFE53935));
 }

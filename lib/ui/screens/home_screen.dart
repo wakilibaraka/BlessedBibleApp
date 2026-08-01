@@ -13,6 +13,7 @@ import '../widgets/bouncy_entrance.dart';
 import 'commentary_hub_screen.dart';
 import 'today_screen.dart';
 import '../../services/share_service.dart';
+import '../sheets/theme_picker_sheet.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -54,11 +55,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   Future<void> _onRefresh() async {
-    _verseController.reset();
-    // Trigger a reload via Riverpod
-    ref.invalidate(homeProvider);
-    await Future.delayed(const Duration(milliseconds: 900));
-    _verseController.forward();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const ThemePickerSheet(),
+    );
   }
 
   @override

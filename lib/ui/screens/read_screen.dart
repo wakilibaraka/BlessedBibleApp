@@ -551,8 +551,14 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
     final tokens = theme.extension<ReadingTokens>()!;
     Color getThemeBackgroundColor() {
       switch (appThemeMode) {
-        case AppThemeMode.pop:
-          return const Color(0xFFF4F5F7);
+        case AppThemeMode.dawn:
+          return AppColors.dawnBackground;
+        case AppThemeMode.lilies:
+          return AppColors.liliesBackground;
+        case AppThemeMode.roses:
+          return AppColors.rosesBackground;
+        case AppThemeMode.olives:
+          return AppColors.olivesBackground;
         case AppThemeMode.dusk:
           return const Color(0xFF312C51);
         case AppThemeMode.fresh:
@@ -1232,7 +1238,13 @@ Positioned(
     Color redLetterColor;
     switch (appThemeMode.resolve(context)) {
       case AppThemeMode.light:
-      case AppThemeMode.pop:
+      case AppThemeMode.priestlyPurple:
+      case AppThemeMode.galileeBlue:
+      case AppThemeMode.scarletRed:
+      case AppThemeMode.dawn:
+      case AppThemeMode.lilies:
+      case AppThemeMode.roses:
+      case AppThemeMode.olives:
       case AppThemeMode.fresh:
         starColor = Colors.deepOrange.shade400;
         redLetterColor = const Color(0xFFB33A3A); // Soft crimson
@@ -1697,8 +1709,14 @@ class __BookChapterSelectorSheetState extends ConsumerState<_BookChapterSelector
 
     Color getThemeBackgroundColor() {
       switch (appThemeMode) {
-        case AppThemeMode.pop:
-          return const Color(0xFFF4F5F7);
+        case AppThemeMode.dawn:
+          return AppColors.dawnBackground;
+        case AppThemeMode.lilies:
+          return AppColors.liliesBackground;
+        case AppThemeMode.roses:
+          return AppColors.rosesBackground;
+        case AppThemeMode.olives:
+          return AppColors.olivesBackground;
         case AppThemeMode.dusk:
           return const Color(0xFF312C51);
         case AppThemeMode.fresh:
@@ -2103,7 +2121,10 @@ class _TypographyBottomSheet extends ConsumerWidget {
 
     Color getSheetSurface() {
       switch (appThemeMode) {
-        case AppThemeMode.pop: return const Color(0xFFF4F5F7);
+        case AppThemeMode.dawn: return AppColors.dawnBackground;
+        case AppThemeMode.lilies: return AppColors.liliesBackground;
+        case AppThemeMode.roses: return AppColors.rosesBackground;
+        case AppThemeMode.olives: return AppColors.olivesBackground;
         case AppThemeMode.dusk: return const Color(0xFF312C51);
         case AppThemeMode.fresh: return const Color(0xFF132C33);
         default: return theme.scaffoldBackgroundColor;
@@ -2132,7 +2153,7 @@ class _TypographyBottomSheet extends ConsumerWidget {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: appThemeMode == AppThemeMode.dusk || appThemeMode == AppThemeMode.fresh || appThemeMode == AppThemeMode.pop
+                    color: appThemeMode == AppThemeMode.dusk || appThemeMode == AppThemeMode.fresh || appThemeMode == AppThemeMode.dawn || appThemeMode == AppThemeMode.lilies || appThemeMode == AppThemeMode.roses || appThemeMode == AppThemeMode.olives
                         ? theme.primaryColor
                         : theme.colorScheme.onSurface.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(2),

@@ -35,15 +35,45 @@ class AppColors {
   static const Color darkTextSecondary = Color(0xFFAFAAA3);
   static const Color darkBorder = Color(0xFF3F3C39);
 
-  // 3D Pop Theme (Palette A "Pop")
-  static const Color popBackground = Color(0xFFF4F5F7);
-  static const Color popSurface = Color(0xFFFFFFFF);
-  static const Color popTextPrimary = Color(0xFF000000);
-  static const Color popTextSecondary = Color(0xFF4A4A52);
-  static const Color popBorder = Color(0xFFE2E2EB);
-  static const Color popPrimary = Color(0xFF752FFF);
-  static const Color popAccent = Color(0xFFFE3A3A);
-  static const Color popHighlight = Color(0xFFFFBB01);
+  // Themed Sepia (Dawn - soft plum-grey twilight / peach sunrise)
+  static const Color dawnBackground = Color(0xFF2E2A3A);
+  static const Color dawnSurface = Color(0xFF3A3547);
+  static const Color dawnTextPrimary = Color(0xFFEDE9F0);
+  static const Color dawnTextSecondary = Color(0xFFA9A2B5);
+  static const Color dawnBorder = Color(0xFF453F52);
+  static const Color dawnPrimary = Color(0xFFE8A87C);
+  static const Color dawnAccent = Color(0xFFE8A87C);
+  static const Color dawnHighlight = Color(0xFFE8A87C);
+
+  // 3D Pop Theme (Lilies - soft pastel pink / baby blue / pale claymorphic)
+  static const Color liliesBackground = Color(0xFFFCE4EC);
+  static const Color liliesSurface = Color(0xFFFDF6F8);
+  static const Color liliesTextPrimary = Color(0xFF4A4045);
+  static const Color liliesTextSecondary = Color(0xFF8E7C85);
+  static const Color liliesBorder = Color(0xFFE8CEDB);
+  static const Color liliesPrimary = Color(0xFF8CB9D1);
+  static const Color liliesAccent = Color(0xFFF4A8C4);
+  static const Color liliesHighlight = Color(0xFFBCE3F5);
+
+  // 3D Pop Theme (Roses - coral / rose-gold / warm floral)
+  static const Color rosesBackground = Color(0xFFFBE4D8);
+  static const Color rosesSurface = Color(0xFFFFF2EB);
+  static const Color rosesTextPrimary = Color(0xFF523326);
+  static const Color rosesTextSecondary = Color(0xFF996B58);
+  static const Color rosesBorder = Color(0xFFEACBB8);
+  static const Color rosesPrimary = Color(0xFFDE7456);
+  static const Color rosesAccent = Color(0xFFB95A4B);
+  static const Color rosesHighlight = Color(0xFFFFC0A8);
+
+  // 3D Pop Theme (Olives - muted olive / sage green / nature)
+  static const Color olivesBackground = Color(0xFFE3E8DB);
+  static const Color olivesSurface = Color(0xFFF0F2EB);
+  static const Color olivesTextPrimary = Color(0xFF2F3E2F);
+  static const Color olivesTextSecondary = Color(0xFF5F755F);
+  static const Color olivesBorder = Color(0xFFCBD4C1);
+  static const Color olivesPrimary = Color(0xFF556B2F);
+  static const Color olivesAccent = Color(0xFF3A4D1F);
+  static const Color olivesHighlight = Color(0xFFB8CBA1);
 
   // 3D Pop Theme (Palette B "Dusk")
   static const Color duskBackground = Color(0xFF312C51);

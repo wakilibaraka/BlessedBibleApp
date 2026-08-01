@@ -655,11 +655,9 @@ class SettingsScreen extends StatelessWidget {
                   ),
             ),
           ),
-          Container(
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surface,
-              borderRadius: BorderRadius.circular(16),
-            ),
+          Material(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(16),
             clipBehavior: Clip.antiAlias,
             child: Column(
               children: [

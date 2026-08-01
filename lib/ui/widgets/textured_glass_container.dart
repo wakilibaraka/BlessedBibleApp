@@ -44,7 +44,13 @@ class TexturedGlassContainer extends ConsumerWidget {
           fillColor = Colors.white.withValues(alpha: 0.35);
           break;
         case AppThemeMode.light:
-        case AppThemeMode.pop:
+        case AppThemeMode.priestlyPurple:
+        case AppThemeMode.galileeBlue:
+        case AppThemeMode.scarletRed:
+        case AppThemeMode.dawn:
+        case AppThemeMode.lilies:
+        case AppThemeMode.roses:
+        case AppThemeMode.olives:
         case AppThemeMode.dusk:
         case AppThemeMode.fresh:
           fillColor = Colors.black.withValues(alpha: 0.08);
@@ -68,7 +74,10 @@ class TexturedGlassContainer extends ConsumerWidget {
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         borderRadius: radius,
-        boxShadow: (appTheme.resolve(context) == AppThemeMode.pop || 
+        boxShadow: (appTheme.resolve(context) == AppThemeMode.dawn || 
+                    appTheme.resolve(context) == AppThemeMode.lilies || 
+                    appTheme.resolve(context) == AppThemeMode.roses || 
+                    appTheme.resolve(context) == AppThemeMode.olives || 
                     appTheme.resolve(context) == AppThemeMode.dusk || 
                     appTheme.resolve(context) == AppThemeMode.fresh) && !isGlassy
             ? [

@@ -1,10 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:the_blessed_bible/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:the_blessed_bible/ui/screens/main_nav_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:the_blessed_bible/theme/app_theme.dart';
 import 'package:the_blessed_bible/data/local_storage/preferences_service.dart';
 

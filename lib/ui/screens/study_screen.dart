@@ -80,7 +80,13 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
     String subGreeting;
     switch (appThemeMode.resolve(context)) {
       case AppThemeMode.light:
-      case AppThemeMode.pop:
+      case AppThemeMode.priestlyPurple:
+      case AppThemeMode.galileeBlue:
+      case AppThemeMode.scarletRed:
+      case AppThemeMode.dawn:
+      case AppThemeMode.lilies:
+      case AppThemeMode.roses:
+      case AppThemeMode.olives:
       case AppThemeMode.fresh:
         subGreeting = "Embrace the light of His word.";
         break;

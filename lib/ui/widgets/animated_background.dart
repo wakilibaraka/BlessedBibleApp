@@ -51,7 +51,9 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground> with Si
     final readSettings = ref.watch(readSettingsProvider);
     final isReadTab = widget.tabIndex == 1;
     final isImmersiveOn = readSettings.readingViewMode == ReadingViewMode.immersive;
-    final disableGlow = isReadTab && isImmersiveOn;
+    final mode = widget.appThemeMode.resolve(context);
+    final isFlatTheme = mode == AppThemeMode.dawn || mode == AppThemeMode.dusk || mode == AppThemeMode.fresh;
+    final disableGlow = (isReadTab && isImmersiveOn) || isFlatTheme;
 
     final shouldAnimate = isRouteCurrent && isTabActive && !disableGlow;
     
@@ -111,11 +113,41 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground> with Si
                 const Color(0xFFFAF9F6),
               ];
               break;
-            case AppThemeMode.pop:
+            case AppThemeMode.priestlyPurple:
+            case AppThemeMode.galileeBlue:
+            case AppThemeMode.scarletRed:
               colors = [
-                Color.lerp(const Color(0xFFEBE3FF), const Color(0xFFD6C2FF), t)!,
-                const Color(0xFFF4F5F7),
-                const Color(0xFFF4F5F7),
+                Color.lerp(const Color(0xFFFDF3D7), const Color(0xFFFDE4A9), t)!,
+                const Color(0xFFFAF9F6),
+                const Color(0xFFFAF9F6),
+              ];
+              break;
+            case AppThemeMode.dawn:
+              colors = [
+                Color.lerp(const Color(0xFFC5D5E5), const Color(0xFF3F6285), t)!, // Highlight to Primary
+                const Color(0xFFEEF1F4),
+                const Color(0xFFEEF1F4),
+              ];
+              break;
+            case AppThemeMode.lilies:
+              colors = [
+                Color.lerp(const Color(0xFFBCE3F5), const Color(0xFF8CB9D1), t)!,
+                const Color(0xFFFCE4EC),
+                const Color(0xFFFCE4EC),
+              ];
+              break;
+            case AppThemeMode.roses:
+              colors = [
+                Color.lerp(const Color(0xFFFFC0A8), const Color(0xFFDE7456), t)!,
+                const Color(0xFFFBE4D8),
+                const Color(0xFFFBE4D8),
+              ];
+              break;
+            case AppThemeMode.olives:
+              colors = [
+                Color.lerp(const Color(0xFFB8CBA1), const Color(0xFF556B2F), t)!,
+                const Color(0xFFE3E8DB),
+                const Color(0xFFE3E8DB),
               ];
               break;
             case AppThemeMode.dusk:

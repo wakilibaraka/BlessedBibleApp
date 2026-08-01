@@ -7,6 +7,7 @@ import '../../state/votd_tracker_provider.dart';
 import '../../state/theme_provider.dart';
 import 'commentary_hub_screen.dart';
 import '../../theme/reading_tokens.dart';
+import '../../theme/app_colors.dart';
 
 class VotdArchiveScreen extends ConsumerWidget {
   const VotdArchiveScreen({super.key});
@@ -27,14 +28,23 @@ class VotdArchiveScreen extends ConsumerWidget {
     final epoch = DateTime(2026, 1, 1);
     
     final appThemeMode = ref.watch(themeProvider);
-    final is3DTheme = appThemeMode == AppThemeMode.pop || 
+    final is3DTheme = appThemeMode == AppThemeMode.dawn || 
+                      appThemeMode == AppThemeMode.lilies || 
+                      appThemeMode == AppThemeMode.roses || 
+                      appThemeMode == AppThemeMode.olives || 
                       appThemeMode == AppThemeMode.dusk || 
                       appThemeMode == AppThemeMode.fresh;
 
     Color getThemeBackgroundColor() {
       switch (appThemeMode) {
-        case AppThemeMode.pop:
-          return const Color(0xFFF4F5F7);
+        case AppThemeMode.dawn:
+          return AppColors.dawnBackground;
+        case AppThemeMode.lilies:
+          return AppColors.liliesBackground;
+        case AppThemeMode.roses:
+          return AppColors.rosesBackground;
+        case AppThemeMode.olives:
+          return AppColors.olivesBackground;
         case AppThemeMode.dusk:
           return const Color(0xFF312C51);
         case AppThemeMode.fresh:
@@ -130,7 +140,10 @@ class VotdArchiveScreen extends ConsumerWidget {
                             width: 0.5,
                             color: is3DTheme ? Colors.white.withValues(alpha: 0.15) : tokens.readingBorder,
                           ),
-                          boxShadow: (appThemeMode == AppThemeMode.pop || 
+                          boxShadow: (appThemeMode == AppThemeMode.dawn || 
+                                      appThemeMode == AppThemeMode.lilies || 
+                                      appThemeMode == AppThemeMode.roses || 
+                                      appThemeMode == AppThemeMode.olives || 
                                       appThemeMode == AppThemeMode.dusk || 
                                       appThemeMode == AppThemeMode.fresh)
                               ? [

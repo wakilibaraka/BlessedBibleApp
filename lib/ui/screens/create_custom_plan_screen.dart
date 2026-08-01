@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/bible_provider.dart';
 import '../../state/reading_plan_provider.dart';
 import '../../state/theme_provider.dart';
+import '../../theme/app_colors.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../../services/custom_plan_scheduler.dart';
 import '../widgets/shared_app_bar.dart';
@@ -186,8 +187,14 @@ class _CreateCustomPlanScreenState extends ConsumerState<CreateCustomPlanScreen>
 
     Color getThemeBackgroundColor() {
       switch (appThemeMode) {
-        case AppThemeMode.pop:
-          return const Color(0xFFF4F5F7);
+        case AppThemeMode.dawn:
+          return AppColors.dawnBackground;
+        case AppThemeMode.lilies:
+          return AppColors.liliesBackground;
+        case AppThemeMode.roses:
+          return AppColors.rosesBackground;
+        case AppThemeMode.olives:
+          return AppColors.olivesBackground;
         case AppThemeMode.dusk:
           return const Color(0xFF312C51);
         case AppThemeMode.fresh:
@@ -199,8 +206,14 @@ class _CreateCustomPlanScreenState extends ConsumerState<CreateCustomPlanScreen>
 
     Color getThemeSurfaceColor() {
       switch (appThemeMode) {
-        case AppThemeMode.pop:
-          return Colors.white;
+        case AppThemeMode.dawn:
+          return AppColors.dawnSurface;
+        case AppThemeMode.lilies:
+          return AppColors.liliesSurface;
+        case AppThemeMode.roses:
+          return AppColors.rosesSurface;
+        case AppThemeMode.olives:
+          return AppColors.olivesSurface;
         case AppThemeMode.dusk:
           return const Color(0xFF3F3965);
         case AppThemeMode.fresh:
