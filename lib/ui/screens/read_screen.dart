@@ -862,7 +862,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen> with WidgetsBindingObse
                                                       debugPrint('[HIGHLIGHT_DEBUG] RENDER verse key=$refStr found=${highlights.containsKey(refStr)} color=$savedColorIndex highlightColor=$highlightColor isBookmarked=$isBookmarked timestamp=${DateTime.now().millisecondsSinceEpoch}');
                                                     }
                                                     
-                                                    if (isBookmarked || highlightColor != null) {
+                                                    if (kHighlightDebug && (isBookmarked || highlightColor != null)) {
                                                       debugPrint('DEBUG RENDER: $refStr isBookmarked=$isBookmarked, highlightColor=$highlightColor');
                                                     }
 

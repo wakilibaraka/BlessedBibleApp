@@ -61,7 +61,7 @@ final bookmarksProvider = NotifierProvider<BookmarksNotifier, Set<String>>(Bookm
 
 
 
-const bool kHighlightDebug = true;
+const bool kHighlightDebug = false;
 
 class HighlightsNotifier extends Notifier<Map<String, int>> {
   @override
