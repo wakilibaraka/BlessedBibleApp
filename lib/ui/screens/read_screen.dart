@@ -349,19 +349,67 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   // ────────────────────────────────────────────────────────────────
 
   bool _isPageSelectionMode = false;
+  final List<GlobalKey> _selectionVerseKeys = [];
+  int _selectionTargetIndex = 0;
 
   void _enterPageSelection() {
+    int topIndex = 0;
+    final positions = _itemPositionsListeners[_currentPageIndex]?.itemPositions.value;
+    if (positions != null && positions.isNotEmpty) {
+      final visible = positions.where((p) => p.itemTrailingEdge > 0).toList();
+      visible.sort((a, b) => a.itemLeadingEdge.compareTo(b.itemLeadingEdge));
+      if (visible.isNotEmpty) {
+        topIndex = visible.first.index;
+      }
+    }
+    _selectionTargetIndex = topIndex;
+
     ref.read(navHiddenProvider.notifier).set(true);
     setState(() {
       _isPageSelectionMode = true;
     });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_selectionTargetIndex >= 0 && _selectionTargetIndex < _selectionVerseKeys.length) {
+        final key = _selectionVerseKeys[_selectionTargetIndex];
+        if (key.currentContext != null) {
+          Scrollable.ensureVisible(key.currentContext!, alignment: 0.0, duration: Duration.zero);
+        }
+      }
+    });
   }
 
   void _exitPageSelection() {
+    int topIndex = 0;
+    for (int i = 0; i < _selectionVerseKeys.length; i++) {
+      final key = _selectionVerseKeys[i];
+      final ctx = key.currentContext;
+      if (ctx != null) {
+        final box = ctx.findRenderObject() as RenderBox?;
+        final scrollableState = Scrollable.maybeOf(ctx);
+        if (box != null && scrollableState != null) {
+          final scrollableBox = scrollableState.context.findRenderObject() as RenderBox?;
+          if (scrollableBox != null) {
+            final position = box.localToGlobal(Offset.zero, ancestor: scrollableBox);
+            if (position.dy >= 0) {
+               topIndex = i;
+               break;
+            }
+          }
+        }
+      }
+    }
+
     ref.read(navHiddenProvider.notifier).set(false);
     setState(() {
       _isPageSelectionMode = false;
     });
+
+    if (topIndex > 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _itemScrollControllers[_currentPageIndex]?.jumpTo(index: topIndex);
+      });
+    }
   }
 
   @override
@@ -1398,53 +1446,13 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                           maxWidth: 800),
                                                   child: Builder(
                                                     builder: (context) {
-                                                      Widget listWidget = ScrollablePositionedList.builder(
-                                                        itemScrollController:
-                                                            _itemScrollControllers[
-                                                                pageIndex],
-                                                        itemPositionsListener:
-                                                            _itemPositionsListeners[
-                                                                pageIndex],
-                                                        initialScrollIndex: (pageIndex ==
-                                                                _currentPageIndex
-                                                            ? _navigatedVerseIndex
-                                                            : null) ??
-                                                        ref
-                                                            .read(
-                                                                preferencesProvider)
-                                                            .getChapterScrollPosition(
-                                                                fc.book
-                                                                    .abbreviation,
-                                                                fc.chapter
-                                                                    .number) ??
-                                                        0,
-                                                    padding: EdgeInsets.only(
-                                                        top: MediaQuery.of(context).padding.top +
-                                                            80.0,
-                                                        left: math.max(
-                                                            MediaQuery.of(context)
-                                                                .padding
-                                                                .left,
-                                                            MediaQuery.of(context)
-                                                                    .size
-                                                                    .width *
-                                                                (typography.marginPercent /
-                                                                    100.0)),
-                                                        right: math.max(
-                                                            MediaQuery.of(context)
-                                                                .padding
-                                                                .right,
-                                                            MediaQuery.of(context)
-                                                                    .size
-                                                                    .width *
-                                                                (typography.marginPercent /
-                                                                    100.0)),
-                                                        bottom:
-                                                            MediaQuery.of(context).padding.bottom + 80.0),
-                                                    itemCount:
-                                                        verses.length + 1,
-                                                    itemBuilder:
-                                                        (context, index) {
+                                                      final listPadding = EdgeInsets.only(
+                                                          top: MediaQuery.of(context).padding.top + 80.0,
+                                                          left: math.max(MediaQuery.of(context).padding.left, MediaQuery.of(context).size.width * (typography.marginPercent / 100.0)),
+                                                          right: math.max(MediaQuery.of(context).padding.right, MediaQuery.of(context).size.width * (typography.marginPercent / 100.0)),
+                                                          bottom: MediaQuery.of(context).padding.bottom + 80.0);
+
+                                                      Widget buildVerseItem(BuildContext context, int index) {
                                                       if (index ==
                                                           verses.length) {
                                                         bool
@@ -1668,10 +1676,40 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                           ),
                                                         ],
                                                       );
-                                                    },
-                                                  ); // end ScrollablePositionedList
+                                                    } // end buildVerseItem
 
-                                                  return _isPageSelectionMode ? SelectionArea(child: listWidget) : listWidget;
+                                                    Widget listWidget;
+                                                    if (_isPageSelectionMode) {
+                                                      if (_selectionVerseKeys.length != verses.length + 1) {
+                                                        _selectionVerseKeys.clear();
+                                                        _selectionVerseKeys.addAll(List.generate(verses.length + 1, (_) => GlobalKey()));
+                                                      }
+                                                      listWidget = SingleChildScrollView(
+                                                        padding: listPadding,
+                                                        child: SelectionArea(
+                                                          child: Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                            children: List.generate(verses.length + 1, (index) {
+                                                              return KeyedSubtree(
+                                                                key: _selectionVerseKeys[index],
+                                                                child: Builder(builder: (ctx) => buildVerseItem(ctx, index)),
+                                                              );
+                                                            }),
+                                                          ),
+                                                        ),
+                                                      );
+                                                    } else {
+                                                      listWidget = ScrollablePositionedList.builder(
+                                                        itemScrollController: _itemScrollControllers[pageIndex],
+                                                        itemPositionsListener: _itemPositionsListeners[pageIndex],
+                                                        initialScrollIndex: (pageIndex == _currentPageIndex ? _navigatedVerseIndex : null) ??
+                                                            ref.read(preferencesProvider).getChapterScrollPosition(fc.book.abbreviation, fc.chapter.number) ?? 0,
+                                                        padding: listPadding,
+                                                        itemCount: verses.length + 1,
+                                                        itemBuilder: buildVerseItem,
+                                                      );
+                                                    }
+                                                    return listWidget;
                                                 }), // end Builder
                                                 ), // end ConstrainedBox
                                               ), // end Center
