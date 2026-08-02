@@ -7,6 +7,7 @@ import '../../state/home_provider.dart';
 import '../../state/votd_tracker_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../state/commentary_provider.dart';
+import '../../state/nav_provider.dart';
 import '../widgets/shared_top_header.dart';
 import '../widgets/glass_container.dart';
 import '../widgets/bouncy_entrance.dart';
@@ -55,12 +56,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   Future<void> _onRefresh() async {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => const ThemePickerSheet(),
-    );
+    // Re-evaluate Home content and streak tracker.
+    // Structured as an async method for future drop-in cloud fetches.
+    ref.invalidate(homeProvider);
+    ref.invalidate(votdTrackerProvider);
   }
 
   @override
@@ -77,15 +76,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           // ── Layer 2: Content ───────────────────────────────────────────
           SafeArea(
             bottom: false,
-            child: RefreshIndicator(
-              onRefresh: _onRefresh,
-              color: const Color(0xFFC9A227),
-              backgroundColor: isDark ? const Color(0xFF2C2A28) : Colors.white,
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-                child: FadeTransition(
-                  opacity: _verseFade,
-                  child: _buildPage(context, homeState, appThemeMode),
+            child: GestureDetector(
+              onHorizontalDragEnd: (details) {
+                if (details.primaryVelocity == null) return;
+                if (details.primaryVelocity! > 300) {
+                  // Swipe Right -> Appearance Sheet
+                  ThemePickerSheet.show(context);
+                } else if (details.primaryVelocity! < -300) {
+                  // Swipe Left -> Settings
+                  ref.read(navProvider.notifier).setIndex(4);
+                }
+              },
+              child: RefreshIndicator(
+                onRefresh: _onRefresh,
+                color: const Color(0xFFC9A227),
+                backgroundColor: isDark ? const Color(0xFF2C2A28) : Colors.white,
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                  child: FadeTransition(
+                    opacity: _verseFade,
+                    child: _buildPage(context, homeState, appThemeMode),
+                  ),
                 ),
               ),
             ),
