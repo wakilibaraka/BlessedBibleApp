@@ -78,13 +78,15 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
           sigmaX: 45.0,
           sigmaY: 45.0,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          padding: EdgeInsets.only(
-            top: 16,
-            left: 20,
-            right: 20,
-            bottom: MediaQuery.of(context).padding.bottom + 20,
-          ),
-          child: Column(
+          padding: EdgeInsets.zero,
+          child: SingleChildScrollView(
+            padding: EdgeInsets.only(
+              top: 16,
+              left: 20,
+              right: 20,
+              bottom: MediaQuery.of(context).padding.bottom + 20,
+            ),
+            child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -134,12 +136,11 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
             ],
           ),
           const SizedBox(height: 16),
-          Flexible(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 250),
-              child: _showAdvanced ? _buildAdvancedContent(theme, readSettings, isMatchSystem, isSingleTheme, rotationPool) : SingleChildScrollView(
-                key: const ValueKey('appearance_main'),
-                child: Column(
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 250),
+            child: _showAdvanced ? _buildAdvancedContent(theme, readSettings, isMatchSystem, isSingleTheme, rotationPool) : Container(
+              key: const ValueKey('appearance_main'),
+              child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                   Consumer(builder: (context, ref, _) {
@@ -517,8 +518,8 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
               ),
             ),
           ),
-        ),
         ],
+      ),
       ),
       ),
       ),
@@ -526,7 +527,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
   }
 
   Widget _buildAdvancedContent(ThemeData theme, ReadSettingsState readSettings, bool isMatchSystem, bool isSingleTheme, List<AppThemeMode> rotationPool) {
-    return SingleChildScrollView(
+    return Container(
       key: const ValueKey('advanced_main'),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
