@@ -332,7 +332,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                       );
                     },
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
 
                   Text(
                     'FOUNDATIONS',
@@ -340,9 +340,10 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                       color: theme.primaryColor,
                       letterSpacing: 1.2,
                       fontWeight: FontWeight.bold,
+                      fontSize: 10,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
                   Row(
                     children: [
                       Expanded(
@@ -372,7 +373,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
 
                   Text(
                     'FIRMAMENT',
@@ -380,9 +381,10 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                       color: theme.primaryColor,
                       letterSpacing: 1.2,
                       fontWeight: FontWeight.bold,
+                      fontSize: 10,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
                   Row(
                     children: [
                       Expanded(
@@ -419,7 +421,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
 
                   Text(
                     'EDEN',
@@ -427,9 +429,10 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                       color: theme.primaryColor,
                       letterSpacing: 1.2,
                       fontWeight: FontWeight.bold,
+                      fontSize: 10,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
                   Row(
                     children: [
                       Expanded(
@@ -466,7 +469,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
 
                   Text(
                     'SANCTUARY',
@@ -474,9 +477,10 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                       color: theme.primaryColor,
                       letterSpacing: 1.2,
                       fontWeight: FontWeight.bold,
+                      fontSize: 10,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
                   Row(
                     children: [
                       Expanded(
@@ -513,7 +517,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
                 ],
               ),
             ),
@@ -541,18 +545,73 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
             ),
           ),
           const SizedBox(height: 12),
-          SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            title: const Text('Match system appearance', style: TextStyle(fontSize: 14)),
-            subtitle: const Text('Automatically switch between light and dark themes based on your device settings', style: TextStyle(fontSize: 12)),
-            value: isMatchSystem,
-            onChanged: (value) {
-              HapticFeedback.selectionClick();
-              ref.read(themeProvider.notifier).setMatchSystem(value);
-              if (value) {
-                ref.read(themeProvider.notifier).setTheme(AppThemeMode.automatic);
-              }
-            },
+          Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    ref.read(themeProvider.notifier).setMatchSystem(false);
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: !isMatchSystem ? const Color(0xFFFBB6A8) : theme.colorScheme.onSurface.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(28),
+                      boxShadow: !isMatchSystem ? [
+                        BoxShadow(
+                          color: const Color(0xFFFBB6A8).withValues(alpha: 0.5),
+                          blurRadius: 16,
+                          offset: const Offset(0, 4),
+                        )
+                      ] : null,
+                      border: Border.all(
+                        color: !isMatchSystem ? Colors.transparent : theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                      ),
+                    ),
+                    child: Center(
+                      child: Icon(
+                        Icons.lock_rounded, 
+                        color: !isMatchSystem ? Colors.black87 : theme.colorScheme.onSurface,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    ref.read(themeProvider.notifier).setMatchSystem(true);
+                    ref.read(themeProvider.notifier).setTheme(AppThemeMode.automatic);
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: isMatchSystem ? const Color(0xFF2E313D) : theme.colorScheme.onSurface.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(28),
+                      border: Border.all(
+                        color: isMatchSystem ? Colors.transparent : theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'A',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w900,
+                          color: isMatchSystem ? Colors.white : theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           Text(
@@ -564,18 +623,43 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
             ),
           ),
           const SizedBox(height: 12),
-          AnimatedSegmentedTile<bool>(
-            title: 'Rotation vs Locked',
-            subtitle: 'Choose whether themes cycle daily',
-            selectedValue: isSingleTheme,
-            options: const [
-              MapEntry(false, 'Rotating'),
-              MapEntry(true, 'Locked'),
-            ],
-            onChanged: (val) {
+          GestureDetector(
+            onTap: () {
               HapticFeedback.selectionClick();
-              ref.read(themeProvider.notifier).setSingleTheme(val);
+              ref.read(themeProvider.notifier).setSingleTheme(!isSingleTheme);
             },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: theme.colorScheme.onSurface.withValues(alpha: 0.1)),
+              ),
+              child: Row(
+                children: [
+                  Icon(isSingleTheme ? Icons.lock_rounded : Icons.loop_rounded, size: 16, color: theme.colorScheme.onSurface),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      isSingleTheme ? 'Locked Theme' : 'Daily Rotation',
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Text(
+                      isSingleTheme ? 'Locked' : 'Rotating',
+                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
           if (!isSingleTheme) ...[
             const SizedBox(height: 12),
@@ -755,7 +839,7 @@ class _ThemePillState extends ConsumerState<_ThemePill> with SingleTickerProvide
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
-        height: 52,
+        height: 46,
         decoration: BoxDecoration(
           color: isSelected ? widget.fillColor : theme.colorScheme.onSurface.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(26),
@@ -772,8 +856,8 @@ class _ThemePillState extends ConsumerState<_ThemePill> with SingleTickerProvide
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeOutCubic,
               padding: EdgeInsets.only(
-                left: isSelected ? 8 : 46,
-                right: isSelected ? 46 : 8,
+                left: isSelected ? 6 : 40,
+                right: isSelected ? 40 : 6,
               ),
               child: Align(
                 alignment: Alignment.center,
@@ -785,7 +869,7 @@ class _ThemePillState extends ConsumerState<_ThemePill> with SingleTickerProvide
                   style: TextStyle(
                     color: isSelected ? widget.textColor : theme.colorScheme.onSurface,
                     fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
-                    fontSize: 11,
+                    fontSize: 10,
                     height: 1.1,
                   ),
                 ),
@@ -798,8 +882,8 @@ class _ThemePillState extends ConsumerState<_ThemePill> with SingleTickerProvide
               child: Padding(
                 padding: const EdgeInsets.all(4.0),
                 child: Container(
-                  width: 40,
-                  height: 40,
+                  width: 32,
+                  height: 32,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: SweepGradient(colors: [...widget.swatchColors, widget.swatchColors.first]),
@@ -930,7 +1014,7 @@ class _DarkThemePillState extends ConsumerState<_DarkThemePill> with SingleTicke
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
-        height: 52,
+        height: 46,
         decoration: BoxDecoration(
           color: isSelected ? fillColor : theme.colorScheme.onSurface.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(26),
@@ -947,8 +1031,8 @@ class _DarkThemePillState extends ConsumerState<_DarkThemePill> with SingleTicke
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeOutCubic,
               padding: EdgeInsets.only(
-                left: isSelected ? 8 : 46,
-                right: isSelected ? 46 : 8,
+                left: isSelected ? 6 : 40,
+                right: isSelected ? 40 : 6,
               ),
               child: Align(
                 alignment: Alignment.center,
@@ -960,7 +1044,7 @@ class _DarkThemePillState extends ConsumerState<_DarkThemePill> with SingleTicke
                   style: TextStyle(
                     color: isSelected ? textColor : theme.colorScheme.onSurface,
                     fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
-                    fontSize: 11,
+                    fontSize: 10,
                     height: 1.1,
                   ),
                 ),
@@ -973,8 +1057,8 @@ class _DarkThemePillState extends ConsumerState<_DarkThemePill> with SingleTicke
               child: Padding(
                 padding: const EdgeInsets.all(4.0),
                 child: Container(
-                  width: 40,
-                  height: 40,
+                  width: 32,
+                  height: 32,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: SweepGradient(colors: [...swatchColors, swatchColors.first]),
@@ -1144,7 +1228,7 @@ class _SimpleTopPill extends StatelessWidget {
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
-        height: 52,
+        height: 46,
         decoration: BoxDecoration(
           color: isActive ? theme.colorScheme.primaryContainer : theme.colorScheme.onSurface.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(26),
