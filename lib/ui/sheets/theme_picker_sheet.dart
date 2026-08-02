@@ -57,6 +57,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           padding: EdgeInsets.zero,
           child: SingleChildScrollView(
+            physics: const ClampingScrollPhysics(),
             padding: EdgeInsets.only(
               top: 16,
               left: 20,

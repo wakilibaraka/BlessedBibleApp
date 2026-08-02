@@ -77,6 +77,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           SafeArea(
             bottom: false,
             child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onHorizontalDragUpdate: (details) {
+                // Empty callback ensures this GestureDetector actively competes in the arena
+                // for horizontal drags, preventing the vertical scroll view from eating the first swipe.
+              },
               onHorizontalDragEnd: (details) {
                 if (details.primaryVelocity == null) return;
                 if (details.primaryVelocity! > 300) {

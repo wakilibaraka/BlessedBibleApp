@@ -22,7 +22,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'privacy_policy_screen.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../../state/translation_provider.dart';
-import '../../state/nav_provider.dart';
 import '../sheets/translation_picker_sheet.dart';
 
 final packageInfoProvider = FutureProvider<PackageInfo>((ref) async {
@@ -34,13 +33,7 @@ class SettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) {
-        if (didPop) return;
-        ref.read(navProvider.notifier).setIndex(0);
-      },
-      child: Scaffold(
+    return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: const SharedAppBar(
         title: Text('Settings'),
@@ -637,7 +630,6 @@ class SettingsScreen extends ConsumerWidget {
         ],
       ),
       ),
-    ),
     );
   }
 

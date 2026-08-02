@@ -144,6 +144,7 @@ class _TranslationPickerSheetState extends ConsumerState<TranslationPickerSheet>
           
           Expanded(
             child: SingleChildScrollView(
+              physics: const ClampingScrollPhysics(),
               child: availableTranslations.when(
                 data: (installed) => _buildTranslationList(context, ref, theme, activeTranslationId, installed),
                 loading: () => const Center(child: Padding(padding: EdgeInsets.all(32), child: CircularProgressIndicator())),

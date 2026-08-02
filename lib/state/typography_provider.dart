@@ -61,9 +61,13 @@ class TypographyNotifier extends Notifier<TypographyState> {
       if (marginValue is String) {
         if (marginValue == 'narrow') {
           marginPercent = 4.0;
-        } else if (marginValue == 'standard') marginPercent = 8.0;
-        else if (marginValue == 'wide') marginPercent = 16.0;
-        else marginPercent = double.tryParse(marginValue);
+        } else if (marginValue == 'standard') {
+          marginPercent = 8.0;
+        } else if (marginValue == 'wide') {
+          marginPercent = 16.0;
+        } else {
+          marginPercent = double.tryParse(marginValue);
+        }
       } else if (marginValue is double) {
         marginPercent = marginValue;
       } else if (marginValue is int) {

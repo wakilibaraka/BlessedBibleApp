@@ -104,6 +104,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: () {
           if (_isEditing) setState(() => _isEditing = false);
         },
@@ -182,6 +183,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                           return Row(
                             children: [
                               GestureDetector(
+                                behavior: HitTestBehavior.opaque,
                                 onTap: () {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
@@ -217,6 +219,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                               ),
                               if (streak.count > 0 || isLit) const SizedBox(width: 16),
                               GestureDetector(
+                                behavior: HitTestBehavior.opaque,
                                 onTap: () {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
@@ -305,6 +308,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                       child: Padding(
                         padding: const EdgeInsets.only(bottom: 16.0),
                         child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
                           onLongPress: () {
                             if (!_isEditing) setState(() => _isEditing = true);
                           },

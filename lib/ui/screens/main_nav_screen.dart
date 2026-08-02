@@ -59,13 +59,26 @@ class MainNavScreen extends ConsumerWidget {
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
         
+        if (!context.mounted) return;
+
+        // Ensure this PopScope only acts if we are truly at the root route.
+        // This prevents the exit dialog from firing when popping modal sheets.
+        if (ModalRoute.of(context)?.isCurrent != true) {
+          return;
+        }
+        
         final selectedVerses = ref.read(readSelectionProvider);
         if (selectedVerses.isNotEmpty) {
           ref.read(readSelectionProvider.notifier).clear();
           return;
         }
 
-        if (!context.mounted) return;
+        // If we are not on the Home tab (0), navigating back should just take us Home.
+        final currentTab = ref.read(navProvider);
+        if (currentTab != 0) {
+          ref.read(navProvider.notifier).setIndex(0);
+          return;
+        }
 
         final shouldExit = await showDialog<bool>(
           context: context,
