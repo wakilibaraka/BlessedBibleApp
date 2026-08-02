@@ -351,12 +351,14 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   bool _isPageSelectionMode = false;
 
   void _enterPageSelection() {
+    ref.read(navHiddenProvider.notifier).set(true);
     setState(() {
       _isPageSelectionMode = true;
     });
   }
 
   void _exitPageSelection() {
+    ref.read(navHiddenProvider.notifier).set(false);
     setState(() {
       _isPageSelectionMode = false;
     });
@@ -662,7 +664,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
     final centerPill = _buildThemedPill(
       tokens: tokens,
-      onTap: () => _showSelectorBottomSheet(allBooks),
+      onTap: _isPageSelectionMode ? () {} : () => _showSelectorBottomSheet(allBooks),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -681,17 +683,21 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
               ),
             ),
           ),
-          const SizedBox(width: 4),
-          Icon(
-            Icons.keyboard_arrow_down_rounded,
-            size: 16,
-            color: tokens.readingInk.withValues(alpha: 0.7),
-          ),
+          if (!_isPageSelectionMode) ...[
+            const SizedBox(width: 4),
+            Icon(
+              Icons.keyboard_arrow_down_rounded,
+              size: 16,
+              color: tokens.readingInk.withValues(alpha: 0.7),
+            ),
+          ],
         ],
       ),
     );
 
-    final leadingButton = Consumer(builder: (context, ref, _) {
+    final leadingButton = _isPageSelectionMode 
+      ? const SizedBox(width: 48)
+      : Consumer(builder: (context, ref, _) {
       final activeTransId = ref.watch(activeTranslationProvider);
       final installed = ref.watch(availableTranslationsProvider).value ?? [];
       final activeTransLabel = _getTranslationLabel(activeTransId, installed);
@@ -716,7 +722,21 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       }, isImmersiveMode);
     });
 
-    final trailingButton = _buildSideButton(
+    final trailingButton = _isPageSelectionMode
+        ? _buildSideButton(
+            context,
+            tokens,
+            Text(
+              'Done',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: tokens.readingInk,
+                letterSpacing: -0.5,
+              ),
+            ),
+            _exitPageSelection,
+            false)
+        : _buildSideButton(
         context,
         tokens,
         Text(
@@ -1093,7 +1113,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
                                       return RepaintBoundary(
                                         child: GestureDetector(
-                                          onTap: () {
+                                          onTap: _isPageSelectionMode ? null : () {
                                             if (selectedVerses.isNotEmpty) {
                                               _clearSelection();
                                             }
@@ -1126,6 +1146,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                   ref.read(navSettingsProvider);
 
                                               // ── Deliberate-drag gate for navigation ──
+                                              if (_isPageSelectionMode) return false;
+
                                               if (bibleNavSettings
                                                   .swipeDownToNav) {
                                                 if (notification

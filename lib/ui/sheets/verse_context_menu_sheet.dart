@@ -4,8 +4,9 @@ import '../widgets/textured_glass_container.dart';
 import '../../state/notes_provider.dart';
 import '../../state/user_data_provider.dart';
 import '../screens/read_screen.dart' show VerseActionLogic;
-
 import '../../state/bible_provider.dart';
+import 'package:flutter/cupertino.dart';
+import '../screens/commentary_hub_screen.dart';
 
 class VerseContextMenuSheet extends ConsumerWidget {
   final int verseNumber;
@@ -29,7 +30,6 @@ class VerseContextMenuSheet extends ConsumerWidget {
 
 
     final hasNote = ref.watch(notesProvider).any((n) => n.reference == verseKey);
-    final isHighlighted = ref.watch(highlightsProvider).containsKey(verseKey);
 
     final targetVerses = [verseNumber];
 
@@ -50,38 +50,17 @@ class VerseContextMenuSheet extends ConsumerWidget {
                     children: [
                       Expanded(
                         child: _MenuButton(
-                          icon: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Container(width: 4, height: 4, decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle)),
-                                  const SizedBox(height: 2),
-                                  Container(width: 4, height: 4, decoration: const BoxDecoration(color: Colors.yellow, shape: BoxShape.circle)),
-                                  const SizedBox(height: 2),
-                                  Container(width: 4, height: 4, decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle)),
-                                ],
-                              ),
-                              const SizedBox(width: 4),
-                              const Icon(Icons.highlight_rounded),
-                            ],
-                          ),
-                          label: isHighlighted ? 'Highlighted' : 'Highlight',
-                          color: isHighlighted ? Colors.amber.shade600 : null,
+                          icon: const Icon(Icons.comment_bank_outlined, size: 24),
+                          label: 'Commentary',
                           onTap: () {
                             Navigator.of(context).pop();
-                            VerseActionLogic.handleHighlightInteraction(
-                              context: context,
-                              ref: ref,
-                              theme: theme,
-                              bookAbbrev: bookAbbrev,
-                              chapterNum: chapterNum,
-                              targetVerses: targetVerses,
-                              isLongPress: false,
-                              onClearSelection: () {},
-                            );
+                            Navigator.of(context).push(CupertinoPageRoute(
+                              builder: (_) => CommentaryHubScreen(
+                                book: bookName,
+                                chapter: chapterNum,
+                                verse: verseNumber,
+                              ),
+                            ));
                           },
                         ),
                       ),
