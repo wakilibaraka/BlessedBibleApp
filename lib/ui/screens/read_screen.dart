@@ -100,6 +100,13 @@ class LazyPageScrollPhysics extends ScrollPhysics {
   }
 
   @override
+  SpringDescription get spring => SpringDescription.withDampingRatio(
+        mass: 0.25,      // lighter mass makes it accelerate faster
+        stiffness: 280.0, // higher stiffness makes it snap firmly
+        ratio: 0.95,      // slight underdamping for a snappy fluid feel without wobbling
+      );
+
+  @override
   bool get allowImplicitScrolling => false;
 }
 
@@ -902,7 +909,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                 controller: _pageController,
                                 itemCount: flatChapters.length,
                                 onPageChanged: (pageIndex) {
-                                  HapticFeedback.selectionClick();
                                   debugPrint(
                                       'STEP0: onPageChanged gesture started for page $pageIndex');
                                   setState(() {
