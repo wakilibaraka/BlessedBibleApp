@@ -48,15 +48,23 @@ import '../../theme/reading_tokens.dart';
 import '../widgets/commentary_view.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
-class LazyPageScrollPhysics extends ScrollPhysics {
-  const LazyPageScrollPhysics({super.parent});
+class LazyPageScrollPhysics extends PageScrollPhysics {
+  final GestureSensitivity sensitivity;
+
+  const LazyPageScrollPhysics({
+    super.parent,
+    this.sensitivity = GestureSensitivity.fluid,
+  });
 
   @override
   LazyPageScrollPhysics applyTo(ScrollPhysics? ancestor) {
-    return LazyPageScrollPhysics(parent: buildParent(ancestor));
+    return LazyPageScrollPhysics(
+      parent: buildParent(ancestor),
+      sensitivity: sensitivity,
+    );
   }
 
-  double _getPage(ScrollMetrics position) {
+  double _getCustomPage(ScrollMetrics position) {
     return position.pixels / position.viewportDimension;
   }
 
@@ -64,8 +72,8 @@ class LazyPageScrollPhysics extends ScrollPhysics {
     return page * position.viewportDimension;
   }
 
-  double _getTargetPixels(ScrollMetrics position, Tolerance tolerance, double velocity) {
-    double page = _getPage(position);
+  double _getCustomTargetPixels(ScrollMetrics position, Tolerance tolerance, double velocity) {
+    double page = _getCustomPage(position);
     
     // Very relaxed swipe thresholds for a "lazy" feel.
     // Flick threshold: 50 px/s (very light flick)
@@ -87,12 +95,16 @@ class LazyPageScrollPhysics extends ScrollPhysics {
 
   @override
   Simulation? createBallisticSimulation(ScrollMetrics position, double velocity) {
+    if (sensitivity == GestureSensitivity.fluid) {
+      return super.createBallisticSimulation(position, velocity);
+    }
+
     if ((velocity <= 0.0 && position.pixels <= position.minScrollExtent) ||
         (velocity >= 0.0 && position.pixels >= position.maxScrollExtent)) {
       return super.createBallisticSimulation(position, velocity);
     }
     final Tolerance tolerance = toleranceFor(position);
-    final double target = _getTargetPixels(position, tolerance, velocity);
+    final double target = _getCustomTargetPixels(position, tolerance, velocity);
     if (target != position.pixels) {
       return SpringSimulation(spring, position.pixels, target, velocity, tolerance: tolerance);
     }
@@ -100,11 +112,16 @@ class LazyPageScrollPhysics extends ScrollPhysics {
   }
 
   @override
-  SpringDescription get spring => SpringDescription.withDampingRatio(
-        mass: 0.25,      // lighter mass makes it accelerate faster
-        stiffness: 280.0, // higher stiffness makes it snap firmly
-        ratio: 0.95,      // slight underdamping for a snappy fluid feel without wobbling
-      );
+  SpringDescription get spring {
+    if (sensitivity == GestureSensitivity.fluid) {
+      return super.spring;
+    }
+    return SpringDescription.withDampingRatio(
+      mass: 0.25,
+      stiffness: 280.0,
+      ratio: 0.95,
+    );
+  }
 
   @override
   bool get allowImplicitScrolling => false;
@@ -905,7 +922,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                     style: theme.textTheme.bodyLarge),
                               )
                             : PageView.builder(
-                                physics: const LazyPageScrollPhysics(),
+                                physics: LazyPageScrollPhysics(
+                                  sensitivity: ref.watch(readSettingsProvider.select((s) => s.gestureSensitivity)),
+                                ),
                                 controller: _pageController,
                                 itemCount: flatChapters.length,
                                 onPageChanged: (pageIndex) {

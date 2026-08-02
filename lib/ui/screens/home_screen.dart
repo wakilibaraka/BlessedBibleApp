@@ -16,9 +16,13 @@ import 'commentary_hub_screen.dart';
 import 'today_screen.dart';
 import '../../services/share_service.dart';
 import '../sheets/theme_picker_sheet.dart';
+import '../../state/read_settings_provider.dart';
 
 class StrictHorizontalDragGestureRecognizer extends HorizontalDragGestureRecognizer {
   Offset _totalDelta = Offset.zero;
+  final GestureSensitivity sensitivity;
+
+  StrictHorizontalDragGestureRecognizer({this.sensitivity = GestureSensitivity.fluid});
 
   @override
   void addAllowedPointer(PointerDownEvent event) {
@@ -32,11 +36,17 @@ class StrictHorizontalDragGestureRecognizer extends HorizontalDragGestureRecogni
       _totalDelta += event.delta;
       final dy = _totalDelta.dy.abs();
       final dx = _totalDelta.dx.abs();
-      // Strict threshold: |dx| must be > |dy| * 2. 
-      // If vertical movement is too high compared to horizontal, reject immediately.
-      // Wait for a tiny movement (3px) to avoid rejecting pure tap jitter.
-      if (dy > 3 && dy >= dx * 0.5) {
-        resolve(GestureDisposition.rejected);
+      
+      if (sensitivity == GestureSensitivity.firm) {
+        // Strict threshold: |dx| must be > |dy| * 2. 
+        if (dy > 3 && dy >= dx * 0.5) {
+          resolve(GestureDisposition.rejected);
+        }
+      } else {
+        // Fluid threshold: mostly horizontal (at least 45 deg angle)
+        if (dy > 3 && dy >= dx * 1.2) {
+          resolve(GestureDisposition.rejected);
+        }
       }
     }
     super.handleEvent(event);
@@ -107,7 +117,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               behavior: HitTestBehavior.opaque,
               gestures: {
                 StrictHorizontalDragGestureRecognizer: GestureRecognizerFactoryWithHandlers<StrictHorizontalDragGestureRecognizer>(
-                  () => StrictHorizontalDragGestureRecognizer(),
+                  () => StrictHorizontalDragGestureRecognizer(
+                    sensitivity: ref.watch(readSettingsProvider.select((s) => s.gestureSensitivity)),
+                  ),
                   (StrictHorizontalDragGestureRecognizer instance) {
                     instance
                       ..onUpdate = (details) {

@@ -64,6 +64,24 @@ class SettingsScreen extends ConsumerWidget {
                 },
               );
             }),
+            Consumer(builder: (context, ref, _) {
+              final sensitivity = ref.watch(readSettingsProvider.select((s) => s.gestureSensitivity));
+              return AnimatedSegmentedTile<GestureSensitivity>(
+                title: 'Gesture Sensitivity',
+                subtitle: sensitivity == GestureSensitivity.fluid
+                    ? 'Fluid: Light, flick-responsive gestures across the app.'
+                    : 'Firm: Deliberate gestures, resistant to accidental swipes.',
+                selectedValue: sensitivity,
+                options: const [
+                  MapEntry(GestureSensitivity.fluid, 'Fluid'),
+                  MapEntry(GestureSensitivity.firm, 'Firm'),
+                ],
+                onChanged: (val) {
+                  HapticFeedback.selectionClick();
+                  ref.read(readSettingsProvider.notifier).setGestureSensitivity(val);
+                },
+              );
+            }),
           ]),
           
           _buildSection(context, 'Reading', [
