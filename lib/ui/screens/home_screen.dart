@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/home_data.dart';
@@ -15,6 +16,32 @@ import 'commentary_hub_screen.dart';
 import 'today_screen.dart';
 import '../../services/share_service.dart';
 import '../sheets/theme_picker_sheet.dart';
+
+class StrictHorizontalDragGestureRecognizer extends HorizontalDragGestureRecognizer {
+  Offset _totalDelta = Offset.zero;
+
+  @override
+  void addAllowedPointer(PointerDownEvent event) {
+    _totalDelta = Offset.zero;
+    super.addAllowedPointer(event);
+  }
+
+  @override
+  void handleEvent(PointerEvent event) {
+    if (event is PointerMoveEvent) {
+      _totalDelta += event.delta;
+      final dy = _totalDelta.dy.abs();
+      final dx = _totalDelta.dx.abs();
+      // Strict threshold: |dx| must be > |dy| * 2. 
+      // If vertical movement is too high compared to horizontal, reject immediately.
+      // Wait for a tiny movement (3px) to avoid rejecting pure tap jitter.
+      if (dy > 3 && dy >= dx * 0.5) {
+        resolve(GestureDisposition.rejected);
+      }
+    }
+    super.handleEvent(event);
+  }
+}
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -76,21 +103,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           // ── Layer 2: Content ───────────────────────────────────────────
           SafeArea(
             bottom: false,
-            child: GestureDetector(
+            child: RawGestureDetector(
               behavior: HitTestBehavior.opaque,
-              onHorizontalDragUpdate: (details) {
-                // Empty callback ensures this GestureDetector actively competes in the arena
-                // for horizontal drags, preventing the vertical scroll view from eating the first swipe.
-              },
-              onHorizontalDragEnd: (details) {
-                if (details.primaryVelocity == null) return;
-                if (details.primaryVelocity! > 300) {
-                  // Swipe Right -> Appearance Sheet
-                  ThemePickerSheet.show(context);
-                } else if (details.primaryVelocity! < -300) {
-                  // Swipe Left -> Settings
-                  ref.read(navProvider.notifier).setIndex(4);
-                }
+              gestures: {
+                StrictHorizontalDragGestureRecognizer: GestureRecognizerFactoryWithHandlers<StrictHorizontalDragGestureRecognizer>(
+                  () => StrictHorizontalDragGestureRecognizer(),
+                  (StrictHorizontalDragGestureRecognizer instance) {
+                    instance
+                      ..onUpdate = (details) {
+                        // Empty callback ensures this recognizer actively competes in the arena.
+                      }
+                      ..onEnd = (details) {
+                        if (details.primaryVelocity == null) return;
+                        if (details.primaryVelocity! > 300) {
+                          // Swipe Right -> Appearance Sheet
+                          ThemePickerSheet.show(context);
+                        } else if (details.primaryVelocity! < -300) {
+                          // Swipe Left -> Settings
+                          ref.read(navProvider.notifier).setIndex(4);
+                        }
+                      };
+                  },
+                ),
               },
               child: RefreshIndicator(
                 onRefresh: _onRefresh,

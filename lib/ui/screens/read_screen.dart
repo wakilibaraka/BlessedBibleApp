@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/physics.dart';
 import '../../theme/app_colors.dart';
 import '../widgets/pinch_to_zoom_font_wrapper.dart';
 import '../widgets/pill_segmented_control.dart';
@@ -46,6 +47,62 @@ import '../../state/translation_provider.dart';
 import '../../theme/reading_tokens.dart';
 import '../widgets/commentary_view.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+
+class LazyPageScrollPhysics extends ScrollPhysics {
+  const LazyPageScrollPhysics({super.parent});
+
+  @override
+  LazyPageScrollPhysics applyTo(ScrollPhysics? ancestor) {
+    return LazyPageScrollPhysics(parent: buildParent(ancestor));
+  }
+
+  double _getPage(ScrollMetrics position) {
+    return position.pixels / position.viewportDimension;
+  }
+
+  double _getPixels(ScrollMetrics position, double page) {
+    return page * position.viewportDimension;
+  }
+
+  double _getTargetPixels(ScrollMetrics position, Tolerance tolerance, double velocity) {
+    double page = _getPage(position);
+    
+    // Very relaxed swipe thresholds for a "lazy" feel.
+    // Flick threshold: 50 px/s (very light flick)
+    if (velocity < -50.0) {
+      page -= 0.5;
+    } else if (velocity > 50.0) {
+      page += 0.5;
+    } else {
+      // Distance threshold: only need to drag 15% of the screen to snap to the next page.
+      double fraction = page - page.roundToDouble();
+      if (fraction > 0.15) {
+        page = page.roundToDouble() + 1.0;
+      } else if (fraction < -0.15) {
+        page = page.roundToDouble() - 1.0;
+      }
+    }
+    return _getPixels(position, page.roundToDouble());
+  }
+
+  @override
+  Simulation? createBallisticSimulation(ScrollMetrics position, double velocity) {
+    if ((velocity <= 0.0 && position.pixels <= position.minScrollExtent) ||
+        (velocity >= 0.0 && position.pixels >= position.maxScrollExtent)) {
+      return super.createBallisticSimulation(position, velocity);
+    }
+    final Tolerance tolerance = toleranceFor(position);
+    final double target = _getTargetPixels(position, tolerance, velocity);
+    if (target != position.pixels) {
+      return SpringSimulation(spring, position.pixels, target, velocity, tolerance: tolerance);
+    }
+    return null;
+  }
+
+  @override
+  bool get allowImplicitScrolling => false;
+}
+
 class ExpandedChipsNotifier extends Notifier<Map<int, String?>> {
   @override
   Map<int, String?> build() => {};
@@ -841,6 +898,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                     style: theme.textTheme.bodyLarge),
                               )
                             : PageView.builder(
+                                physics: const LazyPageScrollPhysics(),
                                 controller: _pageController,
                                 itemCount: flatChapters.length,
                                 onPageChanged: (pageIndex) {
