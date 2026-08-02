@@ -4,6 +4,7 @@ import '../../state/theme_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/read_settings_provider.dart';
 import '../../state/nav_provider.dart';
+import '../../state/surface_style_provider.dart';
 
 class AnimatedBackground extends ConsumerStatefulWidget {
   final AppThemeMode appThemeMode;
@@ -49,11 +50,10 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground> with Si
     }
     
     final readSettings = ref.watch(readSettingsProvider);
+    final surfaceStyle = ref.watch(surfaceStyleProvider);
     final isReadTab = widget.tabIndex == 1;
     final isImmersiveOn = readSettings.readingViewMode == ReadingViewMode.immersive;
-    final mode = widget.appThemeMode.resolve(context);
-    final isFlatTheme = mode == AppThemeMode.dawn || mode == AppThemeMode.dusk || mode == AppThemeMode.fresh;
-    final disableGlow = (isReadTab && isImmersiveOn) || isFlatTheme;
+    final disableGlow = surfaceStyle != SurfaceStyle.threeDimensional || (isReadTab && isImmersiveOn);
 
     final shouldAnimate = isRouteCurrent && isTabActive && !disableGlow;
     
@@ -61,14 +61,6 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground> with Si
       _bgAnimation.repeat(reverse: true);
     } else if (!shouldAnimate && _bgAnimation.isAnimating) {
       _bgAnimation.stop();
-    }
-
-    if (disableGlow) {
-      return AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-        color: Theme.of(context).scaffoldBackgroundColor,
-      );
     }
 
     return RepaintBoundary(
@@ -171,15 +163,19 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground> with Si
             switchInCurve: Curves.easeOut,
             switchOutCurve: Curves.easeOut,
             child: Container(
-              key: ValueKey(widget.appThemeMode.resolve(context)),
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  center: Alignment(cx!, cy!),
-                  radius: radius,
-                  colors: colors,
-                  stops: const [0.0, 0.5, 1.0],
-                ),
-              ),
+              key: ValueKey('${widget.appThemeMode.resolve(context).name}_$disableGlow'),
+              decoration: disableGlow
+                  ? BoxDecoration(
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                    )
+                  : BoxDecoration(
+                      gradient: RadialGradient(
+                        center: Alignment(cx!, cy!),
+                        radius: radius,
+                        colors: colors,
+                        stops: const [0.0, 0.5, 1.0],
+                      ),
+                    ),
             ),
           );
         },

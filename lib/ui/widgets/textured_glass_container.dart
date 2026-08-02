@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/theme_provider.dart';
-import '../../state/glass_ui_provider.dart';
+import '../../state/surface_style_provider.dart';
 import '../../theme/reading_tokens.dart';
 
 class TexturedGlassContainer extends ConsumerWidget {
@@ -31,10 +31,11 @@ class TexturedGlassContainer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appTheme = ref.watch(themeProvider);
-    final isGlassy = ref.watch(glassUiProvider);
+    final surfaceStyle = ref.watch(surfaceStyleProvider);
     final radius = borderRadius ?? BorderRadius.circular(24);
 
-    final useBlur = isGlassy && !isScrollable;
+    final useBlur = surfaceStyle == SurfaceStyle.frosted && !isScrollable;
+    final is3D = surfaceStyle == SurfaceStyle.threeDimensional;
 
     final tokens = Theme.of(context).extension<ReadingTokens>()!;
     Color fillColor;
@@ -61,10 +62,61 @@ class TexturedGlassContainer extends ConsumerWidget {
           fillColor = Colors.black.withValues(alpha: 0.15);
           break;
       }
-    } else if (isGlassy && isScrollable) {
+    } else if (surfaceStyle == SurfaceStyle.frosted && isScrollable) {
       fillColor = tokens.readingSurface.withValues(alpha: 0.85);
     } else {
       fillColor = tokens.readingSurface;
+    }
+
+    final bgLuminance = tokens.readingSurface.computeLuminance();
+    final isDarkBg = bgLuminance < 0.4;
+    
+    final List<BoxShadow> shadows;
+    if (is3D) {
+      shadows = isDarkBg
+          ? [
+              BoxShadow(
+                color: Colors.white.withValues(alpha: 0.08),
+                offset: const Offset(-2.0, -2.0),
+                blurRadius: 4,
+              ),
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.4),
+                offset: const Offset(4.0, 4.0),
+                blurRadius: 6,
+              ),
+            ]
+          : [
+              BoxShadow(
+                color: Colors.white.withValues(alpha: 0.9),
+                offset: const Offset(-2.0, -2.0),
+                blurRadius: 4,
+              ),
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.08),
+                offset: const Offset(4.0, 4.0),
+                blurRadius: 6,
+              ),
+            ];
+    } else if (surfaceStyle == SurfaceStyle.frosted) {
+      shadows = [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.08),
+          blurRadius: 24,
+          spreadRadius: 0,
+          offset: const Offset(0, 10),
+        ),
+      ];
+    } else {
+      // Flat style - very minimal or no shadow
+      shadows = [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.03),
+          blurRadius: 8,
+          spreadRadius: 0,
+          offset: const Offset(0, 2),
+        ),
+      ];
     }
 
     return AnimatedContainer(
@@ -74,92 +126,49 @@ class TexturedGlassContainer extends ConsumerWidget {
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         borderRadius: radius,
-        boxShadow: (appTheme.resolve(context) == AppThemeMode.dawn || 
-                    appTheme.resolve(context) == AppThemeMode.lilies || 
-                    appTheme.resolve(context) == AppThemeMode.roses || 
-                    appTheme.resolve(context) == AppThemeMode.olives || 
-                    appTheme.resolve(context) == AppThemeMode.dusk || 
-                    appTheme.resolve(context) == AppThemeMode.fresh) && !isGlassy
-            ? [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 20,
-                  spreadRadius: 0,
-                  offset: const Offset(8, 8),
-                ),
-                BoxShadow(
-                  color: Colors.white.withValues(alpha: 0.8),
-                  blurRadius: 20,
-                  spreadRadius: 0,
-                  offset: const Offset(-8, -8),
-                ),
-              ]
-            : [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.08),
-                  blurRadius: 24,
-                  spreadRadius: 0,
-                  offset: const Offset(0, 10),
-                ),
-              ],
+        boxShadow: shadows,
       ),
       child: ClipRRect(
         borderRadius: radius,
         clipBehavior: Clip.antiAlias,
-        child: useBlur
-            ? RepaintBoundary(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: sigmaX, sigmaY: sigmaY),
-                  child: CustomPaint(
-                    foregroundPainter: _NoisePainter(),
-                    child: Container(
-                      padding: padding,
-                      decoration: BoxDecoration(
-                        color: fillColor,
-                        border: Border.all(
-                          width: 1.0,
-                          color: tokens.readingBorder,
-                        ),
-                        borderRadius: radius,
-                      ),
-                      child: child,
-                    ),
-                  ),
-                ),
-              )
-            : isGlassy && isScrollable
-                ? Container(
-                    padding: padding,
-                    decoration: BoxDecoration(
-                      color: fillColor,
-                      border: Border.all(
-                        width: 0.5,
-                        color: Colors.white.withValues(alpha: 0.2), // slightly more visible border
-                      ),
-                      borderRadius: radius,
-                    ),
-                    child: child,
-                  )
-                : Container(
+        child: RepaintBoundary(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(
+              sigmaX: useBlur ? sigmaX : 0.001, 
+              sigmaY: useBlur ? sigmaY : 0.001
+            ),
+            child: CustomPaint(
+              foregroundPainter: _NoisePainter(drawNoise: useBlur),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
                 padding: padding,
                 decoration: BoxDecoration(
                   color: fillColor,
                   border: Border.all(
-                    width: 0.5,
-                    color: Colors.white.withValues(alpha: 0.15),
+                    width: is3D ? 0.0 : (useBlur ? 1.0 : 0.5),
+                    color: is3D ? Colors.transparent : (useBlur ? tokens.readingBorder : Colors.white.withValues(alpha: 0.15)),
                   ),
                   borderRadius: radius,
                 ),
                 child: child,
               ),
+            ),
+          ),
+        ),
       ),
     );
   }
 }
 
 class _NoisePainter extends CustomPainter {
+  final bool drawNoise;
+
+  _NoisePainter({this.drawNoise = true});
+
   @override
   void paint(Canvas canvas, Size size) {
+    if (!drawNoise) return;
+
     final random = math.Random(42); // Fixed seed prevents jitter
     final count = (size.width * size.height * 0.01).toInt().clamp(0, 500);
 
@@ -184,5 +193,7 @@ class _NoisePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _NoisePainter oldDelegate) {
+    return oldDelegate.drawNoise != drawNoise;
+  }
 }

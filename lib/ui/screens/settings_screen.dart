@@ -9,7 +9,7 @@ import '../../state/hints_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../state/user_data_provider.dart';
 import '../../state/typography_provider.dart';
-import '../../state/glass_ui_provider.dart';
+import '../../state/surface_style_provider.dart';
 import '../../state/nav_settings_provider.dart';
 import '../../state/search_settings_provider.dart';
 import '../../state/bible_nav_settings_provider.dart';
@@ -45,14 +45,19 @@ class SettingsScreen extends StatelessWidget {
         children: [
           _buildSection(context, 'Appearance', [
             Consumer(builder: (context, ref, _) {
-              final isGlassy = ref.watch(glassUiProvider);
-              return SwitchListTile(
-                title: const Text('Frosted Glass UI'),
-                subtitle: const Text('Enable ultra-thin Apple-style liquid glass'),
-                value: isGlassy,
-                onChanged: (value) {
+              final surfaceStyle = ref.watch(surfaceStyleProvider);
+              return _AnimatedSegmentedTile<SurfaceStyle>(
+                title: 'Surface Style',
+                subtitle: 'Visual depth and material styling',
+                selectedValue: surfaceStyle,
+                options: const [
+                  MapEntry(SurfaceStyle.flat, 'Flat'),
+                  MapEntry(SurfaceStyle.frosted, 'Frosted Glass'),
+                  MapEntry(SurfaceStyle.threeDimensional, '3D'),
+                ],
+                onChanged: (val) {
                   HapticFeedback.selectionClick();
-                  ref.read(glassUiProvider.notifier).set(value);
+                  ref.read(surfaceStyleProvider.notifier).setStyle(val);
                 },
               );
             }),

@@ -17,7 +17,7 @@ import '../state/read_settings_provider.dart';
 import '../state/study_layout_provider.dart';
 import '../state/theme_provider.dart';
 import '../state/typography_provider.dart';
-import '../state/glass_ui_provider.dart';
+import '../state/surface_style_provider.dart';
 
 class BackupService {
   static const int currentVersion = 1;
@@ -134,7 +134,7 @@ class BackupService {
       ref.invalidate(studyLayoutProvider);
       ref.invalidate(themeProvider);
       ref.invalidate(typographyProvider);
-      ref.invalidate(glassUiProvider);
+      ref.invalidate(surfaceStyleProvider);
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

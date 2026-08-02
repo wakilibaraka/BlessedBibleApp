@@ -5,7 +5,7 @@ import '../../state/search_provider.dart';
 import '../../state/search_engine.dart';
 import '../../state/nav_provider.dart';
 import '../../state/read_location_provider.dart';
-import '../../state/glass_ui_provider.dart';
+import '../../state/surface_style_provider.dart';
 import '../../state/bible_provider.dart';
 import '../../state/search_settings_provider.dart';
 import '../../state/most_read_provider.dart';
@@ -116,7 +116,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
   Widget build(BuildContext context) {
     final searchState = ref.watch(searchStateProvider);
     final theme = Theme.of(context);
-    final isGlassy = ref.watch(glassUiProvider);
+    final isGlassy = ref.watch(surfaceStyleProvider) == SurfaceStyle.frosted;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
