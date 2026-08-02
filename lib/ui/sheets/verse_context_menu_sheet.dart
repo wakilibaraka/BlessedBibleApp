@@ -11,12 +11,14 @@ class VerseContextMenuSheet extends ConsumerWidget {
   final int verseNumber;
   final String bookName;
   final int chapterNum;
+  final VoidCallback onCustomSelection;
 
   const VerseContextMenuSheet({
     super.key,
     required this.verseNumber,
     required this.bookName,
     required this.chapterNum,
+    required this.onCustomSelection,
   });
 
   @override
@@ -25,7 +27,7 @@ class VerseContextMenuSheet extends ConsumerWidget {
     final bookAbbrev = _getBookAbbrev(ref, bookName);
     final verseKey = generateVerseKey(bookAbbrev, chapterNum, verseNumber);
 
-    final isBookmarked = ref.watch(bookmarksProvider).contains(verseKey);
+
     final hasNote = ref.watch(notesProvider).any((n) => n.reference == verseKey);
     final isHighlighted = ref.watch(highlightsProvider).containsKey(verseKey);
 
@@ -48,78 +50,63 @@ class VerseContextMenuSheet extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
-                Wrap(
-                  spacing: 16,
-                  runSpacing: 16,
-                  alignment: WrapAlignment.center,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _MenuButton(
-                      icon: const HighlightTorchIcon(size: 24),
-                      label: isHighlighted ? 'Highlighted' : 'Highlight',
-                      color: isHighlighted ? Colors.amber.shade600 : null,
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        VerseActionLogic.handleHighlightInteraction(
-                          context: context,
-                          ref: ref,
-                          theme: theme,
-                          bookName: bookName,
-                          chapterNum: chapterNum,
-                          targetVerses: targetVerses,
-                          isLongPress: false,
-                          onClearSelection: () {},
-                        );
-                      },
+                    Expanded(
+                      child: _MenuButton(
+                        icon: const HighlightTorchIcon(size: 24),
+                        label: isHighlighted ? 'Highlighted' : 'Highlight',
+                        color: isHighlighted ? Colors.amber.shade600 : null,
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          VerseActionLogic.handleHighlightInteraction(
+                            context: context,
+                            ref: ref,
+                            theme: theme,
+                            bookName: bookName,
+                            chapterNum: chapterNum,
+                            targetVerses: targetVerses,
+                            isLongPress: false,
+                            onClearSelection: () {},
+                          );
+                        },
+                      ),
                     ),
-                    _MenuButton(
-                      icon: Icon(Icons.edit_document, size: 24),
-                      label: hasNote ? 'Edit Note' : 'Note',
-                      color: hasNote ? Colors.blue.shade600 : null,
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        VerseActionLogic.handleNote(
-                          context, ref, theme, bookName, chapterNum, targetVerses,
-                        );
-                      },
+                    Expanded(
+                      child: _MenuButton(
+                        icon: Icon(Icons.text_format_rounded, size: 24),
+                        label: 'Selection',
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          onCustomSelection();
+                        },
+                      ),
                     ),
-                    _MenuButton(
-                      icon: Icon(isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_border_rounded, size: 24),
-                      label: isBookmarked ? 'Saved' : 'Bookmark',
-                      color: isBookmarked ? theme.primaryColor : null,
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        VerseActionLogic.handleBookmark(
-                          context, theme, ref, bookName, chapterNum, targetVerses,
-                        );
-                      },
+                    Expanded(
+                      child: _MenuButton(
+                        icon: Icon(Icons.edit_document, size: 24),
+                        label: hasNote ? 'Edit Note' : 'Note',
+                        color: hasNote ? Colors.blue.shade600 : null,
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          VerseActionLogic.handleNote(
+                            context, ref, theme, bookName, chapterNum, targetVerses,
+                          );
+                        },
+                      ),
                     ),
-                    _MenuButton(
-                      icon: Icon(Icons.copy_rounded, size: 24),
-                      label: 'Copy',
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        VerseActionLogic.handleCopy(
-                          context, ref, bookName, chapterNum, targetVerses,
-                        );
-                      },
-                    ),
-                    _MenuButton(
-                      icon: Icon(Icons.ios_share_rounded, size: 24),
-                      label: 'Share',
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        VerseActionLogic.handleShare(
-                          context, ref, bookName, chapterNum, targetVerses,
-                        );
-                      },
-                    ),
-                    _MenuButton(
-                      icon: Icon(Icons.select_all_rounded, size: 24),
-                      label: 'Select Text',
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        _showSelectTextDialog(context, ref, bookName, chapterNum, verseNumber);
-                      },
+                    Expanded(
+                      child: _MenuButton(
+                        icon: Icon(Icons.ios_share_rounded, size: 24),
+                        label: 'Share',
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          VerseActionLogic.handleShare(
+                            context, ref, bookName, chapterNum, targetVerses,
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),
@@ -142,53 +129,7 @@ class VerseContextMenuSheet extends ConsumerWidget {
     return fullBookName.substring(0, 3).toUpperCase();
   }
 
-  void _showSelectTextDialog(BuildContext context, WidgetRef ref, String bookName, int chapterNum, int verseNumber) {
-    final theme = Theme.of(context);
-    final chapterData = VerseActionLogic.getChapterData(ref, bookName, chapterNum);
-    String verseText = 'Loading...';
-    if (chapterData != null) {
-      final verse = chapterData.verses.firstWhere((v) => v.number == verseNumber, orElse: () => chapterData.verses.first);
-      verseText = verse.text;
-    }
-    
-    showDialog(
-      context: context,
-      builder: (ctx) => Dialog(
-        backgroundColor: theme.cardColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                'Select Text',
-                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-              Flexible(
-                child: SingleChildScrollView(
-                  child: SelectableText(
-                    verseText,
-                    style: theme.textTheme.bodyLarge,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () => Navigator.of(ctx).pop(),
-                  child: const Text('Close'),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+
 }
 
 class _MenuButton extends StatelessWidget {

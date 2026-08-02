@@ -783,14 +783,8 @@ class MainNavScreen extends ConsumerWidget {
     final readLoc = ref.watch(readLocationProvider);
     final selectedVerses = ref.watch(readSelectionProvider);
     final targetVerses = selectedVerses.toList();
-    final bookmarks = ref.watch(bookmarksProvider);
     final chapterNum = readLoc.chapter;
     final bookName = readLoc.bookName;
-    final isBookmarked = targetVerses.isNotEmpty && targetVerses.every((v) {
-      final refStr = generateVerseKey(bookName, chapterNum, v);
-      return bookmarks.contains(refStr);
-    });
-
     final actionIconColor = theme.colorScheme.onSurface.withValues(alpha: 0.4);
 
     return Padding(
@@ -803,10 +797,10 @@ class MainNavScreen extends ConsumerWidget {
             context, ref,
             isAction: isMinimalAction,
             navIcon: Icons.home_outlined, navActiveIcon: Icons.home, navLabel: 'Home', navIndex: 0, currentIndex: currentIndex,
-            actionIcon: isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_border_rounded, actionLabel: 'Bookmark',
-            actionColor: isBookmarked ? theme.primaryColor : actionIconColor,
+            actionIcon: Icons.copy_rounded, actionLabel: 'Copy',
+            actionColor: actionIconColor,
             onActionTap: () {
-              VerseActionLogic.handleBookmark(context, theme, ref, bookName, chapterNum, targetVerses);
+              VerseActionLogic.handleCopy(context, ref, bookName, chapterNum, targetVerses);
               ref.read(readSelectionProvider.notifier).clear();
             },
           ),

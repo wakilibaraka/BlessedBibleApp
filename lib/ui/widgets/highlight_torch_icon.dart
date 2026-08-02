@@ -68,15 +68,20 @@ class _TorchPainter extends CustomPainter {
     canvas.drawPath(pathBeam, paintBeam);
 
     // Three dots in front of beam
-    final paintDots = Paint()
-      ..color = torchColor
-      ..style = PaintingStyle.fill;
-
     final dotRadius = size.width * 0.05;
     // Align them vertically near the top right
-    canvas.drawCircle(Offset(size.width * 0.70, size.height * 0.20), dotRadius, paintDots);
-    canvas.drawCircle(Offset(size.width * 0.70, size.height * 0.35), dotRadius, paintDots);
-    canvas.drawCircle(Offset(size.width * 0.70, size.height * 0.50), dotRadius, paintDots);
+    
+    // Red dot
+    final paintRed = Paint()..color = Colors.red..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(size.width * 0.70, size.height * 0.20), dotRadius, paintRed);
+    
+    // Yellow dot
+    final paintYellow = Paint()..color = Colors.amber..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(size.width * 0.70, size.height * 0.35), dotRadius, paintYellow);
+    
+    // Green dot
+    final paintGreen = Paint()..color = Colors.green..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(size.width * 0.70, size.height * 0.50), dotRadius, paintGreen);
   }
 
   @override

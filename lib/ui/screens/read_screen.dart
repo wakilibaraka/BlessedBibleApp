@@ -348,6 +348,20 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   }
   // ────────────────────────────────────────────────────────────────
 
+  int? _inlineSelectionVerse;
+
+  void _enterInlineSelection(int verseNum) {
+    setState(() {
+      _inlineSelectionVerse = verseNum;
+    });
+  }
+
+  void _exitInlineSelection() {
+    setState(() {
+      _inlineSelectionVerse = null;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -1561,6 +1575,60 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                     'DEBUG RENDER: $refStr isBookmarked=$isBookmarked, highlightColor=$highlightColor');
                                                               }
 
+                                                              final verseWidget = _buildReadingLayoutVerse(
+                                                                context,
+                                                                ref,
+                                                                verse,
+                                                                secondaryVerseMap[verse.number],
+                                                                allBooks.indexOf(fc.book) + 1,
+                                                                fc.chapter.number,
+                                                                readSettings.readingLayout,
+                                                                theme,
+                                                                typography,
+                                                                appThemeMode,
+                                                                hasCommentary: hasCommentary,
+                                                                onCommentaryTap: () => _showCommentaryBottomSheet(
+                                                                    verse.number,
+                                                                    verse.text),
+                                                                isBookmarked: isBookmarked,
+                                                                isRedLetterEnabled: readSettings.isRedLetterEnabled,
+                                                              );
+
+                                                              if (_inlineSelectionVerse == verse.number) {
+                                                                return Container(
+                                                                  margin: const EdgeInsets.symmetric(vertical: 4.0),
+                                                                  padding: const EdgeInsets.all(12.0),
+                                                                  decoration: BoxDecoration(
+                                                                    color: theme.colorScheme.surfaceContainerHighest,
+                                                                    borderRadius: BorderRadius.circular(12),
+                                                                    border: Border.all(color: theme.primaryColor.withValues(alpha: 0.5), width: 1.5),
+                                                                  ),
+                                                                  child: Column(
+                                                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                                    children: [
+                                                                      Row(
+                                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                        children: [
+                                                                          Text("Select Text", style: theme.textTheme.labelMedium?.copyWith(color: theme.primaryColor, fontWeight: FontWeight.bold)),
+                                                                          TextButton.icon(
+                                                                            onPressed: _exitInlineSelection,
+                                                                            icon: const Icon(Icons.check, size: 16),
+                                                                            label: const Text("Done"),
+                                                                            style: TextButton.styleFrom(
+                                                                              visualDensity: VisualDensity.compact,
+                                                                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                                                                              backgroundColor: theme.primaryColor.withValues(alpha: 0.1),
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                      const SizedBox(height: 8),
+                                                                      SelectionArea(child: verseWidget),
+                                                                    ],
+                                                                  ),
+                                                                );
+                                                              }
+
                                                               return GestureDetector(
                                                                 onDoubleTap: () {
                                                                   HapticFeedback.lightImpact();
@@ -1577,62 +1645,32 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                       verseNumber: verse.number,
                                                                       bookName: fc.book.name,
                                                                       chapterNum: fc.chapter.number,
+                                                                      onCustomSelection: () => _enterInlineSelection(verse.number),
                                                                     ),
                                                                   );
                                                                 },
                                                                 child: Stack(
                                                                   children: [
                                                                     AnimatedContainer(
-                                                                      duration: const Duration(
-                                                                          milliseconds:
-                                                                              250),
-                                                                      clipBehavior:
-                                                                          Clip.antiAlias,
+                                                                      duration: const Duration(milliseconds: 250),
+                                                                      clipBehavior: Clip.antiAlias,
                                                                       padding: const EdgeInsets.only(
-                                                                          top:
-                                                                              6.0,
-                                                                          bottom:
-                                                                              6.0,
-                                                                          left:
-                                                                              12.0,
-                                                                          right:
-                                                                              12.0),
-                                                                      decoration:
-                                                                          BoxDecoration(
+                                                                          top: 6.0,
+                                                                          bottom: 6.0,
+                                                                          left: 12.0,
+                                                                          right: 12.0),
+                                                                      decoration: BoxDecoration(
                                                                         color: isSelected
                                                                             ? (highlightColor != null
                                                                                 ? highlightColor.withValues(alpha: 0.35)
                                                                                 : theme.primaryColor.withValues(alpha: 0.15))
                                                                             : (_navigatedVerseIndex == index ? theme.primaryColor.withValues(alpha: 0.15) : (highlightColor != null ? highlightColor.withValues(alpha: 0.35) : Colors.transparent)),
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(12),
-                                                                        border: (isSelected &&
-                                                                                highlightColor != null)
+                                                                        borderRadius: BorderRadius.circular(12),
+                                                                        border: (isSelected && highlightColor != null)
                                                                             ? Border.all(color: theme.primaryColor.withValues(alpha: 0.5), width: 1.5)
                                                                             : Border.all(color: Colors.transparent, width: 1.5),
                                                                       ),
-                                                                      child:
-                                                                        _buildReadingLayoutVerse(
-                                                                      context,
-                                                                      ref,
-                                                                      verse,
-                                                                      secondaryVerseMap[verse.number],
-                                                                      allBooks.indexOf(fc.book) + 1,
-                                                                      fc.chapter.number,
-                                                                        readSettings.readingLayout,
-                                                                        theme,
-                                                                        typography,
-                                                                        appThemeMode,
-                                                                        hasCommentary:
-                                                                            hasCommentary,
-                                                                        onCommentaryTap: () => _showCommentaryBottomSheet(
-                                                                            verse.number,
-                                                                            verse.text),
-                                                                        isBookmarked:
-                                                                            isBookmarked,
-                                                                        isRedLetterEnabled:
-                                                                            readSettings.isRedLetterEnabled,
-                                                                      ),
+                                                                      child: verseWidget,
                                                                     ),
                                                                   ],
                                                                 ),
