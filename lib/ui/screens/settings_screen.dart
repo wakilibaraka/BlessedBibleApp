@@ -17,6 +17,7 @@ import '../../state/read_settings_provider.dart';
 import '../../services/backup_service.dart';
 import '../../state/reminders_provider.dart';
 import '../widgets/shared_app_bar.dart';
+import '../widgets/animated_segmented_tile.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'privacy_policy_screen.dart';
@@ -40,48 +41,16 @@ class SettingsScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      body: ListView(
-        padding: const EdgeInsets.only(bottom: 120),
-        children: [
-          _buildSection(context, 'Appearance', [
-            Consumer(builder: (context, ref, _) {
-              final surfaceStyle = ref.watch(surfaceStyleProvider);
-              return _AnimatedSegmentedTile<SurfaceStyle>(
-                title: 'Surface Style',
-                subtitle: 'Visual depth and material styling',
-                selectedValue: surfaceStyle,
-                options: const [
-                  MapEntry(SurfaceStyle.flat, 'Flat'),
-                  MapEntry(SurfaceStyle.frosted, 'Frosted Glass'),
-                  MapEntry(SurfaceStyle.threeDimensional, '3D'),
-                ],
-                onChanged: (val) {
-                  HapticFeedback.selectionClick();
-                  ref.read(surfaceStyleProvider.notifier).setStyle(val);
-                },
-              );
-            }),
-            Consumer(builder: (context, ref, _) {
-              final themeMode = ref.watch(themeProvider);
-              return SwitchListTile(
-                title: const Text('Match system appearance'),
-                subtitle: const Text('Automatically switch between light and dark themes based on your device settings'),
-                value: themeMode == AppThemeMode.automatic,
-                onChanged: (value) {
-                  HapticFeedback.selectionClick();
-                  if (value) {
-                    ref.read(themeProvider.notifier).setTheme(AppThemeMode.automatic);
-                  } else {
-                    final resolved = AppThemeMode.automatic.resolve(context);
-                    ref.read(themeProvider.notifier).setTheme(resolved);
-                  }
-                },
-              );
-            }),
-            Consumer(builder: (context, ref, _) {
-              final defaultStartTab = ref.watch(readSettingsProvider.select((s) => s.defaultStartTab));
-              return _AnimatedSegmentedTile<int>(
-                title: 'Default start page',
+      body: SafeArea(
+        bottom: true,
+        child: ListView(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 120),
+          children: [
+            _buildSection(context, 'General', [
+              Consumer(builder: (context, ref, _) {
+                final defaultStartTab = ref.watch(readSettingsProvider.select((s) => s.defaultStartTab));
+                return AnimatedSegmentedTile<int>(
+                  title: 'Default start page',
                 subtitle: 'Choose which page the app opens to on launch',
                 selectedValue: defaultStartTab,
                 options: const [
@@ -126,7 +95,7 @@ class SettingsScreen extends StatelessWidget {
             }),
             Consumer(builder: (context, ref, _) {
               final viewMode = ref.watch(readSettingsProvider.select((s) => s.readingViewMode));
-              return _AnimatedSegmentedTile<ReadingViewMode>(
+              return AnimatedSegmentedTile<ReadingViewMode>(
                 title: 'Immersive Reading',
                 subtitle: 'Hide navigation bars while scrolling and remove the background glow for a cleaner read',
                 selectedValue: viewMode,
@@ -142,7 +111,7 @@ class SettingsScreen extends StatelessWidget {
             }),
             Consumer(builder: (context, ref, _) {
               final isRedLetterEnabled = ref.watch(readSettingsProvider.select((s) => s.isRedLetterEnabled));
-              return _AnimatedSegmentedTile<bool>(
+              return AnimatedSegmentedTile<bool>(
                 title: 'Words of Jesus in red',
                 subtitle: 'Render the words of Jesus in a subtle, classic red letter format',
                 selectedValue: isRedLetterEnabled,
@@ -158,7 +127,7 @@ class SettingsScreen extends StatelessWidget {
             }),
             Consumer(builder: (context, ref, _) {
               final actionStyle = ref.watch(readSettingsProvider.select((s) => s.verseActionStyle));
-              return _AnimatedSegmentedTile<VerseActionStyle>(
+              return AnimatedSegmentedTile<VerseActionStyle>(
                 title: 'Verse Action Style',
                 subtitle: 'Layout for highlight & action controls when a verse is selected',
                 selectedValue: actionStyle,
@@ -454,7 +423,7 @@ class SettingsScreen extends StatelessWidget {
           _buildSection(context, 'Advanced', [
             Consumer(builder: (context, ref, _) {
               final depth = ref.watch(bibleNavSettingsProvider.select((s) => s.depth));
-              return _AnimatedSegmentedTile<NavigationDepth>(
+              return AnimatedSegmentedTile<NavigationDepth>(
                 title: 'Navigation Steps',
                 subtitle: 'How many steps to reach a verse. 2-step: Book → Chapter. 3-step: Book → Chapter → Verse. 4-step: Testament → Book → Chapter → Verse.',
                 selectedValue: depth,
@@ -509,22 +478,6 @@ class SettingsScreen extends StatelessWidget {
                 onChanged: (value) {
                   HapticFeedback.selectionClick();
                   ref.read(searchSettingsProvider.notifier).toggleAutoOpen(value);
-                },
-              );
-            }),
-            Consumer(builder: (context, ref, _) {
-              final glowStyle = ref.watch(readSettingsProvider.select((s) => s.backgroundGlowStyle));
-              return _AnimatedSegmentedTile<BackgroundGlowStyle>(
-                title: 'Background Glow',
-                subtitle: 'Position of the animated background glow in Read view',
-                selectedValue: glowStyle,
-                options: const [
-                  MapEntry(BackgroundGlowStyle.top, 'Top glow (default)'),
-                  MapEntry(BackgroundGlowStyle.full, 'Full background glow (original)'),
-                ],
-                onChanged: (val) {
-                  HapticFeedback.selectionClick();
-                  ref.read(readSettingsProvider.notifier).setBackgroundGlowStyle(val);
                 },
               );
             }),
@@ -670,6 +623,7 @@ class SettingsScreen extends StatelessWidget {
           const SizedBox(height: 100), // Bottom padding to clear nav bar and FAB
         ],
       ),
+      ),
     );
   }
 
@@ -776,80 +730,6 @@ class SettingsScreen extends StatelessWidget {
         notifier.setSabbathLocation(name, lat, lng);
         Navigator.pop(context);
       },
-    );
-  }
-}
-
-class _AnimatedSegmentedTile<T> extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final T selectedValue;
-  final List<MapEntry<T, String>> options;
-  final ValueChanged<T> onChanged;
-
-  const _AnimatedSegmentedTile({
-    required this.title,
-    required this.subtitle,
-    required this.selectedValue,
-    required this.options,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: theme.textTheme.titleMedium),
-          const SizedBox(height: 4),
-          Text(subtitle, style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Row(
-              children: options.map((entry) {
-                final isSelected = entry.key == selectedValue;
-                return Expanded(
-                  child: GestureDetector(
-                    onTap: () { HapticFeedback.selectionClick(); onChanged(entry.key); },
-                    behavior: HitTestBehavior.opaque,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 250),
-                      curve: Curves.easeOutCubic,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      decoration: BoxDecoration(
-                        color: isSelected ? theme.primaryColor : Colors.transparent,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: isSelected 
-                            ? [BoxShadow(color: theme.primaryColor.withValues(alpha: 0.3), blurRadius: 4, offset: const Offset(0, 2))]
-                            : [],
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        entry.value,
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          color: isSelected ? Colors.white : theme.colorScheme.onSurface.withValues(alpha: 0.8),
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-          const SizedBox(height: 8),
-        ],
-      ),
     );
   }
 }

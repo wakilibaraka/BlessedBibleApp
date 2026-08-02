@@ -53,7 +53,7 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground> with Si
     final surfaceStyle = ref.watch(surfaceStyleProvider);
     final isReadTab = widget.tabIndex == 1;
     final isImmersiveOn = readSettings.readingViewMode == ReadingViewMode.immersive;
-    final disableGlow = surfaceStyle != SurfaceStyle.threeDimensional || (isReadTab && isImmersiveOn);
+    final disableGlow = surfaceStyle != SurfaceStyle.threeDimensional || (isReadTab && isImmersiveOn) || !readSettings.isGlowEnabled;
 
     final shouldAnimate = isRouteCurrent && isTabActive && !disableGlow;
     
@@ -116,9 +116,9 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground> with Si
               break;
             case AppThemeMode.dawn:
               colors = [
-                Color.lerp(const Color(0xFFC5D5E5), const Color(0xFF3F6285), t)!, // Highlight to Primary
-                const Color(0xFFEEF1F4),
-                const Color(0xFFEEF1F4),
+                Color.lerp(const Color(0xFF453F52), const Color(0xFF3A3547), t)!, // Center: dawnSurface
+                const Color(0xFF2E2A3A), // Edges: dawnBackground
+                const Color(0xFF2E2A3A),
               ];
               break;
             case AppThemeMode.lilies:
@@ -158,6 +158,9 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground> with Si
               break;
           }
 
+          final intensity = ref.read(readSettingsProvider).glowIntensity;
+          final finalColors = colors.map((c) => Color.lerp(Theme.of(context).scaffoldBackgroundColor, c, intensity)!).toList();
+
           return AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
             switchInCurve: Curves.easeOut,
@@ -172,7 +175,7 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground> with Si
                       gradient: RadialGradient(
                         center: Alignment(cx!, cy!),
                         radius: radius,
-                        colors: colors,
+                        colors: finalColors,
                         stops: const [0.0, 0.5, 1.0],
                       ),
                     ),

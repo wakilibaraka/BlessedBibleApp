@@ -3,7 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 
 import '../../state/theme_provider.dart';
+import '../../data/local_storage/preferences_service.dart';
+import '../../state/surface_style_provider.dart';
+import '../screens/advanced_appearance_screen.dart';
 import '../../theme/app_colors.dart';
+import '../widgets/animated_segmented_tile.dart';
 
 class ThemePickerSheet extends ConsumerWidget {
   const ThemePickerSheet({super.key});
@@ -95,38 +99,47 @@ class ThemePickerSheet extends ConsumerWidget {
                 children: [
                   Row(
                     children: [
-                      Expanded(
-                        child: _SimpleTopPill(
-                          icon: Icon(
-                            isSingleTheme ? Icons.lock : Icons.lock_open,
-                            color: isSingleTheme ? theme.colorScheme.onPrimaryContainer : theme.colorScheme.onSurface,
-                            size: 20,
-                          ),
-                          isActive: isSingleTheme,
-                          onTap: () {
-                            ref.read(themeProvider.notifier).setSingleTheme(!isSingleTheme);
-                          },
-                        ),
+                      const Expanded(
+                        child: SizedBox(), // Padlock moved to Advanced
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: _SimpleTopPill(
-                          icon: Text(
-                            'A',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w900,
-                              color: isMatchSystem ? theme.colorScheme.onPrimaryContainer : theme.colorScheme.onSurface,
-                            ),
+                          icon: Icon(
+                            Icons.tune_rounded,
+                            color: theme.colorScheme.onSurface,
+                            size: 20,
                           ),
-                          isActive: isMatchSystem,
+                          isActive: false,
                           onTap: () {
-                            ref.read(themeProvider.notifier).setMatchSystem(!isMatchSystem);
+                            Navigator.pop(context); // Close sheet
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const AdvancedAppearanceScreen()),
+                            );
                           },
                         ),
                       ),
                     ],
                   ),
+                  const SizedBox(height: 24),
+                  Consumer(builder: (context, ref, _) {
+                    final surfaceStyle = ref.watch(surfaceStyleProvider);
+                    return AnimatedSegmentedTile<SurfaceStyle>(
+                      title: 'Surface Style',
+                      subtitle: 'Visual depth and material styling',
+                      selectedValue: surfaceStyle,
+                      options: const [
+                        MapEntry(SurfaceStyle.flat, 'Flat'),
+                        MapEntry(SurfaceStyle.frosted, 'Frosted'),
+                        MapEntry(SurfaceStyle.threeDimensional, '3D'),
+                      ],
+                      onChanged: (val) {
+                        HapticFeedback.selectionClick();
+                        ref.read(surfaceStyleProvider.notifier).setStyle(val);
+                      },
+                    );
+                  }),
                   const SizedBox(height: 12),
                   Builder(
                     builder: (context) {

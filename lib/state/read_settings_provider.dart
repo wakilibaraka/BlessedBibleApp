@@ -8,6 +8,8 @@ enum VerseActionStyle { classic, detached, horizontal, raindrop }
 class ReadSettingsState {
   final ReadingViewMode readingViewMode;
   final BackgroundGlowStyle backgroundGlowStyle;
+  final bool isGlowEnabled;
+  final double glowIntensity;
   final VerseActionStyle verseActionStyle;
   final int activeHighlightColorIndex;
   final int primaryHighlightColorIndex;
@@ -21,6 +23,8 @@ class ReadSettingsState {
   const ReadSettingsState({
     this.readingViewMode = ReadingViewMode.pinned,
     this.backgroundGlowStyle = BackgroundGlowStyle.top,
+    this.isGlowEnabled = true,
+    this.glowIntensity = 1.0,
     this.verseActionStyle = VerseActionStyle.horizontal,
     this.activeHighlightColorIndex = 2,
     this.primaryHighlightColorIndex = -1, // Ask every time
@@ -35,6 +39,8 @@ class ReadSettingsState {
   ReadSettingsState copyWith({
     ReadingViewMode? readingViewMode,
     BackgroundGlowStyle? backgroundGlowStyle,
+    bool? isGlowEnabled,
+    double? glowIntensity,
     VerseActionStyle? verseActionStyle,
     int? activeHighlightColorIndex,
     int? primaryHighlightColorIndex,
@@ -48,6 +54,8 @@ class ReadSettingsState {
     return ReadSettingsState(
       readingViewMode: readingViewMode ?? this.readingViewMode,
       backgroundGlowStyle: backgroundGlowStyle ?? this.backgroundGlowStyle,
+      isGlowEnabled: isGlowEnabled ?? this.isGlowEnabled,
+      glowIntensity: glowIntensity ?? this.glowIntensity,
       verseActionStyle: verseActionStyle ?? this.verseActionStyle,
       activeHighlightColorIndex: activeHighlightColorIndex ?? this.activeHighlightColorIndex,
       primaryHighlightColorIndex: primaryHighlightColorIndex ?? this.primaryHighlightColorIndex,
@@ -65,6 +73,8 @@ class ReadSettingsState {
 class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
   static const _readingViewModeKey = 'read_settings_view_mode';
   static const _backgroundGlowStyleKey = 'read_settings_bg_glow_style';
+  static const _isGlowEnabledKey = 'read_settings_is_glow_enabled';
+  static const _glowIntensityKey = 'read_settings_glow_intensity';
   static const _verseActionStyleKey = 'read_settings_verse_action_style';
   static const _activeHighlightColorIndexKey = 'read_settings_active_highlight_color';
   static const _primaryHighlightColorIndexKey = 'read_settings_primary_highlight_color';
@@ -81,6 +91,8 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     final prefs = await SharedPreferences.getInstance();
     final modeString = prefs.getString(_readingViewModeKey);
     final glowString = prefs.getString(_backgroundGlowStyleKey);
+    final isGlowEnabled = prefs.getBool(_isGlowEnabledKey) ?? true;
+    final glowIntensity = prefs.getDouble(_glowIntensityKey) ?? 1.0;
     final verseStyleString = prefs.getString(_verseActionStyleKey);
     final activeHighlightIndex = prefs.getInt(_activeHighlightColorIndexKey);
     final primaryHighlightIndex = prefs.getInt(_primaryHighlightColorIndexKey);
@@ -118,6 +130,8 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     state = state.copyWith(
       readingViewMode: mode,
       backgroundGlowStyle: glowStyle,
+      isGlowEnabled: isGlowEnabled,
+      glowIntensity: glowIntensity,
       verseActionStyle: verseStyle,
       activeHighlightColorIndex: activeHighlightIndex ?? 2,
       primaryHighlightColorIndex: primaryHighlightIndex ?? -1,
@@ -143,6 +157,18 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     state = state.copyWith(backgroundGlowStyle: style);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_backgroundGlowStyleKey, style.name);
+  }
+
+  Future<void> setGlowEnabled(bool isEnabled) async {
+    state = state.copyWith(isGlowEnabled: isEnabled);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_isGlowEnabledKey, isEnabled);
+  }
+
+  Future<void> setGlowIntensity(double intensity) async {
+    state = state.copyWith(glowIntensity: intensity);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble(_glowIntensityKey, intensity);
   }
 
   Future<void> setVerseActionStyle(VerseActionStyle style) async {
