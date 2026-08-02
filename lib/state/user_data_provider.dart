@@ -92,6 +92,21 @@ class HighlightsNotifier extends Notifier<Map<String, int>> {
       debugPrint('[HIGHLIGHT_DEBUG] NOTIFIER map after write: $current');
     }
   }
+
+  void removeHighlight(String reference) {
+    if (kHighlightDebug) {
+      debugPrint('[HIGHLIGHT_DEBUG] NOTIFIER removeHighlight called: ref=$reference');
+    }
+    final current = Map<String, int>.from(state);
+    if (current.containsKey(reference)) {
+      current.remove(reference);
+      state = current;
+      ref.read(preferencesProvider).saveHighlights(current);
+      if (kHighlightDebug) {
+        debugPrint('[HIGHLIGHT_DEBUG] NOTIFIER map after remove write: $current');
+      }
+    }
+  }
 }
 
 final highlightsProvider = NotifierProvider<HighlightsNotifier, Map<String, int>>(HighlightsNotifier.new);

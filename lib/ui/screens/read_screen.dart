@@ -3676,7 +3676,7 @@ class VerseActionLogic {
       BuildContext context,
       ThemeData theme,
       WidgetRef ref,
-      String bookName,
+      String bookAbbrev,
       int chapterNum,
       List<int> targetVerses,
       VoidCallback onClearSelection) {
@@ -3695,13 +3695,50 @@ class VerseActionLogic {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Choose Highlight Color',
-                  style: theme.textTheme.titleSmall
-                      ?.copyWith(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: List.generate(highlightPalette.length, (i) {
+                children: [
+                  // Clear highlight button
+                  GestureDetector(
+                    onTap: () {
+                      for (var v in targetVerses) {
+                        final refStr = generateVerseKey(bookAbbrev, chapterNum, v);
+                        ref.read(highlightsProvider.notifier).removeHighlight(refStr);
+                      }
+                      Navigator.of(ctx).pop();
+                      onClearSelection();
+                    },
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: theme.scaffoldBackgroundColor,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                                color: Colors.black.withValues(alpha: 0.2),
+                                width: 1.5),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                  blurRadius: 4,
+                                  spreadRadius: 1)
+                            ],
+                          ),
+                          child: Icon(Icons.block, size: 20, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                        ),
+                        const SizedBox(height: 6),
+                        Text('None',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.onSurface
+                                  .withValues(alpha: 0.7),
+                            )),
+                      ],
+                    ),
+                  ),
+                  ...List.generate(highlightPalette.length, (i) {
                   final color = AppColors.getRenderedHighlightColor(
                       highlightPaletteSwatches[i],
                       theme.brightness,
@@ -3712,7 +3749,7 @@ class VerseActionLogic {
                           .read(readSettingsProvider.notifier)
                           .setActiveHighlightColorIndex(i);
                       VerseActionLogic.handleHighlight(ctx, theme, ref,
-                          bookName, chapterNum, targetVerses, i);
+                          bookAbbrev, chapterNum, targetVerses, i);
                       Navigator.of(ctx).pop();
                       onClearSelection();
                     },
@@ -3720,8 +3757,8 @@ class VerseActionLogic {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Container(
-                          width: 44,
-                          height: 44,
+                          width: 40,
+                          height: 40,
                           decoration: BoxDecoration(
                             color: color,
                             shape: BoxShape.circle,
@@ -3746,6 +3783,7 @@ class VerseActionLogic {
                     ),
                   );
                 }),
+                ],
               ),
             ],
           ),
@@ -3758,7 +3796,7 @@ class VerseActionLogic {
     required BuildContext context,
     required WidgetRef ref,
     required ThemeData theme,
-    required String bookName,
+    required String bookAbbrev,
     required int chapterNum,
     required List<int> targetVerses,
     required bool isLongPress,
@@ -3768,7 +3806,7 @@ class VerseActionLogic {
         ref.read(readSettingsProvider).primaryHighlightColorIndex;
 
     if (primaryIndex == -1 || isLongPress) {
-      showHighlightPaletteModal(context, theme, ref, bookName, chapterNum,
+      showHighlightPaletteModal(context, theme, ref, bookAbbrev, chapterNum,
           targetVerses, onClearSelection);
     } else {
       // Guard against invalid array accesses for primaryIndex if it somehow became out of bounds (but not -1)
@@ -3777,7 +3815,7 @@ class VerseActionLogic {
               ? primaryIndex
               : 0;
       handleHighlight(
-          context, theme, ref, bookName, chapterNum, targetVerses, safeIndex);
+          context, theme, ref, bookAbbrev, chapterNum, targetVerses, safeIndex);
       onClearSelection();
     }
   }
@@ -3786,21 +3824,21 @@ class VerseActionLogic {
       BuildContext context,
       ThemeData theme,
       WidgetRef ref,
-      String canonicalBookName,
+      String bookAbbrev,
       int chapterNum,
       List<int> targetVerses,
       int activeIndex) {
     if (kHighlightDebug) {
       debugPrint(
-          '[HIGHLIGHT_DEBUG] WRITE handleHighlight: canonicalBookName=$canonicalBookName, chapterNum=$chapterNum, targetVerses=$targetVerses, activeIndex=$activeIndex');
+          '[HIGHLIGHT_DEBUG] WRITE handleHighlight: bookAbbrev=$bookAbbrev, chapterNum=$chapterNum, targetVerses=$targetVerses, activeIndex=$activeIndex');
     }
     bool isRemoving = targetVerses.every((v) {
-      final refStr = generateVerseKey(canonicalBookName, chapterNum, v);
+      final refStr = generateVerseKey(bookAbbrev, chapterNum, v);
       return ref.read(highlightsProvider)[refStr] == activeIndex;
     });
 
     for (var v in targetVerses) {
-      final refStr = generateVerseKey(canonicalBookName, chapterNum, v);
+      final refStr = generateVerseKey(bookAbbrev, chapterNum, v);
       if (kHighlightDebug) {
         debugPrint('[HIGHLIGHT_DEBUG] WRITE key=$refStr color=$activeIndex');
       }

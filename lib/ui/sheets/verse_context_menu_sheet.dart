@@ -4,7 +4,7 @@ import '../widgets/textured_glass_container.dart';
 import '../../state/notes_provider.dart';
 import '../../state/user_data_provider.dart';
 import '../screens/read_screen.dart' show VerseActionLogic;
-import '../widgets/highlight_marker_icon.dart';
+
 import '../../state/bible_provider.dart';
 
 class VerseContextMenuSheet extends ConsumerWidget {
@@ -50,7 +50,24 @@ class VerseContextMenuSheet extends ConsumerWidget {
                     children: [
                       Expanded(
                         child: _MenuButton(
-                          icon: const HighlightMarkerIcon(size: 24),
+                          icon: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(width: 4, height: 4, decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle)),
+                                  const SizedBox(height: 2),
+                                  Container(width: 4, height: 4, decoration: const BoxDecoration(color: Colors.yellow, shape: BoxShape.circle)),
+                                  const SizedBox(height: 2),
+                                  Container(width: 4, height: 4, decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle)),
+                                ],
+                              ),
+                              const SizedBox(width: 4),
+                              const Icon(Icons.highlight_rounded),
+                            ],
+                          ),
                           label: isHighlighted ? 'Highlighted' : 'Highlight',
                           color: isHighlighted ? Colors.amber.shade600 : null,
                           onTap: () {
@@ -59,7 +76,7 @@ class VerseContextMenuSheet extends ConsumerWidget {
                               context: context,
                               ref: ref,
                               theme: theme,
-                              bookName: bookName,
+                              bookAbbrev: bookAbbrev,
                               chapterNum: chapterNum,
                               targetVerses: targetVerses,
                               isLongPress: false,
