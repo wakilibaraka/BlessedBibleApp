@@ -21,6 +21,8 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'privacy_policy_screen.dart';
 import '../../data/local_storage/preferences_service.dart';
+import '../../state/translation_provider.dart';
+import '../sheets/translation_picker_sheet.dart';
 
 final packageInfoProvider = FutureProvider<PackageInfo>((ref) async {
   return await PackageInfo.fromPlatform();
@@ -92,6 +94,31 @@ class SettingsScreen extends StatelessWidget {
           ]),
           
           _buildSection(context, 'Reading', [
+            Consumer(builder: (context, ref, _) {
+              final activeTranslationId = ref.watch(activeTranslationProvider);
+              final allTranslations = ref.watch(availableTranslationsProvider);
+              final activeTranslationName = allTranslations.maybeWhen(
+                data: (list) => list.firstWhere(
+                  (t) => t.translationId == activeTranslationId,
+                  orElse: () => list.first,
+                ).translationName,
+                orElse: () => activeTranslationId.toUpperCase(),
+              );
+              
+              return ListTile(
+                title: const Text('Bible Translation'),
+                subtitle: Text(activeTranslationName),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (ctx) => const TranslationPickerSheet(),
+                  );
+                },
+              );
+            }),
             Consumer(builder: (context, ref, _) {
               final viewMode = ref.watch(readSettingsProvider.select((s) => s.readingViewMode));
               return _AnimatedSegmentedTile<ReadingViewMode>(
@@ -628,6 +655,10 @@ class SettingsScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen()));
               },
+            ),
+            const ListTile(
+              title: Text('Bible Translations'),
+              subtitle: Text('The World English Bible (WEB) is in the Public Domain.\nKing James Version (KJV) is in the Public Domain.'),
             ),
           ]),
           

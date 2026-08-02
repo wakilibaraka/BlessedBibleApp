@@ -25,6 +25,7 @@ class PreferencesService {
   static const String _lastReadDateKey = 'last_read_date';
   static const String _redLetterEnabledKey = 'red_letter_enabled';
   static const String _defaultStartTabKey = 'default_start_tab';
+  static const String _activeTranslationKey = 'active_translation';
 
   // Reading tips
   static const String _showReadingTipsKey = 'show_reading_tips';
@@ -49,6 +50,14 @@ class PreferencesService {
   void saveSearchHistory(List<SearchResult> history) {
     final jsonList = history.map((e) => e.toJson()).toList();
     prefs.setString(_searchHistoryKey, jsonEncode(jsonList));
+  }
+
+  String getActiveTranslation() {
+    return prefs.getString(_activeTranslationKey) ?? 'kjv';
+  }
+
+  Future<void> setActiveTranslation(String translationId) async {
+    await prefs.setString(_activeTranslationKey, translationId);
   }
 
   List<SearchResult> getSearchHistory() {

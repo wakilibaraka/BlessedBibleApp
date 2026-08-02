@@ -7,8 +7,11 @@ import '../data/models/home_data.dart';
 import 'bible_provider.dart';
 import 'notes_provider.dart';
 import 'commentary_provider.dart';
+import 'translation_provider.dart';
+import '../services/bible_database_service.dart';
 
 enum SearchResultType { reference, bible, commentary, history, note }
+
 
 class SearchResult {
   final String title;
@@ -72,10 +75,11 @@ class IndexData {
 
 class IndexBuildArgs {
   final List<BibleBook>? bibleBooks;
+  final List<Map<String, dynamic>>? dbVerses;
   final List<CommentaryEntry>? commentaryData;
   final List<PersonalNote> notes;
   
-  IndexBuildArgs(this.bibleBooks, this.commentaryData, this.notes);
+  IndexBuildArgs(this.bibleBooks, this.dbVerses, this.commentaryData, this.notes);
 }
 
 class SearchQueryArgs {
@@ -110,7 +114,35 @@ IndexData buildIndexIsolate(IndexBuildArgs args) {
   }
 
   // 1. Bible Books
-  if (args.bibleBooks != null) {
+  if (args.dbVerses != null && args.bibleBooks != null) {
+    for (final v in args.dbVerses!) {
+      final bookNum = v['book_number'] as int;
+      final ch = v['chapter'] as int;
+      final ver = v['verse'] as int;
+      final text = v['text'] as String;
+      final isOt = bookNum <= 39;
+      // bibleBooks is 0-indexed, bookNum is 1-indexed
+      final book = args.bibleBooks![bookNum - 1];
+
+      final item = SearchItem(
+        id: nextId++,
+        type: SearchResultType.bible,
+        title: '${book.name} $ch:$ver',
+        subtitle: 'Bible Verse',
+        text: text,
+        metadata: {
+          'book': book.name,
+          'bookAbbrev': book.abbreviation,
+          'chapter': ch,
+          'verse': ver,
+          'text': text,
+          'isOt': isOt,
+        },
+      );
+      corpus.add(item);
+      addTokens(item.id, '${item.title} ${item.text}');
+    }
+  } else if (args.bibleBooks != null) {
     for (int i = 0; i < args.bibleBooks!.length; i++) {
       final book = args.bibleBooks![i];
       final isOt = i < 39;
@@ -410,18 +442,23 @@ class SearchEngine {
 
 final baseSearchIndexProvider = FutureProvider<IndexData>((ref) async {
   final bibleState = ref.watch(bibleProvider);
+  final activeTranslation = ref.watch(activeTranslationProvider);
 
   // Don't build the index until Bible data is ready — avoids a pointless heavy
   // compute() call that would immediately be cancelled and re-triggered.
   if (bibleState.isLoading || bibleState.books.isEmpty) {
     return IndexData([], {});
   }
+  
+  // Fetch verses from the database for the current translation
+  final dbVerses = await bibleDbService.getAllVerses(activeTranslation);
 
   // Commentary is optional — use whatever is already available without blocking
   final commentaryAsync = ref.watch(commentaryProvider);
 
   final args = IndexBuildArgs(
     bibleState.books,
+    dbVerses,
     commentaryAsync.asData?.value,
     [], // Notes handled dynamically
   );

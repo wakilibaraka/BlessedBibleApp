@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/models/bible_model.dart';
 import '../utils/isolate_parsers.dart';
 import '../utils/startup_stopwatch.dart'; // For startupStopwatch
+import '../services/bible_database_service.dart';
 
 class BibleState {
   final bool isLoading;
@@ -70,4 +71,11 @@ final flatChaptersProvider = Provider<List<FlatChapter>>((ref) {
     }
   }
   return chapters;
+});
+
+typedef ChapterKey = ({String translationId, int bookNumber, int chapterNumber});
+
+final translationChapterProvider = FutureProvider.family<List<BibleVerse>, ChapterKey>((ref, key) async {
+  // If kjv, we could technically still use the loaded JSON, but DB is consistent.
+  return await bibleDbService.getChapter(key.translationId, key.bookNumber, key.chapterNumber);
 });

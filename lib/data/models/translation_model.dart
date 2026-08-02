@@ -1,0 +1,31 @@
+class TranslationInfo {
+  final String translationId;
+  final String languageCode;
+  final String languageName;
+  final String translationName;
+  final String abbreviation;
+  final String license;
+  final bool isComplete;
+
+  TranslationInfo({
+    required this.translationId,
+    required this.languageCode,
+    required this.languageName,
+    required this.translationName,
+    required this.abbreviation,
+    required this.license,
+    required this.isComplete,
+  });
+
+  factory TranslationInfo.fromMap(Map<String, dynamic> map) {
+    return TranslationInfo(
+      translationId: map['translation_id'] as String,
+      languageCode: map['language_code'] as String,
+      languageName: map['language_name'] as String,
+      translationName: map['translation_name'] as String,
+      abbreviation: map['abbreviation'] as String,
+      license: map['license'] as String,
+      isComplete: (map['is_complete'] as int) == 1,
+    );
+  }
+}

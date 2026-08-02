@@ -19,7 +19,7 @@ class ReadSettingsState {
   final int defaultStartTab; // 0=Home, 1=Read, 2=Search, 3=Study
 
   const ReadSettingsState({
-    this.readingViewMode = ReadingViewMode.immersive,
+    this.readingViewMode = ReadingViewMode.pinned,
     this.backgroundGlowStyle = BackgroundGlowStyle.top,
     this.verseActionStyle = VerseActionStyle.horizontal,
     this.activeHighlightColorIndex = 2,
@@ -91,11 +91,11 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     final keepScreenAwake = prefs.getBool('keep_screen_awake') ?? false;
     final defaultStartTab = prefs.getInt('default_start_tab') ?? 0;
     
-    ReadingViewMode mode = ReadingViewMode.immersive;
+    ReadingViewMode mode = ReadingViewMode.pinned;
     if (modeString != null) {
       mode = ReadingViewMode.values.firstWhere(
         (e) => e.name == modeString,
-        orElse: () => ReadingViewMode.immersive,
+        orElse: () => ReadingViewMode.pinned,
       );
     }
 
