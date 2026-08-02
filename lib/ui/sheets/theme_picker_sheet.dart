@@ -5,11 +5,15 @@ import 'package:flutter/services.dart';
 import '../../state/theme_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../../state/surface_style_provider.dart';
-import '../screens/advanced_appearance_screen.dart';
 import '../../theme/app_colors.dart';
 import '../widgets/animated_segmented_tile.dart';
 
-class ThemePickerSheet extends ConsumerWidget {
+import '../widgets/textured_glass_container.dart';
+import '../../state/read_settings_provider.dart';
+
+const double kAppearanceSheetHeightFactor = 0.65;
+
+class ThemePickerSheet extends ConsumerStatefulWidget {
   const ThemePickerSheet({super.key});
 
   static Future<void> show(BuildContext context) {
@@ -22,7 +26,14 @@ class ThemePickerSheet extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ThemePickerSheet> createState() => _ThemePickerSheetState();
+}
+
+class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
+  bool _showAdvanced = false;
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final currentMode = ref.watch(themeProvider);
 
@@ -50,20 +61,28 @@ class ThemePickerSheet extends ConsumerWidget {
     final isMatchSystem = ref.watch(isMatchSystemProvider);
     final rotationPool = ref.watch(rotationPoolProvider);
 
-    return Container(
-      decoration: BoxDecoration(
-        color: getSheetSurface(),
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      padding: EdgeInsets.only(
-        top: 16,
-        left: 20,
-        right: 20,
-        bottom: MediaQuery.of(context).padding.bottom + 20,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
+    final readSettings = ref.watch(readSettingsProvider);
+
+    return PopScope(
+      canPop: !_showAdvanced,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          setState(() { _showAdvanced = false; });
+        }
+      },
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height * kAppearanceSheetHeightFactor,
+        child: TexturedGlassContainer(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          padding: EdgeInsets.only(
+            top: 16,
+            left: 20,
+            right: 20,
+            bottom: MediaQuery.of(context).padding.bottom + 20,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Center(
             child: Container(
@@ -79,24 +98,42 @@ class ThemePickerSheet extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Appearance',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+              Row(
+                children: [
+                  if (_showAdvanced) ...[
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
+                      onPressed: () => setState(() => _showAdvanced = false),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                    const SizedBox(width: 12),
+                  ],
+                  Text(
+                    _showAdvanced ? 'Advanced Appearance' : 'Appearance',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
               IconButton(
                 icon: const Icon(Icons.close, size: 20),
                 onPressed: () => Navigator.pop(context),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
               ),
             ],
           ),
           const SizedBox(height: 16),
           Flexible(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              child: _showAdvanced ? _buildAdvancedContent(theme, readSettings, isMatchSystem, isSingleTheme, rotationPool) : SingleChildScrollView(
+                key: const ValueKey('appearance_main'),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                   Row(
                     children: [
                       const Expanded(
@@ -112,11 +149,8 @@ class ThemePickerSheet extends ConsumerWidget {
                           ),
                           isActive: false,
                           onTap: () {
-                            Navigator.pop(context); // Close sheet
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => const AdvancedAppearanceScreen()),
-                            );
+                            HapticFeedback.selectionClick();
+                            setState(() { _showAdvanced = true; });
                           },
                         ),
                       ),
@@ -130,8 +164,8 @@ class ThemePickerSheet extends ConsumerWidget {
                       subtitle: 'Visual depth and material styling',
                       selectedValue: surfaceStyle,
                       options: const [
-                        MapEntry(SurfaceStyle.flat, 'Flat'),
                         MapEntry(SurfaceStyle.frosted, 'Frosted'),
+                        MapEntry(SurfaceStyle.flat, 'Flat'),
                         MapEntry(SurfaceStyle.threeDimensional, '3D'),
                       ],
                       onChanged: (val) {
@@ -141,7 +175,7 @@ class ThemePickerSheet extends ConsumerWidget {
                     );
                   }),
                   const SizedBox(height: 12),
-                  Builder(
+                  if (false) Builder(
                     builder: (context) {
                       final bgLuminance = theme.colorScheme.surface.computeLuminance();
                       final isDarkBg = bgLuminance < 0.4;
@@ -498,6 +532,147 @@ class ThemePickerSheet extends ConsumerWidget {
               ),
             ),
           ),
+        ),
+        ],
+      ),
+      ),
+      ),
+    );
+  }
+
+  Widget _buildAdvancedContent(ThemeData theme, ReadSettingsState readSettings, bool isMatchSystem, bool isSingleTheme, List<AppThemeMode> rotationPool) {
+    return SingleChildScrollView(
+      key: const ValueKey('advanced_main'),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'SYSTEM',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.primaryColor,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+            ),
+          ),
+          const SizedBox(height: 12),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: const Text('Match system appearance', style: TextStyle(fontSize: 14)),
+            subtitle: const Text('Automatically switch between light and dark themes based on your device settings', style: TextStyle(fontSize: 12)),
+            value: isMatchSystem,
+            onChanged: (value) {
+              HapticFeedback.selectionClick();
+              ref.read(themeProvider.notifier).setMatchSystem(value);
+              if (value) {
+                ref.read(themeProvider.notifier).setTheme(AppThemeMode.automatic);
+              }
+            },
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'THEME MODE',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.primaryColor,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+            ),
+          ),
+          const SizedBox(height: 12),
+          AnimatedSegmentedTile<bool>(
+            title: 'Rotation vs Locked',
+            subtitle: 'Choose whether themes cycle daily',
+            selectedValue: isSingleTheme,
+            options: const [
+              MapEntry(false, 'Rotating'),
+              MapEntry(true, 'Locked'),
+            ],
+            onChanged: (val) {
+              HapticFeedback.selectionClick();
+              ref.read(themeProvider.notifier).setSingleTheme(val);
+            },
+          ),
+          if (!isSingleTheme) ...[
+            const SizedBox(height: 12),
+            GestureDetector(
+              onTap: () {
+                HapticFeedback.selectionClick();
+                _showRotationPoolDialog(context, ref);
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: theme.primaryColor.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: theme.primaryColor.withValues(alpha: 0.3)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.tune_rounded, size: 16, color: theme.primaryColor),
+                        const SizedBox(width: 8),
+                        Text('Edit Pool (${rotationPool.length} themes)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: theme.primaryColor)),
+                      ],
+                    ),
+                    Icon(Icons.arrow_forward_ios_rounded, size: 12, color: theme.primaryColor),
+                  ],
+                ),
+              ),
+            ),
+          ],
+          const SizedBox(height: 24),
+          Text(
+            'BACKGROUND GLOW',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.primaryColor,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+            ),
+          ),
+          const SizedBox(height: 12),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: const Text('Enable Background Glow', style: TextStyle(fontSize: 14)),
+            subtitle: const Text('Renders a subtle animated light behind the reader in 3D surface style', style: TextStyle(fontSize: 12)),
+            value: readSettings.isGlowEnabled,
+            onChanged: (value) {
+              HapticFeedback.selectionClick();
+              ref.read(readSettingsProvider.notifier).setGlowEnabled(value);
+            },
+          ),
+          if (readSettings.isGlowEnabled) ...[
+            const SizedBox(height: 16),
+            AnimatedSegmentedTile<BackgroundGlowStyle>(
+              title: 'Glow Position',
+              subtitle: 'Where the glow originates on the screen',
+              selectedValue: readSettings.backgroundGlowStyle,
+              options: const [
+                MapEntry(BackgroundGlowStyle.top, 'Top'),
+                MapEntry(BackgroundGlowStyle.full, 'Full'),
+              ],
+              onChanged: (val) {
+                HapticFeedback.selectionClick();
+                ref.read(readSettingsProvider.notifier).setBackgroundGlowStyle(val);
+              },
+            ),
+            const SizedBox(height: 16),
+            AnimatedSegmentedTile<double>(
+              title: 'Glow Intensity',
+              subtitle: 'Brightness of the animated light',
+              selectedValue: readSettings.glowIntensity,
+              options: const [
+                MapEntry(0.5, 'Subtle'),
+                MapEntry(0.75, 'Normal'),
+                MapEntry(1.0, 'Bright'),
+              ],
+              onChanged: (val) {
+                HapticFeedback.selectionClick();
+                ref.read(readSettingsProvider.notifier).setGlowIntensity(val);
+              },
+            ),
+          ],
+          const SizedBox(height: 40),
         ],
       ),
     );
