@@ -384,10 +384,42 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     );
   }
 
-  Widget _buildUnifiedTopPill(BuildContext context, WidgetRef ref, ThemeData theme, String currentBookName, int currentChapter, List<BibleBook> allBooks, bool isImmersiveMode) {
+  Widget _buildThemedPill({required Widget child, required ReadingTokens tokens, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: RepaintBoundary(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
+                  child: const SizedBox.shrink(),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: tokens.readingPaper.withValues(alpha: 0.85),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: tokens.readingBorder.withValues(alpha: 0.3),
+                    width: 1,
+                  ),
+                ),
+                child: child,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSideButton(BuildContext context, ReadingTokens tokens, Widget child, VoidCallback onTap, bool isImmersiveMode) {
     _itemPositionsListeners[_currentPageIndex] ??= ItemPositionsListener.create();
     final listenable = _itemPositionsListeners[_currentPageIndex]!.itemPositions;
-    final tokens = theme.extension<ReadingTokens>()!;
 
     return ValueListenableBuilder<bool>(
       valueListenable: _isScrolling,
@@ -417,128 +449,110 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                   curve: Curves.easeOutCubic,
                   opacity: shouldHide ? 0.01 : 1.0,
                   alwaysIncludeSemantics: true,
-                  child: RepaintBoundary(
-                  child: Center(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(24),
-                      child: Stack(
-                        children: [
-                          Positioned.fill(
-                            child: BackdropFilter(
-                              filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
-                              child: const SizedBox.shrink(),
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: tokens.readingPaper.withValues(alpha: 0.85),
-                              borderRadius: BorderRadius.circular(24),
-                              border: Border.all(
-                                color: tokens.readingBorder.withValues(alpha: 0.3),
-                                width: 1,
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                // Left: Translation Button
-                                Consumer(builder: (context, ref, _) {
-                                  final activeTrans = ref.watch(activeTranslationProvider).toUpperCase();
-                                  return InkWell(
-                                    borderRadius: BorderRadius.circular(20),
-                                    onTap: () {
-                                      showModalBottomSheet(
-                                        context: context,
-                                        isScrollControlled: true,
-                                        backgroundColor: Colors.transparent,
-                                        builder: (ctx) => const TranslationPickerSheet(),
-                                      );
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                                      child: Text(
-                                        activeTrans,
-                                        style: theme.textTheme.titleSmall?.copyWith(
-                                          fontWeight: FontWeight.w700,
-                                          color: tokens.readingInk,
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                }),
-                                
-                                // Divider
-                                Container(width: 1, height: 16, color: tokens.readingBorder.withValues(alpha: 0.3)),
-                                
-                                // Center: Chapter/Verse Picker
-                                InkWell(
-                                  borderRadius: BorderRadius.circular(20),
-                                  onTap: () => _showSelectorBottomSheet(allBooks),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Flexible(
-                                          child: FittedBox(
-                                            fit: BoxFit.scaleDown,
-                                            child: ConstrainedBox(
-                                              constraints: const BoxConstraints(maxWidth: 160),
-                                              child: Text(
-                                                '$currentBookName $currentChapter',
-                                                style: theme.textTheme.titleSmall?.copyWith(
-                                                  fontWeight: FontWeight.w700,
-                                                  color: tokens.readingInk,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Icon(
-                                          Icons.keyboard_arrow_down_rounded,
-                                          size: 16,
-                                          color: tokens.readingInk.withValues(alpha: 0.7),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
+                  child: _buildThemedPill(
+                    child: child,
+                    tokens: tokens,
+                    onTap: onTap,
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 
-                                // Divider
-                                Container(width: 1, height: 16, color: tokens.readingBorder.withValues(alpha: 0.3)),
-
-                                // Right: Aa Typography Button
-                                InkWell(
-                                  borderRadius: BorderRadius.circular(20),
-                                  onTap: _showTypographyBottomSheet,
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                                    child: Text(
-                                      'Aa',
-                                      style: theme.textTheme.titleMedium?.copyWith(
-                                        fontWeight: FontWeight.w700,
-                                        color: tokens.readingInk,
-                                        letterSpacing: -0.5,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+  Widget _buildTopRow(BuildContext context, WidgetRef ref, ThemeData theme, String currentBookName, int currentChapter, List<BibleBook> allBooks, bool isImmersiveMode) {
+    final tokens = theme.extension<ReadingTokens>()!;
+    
+    final centerPill = _buildThemedPill(
+      tokens: tokens,
+      onTap: () => _showSelectorBottomSheet(allBooks),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flexible(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 160),
+                child: Text(
+                  '$currentBookName $currentChapter',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: tokens.readingInk,
                   ),
                 ),
               ),
             ),
+          ),
+          const SizedBox(width: 4),
+          Icon(
+            Icons.keyboard_arrow_down_rounded,
+            size: 16,
+            color: tokens.readingInk.withValues(alpha: 0.7),
+          ),
+        ],
+      ),
+    );
+    
+    final leadingButton = Consumer(builder: (context, ref, _) {
+      final activeTrans = ref.watch(activeTranslationProvider).toUpperCase();
+      return _buildSideButton(
+        context, tokens, 
+        Text(
+          activeTrans,
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w700,
+            color: tokens.readingInk,
+          ),
+        ),
+        () {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (ctx) => const TranslationPickerSheet(),
           );
         },
+        isImmersiveMode
       );
-      },
+    });
+    
+    final trailingButton = _buildSideButton(
+      context, tokens, 
+      Text(
+        'Aa',
+        style: theme.textTheme.titleMedium?.copyWith(
+          fontWeight: FontWeight.w700,
+          color: tokens.readingInk,
+          letterSpacing: -0.5,
+        ),
+      ),
+      _showTypographyBottomSheet,
+      isImmersiveMode
+    );
+
+    return SizedBox(
+      height: 48,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Align(
+            alignment: Alignment.centerLeft,
+            child: leadingButton,
+          ),
+          Align(
+            alignment: Alignment.center,
+            child: centerPill,
+          ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: trailingButton,
+          ),
+        ],
+      ),
     );
   }
 
@@ -1386,7 +1400,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                         left: 24.0,
                         right: 24.0,
                       ),
-                      child: _buildUnifiedTopPill(
+                      child: _buildTopRow(
                         context,
                         ref,
                         theme,
