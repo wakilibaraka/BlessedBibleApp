@@ -126,18 +126,36 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                     children: [
                     Consumer(builder: (context, ref, _) {
                       final surfaceStyle = ref.watch(earthHeavenStyleProvider);
-                      return AnimatedSegmentedTile<EarthHeavenStyle>(
-                        title: 'Surface Style',
-                        subtitle: 'Visual depth and material styling',
-                        selectedValue: surfaceStyle,
-                        options: const [
-                          MapEntry(EarthHeavenStyle.heaven, 'Heaven'),
-                          MapEntry(EarthHeavenStyle.earth, 'Earth'),
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          AnimatedSegmentedTile<EarthHeavenStyle>(
+                            title: 'Surface Style',
+                            subtitle: 'Visual depth and material styling',
+                            selectedValue: surfaceStyle,
+                            options: const [
+                              MapEntry(EarthHeavenStyle.heaven, 'Heaven'),
+                              MapEntry(EarthHeavenStyle.earth, 'Earth'),
+                            ],
+                            onChanged: (val) {
+                              HapticFeedback.selectionClick();
+                              ref.read(earthHeavenStyleProvider.notifier).setStyle(val);
+                            },
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4.0, left: 2.0),
+                            child: Text(
+                              surfaceStyle == EarthHeavenStyle.heaven
+                                  ? 'Layered depth'
+                                  : 'Flat surfaces',
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                                fontSize: 10,
+                              ),
+                            ),
+                          ),
                         ],
-                        onChanged: (val) {
-                          HapticFeedback.selectionClick();
-                          ref.read(earthHeavenStyleProvider.notifier).setStyle(val);
-                        },
                       );
                     }),
                     const SizedBox(height: 12),
