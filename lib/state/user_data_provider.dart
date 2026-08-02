@@ -68,6 +68,24 @@ class HighlightsNotifier extends Notifier<Map<String, int>> {
   Map<String, int> build() {
     final prefs = ref.watch(preferencesProvider);
     final data = prefs.getHighlights();
+    
+    bool needsCleanup = false;
+    final keysToRemove = <String>[];
+    for (final key in data.keys) {
+      final underscoreIdx = key.indexOf('_');
+      if (underscoreIdx > 3) {
+        keysToRemove.add(key);
+        needsCleanup = true;
+      }
+    }
+    
+    if (needsCleanup) {
+      for (final key in keysToRemove) {
+        data.remove(key);
+      }
+      Future.microtask(() => prefs.saveHighlights(data));
+    }
+
     if (kHighlightDebug) {
       debugPrint('[HIGHLIGHT_DEBUG] NOTIFIER init: loaded ${data.length} highlights');
     }
