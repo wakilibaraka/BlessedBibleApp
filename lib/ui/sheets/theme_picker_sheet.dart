@@ -539,7 +539,7 @@ class _ThemePillState extends ConsumerState<_ThemePill> with SingleTickerProvide
 
     return GestureDetector(
       onTap: () {
-        HapticFeedback.selectionClick();
+        HapticFeedback.mediumImpact();
         _triggerSparkle();
         ref.read(themeProvider.notifier).setTheme(widget.mode);
       },
@@ -706,7 +706,7 @@ class _DarkThemePillState extends ConsumerState<_DarkThemePill> with SingleTicke
 
     return GestureDetector(
       onTap: () {
-        HapticFeedback.selectionClick();
+        HapticFeedback.mediumImpact();
         _triggerSparkle();
         if (isDarkActive) {
           _lastDarkVariant = AppThemeMode.oled;

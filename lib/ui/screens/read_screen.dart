@@ -3389,7 +3389,6 @@ class _TypographyBottomSheet extends ConsumerWidget {
                                 theme.primaryColor.withValues(alpha: 0.2),
                             onChanged: (value) {
                               if (value != typography.fontSize) {
-                                HapticFeedback.selectionClick();
                                 typographyNotifier.setFontSize(value);
                               }
                             },
@@ -3501,7 +3500,6 @@ class _TypographyBottomSheet extends ConsumerWidget {
                       inactiveColor: theme.primaryColor.withValues(alpha: 0.2),
                       onChanged: (value) {
                         if (value != typography.marginPercent) {
-                          HapticFeedback.selectionClick();
                           typographyNotifier.setMarginPercent(value);
                         }
                       },
