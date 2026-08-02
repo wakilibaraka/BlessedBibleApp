@@ -11,7 +11,7 @@ import '../widgets/animated_segmented_tile.dart';
 import '../widgets/textured_glass_container.dart';
 import '../../state/read_settings_provider.dart';
 
-const double kAppearanceSheetHeightFactor = 0.65;
+const double kAppearanceSheetHeightFactor = 0.70;
 
 class ThemePickerSheet extends ConsumerStatefulWidget {
   const ThemePickerSheet({super.key});
@@ -70,9 +70,13 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
           setState(() { _showAdvanced = false; });
         }
       },
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height * kAppearanceSheetHeightFactor,
+      child: Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * kAppearanceSheetHeightFactor,
+        ),
         child: TexturedGlassContainer(
+          sigmaX: 45.0,
+          sigmaY: 45.0,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           padding: EdgeInsets.only(
             top: 16,
@@ -117,12 +121,16 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                   ),
                 ],
               ),
-              IconButton(
-                icon: const Icon(Icons.close, size: 20),
-                onPressed: () => Navigator.pop(context),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-              ),
+              if (!_showAdvanced)
+                IconButton(
+                  icon: Icon(Icons.tune_rounded, size: 20, color: theme.colorScheme.onSurface),
+                  onPressed: () {
+                    HapticFeedback.selectionClick();
+                    setState(() { _showAdvanced = true; });
+                  },
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
             ],
           ),
           const SizedBox(height: 16),
@@ -134,29 +142,6 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                  Row(
-                    children: [
-                      const Expanded(
-                        child: SizedBox(), // Padlock moved to Advanced
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _SimpleTopPill(
-                          icon: Icon(
-                            Icons.tune_rounded,
-                            color: theme.colorScheme.onSurface,
-                            size: 20,
-                          ),
-                          isActive: false,
-                          onTap: () {
-                            HapticFeedback.selectionClick();
-                            setState(() { _showAdvanced = true; });
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
                   Consumer(builder: (context, ref, _) {
                     final surfaceStyle = ref.watch(surfaceStyleProvider);
                     return AnimatedSegmentedTile<SurfaceStyle>(
@@ -568,7 +553,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
               }
             },
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           Text(
             'THEME MODE',
             style: theme.textTheme.labelSmall?.copyWith(
@@ -621,7 +606,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
               ),
             ),
           ],
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           Text(
             'BACKGROUND GLOW',
             style: theme.textTheme.labelSmall?.copyWith(
@@ -672,7 +657,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
               },
             ),
           ],
-          const SizedBox(height: 40),
+          const SizedBox(height: 16),
         ],
       ),
     );

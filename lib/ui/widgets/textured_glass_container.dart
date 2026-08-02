@@ -42,7 +42,7 @@ class TexturedGlassContainer extends ConsumerWidget {
     if (useBlur) {
       switch (appTheme.resolve(context)) {
         case AppThemeMode.sepia:
-          fillColor = Colors.white.withValues(alpha: 0.35);
+          fillColor = Colors.white.withValues(alpha: 0.55);
           break;
         case AppThemeMode.light:
         case AppThemeMode.priestlyPurple:
@@ -52,14 +52,14 @@ class TexturedGlassContainer extends ConsumerWidget {
         case AppThemeMode.lilies:
         case AppThemeMode.roses:
         case AppThemeMode.olives:
-        case AppThemeMode.dusk:
         case AppThemeMode.fresh:
-          fillColor = Colors.black.withValues(alpha: 0.08);
+          fillColor = Colors.white.withValues(alpha: 0.45);
           break;
+        case AppThemeMode.dusk:
         case AppThemeMode.dark:
         case AppThemeMode.oled:
         case AppThemeMode.automatic:
-          fillColor = Colors.black.withValues(alpha: 0.15);
+          fillColor = Colors.black.withValues(alpha: 0.55);
           break;
       }
     } else if (surfaceStyle == SurfaceStyle.frosted && isScrollable) {
