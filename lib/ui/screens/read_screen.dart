@@ -406,16 +406,18 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
             final isAtTopRest = isAtTop && !isScrolling;
             final shouldHide = (isImmersiveMode || _delayHeaderReveal) && !isAtTopRest;
 
-            return AnimatedSlide(
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.easeOutCubic,
-              offset: shouldHide ? const Offset(0, -1) : Offset.zero,
-              child: AnimatedOpacity(
+            return IgnorePointer(
+              ignoring: shouldHide,
+              child: AnimatedSlide(
                 duration: const Duration(milliseconds: 500),
                 curve: Curves.easeOutCubic,
-                opacity: shouldHide ? 0.0 : 1.0,
-                alwaysIncludeSemantics: true,
-                child: RepaintBoundary(
+                offset: shouldHide ? const Offset(0, -1) : Offset.zero,
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.easeOutCubic,
+                  opacity: shouldHide ? 0.01 : 1.0,
+                  alwaysIncludeSemantics: true,
+                  child: RepaintBoundary(
                   child: Center(
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(24),
@@ -532,9 +534,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                   ),
                 ),
               ),
-            );
-          },
-        );
+            ),
+          );
+        },
+      );
       },
     );
   }
