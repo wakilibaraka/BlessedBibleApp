@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 
 import '../../state/theme_provider.dart';
-import '../../data/local_storage/preferences_service.dart';
 import '../../state/surface_style_provider.dart';
 import '../../theme/app_colors.dart';
 import '../widgets/animated_segmented_tile.dart';
@@ -37,25 +36,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
     final theme = Theme.of(context);
     final currentMode = ref.watch(themeProvider);
 
-    Color getSheetSurface() {
-      switch (currentMode) {
-        case AppThemeMode.dawn: return AppColors.dawnBackground;
-        case AppThemeMode.lilies: return AppColors.liliesBackground;
-        case AppThemeMode.roses: return AppColors.rosesBackground;
-        case AppThemeMode.olives: return AppColors.olivesBackground;
-        case AppThemeMode.dusk: return AppColors.duskBackground;
-        case AppThemeMode.fresh: return AppColors.freshBackground;
-        case AppThemeMode.priestlyPurple: return AppColors.lightBackground;
-        case AppThemeMode.galileeBlue: return AppColors.lightBackground;
-        case AppThemeMode.scarletRed: return AppColors.lightBackground;
-        case AppThemeMode.sepia: return AppColors.sepiaBackground;
-        case AppThemeMode.dark: return AppColors.darkBackground;
-        case AppThemeMode.oled: return Colors.black;
-        case AppThemeMode.automatic:
-        case AppThemeMode.light:
-          return theme.colorScheme.surface;
-      }
-    }
+
 
     final isSingleTheme = ref.watch(isSingleThemeProvider);
     final isMatchSystem = ref.watch(isMatchSystemProvider);
@@ -161,177 +142,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                     );
                   }),
                   const SizedBox(height: 12),
-                  if (false) Builder(
-                    builder: (context) {
-                      final bgLuminance = theme.colorScheme.surface.computeLuminance();
-                      final isDarkBg = bgLuminance < 0.4;
-                      final neumorphicShadows = isDarkBg
-                          ? [
-                              BoxShadow(
-                                color: Colors.white.withValues(alpha: 0.08),
-                                offset: const Offset(-1.5, -1.5),
-                                blurRadius: 3,
-                              ),
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.35),
-                                offset: const Offset(2.5, 2.5),
-                                blurRadius: 5,
-                              ),
-                            ]
-                          : [
-                              BoxShadow(
-                                color: Colors.white.withValues(alpha: 0.9),
-                                offset: const Offset(-1.5, -1.5),
-                                blurRadius: 3,
-                              ),
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.08),
-                                offset: const Offset(2.5, 2.5),
-                                blurRadius: 5,
-                              ),
-                            ];
 
-                      Widget icon;
-                      String mainText;
-                      Widget? actionWidget;
-
-                      if (isMatchSystem) {
-                        icon = Icon(Icons.brightness_auto_rounded, size: 16, color: theme.primaryColor);
-                        mainText = 'Match System: Uses system Light or Dark mode';
-                        actionWidget = Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: theme.primaryColor.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: theme.primaryColor.withValues(alpha: 0.25)),
-                            boxShadow: neumorphicShadows,
-                          ),
-                          child: Text(
-                            'OS Sync',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w800,
-                              color: theme.primaryColor,
-                            ),
-                          ),
-                        );
-                      } else if (isSingleTheme) {
-                        icon = Icon(Icons.lock_rounded, size: 16, color: theme.colorScheme.onSurface);
-                        final name = () {
-                          switch (currentMode) {
-                            case AppThemeMode.light: return 'Light';
-                            case AppThemeMode.sepia: return 'Sepia';
-                            case AppThemeMode.dark: return 'Dark';
-                            case AppThemeMode.oled: return 'OLED';
-                            case AppThemeMode.dawn: return 'Dawn';
-                            case AppThemeMode.fresh: return 'Fresh';
-                            case AppThemeMode.dusk: return 'Dusk';
-                            case AppThemeMode.lilies: return 'Lilies';
-                            case AppThemeMode.roses: return 'Roses';
-                            case AppThemeMode.olives: return 'Olives';
-                            case AppThemeMode.priestlyPurple: return 'Priestly Purple';
-                            case AppThemeMode.galileeBlue: return 'Galilee Blue';
-                            case AppThemeMode.scarletRed: return 'Scarlet Red';
-                            case AppThemeMode.automatic: return 'Match System';
-                          }
-                        }();
-                        mainText = 'Locked Theme: $name';
-                        actionWidget = Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.onSurface.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: theme.colorScheme.onSurface.withValues(alpha: 0.15)),
-                            boxShadow: neumorphicShadows,
-                          ),
-                          child: Text(
-                            'Locked',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w800,
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                            ),
-                          ),
-                        );
-                      } else {
-                        icon = Icon(Icons.auto_mode_rounded, size: 16, color: theme.primaryColor);
-                        mainText = 'Daily Rotation: Active (${rotationPool.length} themes)';
-                        actionWidget = GestureDetector(
-                          onTap: () {
-                            HapticFeedback.selectionClick();
-                            _showRotationPoolDialog(context, ref);
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: theme.primaryColor.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: theme.primaryColor.withValues(alpha: 0.3)),
-                              boxShadow: neumorphicShadows,
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.tune_rounded, size: 11, color: theme.primaryColor),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'Edit Pool',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w800,
-                                    color: theme.primaryColor,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }
-
-                      return AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: isMatchSystem || !isSingleTheme
-                              ? theme.primaryColor.withValues(alpha: 0.08)
-                              : theme.colorScheme.onSurface.withValues(alpha: 0.05),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: isMatchSystem || !isSingleTheme
-                                ? theme.primaryColor.withValues(alpha: 0.2)
-                                : theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                          ),
-                          boxShadow: neumorphicShadows,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Row(
-                                children: [
-                                  icon,
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      mainText,
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                        color: isMatchSystem || !isSingleTheme ? theme.primaryColor : theme.colorScheme.onSurface,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            actionWidget,
-                          ],
-                        ),
-                      );
-                    },
-                  ),
                   const SizedBox(height: 12),
 
                   Text(
@@ -1178,72 +989,7 @@ class _SparkleSpec {
   const _SparkleSpec(this.relX, this.relY, this.dirX, this.dirY);
 }
 
-class _SimpleTopPill extends StatelessWidget {
-  final Widget icon;
-  final bool isActive;
-  final VoidCallback onTap;
 
-  const _SimpleTopPill({
-    required this.icon,
-    required this.isActive,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final bgLuminance = (isActive ? theme.colorScheme.primaryContainer : theme.colorScheme.surface).computeLuminance();
-    final isDarkBg = bgLuminance < 0.4;
-    
-    final neumorphicShadows = isDarkBg
-        ? [
-            BoxShadow(
-              color: Colors.white.withValues(alpha: 0.15),
-              offset: const Offset(-2, -2),
-              blurRadius: 4,
-            ),
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.45),
-              offset: const Offset(3, 3),
-              blurRadius: 6,
-            ),
-          ]
-        : [
-            BoxShadow(
-              color: Colors.white.withValues(alpha: 0.85),
-              offset: const Offset(-2, -2),
-              blurRadius: 4,
-            ),
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.12),
-              offset: const Offset(3, 3),
-              blurRadius: 6,
-            ),
-          ];
-
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.selectionClick();
-        onTap();
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        height: 46,
-        decoration: BoxDecoration(
-          color: isActive ? theme.colorScheme.primaryContainer : theme.colorScheme.onSurface.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(26),
-          border: Border.all(
-            color: isActive ? theme.primaryColor : theme.colorScheme.onSurface.withValues(alpha: 0.1),
-            width: isActive ? 2 : 1,
-          ),
-          boxShadow: neumorphicShadows,
-        ),
-        alignment: Alignment.center,
-        child: icon,
-      ),
-    );
-  }
-}
 
 void _showRotationPoolDialog(BuildContext context, WidgetRef ref) {
   showModalBottomSheet(

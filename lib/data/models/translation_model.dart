@@ -28,4 +28,16 @@ class TranslationInfo {
       isComplete: (map['is_complete'] as int) == 1,
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'translation_id': translationId,
+      'language_code': languageCode,
+      'language_name': languageName,
+      'translation_name': translationName,
+      'abbreviation': abbreviation,
+      'license': license,
+      'is_complete': isComplete ? 1 : 0,
+    };
+  }
 }

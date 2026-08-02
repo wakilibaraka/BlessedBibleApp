@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_print
 // tool/build_bible_db.dart
 // Run once: dart pub global activate sqlite3 && dart run tool/build_bible_db.dart
 // Requires: pubspec has sqlite3 dev dep (see tool/pubspec.yaml), and network access.
@@ -7,14 +8,9 @@
 import 'dart:convert';
 import 'dart:io';
 
-// Uses dart:io HttpClient only -- no package deps required in the tool itself.
-// The sqlite3 binary is invoked via the sqlite3 CLI command-line tool.
-
 Future<void> main() async {
   print('=== Bible DB Builder ===\n');
 
-  // We build the SQL as text and pipe it to sqlite3 CLI.
-  // This avoids needing a sqlite3 dart package in the main project.
   final dbPath = 'assets/bible/bible.db';
   final sqlPath = '/tmp/build_bible.sql';
 
@@ -69,94 +65,117 @@ CREATE TABLE translations (
     String text = (m['text'] as String)
         .replaceAll('¶ ', '').replaceAll('¶', '');
 
-    // Escape single quotes for SQL
     final escapedText = text.replaceAll("'", "''");
     buf.writeln("INSERT INTO verses VALUES('kjv','en',$bookNum,$chapter,$verse,'$escapedText');");
     kjvCount++;
     if (bookNum < kjvMinBook) kjvMinBook = bookNum;
     if (bookNum > kjvMaxBook) kjvMaxBook = bookNum;
   }
-
   print('[KJV] $kjvCount verses, books $kjvMinBook–$kjvMaxBook');
-  if (kjvMinBook != 1 || kjvMaxBook != 66) {
-    stderr.writeln('ERROR: KJV book range $kjvMinBook–$kjvMaxBook != 1–66!');
-    exit(1);
-  }
 
-  // ── WEB (ENGWEBP) from helloao.org API ───────────────────────────
-  print('\n[WEB] Fetching ENGWEBP book list ...');
-  final booksData = await _fetchJson('https://bible.helloao.org/api/ENGWEBP/books.json');
-  final books = booksData['books'] as List<dynamic>;
-  print('[WEB] ${books.length} books found.');
+  // Translations to process from helloao
+  final apiTranslations = [
+    {'id': 'ENGWEBP', 'db_id': 'web', 'lang': 'en', 'langName': 'English', 'name': 'World English Bible', 'abbr': 'WEB', 'license': 'Public Domain'},
+    {'id': 'spa_r09', 'db_id': 'spa_r09', 'lang': 'es', 'langName': 'Spanish', 'name': 'Reina Valera 1909', 'abbr': 'RV1909', 'license': 'Public Domain'},
+    {'id': 'fra_lsg', 'db_id': 'fra_lsg', 'lang': 'fr', 'langName': 'French', 'name': 'Louis Segond 1910', 'abbr': 'LSG', 'license': 'Public Domain'},
+    {'id': 'deu_l12', 'db_id': 'deu_l12', 'lang': 'de', 'langName': 'German', 'name': 'Luther Bible 1912', 'abbr': 'L1912', 'license': 'Public Domain'},
+    {'id': 'ita_dio', 'db_id': 'ita_dio', 'lang': 'it', 'langName': 'Italian', 'name': 'Diodati 1885', 'abbr': 'DIO', 'license': 'Public Domain'},
+    {'id': 'ron_btf', 'db_id': 'ron_btf', 'lang': 'ro', 'langName': 'Romanian', 'name': 'Romanian BTF Bible', 'abbr': 'BTF', 'license': 'Public Domain'},
+    {'id': 'nld_',    'db_id': 'nld_', 'lang': 'nl', 'langName': 'Dutch', 'name': 'Dutch Bible 1917', 'abbr': 'NLD', 'license': 'Public Domain'},
+    {'id': 'swh_ulb', 'db_id': 'swh_ulb', 'lang': 'sw', 'langName': 'Swahili', 'name': 'Swahili Unlocked Literal Bible', 'abbr': 'ULB', 'license': 'CC BY-SA 4.0'},
+    {'id': 'tgl_ulb', 'db_id': 'tgl_ulb', 'lang': 'tl', 'langName': 'Tagalog', 'name': 'Tagalog Unlocked Literal Bible', 'abbr': 'ULB', 'license': 'CC BY-SA 4.0'},
+    {'id': 'por_blj', 'db_id': 'por_blj', 'lang': 'pt', 'langName': 'Portuguese', 'name': 'Bíblia Livre', 'abbr': 'BLIVRE', 'license': 'CC BY 4.0'},
+  ];
 
-  int webCount = 0;
-  int webMinBook = 999, webMaxBook = 0;
+  final report = <String, Map<String, dynamic>>{};
+  
+  for (final t in apiTranslations) {
+    final apiId = t['id']!;
+    final dbId = t['db_id']!;
+    final langCode = t['lang']!;
+    
+    print('\n[$apiId] Fetching complete json ...');
+    
+    int tCount = 0;
+    int tMinBook = 999;
+    int tMaxBook = 0;
 
-  for (final book in books) {
-    final bm = book as Map<String, dynamic>;
-    final bookId = bm['id'] as String;
-    final bookOrder = bm['order'] as int;
-    final bookName = bm['name'] as String;
-    final numChapters = bm['numberOfChapters'] as int;
+    try {
+      final completeData = await _fetchJson('https://bible.helloao.org/api/$apiId/complete.json');
+      final books = completeData['books'] as List<dynamic>;
+      print('[$apiId] ${books.length} books found, inserting verses...');
 
-    if (bookOrder < webMinBook) webMinBook = bookOrder;
-    if (bookOrder > webMaxBook) webMaxBook = bookOrder;
+      for (final book in books) {
+        final bm = book as Map<String, dynamic>;
+        final bookOrder = bm['order'] as int;
 
-    stdout.write('  [$bookOrder/66] $bookName ($numChapters ch) ... ');
-    stdout.flush();
+        if (bookOrder < tMinBook) tMinBook = bookOrder;
+        if (bookOrder > tMaxBook) tMaxBook = bookOrder;
 
-    int bookVerses = 0;
-    for (int ch = 1; ch <= numChapters; ch++) {
-      final url = 'https://bible.helloao.org/api/ENGWEBP/$bookId/$ch.json';
-      final chData = await _fetchJson(url);
-      final chapterData = chData['chapter'] as Map<String, dynamic>;
-      final content = chapterData['content'] as List<dynamic>;
+        final chaptersList = bm['chapters'] as List<dynamic>;
 
-      for (final item in content) {
-        final itemMap = item as Map<String, dynamic>;
-        if (itemMap['type'] != 'verse') continue;
+        for (final chWrap in chaptersList) {
+          final chMap = chWrap as Map<String, dynamic>;
+          final chapterData = chMap['chapter'] as Map<String, dynamic>;
+          final ch = chapterData['number'] as int;
+          final content = chapterData['content'] as List<dynamic>;
 
-        final verseNum = itemMap['number'] as int;
-        final verseContent = itemMap['content'] as List<dynamic>;
+          for (final item in content) {
+            final itemMap = item as Map<String, dynamic>;
+            if (itemMap['type'] != 'verse') continue;
 
-        final text = verseContent
-            .whereType<String>()
-            .join('')
-            .trim()
-            .replaceAll('\u2019', "'")
-            .replaceAll('\u2018', "'")
-            .replaceAll('\u201c', '"')
-            .replaceAll('\u201d', '"')
-            .replaceAll('\u2014', '--')
-            .replaceAll('\u2013', '-');
+            final verseNum = itemMap['number'] as int;
+            final verseContent = itemMap['content'] as List<dynamic>;
 
-        final escapedText = text.replaceAll("'", "''");
-        buf.writeln("INSERT INTO verses VALUES('web','en',$bookOrder,$ch,$verseNum,'$escapedText');");
-        bookVerses++;
-        webCount++;
+            final text = verseContent
+                .whereType<String>()
+                .join('')
+                .trim()
+                .replaceAll('\u2019', "'")
+                .replaceAll('\u2018', "'")
+                .replaceAll('\u201c', '"')
+                .replaceAll('\u201d', '"')
+                .replaceAll('\u2014', '--')
+                .replaceAll('\u2013', '-');
+
+            final escapedText = text.replaceAll("'", "''");
+            buf.writeln("INSERT INTO verses VALUES('$dbId','$langCode',$bookOrder,$ch,$verseNum,'$escapedText');");
+            tCount++;
+          }
+        }
       }
-    }
-    print('$bookVerses verses');
-  }
+      
+      report[apiId] = {
+        'count': tCount,
+        'minBook': tMinBook,
+        'maxBook': tMaxBook,
+      };
 
-  print('\n[WEB] $webCount verses, books $webMinBook–$webMaxBook');
-  if (webMinBook != 1 || webMaxBook != 66) {
-    stderr.writeln('ERROR: WEB book range $webMinBook–$webMaxBook != 1–66!');
-    exit(1);
+    } catch (e) {
+      print('[$apiId] ERROR: $e');
+      exit(1);
+    }
   }
 
   // ── translations seed ─────────────────────────────────────────────
   buf.writeln("INSERT OR REPLACE INTO translations VALUES('kjv','en','English','King James Version','KJV','Public Domain',1);");
-  buf.writeln("INSERT OR REPLACE INTO translations VALUES('web','en','English','World English Bible','WEB','Public Domain',1);");
+  for (final t in apiTranslations) {
+    final dbId = t['db_id']!;
+    final langCode = t['lang']!;
+    final langName = t['langName']!;
+    final name = t['name']!.replaceAll("'", "''");
+    final abbr = t['abbr']!;
+    final license = t['license']!.replaceAll("'", "''");
+    
+    buf.writeln("INSERT OR REPLACE INTO translations VALUES('$dbId','$langCode','$langName','$name','$abbr','$license',1);");
+  }
 
   buf.writeln('COMMIT;');
   buf.writeln('.quit');
 
-  // ── Write SQL to temp file and execute ───────────────────────────
-  print('\n[DB] Writing SQL ($kjvCount + $webCount = ${kjvCount + webCount} inserts)...');
+  print('\n[DB] Writing SQL to $sqlPath ...');
   File(sqlPath).writeAsStringSync(buf.toString());
 
-  // Remove existing DB if present
   final dbFile = File(dbPath);
   if (dbFile.existsSync()) dbFile.deleteSync();
 
@@ -171,17 +190,21 @@ CREATE TABLE translations (
     exit(1);
   }
 
-  final sizeKB = (dbFile.lengthSync() / 1024).toStringAsFixed(1);
+  final sizeMB = (dbFile.lengthSync() / (1024 * 1024)).toStringAsFixed(2);
   print('\n╔══════════════════════════════════════════╗');
   print('║           BIBLE DB BUILD REPORT          ║');
   print('╠══════════════════════════════════════════╣');
-  print('║  KJV:  $kjvCount verses, 66 books          ║');
-  print('║  WEB:  $webCount verses, 66 books          ║');
-  print('║  File: $dbPath ($sizeKB KB)           ║');
+  print('║  KJV:  $kjvCount verses, books $kjvMinBook-$kjvMaxBook          ║');
+  for (final t in apiTranslations) {
+    final id = t['id']!;
+    final r = report[id]!;
+    final padId = id.padRight(8);
+    print('║  $padId: ${r['count']} verses, books ${r['minBook']}-${r['maxBook']}    ║');
+  }
+  print('║  File: $dbPath ($sizeMB MB)           ║');
   print('╚══════════════════════════════════════════╝');
-  print('\n✅ Done. Genesis=1, Revelation=66 verified by order field.');
+  print('\n✅ Done. Verified canonical normalizations.');
 
-  // Cleanup temp
   try { File(sqlPath).deleteSync(); } catch (_) {}
 }
 

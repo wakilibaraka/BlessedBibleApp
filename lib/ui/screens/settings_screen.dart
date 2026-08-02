@@ -9,7 +9,6 @@ import '../../state/hints_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../state/user_data_provider.dart';
 import '../../state/typography_provider.dart';
-import '../../state/surface_style_provider.dart';
 import '../../state/nav_settings_provider.dart';
 import '../../state/search_settings_provider.dart';
 import '../../state/bible_nav_settings_provider.dart';
@@ -100,6 +99,7 @@ class SettingsScreen extends ConsumerWidget {
                 },
               );
             }),
+
             Consumer(builder: (context, ref, _) {
               final viewMode = ref.watch(readSettingsProvider.select((s) => s.readingViewMode));
               return AnimatedSegmentedTile<ReadingViewMode>(
@@ -623,7 +623,13 @@ class SettingsScreen extends ConsumerWidget {
             ),
             const ListTile(
               title: Text('Bible Translations'),
-              subtitle: Text('The World English Bible (WEB) is in the Public Domain.\nKing James Version (KJV) is in the Public Domain.'),
+              subtitle: Text(
+                'Most translations (KJV, WEB, Spanish RV1909, French LSG, German Luther, Italian Diodati, Romanian BTF, Russian Synodal, Chinese CUV, Arabic Van Dyck, Korean 1910, Dutch 1917, Ukrainian Kulish) are in the Public Domain.\n\n'
+                'Creative Commons:\n'
+                '• Swahili ULB & Tagalog ULB (CC BY-SA 4.0)\n'
+                '• Portuguese Bíblia Livre (CC BY 4.0)\n'
+                '• Hindi Indian Revised Version (CC BY-SA 4.0)'
+              ),
             ),
           ]),
           

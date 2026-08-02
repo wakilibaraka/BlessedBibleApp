@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
-        android:label="the_blessed_bible"
+        android:label="Blessed Bible"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

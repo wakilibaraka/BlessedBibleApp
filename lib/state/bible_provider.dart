@@ -45,6 +45,10 @@ class BibleNotifier extends Notifier<BibleState> {
       final booksList = await compute(parseBibleJson, jsonString);
       if (kStartupTrace) debugPrint('Bible data ready: ${startupStopwatch.elapsedMilliseconds} ms');
       
+      // Await DB copy/initialization so the splash screen stays active until DB is fully ready
+      await bibleDbService.database;
+      if (kStartupTrace) debugPrint('Database ready: ${startupStopwatch.elapsedMilliseconds} ms');
+      
       state = state.copyWith(isLoading: false, books: booksList);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: 'Failed to load Bible: $e');

@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 enum ReadingViewMode { immersive, pinned }
 enum BackgroundGlowStyle { top, full }
 enum VerseActionStyle { classic, detached, horizontal, raindrop }
+enum ReadingLayout { single, interleaved, sideBySide, chips }
 
 class ReadSettingsState {
   final ReadingViewMode readingViewMode;
@@ -19,6 +20,7 @@ class ReadSettingsState {
   final bool showVerseNumbers;
   final bool keepScreenAwake;
   final int defaultStartTab; // 0=Home, 1=Read, 2=Search, 3=Study
+  final ReadingLayout readingLayout;
 
   const ReadSettingsState({
     this.readingViewMode = ReadingViewMode.pinned,
@@ -34,6 +36,7 @@ class ReadSettingsState {
     this.showVerseNumbers = true,
     this.keepScreenAwake = false,
     this.defaultStartTab = 0,
+    this.readingLayout = ReadingLayout.single,
   });
 
   ReadSettingsState copyWith({
@@ -50,6 +53,7 @@ class ReadSettingsState {
     bool? showVerseNumbers,
     bool? keepScreenAwake,
     int? defaultStartTab,
+    ReadingLayout? readingLayout,
   }) {
     return ReadSettingsState(
       readingViewMode: readingViewMode ?? this.readingViewMode,
@@ -65,6 +69,7 @@ class ReadSettingsState {
       showVerseNumbers: showVerseNumbers ?? this.showVerseNumbers,
       keepScreenAwake: keepScreenAwake ?? this.keepScreenAwake,
       defaultStartTab: defaultStartTab ?? this.defaultStartTab,
+      readingLayout: readingLayout ?? this.readingLayout,
     );
   }
 
@@ -80,6 +85,7 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
   static const _primaryHighlightColorIndexKey = 'read_settings_primary_highlight_color';
   static const _secondaryHighlightColorIndexKey = 'read_settings_secondary_highlight_color';
   static const _isManualNavHiddenKey = 'read_settings_is_manual_nav_hidden';
+  static const _readingLayoutKey = 'read_settings_reading_layout';
 
   @override
   ReadSettingsState build() {
@@ -102,6 +108,7 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     final showVerseNumbers = prefs.getBool('show_verse_numbers') ?? true;
     final keepScreenAwake = prefs.getBool('keep_screen_awake') ?? false;
     final defaultStartTab = prefs.getInt('default_start_tab') ?? 0;
+    final layoutString = prefs.getString(_readingLayoutKey);
     
     ReadingViewMode mode = ReadingViewMode.pinned;
     if (modeString != null) {
@@ -126,6 +133,14 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
         orElse: () => VerseActionStyle.horizontal,
       );
     }
+
+    ReadingLayout layout = ReadingLayout.single;
+    if (layoutString != null) {
+      layout = ReadingLayout.values.firstWhere(
+        (e) => e.name == layoutString,
+        orElse: () => ReadingLayout.single,
+      );
+    }
     
     state = state.copyWith(
       readingViewMode: mode,
@@ -141,7 +156,14 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
       showVerseNumbers: showVerseNumbers,
       keepScreenAwake: keepScreenAwake,
       defaultStartTab: defaultStartTab,
+      readingLayout: layout,
     );
+  }
+
+  Future<void> setReadingLayout(ReadingLayout layout) async {
+    state = state.copyWith(readingLayout: layout);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_readingLayoutKey, layout.name);
   }
 
   Future<void> setReadingViewMode(ReadingViewMode mode) async {

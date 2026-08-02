@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:ui';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
 import '../widgets/pinch_to_zoom_font_wrapper.dart';
@@ -20,6 +21,7 @@ import '../../state/reading_plan_provider.dart';
 import '../../state/streak_provider.dart';
 import '../../state/most_read_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
+import '../../data/models/translation_model.dart';
 import '../../state/hints_provider.dart';
 import '../../utils/bible_sections.dart';
 import '../../services/share_service.dart';
@@ -44,6 +46,103 @@ import '../../state/translation_provider.dart';
 import '../../theme/reading_tokens.dart';
 import '../widgets/commentary_view.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+class ExpandedChipsNotifier extends Notifier<Map<int, String?>> {
+  @override
+  Map<int, String?> build() => {};
+
+  void toggle(int verseNumber) {
+    if (state.containsKey(verseNumber)) {
+      state = {...state}..remove(verseNumber);
+    } else {
+      state = {...state, verseNumber: null};
+    }
+  }
+
+  void setLanguage(int verseNumber, String languageId) {
+    state = {...state, verseNumber: languageId};
+  }
+
+  void clear(int verseNumber) {
+    if (state.containsKey(verseNumber)) {
+      state = {...state}..remove(verseNumber);
+    }
+  }
+}
+
+final expandedChipsProvider = NotifierProvider<ExpandedChipsNotifier, Map<int, String?>>(ExpandedChipsNotifier.new);
+
+String _getTranslationGlyph(String languageName) {
+  switch (languageName.toLowerCase()) {
+    case 'english': return '英';
+    case 'french': return '法';
+    case 'chinese': return '中';
+    case 'korean': return '韓';
+    case 'russian': return '俄';
+    case 'german': return '德';
+    case 'spanish': return '西';
+    case 'japanese': return '日';
+    case 'arabic': return '阿';
+    case 'hindi': return '印';
+    case 'italian': return '意';
+    case 'portuguese': return '葡';
+    case 'dutch': return '荷';
+    case 'ukrainian': return '烏';
+    case 'polish': return '波';
+    case 'swahili': return '斯';
+    case 'tagalog': return '塔';
+    default: return languageName.isNotEmpty ? languageName[0].toUpperCase() : 'A';
+  }
+}
+
+String _getLanguageAbbr(String languageName) {
+  switch (languageName.toLowerCase()) {
+    case 'english': return 'EN';
+    case 'swahili': return 'SW';
+    case 'french': return 'FR';
+    case 'italian': return 'IT';
+    case 'spanish': return 'ES';
+    case 'tagalog': return 'TL';
+    case 'arabic': return 'AR';
+    case 'chinese': return 'ZH';
+    case 'hindi': return 'HI';
+    case 'korean': return 'KO';
+    case 'russian': return 'RU';
+    case 'german': return 'DE';
+    case 'japanese': return 'JA';
+    case 'portuguese': return 'PT';
+    case 'dutch': return 'NL';
+    case 'romanian': return 'RO';
+    case 'ukrainian': return 'UK';
+    case 'polish': return 'PL';
+    case 'indonesian': return 'ID';
+    default: return languageName.length >= 2 ? languageName.substring(0, 2).toUpperCase() : languageName.toUpperCase();
+  }
+}
+
+String _getTranslationLabel(String translationId, List<TranslationInfo> allInstalled, {String? defaultName}) {
+  try {
+    final info = allInstalled.firstWhere((t) => t.translationId == translationId);
+    final sameLanguageVersions = allInstalled.where((t) => t.languageName == info.languageName).toList();
+    if (sameLanguageVersions.length > 1) {
+      return info.abbreviation.toUpperCase();
+    }
+    return _getLanguageAbbr(info.languageName);
+  } catch (_) {
+    if (defaultName != null) return _getLanguageAbbr(defaultName);
+    return translationId.toUpperCase();
+  }
+}
+
+String _getTranslationCombinedLabel(String translationId, List<TranslationInfo> allInstalled, {String? defaultName}) {
+  try {
+    final info = allInstalled.firstWhere((t) => t.translationId == translationId);
+    final label = _getTranslationLabel(translationId, allInstalled);
+    return '${_getTranslationGlyph(info.languageName)} $label';
+  } catch (_) {
+    final name = defaultName ?? translationId;
+    return '${_getTranslationGlyph(name)} ${_getTranslationLabel(translationId, allInstalled, defaultName: defaultName)}';
+  }
+}
 
 String _toHeadingCase(String text) {
   if (text.isEmpty) return text;
@@ -200,9 +299,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           if (!prefs.showReadingTips) return;
 
           final hints = ref.read(hintsProvider);
-          if (!hints.contains('seen_swipe_hint')) {
-            _tryShowHint('seen_swipe_hint', 'Swipe to change passage');
-          } else if (!hints.contains('seen_highlight_hint')) {
+          if (!hints.contains('seen_highlight_hint')) {
             _tryShowHint('seen_highlight_hint',
                 'Long-press a verse to highlight or take notes');
           } else if (!hints.contains('seen_commentary_hint')) {
@@ -304,8 +401,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
             // Clean up the listener after the initial animation is done
             Future.delayed(const Duration(milliseconds: 650), () {
-              if (mounted)
+              if (mounted) {
                 listener.itemPositions.removeListener(checkOverscroll);
+              }
             });
           }
 
@@ -340,6 +438,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
+      useRootNavigator: true,
       builder: (context) => const _TypographyBottomSheet(),
     );
   }
@@ -384,7 +483,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     );
   }
 
-  Widget _buildThemedPill({required Widget child, required ReadingTokens tokens, required VoidCallback onTap}) {
+  Widget _buildThemedPill(
+      {required Widget child,
+      required ReadingTokens tokens,
+      required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
       child: RepaintBoundary(
@@ -399,7 +501,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
                   color: tokens.readingPaper.withValues(alpha: 0.85),
                   borderRadius: BorderRadius.circular(24),
@@ -417,9 +520,12 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     );
   }
 
-  Widget _buildSideButton(BuildContext context, ReadingTokens tokens, Widget child, VoidCallback onTap, bool isImmersiveMode) {
-    _itemPositionsListeners[_currentPageIndex] ??= ItemPositionsListener.create();
-    final listenable = _itemPositionsListeners[_currentPageIndex]!.itemPositions;
+  Widget _buildSideButton(BuildContext context, ReadingTokens tokens,
+      Widget child, VoidCallback onTap, bool isImmersiveMode) {
+    _itemPositionsListeners[_currentPageIndex] ??=
+        ItemPositionsListener.create();
+    final listenable =
+        _itemPositionsListeners[_currentPageIndex]!.itemPositions;
 
     return ValueListenableBuilder<bool>(
       valueListenable: _isScrolling,
@@ -430,13 +536,15 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
             bool isAtTop = false;
             if (positions.isNotEmpty) {
               final firstPos = positions.where((p) => p.index == 0);
-              if (firstPos.isNotEmpty && firstPos.first.itemLeadingEdge >= -0.05) {
+              if (firstPos.isNotEmpty &&
+                  firstPos.first.itemLeadingEdge >= -0.05) {
                 isAtTop = true;
               }
             }
 
             final isAtTopRest = isAtTop && !isScrolling;
-            final shouldHide = (isImmersiveMode || _delayHeaderReveal) && !isAtTopRest;
+            final shouldHide =
+                (isImmersiveMode || _delayHeaderReveal) && !isAtTopRest;
 
             return IgnorePointer(
               ignoring: shouldHide,
@@ -463,9 +571,16 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     );
   }
 
-  Widget _buildTopRow(BuildContext context, WidgetRef ref, ThemeData theme, String currentBookName, int currentChapter, List<BibleBook> allBooks, bool isImmersiveMode) {
+  Widget _buildTopRow(
+      BuildContext context,
+      WidgetRef ref,
+      ThemeData theme,
+      String currentBookName,
+      int currentChapter,
+      List<BibleBook> allBooks,
+      bool isImmersiveMode) {
     final tokens = theme.extension<ReadingTokens>()!;
-    
+
     final centerPill = _buildThemedPill(
       tokens: tokens,
       onTap: () => _showSelectorBottomSheet(allBooks),
@@ -496,43 +611,45 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         ],
       ),
     );
-    
+
     final leadingButton = Consumer(builder: (context, ref, _) {
-      final activeTrans = ref.watch(activeTranslationProvider).toUpperCase();
+      final activeTransId = ref.watch(activeTranslationProvider);
+      final installed = ref.watch(availableTranslationsProvider).value ?? [];
+      final activeTransLabel = _getTranslationLabel(activeTransId, installed);
+      
       return _buildSideButton(
-        context, tokens, 
+          context,
+          tokens,
+          Text(
+            activeTransLabel,
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: tokens.readingInk,
+            ),
+          ), () {
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          useRootNavigator: true,
+          backgroundColor: Colors.transparent,
+          builder: (ctx) => const TranslationPickerSheet(),
+        );
+      }, isImmersiveMode);
+    });
+
+    final trailingButton = _buildSideButton(
+        context,
+        tokens,
         Text(
-          activeTrans,
-          style: theme.textTheme.titleSmall?.copyWith(
+          'Aa',
+          style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w700,
             color: tokens.readingInk,
+            letterSpacing: -0.5,
           ),
         ),
-        () {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            backgroundColor: Colors.transparent,
-            builder: (ctx) => const TranslationPickerSheet(),
-          );
-        },
-        isImmersiveMode
-      );
-    });
-    
-    final trailingButton = _buildSideButton(
-      context, tokens, 
-      Text(
-        'Aa',
-        style: theme.textTheme.titleMedium?.copyWith(
-          fontWeight: FontWeight.w700,
-          color: tokens.readingInk,
-          letterSpacing: -0.5,
-        ),
-      ),
-      _showTypographyBottomSheet,
-      isImmersiveMode
-    );
+        _showTypographyBottomSheet,
+        isImmersiveMode);
 
     return SizedBox(
       height: 48,
@@ -857,6 +974,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                     builder: (context, ref, child) {
                                       final activeTrans =
                                           ref.watch(activeTranslationProvider);
+                                      final secondaryTrans =
+                                          ref.watch(secondaryTranslationProvider);
+                                      final readingLayout =
+                                          ref.watch(readSettingsProvider).readingLayout;
                                       final bookNum =
                                           allBooks.indexOf(fc.book) + 1;
                                       final chapterData =
@@ -865,8 +986,27 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                         bookNumber: bookNum,
                                         chapterNumber: fc.chapter.number,
                                       )));
+                                      
+                                      List<BibleVerse>? secondaryVerses;
+                                      if (secondaryTrans != null && readingLayout != ReadingLayout.single) {
+                                        final secondaryChapterData =
+                                            ref.watch(translationChapterProvider((
+                                          translationId: secondaryTrans,
+                                          bookNumber: bookNum,
+                                          chapterNumber: fc.chapter.number,
+                                        )));
+                                        secondaryVerses = secondaryChapterData.value;
+                                      }
+                                      
                                       final verses = chapterData.value ??
                                           fc.chapter.verses;
+                                          
+                                      final secondaryVerseMap = <int, BibleVerse>{};
+                                      if (secondaryVerses != null) {
+                                        for (final v in secondaryVerses) {
+                                          secondaryVerseMap[v.number] = v;
+                                        }
+                                      }
 
                                       return RepaintBoundary(
                                         child: GestureDetector(
@@ -893,8 +1033,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                 _scrollEndTimer = Timer(
                                                     const Duration(
                                                         milliseconds: 150), () {
-                                                  if (mounted)
+                                                  if (mounted) {
                                                     _isScrolling.value = false;
+                                                  }
                                                 });
                                               }
 
@@ -990,8 +1131,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                 }
                                               }
 
-                                              if (navSettings.alwaysShowNav)
+                                              if (navSettings.alwaysShowNav) {
                                                 return false;
+                                              }
 
                                               if (notification
                                                   is UserScrollNotification) {
@@ -1009,12 +1151,13 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
                                                   // Reveal nav immediately if not manually hidden
                                                   if (!isManualHidden) {
-                                                    if (mounted)
+                                                    if (mounted) {
                                                       ref
                                                           .read(
                                                               navHiddenProvider
                                                                   .notifier)
                                                           .set(false);
+                                                    }
 
                                                     // Delay the top header chrome slightly so it's not jarring
                                                     _delayHeaderReveal = true;
@@ -1023,19 +1166,21 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                     _headerRevealTimer = Timer(
                                                         const Duration(
                                                             seconds: 1), () {
-                                                      if (mounted)
+                                                      if (mounted) {
                                                         setState(() =>
                                                             _delayHeaderReveal =
                                                                 false);
+                                                      }
                                                     });
                                                   }
                                                   // Always exit full immersive when scrolling up
-                                                  if (mounted)
+                                                  if (mounted) {
                                                     ref
                                                         .read(
                                                             immersiveModeProvider
                                                                 .notifier)
                                                         .set(false);
+                                                  }
                                                 } else if (notification
                                                         .direction ==
                                                     ScrollDirection.reverse) {
@@ -1110,274 +1255,326 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                               }
                                               return false;
                                             },
-                                            child: Center(
-                                              child: ConstrainedBox(
-                                                constraints:
-                                                    const BoxConstraints(
-                                                        maxWidth: 800),
-                                                child: ScrollablePositionedList
-                                                    .builder(
-                                                  itemScrollController:
-                                                      _itemScrollControllers[
-                                                          pageIndex],
-                                                  itemPositionsListener:
-                                                      _itemPositionsListeners[
-                                                          pageIndex],
-                                                  initialScrollIndex: (pageIndex ==
-                                                              _currentPageIndex
-                                                          ? _navigatedVerseIndex
-                                                          : null) ??
-                                                      ref
-                                                          .read(
-                                                              preferencesProvider)
-                                                          .getChapterScrollPosition(
-                                                              fc.book
-                                                                  .abbreviation,
-                                                              fc.chapter
-                                                                  .number) ??
-                                                      0,
-                                                  padding: EdgeInsets.only(
-                                                      top:
-                                                          MediaQuery.of(context)
-                                                                  .padding
-                                                                  .top +
-                                                              80.0,
-                                                      left: 24.0,
-                                                      right: 24.0,
-                                                      bottom:
-                                                          MediaQuery.of(context)
-                                                                  .padding
-                                                                  .bottom +
-                                                              80.0),
-                                                  itemCount: verses.length + 1,
-                                                  itemBuilder:
-                                                      (context, index) {
-                                                    if (index ==
-                                                        verses.length) {
-                                                      bool
-                                                          hasChapterCommentary =
-                                                          chaptersWithCommentary
+                                            child: Directionality(
+                                              textDirection: () {
+                                                final availableTrans = ref
+                                                        .watch(
+                                                            availableTranslationsProvider)
+                                                        .value ??
+                                                    [];
+                                                final activeTransId = ref.watch(
+                                                    activeTranslationProvider);
+                                                final transInfo =
+                                                    availableTrans.firstWhere(
+                                                        (t) =>
+                                                            t.translationId ==
+                                                            activeTransId,
+                                                        orElse: () => availableTrans
+                                                                .isNotEmpty
+                                                            ? availableTrans
+                                                                .first
+                                                            : throw Exception(
+                                                                'No translation'));
+                                                final isRtl = [
+                                                  'ar',
+                                                  'he',
+                                                  'fa',
+                                                  'ur'
+                                                ].contains(
+                                                    transInfo.languageCode);
+                                                return isRtl
+                                                    ? TextDirection.rtl
+                                                    : TextDirection.ltr;
+                                              }(),
+                                              child: Center(
+                                                child: ConstrainedBox(
+                                                  constraints:
+                                                      const BoxConstraints(
+                                                          maxWidth: 800),
+                                                  child:
+                                                      ScrollablePositionedList
+                                                          .builder(
+                                                    itemScrollController:
+                                                        _itemScrollControllers[
+                                                            pageIndex],
+                                                    itemPositionsListener:
+                                                        _itemPositionsListeners[
+                                                            pageIndex],
+                                                    initialScrollIndex: (pageIndex ==
+                                                                _currentPageIndex
+                                                            ? _navigatedVerseIndex
+                                                            : null) ??
+                                                        ref
+                                                            .read(
+                                                                preferencesProvider)
+                                                            .getChapterScrollPosition(
+                                                                fc.book
+                                                                    .abbreviation,
+                                                                fc.chapter
+                                                                    .number) ??
+                                                        0,
+                                                    padding: EdgeInsets.only(
+                                                        top: MediaQuery.of(context).padding.top +
+                                                            80.0,
+                                                        left: math.max(
+                                                            MediaQuery.of(context)
+                                                                .padding
+                                                                .left,
+                                                            MediaQuery.of(context)
+                                                                    .size
+                                                                    .width *
+                                                                (typography.marginPercent /
+                                                                    100.0)),
+                                                        right: math.max(
+                                                            MediaQuery.of(context)
+                                                                .padding
+                                                                .right,
+                                                            MediaQuery.of(context)
+                                                                    .size
+                                                                    .width *
+                                                                (typography.marginPercent /
+                                                                    100.0)),
+                                                        bottom:
+                                                            MediaQuery.of(context).padding.bottom + 80.0),
+                                                    itemCount:
+                                                        verses.length + 1,
+                                                    itemBuilder:
+                                                        (context, index) {
+                                                      if (index ==
+                                                          verses.length) {
+                                                        bool
+                                                            hasChapterCommentary =
+                                                            chaptersWithCommentary
+                                                                .contains(
+                                                                    '${fc.book.name}|${fc.chapter.number}');
+                                                        return _buildEndOfChapterBlock(
+                                                            fc,
+                                                            pageIndex,
+                                                            theme,
+                                                            hasChapterCommentary);
+                                                      }
+                                                      final verse =
+                                                          verses[index];
+                                                      final isSelected =
+                                                          selectedVerses
                                                               .contains(
-                                                                  '${fc.book.name}|${fc.chapter.number}');
-                                                      return _buildEndOfChapterBlock(
-                                                          fc,
-                                                          pageIndex,
-                                                          theme,
-                                                          hasChapterCommentary);
-                                                    }
-                                                    final verse = verses[index];
-                                                    final isSelected =
-                                                        selectedVerses.contains(
-                                                            verse.number);
-                                                    final isSelectionMode =
-                                                        selectedVerses
-                                                            .isNotEmpty;
+                                                                  verse.number);
+                                                      final isSelectionMode =
+                                                          selectedVerses
+                                                              .isNotEmpty;
 
-                                                    final bookData =
-                                                        chapterTitles[
-                                                            fc.book.name];
-                                                    final chapterTitle =
-                                                        bookData?[fc
-                                                            .chapter.number
-                                                            .toString()];
+                                                      final bookData =
+                                                          chapterTitles[
+                                                              fc.book.name];
+                                                      final chapterTitle =
+                                                          bookData?[fc
+                                                              .chapter.number
+                                                              .toString()];
 
-                                                    return Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .stretch,
-                                                      children: [
-                                                        if (index == 0 &&
-                                                            chapterTitle !=
-                                                                null) ...[
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .only(
-                                                                    top: 16.0,
-                                                                    bottom: 8.0,
-                                                                    left: 15.0,
-                                                                    right:
-                                                                        12.0),
-                                                            child: Text(
-                                                              _toHeadingCase(
-                                                                  chapterTitle),
-                                                              style: theme
-                                                                  .textTheme
-                                                                  .titleSmall
-                                                                  ?.copyWith(
-                                                                color: theme
-                                                                    .primaryColor,
-                                                                fontSize: typography
-                                                                        .fontSize *
-                                                                    1.25,
-                                                                fontFamily:
-                                                                    typography
-                                                                        .fontFamily,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w700,
-                                                                letterSpacing:
-                                                                    0.2,
+                                                      return Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .stretch,
+                                                        children: [
+                                                          if (index == 0 &&
+                                                              chapterTitle !=
+                                                                  null) ...[
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .only(
+                                                                      top: 16.0,
+                                                                      bottom:
+                                                                          8.0,
+                                                                      left:
+                                                                          15.0,
+                                                                      right:
+                                                                          12.0),
+                                                              child: Text(
+                                                                _toHeadingCase(
+                                                                    chapterTitle),
+                                                                style: theme
+                                                                    .textTheme
+                                                                    .titleSmall
+                                                                    ?.copyWith(
+                                                                  color: theme
+                                                                      .primaryColor,
+                                                                  fontSize:
+                                                                      typography
+                                                                              .fontSize *
+                                                                          1.25,
+                                                                  fontFamily:
+                                                                      typography
+                                                                          .fontFamily,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w700,
+                                                                  letterSpacing:
+                                                                      0.2,
+                                                                ),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .left,
                                                               ),
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .left,
                                                             ),
+                                                          ],
+                                                          // Check for commentary
+                                                          AnimatedOpacity(
+                                                            duration:
+                                                                const Duration(
+                                                                    milliseconds:
+                                                                        250),
+                                                            opacity:
+                                                                (isSelectionMode &&
+                                                                        !isSelected)
+                                                                    ? 0.85
+                                                                    : 1.0,
+                                                            alwaysIncludeSemantics:
+                                                                true,
+                                                            child: Consumer(
+                                                                builder:
+                                                                    (context,
+                                                                        itemRef,
+                                                                        _) {
+                                                              bool
+                                                                  hasCommentary =
+                                                                  versesWithCommentary
+                                                                      .contains(
+                                                                          '${fc.book.name}|${fc.chapter.number}|${verse.number}');
+
+                                                              final highlights =
+                                                                  itemRef.watch(
+                                                                      highlightsProvider);
+                                                              final bookmarks =
+                                                                  itemRef.watch(
+                                                                      bookmarksProvider);
+                                                              final refStr =
+                                                                  generateVerseKey(
+                                                                      fc.book
+                                                                          .abbreviation,
+                                                                      fc.chapter
+                                                                          .number,
+                                                                      verse
+                                                                          .number);
+                                                              final isBookmarked =
+                                                                  bookmarks
+                                                                      .contains(
+                                                                          refStr);
+                                                              final savedColorIndex =
+                                                                  highlights[
+                                                                      refStr];
+                                                              Color?
+                                                                  highlightColor;
+                                                              if (savedColorIndex !=
+                                                                      null &&
+                                                                  savedColorIndex >=
+                                                                      0 &&
+                                                                  savedColorIndex <
+                                                                      highlightPalette
+                                                                          .length) {
+                                                                highlightColor = AppColors.getRenderedHighlightColor(
+                                                                    highlightPalette[
+                                                                        savedColorIndex],
+                                                                    theme
+                                                                        .brightness,
+                                                                    theme
+                                                                        .scaffoldBackgroundColor);
+                                                              }
+
+                                                              if (kHighlightDebug) {
+                                                                debugPrint(
+                                                                    '[HIGHLIGHT_DEBUG] RENDER verse key=$refStr found=${highlights.containsKey(refStr)} color=$savedColorIndex highlightColor=$highlightColor isBookmarked=$isBookmarked timestamp=${DateTime.now().millisecondsSinceEpoch}');
+                                                              }
+
+                                                              if (kHighlightDebug &&
+                                                                  (isBookmarked ||
+                                                                      highlightColor !=
+                                                                          null)) {
+                                                                debugPrint(
+                                                                    'DEBUG RENDER: $refStr isBookmarked=$isBookmarked, highlightColor=$highlightColor');
+                                                              }
+
+                                                              return GestureDetector(
+                                                                onTap: () =>
+                                                                    _toggleVerseSelection(
+                                                                        verse
+                                                                            .number),
+                                                                onLongPress:
+                                                                    () {
+                                                                  _showVerseContextMenu(
+                                                                      context,
+                                                                      verse
+                                                                          .number,
+                                                                      fc
+                                                                          .chapter,
+                                                                      fc.book
+                                                                          .name,
+                                                                      fc.chapter
+                                                                          .number);
+                                                                },
+                                                                child: Stack(
+                                                                  children: [
+                                                                    AnimatedContainer(
+                                                                      duration: const Duration(
+                                                                          milliseconds:
+                                                                              250),
+                                                                      clipBehavior:
+                                                                          Clip.antiAlias,
+                                                                      padding: const EdgeInsets.only(
+                                                                          top:
+                                                                              6.0,
+                                                                          bottom:
+                                                                              6.0,
+                                                                          left:
+                                                                              12.0,
+                                                                          right:
+                                                                              12.0),
+                                                                      decoration:
+                                                                          BoxDecoration(
+                                                                        color: isSelected
+                                                                            ? (highlightColor != null
+                                                                                ? highlightColor.withValues(alpha: 0.35)
+                                                                                : theme.primaryColor.withValues(alpha: 0.15))
+                                                                            : (_navigatedVerseIndex == index ? theme.primaryColor.withValues(alpha: 0.15) : (highlightColor != null ? highlightColor.withValues(alpha: 0.35) : Colors.transparent)),
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(12),
+                                                                        border: (isSelected &&
+                                                                                highlightColor != null)
+                                                                            ? Border.all(color: theme.primaryColor.withValues(alpha: 0.5), width: 1.5)
+                                                                            : Border.all(color: Colors.transparent, width: 1.5),
+                                                                      ),
+                                                                      child:
+                                                                        _buildReadingLayoutVerse(
+                                                                      context,
+                                                                      ref,
+                                                                      verse,
+                                                                      secondaryVerseMap[verse.number],
+                                                                      allBooks.indexOf(fc.book) + 1,
+                                                                      fc.chapter.number,
+                                                                        readSettings.readingLayout,
+                                                                        theme,
+                                                                        typography,
+                                                                        appThemeMode,
+                                                                        hasCommentary:
+                                                                            hasCommentary,
+                                                                        onCommentaryTap: () => _showCommentaryBottomSheet(
+                                                                            verse.number,
+                                                                            verse.text),
+                                                                        isBookmarked:
+                                                                            isBookmarked,
+                                                                        isRedLetterEnabled:
+                                                                            readSettings.isRedLetterEnabled,
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              );
+                                                            }),
                                                           ),
                                                         ],
-                                                        // Check for commentary
-                                                        AnimatedOpacity(
-                                                          duration:
-                                                              const Duration(
-                                                                  milliseconds:
-                                                                      250),
-                                                          opacity:
-                                                              (isSelectionMode &&
-                                                                      !isSelected)
-                                                                  ? 0.85
-                                                                  : 1.0,
-                                                          alwaysIncludeSemantics:
-                                                              true,
-                                                          child: Consumer(
-                                                              builder: (context,
-                                                                  itemRef, _) {
-                                                            bool hasCommentary =
-                                                                versesWithCommentary
-                                                                    .contains(
-                                                                        '${fc.book.name}|${fc.chapter.number}|${verse.number}');
-
-                                                            final highlights =
-                                                                itemRef.watch(
-                                                                    highlightsProvider);
-                                                            final bookmarks =
-                                                                itemRef.watch(
-                                                                    bookmarksProvider);
-                                                            final refStr =
-                                                                generateVerseKey(
-                                                                    fc.book
-                                                                        .abbreviation,
-                                                                    fc.chapter
-                                                                        .number,
-                                                                    verse
-                                                                        .number);
-                                                            final isBookmarked =
-                                                                bookmarks
-                                                                    .contains(
-                                                                        refStr);
-                                                            final savedColorIndex =
-                                                                highlights[
-                                                                    refStr];
-                                                            Color?
-                                                                highlightColor;
-                                                            if (savedColorIndex !=
-                                                                    null &&
-                                                                savedColorIndex >=
-                                                                    0 &&
-                                                                savedColorIndex <
-                                                                    highlightPalette
-                                                                        .length) {
-                                                              highlightColor = AppColors.getRenderedHighlightColor(
-                                                                  highlightPalette[
-                                                                      savedColorIndex],
-                                                                  theme
-                                                                      .brightness,
-                                                                  theme
-                                                                      .scaffoldBackgroundColor);
-                                                            }
-
-                                                            if (kHighlightDebug) {
-                                                              debugPrint(
-                                                                  '[HIGHLIGHT_DEBUG] RENDER verse key=$refStr found=${highlights.containsKey(refStr)} color=$savedColorIndex highlightColor=$highlightColor isBookmarked=$isBookmarked timestamp=${DateTime.now().millisecondsSinceEpoch}');
-                                                            }
-
-                                                            if (kHighlightDebug &&
-                                                                (isBookmarked ||
-                                                                    highlightColor !=
-                                                                        null)) {
-                                                              debugPrint(
-                                                                  'DEBUG RENDER: $refStr isBookmarked=$isBookmarked, highlightColor=$highlightColor');
-                                                            }
-
-                                                            return GestureDetector(
-                                                              onTap: () =>
-                                                                  _toggleVerseSelection(
-                                                                      verse
-                                                                          .number),
-                                                              onLongPress: () {
-                                                                _showVerseContextMenu(
-                                                                    context,
-                                                                    verse
-                                                                        .number,
-                                                                    fc.chapter,
-                                                                    fc.book
-                                                                        .name,
-                                                                    fc.chapter
-                                                                        .number);
-                                                              },
-                                                              child: Stack(
-                                                                children: [
-                                                                  AnimatedContainer(
-                                                                    duration: const Duration(
-                                                                        milliseconds:
-                                                                            250),
-                                                                    clipBehavior:
-                                                                        Clip.antiAlias,
-                                                                    padding: const EdgeInsets
-                                                                        .only(
-                                                                        top:
-                                                                            6.0,
-                                                                        bottom:
-                                                                            6.0,
-                                                                        left:
-                                                                            12.0,
-                                                                        right:
-                                                                            12.0),
-                                                                    decoration:
-                                                                        BoxDecoration(
-                                                                      color: isSelected
-                                                                          ? (highlightColor != null
-                                                                              ? highlightColor.withValues(alpha: 0.35)
-                                                                              : theme.primaryColor.withValues(alpha: 0.15))
-                                                                          : (_navigatedVerseIndex == index ? theme.primaryColor.withValues(alpha: 0.15) : (highlightColor != null ? highlightColor.withValues(alpha: 0.35) : Colors.transparent)),
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              12),
-                                                                      border: (isSelected &&
-                                                                              highlightColor !=
-                                                                                  null)
-                                                                          ? Border.all(
-                                                                              color: theme.primaryColor.withValues(alpha: 0.5),
-                                                                              width: 1.5)
-                                                                          : Border.all(color: Colors.transparent, width: 1.5),
-                                                                    ),
-                                                                    child:
-                                                                        _buildNormalVerse(
-                                                                      verse,
-                                                                      theme,
-                                                                      typography,
-                                                                      appThemeMode,
-                                                                      hasCommentary:
-                                                                          hasCommentary,
-                                                                      onCommentaryTap: () => _showCommentaryBottomSheet(
-                                                                          verse
-                                                                              .number,
-                                                                          verse
-                                                                              .text),
-                                                                      isBookmarked:
-                                                                          isBookmarked,
-                                                                      isRedLetterEnabled:
-                                                                          readSettings
-                                                                              .isRedLetterEnabled,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            );
-                                                          }),
-                                                        ),
-                                                      ],
-                                                    );
-                                                  },
+                                                      );
+                                                    },
+                                                  ),
                                                 ),
                                               ),
                                             ),
@@ -1407,7 +1604,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                         currentBookName,
                         currentChapter,
                         allBooks,
-                        isImmersive && readSettings.readingViewMode == ReadingViewMode.immersive,
+                        isImmersive &&
+                            readSettings.readingViewMode ==
+                                ReadingViewMode.immersive,
                       ),
                     ),
                   ),
@@ -1483,8 +1682,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                       switchInCurve: Curves.easeOutCubic,
                       switchOutCurve: Curves.easeInCubic,
                       transitionBuilder: (child, animation) {
-                        if (child.key == const ValueKey('empty'))
+                        if (child.key == const ValueKey('empty')) {
                           return const SizedBox.shrink();
+                        }
                         return Stack(
                           children: [
                             FadeTransition(
@@ -1606,19 +1806,311 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     );
   }
 
+  Widget _buildReadingLayoutVerse(
+      BuildContext context,
+      WidgetRef ref,
+      BibleVerse primaryVerse,
+      BibleVerse? secondaryVerse,
+      int bookNumber,
+      int chapterNumber,
+      ReadingLayout layout,
+      ThemeData theme,
+      TypographyState typography,
+      AppThemeMode appThemeMode,
+      {bool hasCommentary = false,
+      VoidCallback? onCommentaryTap,
+      bool isBookmarked = false,
+      bool isRedLetterEnabled = true}) {
+    final primary = _buildNormalVerse(
+      primaryVerse,
+      theme,
+      typography,
+      appThemeMode,
+      hasCommentary: hasCommentary,
+      onCommentaryTap: onCommentaryTap,
+      isBookmarked: isBookmarked,
+      isRedLetterEnabled: isRedLetterEnabled,
+    );
+
+    if (secondaryVerse == null || layout == ReadingLayout.single) {
+      return primary;
+    }
+
+    if (layout == ReadingLayout.interleaved) {
+      final tokens = theme.extension<ReadingTokens>()!;
+      final secondaryColor = tokens.readingInk.withValues(alpha: 0.65);
+      
+      final secondaryTypography = typography.copyWith(
+        fontSize: typography.fontSize * 0.95,
+      );
+
+      final installedTranslations = ref.watch(availableTranslationsProvider).value ?? [];
+      final secondaryId = ref.read(secondaryTranslationProvider) ?? '';
+      final badgeLabel = _getTranslationCombinedLabel(secondaryId, installedTranslations);
+
+      final secondary = _buildNormalVerse(
+        secondaryVerse,
+        theme,
+        secondaryTypography,
+        appThemeMode,
+        hasCommentary: false,
+        isBookmarked: false,
+        isRedLetterEnabled: isRedLetterEnabled,
+        overrideColor: secondaryColor,
+        hideVerseNumber: true,
+      );
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          primary,
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  badgeLabel,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: secondaryColor.withValues(alpha: 0.7),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                secondary,
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+    
+    if (layout == ReadingLayout.sideBySide) {
+      final tokens = theme.extension<ReadingTokens>()!;
+      final secondaryColor = tokens.readingInk.withValues(alpha: 0.75);
+      
+      final secondaryTypography = typography.copyWith(
+        fontSize: typography.fontSize * 0.95,
+      );
+
+      final installedTranslations = ref.watch(availableTranslationsProvider).value ?? [];
+      final secondaryId = ref.read(secondaryTranslationProvider) ?? '';
+      final badgeLabel = _getTranslationCombinedLabel(secondaryId, installedTranslations);
+
+      final secondary = _buildNormalVerse(
+        secondaryVerse,
+        theme,
+        secondaryTypography,
+        appThemeMode,
+        hasCommentary: false,
+        isBookmarked: false,
+        isRedLetterEnabled: isRedLetterEnabled,
+        overrideColor: secondaryColor,
+        hideVerseNumber: true,
+      );
+
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(child: primary),
+          const SizedBox(width: 24),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  badgeLabel,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: secondaryColor.withValues(alpha: 0.7),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                secondary,
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+    
+    if (layout == ReadingLayout.chips) {
+      final expandedChipsMap = ref.watch(expandedChipsProvider);
+      final activeChipId = expandedChipsMap[primaryVerse.number];
+      
+      final tokens = theme.extension<ReadingTokens>()!;
+      final secondaryColor = tokens.readingInk.withValues(alpha: 0.75);
+      
+      final secondaryTypography = typography.copyWith(
+        fontSize: typography.fontSize * 0.95,
+      );
+
+      final targetLanguages = {
+        'English': 'EN',
+        'Swahili': 'SW',
+        'French': 'FR',
+        'Italian': 'IT',
+        'Spanish': 'ES',
+        'Tagalog': 'TL',
+      };
+      
+      final installedTranslations = ref.watch(availableTranslationsProvider).value ?? [];
+      final availableChips = <String, String>{}; 
+      for (final t in installedTranslations) {
+        if (targetLanguages.containsKey(t.languageName)) {
+          final label = targetLanguages[t.languageName]!;
+          if (!availableChips.containsKey(label)) {
+            availableChips[label] = t.translationId;
+          }
+        }
+      }
+
+      Widget? activeTranslationWidget;
+      if (activeChipId != null) {
+        final verseAsync = ref.watch(verseTranslationProvider((
+          translationId: activeChipId,
+          bookNumber: bookNumber,
+          chapter: chapterNumber,
+          verse: primaryVerse.number,
+        )));
+        
+        activeTranslationWidget = verseAsync.when(
+          data: (verse) {
+            if (verse == null) return const SizedBox.shrink();
+            return _buildNormalVerse(
+              verse,
+              theme,
+              secondaryTypography,
+              appThemeMode,
+              hasCommentary: false,
+              isBookmarked: false,
+              isRedLetterEnabled: isRedLetterEnabled,
+              overrideColor: secondaryColor,
+              hideVerseNumber: true,
+            );
+          },
+          loading: () => Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SizedBox(
+              height: 16, width: 16,
+              child: CircularProgressIndicator(strokeWidth: 2, color: theme.primaryColor),
+            ),
+          ),
+          error: (_, __) => const SizedBox.shrink(),
+        );
+      }
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          primary,
+          const SizedBox(height: 8),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                for (final langEntry in targetLanguages.entries)
+                  Builder(
+                    builder: (context) {
+                      final isInstalled = availableChips.containsKey(langEntry.value);
+                      final translationId = availableChips[langEntry.value];
+                      final isSelected = activeChipId == translationId;
+
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Material(
+                          color: isSelected
+                              ? theme.primaryColor.withValues(alpha: 0.15)
+                              : theme.colorScheme.surface,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            side: BorderSide(
+                              color: isSelected
+                                  ? theme.primaryColor.withValues(alpha: 0.5)
+                                  : theme.colorScheme.onSurface.withValues(alpha: isInstalled ? 0.15 : 0.05),
+                            ),
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: InkWell(
+                            onTap: () {
+                              if (isInstalled) {
+                                if (isSelected) {
+                                  ref.read(expandedChipsProvider.notifier).clear(primaryVerse.number);
+                                } else {
+                                  ref.read(expandedChipsProvider.notifier).setLanguage(primaryVerse.number, translationId!);
+                                }
+                              } else {
+                                // Uninstalled: Prompt download by opening picker
+                                showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  useRootNavigator: true,
+                                  backgroundColor: Colors.transparent,
+                                  builder: (context) => const TranslationPickerSheet(),
+                                );
+                              }
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    _getTranslationCombinedLabel(
+                                      isInstalled ? translationId! : langEntry.value, 
+                                      installedTranslations, 
+                                      defaultName: langEntry.key
+                                    ),
+                                    style: theme.textTheme.labelMedium?.copyWith(
+                                      color: isSelected
+                                          ? theme.primaryColor
+                                          : theme.colorScheme.onSurface.withValues(alpha: isInstalled ? 0.7 : 0.3),
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  if (!isInstalled) ...[
+                                    const SizedBox(width: 4),
+                                    Icon(Icons.download_rounded, size: 12, color: theme.colorScheme.onSurface.withValues(alpha: 0.3)),
+                                  ]
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+                  ),
+              ],
+            ),
+          ),
+          if (activeTranslationWidget != null) ...[
+            const SizedBox(height: 12),
+            activeTranslationWidget,
+          ],
+        ],
+      );
+    }
+    
+    // Fallback for other modes not implemented yet
+    return primary;
+  }
+
   Widget _buildNormalVerse(BibleVerse verse, ThemeData theme,
       TypographyState typography, AppThemeMode appThemeMode,
       {bool hasCommentary = false,
       VoidCallback? onCommentaryTap,
       bool isBookmarked = false,
-      bool isRedLetterEnabled = true}) {
+      bool isRedLetterEnabled = true,
+      Color? overrideColor,
+      bool hideVerseNumber = false}) {
     final tokens = theme.extension<ReadingTokens>()!;
     final fontStyle = theme.textTheme.bodyMedium?.copyWith(
           fontFamily: typography.fontFamily,
           fontSize: typography.fontSize,
           height: typography.lineHeight,
           letterSpacing: 0.15,
-          color: tokens.readingInk,
+          color: overrideColor ?? tokens.readingInk,
           decoration: isBookmarked ? TextDecoration.underline : null,
           decorationColor: isBookmarked ? theme.primaryColor : null,
           decorationStyle: isBookmarked ? TextDecorationStyle.solid : null,
@@ -1688,10 +2180,22 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     }
 
     return RichText(
+      textAlign: () {
+        switch (typography.textAlignMode) {
+          case TextAlignMode.left:
+            return TextAlign.start;
+          case TextAlignMode.center:
+            return TextAlign.center;
+          case TextAlignMode.right:
+            return TextAlign.end;
+          case TextAlignMode.justified:
+            return TextAlign.justify;
+        }
+      }(),
       text: TextSpan(
         style: fontStyle,
         children: [
-          if (ref.watch(readSettingsProvider).showVerseNumbers)
+          if (ref.watch(readSettingsProvider).showVerseNumbers && !hideVerseNumber)
             TextSpan(
               text: '${verse.number}  ',
               style: theme.textTheme.titleMedium?.copyWith(
@@ -1848,8 +2352,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
               final primaryPlanId = activePlanIds.first;
               final planState = ref.watch(readingPlanProvider(primaryPlanId));
               if (activePlanDay < 1 ||
-                  activePlanDay > planState.planData.length)
+                  activePlanDay > planState.planData.length) {
                 return const SizedBox.shrink();
+              }
 
               final dayTarget = planState.planData[activePlanDay - 1];
               final chapterId = '${fc.book.name}_${fc.chapter.number}';
@@ -2211,39 +2716,13 @@ class __BookChapterSelectorSheetState
       return const SizedBox.shrink();
     }
 
-    final appThemeMode = ref.watch(themeProvider);
-
-    Color getThemeBackgroundColor() {
-      switch (appThemeMode) {
-        case AppThemeMode.dawn:
-          return AppColors.dawnBackground;
-        case AppThemeMode.lilies:
-          return AppColors.liliesBackground;
-        case AppThemeMode.roses:
-          return AppColors.rosesBackground;
-        case AppThemeMode.olives:
-          return AppColors.olivesBackground;
-        case AppThemeMode.dusk:
-          return const Color(0xFF312C51);
-        case AppThemeMode.fresh:
-          return const Color(0xFF132C33);
-        default:
-          return theme.scaffoldBackgroundColor;
-      }
-    }
-
     return Material(
-      color: Colors.transparent, // Let AnimatedContainer handle the color
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.easeInOut,
-        decoration: BoxDecoration(
-          color: getThemeBackgroundColor(),
+      color: Colors.transparent,
+      child: FractionallySizedBox(
+        heightFactor: 0.75,
+        child: TexturedGlassContainer(
           borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height * 0.85,
+          padding: EdgeInsets.zero,
           child: Padding(
             padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
             child: Column(
@@ -2696,26 +3175,9 @@ class _TypographyBottomSheet extends ConsumerWidget {
     final theme = Theme.of(context);
     final typography = ref.watch(typographyProvider);
     final typographyNotifier = ref.read(typographyProvider.notifier);
-    final appThemeMode = ref.watch(themeProvider);
 
-    Color getSheetSurface() {
-      switch (appThemeMode) {
-        case AppThemeMode.dawn:
-          return AppColors.dawnBackground;
-        case AppThemeMode.lilies:
-          return AppColors.liliesBackground;
-        case AppThemeMode.roses:
-          return AppColors.rosesBackground;
-        case AppThemeMode.olives:
-          return AppColors.olivesBackground;
-        case AppThemeMode.dusk:
-          return const Color(0xFF312C51);
-        case AppThemeMode.fresh:
-          return const Color(0xFF132C33);
-        default:
-          return theme.scaffoldBackgroundColor;
-      }
-    }
+
+
 
     final fonts = [
       'EB Garamond',
@@ -2726,231 +3188,425 @@ class _TypographyBottomSheet extends ConsumerWidget {
       'Lexend'
     ];
 
+    final handlebarColor = theme.colorScheme.onSurface.withValues(alpha: 0.2);
+
+    final sectionLabelStyle = theme.textTheme.labelSmall?.copyWith(
+      color: theme.primaryColor,
+      letterSpacing: 1.2,
+      fontWeight: FontWeight.bold,
+      fontSize: 10,
+    );
+    final valueStyle = theme.textTheme.labelMedium?.copyWith(
+      color: theme.primaryColor,
+      fontWeight: FontWeight.bold,
+    );
+    final iconColor = theme.primaryColor;
+
     return BouncyEntrance(
       delay: const Duration(milliseconds: 50),
-      child: Material(
-        color: getSheetSurface(),
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-        clipBehavior: Clip.antiAlias,
-        child: SafeArea(
-          top: false,
-          child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Handlebar
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: appThemeMode == AppThemeMode.dusk ||
-                              appThemeMode == AppThemeMode.fresh ||
-                              appThemeMode == AppThemeMode.dawn ||
-                              appThemeMode == AppThemeMode.lilies ||
-                              appThemeMode == AppThemeMode.roses ||
-                              appThemeMode == AppThemeMode.olives
-                          ? theme.primaryColor
-                          : theme.colorScheme.onSurface.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(2),
+      child: FractionallySizedBox(
+        heightFactor: 0.75,
+        child: TexturedGlassContainer(
+          sigmaX: 45.0,
+          sigmaY: 45.0,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+          padding: EdgeInsets.zero,
+          child: SafeArea(
+            top: false,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20.0, 16.0, 20.0, 16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 36,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: handlebarColor,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  'Typography',
-                  style: theme.textTheme.titleLarge
-                      ?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'FONT SIZE',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.primaryColor,
-                        letterSpacing: 1.2,
-                        fontWeight: FontWeight.bold,
+                  const SizedBox(height: 14),
+                  Text(
+                    'Typography',
+                    style: theme.textTheme.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.text_increase_rounded,
+                              size: 16, color: iconColor),
+                          const SizedBox(width: 8),
+                          Text('FONT SIZE', style: sectionLabelStyle),
+                        ],
                       ),
-                    ),
-                    Text(
-                      '${typography.fontSize.clamp(12.0, 32.0).round()}',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: theme.primaryColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        final newValue =
-                            (typography.fontSize - 1).clamp(12.0, 32.0);
-                        if (newValue != typography.fontSize) {
-                          HapticFeedback.selectionClick();
-                          typographyNotifier.setFontSize(newValue);
-                        }
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8.0, vertical: 8.0),
-                        child: Text('A', style: theme.textTheme.labelSmall),
-                      ),
-                    ),
-                    Expanded(
-                      child: SliderTheme(
-                        data: SliderTheme.of(context).copyWith(
-                          tickMarkShape: const RoundSliderTickMarkShape(
-                              tickMarkRadius: 2.0),
-                          activeTickMarkColor: theme.scaffoldBackgroundColor
-                              .withValues(alpha: 0.6),
-                          inactiveTickMarkColor:
-                              theme.primaryColor.withValues(alpha: 0.3),
-                        ),
-                        child: Slider(
-                          value: typography.fontSize.clamp(12.0, 32.0),
-                          min: 12.0,
-                          max: 32.0,
-                          divisions: 20,
-                          activeColor: theme.primaryColor,
-                          inactiveColor:
-                              theme.primaryColor.withValues(alpha: 0.2),
-                          onChanged: (value) {
-                            if (value != typography.fontSize) {
-                              HapticFeedback.selectionClick();
-                              typographyNotifier.setFontSize(value);
-                            }
-                          },
+                      Text('${typography.fontSize.clamp(12.0, 32.0).round()}',
+                          style: valueStyle),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          final v = (typography.fontSize - 1).clamp(12.0, 32.0);
+                          if (v != typography.fontSize) {
+                            HapticFeedback.selectionClick();
+                            typographyNotifier.setFontSize(v);
+                          }
+                        },
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: theme.primaryColor.withValues(alpha: 0.10),
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(
+                                color:
+                                    theme.primaryColor.withValues(alpha: 0.25)),
+                          ),
+                          child: Center(
+                            child: Text('A−',
+                                style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: theme.primaryColor,
+                                    height: 1.0)),
+                          ),
                         ),
                       ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: SliderTheme(
+                          data: SliderTheme.of(context).copyWith(
+                            trackHeight: 3,
+                            thumbShape: const RoundSliderThumbShape(
+                                enabledThumbRadius: 7),
+                            tickMarkShape: const RoundSliderTickMarkShape(
+                                tickMarkRadius: 1.5),
+                            activeTickMarkColor: theme.scaffoldBackgroundColor
+                                .withValues(alpha: 0.6),
+                            inactiveTickMarkColor:
+                                theme.primaryColor.withValues(alpha: 0.3),
+                          ),
+                          child: Slider(
+                            value: typography.fontSize.clamp(12.0, 32.0),
+                            min: 12.0,
+                            max: 32.0,
+                            divisions: 20,
+                            activeColor: theme.primaryColor,
+                            inactiveColor:
+                                theme.primaryColor.withValues(alpha: 0.2),
+                            onChanged: (value) {
+                              if (value != typography.fontSize) {
+                                HapticFeedback.selectionClick();
+                                typographyNotifier.setFontSize(value);
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      GestureDetector(
+                        onTap: () {
+                          final v = (typography.fontSize + 1).clamp(12.0, 32.0);
+                          if (v != typography.fontSize) {
+                            HapticFeedback.selectionClick();
+                            typographyNotifier.setFontSize(v);
+                          }
+                        },
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: theme.primaryColor.withValues(alpha: 0.10),
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(
+                                color:
+                                    theme.primaryColor.withValues(alpha: 0.25)),
+                          ),
+                          child: Center(
+                            child: Text('A+',
+                                style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: theme.primaryColor,
+                                    height: 1.0)),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.format_line_spacing_rounded,
+                              size: 16, color: iconColor),
+                          const SizedBox(width: 8),
+                          Text('LINE SPACING', style: sectionLabelStyle),
+                        ],
+                      ),
+                      Text(
+                        typography.lineHeight <= 1.4
+                            ? 'Compact'
+                            : (typography.lineHeight >= 1.8
+                                ? 'Relaxed'
+                                : 'Normal'),
+                        style: valueStyle,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Center(
+                    child: PillSegmentedControl(
+                      segments: const ['Compact', 'Normal', 'Relaxed'],
+                      selectedIndex: typography.lineHeight <= 1.4
+                          ? 0
+                          : (typography.lineHeight >= 1.8 ? 2 : 1),
+                      onSegmentSelected: (index) {
+                        HapticFeedback.selectionClick();
+                        typographyNotifier
+                            .setLineHeight([1.3, 1.6, 1.9][index]);
+                      },
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        final newValue =
-                            (typography.fontSize + 1).clamp(12.0, 32.0);
-                        if (newValue != typography.fontSize) {
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.padding_rounded,
+                              size: 16, color: iconColor),
+                          const SizedBox(width: 8),
+                          Text('MARGINS', style: sectionLabelStyle),
+                        ],
+                      ),
+                      Text('${typography.marginPercent.toStringAsFixed(0)}%',
+                          style: valueStyle),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  SliderTheme(
+                    data: SliderTheme.of(context).copyWith(
+                      trackHeight: 3,
+                      thumbShape:
+                          const RoundSliderThumbShape(enabledThumbRadius: 7),
+                      tickMarkShape:
+                          const RoundSliderTickMarkShape(tickMarkRadius: 1.5),
+                      activeTickMarkColor:
+                          theme.scaffoldBackgroundColor.withValues(alpha: 0.6),
+                      inactiveTickMarkColor:
+                          theme.primaryColor.withValues(alpha: 0.3),
+                    ),
+                    child: Slider(
+                      value: typography.marginPercent.clamp(0.0, 16.0),
+                      min: 0.0,
+                      max: 16.0,
+                      divisions: 16,
+                      activeColor: theme.primaryColor,
+                      inactiveColor: theme.primaryColor.withValues(alpha: 0.2),
+                      onChanged: (value) {
+                        if (value != typography.marginPercent) {
                           HapticFeedback.selectionClick();
-                          typographyNotifier.setFontSize(newValue);
+                          typographyNotifier.setMarginPercent(value);
                         }
                       },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8.0, vertical: 8.0),
-                        child: Text('A', style: theme.textTheme.titleLarge),
-                      ),
                     ),
-                  ],
-                ),
-
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'LINE SPACING',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.primaryColor,
-                        letterSpacing: 1.2,
-                        fontWeight: FontWeight.bold,
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.format_align_left_rounded,
+                              size: 16, color: iconColor),
+                          const SizedBox(width: 8),
+                          Text('ALIGNMENT', style: sectionLabelStyle),
+                        ],
                       ),
-                    ),
-                    Text(
-                      typography.lineHeight <= 1.4
-                          ? 'Compact'
-                          : (typography.lineHeight >= 1.8
-                              ? 'Relaxed'
-                              : 'Normal'),
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: theme.primaryColor,
-                        fontWeight: FontWeight.bold,
+                      Text(
+                        () {
+                          switch (typography.textAlignMode) {
+                            case TextAlignMode.left:
+                              return 'Left';
+                            case TextAlignMode.center:
+                              return 'Center';
+                            case TextAlignMode.right:
+                              return 'Right';
+                            case TextAlignMode.justified:
+                              return 'Justified';
+                          }
+                        }(),
+                        style: valueStyle,
                       ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _AlignmentButton(
+                        icon: Icons.format_align_left_rounded,
+                        isSelected:
+                            typography.textAlignMode == TextAlignMode.left,
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          typographyNotifier
+                              .setTextAlignMode(TextAlignMode.left);
+                        },
+                      ),
+                      const SizedBox(width: 12),
+                      _AlignmentButton(
+                        icon: Icons.format_align_center_rounded,
+                        isSelected:
+                            typography.textAlignMode == TextAlignMode.center,
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          typographyNotifier
+                              .setTextAlignMode(TextAlignMode.center);
+                        },
+                      ),
+                      const SizedBox(width: 12),
+                      _AlignmentButton(
+                        icon: Icons.format_align_right_rounded,
+                        isSelected:
+                            typography.textAlignMode == TextAlignMode.right,
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          typographyNotifier
+                              .setTextAlignMode(TextAlignMode.right);
+                        },
+                      ),
+                      const SizedBox(width: 12),
+                      _AlignmentButton(
+                        icon: Icons.format_align_justify_rounded,
+                        isSelected:
+                            typography.textAlignMode == TextAlignMode.justified,
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          typographyNotifier
+                              .setTextAlignMode(TextAlignMode.justified);
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Icon(Icons.font_download_rounded,
+                          size: 16, color: iconColor),
+                      const SizedBox(width: 8),
+                      Text('FONT FAMILY', style: sectionLabelStyle),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      childAspectRatio: 2.6,
+                      crossAxisSpacing: 8,
+                      mainAxisSpacing: 8,
                     ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Center(
-                  child: PillSegmentedControl(
-                    segments: const ['Compact', 'Normal', 'Relaxed'],
-                    selectedIndex: typography.lineHeight <= 1.4
-                        ? 0
-                        : (typography.lineHeight >= 1.8 ? 2 : 1),
-                    onSegmentSelected: (index) {
-                      HapticFeedback.selectionClick();
-                      final heights = [1.3, 1.6, 1.9];
-                      typographyNotifier.setLineHeight(heights[index]);
-                    },
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  'FONT FAMILY',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.primaryColor,
-                    letterSpacing: 1.2,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 3.0,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                  ),
-                  itemCount: fonts.length,
-                  itemBuilder: (context, index) {
-                    final font = fonts[index];
-                    final isSelected = typography.fontFamily == font;
-
-                    return InkWell(
-                      onTap: () => typographyNotifier.setFontFamily(font),
-                      borderRadius: BorderRadius.circular(12),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? theme.primaryColor.withValues(alpha: 0.15)
-                              : theme.colorScheme.surface,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
+                    itemCount: fonts.length,
+                    itemBuilder: (context, index) {
+                      final font = fonts[index];
+                      final isSelected = typography.fontFamily == font;
+                      return InkWell(
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          typographyNotifier.setFontFamily(font);
+                        },
+                        borderRadius: BorderRadius.circular(10),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
                             color: isSelected
                                 ? theme.primaryColor
                                 : theme.colorScheme.onSurface
-                                    .withValues(alpha: 0.1),
-                            width: isSelected ? 2 : 1,
+                                    .withValues(alpha: 0.05),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: isSelected
+                                  ? theme.primaryColor
+                                  : Colors.transparent,
+                            ),
+                          ),
+                          child: Text(
+                            font,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontFamily: font,
+                              color: isSelected
+                                  ? theme.colorScheme.surface
+                                  : theme.primaryColor,
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                              fontSize: 13,
+                            ),
                           ),
                         ),
-                        child: Text(
-                          font,
-                          style: TextStyle(fontFamily: font).copyWith(
-                            color: isSelected
-                                ? theme.primaryColor
-                                : theme.colorScheme.onSurface,
-                            fontWeight: isSelected
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(height: 16),
-              ],
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AlignmentButton extends StatelessWidget {
+  final IconData icon;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _AlignmentButton({
+    required this.icon,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? theme.primaryColor
+              : theme.colorScheme.onSurface.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? theme.primaryColor : Colors.transparent,
+          ),
+        ),
+        child: Icon(
+          icon,
+          size: 20,
+          color: isSelected ? theme.colorScheme.surface : theme.primaryColor,
         ),
       ),
     );
@@ -3031,6 +3687,7 @@ class VerseActionLogic {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
+      useRootNavigator: true,
       builder: (ctx) {
         return Container(
           margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),

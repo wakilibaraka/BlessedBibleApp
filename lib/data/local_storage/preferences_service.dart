@@ -26,6 +26,8 @@ class PreferencesService {
   static const String _redLetterEnabledKey = 'red_letter_enabled';
   static const String _defaultStartTabKey = 'default_start_tab';
   static const String _activeTranslationKey = 'active_translation';
+  static const String _secondaryTranslationKey = 'secondary_translation';
+
 
   // Reading tips
   static const String _showReadingTipsKey = 'show_reading_tips';
@@ -59,6 +61,19 @@ class PreferencesService {
   Future<void> setActiveTranslation(String translationId) async {
     await prefs.setString(_activeTranslationKey, translationId);
   }
+
+  String? getSecondaryTranslation() {
+    return prefs.getString(_secondaryTranslationKey) ?? 'swh_ulb';
+  }
+
+  Future<void> setSecondaryTranslation(String? translationId) async {
+    if (translationId == null) {
+      await prefs.remove(_secondaryTranslationKey);
+    } else {
+      await prefs.setString(_secondaryTranslationKey, translationId);
+    }
+  }
+
 
   List<SearchResult> getSearchHistory() {
     final jsonString = prefs.getString(_searchHistoryKey);
