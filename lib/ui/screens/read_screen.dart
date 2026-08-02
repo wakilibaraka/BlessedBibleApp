@@ -28,7 +28,6 @@ import '../../utils/bible_sections.dart';
 import '../../services/share_service.dart';
 import 'notes_list_screen.dart';
 
-import '../../state/notes_provider.dart';
 import '../sheets/translation_picker_sheet.dart';
 
 import '../widgets/day_complete_celebration.dart';
@@ -46,6 +45,7 @@ import '../../state/nav_settings_provider.dart';
 import '../../state/translation_provider.dart';
 import '../../theme/reading_tokens.dart';
 import '../widgets/commentary_view.dart';
+import '../sheets/verse_context_menu_sheet.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 class LazyPageScrollPhysics extends PageScrollPhysics {
@@ -347,22 +347,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     if (mounted) setState(() {});
   }
   // ────────────────────────────────────────────────────────────────
-
-  int? _contextMenuVerse;
-  dynamic _contextMenuChapterData;
-  String? _contextMenuBookName;
-  int? _contextMenuChapterNum;
-
-  void _dismissContextMenu() {
-    if (_contextMenuVerse != null && mounted) {
-      setState(() {
-        _contextMenuVerse = null;
-        _contextMenuChapterData = null;
-        _contextMenuBookName = null;
-        _contextMenuChapterNum = null;
-      });
-    }
-  }
 
   @override
   void initState() {
@@ -1578,22 +1562,23 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                               }
 
                                                               return GestureDetector(
-                                                                onTap: () =>
-                                                                    _toggleVerseSelection(
-                                                                        verse
-                                                                            .number),
-                                                                onLongPress:
-                                                                    () {
-                                                                  _showVerseContextMenu(
-                                                                      context,
-                                                                      verse
-                                                                          .number,
-                                                                      fc
-                                                                          .chapter,
-                                                                      fc.book
-                                                                          .name,
-                                                                      fc.chapter
-                                                                          .number);
+                                                                onDoubleTap: () {
+                                                                  HapticFeedback.lightImpact();
+                                                                  VerseActionLogic.handleBookmark(context, theme, ref, fc.book.name, fc.chapter.number, [verse.number]);
+                                                                },
+                                                                onTap: () => _toggleVerseSelection(verse.number),
+                                                                onLongPress: () {
+                                                                  HapticFeedback.mediumImpact();
+                                                                  showModalBottomSheet(
+                                                                    context: context,
+                                                                    backgroundColor: Colors.transparent,
+                                                                    useRootNavigator: true,
+                                                                    builder: (ctx) => VerseContextMenuSheet(
+                                                                      verseNumber: verse.number,
+                                                                      bookName: fc.book.name,
+                                                                      chapterNum: fc.chapter.number,
+                                                                    ),
+                                                                  );
                                                                 },
                                                                 child: Stack(
                                                                   children: [
@@ -1757,54 +1742,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                         ),
                       ),
                     ),
-                  // ────────────────────────────────────────────────────────────────
-                  // ────────────────────────────────────────────────────────────────
-                  Positioned.fill(
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 250),
-                      switchInCurve: Curves.easeOutCubic,
-                      switchOutCurve: Curves.easeInCubic,
-                      transitionBuilder: (child, animation) {
-                        if (child.key == const ValueKey('empty')) {
-                          return const SizedBox.shrink();
-                        }
-                        return Stack(
-                          children: [
-                            FadeTransition(
-                              opacity: animation,
-                              alwaysIncludeSemantics: true,
-                              child: GestureDetector(
-                                behavior: HitTestBehavior.translucent,
-                                onTap: _dismissContextMenu,
-                                child: Container(
-                                  color: Colors.black.withValues(alpha: 0.1),
-                                ),
-                              ),
-                            ),
-                            SlideTransition(
-                              position: Tween<Offset>(
-                                begin: const Offset(0, 1),
-                                end: Offset.zero,
-                              ).animate(animation),
-                              child: child,
-                            ),
-                          ],
-                        );
-                      },
-                      child: _contextMenuVerse != null
-                          ? VerseContextMenuContent(
-                              key: ValueKey('content_$_contextMenuVerse'),
-                              verseNumber: _contextMenuVerse!,
-                              chapterData: _contextMenuChapterData,
-                              bookName: _contextMenuBookName!,
-                              chapterNum: _contextMenuChapterNum!,
-                              bookAbbrev:
-                                  ref.read(readLocationProvider).bookAbbrev,
-                              onDismiss: _dismissContextMenu,
-                            )
-                          : const SizedBox.shrink(key: ValueKey('empty')),
-                    ),
-                  ),
 
                   // ── Hints UI ──────────────────────────────────────────────────
                   if (_currentHintMessage != null)
@@ -1865,16 +1802,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         ),
       ),
     );
-  }
-
-  void _showVerseContextMenu(BuildContext context, int verseNumber,
-      dynamic chapterData, String bookName, int chapterNum) {
-    setState(() {
-      _contextMenuVerse = verseNumber;
-      _contextMenuChapterData = chapterData;
-      _contextMenuBookName = bookName;
-      _contextMenuChapterNum = chapterNum;
-    });
   }
 
   void _showCommentaryBottomSheet(int verseNumber, String verseText) {
@@ -3694,49 +3621,7 @@ class _AlignmentButton extends StatelessWidget {
   }
 }
 
-class _ContextMenuButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-  final VoidCallback? onLongPress;
-  final Color? color;
-  const _ContextMenuButton(
-      {required this.icon,
-      required this.label,
-      required this.onTap,
-      this.onLongPress,
-      this.color});
 
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return GestureDetector(
-      onTap: onTap,
-      onLongPress: onLongPress,
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: color != null
-                  ? color!.withValues(alpha: 0.15)
-                  : theme.colorScheme.onSurface.withValues(alpha: 0.08),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon,
-                color: color ?? theme.colorScheme.onSurface, size: 26),
-          ),
-          const SizedBox(height: 6),
-          Text(label,
-              style: theme.textTheme.labelSmall
-                  ?.copyWith(fontWeight: FontWeight.w600, color: color)),
-        ],
-      ),
-    );
-  }
-}
 
 class VerseActionLogic {
   static void _showFeedback(
@@ -4000,194 +3885,3 @@ class VerseActionLogic {
   }
 }
 
-class VerseContextMenuContent extends ConsumerStatefulWidget {
-  final int verseNumber;
-  final dynamic chapterData;
-  final String bookName;
-  final int chapterNum;
-  final String bookAbbrev;
-  final VoidCallback onDismiss;
-
-  const VerseContextMenuContent({
-    super.key,
-    required this.verseNumber,
-    required this.chapterData,
-    required this.bookName,
-    required this.chapterNum,
-    required this.bookAbbrev,
-    required this.onDismiss,
-  });
-
-  @override
-  ConsumerState<VerseContextMenuContent> createState() =>
-      _VerseContextMenuContentState();
-}
-
-class _VerseContextMenuContentState
-    extends ConsumerState<VerseContextMenuContent> {
-  @override
-  Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!context.mounted) return;
-      ref.read(hintsProvider.notifier).maybeShowHint('highlight_long_press',
-          () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Long-press Highlight to change color'),
-            duration: Duration(seconds: 3),
-          ),
-        );
-      });
-    });
-
-    ref.listen(readSelectionProvider, (previous, next) {
-      if (previous != null && previous.isNotEmpty && next.isEmpty) {
-        widget.onDismiss();
-      }
-    });
-
-    final verseKey = generateVerseKey(
-        widget.bookAbbrev, widget.chapterNum, widget.verseNumber);
-    final selectedVerses = ref.watch(readSelectionProvider);
-    final targetVerses = selectedVerses.isNotEmpty
-        ? selectedVerses.toList()
-        : [widget.verseNumber];
-
-    final isBookmarked = ref.watch(bookmarksProvider).contains(verseKey);
-    final hasNote =
-        ref.watch(notesProvider).any((n) => n.reference == verseKey);
-    final isHighlighted = ref.watch(highlightsProvider).containsKey(verseKey);
-    final theme = Theme.of(context);
-
-    final commentaryNotifier = ref.read(commentaryProvider.notifier);
-    final bool hasCommentary = targetVerses.any((v) => commentaryNotifier
-        .commentaryForVerse(widget.bookName, widget.chapterNum, v)
-        .isNotEmpty);
-
-    // Default icon row
-    final actionButtons = [
-      _ContextMenuButton(
-          icon: isBookmarked
-              ? Icons.bookmark_rounded
-              : Icons.bookmark_border_rounded,
-          label: isBookmarked ? 'Saved' : 'Bookmark',
-          color: isBookmarked ? theme.primaryColor : null,
-          onTap: () {
-            VerseActionLogic.handleBookmark(context, theme, ref,
-                widget.bookName, widget.chapterNum, targetVerses);
-            widget.onDismiss();
-          }),
-      _ContextMenuButton(
-          icon: Icons.edit_document,
-          label: hasNote ? 'Edit Note' : 'Note',
-          color: hasNote ? Colors.blue.shade600 : null,
-          onTap: () {
-            widget.onDismiss();
-            VerseActionLogic.handleNote(context, ref, theme, widget.bookName,
-                widget.chapterNum, targetVerses);
-          }),
-      _ContextMenuButton(
-          icon: Icons.copy_rounded,
-          label: 'Copy',
-          onTap: () {
-            widget.onDismiss();
-            VerseActionLogic.handleCopy(
-                context, ref, widget.bookName, widget.chapterNum, targetVerses);
-          }),
-      if (hasCommentary)
-        _ContextMenuButton(
-            icon: Icons.lightbulb_outline_rounded,
-            label: 'Commentary',
-            onTap: () {
-              widget.onDismiss();
-              VerseActionLogic.handleCommentary(context, ref, widget.bookName,
-                  widget.chapterNum, widget.verseNumber, targetVerses);
-            }),
-      _ContextMenuButton(
-          icon: Icons.ios_share_rounded,
-          label: 'Share',
-          onTap: () {
-            widget.onDismiss();
-            VerseActionLogic.handleShare(
-                context, ref, widget.bookName, widget.chapterNum, targetVerses);
-          }),
-    ];
-
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 24.0, left: 16, right: 16),
-          child: TexturedGlassContainer(
-            borderRadius: BorderRadius.circular(32),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        selectedVerses.isNotEmpty
-                            ? '${selectedVerses.length} verse${selectedVerses.length > 1 ? 's' : ''} selected'
-                            : '${widget.bookName} ${widget.chapterNum}:${widget.verseNumber}',
-                        style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: theme.textTheme.titleSmall?.color
-                                ?.withValues(alpha: 0.7)),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close_rounded, size: 20),
-                        onPressed: widget.onDismiss,
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      _ContextMenuButton(
-                          icon: Icons.highlight_rounded,
-                          label: isHighlighted ? 'Highlighted' : 'Highlight',
-                          color: isHighlighted ? Colors.amber.shade600 : null,
-                          onTap: () {
-                            VerseActionLogic.handleHighlightInteraction(
-                              context: context,
-                              ref: ref,
-                              theme: theme,
-                              bookName: widget.bookName,
-                              chapterNum: widget.chapterNum,
-                              targetVerses: targetVerses,
-                              isLongPress: false,
-                              onClearSelection: widget.onDismiss,
-                            );
-                          },
-                          onLongPress: () {
-                            VerseActionLogic.handleHighlightInteraction(
-                              context: context,
-                              ref: ref,
-                              theme: theme,
-                              bookName: widget.bookName,
-                              chapterNum: widget.chapterNum,
-                              targetVerses: targetVerses,
-                              isLongPress: true,
-                              onClearSelection: widget.onDismiss,
-                            );
-                          }),
-                      ...actionButtons,
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}

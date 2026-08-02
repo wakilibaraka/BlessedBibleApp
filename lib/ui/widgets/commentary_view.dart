@@ -443,39 +443,41 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
   Widget _buildEntryContent(ThemeData theme, ReadingTokens tokens, CommentaryEntry entry, TypographyState typography) {
     final paragraphs = entry.text.split('\n\n');
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ...paragraphs.map((p) => Padding(
-          padding: const EdgeInsets.only(bottom: 16.0),
-          child: Text(
-            p.trim(),
-            style: theme.textTheme.bodyLarge?.copyWith(
-              fontSize: typography.fontSize,
-              height: typography.lineHeight,
-              fontFamily: typography.fontFamily,
-              color: tokens.readingInk,
+    return SelectionArea(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ...paragraphs.map((p) => Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: Text(
+              p.trim(),
+              style: theme.textTheme.bodyLarge?.copyWith(
+                fontSize: typography.fontSize,
+                height: typography.lineHeight,
+                fontFamily: typography.fontFamily,
+                color: tokens.readingInk,
+              ),
             ),
-          ),
-        )),
-        const Divider(height: 24),
-        Text(
-          entry.author,
-          style: theme.textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: tokens.readingAccent,
-          ),
-        ),
-        if (entry.source.isNotEmpty) ...[
-          const SizedBox(height: 2),
+          )),
+          const Divider(height: 24),
           Text(
-            entry.source,
-            style: theme.textTheme.labelMedium?.copyWith(
-              color: tokens.readingInkMuted,
+            entry.author,
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: tokens.readingAccent,
             ),
           ),
+          if (entry.source.isNotEmpty) ...[
+            const SizedBox(height: 2),
+            Text(
+              entry.source,
+              style: theme.textTheme.labelMedium?.copyWith(
+                color: tokens.readingInkMuted,
+              ),
+            ),
+          ],
         ],
-      ],
+      ),
     );
   }
 }
