@@ -45,7 +45,6 @@ class ThemePickerSheet extends ConsumerWidget {
     final isSingleTheme = ref.watch(isSingleThemeProvider);
     final isMatchSystem = ref.watch(isMatchSystemProvider);
     final rotationPool = ref.watch(rotationPoolProvider);
-    final isRotationActive = !isSingleTheme && !isMatchSystem;
 
     return Container(
       decoration: BoxDecoration(
@@ -97,34 +96,30 @@ class ThemePickerSheet extends ConsumerWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: Builder(
-                          builder: (context) {
-                            final previewProps = _getThemeProperties(currentMode, theme);
-                            return _ThemePill(
-                              label: isSingleTheme ? 'Locked:\n${previewProps.name.replaceAll('\n', ' ')}' : 'Single:\n${previewProps.name.replaceAll('\n', ' ')}',
-                              mode: currentMode,
-                              currentMode: currentMode,
-                              fillColor: previewProps.fill,
-                              textColor: previewProps.text,
-                              swatchColors: previewProps.swatches,
-                              overrideIsSelected: isSingleTheme,
-                              onTap: () {
-                                ref.read(themeProvider.notifier).setSingleTheme(!isSingleTheme);
-                              },
-                            );
-                          }
+                        child: _SimpleTopPill(
+                          icon: Icon(
+                            isSingleTheme ? Icons.lock : Icons.lock_open,
+                            color: isSingleTheme ? theme.colorScheme.onPrimaryContainer : theme.colorScheme.onSurface,
+                            size: 20,
+                          ),
+                          isActive: isSingleTheme,
+                          onTap: () {
+                            ref.read(themeProvider.notifier).setSingleTheme(!isSingleTheme);
+                          },
                         ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
-                        child: _ThemePill(
-                          label: 'Match System',
-                          mode: AppThemeMode.automatic,
-                          currentMode: currentMode,
-                          fillColor: theme.colorScheme.primaryContainer,
-                          textColor: theme.colorScheme.onPrimaryContainer,
-                          swatchColors: [theme.primaryColor, theme.colorScheme.secondary, theme.colorScheme.surface],
-                          overrideIsSelected: isMatchSystem,
+                        child: _SimpleTopPill(
+                          icon: Text(
+                            'A',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w900,
+                              color: isMatchSystem ? theme.colorScheme.onPrimaryContainer : theme.colorScheme.onSurface,
+                            ),
+                          ),
+                          isActive: isMatchSystem,
                           onTap: () {
                             ref.read(themeProvider.notifier).setMatchSystem(!isMatchSystem);
                           },
@@ -132,51 +127,178 @@ class ThemePickerSheet extends ConsumerWidget {
                       ),
                     ],
                   ),
-                  if (isRotationActive) ...[
-                    const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: theme.primaryColor.withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: theme.primaryColor.withValues(alpha: 0.2)),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(Icons.auto_mode_rounded, size: 16, color: theme.primaryColor),
-                              const SizedBox(width: 6),
-                              Text(
-                                'Daily Rotation: Active (${rotationPool.length} themes)',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: theme.primaryColor,
-                                ),
+                  const SizedBox(height: 12),
+                  Builder(
+                    builder: (context) {
+                      final bgLuminance = theme.colorScheme.surface.computeLuminance();
+                      final isDarkBg = bgLuminance < 0.4;
+                      final neumorphicShadows = isDarkBg
+                          ? [
+                              BoxShadow(
+                                color: Colors.white.withValues(alpha: 0.08),
+                                offset: const Offset(-1.5, -1.5),
+                                blurRadius: 3,
                               ),
-                            ],
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.35),
+                                offset: const Offset(2.5, 2.5),
+                                blurRadius: 5,
+                              ),
+                            ]
+                          : [
+                              BoxShadow(
+                                color: Colors.white.withValues(alpha: 0.9),
+                                offset: const Offset(-1.5, -1.5),
+                                blurRadius: 3,
+                              ),
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.08),
+                                offset: const Offset(2.5, 2.5),
+                                blurRadius: 5,
+                              ),
+                            ];
+
+                      Widget icon;
+                      String mainText;
+                      Widget? actionWidget;
+
+                      if (isMatchSystem) {
+                        icon = Icon(Icons.brightness_auto_rounded, size: 16, color: theme.primaryColor);
+                        mainText = 'Match System: Uses system Light or Dark mode';
+                        actionWidget = Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: theme.primaryColor.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: theme.primaryColor.withValues(alpha: 0.25)),
+                            boxShadow: neumorphicShadows,
                           ),
-                          InkWell(
-                            onTap: () => _showRotationPoolDialog(context, ref),
-                            child: Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: Text(
-                                'Edit Pool',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w900,
-                                  color: theme.primaryColor,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
+                          child: Text(
+                            'OS Sync',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              color: theme.primaryColor,
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                  ],
+                        );
+                      } else if (isSingleTheme) {
+                        icon = Icon(Icons.lock_rounded, size: 16, color: theme.colorScheme.onSurface);
+                        final name = () {
+                          switch (currentMode) {
+                            case AppThemeMode.light: return 'Light';
+                            case AppThemeMode.sepia: return 'Sepia';
+                            case AppThemeMode.dark: return 'Dark';
+                            case AppThemeMode.oled: return 'OLED';
+                            case AppThemeMode.dawn: return 'Dawn';
+                            case AppThemeMode.fresh: return 'Fresh';
+                            case AppThemeMode.dusk: return 'Dusk';
+                            case AppThemeMode.lilies: return 'Lilies';
+                            case AppThemeMode.roses: return 'Roses';
+                            case AppThemeMode.olives: return 'Olives';
+                            case AppThemeMode.priestlyPurple: return 'Priestly Purple';
+                            case AppThemeMode.galileeBlue: return 'Galilee Blue';
+                            case AppThemeMode.scarletRed: return 'Scarlet Red';
+                            case AppThemeMode.automatic: return 'Match System';
+                          }
+                        }();
+                        mainText = 'Locked Theme: $name';
+                        actionWidget = Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: theme.colorScheme.onSurface.withValues(alpha: 0.15)),
+                            boxShadow: neumorphicShadows,
+                          ),
+                          child: Text(
+                            'Locked',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                            ),
+                          ),
+                        );
+                      } else {
+                        icon = Icon(Icons.auto_mode_rounded, size: 16, color: theme.primaryColor);
+                        mainText = 'Daily Rotation: Active (${rotationPool.length} themes)';
+                        actionWidget = GestureDetector(
+                          onTap: () {
+                            HapticFeedback.selectionClick();
+                            _showRotationPoolDialog(context, ref);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: theme.primaryColor.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: theme.primaryColor.withValues(alpha: 0.3)),
+                              boxShadow: neumorphicShadows,
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.tune_rounded, size: 11, color: theme.primaryColor),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Edit Pool',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w800,
+                                    color: theme.primaryColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+
+                      return AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: isMatchSystem || !isSingleTheme
+                              ? theme.primaryColor.withValues(alpha: 0.08)
+                              : theme.colorScheme.onSurface.withValues(alpha: 0.05),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: isMatchSystem || !isSingleTheme
+                                ? theme.primaryColor.withValues(alpha: 0.2)
+                                : theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                          ),
+                          boxShadow: neumorphicShadows,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  icon,
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      mainText,
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: isMatchSystem || !isSingleTheme ? theme.primaryColor : theme.colorScheme.onSurface,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            actionWidget,
+                          ],
+                        ),
+                      );
+                    },
+                  ),
                   const SizedBox(height: 16),
 
                   Text(
@@ -267,7 +389,7 @@ class ThemePickerSheet extends ConsumerWidget {
                   const SizedBox(height: 24),
 
                   Text(
-                    'GARDEN OF EDEN',
+                    'EDEN',
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: theme.primaryColor,
                       letterSpacing: 1.2,
@@ -376,8 +498,6 @@ class _ThemePill extends ConsumerStatefulWidget {
   final Color fillColor;
   final Color textColor;
   final List<Color> swatchColors;
-  final bool? overrideIsSelected;
-  final VoidCallback? onTap;
 
   const _ThemePill({
     required this.label,
@@ -386,8 +506,6 @@ class _ThemePill extends ConsumerStatefulWidget {
     required this.fillColor,
     required this.textColor,
     required this.swatchColors,
-    this.overrideIsSelected,
-    this.onTap,
   });
 
   @override
@@ -419,10 +537,10 @@ class _ThemePillState extends ConsumerState<_ThemePill> with SingleTickerProvide
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isSelected = widget.overrideIsSelected ?? (widget.currentMode == widget.mode ||
+    final isSelected = widget.currentMode == widget.mode ||
         (widget.currentMode == AppThemeMode.automatic &&
             widget.mode == AppThemeMode.automatic.resolve(context) &&
-            widget.mode != AppThemeMode.automatic));
+            widget.mode != AppThemeMode.automatic);
 
     final bgLuminance = (isSelected ? widget.fillColor : theme.colorScheme.surface).computeLuminance();
     final isDarkBg = bgLuminance < 0.4;
@@ -459,11 +577,7 @@ class _ThemePillState extends ConsumerState<_ThemePill> with SingleTickerProvide
       onTap: () {
         HapticFeedback.selectionClick();
         _triggerSparkle();
-        if (widget.onTap != null) {
-          widget.onTap!();
-        } else {
-          ref.read(themeProvider.notifier).setTheme(widget.mode);
-        }
+        ref.read(themeProvider.notifier).setTheme(widget.mode);
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
@@ -665,7 +779,7 @@ class _DarkThemePillState extends ConsumerState<_DarkThemePill> with SingleTicke
               child: Align(
                 alignment: Alignment.center,
                 child: Text(
-                  'Dark\nOLED',
+                  activeVariant == AppThemeMode.oled ? 'OLED\nDark' : 'Dark\nOLED',
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.visible,
@@ -806,22 +920,70 @@ class _SparkleSpec {
   const _SparkleSpec(this.relX, this.relY, this.dirX, this.dirY);
 }
 
-({String name, Color fill, Color text, List<Color> swatches}) _getThemeProperties(AppThemeMode mode, ThemeData theme) {
-  switch (mode) {
-    case AppThemeMode.light: return (name: 'Light', fill: AppColors.lightBackground, text: AppColors.lightTextPrimary, swatches: const [AppColors.lightBackground, AppColors.lightSurface, AppColors.lightAccent]);
-    case AppThemeMode.sepia: return (name: 'Sepia', fill: AppColors.sepiaBackground, text: AppColors.sepiaTextPrimary, swatches: const [AppColors.sepiaBackground, AppColors.sepiaSurface, AppColors.sepiaTextPrimary]);
-    case AppThemeMode.dark: return (name: 'Dark', fill: const Color(0xFF333333), text: AppColors.darkTextPrimary, swatches: const [Color(0xFF444444), Color(0xFF222222), Color(0xFF555555)]);
-    case AppThemeMode.oled: return (name: 'OLED', fill: Colors.black, text: AppColors.darkTextPrimary, swatches: const [Colors.black, Color(0xFF222222), Colors.black]);
-    case AppThemeMode.dawn: return (name: 'Dawn', fill: AppColors.dawnBackground, text: AppColors.dawnTextPrimary, swatches: const [AppColors.dawnPrimary, AppColors.dawnAccent, AppColors.dawnBackground]);
-    case AppThemeMode.fresh: return (name: 'Fresh', fill: AppColors.freshBackground, text: AppColors.freshTextPrimary, swatches: const [AppColors.freshPrimary, AppColors.freshAccent, AppColors.freshBackground]);
-    case AppThemeMode.dusk: return (name: 'Dusk', fill: AppColors.duskBackground, text: AppColors.duskTextPrimary, swatches: const [AppColors.duskPrimary, AppColors.duskAccent, AppColors.duskBackground]);
-    case AppThemeMode.lilies: return (name: 'Lilies', fill: AppColors.liliesBackground, text: AppColors.liliesTextPrimary, swatches: const [AppColors.liliesPrimary, AppColors.liliesAccent, AppColors.liliesBackground]);
-    case AppThemeMode.roses: return (name: 'Roses', fill: AppColors.rosesBackground, text: AppColors.rosesTextPrimary, swatches: const [AppColors.rosesPrimary, AppColors.rosesAccent, AppColors.rosesBackground]);
-    case AppThemeMode.olives: return (name: 'Olives', fill: AppColors.olivesBackground, text: AppColors.olivesTextPrimary, swatches: const [AppColors.olivesPrimary, AppColors.olivesAccent, AppColors.olivesBackground]);
-    case AppThemeMode.priestlyPurple: return (name: 'Priestly\nPurple', fill: AppColors.lightBackground, text: const Color(0xFF673AB7), swatches: const [Color(0xFF673AB7), Color(0xFF9575CD), AppColors.lightBackground]);
-    case AppThemeMode.galileeBlue: return (name: 'Galilee\nBlue', fill: AppColors.lightBackground, text: const Color(0xFF2196F3), swatches: const [Color(0xFF2196F3), Color(0xFF64B5F6), AppColors.lightBackground]);
-    case AppThemeMode.scarletRed: return (name: 'Scarlet\nRed', fill: AppColors.lightBackground, text: const Color(0xFFE53935), swatches: const [Color(0xFFE53935), Color(0xFFEF5350), AppColors.lightBackground]);
-    case AppThemeMode.automatic: return (name: 'Match\nSystem', fill: theme.colorScheme.primaryContainer, text: theme.colorScheme.onPrimaryContainer, swatches: [theme.primaryColor, theme.colorScheme.secondary, theme.colorScheme.surface]);
+class _SimpleTopPill extends StatelessWidget {
+  final Widget icon;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  const _SimpleTopPill({
+    required this.icon,
+    required this.isActive,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final bgLuminance = (isActive ? theme.colorScheme.primaryContainer : theme.colorScheme.surface).computeLuminance();
+    final isDarkBg = bgLuminance < 0.4;
+    
+    final neumorphicShadows = isDarkBg
+        ? [
+            BoxShadow(
+              color: Colors.white.withValues(alpha: 0.15),
+              offset: const Offset(-2, -2),
+              blurRadius: 4,
+            ),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.45),
+              offset: const Offset(3, 3),
+              blurRadius: 6,
+            ),
+          ]
+        : [
+            BoxShadow(
+              color: Colors.white.withValues(alpha: 0.85),
+              offset: const Offset(-2, -2),
+              blurRadius: 4,
+            ),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.12),
+              offset: const Offset(3, 3),
+              blurRadius: 6,
+            ),
+          ];
+
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        onTap();
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        height: 52,
+        decoration: BoxDecoration(
+          color: isActive ? theme.colorScheme.primaryContainer : theme.colorScheme.onSurface.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(26),
+          border: Border.all(
+            color: isActive ? theme.primaryColor : theme.colorScheme.onSurface.withValues(alpha: 0.1),
+            width: isActive ? 2 : 1,
+          ),
+          boxShadow: neumorphicShadows,
+        ),
+        alignment: Alignment.center,
+        child: icon,
+      ),
+    );
   }
 }
 
