@@ -1624,6 +1624,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                     verse.text),
                                                                 isBookmarked: isBookmarked,
                                                                 isRedLetterEnabled: readSettings.isRedLetterEnabled,
+                                                                isSelectionMode: _isPageSelectionMode,
                                                               );
 
                                                               return GestureDetector(
@@ -1920,7 +1921,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       {bool hasCommentary = false,
       VoidCallback? onCommentaryTap,
       bool isBookmarked = false,
-      bool isRedLetterEnabled = true}) {
+      bool isRedLetterEnabled = true,
+      bool isSelectionMode = false}) {
     final primary = _buildNormalVerse(
       primaryVerse,
       theme,
@@ -1930,6 +1932,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       onCommentaryTap: onCommentaryTap,
       isBookmarked: isBookmarked,
       isRedLetterEnabled: isRedLetterEnabled,
+      isSelectionMode: isSelectionMode,
     );
 
     if (secondaryVerse == null || layout == ReadingLayout.single) {
@@ -1958,6 +1961,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         isRedLetterEnabled: isRedLetterEnabled,
         overrideColor: secondaryColor,
         hideVerseNumber: true,
+        isSelectionMode: isSelectionMode,
       );
 
       return Column(
@@ -2008,6 +2012,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         isRedLetterEnabled: isRedLetterEnabled,
         overrideColor: secondaryColor,
         hideVerseNumber: true,
+        isSelectionMode: isSelectionMode,
       );
 
       return Row(
@@ -2088,6 +2093,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
               isRedLetterEnabled: isRedLetterEnabled,
               overrideColor: secondaryColor,
               hideVerseNumber: true,
+              isSelectionMode: isSelectionMode,
             );
           },
           loading: () => Padding(
@@ -2203,7 +2209,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       bool isBookmarked = false,
       bool isRedLetterEnabled = true,
       Color? overrideColor,
-      bool hideVerseNumber = false}) {
+      bool hideVerseNumber = false,
+      bool isSelectionMode = false}) {
     final tokens = theme.extension<ReadingTokens>()!;
     final fontStyle = theme.textTheme.bodyMedium?.copyWith(
           fontFamily: typography.fontFamily,
@@ -2279,54 +2286,58 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       currentIndex = endIndex + 1;
     }
 
-    return RichText(
-      textAlign: () {
-        switch (typography.textAlignMode) {
-          case TextAlignMode.left:
-            return TextAlign.start;
-          case TextAlignMode.center:
-            return TextAlign.center;
-          case TextAlignMode.right:
-            return TextAlign.end;
-          case TextAlignMode.justified:
-            return TextAlign.justify;
-        }
-      }(),
-      text: TextSpan(
-        style: fontStyle,
-        children: [
-          if (ref.watch(readSettingsProvider).showVerseNumbers && !hideVerseNumber)
-            TextSpan(
-              text: '${verse.number}  ',
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: tokens.readingAccent,
-                fontWeight: FontWeight.bold,
-                fontSize: typography.fontSize * 0.75, // Scale number down
-              ),
+    final textAlign = () {
+      switch (typography.textAlignMode) {
+        case TextAlignMode.left:
+          return TextAlign.start;
+        case TextAlignMode.center:
+          return TextAlign.center;
+        case TextAlignMode.right:
+          return TextAlign.end;
+        case TextAlignMode.justified:
+          return TextAlign.justify;
+      }
+    }();
+
+    final textSpan = TextSpan(
+      style: fontStyle,
+      children: [
+        if (ref.watch(readSettingsProvider).showVerseNumbers && !hideVerseNumber)
+          TextSpan(
+            text: '${verse.number}  ',
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: tokens.readingAccent,
+              fontWeight: FontWeight.bold,
+              fontSize: typography.fontSize * 0.75, // Scale number down
             ),
-          ...textSpans,
-          if (hasCommentary)
-            WidgetSpan(
-              alignment: PlaceholderAlignment.top,
-              child: GestureDetector(
-                onTap: onCommentaryTap,
-                behavior: HitTestBehavior.opaque,
-                child: Padding(
-                  // Generous padding increases the invisible tap target area for all finger sizes
-                  padding: const EdgeInsets.only(
-                      left: 4.0, right: 8.0, top: 2.0, bottom: 8.0),
-                  child: Icon(
-                    Icons.star_rounded,
-                    color: starColor,
-                    size: typography.fontSize *
-                        0.85, // Slightly larger star for visibility
-                  ),
+          ),
+        ...textSpans,
+        if (hasCommentary && !isSelectionMode)
+          WidgetSpan(
+            alignment: PlaceholderAlignment.top,
+            child: GestureDetector(
+              onTap: onCommentaryTap,
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                // Generous padding increases the invisible tap target area for all finger sizes
+                padding: const EdgeInsets.only(
+                    left: 4.0, right: 8.0, top: 2.0, bottom: 8.0),
+                child: Icon(
+                  Icons.star_rounded,
+                  color: starColor,
+                  size: typography.fontSize *
+                      0.85, // Slightly larger star for visibility
                 ),
               ),
             ),
-        ],
-      ),
+          ),
+      ],
     );
+
+    if (isSelectionMode) {
+      return Text.rich(textSpan, textAlign: textAlign);
+    }
+    return RichText(textAlign: textAlign, text: textSpan);
   }
 
   Widget _buildEndOfChapterBlock(FlatChapter fc, int pageIndex, ThemeData theme,
