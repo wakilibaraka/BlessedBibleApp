@@ -348,17 +348,17 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   }
   // ────────────────────────────────────────────────────────────────
 
-  int? _inlineSelectionVerse;
+  bool _isPageSelectionMode = false;
 
-  void _enterInlineSelection(int verseNum) {
+  void _enterPageSelection() {
     setState(() {
-      _inlineSelectionVerse = verseNum;
+      _isPageSelectionMode = true;
     });
   }
 
-  void _exitInlineSelection() {
+  void _exitPageSelection() {
     setState(() {
-      _inlineSelectionVerse = null;
+      _isPageSelectionMode = false;
     });
   }
 
@@ -920,9 +920,11 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                     style: theme.textTheme.bodyLarge),
                               )
                             : PageView.builder(
-                                physics: LazyPageScrollPhysics(
-                                  sensitivity: ref.watch(readSettingsProvider.select((s) => s.gestureSensitivity)),
-                                ),
+                                physics: _isPageSelectionMode
+                                    ? const NeverScrollableScrollPhysics()
+                                    : LazyPageScrollPhysics(
+                                        sensitivity: ref.watch(readSettingsProvider.select((s) => s.gestureSensitivity)),
+                                      ),
                                 controller: _pageController,
                                 itemCount: flatChapters.length,
                                 onPageChanged: (pageIndex) {
@@ -1372,16 +1374,16 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                   constraints:
                                                       const BoxConstraints(
                                                           maxWidth: 800),
-                                                  child:
-                                                      ScrollablePositionedList
-                                                          .builder(
-                                                    itemScrollController:
-                                                        _itemScrollControllers[
-                                                            pageIndex],
-                                                    itemPositionsListener:
-                                                        _itemPositionsListeners[
-                                                            pageIndex],
-                                                    initialScrollIndex: (pageIndex ==
+                                                  child: Builder(
+                                                    builder: (context) {
+                                                      Widget listWidget = ScrollablePositionedList.builder(
+                                                        itemScrollController:
+                                                            _itemScrollControllers[
+                                                                pageIndex],
+                                                        itemPositionsListener:
+                                                            _itemPositionsListeners[
+                                                                pageIndex],
+                                                        initialScrollIndex: (pageIndex ==
                                                                 _currentPageIndex
                                                             ? _navigatedVerseIndex
                                                             : null) ??
@@ -1594,48 +1596,13 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                 isRedLetterEnabled: readSettings.isRedLetterEnabled,
                                                               );
 
-                                                              if (_inlineSelectionVerse == verse.number) {
-                                                                return Container(
-                                                                  margin: const EdgeInsets.symmetric(vertical: 4.0),
-                                                                  padding: const EdgeInsets.all(12.0),
-                                                                  decoration: BoxDecoration(
-                                                                    color: theme.colorScheme.surfaceContainerHighest,
-                                                                    borderRadius: BorderRadius.circular(12),
-                                                                    border: Border.all(color: theme.primaryColor.withValues(alpha: 0.5), width: 1.5),
-                                                                  ),
-                                                                  child: Column(
-                                                                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                                                                    children: [
-                                                                      Row(
-                                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                        children: [
-                                                                          Text("Select Text", style: theme.textTheme.labelMedium?.copyWith(color: theme.primaryColor, fontWeight: FontWeight.bold)),
-                                                                          TextButton.icon(
-                                                                            onPressed: _exitInlineSelection,
-                                                                            icon: const Icon(Icons.check, size: 16),
-                                                                            label: const Text("Done"),
-                                                                            style: TextButton.styleFrom(
-                                                                              visualDensity: VisualDensity.compact,
-                                                                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                                                                              backgroundColor: theme.primaryColor.withValues(alpha: 0.1),
-                                                                            ),
-                                                                          ),
-                                                                        ],
-                                                                      ),
-                                                                      const SizedBox(height: 8),
-                                                                      SelectionArea(child: verseWidget),
-                                                                    ],
-                                                                  ),
-                                                                );
-                                                              }
-
                                                               return GestureDetector(
-                                                                onDoubleTap: () {
+                                                                onDoubleTap: _isPageSelectionMode ? null : () {
                                                                   HapticFeedback.lightImpact();
                                                                   VerseActionLogic.handleBookmark(context, theme, ref, fc.book.name, fc.chapter.number, [verse.number]);
                                                                 },
-                                                                onTap: () => _toggleVerseSelection(verse.number),
-                                                                onLongPress: () {
+                                                                onTap: _isPageSelectionMode ? null : () => _toggleVerseSelection(verse.number),
+                                                                onLongPress: _isPageSelectionMode ? null : () {
                                                                   HapticFeedback.mediumImpact();
                                                                   showModalBottomSheet(
                                                                     context: context,
@@ -1645,7 +1612,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                       verseNumber: verse.number,
                                                                       bookName: fc.book.name,
                                                                       chapterNum: fc.chapter.number,
-                                                                      onCustomSelection: () => _enterInlineSelection(verse.number),
+                                                                      onCustomSelection: _enterPageSelection,
                                                                     ),
                                                                   );
                                                                 },
@@ -1680,14 +1647,17 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                         ],
                                                       );
                                                     },
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
+                                                  ); // end ScrollablePositionedList
+
+                                                  return _isPageSelectionMode ? SelectionArea(child: listWidget) : listWidget;
+                                                }), // end Builder
+                                                ), // end ConstrainedBox
+                                              ), // end Center
+                                            ), // end Directionality
+                                          ), // end NotificationListener
+                                        ), // end GestureDetector
+                                      ); // end RepaintBoundary
+                                    }, // end Consumer's builder
                                   );
                                 },
                               ),
@@ -1829,6 +1799,28 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                 constraints: const BoxConstraints(),
                               ),
                             ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  if (_isPageSelectionMode)
+                    Positioned(
+                      bottom: 80,
+                      left: 0,
+                      right: 0,
+                      child: Center(
+                        child: FilledButton.icon(
+                          onPressed: _exitPageSelection,
+                          icon: const Icon(Icons.check, size: 20),
+                          label: const Text('Done'),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: theme.primaryColor,
+                            foregroundColor: theme.colorScheme.onPrimary,
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            elevation: 8,
                           ),
                         ),
                       ),

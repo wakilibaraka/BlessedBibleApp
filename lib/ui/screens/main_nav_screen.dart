@@ -787,11 +787,15 @@ class MainNavScreen extends ConsumerWidget {
     final bookName = readLoc.bookName;
     final actionIconColor = theme.colorScheme.onSurface.withValues(alpha: 0.4);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 24.0),
-      child: Row(
-        key: const ValueKey('unified_tabs'),
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return SafeArea(
+      bottom: true,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 24.0),
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          child: Row(
+            key: const ValueKey('unified_tabs'),
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           _buildMorphingSlot(
             context, ref,
@@ -859,6 +863,8 @@ class MainNavScreen extends ConsumerWidget {
           ),
         ],
       ),
+      ),
+    ),
     );
   }
 

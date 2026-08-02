@@ -4,7 +4,7 @@ import '../widgets/textured_glass_container.dart';
 import '../../state/notes_provider.dart';
 import '../../state/user_data_provider.dart';
 import '../screens/read_screen.dart' show VerseActionLogic;
-import '../widgets/highlight_torch_icon.dart';
+import '../widgets/highlight_marker_icon.dart';
 import '../../state/bible_provider.dart';
 
 class VerseContextMenuSheet extends ConsumerWidget {
@@ -33,8 +33,10 @@ class VerseContextMenuSheet extends ConsumerWidget {
 
     final targetVerses = [verseNumber];
 
-    return SafeArea(
-      child: Padding(
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      child: SafeArea(
+        child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
         child: TexturedGlassContainer(
           borderRadius: BorderRadius.circular(24),
@@ -43,79 +45,72 @@ class VerseContextMenuSheet extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  '$bookName $chapterNum:$verseNumber',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Expanded(
+                        child: _MenuButton(
+                          icon: const HighlightMarkerIcon(size: 24),
+                          label: isHighlighted ? 'Highlighted' : 'Highlight',
+                          color: isHighlighted ? Colors.amber.shade600 : null,
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            VerseActionLogic.handleHighlightInteraction(
+                              context: context,
+                              ref: ref,
+                              theme: theme,
+                              bookName: bookName,
+                              chapterNum: chapterNum,
+                              targetVerses: targetVerses,
+                              isLongPress: false,
+                              onClearSelection: () {},
+                            );
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: _MenuButton(
+                          icon: Icon(Icons.edit_document, size: 24),
+                          label: hasNote ? 'Edit Note' : 'Note',
+                          color: hasNote ? Colors.blue.shade600 : null,
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            VerseActionLogic.handleNote(
+                              context, ref, theme, bookName, chapterNum, targetVerses,
+                            );
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: _MenuButton(
+                          icon: Icon(Icons.ios_share_rounded, size: 24),
+                          label: 'Share',
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            VerseActionLogic.handleShare(
+                              context, ref, bookName, chapterNum, targetVerses,
+                            );
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: _MenuButton(
+                          icon: Icon(Icons.crop_free_rounded, size: 24),
+                          label: 'Select Text',
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            onCustomSelection();
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Expanded(
-                      child: _MenuButton(
-                        icon: const HighlightTorchIcon(size: 24),
-                        label: isHighlighted ? 'Highlighted' : 'Highlight',
-                        color: isHighlighted ? Colors.amber.shade600 : null,
-                        onTap: () {
-                          Navigator.of(context).pop();
-                          VerseActionLogic.handleHighlightInteraction(
-                            context: context,
-                            ref: ref,
-                            theme: theme,
-                            bookName: bookName,
-                            chapterNum: chapterNum,
-                            targetVerses: targetVerses,
-                            isLongPress: false,
-                            onClearSelection: () {},
-                          );
-                        },
-                      ),
-                    ),
-                    Expanded(
-                      child: _MenuButton(
-                        icon: Icon(Icons.text_format_rounded, size: 24),
-                        label: 'Selection',
-                        onTap: () {
-                          Navigator.of(context).pop();
-                          onCustomSelection();
-                        },
-                      ),
-                    ),
-                    Expanded(
-                      child: _MenuButton(
-                        icon: Icon(Icons.edit_document, size: 24),
-                        label: hasNote ? 'Edit Note' : 'Note',
-                        color: hasNote ? Colors.blue.shade600 : null,
-                        onTap: () {
-                          Navigator.of(context).pop();
-                          VerseActionLogic.handleNote(
-                            context, ref, theme, bookName, chapterNum, targetVerses,
-                          );
-                        },
-                      ),
-                    ),
-                    Expanded(
-                      child: _MenuButton(
-                        icon: Icon(Icons.ios_share_rounded, size: 24),
-                        label: 'Share',
-                        onTap: () {
-                          Navigator.of(context).pop();
-                          VerseActionLogic.handleShare(
-                            context, ref, bookName, chapterNum, targetVerses,
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
               ],
             ),
           ),
         ),
       ),
-    );
+    ));
   }
 
   String _getBookAbbrev(WidgetRef ref, String fullBookName) {
