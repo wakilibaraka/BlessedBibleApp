@@ -134,6 +134,7 @@ class BackupService {
       ref.invalidate(studyLayoutProvider);
       ref.invalidate(themeProvider);
       ref.invalidate(typographyProvider);
+      ref.invalidate(earthHeavenStyleProvider);
       ref.invalidate(surfaceStyleProvider);
 
       if (context.mounted) {

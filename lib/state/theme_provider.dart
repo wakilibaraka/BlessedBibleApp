@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,174 +16,133 @@ extension AppThemeModeExtension on AppThemeMode {
   }
 }
 
-const List<AppThemeMode> kDefaultRotationPool = [
-  AppThemeMode.dawn,
-  AppThemeMode.fresh,
-  AppThemeMode.dusk,
-  AppThemeMode.lilies,
-  AppThemeMode.roses,
-  AppThemeMode.olives,
-  AppThemeMode.priestlyPurple,
-  AppThemeMode.galileeBlue,
-  AppThemeMode.scarletRed,
-];
+enum ThemeEngineMode { locked, timeBased }
 
 class ThemeNotifier extends Notifier<AppThemeMode> {
   static const _themeKey = 'app_theme_mode';
+  static const _lockedThemeKey = 'theme_locked_mode';
+  static const _engineModeKey = 'theme_engine_mode';
+  static const _engineMigratedKey = 'engine_migrated_v1';
   static const _isSingleThemeKey = 'theme_is_single';
   static const _isMatchSystemKey = 'theme_is_match_system';
-  static const _lockedThemeKey = 'theme_locked_mode';
-  static const _rotationPoolKey = 'theme_rotation_pool_v2';
 
-  bool _isSingleTheme = false;
-  bool _isMatchSystem = false;
+  ThemeEngineMode _engineMode = ThemeEngineMode.locked;
   AppThemeMode _lockedTheme = AppThemeMode.sepia;
-  List<AppThemeMode> _rotationPool = List.from(kDefaultRotationPool);
+  Timer? _timeWatcher;
 
-  bool get isSingleTheme => _isSingleTheme;
-  bool get isMatchSystem => _isMatchSystem;
+  ThemeEngineMode get engineMode => _engineMode;
   AppThemeMode get lockedTheme => _lockedTheme;
-  List<AppThemeMode> get rotationPool => List.unmodifiable(_rotationPool);
 
   @override
   AppThemeMode build() {
     _loadTheme();
+    
+    ref.onDispose(() {
+      _timeWatcher?.cancel();
+    });
+    
     return AppThemeMode.sepia;
   }
 
   Future<void> _loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
     
-    _isMatchSystem = prefs.getBool(_isMatchSystemKey) ?? false;
-    _isSingleTheme = prefs.getBool(_isSingleThemeKey) ?? false;
-
     final lockedIndex = prefs.getInt(_lockedThemeKey);
     if (lockedIndex != null && lockedIndex >= 0 && lockedIndex < AppThemeMode.values.length) {
       _lockedTheme = AppThemeMode.values[lockedIndex];
-    }
-
-    final savedPool = prefs.getStringList(_rotationPoolKey);
-    if (savedPool != null && savedPool.isNotEmpty) {
-      final loadedPool = <AppThemeMode>[];
-      for (final name in savedPool) {
-        try {
-          final mode = AppThemeMode.values.firstWhere((e) => e.name == name);
-          loadedPool.add(mode);
-        } catch (_) {}
-      }
-      if (loadedPool.isNotEmpty) {
-        _rotationPool = loadedPool;
+    } else {
+      final oldIndex = prefs.getInt(_themeKey);
+      if (oldIndex != null && oldIndex >= 0 && oldIndex < AppThemeMode.values.length) {
+        _lockedTheme = AppThemeMode.values[oldIndex];
       }
     }
 
-    // Migration logic for old theme key
-    final oldIndex = prefs.getInt(_themeKey);
-    if (oldIndex != null && oldIndex >= 0 && oldIndex < AppThemeMode.values.length) {
-      final oldMode = AppThemeMode.values[oldIndex];
-      if (oldMode == AppThemeMode.automatic) {
-        _isMatchSystem = true;
+    final migrated = prefs.getBool(_engineMigratedKey) ?? false;
+    if (!migrated) {
+      final isSingle = prefs.getBool(_isSingleThemeKey) ?? false;
+      final isMatchSystem = prefs.getBool(_isMatchSystemKey) ?? false;
+      if (isSingle || isMatchSystem) {
+        _engineMode = ThemeEngineMode.locked;
       } else {
-        _lockedTheme = oldMode;
+        _engineMode = ThemeEngineMode.timeBased;
+      }
+      await prefs.setBool(_engineMigratedKey, true);
+      await prefs.setInt(_engineModeKey, _engineMode.index);
+    } else {
+      final savedEngine = prefs.getInt(_engineModeKey);
+      if (savedEngine != null && savedEngine >= 0 && savedEngine < ThemeEngineMode.values.length) {
+        _engineMode = ThemeEngineMode.values[savedEngine];
       }
     }
 
     _updateState();
+    _updateTimer();
   }
 
-  AppThemeMode getTodayRotationTheme() {
-    if (_rotationPool.isEmpty) {
-      return AppThemeMode.sepia;
+  void _updateTimer() {
+    if (_engineMode == ThemeEngineMode.timeBased) {
+      if (_timeWatcher == null || !_timeWatcher!.isActive) {
+        _timeWatcher = Timer.periodic(const Duration(minutes: 1), (_) {
+          _updateState();
+        });
+      }
+    } else {
+      _timeWatcher?.cancel();
+      _timeWatcher = null;
     }
-    final now = DateTime.now();
-    final dayNumber = now.year * 366 + now.month * 31 + now.day;
-    final index = dayNumber % _rotationPool.length;
-    return _rotationPool[index];
+  }
+
+  AppThemeMode _getTimeBasedTheme() {
+    final hour = DateTime.now().hour;
+    if (hour >= 5 && hour < 10) {
+      return AppThemeMode.light;
+    } else if (hour >= 10 && hour < 17) {
+      return AppThemeMode.sepia;
+    } else if (hour >= 17 && hour < 21) {
+      return AppThemeMode.dark;
+    } else {
+      return AppThemeMode.oled;
+    }
   }
 
   void _updateState() {
-    if (_isMatchSystem) {
-      state = AppThemeMode.automatic;
-    } else if (_isSingleTheme) {
-      state = _lockedTheme;
+    if (_engineMode == ThemeEngineMode.locked) {
+      if (state != _lockedTheme) {
+        state = _lockedTheme;
+      }
     } else {
-      state = getTodayRotationTheme();
+      final timeTheme = _getTimeBasedTheme();
+      if (state != timeTheme) {
+        state = timeTheme;
+      }
     }
   }
 
-  Future<void> setMatchSystem(bool enabled) async {
-    _isMatchSystem = enabled;
-    if (enabled) {
-      _isSingleTheme = false;
-    }
+  Future<void> setEngineMode(ThemeEngineMode mode) async {
+    _engineMode = mode;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_isMatchSystemKey, enabled);
-    await prefs.setBool(_isSingleThemeKey, _isSingleTheme);
+    await prefs.setInt(_engineModeKey, mode.index);
     _updateState();
-  }
-
-  Future<void> setSingleTheme(bool enabled) async {
-    _isSingleTheme = enabled;
-    if (enabled) {
-      _isMatchSystem = false;
-    }
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_isSingleThemeKey, enabled);
-    await prefs.setBool(_isMatchSystemKey, _isMatchSystem);
-    _updateState();
+    _updateTimer();
   }
 
   Future<void> setTheme(AppThemeMode mode) async {
-    if (mode == AppThemeMode.automatic) {
-      await setMatchSystem(true);
-      return;
-    }
-
-    // Tapping a theme pill locks Single Theme mode ON
-    _isMatchSystem = false;
-    _isSingleTheme = true;
+    _engineMode = ThemeEngineMode.locked;
     _lockedTheme = mode;
 
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_isMatchSystemKey, false);
-    await prefs.setBool(_isSingleThemeKey, true);
+    await prefs.setInt(_engineModeKey, ThemeEngineMode.locked.index);
     await prefs.setInt(_lockedThemeKey, mode.index);
     await prefs.setInt(_themeKey, mode.index);
 
     _updateState();
-  }
-
-  Future<void> toggleThemeInPool(AppThemeMode mode) async {
-    if (_rotationPool.contains(mode)) {
-      if (_rotationPool.length > 1) {
-        _rotationPool.remove(mode);
-      }
-    } else {
-      _rotationPool.add(mode);
-    }
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(_rotationPoolKey, _rotationPool.map((e) => e.name).toList());
-    _updateState();
-  }
-
-  bool isThemeInPool(AppThemeMode mode) {
-    return _rotationPool.contains(mode);
+    _updateTimer();
   }
 }
 
 final themeProvider = NotifierProvider<ThemeNotifier, AppThemeMode>(ThemeNotifier.new);
 
-final isSingleThemeProvider = Provider<bool>((ref) {
+final engineModeProvider = Provider<ThemeEngineMode>((ref) {
   ref.watch(themeProvider);
-  return ref.read(themeProvider.notifier).isSingleTheme;
-});
-
-final isMatchSystemProvider = Provider<bool>((ref) {
-  ref.watch(themeProvider);
-  return ref.read(themeProvider.notifier).isMatchSystem;
-});
-
-final rotationPoolProvider = Provider<List<AppThemeMode>>((ref) {
-  ref.watch(themeProvider);
-  return ref.read(themeProvider.notifier).rotationPool;
+  return ref.read(themeProvider.notifier).engineMode;
 });

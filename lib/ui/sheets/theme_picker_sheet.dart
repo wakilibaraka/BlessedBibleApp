@@ -36,11 +36,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
     final theme = Theme.of(context);
     final currentMode = ref.watch(themeProvider);
 
-
-
-    final isSingleTheme = ref.watch(isSingleThemeProvider);
-    final isMatchSystem = ref.watch(isMatchSystemProvider);
-    final rotationPool = ref.watch(rotationPoolProvider);
+    final engineMode = ref.watch(engineModeProvider);
 
     final readSettings = ref.watch(readSettingsProvider);
 
@@ -117,33 +113,35 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
             ],
           ),
           const SizedBox(height: 16),
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 250),
-            child: _showAdvanced ? _buildAdvancedContent(theme, readSettings, isMatchSystem, isSingleTheme, rotationPool) : Container(
-              key: const ValueKey('appearance_main'),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                  Consumer(builder: (context, ref, _) {
-                    final surfaceStyle = ref.watch(surfaceStyleProvider);
-                    return AnimatedSegmentedTile<SurfaceStyle>(
-                      title: 'Surface Style',
-                      subtitle: 'Visual depth and material styling',
-                      selectedValue: surfaceStyle,
-                      options: const [
-                        MapEntry(SurfaceStyle.frosted, 'Frosted'),
-                        MapEntry(SurfaceStyle.flat, 'Flat'),
-                        MapEntry(SurfaceStyle.threeDimensional, '3D'),
-                      ],
-                      onChanged: (val) {
-                        HapticFeedback.selectionClick();
-                        ref.read(surfaceStyleProvider.notifier).setStyle(val);
-                      },
-                    );
-                  }),
-                  const SizedBox(height: 12),
+          const SizedBox(height: 16),
+          ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 520.0),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              child: _showAdvanced ? _buildAdvancedContent(theme, readSettings, engineMode) : Container(
+                key: const ValueKey('appearance_main'),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                    Consumer(builder: (context, ref, _) {
+                      final surfaceStyle = ref.watch(earthHeavenStyleProvider);
+                      return AnimatedSegmentedTile<EarthHeavenStyle>(
+                        title: 'Surface Style',
+                        subtitle: 'Visual depth and material styling',
+                        selectedValue: surfaceStyle,
+                        options: const [
+                          MapEntry(EarthHeavenStyle.heaven, 'Heaven'),
+                          MapEntry(EarthHeavenStyle.earth, 'Earth'),
+                        ],
+                        onChanged: (val) {
+                          HapticFeedback.selectionClick();
+                          ref.read(earthHeavenStyleProvider.notifier).setStyle(val);
+                        },
+                      );
+                    }),
+                    const SizedBox(height: 12),
 
-                  const SizedBox(height: 12),
+                    const SizedBox(height: 12),
 
                   Text(
                     'FOUNDATIONS',
@@ -159,7 +157,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                     children: [
                       Expanded(
                         child: _ThemePill(
-                          label: 'Light',
+                          label: 'Dawn',
                           mode: AppThemeMode.light,
                           currentMode: currentMode,
                           fillColor: AppColors.lightBackground,
@@ -170,7 +168,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: _ThemePill(
-                          label: 'Sepia',
+                          label: 'Fresh',
                           mode: AppThemeMode.sepia,
                           currentMode: currentMode,
                           fillColor: AppColors.sepiaBackground,
@@ -200,7 +198,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                     children: [
                       Expanded(
                         child: _ThemePill(
-                          label: 'Dawn',
+                          label: 'Sun',
                           mode: AppThemeMode.dawn,
                           currentMode: currentMode,
                           fillColor: AppColors.dawnBackground,
@@ -211,7 +209,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: _ThemePill(
-                          label: 'Fresh',
+                          label: 'Moon',
                           mode: AppThemeMode.fresh,
                           currentMode: currentMode,
                           fillColor: AppColors.freshBackground,
@@ -222,7 +220,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: _ThemePill(
-                          label: 'Dusk',
+                          label: 'Stars',
                           mode: AppThemeMode.dusk,
                           currentMode: currentMode,
                           fillColor: AppColors.duskBackground,
@@ -333,6 +331,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
               ),
             ),
           ),
+          ),
         ],
       ),
       ),
@@ -341,90 +340,12 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
     );
   }
 
-  Widget _buildAdvancedContent(ThemeData theme, ReadSettingsState readSettings, bool isMatchSystem, bool isSingleTheme, List<AppThemeMode> rotationPool) {
+  Widget _buildAdvancedContent(ThemeData theme, ReadSettingsState readSettings, ThemeEngineMode engineMode) {
     return Container(
       key: const ValueKey('advanced_main'),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'SYSTEM',
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.primaryColor,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    HapticFeedback.selectionClick();
-                    ref.read(themeProvider.notifier).setMatchSystem(false);
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    height: 56,
-                    decoration: BoxDecoration(
-                      color: !isMatchSystem ? const Color(0xFFFBB6A8) : theme.colorScheme.onSurface.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(28),
-                      boxShadow: !isMatchSystem ? [
-                        BoxShadow(
-                          color: const Color(0xFFFBB6A8).withValues(alpha: 0.5),
-                          blurRadius: 16,
-                          offset: const Offset(0, 4),
-                        )
-                      ] : null,
-                      border: Border.all(
-                        color: !isMatchSystem ? Colors.transparent : theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                      ),
-                    ),
-                    child: Center(
-                      child: Icon(
-                        Icons.lock_rounded, 
-                        color: !isMatchSystem ? Colors.black87 : theme.colorScheme.onSurface,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    HapticFeedback.selectionClick();
-                    ref.read(themeProvider.notifier).setMatchSystem(true);
-                    ref.read(themeProvider.notifier).setTheme(AppThemeMode.automatic);
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    height: 56,
-                    decoration: BoxDecoration(
-                      color: isMatchSystem ? const Color(0xFF2E313D) : theme.colorScheme.onSurface.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(28),
-                      border: Border.all(
-                        color: isMatchSystem ? Colors.transparent : theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                      ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'A',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w900,
-                          color: isMatchSystem ? Colors.white : theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
           Text(
             'THEME MODE',
             style: theme.textTheme.labelSmall?.copyWith(
@@ -437,7 +358,10 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
           GestureDetector(
             onTap: () {
               HapticFeedback.selectionClick();
-              ref.read(themeProvider.notifier).setSingleTheme(!isSingleTheme);
+              final newMode = engineMode == ThemeEngineMode.locked 
+                  ? ThemeEngineMode.timeBased 
+                  : ThemeEngineMode.locked;
+              ref.read(themeProvider.notifier).setEngineMode(newMode);
             },
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
@@ -449,11 +373,11 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
               ),
               child: Row(
                 children: [
-                  Icon(isSingleTheme ? Icons.lock_rounded : Icons.loop_rounded, size: 16, color: theme.colorScheme.onSurface),
+                  Icon(engineMode == ThemeEngineMode.locked ? Icons.lock_rounded : Icons.schedule_rounded, size: 16, color: theme.colorScheme.onSurface),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      isSingleTheme ? 'Locked Theme' : 'Daily Rotation',
+                      engineMode == ThemeEngineMode.locked ? 'Locked Theme' : 'Time-Based',
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                     ),
                   ),
@@ -464,7 +388,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Text(
-                      isSingleTheme ? 'Locked' : 'Rotating',
+                      engineMode == ThemeEngineMode.locked ? 'Locked' : 'Auto',
                       style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -472,36 +396,6 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
               ),
             ),
           ),
-          if (!isSingleTheme) ...[
-            const SizedBox(height: 12),
-            GestureDetector(
-              onTap: () {
-                HapticFeedback.selectionClick();
-                _showRotationPoolDialog(context, ref);
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: theme.primaryColor.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: theme.primaryColor.withValues(alpha: 0.3)),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.tune_rounded, size: 16, color: theme.primaryColor),
-                        const SizedBox(width: 8),
-                        Text('Edit Pool (${rotationPool.length} themes)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: theme.primaryColor)),
-                      ],
-                    ),
-                    Icon(Icons.arrow_forward_ios_rounded, size: 12, color: theme.primaryColor),
-                  ],
-                ),
-              ),
-            ),
-          ],
           const SizedBox(height: 16),
           Text(
             'BACKGROUND GLOW',
@@ -848,7 +742,7 @@ class _DarkThemePillState extends ConsumerState<_DarkThemePill> with SingleTicke
               child: Align(
                 alignment: Alignment.center,
                 child: Text(
-                  activeVariant == AppThemeMode.oled ? 'OLED\nDark' : 'Dark\nOLED',
+                  activeVariant == AppThemeMode.oled ? 'OLED\nDark' : 'Dusk\nOLED',
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.visible,
@@ -989,76 +883,3 @@ class _SparkleSpec {
   const _SparkleSpec(this.relX, this.relY, this.dirX, this.dirY);
 }
 
-
-
-void _showRotationPoolDialog(BuildContext context, WidgetRef ref) {
-  showModalBottomSheet(
-    context: context,
-    backgroundColor: Theme.of(context).colorScheme.surface,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    ),
-    builder: (context) {
-      return Consumer(
-        builder: (context, ref, child) {
-          final pool = ref.watch(rotationPoolProvider);
-          final notifier = ref.read(themeProvider.notifier);
-
-          final candidateThemes = [
-            (AppThemeMode.dawn, 'Dawn'),
-            (AppThemeMode.fresh, 'Fresh'),
-            (AppThemeMode.dusk, 'Dusk'),
-            (AppThemeMode.lilies, 'Lilies'),
-            (AppThemeMode.roses, 'Roses'),
-            (AppThemeMode.olives, 'Olives'),
-            (AppThemeMode.priestlyPurple, 'Priestly Purple'),
-            (AppThemeMode.galileeBlue, 'Galilee Blue'),
-            (AppThemeMode.scarletRed, 'Scarlet Red'),
-            (AppThemeMode.sepia, 'Sepia'),
-          ];
-
-          return Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Customize Daily Rotation Pool',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Select which themes to include in your daily rotation.',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: candidateThemes.map((item) {
-                    final isSelected = pool.contains(item.$1);
-                    return FilterChip(
-                      selected: isSelected,
-                      label: Text(item.$2),
-                      selectedColor: Theme.of(context).primaryColor.withValues(alpha: 0.2),
-                      onSelected: (_) {
-                        HapticFeedback.selectionClick();
-                        notifier.toggleThemeInPool(item.$1);
-                      },
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 16),
-              ],
-            ),
-          );
-        },
-      );
-    },
-  );
-}
