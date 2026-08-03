@@ -124,7 +124,7 @@ class LazyPageScrollPhysics extends ClampingScrollPhysics {
   @override
   SpringDescription get spring {
     if (sensitivity == GestureSensitivity.instant) {
-      return const SpringDescription(mass: 0.1, stiffness: 2000.0, damping: 1.0);
+      return SpringDescription.withDampingRatio(mass: 0.1, stiffness: 2000.0, ratio: 1.0);
     }
     if (sensitivity == GestureSensitivity.fluid) {
       return super.spring;
@@ -894,7 +894,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           if (targetIndex != -1 && _pageController.hasClients) {
             final currentPage = _pageController.page?.round() ?? 0;
             if (currentPage != targetIndex) {
-              if ((currentPage - targetIndex).abs() == 1) {
+              final readSettings = ref.read(readSettingsProvider);
+              if (readSettings.gestureSensitivity == GestureSensitivity.instant) {
+                _pageController.jumpToPage(targetIndex);
+              } else if ((currentPage - targetIndex).abs() == 1) {
                 _pageController.animateToPage(targetIndex,
                     duration: const Duration(milliseconds: 300),
                     curve: Curves.easeInOut);
@@ -1594,9 +1597,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                       );
                                                     } // end buildVerseItem
 
-                                                    // Base vertical physics — instant = AntiGravity, otherwise Bouncing
+                                                    // Base vertical physics — instant = Clamping, otherwise Bouncing
                                                     final ScrollPhysics basePhysics = readSettings.gestureSensitivity == GestureSensitivity.instant
-                                                        ? const AntiGravityScrollPhysics()
+                                                        ? const ClampingScrollPhysics()
                                                         : const BouncingScrollPhysics();
 
                                                     Widget listWidget;
@@ -2286,6 +2289,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   Widget _buildEndOfChapterBlock(FlatChapter fc, int pageIndex, ThemeData theme,
       bool hasChapterCommentary) {
     final flatChapters = ref.read(flatChaptersProvider);
+    final readSettings = ref.read(readSettingsProvider);
     final hasPrevious = pageIndex > 0;
     final hasNext = pageIndex < flatChapters.length - 1;
     final tokens = theme.extension<ReadingTokens>()!;
@@ -2360,9 +2364,13 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
               if (hasPrevious)
                 TextButton(
                   onPressed: () {
-                    _pageController.animateToPage(pageIndex - 1,
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut);
+                    if (readSettings.gestureSensitivity == GestureSensitivity.instant) {
+                      _pageController.jumpToPage(pageIndex - 1);
+                    } else {
+                      _pageController.animateToPage(pageIndex - 1,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut);
+                    }
                   },
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
@@ -2378,9 +2386,13 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
               if (hasNext)
                 TextButton(
                   onPressed: () {
-                    _pageController.animateToPage(pageIndex + 1,
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut);
+                    if (readSettings.gestureSensitivity == GestureSensitivity.instant) {
+                      _pageController.jumpToPage(pageIndex + 1);
+                    } else {
+                      _pageController.animateToPage(pageIndex + 1,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut);
+                    }
                   },
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
