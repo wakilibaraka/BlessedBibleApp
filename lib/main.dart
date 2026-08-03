@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'data/local_storage/preferences_service.dart';
 import 'ui/screens/splash_loading_screen.dart';
 import 'state/bible_provider.dart';
+import 'state/read_settings_provider.dart';
 
 import 'package:flutter/foundation.dart';
 import 'ui/widgets/app_error_fallback.dart';
@@ -87,6 +88,45 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
   Widget build(BuildContext context) {
     final themeMode = ref.watch(themeProvider);
     final isBibleLoading = ref.watch(bibleProvider.select((s) => s.isLoading));
+    final readSettings = ref.watch(readSettingsProvider);
+    final isInstantMode = readSettings.gestureSensitivity == GestureSensitivity.instant;
+
+    final noAnimTransitions = PageTransitionsTheme(
+      builders: {
+        TargetPlatform.android: const NoAnimationPageTransitionsBuilder(),
+        TargetPlatform.iOS: const NoAnimationPageTransitionsBuilder(),
+        TargetPlatform.macOS: const NoAnimationPageTransitionsBuilder(),
+      },
+    );
+
+    ThemeData lightBase = themeMode == AppThemeMode.lilies
+        ? AppTheme.liliesTheme(14.0)
+        : themeMode == AppThemeMode.roses
+            ? AppTheme.rosesTheme(14.0)
+            : themeMode == AppThemeMode.olives
+                ? AppTheme.olivesTheme(14.0)
+                : themeMode == AppThemeMode.priestlyPurple
+                    ? AppTheme.priestlyPurpleTheme(14.0)
+                    : themeMode == AppThemeMode.galileeBlue
+                        ? AppTheme.galileeBlueTheme(14.0)
+                        : themeMode == AppThemeMode.scarletRed
+                            ? AppTheme.scarletRedTheme(14.0)
+                            : themeMode == AppThemeMode.sepia 
+                                ? AppTheme.sepiaTheme(14.0)
+                                : AppTheme.lightTheme(14.0);
+
+    ThemeData darkBase = themeMode == AppThemeMode.dawn
+        ? AppTheme.dawnTheme(14.0)
+        : themeMode == AppThemeMode.dusk
+            ? AppTheme.duskTheme(14.0)
+            : themeMode == AppThemeMode.fresh
+                ? AppTheme.freshTheme(14.0)
+                : AppTheme.darkTheme(14.0, isAmoled: themeMode == AppThemeMode.oled);
+
+    if (isInstantMode) {
+      lightBase = lightBase.copyWith(pageTransitionsTheme: noAnimTransitions);
+      darkBase = darkBase.copyWith(pageTransitionsTheme: noAnimTransitions);
+    }
 
     return MaterialApp(
       title: 'The Blessed Bible',
@@ -109,28 +149,8 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
         AppThemeMode.dark => ThemeMode.dark,
         AppThemeMode.oled => ThemeMode.dark,
       },
-      theme: themeMode == AppThemeMode.lilies
-          ? AppTheme.liliesTheme(14.0)
-          : themeMode == AppThemeMode.roses
-              ? AppTheme.rosesTheme(14.0)
-              : themeMode == AppThemeMode.olives
-                  ? AppTheme.olivesTheme(14.0)
-                  : themeMode == AppThemeMode.priestlyPurple
-                      ? AppTheme.priestlyPurpleTheme(14.0)
-                      : themeMode == AppThemeMode.galileeBlue
-                          ? AppTheme.galileeBlueTheme(14.0)
-                          : themeMode == AppThemeMode.scarletRed
-                              ? AppTheme.scarletRedTheme(14.0)
-                              : themeMode == AppThemeMode.sepia 
-                                  ? AppTheme.sepiaTheme(14.0)
-                                  : AppTheme.lightTheme(14.0),
-      darkTheme: themeMode == AppThemeMode.dawn
-          ? AppTheme.dawnTheme(14.0)
-          : themeMode == AppThemeMode.dusk
-              ? AppTheme.duskTheme(14.0)
-              : themeMode == AppThemeMode.fresh
-                  ? AppTheme.freshTheme(14.0)
-                  : AppTheme.darkTheme(14.0, isAmoled: themeMode == AppThemeMode.oled),
+      theme: lightBase,
+      darkTheme: darkBase,
       home: isBibleLoading ? const SplashLoadingScreen() : const MainNavScreen(),
     );
   }

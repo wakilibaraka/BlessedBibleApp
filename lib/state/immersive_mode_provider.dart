@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ImmersiveModeNotifier extends Notifier<bool> {
+class ChromeHiddenNotifier extends Notifier<bool> {
   @override
   bool build() => false;
 
@@ -8,7 +8,7 @@ class ImmersiveModeNotifier extends Notifier<bool> {
   void set(bool value) => state = value;
 }
 
-final immersiveModeProvider = NotifierProvider<ImmersiveModeNotifier, bool>(ImmersiveModeNotifier.new);
+final chromeHiddenProvider = NotifierProvider<ChromeHiddenNotifier, bool>(ChromeHiddenNotifier.new);
 
 class NavHiddenNotifier extends Notifier<bool> {
   @override

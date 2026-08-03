@@ -454,9 +454,10 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
             child: GestureDetector(
               onHorizontalDragEnd: (details) {
                 if (details.primaryVelocity == null) return;
-                if (details.primaryVelocity! < -300 && !_isLastPassage) {
+                final threshold = readSettings.horizontalSwipeVelocityThreshold;
+                if (details.primaryVelocity! < -threshold && !_isLastPassage) {
                   _goToPassage(_passageIndex + 1);
-                } else if (details.primaryVelocity! > 300 && _passageIndex > 0) {
+                } else if (details.primaryVelocity! > threshold && _passageIndex > 0) {
                   _goToPassage(_passageIndex - 1);
                 }
               },

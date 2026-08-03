@@ -78,6 +78,16 @@ class ReadSettingsState {
     );
   }
 
+  double get horizontalSwipeVelocityThreshold {
+    switch (gestureSensitivity) {
+      case GestureSensitivity.firm:
+        return 300.0;
+      case GestureSensitivity.fluid:
+        return 50.0;
+      case GestureSensitivity.instant:
+        return 10.0;
+    }
+  }
 }
 
 class ReadSettingsNotifier extends Notifier<ReadSettingsState> {

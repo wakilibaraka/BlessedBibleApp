@@ -42,7 +42,7 @@ import '../../state/bible_nav_settings_provider.dart';
 import '../../state/read_location_provider.dart';
 import '../widgets/textured_glass_container.dart';
 import '../widgets/bouncy_entrance.dart';
-import '../../state/nav_settings_provider.dart';
+
 import '../../state/translation_provider.dart';
 import '../../theme/reading_tokens.dart';
 import '../widgets/commentary_view.dart';
@@ -327,10 +327,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   Timer? _scrollDebounceTimer;
   Timer? _visitTimer;
   Timer? _scrollEndTimer;
-  Timer? _navRevealTimer;
-  Timer? _headerRevealTimer;
   Timer? _pageDebounceTimer;
-  bool _delayHeaderReveal = false;
+
   final ValueNotifier<bool> _isScrolling = ValueNotifier(false);
   // True while PageView is mid-swipe; used to freeze vertical child list.
   final ValueNotifier<bool> _isPageSwiping = ValueNotifier(false);
@@ -383,9 +381,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   static const int _kHoldMillis = 700;
 
   double _overscrollAccum = 0.0; // total negative overscroll pixels seen
-  Timer? _continuousScrollTimerStage1;
-  Timer? _continuousScrollTimerStage2;
-  bool _isScrollingDown = false;
   DateTime? _overscrollStart; // when the drag crossed the first threshold
   bool _navTriggeredThisDrag = false;
   bool _hasFiredArmedHaptic = false;
@@ -513,8 +508,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     _scrollDebounceTimer?.cancel();
     _visitTimer?.cancel();
     _scrollEndTimer?.cancel();
-    _navRevealTimer?.cancel();
-    _headerRevealTimer?.cancel();
     _pageDebounceTimer?.cancel();
     _isScrolling.dispose();
     _pageController.dispose();
@@ -706,53 +699,11 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   }
 
   Widget _buildSideButton(BuildContext context, ReadingTokens tokens,
-      Widget child, VoidCallback onTap, bool isImmersiveMode) {
-    _itemPositionsListeners[_currentPageIndex] ??=
-        ItemPositionsListener.create();
-    final listenable =
-        _itemPositionsListeners[_currentPageIndex]!.itemPositions;
-
-    return ValueListenableBuilder<bool>(
-      valueListenable: _isScrolling,
-      builder: (context, isScrolling, _) {
-        return ValueListenableBuilder<Iterable<ItemPosition>>(
-          valueListenable: listenable,
-          builder: (context, positions, _) {
-            bool isAtTop = false;
-            if (positions.isNotEmpty) {
-              final firstPos = positions.where((p) => p.index == 0);
-              if (firstPos.isNotEmpty &&
-                  firstPos.first.itemLeadingEdge >= -0.05) {
-                isAtTop = true;
-              }
-            }
-
-            final isAtTopRest = isAtTop && !isScrolling;
-            final shouldHide =
-                (isImmersiveMode || _delayHeaderReveal) && !isAtTopRest;
-
-            return IgnorePointer(
-              ignoring: shouldHide,
-              child: AnimatedSlide(
-                duration: const Duration(milliseconds: 500),
-                curve: Curves.easeOutCubic,
-                offset: shouldHide ? const Offset(0, -1) : Offset.zero,
-                child: AnimatedOpacity(
-                  duration: const Duration(milliseconds: 500),
-                  curve: Curves.easeOutCubic,
-                  opacity: shouldHide ? 0.01 : 1.0,
-                  alwaysIncludeSemantics: true,
-                  child: _buildThemedPill(
-                    child: child,
-                    tokens: tokens,
-                    onTap: onTap,
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
+      Widget child, VoidCallback onTap) {
+    return _buildThemedPill(
+      child: child,
+      tokens: tokens,
+      onTap: onTap,
     );
   }
 
@@ -762,8 +713,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       ThemeData theme,
       String currentBookName,
       int currentChapter,
-      List<BibleBook> allBooks,
-      bool isImmersiveMode) {
+      List<BibleBook> allBooks) {
     final tokens = theme.extension<ReadingTokens>()!;
 
     final centerPill = _buildThemedPill(
@@ -823,7 +773,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           backgroundColor: Colors.transparent,
           builder: (ctx) => const TranslationPickerSheet(),
         );
-      }, isImmersiveMode);
+      });
     });
 
     final trailingButton = _isPageSelectionMode
@@ -838,8 +788,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                 letterSpacing: -0.5,
               ),
             ),
-            _exitPageSelection,
-            false)
+            _exitPageSelection)
         : _buildSideButton(
         context,
         tokens,
@@ -851,8 +800,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
             letterSpacing: -0.5,
           ),
         ),
-        _showTypographyBottomSheet,
-        isImmersiveMode);
+        _showTypographyBottomSheet);
 
     return SizedBox(
       height: 48,
@@ -884,7 +832,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     final chapterTitles = ref.watch(chapterTitlesProvider);
     final readSettings = ref.watch(readSettingsProvider);
     final selectedVerses = ref.watch(readSelectionProvider);
-    final isImmersive = ref.watch(immersiveModeProvider);
 
     final commentaryState = ref.watch(commentaryProvider);
     final Set<String> versesWithCommentary = {};
@@ -1262,8 +1209,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                 });
                                               }
 
-                                              final navSettings =
-                                                  ref.read(navSettingsProvider);
 
                                               // ── Deliberate-drag gate for navigation ──
                                               if (_isPageSelectionMode) return false;
@@ -1356,128 +1301,24 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                 }
                                               }
 
-                                              if (navSettings.alwaysShowNav) {
-                                                return false;
-                                              }
-
                                               if (notification
                                                   is UserScrollNotification) {
                                                 if (notification.metrics.axis != Axis.vertical) return false;
-                                                if (notification.direction ==
-                                                    ScrollDirection.forward) {
-                                                  _isScrollingDown = false;
-                                                  _continuousScrollTimerStage1
-                                                      ?.cancel();
-                                                  _continuousScrollTimerStage2
-                                                      ?.cancel();
-                                                  final isManualHidden = ref
-                                                      .read(
-                                                          readSettingsProvider)
-                                                      .isManualNavHidden;
+                                                
+                                                final isImmersive = ref.read(readSettingsProvider).readingViewMode == ReadingViewMode.immersive;
 
-                                                  // Reveal nav immediately if not manually hidden
-                                                  if (!isManualHidden) {
-                                                    if (mounted) {
-                                                      ref
-                                                          .read(
-                                                              navHiddenProvider
-                                                                  .notifier)
-                                                          .set(false);
-                                                    }
-
-                                                    // Delay the top header chrome slightly so it's not jarring
-                                                    _delayHeaderReveal = true;
-                                                    _headerRevealTimer
-                                                        ?.cancel();
-                                                    _headerRevealTimer = Timer(
-                                                        const Duration(
-                                                            seconds: 1), () {
-                                                      if (mounted) {
-                                                        setState(() =>
-                                                            _delayHeaderReveal =
-                                                                false);
-                                                      }
-                                                    });
+                                                if (notification.direction == ScrollDirection.forward) {
+                                                  if (mounted && isImmersive) {
+                                                    ref.read(chromeHiddenProvider.notifier).set(false);
                                                   }
-                                                  // Always exit full immersive when scrolling up
-                                                  if (mounted) {
-                                                    ref
-                                                        .read(
-                                                            immersiveModeProvider
-                                                                .notifier)
-                                                        .set(false);
+                                                } else if (notification.direction == ScrollDirection.reverse) {
+                                                  if (mounted && isImmersive) {
+                                                    ref.read(chromeHiddenProvider.notifier).set(true);
                                                   }
-                                                } else if (notification
-                                                        .direction ==
-                                                    ScrollDirection.reverse) {
-                                                  _isScrollingDown = true;
-
-                                                  // Start stage 1 timer (3 seconds -> hide nav)
-                                                  if (_continuousScrollTimerStage1 ==
-                                                          null ||
-                                                      !_continuousScrollTimerStage1!
-                                                          .isActive) {
-                                                    _continuousScrollTimerStage1 =
-                                                        Timer(
-                                                            const Duration(
-                                                                seconds: 3),
-                                                            () {
-                                                      if (mounted &&
-                                                          _isScrollingDown) {
-                                                        ref
-                                                            .read(
-                                                                navHiddenProvider
-                                                                    .notifier)
-                                                            .set(true);
-                                                        _delayHeaderReveal =
-                                                            false;
-                                                      }
-                                                    });
-                                                  }
-
-                                                  // Start stage 2 timer (5 seconds -> full immersive)
-                                                  if (ref
-                                                          .read(
-                                                              readSettingsProvider)
-                                                          .readingViewMode ==
-                                                      ReadingViewMode
-                                                          .immersive) {
-                                                    if (_continuousScrollTimerStage2 ==
-                                                            null ||
-                                                        !_continuousScrollTimerStage2!
-                                                            .isActive) {
-                                                      _continuousScrollTimerStage2 =
-                                                          Timer(
-                                                              const Duration(
-                                                                  seconds: 5),
-                                                              () {
-                                                        if (mounted &&
-                                                            _isScrollingDown) {
-                                                          ref
-                                                              .read(
-                                                                  immersiveModeProvider
-                                                                      .notifier)
-                                                              .set(true);
-                                                        }
-                                                      });
-                                                    }
-                                                  }
-                                                } else if (notification
-                                                        .direction ==
-                                                    ScrollDirection.idle) {
-                                                  _isScrollingDown = false;
-                                                  _continuousScrollTimerStage1
-                                                      ?.cancel();
-                                                  _continuousScrollTimerStage2
-                                                      ?.cancel();
                                                 }
                                               } else if (notification
                                                   is ScrollEndNotification) {
-                                                _isScrollingDown = false;
-                                                _continuousScrollTimerStage1
-                                                    ?.cancel();
-                                                _continuousScrollTimerStage2
-                                                    ?.cancel();
+                                                // No longer need to cancel timers
                                               }
                                               return false;
                                             },
@@ -1814,24 +1655,40 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                     top: 0,
                     left: 0,
                     right: 0,
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                        top: MediaQuery.of(context).padding.top + 8.0,
-                        left: 24.0,
-                        right: 24.0,
-                      ),
-                      child: _buildTopRow(
-                        context,
-                        ref,
-                        theme,
-                        currentBookName,
-                        currentChapter,
-                        allBooks,
-                        isImmersive &&
-                            readSettings.readingViewMode ==
-                                ReadingViewMode.immersive,
-                      ),
-                    ),
+                    child: Builder(builder: (context) {
+                      final isChromeHidden = ref.watch(chromeHiddenProvider);
+                      final isImmersive = ref.watch(readSettingsProvider).readingViewMode == ReadingViewMode.immersive;
+                      final shouldHideTopChrome = isChromeHidden && isImmersive;
+                      
+                      return IgnorePointer(
+                        ignoring: shouldHideTopChrome,
+                        child: AnimatedSlide(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeOutCubic,
+                          offset: shouldHideTopChrome ? const Offset(0, -1) : Offset.zero,
+                          child: AnimatedOpacity(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeOutCubic,
+                            opacity: shouldHideTopChrome ? 0.0 : 1.0,
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                top: MediaQuery.of(context).padding.top + 8.0,
+                                left: 24.0,
+                                right: 24.0,
+                              ),
+                              child: _buildTopRow(
+                                context,
+                                ref,
+                                theme,
+                                currentBookName,
+                                currentChapter,
+                                allBooks,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
                   ),
 
                   // ── Pull-to-navigate progressive indicator ──────────────────────

@@ -1118,7 +1118,7 @@ class _DayViewState extends ConsumerState<DayView> with TickerProviderStateMixin
         body: GestureDetector(
           onHorizontalDragEnd: (details) {
             if (details.primaryVelocity == null) return;
-            final double swipeThreshold = readSettings.gestureSensitivity == GestureSensitivity.firm ? 300.0 : 50.0;
+            final double swipeThreshold = readSettings.horizontalSwipeVelocityThreshold;
             if (details.primaryVelocity! < -swipeThreshold) {
               _nextDay();
             } else if (details.primaryVelocity! > swipeThreshold) {
@@ -1191,7 +1191,7 @@ class _DayViewState extends ConsumerState<DayView> with TickerProviderStateMixin
       body: GestureDetector(
         onHorizontalDragEnd: (details) {
           if (details.primaryVelocity == null) return;
-          final double swipeThreshold = readSettings.gestureSensitivity == GestureSensitivity.firm ? 300.0 : 50.0;
+          final double swipeThreshold = readSettings.horizontalSwipeVelocityThreshold;
           if (details.primaryVelocity! < -swipeThreshold) {
             _nextDay();
           } else if (details.primaryVelocity! > swipeThreshold) {
@@ -1534,9 +1534,9 @@ class _AdaptivePlanCalendar extends StatelessWidget {
       return GestureDetector(
         onHorizontalDragEnd: (details) {
           if (details.primaryVelocity == null) return;
-          if (details.primaryVelocity! < -300) {
+          if (details.primaryVelocity! < -swipeThreshold) {
             onNextMonth();
-          } else if (details.primaryVelocity! > 300) {
+          } else if (details.primaryVelocity! > swipeThreshold) {
             onPrevMonth();
           }
         },
@@ -1610,9 +1610,9 @@ class _AdaptivePlanCalendar extends StatelessWidget {
             GestureDetector(
               onHorizontalDragEnd: (details) {
                 if (details.primaryVelocity == null) return;
-                if (details.primaryVelocity! < -300) {
+                if (details.primaryVelocity! < -swipeThreshold) {
                   onNextMonth();
-                } else if (details.primaryVelocity! > 300) {
+                } else if (details.primaryVelocity! > swipeThreshold) {
                   onPrevMonth();
                 }
               },

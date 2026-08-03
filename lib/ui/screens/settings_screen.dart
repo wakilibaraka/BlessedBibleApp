@@ -9,7 +9,6 @@ import '../../state/hints_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../state/user_data_provider.dart';
 import '../../state/typography_provider.dart';
-import '../../state/nav_settings_provider.dart';
 import '../../state/search_settings_provider.dart';
 import '../../state/bible_nav_settings_provider.dart';
 import '../../state/read_settings_provider.dart';
@@ -118,7 +117,7 @@ class SettingsScreen extends ConsumerWidget {
               final viewMode = ref.watch(readSettingsProvider.select((s) => s.readingViewMode));
               return AnimatedSegmentedTile<ReadingViewMode>(
                 title: 'Immersive Reading',
-                subtitle: 'Hide navigation bars while scrolling and remove the background glow for a cleaner read',
+                subtitle: 'Auto-hides the top bar and bottom navigation while you scroll for a cleaner read',
                 selectedValue: viewMode,
                 options: const [
                   MapEntry(ReadingViewMode.immersive, 'On'),
@@ -307,18 +306,6 @@ class SettingsScreen extends ConsumerWidget {
                     (i) => ref.read(readSettingsProvider.notifier).setSecondaryHighlightColorIndex(i)
                   ),
                 ],
-              );
-            }),
-            Consumer(builder: (context, ref, _) {
-              final alwaysShowNav = ref.watch(navSettingsProvider.select((s) => s.alwaysShowNav));
-              return SwitchListTile(
-                title: const Text('Autohide main navigation bar'),
-                subtitle: const Text('Keep bottom nav visible even when verses are selected'),
-                value: alwaysShowNav,
-                onChanged: (value) {
-                  HapticFeedback.selectionClick();
-                  ref.read(navSettingsProvider.notifier).setAlwaysShowNav(value);
-                },
               );
             }),
           ]),

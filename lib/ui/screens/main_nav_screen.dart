@@ -40,7 +40,6 @@ class MainNavScreen extends ConsumerWidget {
     final currentIndex = ref.watch(navProvider);
     final isNavVisible = ref.watch(bottomNavVisibilityProvider);
     final isNavHidden = !isNavVisible;
-    final navSettings = ref.watch(navSettingsProvider);
     final selectedVerses = ref.watch(readSelectionProvider);
     final readLoc = ref.watch(readLocationProvider);
 
@@ -389,7 +388,6 @@ class MainNavScreen extends ConsumerWidget {
                                                               ? const Icon(Icons.close_rounded, size: 28, key: ValueKey('raindrop_close'))
                                                               : _buildFabIcon(
                                                                   currentIndex,
-                                                                  navSettings,
                                                                   ref),
                                                         ),
                                                         color: Theme.of(context)
@@ -430,7 +428,7 @@ class MainNavScreen extends ConsumerWidget {
   }
 
   Widget _buildFabIcon(
-      int currentIndex, NavSettingsState navSettings, WidgetRef ref) {
+      int currentIndex, WidgetRef ref) {
     if (currentIndex == 0) {
       return const Icon(
         Icons.settings,
@@ -490,7 +488,6 @@ class MainNavScreen extends ConsumerWidget {
         final isCurrentlyHidden = ref.read(navHiddenProvider);
         ref.read(readSettingsProvider.notifier).setManualNavHidden(!isCurrentlyHidden);
         ref.read(navHiddenProvider.notifier).set(!isCurrentlyHidden);
-        ref.read(immersiveModeProvider.notifier).set(!isCurrentlyHidden);
         break;
       case 2:
         // Search tab: no FAB action (search bar is in the screen itself)

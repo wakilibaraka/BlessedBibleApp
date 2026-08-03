@@ -11,7 +11,7 @@ import '../state/notes_provider.dart';
 import '../state/reading_plan_provider.dart';
 import '../state/search_provider.dart';
 import '../state/search_settings_provider.dart';
-import '../state/nav_settings_provider.dart';
+
 import '../state/bible_nav_settings_provider.dart';
 import '../state/read_settings_provider.dart';
 import '../state/study_layout_provider.dart';
@@ -128,7 +128,7 @@ class BackupService {
       ref.invalidate(currentActivePlanIdProvider);
       ref.invalidate(searchStateProvider);
       ref.invalidate(searchSettingsProvider);
-      ref.invalidate(navSettingsProvider);
+      // navSettingsProvider has been removed
       ref.invalidate(bibleNavSettingsProvider);
       ref.invalidate(readSettingsProvider);
       ref.invalidate(studyLayoutProvider);
