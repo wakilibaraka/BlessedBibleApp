@@ -9,6 +9,7 @@ import '../widgets/pill_segmented_control.dart';
 
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -48,13 +49,17 @@ import '../widgets/commentary_view.dart';
 import '../sheets/verse_context_menu_sheet.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
-class LazyPageScrollPhysics extends PageScrollPhysics {
+class LazyPageScrollPhysics extends ClampingScrollPhysics {
   final GestureSensitivity sensitivity;
 
   const LazyPageScrollPhysics({
     super.parent,
-    this.sensitivity = GestureSensitivity.fluid,
+    required this.sensitivity,
   });
+
+  @override
+  double get dragStartDistanceMotionThreshold =>
+      sensitivity == GestureSensitivity.instant ? 25.0 : super.dragStartDistanceMotionThreshold ?? 18.0;
 
   @override
   LazyPageScrollPhysics applyTo(ScrollPhysics? ancestor) {
@@ -75,18 +80,26 @@ class LazyPageScrollPhysics extends PageScrollPhysics {
   double _getCustomTargetPixels(ScrollMetrics position, Tolerance tolerance, double velocity) {
     double page = _getCustomPage(position);
     
-    // Very relaxed swipe thresholds for a "lazy" feel.
-    // Flick threshold: 50 px/s (very light flick)
-    if (velocity < -50.0) {
+    final double flickVelocity = sensitivity == GestureSensitivity.firm 
+        ? 300.0 
+        : (sensitivity == GestureSensitivity.fluid ? 50.0 : 10.0);
+
+    if (velocity < -flickVelocity) {
       page -= 0.5;
-    } else if (velocity > 50.0) {
+    } else if (velocity > flickVelocity) {
       page += 0.5;
     } else {
-      // Distance threshold: only need to drag 15% of the screen to snap to the next page.
+      // Distance threshold. Apple standard for firm is 0.5 (50%). 
+      // Fluid uses 0.15 (15%). 
+      // Instant reduces length required by 90% (0.05 from 0.5, or 0.015 for extreme sensitivity).
+      final double distanceThreshold = sensitivity == GestureSensitivity.firm 
+          ? 0.5 
+          : (sensitivity == GestureSensitivity.fluid ? 0.15 : 0.015);
+
       double fraction = page - page.roundToDouble();
-      if (fraction > 0.15) {
+      if (fraction > distanceThreshold) {
         page = page.roundToDouble() + 1.0;
-      } else if (fraction < -0.15) {
+      } else if (fraction < -distanceThreshold) {
         page = page.roundToDouble() - 1.0;
       }
     }
@@ -95,9 +108,6 @@ class LazyPageScrollPhysics extends PageScrollPhysics {
 
   @override
   Simulation? createBallisticSimulation(ScrollMetrics position, double velocity) {
-    if (sensitivity == GestureSensitivity.fluid) {
-      return super.createBallisticSimulation(position, velocity);
-    }
 
     if ((velocity <= 0.0 && position.pixels <= position.minScrollExtent) ||
         (velocity >= 0.0 && position.pixels >= position.maxScrollExtent)) {
@@ -128,6 +138,47 @@ class LazyPageScrollPhysics extends PageScrollPhysics {
 
   @override
   bool get allowImplicitScrolling => false;
+}
+
+class AntiGravityScrollPhysics extends BouncingScrollPhysics {
+  const AntiGravityScrollPhysics({super.parent});
+
+  @override
+  AntiGravityScrollPhysics applyTo(ScrollPhysics? ancestor) {
+    return AntiGravityScrollPhysics(parent: buildParent(ancestor));
+  }
+
+  @override
+  SpringDescription get spring {
+    return const SpringDescription(
+      mass: 0.1,
+      stiffness: 400.0,
+      damping: 0.5,
+    );
+  }
+}
+
+class StrictVerticalScrollPhysics extends ScrollPhysics {
+  final ValueNotifier<bool> isPageSwiping;
+
+  const StrictVerticalScrollPhysics({
+    super.parent,
+    required this.isPageSwiping,
+  });
+
+  @override
+  StrictVerticalScrollPhysics applyTo(ScrollPhysics? ancestor) {
+    return StrictVerticalScrollPhysics(
+      parent: buildParent(ancestor),
+      isPageSwiping: isPageSwiping,
+    );
+  }
+
+  @override
+  bool shouldAcceptUserOffset(ScrollMetrics position) {
+    if (isPageSwiping.value) return false;
+    return super.shouldAcceptUserOffset(position);
+  }
 }
 
 class ExpandedChipsNotifier extends Notifier<Map<int, String?>> {
@@ -281,6 +332,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   Timer? _pageDebounceTimer;
   bool _delayHeaderReveal = false;
   final ValueNotifier<bool> _isScrolling = ValueNotifier(false);
+  // True while PageView is mid-swipe; used to freeze vertical child list.
+  final ValueNotifier<bool> _isPageSwiping = ValueNotifier(false);
 
   // ── Hints ────────────────────────────────────────────────────────
   String? _currentHintId;
@@ -990,7 +1043,23 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                 child: Text('Passage not found.',
                                     style: theme.textTheme.bodyLarge),
                               )
-                            : PageView.builder(
+                            : NotificationListener<ScrollNotification>(
+                                onNotification: (notification) {
+                                  // Axis-lock: freeze the vertical list while PageView is swiping horizontally
+                                  if (notification.metrics.axis == Axis.horizontal) {
+                                    if (notification is ScrollStartNotification) {
+                                      _isPageSwiping.value = true;
+                                    } else if (notification is ScrollEndNotification) {
+                                      // Give one frame for the page snap to settle before unlocking
+                                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                                        if (mounted) _isPageSwiping.value = false;
+                                      });
+                                    }
+                                  }
+                                  return false; // let notifications bubble
+                                },
+                                child: PageView.builder(
+                                dragStartBehavior: DragStartBehavior.start,
                                 physics: _isPageSelectionMode
                                     ? const NeverScrollableScrollPhysics()
                                     : LazyPageScrollPhysics(
@@ -1007,7 +1076,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
                                   _pageDebounceTimer?.cancel();
                                   _pageDebounceTimer = Timer(
-                                      const Duration(milliseconds: 300), () {
+                                      const Duration(milliseconds: 120), () {
                                     if (!mounted) return;
                                     final fc = flatChapters[pageIndex];
                                     final currentLoc =
@@ -1293,6 +1362,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
                                               if (notification
                                                   is UserScrollNotification) {
+                                                if (notification.metrics.axis != Axis.vertical) return false;
                                                 if (notification.direction ==
                                                     ScrollDirection.forward) {
                                                   _isScrollingDown = false;
@@ -1631,6 +1701,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                               );
 
                                                               return GestureDetector(
+                                                                behavior: HitTestBehavior.opaque,
                                                                 onDoubleTap: _isPageSelectionMode ? null : () {
                                                                   HapticFeedback.lightImpact();
                                                                   VerseActionLogic.handleBookmark(context, theme, ref, fc.book.name, fc.chapter.number, [verse.number]);
@@ -1682,14 +1753,23 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                       );
                                                     } // end buildVerseItem
 
+                                                    // Base vertical physics — instant = AntiGravity, otherwise Bouncing
+                                                    final ScrollPhysics basePhysics = readSettings.gestureSensitivity == GestureSensitivity.instant
+                                                        ? const AntiGravityScrollPhysics()
+                                                        : const BouncingScrollPhysics();
+
                                                     Widget listWidget;
                                                     if (_isPageSelectionMode) {
                                                       if (_selectionVerseKeys.length != verses.length + 1) {
                                                         _selectionVerseKeys.clear();
                                                         _selectionVerseKeys.addAll(List.generate(verses.length + 1, (_) => GlobalKey()));
                                                       }
+
+                                                      // Axis-lock: freeze the vertical list while PageView swipes horizontally
                                                       listWidget = SingleChildScrollView(
                                                         padding: listPadding,
+                                                        dragStartBehavior: DragStartBehavior.down,
+                                                        physics: StrictVerticalScrollPhysics(isPageSwiping: _isPageSwiping).applyTo(basePhysics),
                                                         child: SelectionArea(
                                                           child: Column(
                                                             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1703,14 +1783,16 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                         ),
                                                       );
                                                     } else {
+                                                      // Axis-lock: freeze the vertical list while PageView swipes horizontally
                                                       listWidget = ScrollablePositionedList.builder(
                                                         itemScrollController: _itemScrollControllers[pageIndex],
-                                                        itemPositionsListener: _itemPositionsListeners[pageIndex],
+                                                      itemPositionsListener: _itemPositionsListeners[pageIndex],
                                                         initialScrollIndex: (pageIndex == _currentPageIndex ? _navigatedVerseIndex : null) ??
                                                             ref.read(preferencesProvider).getChapterScrollPosition(fc.book.abbreviation, fc.chapter.number) ?? 0,
                                                         padding: listPadding,
                                                         itemCount: verses.length + 1,
                                                         itemBuilder: buildVerseItem,
+                                                        physics: StrictVerticalScrollPhysics(isPageSwiping: _isPageSwiping).applyTo(basePhysics),
                                                       );
                                                     }
                                                     return listWidget;
@@ -1725,6 +1807,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                   );
                                 },
                               ),
+                            ), // end NotificationListener (axis-lock)
                   ),
                   // Top Navigation Bar Layer (Floating pills allowing text to flow behind)
                   Positioned(
