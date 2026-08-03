@@ -54,3 +54,9 @@ app.*.map.json
 analyzer_output.txt
 diff_*.txt
 task.md
+
+# SQLite WAL/SHM sidecar files (auto-generated, never commit)
+*.db-wal
+*.db-shm
+*-wal
+*-shm
