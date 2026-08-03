@@ -19,7 +19,8 @@ class JiggleAnimator extends StatefulWidget {
   State<JiggleAnimator> createState() => _JiggleAnimatorState();
 }
 
-class _JiggleAnimatorState extends State<JiggleAnimator> with SingleTickerProviderStateMixin {
+class _JiggleAnimatorState extends State<JiggleAnimator>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
   late double _randomOffset;
@@ -29,7 +30,8 @@ class _JiggleAnimatorState extends State<JiggleAnimator> with SingleTickerProvid
     super.initState();
     _randomOffset = math.Random().nextDouble();
     _controller = AnimationController(vsync: this, duration: widget.duration);
-    _animation = Tween<double>(begin: -widget.maxAngle, end: widget.maxAngle).animate(
+    _animation =
+        Tween<double>(begin: -widget.maxAngle, end: widget.maxAngle).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOutSine),
     );
 
@@ -45,7 +47,9 @@ class _JiggleAnimatorState extends State<JiggleAnimator> with SingleTickerProvid
       _startJiggling();
     } else if (!widget.isJiggling && oldWidget.isJiggling) {
       _controller.stop();
-      _controller.animateTo(0.5, duration: const Duration(milliseconds: 100)); // Return to center (0 angle is at 0.5 value)
+      _controller.animateTo(0.5,
+          duration: const Duration(
+              milliseconds: 100)); // Return to center (0 angle is at 0.5 value)
     }
   }
 
@@ -65,7 +69,7 @@ class _JiggleAnimatorState extends State<JiggleAnimator> with SingleTickerProvid
     return AnimatedBuilder(
       animation: _animation,
       builder: (context, child) {
-        // Transform value to have 0 rotation when not jiggling. 
+        // Transform value to have 0 rotation when not jiggling.
         // When not jiggling, we animated value to 0.5, where tween is 0.
         final angle = widget.isJiggling ? _animation.value : 0.0;
         return Transform.rotate(

@@ -39,7 +39,8 @@ void showAddJournalSheet(BuildContext context, WidgetRef ref, ThemeData theme) {
               hintText: 'Write your thoughts, reflections, or prayers...',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: theme.primaryColor.withValues(alpha: 0.3)),
+                borderSide: BorderSide(
+                    color: theme.primaryColor.withValues(alpha: 0.3)),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -60,8 +61,22 @@ void showAddJournalSheet(BuildContext context, WidgetRef ref, ThemeData theme) {
             onPressed: () {
               if (contentController.text.isNotEmpty) {
                 final now = DateTime.now();
-                final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                final dateStr = '${months[now.month - 1]} ${now.day}, ${now.year}';
+                final months = [
+                  'Jan',
+                  'Feb',
+                  'Mar',
+                  'Apr',
+                  'May',
+                  'Jun',
+                  'Jul',
+                  'Aug',
+                  'Sep',
+                  'Oct',
+                  'Nov',
+                  'Dec'
+                ];
+                final dateStr =
+                    '${months[now.month - 1]} ${now.day}, ${now.year}';
                 final entry = JournalEntry(
                   contentController.text,
                   dateStr,
@@ -70,7 +85,8 @@ void showAddJournalSheet(BuildContext context, WidgetRef ref, ThemeData theme) {
                 Navigator.of(context).pop();
               }
             },
-            child: const Text('Save Entry', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text('Save Entry',
+                style: TextStyle(fontWeight: FontWeight.bold)),
           ),
           const SizedBox(height: 24),
         ],

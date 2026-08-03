@@ -48,7 +48,8 @@ class _ActionIconState extends State<ActionIcon> {
           alignment: Alignment.center,
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 200),
-            transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
+            transitionBuilder: (child, anim) =>
+                ScaleTransition(scale: anim, child: child),
             child: Icon(
               _showCheck ? Icons.check_circle_rounded : widget.icon,
               key: ValueKey(_showCheck),

@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-
 class ActiveStudyVerseNotifier extends Notifier<String?> {
   @override
   String? build() => null;
@@ -10,5 +9,6 @@ class ActiveStudyVerseNotifier extends Notifier<String?> {
   }
 }
 
-final activeStudyVerseProvider = NotifierProvider<ActiveStudyVerseNotifier, String?>(ActiveStudyVerseNotifier.new);
-
+final activeStudyVerseProvider =
+    NotifierProvider<ActiveStudyVerseNotifier, String?>(
+        ActiveStudyVerseNotifier.new);

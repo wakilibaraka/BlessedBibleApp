@@ -12,33 +12,40 @@ class TranslationPickerSheet extends ConsumerStatefulWidget {
   const TranslationPickerSheet({super.key});
 
   @override
-  ConsumerState<TranslationPickerSheet> createState() => _TranslationPickerSheetState();
+  ConsumerState<TranslationPickerSheet> createState() =>
+      _TranslationPickerSheetState();
 }
 
-class _TranslationPickerSheetState extends ConsumerState<TranslationPickerSheet> {
+class _TranslationPickerSheetState
+    extends ConsumerState<TranslationPickerSheet> {
   bool _isSelectingSecondary = false;
 
   int _getLanguagePriority(String lang) {
     switch (lang.toLowerCase()) {
-      case 'english': return 0;
-      case 'swahili': return 1;
-      case 'spanish': 
-      case 'french': 
-      case 'german': 
-      case 'italian': 
-      case 'romanian': 
-      case 'portuguese': 
-      case 'dutch': 
-      case 'tagalog': return 2;
-      default: return 3;
+      case 'english':
+        return 0;
+      case 'swahili':
+        return 1;
+      case 'spanish':
+      case 'french':
+      case 'german':
+      case 'italian':
+      case 'romanian':
+      case 'portuguese':
+      case 'dutch':
+      case 'tagalog':
+        return 2;
+      default:
+        return 3;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final readingLayout = ref.watch(readSettingsProvider.select((s) => s.readingLayout));
-    
+    final readingLayout =
+        ref.watch(readSettingsProvider.select((s) => s.readingLayout));
+
     // Auto-switch to primary if mode changes to single
     if (readingLayout == ReadingLayout.single && _isSelectingSecondary) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -46,118 +53,126 @@ class _TranslationPickerSheetState extends ConsumerState<TranslationPickerSheet>
       });
     }
 
-    final activeTranslationId = _isSelectingSecondary 
-        ? ref.watch(secondaryTranslationProvider) 
+    final activeTranslationId = _isSelectingSecondary
+        ? ref.watch(secondaryTranslationProvider)
         : ref.watch(activeTranslationProvider);
-        
+
     final availableTranslations = ref.watch(availableTranslationsProvider);
 
     return FractionallySizedBox(
-      heightFactor: 0.75,
-      child: TexturedGlassContainer(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-        padding: EdgeInsets.only(
-          top: 24,
-          bottom: MediaQuery.of(context).padding.bottom + 24,
-          left: 20,
-          right: 20,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Bible Translation',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.close_rounded),
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                ),
-              ],
-            ),
-          const SizedBox(height: 8),
-          
-          AnimatedSegmentedTile<ReadingLayout>(
-            title: 'Reading Layout',
-            subtitle: () {
-              switch (readingLayout) {
-                case ReadingLayout.single: return 'One translation';
-                case ReadingLayout.interleaved: return 'Two translations stacked per verse';
-                case ReadingLayout.sideBySide: return 'Two translations in side-by-side columns';
-                case ReadingLayout.chips: return 'Tap a verse to switch its translation';
-              }
-            }(),
-            selectedValue: readingLayout,
-            options: const [
-              MapEntry(ReadingLayout.single, 'Single'),
-              MapEntry(ReadingLayout.interleaved, 'Bilingual'),
-              MapEntry(ReadingLayout.sideBySide, 'Parallel'),
-              MapEntry(ReadingLayout.chips, 'Chips'),
-            ],
-            onChanged: (val) {
-              HapticFeedback.selectionClick();
-              ref.read(readSettingsProvider.notifier).setReadingLayout(val);
-            },
+        heightFactor: 0.75,
+        child: TexturedGlassContainer(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+          padding: EdgeInsets.only(
+            top: 24,
+            bottom: MediaQuery.of(context).padding.bottom + 24,
+            left: 20,
+            right: 20,
           ),
-          
-          const SizedBox(height: 16),
-          
-          if (readingLayout != ReadingLayout.single) ...[
-            Container(
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surface,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: theme.colorScheme.onSurface.withValues(alpha: 0.1)),
-              ),
-              padding: const EdgeInsets.all(4),
-              child: Row(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
                 children: [
                   Expanded(
-                    child: _buildTabButton(
-                      'Primary', 
-                      !_isSelectingSecondary, 
-                      () => setState(() => _isSelectingSecondary = false),
-                      theme,
+                    child: Text(
+                      'Bible Translation',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
-                  Expanded(
-                    child: _buildTabButton(
-                      'Secondary', 
-                      _isSelectingSecondary, 
-                      () => setState(() => _isSelectingSecondary = true),
-                      theme,
-                    ),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close_rounded),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 16),
-          ],
-          
-          Expanded(
-            child: SingleChildScrollView(
-              physics: const ClampingScrollPhysics(),
-              child: availableTranslations.when(
-                data: (installed) => _buildTranslationList(context, ref, theme, activeTranslationId, installed),
-                loading: () => const Center(child: Padding(padding: EdgeInsets.all(32), child: CircularProgressIndicator())),
-                error: (e, st) => Center(child: Text('Error loading translations: $e')),
+              const SizedBox(height: 8),
+              AnimatedSegmentedTile<ReadingLayout>(
+                title: 'Reading Layout',
+                subtitle: () {
+                  switch (readingLayout) {
+                    case ReadingLayout.single:
+                      return 'One translation';
+                    case ReadingLayout.interleaved:
+                      return 'Two translations stacked per verse';
+                    case ReadingLayout.sideBySide:
+                      return 'Two translations in side-by-side columns';
+                    case ReadingLayout.chips:
+                      return 'Tap a verse to switch its translation';
+                  }
+                }(),
+                selectedValue: readingLayout,
+                options: const [
+                  MapEntry(ReadingLayout.single, 'Single'),
+                  MapEntry(ReadingLayout.interleaved, 'Bilingual'),
+                  MapEntry(ReadingLayout.sideBySide, 'Parallel'),
+                  MapEntry(ReadingLayout.chips, 'Chips'),
+                ],
+                onChanged: (val) {
+                  HapticFeedback.selectionClick();
+                  ref.read(readSettingsProvider.notifier).setReadingLayout(val);
+                },
               ),
-            ),
+              const SizedBox(height: 16),
+              if (readingLayout != ReadingLayout.single) ...[
+                Container(
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surface,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.1)),
+                  ),
+                  padding: const EdgeInsets.all(4),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: _buildTabButton(
+                          'Primary',
+                          !_isSelectingSecondary,
+                          () => setState(() => _isSelectingSecondary = false),
+                          theme,
+                        ),
+                      ),
+                      Expanded(
+                        child: _buildTabButton(
+                          'Secondary',
+                          _isSelectingSecondary,
+                          () => setState(() => _isSelectingSecondary = true),
+                          theme,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const ClampingScrollPhysics(),
+                  child: availableTranslations.when(
+                    data: (installed) => _buildTranslationList(
+                        context, ref, theme, activeTranslationId, installed),
+                    loading: () => const Center(
+                        child: Padding(
+                            padding: EdgeInsets.all(32),
+                            child: CircularProgressIndicator())),
+                    error: (e, st) =>
+                        Center(child: Text('Error loading translations: $e')),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-    ));
+        ));
   }
 
-  Widget _buildTabButton(String text, bool isSelected, VoidCallback onTap, ThemeData theme) {
+  Widget _buildTabButton(
+      String text, bool isSelected, VoidCallback onTap, ThemeData theme) {
     return GestureDetector(
       onTap: () {
         HapticFeedback.selectionClick();
@@ -168,14 +183,18 @@ class _TranslationPickerSheetState extends ConsumerState<TranslationPickerSheet>
         padding: const EdgeInsets.symmetric(vertical: 8),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: isSelected ? theme.primaryColor.withValues(alpha: 0.15) : Colors.transparent,
+          color: isSelected
+              ? theme.primaryColor.withValues(alpha: 0.15)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
           text,
           style: theme.textTheme.labelLarge?.copyWith(
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            color: isSelected ? theme.primaryColor : theme.colorScheme.onSurface.withValues(alpha: 0.7),
+            color: isSelected
+                ? theme.primaryColor
+                : theme.colorScheme.onSurface.withValues(alpha: 0.7),
           ),
         ),
       ),
@@ -183,14 +202,15 @@ class _TranslationPickerSheetState extends ConsumerState<TranslationPickerSheet>
   }
 
   Widget _buildTranslationList(
-    BuildContext context, 
-    WidgetRef ref, 
+    BuildContext context,
+    WidgetRef ref,
     ThemeData theme,
     String? activeTranslationId,
     List<TranslationInfo> installed,
   ) {
     // Combine installed and downloadable
-    final allTranslations = <String, List<dynamic>>{}; // map of langName -> list of (TranslationInfo OR Map)
+    final allTranslations = <String,
+        List<dynamic>>{}; // map of langName -> list of (TranslationInfo OR Map)
 
     // First add installed
     for (final t in installed) {
@@ -210,13 +230,14 @@ class _TranslationPickerSheetState extends ConsumerState<TranslationPickerSheet>
       }
     }
 
-    final sortedKeys = allTranslations.keys.toList()..sort((a, b) {
-      int pA = _getLanguagePriority(a);
-      int pB = _getLanguagePriority(b);
-      if (pA != pB) return pA.compareTo(pB);
-      return a.compareTo(b); // Alphabetical fallback
-    });
-    
+    final sortedKeys = allTranslations.keys.toList()
+      ..sort((a, b) {
+        int pA = _getLanguagePriority(a);
+        int pB = _getLanguagePriority(b);
+        if (pA != pB) return pA.compareTo(pB);
+        return a.compareTo(b); // Alphabetical fallback
+      });
+
     final children = <Widget>[];
 
     for (final lang in sortedKeys) {
@@ -243,7 +264,7 @@ class _TranslationPickerSheetState extends ConsumerState<TranslationPickerSheet>
             Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
               child: Material(
-                color: isSelected 
+                color: isSelected
                     ? theme.primaryColor.withValues(alpha: 0.1)
                     : theme.colorScheme.surface,
                 borderRadius: BorderRadius.circular(16),
@@ -251,19 +272,25 @@ class _TranslationPickerSheetState extends ConsumerState<TranslationPickerSheet>
                   borderRadius: BorderRadius.circular(16),
                   onTap: () {
                     if (_isSelectingSecondary) {
-                      ref.read(secondaryTranslationProvider.notifier).setTranslation(item.translationId);
+                      ref
+                          .read(secondaryTranslationProvider.notifier)
+                          .setTranslation(item.translationId);
                     } else {
-                      ref.read(activeTranslationProvider.notifier).setTranslation(item.translationId);
+                      ref
+                          .read(activeTranslationProvider.notifier)
+                          .setTranslation(item.translationId);
                     }
                     Navigator.of(context).pop();
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 16),
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color: isSelected 
+                        color: isSelected
                             ? theme.primaryColor.withValues(alpha: 0.5)
-                            : theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                            : theme.colorScheme.onSurface
+                                .withValues(alpha: 0.1),
                       ),
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -277,7 +304,9 @@ class _TranslationPickerSheetState extends ConsumerState<TranslationPickerSheet>
                                 item.translationName,
                                 style: theme.textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.w600,
-                                  color: isSelected ? theme.primaryColor : theme.colorScheme.onSurface,
+                                  color: isSelected
+                                      ? theme.primaryColor
+                                      : theme.colorScheme.onSurface,
                                 ),
                               ),
                               if (item.license.isNotEmpty) ...[
@@ -285,7 +314,8 @@ class _TranslationPickerSheetState extends ConsumerState<TranslationPickerSheet>
                                 Text(
                                   item.license,
                                   style: theme.textTheme.bodySmall?.copyWith(
-                                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                    color: theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.6),
                                   ),
                                 ),
                               ]
@@ -301,7 +331,8 @@ class _TranslationPickerSheetState extends ConsumerState<TranslationPickerSheet>
                           Icon(
                             Icons.cloud_done_outlined,
                             size: 20,
-                            color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.3),
                           ),
                       ],
                     ),
@@ -312,7 +343,9 @@ class _TranslationPickerSheetState extends ConsumerState<TranslationPickerSheet>
           );
         } else {
           // Downloadable
-          children.add(_DownloadableTile(item: item as Map<String, dynamic>, isSecondary: _isSelectingSecondary));
+          children.add(_DownloadableTile(
+              item: item as Map<String, dynamic>,
+              isSecondary: _isSelectingSecondary));
         }
       }
     }
@@ -357,14 +390,14 @@ class _DownloadableTileState extends ConsumerState<_DownloadableTile> {
       if (mounted) {
         // Refresh the list of available translations
         ref.invalidate(availableTranslationsProvider);
-        
+
         // Auto-select after download
         if (widget.isSecondary) {
           ref.read(secondaryTranslationProvider.notifier).setTranslation(tid);
         } else {
           ref.read(activeTranslationProvider.notifier).setTranslation(tid);
         }
-        
+
         Navigator.of(context).pop();
       }
     } catch (e) {
@@ -397,7 +430,9 @@ class _DownloadableTileState extends ConsumerState<_DownloadableTile> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             decoration: BoxDecoration(
               border: Border.all(
-                color: _error != null ? theme.colorScheme.error : theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                color: _error != null
+                    ? theme.colorScheme.error
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.1),
               ),
               borderRadius: BorderRadius.circular(16),
             ),
@@ -411,14 +446,16 @@ class _DownloadableTileState extends ConsumerState<_DownloadableTile> {
                         widget.item['name'] as String,
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.7),
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         "${widget.item['license']} · ${sizeMB.toStringAsFixed(1)} MB",
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.6),
                         ),
                       ),
                       if (_error != null)

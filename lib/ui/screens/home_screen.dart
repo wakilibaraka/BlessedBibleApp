@@ -18,11 +18,11 @@ import '../../services/share_service.dart';
 import '../sheets/theme_picker_sheet.dart';
 import '../../state/read_settings_provider.dart';
 
-class StrictHorizontalDragGestureRecognizer extends HorizontalDragGestureRecognizer {
+class StrictHorizontalDragGestureRecognizer
+    extends HorizontalDragGestureRecognizer {
   Offset _totalDelta = Offset.zero;
-  final GestureSensitivity sensitivity;
 
-  StrictHorizontalDragGestureRecognizer({this.sensitivity = GestureSensitivity.fluid});
+  StrictHorizontalDragGestureRecognizer();
 
   @override
   void addAllowedPointer(PointerDownEvent event) {
@@ -36,17 +36,10 @@ class StrictHorizontalDragGestureRecognizer extends HorizontalDragGestureRecogni
       _totalDelta += event.delta;
       final dy = _totalDelta.dy.abs();
       final dx = _totalDelta.dx.abs();
-      
-      if (sensitivity == GestureSensitivity.firm) {
-        // Strict threshold: |dx| must be > |dy| * 2. 
-        if (dy > 3 && dy >= dx * 0.5) {
-          resolve(GestureDisposition.rejected);
-        }
-      } else {
-        // Fluid threshold: mostly horizontal (at least 45 deg angle)
-        if (dy > 3 && dy >= dx * 1.2) {
-          resolve(GestureDisposition.rejected);
-        }
+
+      // Strict threshold: mostly horizontal (at least 45 deg angle)
+      if (dy > 3 && dy >= dx * 1.2) {
+        resolve(GestureDisposition.rejected);
       }
     }
     super.handleEvent(event);
@@ -69,7 +62,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   @override
   void initState() {
     super.initState();
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(votdTrackerProvider.notifier).markViewed(DateTime.now());
     });
@@ -103,8 +96,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   Widget build(BuildContext context) {
     final homeState = ref.watch(homeProvider);
     final appThemeMode = ref.watch(themeProvider);
-    final isDark    = (appThemeMode == AppThemeMode.dark || appThemeMode == AppThemeMode.oled);
-
+    final isDark = (appThemeMode == AppThemeMode.dark ||
+        appThemeMode == AppThemeMode.oled);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -116,10 +109,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             child: RawGestureDetector(
               behavior: HitTestBehavior.opaque,
               gestures: {
-                StrictHorizontalDragGestureRecognizer: GestureRecognizerFactoryWithHandlers<StrictHorizontalDragGestureRecognizer>(
-                  () => StrictHorizontalDragGestureRecognizer(
-                    sensitivity: ref.watch(readSettingsProvider.select((s) => s.gestureSensitivity)),
-                  ),
+                StrictHorizontalDragGestureRecognizer:
+                    GestureRecognizerFactoryWithHandlers<
+                        StrictHorizontalDragGestureRecognizer>(
+                  () => StrictHorizontalDragGestureRecognizer(),
                   (StrictHorizontalDragGestureRecognizer instance) {
                     instance
                       ..onUpdate = (details) {
@@ -141,9 +134,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               child: RefreshIndicator(
                 onRefresh: _onRefresh,
                 color: const Color(0xFFC9A227),
-                backgroundColor: isDark ? const Color(0xFF2C2A28) : Colors.white,
+                backgroundColor:
+                    isDark ? const Color(0xFF2C2A28) : Colors.white,
                 child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                  physics: const BouncingScrollPhysics(
+                      parent: AlwaysScrollableScrollPhysics()),
                   child: FadeTransition(
                     opacity: _verseFade,
                     child: _buildPage(context, homeState, appThemeMode),
@@ -157,7 +152,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
   }
 
-  Widget _buildPage(BuildContext context, HomeData data, AppThemeMode appThemeMode) {
+  Widget _buildPage(
+      BuildContext context, HomeData data, AppThemeMode appThemeMode) {
     final theme = Theme.of(context);
 
     // Get dynamic commentary for VOTD
@@ -171,13 +167,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         final chapterNum = int.tryParse(match.group(2)!);
         final verseNum = int.tryParse(match.group(3)!);
         final entries = commentaryState.value!;
-        
-        final matchingEntries = entries.where((e) => 
-          e.scope.type == 'verse' &&
-          e.scope.book?.toLowerCase() == bookName.toLowerCase() && 
-          e.scope.chapter == chapterNum && 
-          e.scope.verse == verseNum
-        ).toList();
+
+        final matchingEntries = entries
+            .where((e) =>
+                e.scope.type == 'verse' &&
+                e.scope.book?.toLowerCase() == bookName.toLowerCase() &&
+                e.scope.chapter == chapterNum &&
+                e.scope.verse == verseNum)
+            .toList();
 
         if (matchingEntries.isNotEmpty) {
           excerpt = matchingEntries.first.text;
@@ -287,70 +284,80 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             child: GlassContainer(
               isScrollable: true,
               borderRadius: BorderRadius.circular(24),
-            // Tighter vertical padding so the card fits without nav overlap
-            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Commentary text excerpt (fallback to omitted if none exists)
-                if (excerpt != null) ...[
-                  Text(
-                    excerpt,
-                    maxLines: 8,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      height: 1.60,
-                      color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.82),
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                ],
-
-                // Primary action row: Go Deeper + Share
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 3,
-                      child: _PillButton(
-                        label: 'Go Deeper',
-                        filled: true,
-                        onPressed: () {
-                          final refStr = data.verseOfTheDay.reference;
-                          final lastSpaceIdx = refStr.lastIndexOf(' ');
-                          final bookName = lastSpaceIdx != -1 ? refStr.substring(0, lastSpaceIdx) : refStr;
-                          final refParts = lastSpaceIdx != -1 ? refStr.substring(lastSpaceIdx + 1).split(':') : [];
-                          final chapterNum = refParts.isNotEmpty ? (int.tryParse(refParts[0]) ?? 1) : 1;
-                          final verseNum = refParts.length > 1 ? int.tryParse(refParts[1]) : null;
-
-                          Navigator.of(context).push(CupertinoPageRoute(
-                            builder: (_) => CommentaryHubScreen(
-                              book: bookName,
-                              chapter: chapterNum,
-                              verse: verseNum,
-                              verseText: data.verseOfTheDay.text,
-                            )
-                          ));
-                        },
+              // Tighter vertical padding so the card fits without nav overlap
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Commentary text excerpt (fallback to omitted if none exists)
+                  if (excerpt != null) ...[
+                    Text(
+                      excerpt,
+                      maxLines: 8,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        height: 1.60,
+                        color: theme.textTheme.bodyMedium?.color
+                            ?.withValues(alpha: 0.82),
                       ),
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      flex: 2,
-                      child: _PillButton(
-                        label: 'Share',
-                        filled: false,
-                        onPressed: () {
-                          ShareService.shareText(body: '"${data.verseOfTheDay.text}" — ${data.verseOfTheDay.reference}');
-                        },
-                      ),
-                    ),
+                    const SizedBox(height: 14),
                   ],
-                ),
 
-              ],
+                  // Primary action row: Go Deeper + Share
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: _PillButton(
+                          label: 'Go Deeper',
+                          filled: true,
+                          onPressed: () {
+                            final refStr = data.verseOfTheDay.reference;
+                            final lastSpaceIdx = refStr.lastIndexOf(' ');
+                            final bookName = lastSpaceIdx != -1
+                                ? refStr.substring(0, lastSpaceIdx)
+                                : refStr;
+                            final refParts = lastSpaceIdx != -1
+                                ? refStr.substring(lastSpaceIdx + 1).split(':')
+                                : [];
+                            final chapterNum = refParts.isNotEmpty
+                                ? (int.tryParse(refParts[0]) ?? 1)
+                                : 1;
+                            final verseNum = refParts.length > 1
+                                ? int.tryParse(refParts[1])
+                                : null;
+
+                            Navigator.of(context).push(CupertinoPageRoute(
+                                builder: (_) => CommentaryHubScreen(
+                                      book: bookName,
+                                      chapter: chapterNum,
+                                      verse: verseNum,
+                                      verseText: data.verseOfTheDay.text,
+                                    )));
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        flex: 2,
+                        child: _PillButton(
+                          label: 'Share',
+                          filled: false,
+                          onPressed: () {
+                            ShareService.shareText(
+                                body:
+                                    '"${data.verseOfTheDay.text}" — ${data.verseOfTheDay.reference}');
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
           ),
 
           const SizedBox(height: 16),
@@ -366,7 +373,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     label: 'Watch',
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Media features coming in a future update')),
+                        const SnackBar(
+                            content: Text(
+                                'Media features coming in a future update')),
                       );
                     },
                   ),
@@ -378,7 +387,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     label: 'Listen',
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Media features coming in a future update')),
+                        const SnackBar(
+                            content: Text(
+                                'Media features coming in a future update')),
                       );
                     },
                   ),
@@ -394,9 +405,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
   }
 }
-
-
-
 
 // ── Reusable pill-shaped button used inside the action cluster ──────────
 class _PillButton extends StatelessWidget {
@@ -433,7 +441,8 @@ class _PillButton extends StatelessWidget {
           ),
           child: Text(
             label,
-            style: theme.textTheme.labelMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+            style: theme.textTheme.labelMedium
+                ?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
           ),
         ),
       );
@@ -447,14 +456,16 @@ class _PillButton extends StatelessWidget {
             side: BorderSide(
               color: Theme.of(context).brightness == Brightness.dark
                   ? gold.withValues(alpha: 0.55)
-                  : const Color(0xFF8C6300).withValues(alpha: 0.8), // Deeper bronze for sharper contrast
+                  : const Color(0xFF8C6300).withValues(
+                      alpha: 0.8), // Deeper bronze for sharper contrast
             ),
             shape: shape,
             padding: EdgeInsets.zero,
           ),
           child: Text(
             label,
-            style: theme.textTheme.labelMedium?.copyWith(color: gold, fontWeight: FontWeight.w500),
+            style: theme.textTheme.labelMedium
+                ?.copyWith(color: gold, fontWeight: FontWeight.w500),
           ),
         ),
       );
@@ -510,5 +521,3 @@ class _PillGlassButton extends StatelessWidget {
     );
   }
 }
-
-

@@ -2,10 +2,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum ReadingViewMode { immersive, pinned }
+
 enum BackgroundGlowStyle { top, full }
+
 enum VerseActionStyle { classic, detached, horizontal, raindrop }
+
 enum ReadingLayout { single, interleaved, sideBySide, chips }
-enum GestureSensitivity { fluid, firm, instant }
 
 class ReadSettingsState {
   final ReadingViewMode readingViewMode;
@@ -22,7 +24,6 @@ class ReadSettingsState {
   final bool keepScreenAwake;
   final int defaultStartTab; // 0=Home, 1=Read, 2=Search, 3=Study
   final ReadingLayout readingLayout;
-  final GestureSensitivity gestureSensitivity;
 
   const ReadSettingsState({
     this.readingViewMode = ReadingViewMode.pinned,
@@ -39,7 +40,6 @@ class ReadSettingsState {
     this.keepScreenAwake = false,
     this.defaultStartTab = 0,
     this.readingLayout = ReadingLayout.single,
-    this.gestureSensitivity = GestureSensitivity.fluid,
   });
 
   ReadSettingsState copyWith({
@@ -57,7 +57,6 @@ class ReadSettingsState {
     bool? keepScreenAwake,
     int? defaultStartTab,
     ReadingLayout? readingLayout,
-    GestureSensitivity? gestureSensitivity,
   }) {
     return ReadSettingsState(
       readingViewMode: readingViewMode ?? this.readingViewMode,
@@ -65,28 +64,19 @@ class ReadSettingsState {
       isGlowEnabled: isGlowEnabled ?? this.isGlowEnabled,
       glowIntensity: glowIntensity ?? this.glowIntensity,
       verseActionStyle: verseActionStyle ?? this.verseActionStyle,
-      activeHighlightColorIndex: activeHighlightColorIndex ?? this.activeHighlightColorIndex,
-      primaryHighlightColorIndex: primaryHighlightColorIndex ?? this.primaryHighlightColorIndex,
-      secondaryHighlightColorIndex: secondaryHighlightColorIndex ?? this.secondaryHighlightColorIndex,
+      activeHighlightColorIndex:
+          activeHighlightColorIndex ?? this.activeHighlightColorIndex,
+      primaryHighlightColorIndex:
+          primaryHighlightColorIndex ?? this.primaryHighlightColorIndex,
+      secondaryHighlightColorIndex:
+          secondaryHighlightColorIndex ?? this.secondaryHighlightColorIndex,
       isManualNavHidden: isManualNavHidden ?? this.isManualNavHidden,
       isRedLetterEnabled: isRedLetterEnabled ?? this.isRedLetterEnabled,
       showVerseNumbers: showVerseNumbers ?? this.showVerseNumbers,
       keepScreenAwake: keepScreenAwake ?? this.keepScreenAwake,
       defaultStartTab: defaultStartTab ?? this.defaultStartTab,
       readingLayout: readingLayout ?? this.readingLayout,
-      gestureSensitivity: gestureSensitivity ?? this.gestureSensitivity,
     );
-  }
-
-  double get horizontalSwipeVelocityThreshold {
-    switch (gestureSensitivity) {
-      case GestureSensitivity.firm:
-        return 300.0;
-      case GestureSensitivity.fluid:
-        return 50.0;
-      case GestureSensitivity.instant:
-        return 10.0;
-    }
   }
 }
 
@@ -96,12 +86,14 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
   static const _isGlowEnabledKey = 'read_settings_is_glow_enabled';
   static const _glowIntensityKey = 'read_settings_glow_intensity';
   static const _verseActionStyleKey = 'read_settings_verse_action_style';
-  static const _activeHighlightColorIndexKey = 'read_settings_active_highlight_color';
-  static const _primaryHighlightColorIndexKey = 'read_settings_primary_highlight_color';
-  static const _secondaryHighlightColorIndexKey = 'read_settings_secondary_highlight_color';
+  static const _activeHighlightColorIndexKey =
+      'read_settings_active_highlight_color';
+  static const _primaryHighlightColorIndexKey =
+      'read_settings_primary_highlight_color';
+  static const _secondaryHighlightColorIndexKey =
+      'read_settings_secondary_highlight_color';
   static const _isManualNavHiddenKey = 'read_settings_is_manual_nav_hidden';
   static const _readingLayoutKey = 'read_settings_reading_layout';
-  static const _gestureSensitivityKey = 'read_settings_gesture_sensitivity';
 
   @override
   ReadSettingsState build() {
@@ -118,15 +110,15 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     final verseStyleString = prefs.getString(_verseActionStyleKey);
     final activeHighlightIndex = prefs.getInt(_activeHighlightColorIndexKey);
     final primaryHighlightIndex = prefs.getInt(_primaryHighlightColorIndexKey);
-    final secondaryHighlightIndex = prefs.getInt(_secondaryHighlightColorIndexKey);
+    final secondaryHighlightIndex =
+        prefs.getInt(_secondaryHighlightColorIndexKey);
     final isManualNavHidden = prefs.getBool(_isManualNavHiddenKey) ?? false;
     final isRedLetterEnabled = prefs.getBool('red_letter_enabled') ?? true;
     final showVerseNumbers = prefs.getBool('show_verse_numbers') ?? true;
     final keepScreenAwake = prefs.getBool('keep_screen_awake') ?? false;
     final defaultStartTab = prefs.getInt('default_start_tab') ?? 0;
     final layoutString = prefs.getString(_readingLayoutKey);
-    final gestureString = prefs.getString(_gestureSensitivityKey);
-    
+
     ReadingViewMode mode = ReadingViewMode.pinned;
     if (modeString != null) {
       mode = ReadingViewMode.values.firstWhere(
@@ -142,7 +134,7 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
         orElse: () => BackgroundGlowStyle.top,
       );
     }
-    
+
     VerseActionStyle verseStyle = VerseActionStyle.horizontal;
     if (verseStyleString != null) {
       verseStyle = VerseActionStyle.values.firstWhere(
@@ -158,15 +150,7 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
         orElse: () => ReadingLayout.single,
       );
     }
-    
-    GestureSensitivity gesture = GestureSensitivity.fluid;
-    if (gestureString != null) {
-      gesture = GestureSensitivity.values.firstWhere(
-        (e) => e.name == gestureString,
-        orElse: () => GestureSensitivity.fluid,
-      );
-    }
-    
+
     state = state.copyWith(
       readingViewMode: mode,
       backgroundGlowStyle: glowStyle,
@@ -182,7 +166,6 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
       keepScreenAwake: keepScreenAwake,
       defaultStartTab: defaultStartTab,
       readingLayout: layout,
-      gestureSensitivity: gesture,
     );
   }
 
@@ -193,7 +176,11 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
   }
 
   Future<void> setReadingViewMode(ReadingViewMode mode) async {
-    state = state.copyWith(readingViewMode: mode, isManualNavHidden: mode == ReadingViewMode.immersive ? false : state.isManualNavHidden);
+    state = state.copyWith(
+        readingViewMode: mode,
+        isManualNavHidden: mode == ReadingViewMode.immersive
+            ? false
+            : state.isManualNavHidden);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_readingViewModeKey, mode.name);
     if (mode == ReadingViewMode.immersive) {
@@ -272,12 +259,8 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('default_start_tab', index);
   }
-
-  Future<void> setGestureSensitivity(GestureSensitivity mode) async {
-    state = state.copyWith(gestureSensitivity: mode);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_gestureSensitivityKey, mode.name);
-  }
 }
 
-final readSettingsProvider = NotifierProvider<ReadSettingsNotifier, ReadSettingsState>(ReadSettingsNotifier.new);
+final readSettingsProvider =
+    NotifierProvider<ReadSettingsNotifier, ReadSettingsState>(
+        ReadSettingsNotifier.new);

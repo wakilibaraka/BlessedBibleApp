@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SearchSettingsState {
   final bool autoOpenSingleSearchResult;
-  
+
   const SearchSettingsState({
     this.autoOpenSingleSearchResult = true,
   });
@@ -35,4 +35,6 @@ class SearchSettingsNotifier extends Notifier<SearchSettingsState> {
   }
 }
 
-final searchSettingsProvider = NotifierProvider<SearchSettingsNotifier, SearchSettingsState>(SearchSettingsNotifier.new);
+final searchSettingsProvider =
+    NotifierProvider<SearchSettingsNotifier, SearchSettingsState>(
+        SearchSettingsNotifier.new);

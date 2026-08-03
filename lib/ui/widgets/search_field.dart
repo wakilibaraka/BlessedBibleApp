@@ -29,11 +29,13 @@ class SearchField extends StatelessWidget {
           contentPadding: const EdgeInsets.symmetric(vertical: 14),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(24),
-            borderSide: BorderSide(color: theme.dividerTheme.color ?? Colors.grey),
+            borderSide:
+                BorderSide(color: theme.dividerTheme.color ?? Colors.grey),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(24),
-            borderSide: BorderSide(color: theme.dividerTheme.color ?? Colors.grey),
+            borderSide:
+                BorderSide(color: theme.dividerTheme.color ?? Colors.grey),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(24),

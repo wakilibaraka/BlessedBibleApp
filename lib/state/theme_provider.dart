@@ -3,13 +3,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum AppThemeMode { automatic, light, dark, sepia, oled, dawn, dusk, fresh, lilies, roses, olives, priestlyPurple, galileeBlue, scarletRed }
+enum AppThemeMode {
+  automatic,
+  light,
+  dark,
+  sepia,
+  oled,
+  dawn,
+  dusk,
+  fresh,
+  lilies,
+  roses,
+  olives,
+  priestlyPurple,
+  galileeBlue,
+  scarletRed
+}
 
 extension AppThemeModeExtension on AppThemeMode {
   AppThemeMode resolve(BuildContext context) {
     if (this == AppThemeMode.automatic) {
-      return Theme.of(context).brightness == Brightness.dark 
-          ? AppThemeMode.dark 
+      return Theme.of(context).brightness == Brightness.dark
+          ? AppThemeMode.dark
           : AppThemeMode.light;
     }
     return this;
@@ -36,23 +51,27 @@ class ThemeNotifier extends Notifier<AppThemeMode> {
   @override
   AppThemeMode build() {
     _loadTheme();
-    
+
     ref.onDispose(() {
       _timeWatcher?.cancel();
     });
-    
+
     return AppThemeMode.sepia;
   }
 
   Future<void> _loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
-    
+
     final lockedIndex = prefs.getInt(_lockedThemeKey);
-    if (lockedIndex != null && lockedIndex >= 0 && lockedIndex < AppThemeMode.values.length) {
+    if (lockedIndex != null &&
+        lockedIndex >= 0 &&
+        lockedIndex < AppThemeMode.values.length) {
       _lockedTheme = AppThemeMode.values[lockedIndex];
     } else {
       final oldIndex = prefs.getInt(_themeKey);
-      if (oldIndex != null && oldIndex >= 0 && oldIndex < AppThemeMode.values.length) {
+      if (oldIndex != null &&
+          oldIndex >= 0 &&
+          oldIndex < AppThemeMode.values.length) {
         _lockedTheme = AppThemeMode.values[oldIndex];
       }
     }
@@ -70,7 +89,9 @@ class ThemeNotifier extends Notifier<AppThemeMode> {
       await prefs.setInt(_engineModeKey, _engineMode.index);
     } else {
       final savedEngine = prefs.getInt(_engineModeKey);
-      if (savedEngine != null && savedEngine >= 0 && savedEngine < ThemeEngineMode.values.length) {
+      if (savedEngine != null &&
+          savedEngine >= 0 &&
+          savedEngine < ThemeEngineMode.values.length) {
         _engineMode = ThemeEngineMode.values[savedEngine];
       }
     }
@@ -140,7 +161,8 @@ class ThemeNotifier extends Notifier<AppThemeMode> {
   }
 }
 
-final themeProvider = NotifierProvider<ThemeNotifier, AppThemeMode>(ThemeNotifier.new);
+final themeProvider =
+    NotifierProvider<ThemeNotifier, AppThemeMode>(ThemeNotifier.new);
 
 final engineModeProvider = Provider<ThemeEngineMode>((ref) {
   ref.watch(themeProvider);

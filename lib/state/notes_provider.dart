@@ -18,7 +18,9 @@ class NotesNotifier extends Notifier<List<PersonalNote>> {
     if (json == null) return [];
     try {
       final list = jsonDecode(json) as List;
-      return list.map((e) => PersonalNote.fromJson(e as Map<String, dynamic>)).toList();
+      return list
+          .map((e) => PersonalNote.fromJson(e as Map<String, dynamic>))
+          .toList();
     } catch (_) {
       return [];
     }
@@ -49,4 +51,5 @@ class NotesNotifier extends Notifier<List<PersonalNote>> {
   }
 }
 
-final notesProvider = NotifierProvider<NotesNotifier, List<PersonalNote>>(NotesNotifier.new);
+final notesProvider =
+    NotifierProvider<NotesNotifier, List<PersonalNote>>(NotesNotifier.new);

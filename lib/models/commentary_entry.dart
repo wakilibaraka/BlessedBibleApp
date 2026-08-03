@@ -67,14 +67,15 @@ class CommentaryEntry {
     final author = json['author'] as String? ?? 'Unknown';
     final source = json['source'] as String? ?? '';
     final text = json['text'] as String? ?? '';
-    
+
     final scopeMap = json['scope'] as Map<String, dynamic>? ?? {};
     final scope = CommentaryScope.fromJson(scopeMap);
-    
+
     String id = json['id'] as String? ?? '';
     if (id.isEmpty) {
       // Generate stable ID if missing using hashCode of key fields
-      id = '${author.hashCode ^ scope.toJson().toString().hashCode ^ text.hashCode}';
+      id =
+          '${author.hashCode ^ scope.toJson().toString().hashCode ^ text.hashCode}';
     }
 
     return CommentaryEntry(

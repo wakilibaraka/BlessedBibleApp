@@ -49,23 +49,22 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
       duration: const Duration(milliseconds: 500),
     );
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-          parent: _animationController, curve: Curves.easeOutCubic),
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic),
     );
     _slideAnimation =
-        Tween<Offset>(begin: const Offset(0.0, 0.06), end: Offset.zero)
-            .animate(CurvedAnimation(
+        Tween<Offset>(begin: const Offset(0.0, 0.06), end: Offset.zero).animate(
+            CurvedAnimation(
                 parent: _animationController, curve: Curves.easeOutCubic));
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      
+
       final prefs = ref.read(preferencesProvider);
       final seenHints = prefs.getSeenHints();
       if (!seenHints.contains('search_swipe_hint')) {
         setState(() => _showSwipeHint = true);
       }
-      
+
       _animationController.forward();
       _focusTimer = Timer(const Duration(milliseconds: 150), () {
         if (mounted) _focusNode.requestFocus();
@@ -136,20 +135,20 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                   },
                   onPointerMove: (e) {
                     if (!_isDragging) return;
-                    
+
                     bool isAtTop = true;
                     if (_scrollController.hasClients) {
                       isAtTop = _scrollController.offset <= 16.0;
                     }
-                    
+
                     if (!isAtTop) return;
-                    
+
                     final dy = e.position.dy - _dragStartY;
                     if (dy < -10) {
                       _isDragging = false;
                       return;
                     }
-                    
+
                     if (dy > 40) {
                       _isDragging = false;
                       if (!_focusNode.hasFocus) {
@@ -169,257 +168,260 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                   onPointerCancel: (e) => _isDragging = false,
                   child: Column(
                     children: [
-                    const SizedBox(height: 24),
+                      const SizedBox(height: 24),
 
-                    // ── Search bar + filter chips ─────────────────────────
-                    Padding(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 24.0),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(32),
-                          boxShadow: [
-                            if (isGlassy)
-                              BoxShadow(
-                                color: theme.primaryColor.withValues(
-                                  alpha: _focusNode.hasFocus ? 0.35 : 0.15,
+                      // ── Search bar + filter chips ─────────────────────────
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(32),
+                            boxShadow: [
+                              if (isGlassy)
+                                BoxShadow(
+                                  color: theme.primaryColor.withValues(
+                                    alpha: _focusNode.hasFocus ? 0.35 : 0.15,
+                                  ),
+                                  blurRadius: _focusNode.hasFocus ? 32 : 16,
+                                  spreadRadius: _focusNode.hasFocus ? 4 : 0,
+                                  offset: _focusNode.hasFocus
+                                      ? const Offset(0, 8)
+                                      : const Offset(0, 4),
                                 ),
-                                blurRadius: _focusNode.hasFocus ? 32 : 16,
-                                spreadRadius: _focusNode.hasFocus ? 4 : 0,
-                                offset: _focusNode.hasFocus
-                                    ? const Offset(0, 8)
-                                    : const Offset(0, 4),
-                              ),
-                          ],
-                        ),
-                        child: TexturedGlassContainer(
-                          borderRadius: BorderRadius.circular(32),
-                          padding: EdgeInsets.zero,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // Top: Search input
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0, vertical: 8.0),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.search_rounded,
-                                      color: theme.colorScheme.onSurface
-                                          .withValues(alpha: 0.6),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: TextField(
-                                        controller: _controller,
-                                        focusNode: _focusNode,
-                                        onChanged: (val) {
-                                          ref
-                                              .read(searchStateProvider
-                                                  .notifier)
-                                              .setQuery(val);
-                                          _debounceTimer?.cancel();
-                                          _debounceTimer = Timer(
-                                            const Duration(
-                                                milliseconds: 500),
-                                            () {
-                                              if (!mounted) return;
-                                              final s = ref
-                                                  .read(searchStateProvider);
-                                              final settings = ref.read(
-                                                  searchSettingsProvider);
-                                              if (settings
-                                                      .autoOpenSingleSearchResult &&
-                                                  s.results.length == 1) {
-                                                _onResultTap(
-                                                    s.results.first);
-                                              }
-                                            },
-                                          );
-                                        },
-                                        onSubmitted: (val) {
-                                          final results = ref
-                                              .read(searchStateProvider)
-                                              .results;
-                                          if (results.isNotEmpty) {
-                                            _onResultTap(results.first);
-                                          }
-                                        },
-                                        style: theme.textTheme.titleMedium,
-                                        decoration: InputDecoration(
-                                          hintText:
-                                              'Search verses, commentary…',
-                                          hintStyle: theme
-                                              .textTheme.titleMedium
-                                              ?.copyWith(
-                                            color: theme
-                                                .colorScheme.onSurface
-                                                .withValues(alpha: 0.4),
-                                          ),
-                                          border: InputBorder.none,
-                                        ),
-                                      ),
-                                    ),
-                                    if (_controller.text.isNotEmpty)
-                                      GestureDetector(
-                                        onTap: () {
-                                          _controller.clear();
-                                          ref
-                                              .read(searchStateProvider
-                                                  .notifier)
-                                              .setQuery('');
-                                        },
-                                        child: Icon(
-                                          Icons.close_rounded,
-                                          size: 20,
-                                          color: theme.colorScheme.onSurface
-                                              .withValues(alpha: 0.5),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-
-                              // Divider
-                              Divider(
-                                height: 1,
-                                color: theme.colorScheme.onSurface
-                                    .withValues(alpha: 0.08),
-                              ),
-
-                              // Filter chips row
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0, vertical: 10.0),
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
+                            ],
+                          ),
+                          child: TexturedGlassContainer(
+                            borderRadius: BorderRadius.circular(32),
+                            padding: EdgeInsets.zero,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // Top: Search input
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16.0, vertical: 8.0),
                                   child: Row(
-                                    mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      _buildFilterChip(
-                                        label: 'OT',
-                                        icon: Icons.history_edu_rounded,
-                                        isActive: searchState.filterOt,
-                                        onTap: () => ref
-                                            .read(
-                                                searchStateProvider.notifier)
-                                            .toggleOtFilter(),
-                                        theme: theme,
+                                      Icon(
+                                        Icons.search_rounded,
+                                        color: theme.colorScheme.onSurface
+                                            .withValues(alpha: 0.6),
                                       ),
-                                      const SizedBox(width: 8),
-                                      _buildFilterChip(
-                                        label: 'NT',
-                                        icon: Icons.menu_book_rounded,
-                                        isActive: searchState.filterNt,
-                                        onTap: () => ref
-                                            .read(
-                                                searchStateProvider.notifier)
-                                            .toggleNtFilter(),
-                                        theme: theme,
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: TextField(
+                                          controller: _controller,
+                                          focusNode: _focusNode,
+                                          onChanged: (val) {
+                                            ref
+                                                .read(searchStateProvider
+                                                    .notifier)
+                                                .setQuery(val);
+                                            _debounceTimer?.cancel();
+                                            _debounceTimer = Timer(
+                                              const Duration(milliseconds: 500),
+                                              () {
+                                                if (!mounted) return;
+                                                final s = ref
+                                                    .read(searchStateProvider);
+                                                final settings = ref.read(
+                                                    searchSettingsProvider);
+                                                if (settings
+                                                        .autoOpenSingleSearchResult &&
+                                                    s.results.length == 1) {
+                                                  _onResultTap(s.results.first);
+                                                }
+                                              },
+                                            );
+                                          },
+                                          onSubmitted: (val) {
+                                            final results = ref
+                                                .read(searchStateProvider)
+                                                .results;
+                                            if (results.isNotEmpty) {
+                                              _onResultTap(results.first);
+                                            }
+                                          },
+                                          style: theme.textTheme.titleMedium,
+                                          decoration: InputDecoration(
+                                            hintText:
+                                                'Search verses, commentary…',
+                                            hintStyle: theme
+                                                .textTheme.titleMedium
+                                                ?.copyWith(
+                                              color: theme.colorScheme.onSurface
+                                                  .withValues(alpha: 0.4),
+                                            ),
+                                            border: InputBorder.none,
+                                          ),
+                                        ),
                                       ),
-                                      const SizedBox(width: 8),
-                                      _buildFilterChip(
-                                        label: 'Commentary',
-                                        icon: Icons.library_books_rounded,
-                                        isActive:
-                                            searchState.filterCommentary,
-                                        onTap: () => ref
-                                            .read(
-                                                searchStateProvider.notifier)
-                                            .toggleCommentaryFilter(),
-                                        theme: theme,
-                                      ),
-                                      const SizedBox(width: 8),
-                                      _buildFilterChip(
-                                        label: 'My Notes',
-                                        icon: Icons.sticky_note_2_outlined,
-                                        isActive: searchState.filterNotes,
-                                        onTap: () => ref
-                                            .read(
-                                                searchStateProvider.notifier)
-                                            .toggleNotesFilter(),
-                                        theme: theme,
-                                      ),
+                                      if (_controller.text.isNotEmpty)
+                                        GestureDetector(
+                                          onTap: () {
+                                            _controller.clear();
+                                            ref
+                                                .read(searchStateProvider
+                                                    .notifier)
+                                                .setQuery('');
+                                          },
+                                          child: Icon(
+                                            Icons.close_rounded,
+                                            size: 20,
+                                            color: theme.colorScheme.onSurface
+                                                .withValues(alpha: 0.5),
+                                          ),
+                                        ),
                                     ],
                                   ),
                                 ),
-                              ),
-                            ],
+
+                                // Divider
+                                Divider(
+                                  height: 1,
+                                  color: theme.colorScheme.onSurface
+                                      .withValues(alpha: 0.08),
+                                ),
+
+                                // Filter chips row
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16.0, vertical: 10.0),
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        _buildFilterChip(
+                                          label: 'OT',
+                                          icon: Icons.history_edu_rounded,
+                                          isActive: searchState.filterOt,
+                                          onTap: () => ref
+                                              .read(
+                                                  searchStateProvider.notifier)
+                                              .toggleOtFilter(),
+                                          theme: theme,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        _buildFilterChip(
+                                          label: 'NT',
+                                          icon: Icons.menu_book_rounded,
+                                          isActive: searchState.filterNt,
+                                          onTap: () => ref
+                                              .read(
+                                                  searchStateProvider.notifier)
+                                              .toggleNtFilter(),
+                                          theme: theme,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        _buildFilterChip(
+                                          label: 'Commentary',
+                                          icon: Icons.library_books_rounded,
+                                          isActive:
+                                              searchState.filterCommentary,
+                                          onTap: () => ref
+                                              .read(
+                                                  searchStateProvider.notifier)
+                                              .toggleCommentaryFilter(),
+                                          theme: theme,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        _buildFilterChip(
+                                          label: 'My Notes',
+                                          icon: Icons.sticky_note_2_outlined,
+                                          isActive: searchState.filterNotes,
+                                          onTap: () => ref
+                                              .read(
+                                                  searchStateProvider.notifier)
+                                              .toggleNotesFilter(),
+                                          theme: theme,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
 
-                    const SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
-                    // ── Results ────────────────────────────────────────────
-                    Expanded(
-                      child: Stack(
-                        children: [
-                              searchState.query.isEmpty
-                                  ? _buildRecentPlaces(searchState, theme)
-                                  : _buildSearchResults(searchState, theme),
-                              Positioned(
-                                top: 16,
-                                left: 0,
-                                right: 0,
-                                child: IgnorePointer(
-                                  child: AnimatedOpacity(
-                                    duration: const Duration(milliseconds: 300),
-                                    opacity: _showSwipeHint ? 1.0 : 0.0,
-                                    child: Center(
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                        decoration: BoxDecoration(
-                                          color: theme.colorScheme.surface.withValues(alpha: isGlassy ? 0.7 : 1.0),
-                                          borderRadius: BorderRadius.circular(20),
-                                          border: Border.all(
-                                            color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                      // ── Results ────────────────────────────────────────────
+                      Expanded(
+                        child: Stack(
+                          children: [
+                            searchState.query.isEmpty
+                                ? _buildRecentPlaces(searchState, theme)
+                                : _buildSearchResults(searchState, theme),
+                            Positioned(
+                              top: 16,
+                              left: 0,
+                              right: 0,
+                              child: IgnorePointer(
+                                child: AnimatedOpacity(
+                                  duration: const Duration(milliseconds: 300),
+                                  opacity: _showSwipeHint ? 1.0 : 0.0,
+                                  child: Center(
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 8),
+                                      decoration: BoxDecoration(
+                                        color: theme.colorScheme.surface
+                                            .withValues(
+                                                alpha: isGlassy ? 0.7 : 1.0),
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(
+                                          color: theme.colorScheme.onSurface
+                                              .withValues(alpha: 0.1),
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black
+                                                .withValues(alpha: 0.05),
+                                            blurRadius: 10,
+                                          )
+                                        ],
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                              Icons.keyboard_arrow_down_rounded,
+                                              size: 16,
+                                              color: theme.colorScheme.onSurface
+                                                  .withValues(alpha: 0.6)),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            'Swipe down for keyboard',
+                                            style: theme.textTheme.labelMedium
+                                                ?.copyWith(
+                                              color: theme.colorScheme.onSurface
+                                                  .withValues(alpha: 0.6),
+                                            ),
                                           ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withValues(alpha: 0.05),
-                                              blurRadius: 10,
-                                            )
-                                          ],
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(
-                                              Icons.keyboard_arrow_down_rounded, 
-                                              size: 16, 
-                                              color: theme.colorScheme.onSurface.withValues(alpha: 0.6)
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              'Swipe down for keyboard',
-                                              style: theme.textTheme.labelMedium?.copyWith(
-                                                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                        ],
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   // ── Filter chip ────────────────────────────────────────────────────────
   Widget _buildFilterChip({
@@ -433,8 +435,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
           color: isActive ? theme.primaryColor : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
@@ -458,8 +459,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
             Text(
               label,
               style: theme.textTheme.labelMedium?.copyWith(
-                fontWeight:
-                    isActive ? FontWeight.bold : FontWeight.normal,
+                fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
                 color: isActive
                     ? theme.colorScheme.surface
                     : theme.colorScheme.onSurface,
@@ -491,8 +491,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
               'Search the Bible, commentary\nand your notes',
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color:
-                    theme.colorScheme.onSurface.withValues(alpha: 0.45),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.45),
                 height: 1.6,
               ),
             ),
@@ -500,40 +499,38 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
         ),
       );
     }
-    
+
     return ListView(
       controller: _scrollController,
-      padding: const EdgeInsets.symmetric(
-          horizontal: 24.0, vertical: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
       children: [
         if (state.recentPlaces.isNotEmpty) ...[
           Text(
             'RECENT',
             style: theme.textTheme.labelSmall?.copyWith(
-              color:
-                  theme.colorScheme.onSurface.withValues(alpha: 0.5),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
               fontWeight: FontWeight.bold,
               letterSpacing: 1.2,
             ),
           ),
           const SizedBox(height: 12),
-          ...state.recentPlaces
-              .map((place) => _buildResultItem(place, theme)),
+          ...state.recentPlaces.map((place) => _buildResultItem(place, theme)),
           const SizedBox(height: 24),
         ],
         if (showMostRead) ...[
           Text(
             'MOST READ',
             style: theme.textTheme.labelSmall?.copyWith(
-              color:
-                  theme.colorScheme.onSurface.withValues(alpha: 0.5),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
               fontWeight: FontWeight.bold,
               letterSpacing: 1.2,
             ),
           ),
           const SizedBox(height: 12),
           // take top 5
-          ...mostRead.take(5).map((m) => _buildResultItem(m.toSearchResult(), theme)),
+          ...mostRead
+              .take(5)
+              .map((m) => _buildResultItem(m.toSearchResult(), theme)),
         ]
       ],
     );
@@ -564,8 +561,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
             Text(
               'No results found',
               style: theme.textTheme.bodyLarge?.copyWith(
-                color:
-                    theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
               ),
             ),
           ],
@@ -576,20 +572,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     final referenceResults = state.results
         .where((r) => r.type == SearchResultType.reference)
         .toList();
-    final bibleResults = state.results
-        .where((r) => r.type == SearchResultType.bible)
-        .toList();
+    final bibleResults =
+        state.results.where((r) => r.type == SearchResultType.bible).toList();
     final commentaryResults = state.results
         .where((r) => r.type == SearchResultType.commentary)
         .toList();
-    final noteResults = state.results
-        .where((r) => r.type == SearchResultType.note)
-        .toList();
+    final noteResults =
+        state.results.where((r) => r.type == SearchResultType.note).toList();
 
     return ListView(
       controller: _scrollController,
-      padding: const EdgeInsets.symmetric(
-          horizontal: 24.0, vertical: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
       children: [
         if (referenceResults.isNotEmpty) ...[
           _buildSectionHeader('JUMP TO', theme),
@@ -599,8 +592,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
         ],
         if (bibleResults.isNotEmpty) ...[
           _buildSectionHeader('VERSES', theme),
-          ...bibleResults
-              .map((r) => _buildResultItem(r, theme, state.query)),
+          ...bibleResults.map((r) => _buildResultItem(r, theme, state.query)),
           const SizedBox(height: 12),
         ],
         if (commentaryResults.isNotEmpty) ...[
@@ -611,8 +603,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
         ],
         if (noteResults.isNotEmpty) ...[
           _buildSectionHeader('MY NOTES', theme),
-          ...noteResults
-              .map((r) => _buildResultItem(r, theme, state.query)),
+          ...noteResults.map((r) => _buildResultItem(r, theme, state.query)),
           const SizedBox(height: 12),
         ],
         // Bottom padding so last result is above nav bar
@@ -690,8 +681,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     );
   }
 
-  Widget _buildSnippet(
-      String text, String query, ThemeData theme) {
+  Widget _buildSnippet(String text, String query, ThemeData theme) {
     final style = theme.textTheme.bodyMedium?.copyWith(
       color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
       height: 1.5,
@@ -711,10 +701,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
           style: style, maxLines: 2, overflow: TextOverflow.ellipsis);
     }
 
-    final highlightColor =
-        theme.brightness == Brightness.dark
-            ? Colors.amberAccent
-            : Colors.amber.shade800;
+    final highlightColor = theme.brightness == Brightness.dark
+        ? Colors.amberAccent
+        : Colors.amber.shade800;
     final highlightStyle = style?.copyWith(
       color: highlightColor,
       fontWeight: FontWeight.bold,

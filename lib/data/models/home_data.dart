@@ -13,7 +13,8 @@ class HomeData {
     required this.mostReadVerses,
   });
 
-  bool get isEmpty => activeStudy == null && recentNotes.isEmpty && mostReadVerses.isEmpty;
+  bool get isEmpty =>
+      activeStudy == null && recentNotes.isEmpty && mostReadVerses.isEmpty;
 }
 
 class VerseOfTheDay {

@@ -40,7 +40,7 @@ class BookmarksNotifier extends Notifier<Set<String>> {
     final b = prefs.getBookmarks().toSet();
     final f = prefs.getFavorites().toSet();
     final merged = {...b, ...f};
-    
+
     if (merged.length > b.length) {
       Future.microtask(() => prefs.saveBookmarks(merged.toList()));
     }
@@ -57,9 +57,8 @@ class BookmarksNotifier extends Notifier<Set<String>> {
   }
 }
 
-final bookmarksProvider = NotifierProvider<BookmarksNotifier, Set<String>>(BookmarksNotifier.new);
-
-
+final bookmarksProvider =
+    NotifierProvider<BookmarksNotifier, Set<String>>(BookmarksNotifier.new);
 
 const bool kHighlightDebug = false;
 
@@ -68,7 +67,7 @@ class HighlightsNotifier extends Notifier<Map<String, int>> {
   Map<String, int> build() {
     final prefs = ref.watch(preferencesProvider);
     final data = prefs.getHighlights();
-    
+
     bool needsCleanup = false;
     final keysToRemove = <String>[];
     for (final key in data.keys) {
@@ -78,7 +77,7 @@ class HighlightsNotifier extends Notifier<Map<String, int>> {
         needsCleanup = true;
       }
     }
-    
+
     if (needsCleanup) {
       for (final key in keysToRemove) {
         data.remove(key);
@@ -87,22 +86,28 @@ class HighlightsNotifier extends Notifier<Map<String, int>> {
     }
 
     if (kHighlightDebug) {
-      debugPrint('[HIGHLIGHT_DEBUG] NOTIFIER init: loaded ${data.length} highlights');
+      debugPrint(
+          '[HIGHLIGHT_DEBUG] NOTIFIER init: loaded ${data.length} highlights');
     }
     return data;
   }
 
   void toggleHighlight(String reference, int colorIndex) {
     if (kHighlightDebug) {
-      debugPrint('[HIGHLIGHT_DEBUG] NOTIFIER toggleHighlight called: ref=$reference, color=$colorIndex');
+      debugPrint(
+          '[HIGHLIGHT_DEBUG] NOTIFIER toggleHighlight called: ref=$reference, color=$colorIndex');
     }
     final current = Map<String, int>.from(state);
     if (current.containsKey(reference) && current[reference] == colorIndex) {
       current.remove(reference);
-      if (kHighlightDebug) debugPrint('[HIGHLIGHT_DEBUG] NOTIFIER removing highlight for $reference');
+      if (kHighlightDebug)
+        debugPrint(
+            '[HIGHLIGHT_DEBUG] NOTIFIER removing highlight for $reference');
     } else {
       current[reference] = colorIndex;
-      if (kHighlightDebug) debugPrint('[HIGHLIGHT_DEBUG] NOTIFIER adding highlight for $reference -> $colorIndex');
+      if (kHighlightDebug)
+        debugPrint(
+            '[HIGHLIGHT_DEBUG] NOTIFIER adding highlight for $reference -> $colorIndex');
     }
     state = current;
     ref.read(preferencesProvider).saveHighlights(current);
@@ -113,7 +118,8 @@ class HighlightsNotifier extends Notifier<Map<String, int>> {
 
   void removeHighlight(String reference) {
     if (kHighlightDebug) {
-      debugPrint('[HIGHLIGHT_DEBUG] NOTIFIER removeHighlight called: ref=$reference');
+      debugPrint(
+          '[HIGHLIGHT_DEBUG] NOTIFIER removeHighlight called: ref=$reference');
     }
     final current = Map<String, int>.from(state);
     if (current.containsKey(reference)) {
@@ -121,10 +127,13 @@ class HighlightsNotifier extends Notifier<Map<String, int>> {
       state = current;
       ref.read(preferencesProvider).saveHighlights(current);
       if (kHighlightDebug) {
-        debugPrint('[HIGHLIGHT_DEBUG] NOTIFIER map after remove write: $current');
+        debugPrint(
+            '[HIGHLIGHT_DEBUG] NOTIFIER map after remove write: $current');
       }
     }
   }
 }
 
-final highlightsProvider = NotifierProvider<HighlightsNotifier, Map<String, int>>(HighlightsNotifier.new);
+final highlightsProvider =
+    NotifierProvider<HighlightsNotifier, Map<String, int>>(
+        HighlightsNotifier.new);

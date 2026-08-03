@@ -21,7 +21,8 @@ class BouncyEntrance extends StatefulWidget {
   State<BouncyEntrance> createState() => _BouncyEntranceState();
 }
 
-class _BouncyEntranceState extends State<BouncyEntrance> with SingleTickerProviderStateMixin {
+class _BouncyEntranceState extends State<BouncyEntrance>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
   late Animation<Offset> _slideAnimation;
@@ -46,7 +47,8 @@ class _BouncyEntranceState extends State<BouncyEntrance> with SingleTickerProvid
       ),
     );
 
-    _slideAnimation = Tween<Offset>(begin: const Offset(0, 0.10), end: Offset.zero).animate(
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.10), end: Offset.zero).animate(
       CurvedAnimation(
         parent: _controller,
         curve: Curves.easeOutBack,

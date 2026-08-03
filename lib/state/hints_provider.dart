@@ -26,7 +26,7 @@ class HintsNotifier extends Notifier<Set<String>> {
       markSeen(hintId);
     }
   }
-  
+
   void resetHints() {
     state = {};
     ref.read(preferencesProvider).saveSeenHints([]);

@@ -7,11 +7,11 @@ class RemindersState {
   final double? sabbathLat;
   final double? sabbathLng;
   final String? sabbathLocationName;
-  
+
   final bool dailyEnabled;
   final int dailyHour;
   final int dailyMinute;
-  
+
   final bool customWeeklyEnabled;
   final int customWeeklyDay;
   final int customWeeklyHour;
@@ -64,7 +64,7 @@ class RemindersNotifier extends Notifier<RemindersState> {
   @override
   RemindersState build() {
     final prefs = ref.watch(preferencesProvider);
-    
+
     // Initialize Notification Service on build
     ref.read(notificationServiceProvider).initialize();
 
@@ -103,7 +103,9 @@ class RemindersNotifier extends Notifier<RemindersState> {
 
   void _syncSabbathSchedule() {
     final ns = ref.read(notificationServiceProvider);
-    if (state.sabbathEnabled && state.sabbathLat != null && state.sabbathLng != null) {
+    if (state.sabbathEnabled &&
+        state.sabbathLat != null &&
+        state.sabbathLng != null) {
       ns.scheduleSabbathReminder(state.sabbathLat!, state.sabbathLng!);
     } else {
       ns.cancelSabbathReminders();
@@ -139,7 +141,10 @@ class RemindersNotifier extends Notifier<RemindersState> {
   }
 
   void setCustomWeeklyTime(int day, int hour, int minute) {
-    state = state.copyWith(customWeeklyDay: day, customWeeklyHour: hour, customWeeklyMinute: minute);
+    state = state.copyWith(
+        customWeeklyDay: day,
+        customWeeklyHour: hour,
+        customWeeklyMinute: minute);
     ref.read(preferencesProvider).setCustomWeeklyDay(day);
     ref.read(preferencesProvider).setCustomWeeklyHour(hour);
     ref.read(preferencesProvider).setCustomWeeklyMinute(minute);
@@ -149,11 +154,13 @@ class RemindersNotifier extends Notifier<RemindersState> {
   void _syncWeeklySchedule() {
     final ns = ref.read(notificationServiceProvider);
     if (state.customWeeklyEnabled) {
-      ns.scheduleWeeklyReminder(state.customWeeklyDay, state.customWeeklyHour, state.customWeeklyMinute);
+      ns.scheduleWeeklyReminder(state.customWeeklyDay, state.customWeeklyHour,
+          state.customWeeklyMinute);
     } else {
       ns.cancelWeeklyReminder();
     }
   }
 }
 
-final remindersProvider = NotifierProvider<RemindersNotifier, RemindersState>(RemindersNotifier.new);
+final remindersProvider =
+    NotifierProvider<RemindersNotifier, RemindersState>(RemindersNotifier.new);

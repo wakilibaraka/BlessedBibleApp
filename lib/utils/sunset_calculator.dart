@@ -17,12 +17,16 @@ class SunsetCalculator {
 
     // 4. calculate the Sun's true longitude
     // math.sin uses radians
-    double L = M + (1.916 * math.sin(M * math.pi / 180.0)) + (0.020 * math.sin(2 * M * math.pi / 180.0)) + 282.634;
+    double L = M +
+        (1.916 * math.sin(M * math.pi / 180.0)) +
+        (0.020 * math.sin(2 * M * math.pi / 180.0)) +
+        282.634;
     L = L % 360.0;
     if (L < 0) L += 360.0;
 
     // 5a. calculate the Sun's right ascension
-    double ra = (180.0 / math.pi) * math.atan(0.91764 * math.tan(L * math.pi / 180.0));
+    double ra =
+        (180.0 / math.pi) * math.atan(0.91764 * math.tan(L * math.pi / 180.0));
     ra = ra % 360.0;
     if (ra < 0) ra += 360.0;
 
@@ -41,7 +45,9 @@ class SunsetCalculator {
     // 7a. calculate the Sun's local hour angle
     // Zenith for official sunset is 90.8333 degrees
     double zenith = 90.8333;
-    double cosH = (math.cos(zenith * math.pi / 180.0) - (sinDec * math.sin(lat * math.pi / 180.0))) / (cosDec * math.cos(lat * math.pi / 180.0));
+    double cosH = (math.cos(zenith * math.pi / 180.0) -
+            (sinDec * math.sin(lat * math.pi / 180.0))) /
+        (cosDec * math.cos(lat * math.pi / 180.0));
 
     if (cosH > 1) {
       // The sun never rises on this location (on the specified date)
@@ -69,7 +75,8 @@ class SunsetCalculator {
     int sunsetMinute = ((ut - sunsetHour) * 60.0).round();
 
     // Create UTC DateTime and convert to local time
-    DateTime sunsetUtc = DateTime.utc(date.year, date.month, date.day, sunsetHour, sunsetMinute);
+    DateTime sunsetUtc =
+        DateTime.utc(date.year, date.month, date.day, sunsetHour, sunsetMinute);
     return sunsetUtc.toLocal();
   }
 

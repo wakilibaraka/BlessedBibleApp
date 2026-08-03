@@ -33,7 +33,8 @@ class BibleDatabaseService {
         }
         await Directory(dirname(dbPath)).create(recursive: true);
         final data = await rootBundle.load('assets/bible/$_dbName');
-        final bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+        final bytes =
+            data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
         await File(dbPath).writeAsBytes(bytes, flush: true);
         await prefs.setInt('db_version', requiredDbVersion);
       } catch (e) {
@@ -59,7 +60,8 @@ class BibleDatabaseService {
     return maps.map((map) => TranslationInfo.fromMap(map)).toList();
   }
 
-  Future<List<BibleVerse>> getChapter(String translationId, int bookNumber, int chapterNumber) async {
+  Future<List<BibleVerse>> getChapter(
+      String translationId, int bookNumber, int chapterNumber) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       'verses',
@@ -69,18 +71,22 @@ class BibleDatabaseService {
       orderBy: 'verse ASC',
     );
 
-    return maps.map((map) => BibleVerse(
-      number: map['verse'] as int,
-      text: map['text'] as String,
-    )).toList();
+    return maps
+        .map((map) => BibleVerse(
+              number: map['verse'] as int,
+              text: map['text'] as String,
+            ))
+        .toList();
   }
 
-  Future<BibleVerse?> getVerse(String translationId, int bookNumber, int chapterNumber, int verseNumber) async {
+  Future<BibleVerse?> getVerse(String translationId, int bookNumber,
+      int chapterNumber, int verseNumber) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       'verses',
       columns: ['verse', 'text'],
-      where: 'translation_id = ? AND book_number = ? AND chapter = ? AND verse = ?',
+      where:
+          'translation_id = ? AND book_number = ? AND chapter = ? AND verse = ?',
       whereArgs: [translationId, bookNumber, chapterNumber, verseNumber],
       limit: 1,
     );
@@ -100,7 +106,9 @@ class BibleDatabaseService {
       whereArgs: [translationId],
     );
   }
-  Future<void> insertTranslationPack(TranslationInfo info, List<Map<String, dynamic>> verses) async {
+
+  Future<void> insertTranslationPack(
+      TranslationInfo info, List<Map<String, dynamic>> verses) async {
     final db = await database;
     await db.transaction((txn) async {
       await txn.insert(
@@ -120,8 +128,10 @@ class BibleDatabaseService {
   Future<void> deleteTranslationPack(String translationId) async {
     final db = await database;
     await db.transaction((txn) async {
-      await txn.delete('verses', where: 'translation_id = ?', whereArgs: [translationId]);
-      await txn.delete('translations', where: 'translation_id = ?', whereArgs: [translationId]);
+      await txn.delete('verses',
+          where: 'translation_id = ?', whereArgs: [translationId]);
+      await txn.delete('translations',
+          where: 'translation_id = ?', whereArgs: [translationId]);
     });
     // Vacuum to reclaim space, but do it outside the transaction as it rewrites the DB
     await db.execute('VACUUM;');

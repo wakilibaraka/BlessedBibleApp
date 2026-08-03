@@ -12,17 +12,21 @@ class ShareService {
     required String bookName,
     required int chapterNumber,
     required List<int> verseNumbers,
-    required dynamic chapterData, // Expected to have a `.verses` list with `.text`
+    required dynamic
+        chapterData, // Expected to have a `.verses` list with `.text`
   }) {
     if (verseNumbers.isEmpty) return '';
     final sorted = verseNumbers.toList()..sort();
-    final texts = sorted.map((v) {
-      if (v - 1 >= 0 && v - 1 < chapterData.verses.length) {
-        final text = chapterData.verses[v - 1].text;
-        return sorted.length > 1 ? '$v. $text' : text;
-      }
-      return '';
-    }).where((t) => t.isNotEmpty).join(' ');
+    final texts = sorted
+        .map((v) {
+          if (v - 1 >= 0 && v - 1 < chapterData.verses.length) {
+            final text = chapterData.verses[v - 1].text;
+            return sorted.length > 1 ? '$v. $text' : text;
+          }
+          return '';
+        })
+        .where((t) => t.isNotEmpty)
+        .join(' ');
 
     String refStr;
     if (sorted.length == 1) {
@@ -50,7 +54,9 @@ class ShareService {
     await Clipboard.setData(ClipboardData(text: text));
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Copied to clipboard'), duration: Duration(seconds: 2)),
+        const SnackBar(
+            content: Text('Copied to clipboard'),
+            duration: Duration(seconds: 2)),
       );
     }
   }

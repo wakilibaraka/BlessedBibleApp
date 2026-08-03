@@ -12,6 +12,7 @@ int appWeekday(DateTime date) {
 
 // --- LEGACY FOR UI ---
 enum PlanStartMode { startToday, calendarYear }
+
 class PlanChapter {
   final String id = '';
   final String bookName;
@@ -31,9 +32,9 @@ class PlanPassage {
     );
   }
   Map<String, dynamic> toJson() => {
-    'label': label,
-    'refs': refs,
-  };
+        'label': label,
+        'refs': refs,
+      };
 }
 
 class PlanDayData {
@@ -42,22 +43,28 @@ class PlanDayData {
   final String title;
   final List<PlanPassage> passages;
 
-  PlanDayData({required this.day, required this.week, required this.title, required this.passages});
-  
+  PlanDayData(
+      {required this.day,
+      required this.week,
+      required this.title,
+      required this.passages});
+
   factory PlanDayData.fromJson(Map<String, dynamic> json) {
     return PlanDayData(
       day: json['day'] as int,
       week: json['week'] as int,
       title: json['title'] as String,
-      passages: (json['passages'] as List).map((e) => PlanPassage.fromJson(e)).toList(),
+      passages: (json['passages'] as List)
+          .map((e) => PlanPassage.fromJson(e))
+          .toList(),
     );
   }
   Map<String, dynamic> toJson() => {
-    'day': day,
-    'week': week,
-    'title': title,
-    'passages': passages.map((p) => p.toJson()).toList(),
-  };
+        'day': day,
+        'week': week,
+        'title': title,
+        'passages': passages.map((p) => p.toJson()).toList(),
+      };
 
   // --- LEGACY FOR UI ---
   List<PlanChapter> get chapters => [];
@@ -92,10 +99,12 @@ class ReadingPlanState {
   });
 
   bool get isActive => planStartedOn != null;
-  
-  bool get isComplete => planData.isNotEmpty && completedReadings.length >= planData.length;
-  
-  double get percentComplete => planData.isEmpty ? 0.0 : completedReadings.length / planData.length;
+
+  bool get isComplete =>
+      planData.isNotEmpty && completedReadings.length >= planData.length;
+
+  double get percentComplete =>
+      planData.isEmpty ? 0.0 : completedReadings.length / planData.length;
 
   int get oldestUnread {
     if (planData.isEmpty) return 1;
@@ -113,10 +122,11 @@ class ReadingPlanState {
       return oldestUnread;
     } else {
       // Mode A: scheduled
-      final s = DateTime.utc(planStartedOn!.year, planStartedOn!.month, planStartedOn!.day);
+      final s = DateTime.utc(
+          planStartedOn!.year, planStartedOn!.month, planStartedOn!.day);
       final now = DateTime.now();
       final t = DateTime.utc(now.year, now.month, now.day);
-      
+
       if (t.isBefore(s)) return 1;
 
       int elapsedReadingDays = 0;
@@ -127,15 +137,18 @@ class ReadingPlanState {
         }
         current = current.add(const Duration(days: 1));
       }
-      
+
       // If elapsedReadingDays is 0 (e.g. started today and today is a rest day), it's day 1
       return elapsedReadingDays.clamp(1, planData.length);
     }
   }
 
   Set<int> get missedDays {
-    if (paceMode == 'flexible' || planData.isEmpty || planStartedOn == null || isComplete) return {};
-    
+    if (paceMode == 'flexible' ||
+        planData.isEmpty ||
+        planStartedOn == null ||
+        isComplete) return {};
+
     final today = todayReadingDay;
     if (today == null) return {};
 
@@ -181,7 +194,7 @@ class ReadingPlanState {
   bool isDayComplete(int day) => completedReadings.contains(day);
   double get completionPercentage => percentComplete;
   bool get isPlanComplete => isComplete;
-  PlanStartMode get startMode => PlanStartMode.startToday; 
+  PlanStartMode get startMode => PlanStartMode.startToday;
   String getFormattedDateForDay(int day) => '';
 }
 
@@ -198,16 +211,19 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
 
   Future<void> _loadData(String targetPlanId) async {
     try {
-      final jsonString = await rootBundle.loadString('assets/reading_plans/chronological_1yr.json');
-      final Map<String, dynamic> decoded = await compute<String, Map<String, dynamic>>(
+      final jsonString = await rootBundle
+          .loadString('assets/reading_plans/chronological_1yr.json');
+      final Map<String, dynamic> decoded =
+          await compute<String, Map<String, dynamic>>(
         (s) => jsonDecode(s) as Map<String, dynamic>,
         jsonString,
       );
       final rawReadings = decoded['readings'] as List;
       final planData = rawReadings.map((e) => PlanDayData.fromJson(e)).toList();
 
-      final prefsState = ref.read(preferencesProvider).getReadingPlanState(targetPlanId);
-      
+      final prefsState =
+          ref.read(preferencesProvider).getReadingPlanState(targetPlanId);
+
       String planId = targetPlanId;
       DateTime? planStartedOn;
       String paceMode = 'scheduled';
@@ -223,7 +239,8 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
           completedReadings = list.map((e) => e as int).toSet();
         }
         if (prefsState['planStartedOn'] != null) {
-          planStartedOn = DateTime.tryParse(prefsState['planStartedOn'] as String);
+          planStartedOn =
+              DateTime.tryParse(prefsState['planStartedOn'] as String);
         }
         if (prefsState['paceMode'] != null) {
           paceMode = prefsState['paceMode'] as String;
@@ -246,8 +263,9 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
         final customPlan = ref.read(preferencesProvider).getCustomPlan(planId);
         if (customPlan != null) {
           final rawReadings = customPlan['readings'] as List;
-          finalPlanData = rawReadings.map((e) => PlanDayData.fromJson(e)).toList();
-          
+          finalPlanData =
+              rawReadings.map((e) => PlanDayData.fromJson(e)).toList();
+
           // Restore paceMode and restDay saved inside the plan definition
           if (customPlan.containsKey('paceMode')) {
             paceMode = customPlan['paceMode'] as String;
@@ -291,7 +309,11 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
     });
   }
 
-  void startPlan({String? planId, String paceMode = 'scheduled', int? restDay = 7, List<PlanDayData>? customPlanData}) {
+  void startPlan(
+      {String? planId,
+      String paceMode = 'scheduled',
+      int? restDay = 7,
+      List<PlanDayData>? customPlanData}) {
     final next = state.copyWith(
       planId: planId ?? _planId,
       planStartedOn: DateTime.now(),
@@ -302,7 +324,11 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
     );
     state = next;
     _saveToPrefs(next);
-    ref.read(notificationServiceProvider).syncReadingPlanReminder(next.reminderEnabled, next.reminderTimeHour, next.reminderTimeMinute, next.restDay);
+    ref.read(notificationServiceProvider).syncReadingPlanReminder(
+        next.reminderEnabled,
+        next.reminderTimeHour,
+        next.reminderTimeMinute,
+        next.restDay);
   }
 
   void markReadingComplete(int day) {
@@ -329,7 +355,11 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
     final next = state.copyWith(restDay: day);
     state = next;
     _saveToPrefs(next);
-    ref.read(notificationServiceProvider).syncReadingPlanReminder(next.reminderEnabled, next.reminderTimeHour, next.reminderTimeMinute, next.restDay);
+    ref.read(notificationServiceProvider).syncReadingPlanReminder(
+        next.reminderEnabled,
+        next.reminderTimeHour,
+        next.reminderTimeMinute,
+        next.restDay);
   }
 
   void restartPlan() {
@@ -352,8 +382,11 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
     );
     state = next;
     _saveToPrefs(next);
-    ref.read(notificationServiceProvider).syncReadingPlanReminder(enabled, hour, minute, next.restDay);
+    ref
+        .read(notificationServiceProvider)
+        .syncReadingPlanReminder(enabled, hour, minute, next.restDay);
   }
+
   void jumpToDay(int day) {}
   bool jumpToBook(String book) => false;
   int? findDayForPassage(String book, int chapter) => 1;
@@ -362,7 +395,8 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
   void markChapterComplete(PlanChapter c) {}
 }
 
-final readingPlanProvider = NotifierProvider.family<ReadingPlanNotifier, ReadingPlanState, String>(
+final readingPlanProvider =
+    NotifierProvider.family<ReadingPlanNotifier, ReadingPlanState, String>(
   (planId) => ReadingPlanNotifier(planId),
 );
 
@@ -387,18 +421,27 @@ class ActivePlanIdsNotifier extends Notifier<List<String>> {
     ref.read(preferencesProvider).saveActivePlanIds(next);
   }
 }
-final activePlanIdsProvider = NotifierProvider<ActivePlanIdsNotifier, List<String>>(ActivePlanIdsNotifier.new);
+
+final activePlanIdsProvider =
+    NotifierProvider<ActivePlanIdsNotifier, List<String>>(
+        ActivePlanIdsNotifier.new);
 
 class CurrentActivePlanIdNotifier extends Notifier<String?> {
   @override
   String? build() => null;
   void setContext(String? id) => state = id;
 }
-final currentActivePlanIdProvider = NotifierProvider<CurrentActivePlanIdNotifier, String?>(CurrentActivePlanIdNotifier.new);
+
+final currentActivePlanIdProvider =
+    NotifierProvider<CurrentActivePlanIdNotifier, String?>(
+        CurrentActivePlanIdNotifier.new);
 
 class ActivePlanContextNotifier extends Notifier<int?> {
   @override
   int? build() => null;
   void setContext(int? day) => state = day;
 }
-final activePlanContextProvider = NotifierProvider<ActivePlanContextNotifier, int?>(ActivePlanContextNotifier.new);
+
+final activePlanContextProvider =
+    NotifierProvider<ActivePlanContextNotifier, int?>(
+        ActivePlanContextNotifier.new);

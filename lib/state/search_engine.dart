@@ -1,4 +1,3 @@
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/models/bible_model.dart';
@@ -11,7 +10,6 @@ import 'translation_provider.dart';
 import '../services/bible_database_service.dart';
 
 enum SearchResultType { reference, bible, commentary, history, note }
-
 
 class SearchResult {
   final String title;
@@ -29,23 +27,23 @@ class SearchResult {
   });
 
   Map<String, dynamic> toJson() => {
-    'title': title,
-    'subtitle': subtitle,
-    'snippet': snippet,
-    'type': type.name,
-    'metadata': metadata,
-  };
+        'title': title,
+        'subtitle': subtitle,
+        'snippet': snippet,
+        'type': type.name,
+        'metadata': metadata,
+      };
 
   factory SearchResult.fromJson(Map<String, dynamic> json) => SearchResult(
-    title: json['title'],
-    subtitle: json['subtitle'],
-    snippet: json['snippet'],
-    type: SearchResultType.values.firstWhere(
-      (e) => e.name == json['type'],
-      orElse: () => SearchResultType.bible,
-    ),
-    metadata: json['metadata'] ?? {},
-  );
+        title: json['title'],
+        subtitle: json['subtitle'],
+        snippet: json['snippet'],
+        type: SearchResultType.values.firstWhere(
+          (e) => e.name == json['type'],
+          orElse: () => SearchResultType.bible,
+        ),
+        metadata: json['metadata'] ?? {},
+      );
 }
 
 class SearchItem {
@@ -69,7 +67,7 @@ class SearchItem {
 class IndexData {
   final List<SearchItem> corpus;
   final Map<String, List<int>> invertedIndex;
-  
+
   IndexData(this.corpus, this.invertedIndex);
 }
 
@@ -78,8 +76,9 @@ class IndexBuildArgs {
   final List<Map<String, dynamic>>? dbVerses;
   final List<CommentaryEntry>? commentaryData;
   final List<PersonalNote> notes;
-  
-  IndexBuildArgs(this.bibleBooks, this.dbVerses, this.commentaryData, this.notes);
+
+  IndexBuildArgs(
+      this.bibleBooks, this.dbVerses, this.commentaryData, this.notes);
 }
 
 class SearchQueryArgs {
@@ -91,13 +90,19 @@ class SearchQueryArgs {
   final bool includeNotes;
   final List<BibleBook>? bibleBooks; // Needed for reference matching
   final List<PersonalNote> notes;
-  
-  SearchQueryArgs(this.query, this.indexData, this.includeOt, this.includeNt, this.includeCommentary, this.includeNotes, this.bibleBooks, this.notes);
+
+  SearchQueryArgs(this.query, this.indexData, this.includeOt, this.includeNt,
+      this.includeCommentary, this.includeNotes, this.bibleBooks, this.notes);
 }
 
 List<String> _tokenize(String text) {
   // Lowercase and replace non-alphanumeric (except spaces) with spaces, then split
-  return text.toLowerCase().replaceAll(RegExp(r'[^\p{L}\p{N}\s]', unicode: true), ' ').split(RegExp(r'\s+')).where((t) => t.isNotEmpty).toList();
+  return text
+      .toLowerCase()
+      .replaceAll(RegExp(r'[^\p{L}\p{N}\s]', unicode: true), ' ')
+      .split(RegExp(r'\s+'))
+      .where((t) => t.isNotEmpty)
+      .toList();
 }
 
 IndexData buildIndexIsolate(IndexBuildArgs args) {
@@ -178,7 +183,8 @@ IndexData buildIndexIsolate(IndexBuildArgs args) {
       final chapterNum = scope.chapter;
       final verseNum = scope.verse;
 
-      String authorLabel = entry.author.isNotEmpty ? '${entry.author} Commentary' : 'Commentary';
+      String authorLabel =
+          entry.author.isNotEmpty ? '${entry.author} Commentary' : 'Commentary';
       String locTitle = bookName;
       if (chapterNum != null) locTitle += ' $chapterNum';
       if (verseNum != null) locTitle += ':$verseNum';
@@ -188,7 +194,8 @@ IndexData buildIndexIsolate(IndexBuildArgs args) {
         type: SearchResultType.commentary,
         title: locTitle,
         subtitle: authorLabel,
-        text: (entry.author.isNotEmpty ? '«${entry.author}» ' : '') + entry.text,
+        text:
+            (entry.author.isNotEmpty ? '«${entry.author}» ' : '') + entry.text,
         metadata: {
           'bookName': bookName,
           if (chapterNum != null) 'chapter': chapterNum,
@@ -245,23 +252,25 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
   // Helper for snippet
   String highlightSnippet(String text, String queryLower) {
     final index = text.toLowerCase().indexOf(queryLower);
-    if (index == -1) return text.length > 100 ? '${text.substring(0, 100)}...' : text;
-    
+    if (index == -1)
+      return text.length > 100 ? '${text.substring(0, 100)}...' : text;
+
     final start = (index - 30).clamp(0, text.length);
     final end = (index + queryLower.length + 30).clamp(0, text.length);
-    
+
     String snippet = text.substring(start, end);
     if (start > 0) snippet = '...$snippet';
     if (end < text.length) snippet = '$snippet...';
-    
+
     return snippet;
   }
 
   // 0. Exact Reference Match (highest priority)
   if ((args.includeOt || args.includeNt) && args.bibleBooks != null) {
-    final regex = RegExp(r'^((?:\d\s*)?[a-z]+(?:\s+[a-z]+)*)\s*(?:(\d+)[\s:.]*(\d+)?)?$');
+    final regex =
+        RegExp(r'^((?:\d\s*)?[a-z]+(?:\s+[a-z]+)*)\s*(?:(\d+)[\s:.]*(\d+)?)?$');
     final match = regex.firstMatch(queryLower);
-    
+
     if (match != null) {
       final bookStr = match.group(1)?.trim() ?? '';
       final chapterStr = match.group(2);
@@ -281,7 +290,7 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
               chapter = chapter.clamp(1, book.chapters.length);
             }
           }
-          
+
           if (chapter != null && verseStr != null) {
             verse = int.tryParse(verseStr);
             if (verse != null) {
@@ -297,7 +306,8 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
           results.add(SearchResult(
             title: title,
             subtitle: 'Jump To',
-            snippet: 'Go to ${book.name} Chapter ${chapter ?? 1}${verse != null ? ' Verse $verse' : ''}',
+            snippet:
+                'Go to ${book.name} Chapter ${chapter ?? 1}${verse != null ? ' Verse $verse' : ''}',
             type: SearchResultType.reference,
             metadata: {
               'bookAbbrev': book.abbreviation,
@@ -315,21 +325,22 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
   // For each token in the query, we find all documents that contain a word starting with that token.
   final index = args.indexData.invertedIndex;
   final corpus = args.indexData.corpus;
-  
+
   // Start with null for intersection
   Set<int>? matchingIds;
-  
+
   // Store matching metadata for ranking later
   final matchQuality = <int, int>{}; // id -> score (higher is better)
 
   for (final token in queryTokens) {
     final currentTokenMatches = <int>{};
-    
+
     // Exact matches
     if (index.containsKey(token)) {
       for (final id in index[token]!) {
         currentTokenMatches.add(id);
-        matchQuality[id] = (matchQuality[id] ?? 0) + 10; // Exact word match = 10 pts
+        matchQuality[id] =
+            (matchQuality[id] ?? 0) + 10; // Exact word match = 10 pts
       }
     }
     if (noteIndex.containsKey(token)) {
@@ -338,14 +349,15 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
         matchQuality[id] = (matchQuality[id] ?? 0) + 10;
       }
     }
-    
+
     // Prefix matches (only if token is reasonably long, e.g., > 1 char to avoid exploding)
     if (token.isNotEmpty) {
       for (final key in index.keys) {
         if (key != token && key.startsWith(token)) {
           for (final id in index[key]!) {
             currentTokenMatches.add(id);
-            matchQuality[id] = (matchQuality[id] ?? 0) + 1; // Prefix match = 1 pt
+            matchQuality[id] =
+                (matchQuality[id] ?? 0) + 1; // Prefix match = 1 pt
           }
         }
       }
@@ -358,17 +370,17 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
         }
       }
     }
-    
+
     if (matchingIds == null) {
       matchingIds = currentTokenMatches;
     } else {
       matchingIds = matchingIds.intersection(currentTokenMatches);
     }
-    
+
     // If at any point the intersection is empty, we can abort early
     if (matchingIds.isEmpty) break;
   }
-  
+
   if (matchingIds != null && matchingIds.isNotEmpty) {
     // Filter by requested types and gather items
     final matchedItems = <SearchItem>[];
@@ -390,21 +402,22 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
       }
       matchedItems.add(item);
     }
-    
+
     // Add Exact Phrase boosting
     for (final item in matchedItems) {
       if (item.text.toLowerCase().contains(queryLower)) {
-        matchQuality[item.id] = (matchQuality[item.id] ?? 0) + 50; // Exact phrase = 50 pts
+        matchQuality[item.id] =
+            (matchQuality[item.id] ?? 0) + 50; // Exact phrase = 50 pts
       }
     }
-    
+
     // Sort by match quality descending
     matchedItems.sort((a, b) {
       final scoreA = matchQuality[a.id] ?? 0;
       final scoreB = matchQuality[b.id] ?? 0;
       return scoreB.compareTo(scoreA); // Highest first
     });
-    
+
     // Take top 100
     for (final item in matchedItems.take(100)) {
       results.add(SearchResult(
@@ -426,16 +439,19 @@ class SearchEngine {
   final Future<IndexData> baseIndexFuture;
   final List<PersonalNote> notes;
 
-  SearchEngine({this.bibleBooks, required this.baseIndexFuture, this.notes = const []});
+  SearchEngine(
+      {this.bibleBooks, required this.baseIndexFuture, this.notes = const []});
 
-  Future<List<SearchResult>> search(String query, {
+  Future<List<SearchResult>> search(
+    String query, {
     bool includeOt = true,
     bool includeNt = true,
     bool includeCommentary = true,
     bool includeNotes = true,
   }) async {
     final indexData = await baseIndexFuture;
-    final args = SearchQueryArgs(query, indexData, includeOt, includeNt, includeCommentary, includeNotes, bibleBooks, notes);
+    final args = SearchQueryArgs(query, indexData, includeOt, includeNt,
+        includeCommentary, includeNotes, bibleBooks, notes);
     return await compute(_searchIsolate, args);
   }
 }
@@ -449,7 +465,7 @@ final baseSearchIndexProvider = FutureProvider<IndexData>((ref) async {
   if (bibleState.isLoading || bibleState.books.isEmpty) {
     return IndexData([], {});
   }
-  
+
   // Fetch verses from the database for the current translation
   final dbVerses = await bibleDbService.getAllVerses(activeTranslation);
 

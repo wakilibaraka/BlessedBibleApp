@@ -12,9 +12,10 @@ class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
 
   Future<List<CommentaryEntry>> _loadCommentary() async {
     try {
-      final jsonString = await rootBundle.loadString('assets/commentary/commentary.json');
+      final jsonString =
+          await rootBundle.loadString('assets/commentary/commentary.json');
       final decoded = jsonDecode(jsonString);
-      
+
       List<dynamic> entriesList;
       if (decoded is Map<String, dynamic> && decoded.containsKey('entries')) {
         entriesList = decoded['entries'] as List<dynamic>;
@@ -24,73 +25,89 @@ class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
         return [];
       }
 
-      return entriesList.map((e) => CommentaryEntry.fromJson(e as Map<String, dynamic>)).toList();
+      return entriesList
+          .map((e) => CommentaryEntry.fromJson(e as Map<String, dynamic>))
+          .toList();
     } catch (e) {
       // If the file is missing or empty, do not crash; return empty list
       return [];
     }
   }
 
-  List<CommentaryEntry> commentaryForVerse(String book, int chapter, int verse) {
+  List<CommentaryEntry> commentaryForVerse(
+      String book, int chapter, int verse) {
     final list = state.value ?? [];
-    return list.where((e) =>
-      e.scope.type == 'verse' &&
-      e.scope.book?.toLowerCase() == book.toLowerCase() &&
-      e.scope.chapter == chapter &&
-      e.scope.verse == verse
-    ).toList();
+    return list
+        .where((e) =>
+            e.scope.type == 'verse' &&
+            e.scope.book?.toLowerCase() == book.toLowerCase() &&
+            e.scope.chapter == chapter &&
+            e.scope.verse == verse)
+        .toList();
   }
 
   List<CommentaryEntry> commentaryForChapterVerses(String book, int chapter) {
     final list = state.value ?? [];
-    final entries = list.where((e) =>
-      e.scope.type == 'verse' &&
-      e.scope.book?.toLowerCase() == book.toLowerCase() &&
-      e.scope.chapter == chapter
-    ).toList();
+    final entries = list
+        .where((e) =>
+            e.scope.type == 'verse' &&
+            e.scope.book?.toLowerCase() == book.toLowerCase() &&
+            e.scope.chapter == chapter)
+        .toList();
     entries.sort((a, b) => (a.scope.verse ?? 0).compareTo(b.scope.verse ?? 0));
     return entries;
   }
 
   List<CommentaryEntry> commentaryForChapter(String book, int chapter) {
     final list = state.value ?? [];
-    return list.where((e) =>
-      e.scope.type == 'chapter' &&
-      e.scope.book?.toLowerCase() == book.toLowerCase() &&
-      e.scope.chapter == chapter
-    ).toList();
+    return list
+        .where((e) =>
+            e.scope.type == 'chapter' &&
+            e.scope.book?.toLowerCase() == book.toLowerCase() &&
+            e.scope.chapter == chapter)
+        .toList();
   }
 
   List<CommentaryEntry> commentaryForBook(String book) {
     final list = state.value ?? [];
-    return list.where((e) =>
-      e.scope.type == 'book' &&
-      e.scope.book?.toLowerCase() == book.toLowerCase()
-    ).toList();
+    return list
+        .where((e) =>
+            e.scope.type == 'book' &&
+            e.scope.book?.toLowerCase() == book.toLowerCase())
+        .toList();
   }
 
   List<CommentaryEntry> commentaryForTopic(String topic) {
     final list = state.value ?? [];
-    return list.where((e) =>
-      e.scope.type == 'topic' &&
-      e.scope.topic?.toLowerCase() == topic.toLowerCase()
-    ).toList();
+    return list
+        .where((e) =>
+            e.scope.type == 'topic' &&
+            e.scope.topic?.toLowerCase() == topic.toLowerCase())
+        .toList();
   }
 
   bool hasCommentary(String book, int chapter, int? verse) {
     final list = state.value ?? [];
     return list.any((e) =>
-      (e.scope.type == 'verse' && e.scope.book?.toLowerCase() == book.toLowerCase() && e.scope.chapter == chapter && e.scope.verse == verse) ||
-      (e.scope.type == 'chapter' && e.scope.book?.toLowerCase() == book.toLowerCase() && e.scope.chapter == chapter) ||
-      (e.scope.type == 'book' && e.scope.book?.toLowerCase() == book.toLowerCase())
-    );
+        (e.scope.type == 'verse' &&
+            e.scope.book?.toLowerCase() == book.toLowerCase() &&
+            e.scope.chapter == chapter &&
+            e.scope.verse == verse) ||
+        (e.scope.type == 'chapter' &&
+            e.scope.book?.toLowerCase() == book.toLowerCase() &&
+            e.scope.chapter == chapter) ||
+        (e.scope.type == 'book' &&
+            e.scope.book?.toLowerCase() == book.toLowerCase()));
   }
 
   List<String> get versesWithCommentary {
     final list = state.value ?? [];
     final verses = <String>{};
     for (final e in list) {
-      if (e.scope.type == 'verse' && e.scope.book != null && e.scope.chapter != null && e.scope.verse != null) {
+      if (e.scope.type == 'verse' &&
+          e.scope.book != null &&
+          e.scope.chapter != null &&
+          e.scope.verse != null) {
         // Format exactly like standard references
         verses.add('${e.scope.book} ${e.scope.chapter}:${e.scope.verse}');
       }
@@ -100,7 +117,8 @@ class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
   }
 }
 
-final commentaryProvider = AsyncNotifierProvider<CommentaryNotifier, List<CommentaryEntry>>(
+final commentaryProvider =
+    AsyncNotifierProvider<CommentaryNotifier, List<CommentaryEntry>>(
   CommentaryNotifier.new,
 );
 
@@ -129,6 +147,7 @@ class CommentaryBookmarksNotifier extends Notifier<Set<String>> {
   }
 }
 
-final commentaryBookmarksProvider = NotifierProvider<CommentaryBookmarksNotifier, Set<String>>(
+final commentaryBookmarksProvider =
+    NotifierProvider<CommentaryBookmarksNotifier, Set<String>>(
   CommentaryBookmarksNotifier.new,
 );

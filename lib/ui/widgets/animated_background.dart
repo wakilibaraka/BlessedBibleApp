@@ -20,7 +20,8 @@ class AnimatedBackground extends ConsumerStatefulWidget {
   ConsumerState<AnimatedBackground> createState() => _AnimatedBackgroundState();
 }
 
-class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground> with SingleTickerProviderStateMixin {
+class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground>
+    with SingleTickerProviderStateMixin {
   late AnimationController _bgAnimation;
 
   @override
@@ -42,21 +43,24 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground> with Si
   Widget build(BuildContext context) {
     final route = ModalRoute.of(context);
     final isRouteCurrent = route?.isCurrent ?? true;
-    
+
     bool isTabActive = true;
     if (widget.tabIndex != null) {
       final currentIndex = ref.watch(navProvider);
       isTabActive = currentIndex == widget.tabIndex;
     }
-    
+
     final readSettings = ref.watch(readSettingsProvider);
     final surfaceStyle = ref.watch(surfaceStyleProvider);
     final isReadTab = widget.tabIndex == 1;
-    final isImmersiveOn = readSettings.readingViewMode == ReadingViewMode.immersive;
-    final disableGlow = surfaceStyle != SurfaceStyle.threeDimensional || (isReadTab && isImmersiveOn) || !readSettings.isGlowEnabled;
+    final isImmersiveOn =
+        readSettings.readingViewMode == ReadingViewMode.immersive;
+    final disableGlow = surfaceStyle != SurfaceStyle.threeDimensional ||
+        (isReadTab && isImmersiveOn) ||
+        !readSettings.isGlowEnabled;
 
     final shouldAnimate = isRouteCurrent && isTabActive && !disableGlow;
-    
+
     if (shouldAnimate && !_bgAnimation.isAnimating) {
       _bgAnimation.repeat(reverse: true);
     } else if (!shouldAnimate && _bgAnimation.isAnimating) {
@@ -69,30 +73,35 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground> with Si
         builder: (_, __) {
           final glowStyle = ref.read(readSettingsProvider).backgroundGlowStyle;
           final isTopGlow = glowStyle == BackgroundGlowStyle.top;
-          
+
           final t = _bgAnimation.value;
 
           // Slowly drift the focal point of the radial gradient
           final cx = lerpDouble(-0.3, 0.3, t);
-          final cy = isTopGlow ? -1.0 + (lerpDouble(-0.4, 0.1, t)! * 0.2) : lerpDouble(-0.4, 0.1, t);
+          final cy = isTopGlow
+              ? -1.0 + (lerpDouble(-0.4, 0.1, t)! * 0.2)
+              : lerpDouble(-0.4, 0.1, t);
           final radius = isTopGlow ? 1.0 : 1.6;
 
           final List<Color> colors;
           switch (widget.appThemeMode.resolve(context)) {
             case AppThemeMode.dark:
-      case AppThemeMode.oled:
+            case AppThemeMode.oled:
             case AppThemeMode.automatic:
               // Warm amber glow at focal point, deep charcoal edges
               colors = [
-                Color.lerp(const Color(0xFF3D2B0A), const Color(0xFF251800), t)!,
-                Color.lerp(const Color(0xFF1E1C1A), const Color(0xFF0F0D0B), t)!,
+                Color.lerp(
+                    const Color(0xFF3D2B0A), const Color(0xFF251800), t)!,
+                Color.lerp(
+                    const Color(0xFF1E1C1A), const Color(0xFF0F0D0B), t)!,
                 Theme.of(context).scaffoldBackgroundColor,
               ];
               break;
             case AppThemeMode.sepia:
               // Soft gold glow fading into matte sepia background
               colors = [
-                Color.lerp(const Color(0xFFE5CC98), const Color(0xFFDAB875), t)!,
+                Color.lerp(
+                    const Color(0xFFE5CC98), const Color(0xFFDAB875), t)!,
                 const Color(0xFFF4EAD5), // Fades to matte sepia
                 const Color(0xFFF4EAD5),
               ];
@@ -100,7 +109,8 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground> with Si
             case AppThemeMode.light:
               // Very subtle warm glow that fades quickly into the pure ivory background
               colors = [
-                Color.lerp(const Color(0xFFFDF3D7), const Color(0xFFFDE4A9), t)!,
+                Color.lerp(
+                    const Color(0xFFFDF3D7), const Color(0xFFFDE4A9), t)!,
                 const Color(0xFFFAF9F6), // Fades to Pure Ivory
                 const Color(0xFFFAF9F6),
               ];
@@ -109,49 +119,56 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground> with Si
             case AppThemeMode.galileeBlue:
             case AppThemeMode.scarletRed:
               colors = [
-                Color.lerp(const Color(0xFFFDF3D7), const Color(0xFFFDE4A9), t)!,
+                Color.lerp(
+                    const Color(0xFFFDF3D7), const Color(0xFFFDE4A9), t)!,
                 const Color(0xFFFAF9F6),
                 const Color(0xFFFAF9F6),
               ];
               break;
             case AppThemeMode.dawn:
               colors = [
-                Color.lerp(const Color(0xFF453F52), const Color(0xFF3A3547), t)!, // Center: dawnSurface
+                Color.lerp(const Color(0xFF453F52), const Color(0xFF3A3547),
+                    t)!, // Center: dawnSurface
                 const Color(0xFF2E2A3A), // Edges: dawnBackground
                 const Color(0xFF2E2A3A),
               ];
               break;
             case AppThemeMode.lilies:
               colors = [
-                Color.lerp(const Color(0xFFBCE3F5), const Color(0xFF8CB9D1), t)!,
+                Color.lerp(
+                    const Color(0xFFBCE3F5), const Color(0xFF8CB9D1), t)!,
                 const Color(0xFFFCE4EC),
                 const Color(0xFFFCE4EC),
               ];
               break;
             case AppThemeMode.roses:
               colors = [
-                Color.lerp(const Color(0xFFFFC0A8), const Color(0xFFDE7456), t)!,
+                Color.lerp(
+                    const Color(0xFFFFC0A8), const Color(0xFFDE7456), t)!,
                 const Color(0xFFFBE4D8),
                 const Color(0xFFFBE4D8),
               ];
               break;
             case AppThemeMode.olives:
               colors = [
-                Color.lerp(const Color(0xFFB8CBA1), const Color(0xFF556B2F), t)!,
+                Color.lerp(
+                    const Color(0xFFB8CBA1), const Color(0xFF556B2F), t)!,
                 const Color(0xFFE3E8DB),
                 const Color(0xFFE3E8DB),
               ];
               break;
             case AppThemeMode.dusk:
               colors = [
-                Color.lerp(const Color(0xFF48426D), const Color(0xFF312C51), t)!,
+                Color.lerp(
+                    const Color(0xFF48426D), const Color(0xFF312C51), t)!,
                 const Color(0xFF312C51),
                 const Color(0xFF312C51),
               ];
               break;
             case AppThemeMode.fresh:
               colors = [
-                Color.lerp(const Color(0xFF1C404A), const Color(0xFF132C33), t)!,
+                Color.lerp(
+                    const Color(0xFF1C404A), const Color(0xFF132C33), t)!,
                 const Color(0xFF132C33),
                 const Color(0xFF132C33),
               ];
@@ -159,14 +176,18 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground> with Si
           }
 
           final intensity = ref.read(readSettingsProvider).glowIntensity;
-          final finalColors = colors.map((c) => Color.lerp(Theme.of(context).scaffoldBackgroundColor, c, intensity)!).toList();
+          final finalColors = colors
+              .map((c) => Color.lerp(
+                  Theme.of(context).scaffoldBackgroundColor, c, intensity)!)
+              .toList();
 
           return AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
             switchInCurve: Curves.easeOut,
             switchOutCurve: Curves.easeOut,
             child: Container(
-              key: ValueKey('${widget.appThemeMode.resolve(context).name}_$disableGlow'),
+              key: ValueKey(
+                  '${widget.appThemeMode.resolve(context).name}_$disableGlow'),
               decoration: disableGlow
                   ? BoxDecoration(
                       color: Theme.of(context).scaffoldBackgroundColor,

@@ -20,20 +20,21 @@ class VotdArchiveScreen extends ConsumerWidget {
     // Compute past 7 days
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    
+
     // Create list of dates (most recent first)
-    final dates = List.generate(7, (index) => today.subtract(Duration(days: index)));
-    
+    final dates =
+        List.generate(7, (index) => today.subtract(Duration(days: index)));
+
     // Epoch used for VotD calculation
     final epoch = DateTime(2026, 1, 1);
-    
+
     final appThemeMode = ref.watch(themeProvider);
-    final is3DTheme = appThemeMode == AppThemeMode.dawn || 
-                      appThemeMode == AppThemeMode.lilies || 
-                      appThemeMode == AppThemeMode.roses || 
-                      appThemeMode == AppThemeMode.olives || 
-                      appThemeMode == AppThemeMode.dusk || 
-                      appThemeMode == AppThemeMode.fresh;
+    final is3DTheme = appThemeMode == AppThemeMode.dawn ||
+        appThemeMode == AppThemeMode.lilies ||
+        appThemeMode == AppThemeMode.roses ||
+        appThemeMode == AppThemeMode.olives ||
+        appThemeMode == AppThemeMode.dusk ||
+        appThemeMode == AppThemeMode.fresh;
 
     Color getThemeBackgroundColor() {
       switch (appThemeMode) {
@@ -94,15 +95,18 @@ class VotdArchiveScreen extends ConsumerWidget {
                 (context, index) {
                   final date = dates[index];
                   final isToday = index == 0;
-                  
+
                   // Compute VotD for this specific date
-                  final dayIndex = date.difference(epoch).inDays % HomeNotifier.votdList.length;
+                  final dayIndex = date.difference(epoch).inDays %
+                      HomeNotifier.votdList.length;
                   // Handle negative modulo correctly just in case
-                  final validDayIndex = dayIndex < 0 ? dayIndex + HomeNotifier.votdList.length : dayIndex;
+                  final validDayIndex = dayIndex < 0
+                      ? dayIndex + HomeNotifier.votdList.length
+                      : dayIndex;
                   final votdEntry = HomeNotifier.votdList[validDayIndex];
                   final reference = votdEntry[0];
                   final text = votdEntry[1];
-                  
+
                   String displayDate;
                   if (index == 0) {
                     displayDate = 'Today';
@@ -111,41 +115,62 @@ class VotdArchiveScreen extends ConsumerWidget {
                   } else if (index == 2) {
                     displayDate = '2 days ago';
                   } else {
-                    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                    displayDate = '${months[date.month - 1]} ${date.day}, ${date.year}';
+                    final months = [
+                      'Jan',
+                      'Feb',
+                      'Mar',
+                      'Apr',
+                      'May',
+                      'Jun',
+                      'Jul',
+                      'Aug',
+                      'Sep',
+                      'Oct',
+                      'Nov',
+                      'Dec'
+                    ];
+                    displayDate =
+                        '${months[date.month - 1]} ${date.day}, ${date.year}';
                   }
 
                   final bookName = reference.split(' ').first;
                   final bookTag = bookName.toUpperCase();
-                  
+
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 16.0),
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
-                        boxShadow: isToday ? [
-                          BoxShadow(
-                            color: theme.primaryColor.withValues(alpha: 0.15),
-                            blurRadius: 12,
-                            spreadRadius: 2,
-                            offset: const Offset(0, 4),
-                          )
-                        ] : [],
+                        boxShadow: isToday
+                            ? [
+                                BoxShadow(
+                                  color: theme.primaryColor
+                                      .withValues(alpha: 0.15),
+                                  blurRadius: 12,
+                                  spreadRadius: 2,
+                                  offset: const Offset(0, 4),
+                                )
+                              ]
+                            : [],
                       ),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: is3DTheme ? theme.colorScheme.surface : tokens.readingSurface,
+                          color: is3DTheme
+                              ? theme.colorScheme.surface
+                              : tokens.readingSurface,
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             width: 0.5,
-                            color: is3DTheme ? Colors.white.withValues(alpha: 0.15) : tokens.readingBorder,
+                            color: is3DTheme
+                                ? Colors.white.withValues(alpha: 0.15)
+                                : tokens.readingBorder,
                           ),
-                          boxShadow: (appThemeMode == AppThemeMode.dawn || 
-                                      appThemeMode == AppThemeMode.lilies || 
-                                      appThemeMode == AppThemeMode.roses || 
-                                      appThemeMode == AppThemeMode.olives || 
-                                      appThemeMode == AppThemeMode.dusk || 
-                                      appThemeMode == AppThemeMode.fresh)
+                          boxShadow: (appThemeMode == AppThemeMode.dawn ||
+                                  appThemeMode == AppThemeMode.lilies ||
+                                  appThemeMode == AppThemeMode.roses ||
+                                  appThemeMode == AppThemeMode.olives ||
+                                  appThemeMode == AppThemeMode.dusk ||
+                                  appThemeMode == AppThemeMode.fresh)
                               ? [
                                   BoxShadow(
                                     color: Colors.black.withValues(alpha: 0.08),
@@ -161,20 +186,33 @@ class VotdArchiveScreen extends ConsumerWidget {
                           child: InkWell(
                             borderRadius: BorderRadius.circular(20),
                             onTap: () {
-                              ref.read(votdTrackerProvider.notifier).markViewed(date);
+                              ref
+                                  .read(votdTrackerProvider.notifier)
+                                  .markViewed(date);
                               final refStr = reference;
                               final lastSpaceIdx = refStr.lastIndexOf(' ');
-                              final bookName = lastSpaceIdx != -1 ? refStr.substring(0, lastSpaceIdx) : refStr;
-                              final refParts = lastSpaceIdx != -1 ? refStr.substring(lastSpaceIdx + 1).split(':') : [];
-                              final chapterNum = refParts.isNotEmpty ? (int.tryParse(refParts[0]) ?? 1) : 1;
-                              final verseNum = refParts.length > 1 ? int.tryParse(refParts[1]) : null;
+                              final bookName = lastSpaceIdx != -1
+                                  ? refStr.substring(0, lastSpaceIdx)
+                                  : refStr;
+                              final refParts = lastSpaceIdx != -1
+                                  ? refStr
+                                      .substring(lastSpaceIdx + 1)
+                                      .split(':')
+                                  : [];
+                              final chapterNum = refParts.isNotEmpty
+                                  ? (int.tryParse(refParts[0]) ?? 1)
+                                  : 1;
+                              final verseNum = refParts.length > 1
+                                  ? int.tryParse(refParts[1])
+                                  : null;
 
                               Navigator.of(context).push(CupertinoPageRoute(
                                 builder: (_) => CommentaryHubScreen(
                                   book: bookName,
                                   chapter: chapterNum,
                                   verse: verseNum,
-                                  verseText: null, // text is fetched inside if needed
+                                  verseText:
+                                      null, // text is fetched inside if needed
                                 ),
                               ));
                             },
@@ -182,30 +220,45 @@ class VotdArchiveScreen extends ConsumerWidget {
                               padding: const EdgeInsets.all(20),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(20),
-                                border: isToday ? Border.all(color: theme.primaryColor.withValues(alpha: 0.3), width: 1) : null,
+                                border: isToday
+                                    ? Border.all(
+                                        color: theme.primaryColor
+                                            .withValues(alpha: 0.3),
+                                        width: 1)
+                                    : null,
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         displayDate,
-                                        style: theme.textTheme.labelMedium?.copyWith(
-                                          color: isToday ? tokens.readingAccent : tokens.readingInkMuted,
-                                          fontWeight: isToday ? FontWeight.bold : FontWeight.w500,
+                                        style: theme.textTheme.labelMedium
+                                            ?.copyWith(
+                                          color: isToday
+                                              ? tokens.readingAccent
+                                              : tokens.readingInkMuted,
+                                          fontWeight: isToday
+                                              ? FontWeight.bold
+                                              : FontWeight.w500,
                                         ),
                                       ),
                                       Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 4),
                                         decoration: BoxDecoration(
-                                          color: theme.primaryColor.withValues(alpha: 0.1),
-                                          borderRadius: BorderRadius.circular(8),
+                                          color: theme.primaryColor
+                                              .withValues(alpha: 0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
                                         ),
                                         child: Text(
                                           bookTag,
-                                          style: theme.textTheme.labelSmall?.copyWith(
+                                          style: theme.textTheme.labelSmall
+                                              ?.copyWith(
                                             color: tokens.readingAccent,
                                             fontWeight: FontWeight.bold,
                                             letterSpacing: 0.5,
@@ -240,7 +293,7 @@ class VotdArchiveScreen extends ConsumerWidget {
                       ),
                     ),
                   );
-                  },
+                },
                 childCount: dates.length,
               ),
             ),

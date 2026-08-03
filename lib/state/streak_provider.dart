@@ -14,14 +14,15 @@ class StreakNotifier extends Notifier<StreakState> {
     final prefs = ref.watch(preferencesProvider);
     final count = prefs.getStreakCount();
     final lastRead = prefs.getLastReadDate();
-    
+
     final today = _formatDate(DateTime.now());
-    final yesterday = _formatDate(DateTime.now().subtract(const Duration(days: 1)));
-    
+    final yesterday =
+        _formatDate(DateTime.now().subtract(const Duration(days: 1)));
+
     if (lastRead == null) {
       return const StreakState(count: 0, readToday: false);
     }
-    
+
     if (lastRead == today) {
       return StreakState(count: count, readToday: true);
     } else if (lastRead == yesterday) {
@@ -42,8 +43,9 @@ class StreakNotifier extends Notifier<StreakState> {
     final prefs = ref.read(preferencesProvider);
     final lastRead = prefs.getLastReadDate();
     final today = _formatDate(DateTime.now());
-    final yesterday = _formatDate(DateTime.now().subtract(const Duration(days: 1)));
-    
+    final yesterday =
+        _formatDate(DateTime.now().subtract(const Duration(days: 1)));
+
     int newCount = state.count;
     if (lastRead == yesterday) {
       newCount += 1;
@@ -53,7 +55,7 @@ class StreakNotifier extends Notifier<StreakState> {
 
     prefs.saveLastReadDate(today);
     prefs.saveStreakCount(newCount);
-    
+
     state = StreakState(count: newCount, readToday: true);
   }
 }

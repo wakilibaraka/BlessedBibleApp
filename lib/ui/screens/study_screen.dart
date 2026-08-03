@@ -31,7 +31,8 @@ _ParsedRef _parseReference(String refStr) {
   if (lastSpaceIdx != -1) {
     final bookName = refStr.substring(0, lastSpaceIdx);
     final refParts = refStr.substring(lastSpaceIdx + 1).split(':');
-    final chapterNum = int.tryParse(refParts.isNotEmpty ? refParts[0] : '') ?? 1;
+    final chapterNum =
+        int.tryParse(refParts.isNotEmpty ? refParts[0] : '') ?? 1;
     final verseNum = refParts.length > 1 ? int.tryParse(refParts[1]) : null;
     return _ParsedRef(bookName, chapterNum, verseNum);
   }
@@ -50,7 +51,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
   final List<String> _commentaryAuthors = ['Uriah Smith'];
   Timer? _timer;
   bool _isEditing = false;
-
 
   @override
   void initState() {
@@ -177,9 +177,11 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                         Consumer(builder: (context, ref, child) {
                           final streak = ref.watch(streakProvider);
                           final isLit = streak.readToday;
-                          final glowColor = isLit ? AppColors.goldAccent : Colors.grey.withValues(alpha: 0.5);
+                          final glowColor = isLit
+                              ? AppColors.goldAccent
+                              : Colors.grey.withValues(alpha: 0.5);
                           final showNudge = !isLit && streak.count > 0;
-                          
+
                           return Row(
                             children: [
                               GestureDetector(
@@ -187,7 +189,9 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                                 onTap: () {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text(streak.count > 0 ? '${streak.count} Day Streak! Keep it up!' : 'Read today to start your streak!'),
+                                      content: Text(streak.count > 0
+                                          ? '${streak.count} Day Streak! Keep it up!'
+                                          : 'Read today to start your streak!'),
                                       behavior: SnackBarBehavior.floating,
                                       shape: RoundedRectangleBorder(
                                           borderRadius:
@@ -199,31 +203,47 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                                   children: [
                                     if (streak.count > 0 || isLit) ...[
                                       Icon(
-                                          isLit ? Icons.local_fire_department_rounded : Icons.local_fire_department_outlined,
+                                          isLit
+                                              ? Icons
+                                                  .local_fire_department_rounded
+                                              : Icons
+                                                  .local_fire_department_outlined,
                                           color: glowColor,
-                                          shadows: isLit ? [
-                                            Shadow(
-                                              color: glowColor.withValues(alpha: 0.6),
-                                              blurRadius: 10 + (streak.count.clamp(0, 10).toDouble()),
-                                            )
-                                          ] : null,
+                                          shadows: isLit
+                                              ? [
+                                                  Shadow(
+                                                    color: glowColor.withValues(
+                                                        alpha: 0.6),
+                                                    blurRadius: 10 +
+                                                        (streak.count
+                                                            .clamp(0, 10)
+                                                            .toDouble()),
+                                                  )
+                                                ]
+                                              : null,
                                           size: 24),
                                       const SizedBox(width: 4),
                                       Text('${streak.count}',
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold,
-                                              color: isLit ? theme.colorScheme.onSurface : theme.colorScheme.onSurface.withValues(alpha: 0.6))),
+                                              color: isLit
+                                                  ? theme.colorScheme.onSurface
+                                                  : theme.colorScheme.onSurface
+                                                      .withValues(alpha: 0.6))),
                                     ],
                                   ],
                                 ),
                               ),
-                              if (streak.count > 0 || isLit) const SizedBox(width: 16),
+                              if (streak.count > 0 || isLit)
+                                const SizedBox(width: 16),
                               GestureDetector(
                                 behavior: HitTestBehavior.opaque,
                                 onTap: () {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text(showNudge ? 'Read today to save your streak!' : 'Notifications coming soon!'),
+                                      content: Text(showNudge
+                                          ? 'Read today to save your streak!'
+                                          : 'Notifications coming soon!'),
                                       behavior: SnackBarBehavior.floating,
                                       shape: RoundedRectangleBorder(
                                           borderRadius:
@@ -239,8 +259,8 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                                         color: theme.colorScheme.onSurface),
                                     if (showNudge)
                                       Container(
-                                        margin:
-                                            const EdgeInsets.only(top: 2, right: 2),
+                                        margin: const EdgeInsets.only(
+                                            top: 2, right: 2),
                                         width: 8,
                                         height: 8,
                                         decoration: const BoxDecoration(
@@ -313,114 +333,121 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                             if (!_isEditing) setState(() => _isEditing = true);
                           },
                           child: JiggleAnimator(
-                          isJiggling: _isEditing,
-                          child: Stack(
-                            children: [
-                              cardWidget,
-                              if (_isEditing)
-                                Positioned(
-                                  top: 8,
-                                  right: 8,
-                                  child: Material(
-                                    color: Colors.black.withValues(alpha: 0.5),
-                                    shape: const CircleBorder(),
-                                    child: PopupMenuButton<CardSize>(
-                                      icon: const Icon(Icons.more_horiz_rounded,
-                                          color: Colors.white, size: 20),
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(16)),
-                                      color: theme.colorScheme.surface,
-                                      onSelected: (newSize) {
-                                        ref
-                                            .read(studyLayoutProvider.notifier)
-                                            .setSize(config.id, newSize);
-                                      },
-                                      itemBuilder: (context) => [
-                                        PopupMenuItem(
-                                          value: CardSize.small,
-                                          child: Row(
-                                            children: [
-                                              Icon(
-                                                  Icons
-                                                      .photo_size_select_small_rounded,
-                                                  color: config.size ==
-                                                          CardSize.small
-                                                      ? theme.primaryColor
-                                                      : null),
-                                              const SizedBox(width: 8),
-                                              Text('Small',
-                                                  style: TextStyle(
-                                                      color: config.size ==
-                                                              CardSize.small
-                                                          ? theme.primaryColor
-                                                          : null,
-                                                      fontWeight: config.size ==
-                                                              CardSize.small
-                                                          ? FontWeight.bold
-                                                          : null)),
-                                            ],
+                            isJiggling: _isEditing,
+                            child: Stack(
+                              children: [
+                                cardWidget,
+                                if (_isEditing)
+                                  Positioned(
+                                    top: 8,
+                                    right: 8,
+                                    child: Material(
+                                      color:
+                                          Colors.black.withValues(alpha: 0.5),
+                                      shape: const CircleBorder(),
+                                      child: PopupMenuButton<CardSize>(
+                                        icon: const Icon(
+                                            Icons.more_horiz_rounded,
+                                            color: Colors.white,
+                                            size: 20),
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(16)),
+                                        color: theme.colorScheme.surface,
+                                        onSelected: (newSize) {
+                                          ref
+                                              .read(
+                                                  studyLayoutProvider.notifier)
+                                              .setSize(config.id, newSize);
+                                        },
+                                        itemBuilder: (context) => [
+                                          PopupMenuItem(
+                                            value: CardSize.small,
+                                            child: Row(
+                                              children: [
+                                                Icon(
+                                                    Icons
+                                                        .photo_size_select_small_rounded,
+                                                    color: config.size ==
+                                                            CardSize.small
+                                                        ? theme.primaryColor
+                                                        : null),
+                                                const SizedBox(width: 8),
+                                                Text('Small',
+                                                    style: TextStyle(
+                                                        color: config.size ==
+                                                                CardSize.small
+                                                            ? theme.primaryColor
+                                                            : null,
+                                                        fontWeight: config
+                                                                    .size ==
+                                                                CardSize.small
+                                                            ? FontWeight.bold
+                                                            : null)),
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                        PopupMenuItem(
-                                          value: CardSize.medium,
-                                          child: Row(
-                                            children: [
-                                              Icon(
-                                                  Icons
-                                                      .photo_size_select_actual_rounded,
-                                                  color: config.size ==
-                                                          CardSize.medium
-                                                      ? theme.primaryColor
-                                                      : null),
-                                              const SizedBox(width: 8),
-                                              Text('Medium',
-                                                  style: TextStyle(
-                                                      color: config.size ==
-                                                              CardSize.medium
-                                                          ? theme.primaryColor
-                                                          : null,
-                                                      fontWeight: config.size ==
-                                                              CardSize.medium
-                                                          ? FontWeight.bold
-                                                          : null)),
-                                            ],
+                                          PopupMenuItem(
+                                            value: CardSize.medium,
+                                            child: Row(
+                                              children: [
+                                                Icon(
+                                                    Icons
+                                                        .photo_size_select_actual_rounded,
+                                                    color: config.size ==
+                                                            CardSize.medium
+                                                        ? theme.primaryColor
+                                                        : null),
+                                                const SizedBox(width: 8),
+                                                Text('Medium',
+                                                    style: TextStyle(
+                                                        color: config.size ==
+                                                                CardSize.medium
+                                                            ? theme.primaryColor
+                                                            : null,
+                                                        fontWeight: config
+                                                                    .size ==
+                                                                CardSize.medium
+                                                            ? FontWeight.bold
+                                                            : null)),
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                        PopupMenuItem(
-                                          value: CardSize.large,
-                                          child: Row(
-                                            children: [
-                                              Icon(
-                                                  Icons
-                                                      .photo_size_select_large_rounded,
-                                                  color: config.size ==
-                                                          CardSize.large
-                                                      ? theme.primaryColor
-                                                      : null),
-                                              const SizedBox(width: 8),
-                                              Text('Large',
-                                                  style: TextStyle(
-                                                      color: config.size ==
-                                                              CardSize.large
-                                                          ? theme.primaryColor
-                                                          : null,
-                                                      fontWeight: config.size ==
-                                                              CardSize.large
-                                                          ? FontWeight.bold
-                                                          : null)),
-                                            ],
+                                          PopupMenuItem(
+                                            value: CardSize.large,
+                                            child: Row(
+                                              children: [
+                                                Icon(
+                                                    Icons
+                                                        .photo_size_select_large_rounded,
+                                                    color: config.size ==
+                                                            CardSize.large
+                                                        ? theme.primaryColor
+                                                        : null),
+                                                const SizedBox(width: 8),
+                                                Text('Large',
+                                                    style: TextStyle(
+                                                        color: config.size ==
+                                                                CardSize.large
+                                                            ? theme.primaryColor
+                                                            : null,
+                                                        fontWeight: config
+                                                                    .size ==
+                                                                CardSize.large
+                                                            ? FontWeight.bold
+                                                            : null)),
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
                     ),
                   );
 
@@ -440,16 +467,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
       ),
     );
   }
-
-
-
-
-
-
-
-
-
-
 }
 
 void showNotesPopover(BuildContext context, ThemeData theme) {
@@ -514,7 +531,8 @@ class _KeepAliveWrapper extends StatefulWidget {
   State<_KeepAliveWrapper> createState() => _KeepAliveWrapperState();
 }
 
-class _KeepAliveWrapperState extends State<_KeepAliveWrapper> with AutomaticKeepAliveClientMixin {
+class _KeepAliveWrapperState extends State<_KeepAliveWrapper>
+    with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
   @override
@@ -531,7 +549,8 @@ class ReadingPlanBanner extends ConsumerStatefulWidget {
   ConsumerState<ReadingPlanBanner> createState() => _ReadingPlanBannerState();
 }
 
-class _ReadingPlanBannerState extends ConsumerState<ReadingPlanBanner> with AutomaticKeepAliveClientMixin {
+class _ReadingPlanBannerState extends ConsumerState<ReadingPlanBanner>
+    with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
@@ -549,9 +568,9 @@ class _ReadingPlanBannerState extends ConsumerState<ReadingPlanBanner> with Auto
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: theme.brightness == Brightness.dark 
-                 ? Colors.black.withValues(alpha: 0.3)
-                 : AppColors.goldAccent.withValues(alpha: 0.1),
+              color: theme.brightness == Brightness.dark
+                  ? Colors.black.withValues(alpha: 0.3)
+                  : AppColors.goldAccent.withValues(alpha: 0.1),
               blurRadius: 16,
               spreadRadius: 2,
               offset: const Offset(0, 4),
@@ -564,74 +583,88 @@ class _ReadingPlanBannerState extends ConsumerState<ReadingPlanBanner> with Auto
             borderRadius: BorderRadius.circular(24),
             padding: EdgeInsets.zero,
             child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      CupertinoPageRoute(builder: (_) => const ReadingPlansHubScreen())
-                    );
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Reading Plans',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius:
+                        const BorderRadius.vertical(top: Radius.circular(24)),
+                    onTap: () {
+                      Navigator.of(context).push(CupertinoPageRoute(
+                          builder: (_) => const ReadingPlansHubScreen()));
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Reading Plans',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        Icon(Icons.arrow_forward_ios_rounded, size: 16, color: theme.primaryColor.withValues(alpha: 0.5)),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              if (activePlanIds.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(20),
-                      onTap: () {
-                        Navigator.of(context).push(CupertinoPageRoute(builder: (_) => const ReadingPlansHubScreen()));
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          color: theme.primaryColor.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: theme.primaryColor.withValues(alpha: 0.2)),
-                        ),
-                        child: Column(
-                          children: [
-                            Icon(Icons.menu_book_rounded, size: 40, color: theme.primaryColor.withValues(alpha: 0.8)),
-                            const SizedBox(height: 16),
-                            Text('Start a reading plan', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: theme.primaryColor)),
-                            const SizedBox(height: 4),
-                            Text('Grow in the Word daily.', style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.7))),
-                          ],
-                        ),
+                          Icon(Icons.arrow_forward_ios_rounded,
+                              size: 16,
+                              color: theme.primaryColor.withValues(alpha: 0.5)),
+                        ],
                       ),
                     ),
                   ),
-                )
-              else ...[
-                ...activePlanIds.map((planId) {
-                  return _PlanRowWidget(planId: planId);
-                }),
-                const SizedBox(height: 8),
+                ),
+                if (activePlanIds.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(20),
+                        onTap: () {
+                          Navigator.of(context).push(CupertinoPageRoute(
+                              builder: (_) => const ReadingPlansHubScreen()));
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: theme.primaryColor.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                                color:
+                                    theme.primaryColor.withValues(alpha: 0.2)),
+                          ),
+                          child: Column(
+                            children: [
+                              Icon(Icons.menu_book_rounded,
+                                  size: 40,
+                                  color: theme.primaryColor
+                                      .withValues(alpha: 0.8)),
+                              const SizedBox(height: 16),
+                              Text('Start a reading plan',
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: theme.primaryColor)),
+                              const SizedBox(height: 4),
+                              Text('Grow in the Word daily.',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                      color: theme.colorScheme.onSurface
+                                          .withValues(alpha: 0.7))),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                else ...[
+                  ...activePlanIds.map((planId) {
+                    return _PlanRowWidget(planId: planId);
+                  }),
+                  const SizedBox(height: 8),
+                ],
               ],
-            ],
+            ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -664,7 +697,7 @@ class _PlanRowWidgetState extends ConsumerState<_PlanRowWidget> {
     final planState = ref.watch(readingPlanProvider(planId));
     final title = _getPlanTitle(planId, ref);
     final pct = planState.percentComplete;
-    
+
     if (!_isInit) {
       _lastPct = pct;
       _isInit = true;
@@ -672,8 +705,10 @@ class _PlanRowWidgetState extends ConsumerState<_PlanRowWidget> {
     final beginPct = _lastPct;
     _lastPct = pct;
 
-    String subtitle = 'Day ${planState.currentDay} of ${planState.planData.length}';
-    if (planState.currentDay > 0 && planState.currentDay <= planState.planData.length) {
+    String subtitle =
+        'Day ${planState.currentDay} of ${planState.planData.length}';
+    if (planState.currentDay > 0 &&
+        planState.currentDay <= planState.planData.length) {
       final dayData = planState.planData[planState.currentDay - 1];
       if (dayData.passages.isEmpty) {
         subtitle = 'Today: Rest & Reflection';
@@ -702,12 +737,13 @@ class _PlanRowWidgetState extends ConsumerState<_PlanRowWidget> {
                 builder: (_) => DayView(planId: planId, dayNum: 1),
               ));
             } else if (planState.isPlanComplete) {
-               Navigator.of(context).push(CupertinoPageRoute(
+              Navigator.of(context).push(CupertinoPageRoute(
                 builder: (_) => ReadingPlanBrowser(planId: planId),
               ));
             } else {
               Navigator.of(context).push(CupertinoPageRoute(
-                builder: (_) => DayView(planId: planId, dayNum: planState.currentDay),
+                builder: (_) =>
+                    DayView(planId: planId, dayNum: planState.currentDay),
               ));
             }
           },
@@ -716,7 +752,8 @@ class _PlanRowWidgetState extends ConsumerState<_PlanRowWidget> {
             decoration: BoxDecoration(
               color: theme.colorScheme.surface.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: theme.primaryColor.withValues(alpha: 0.1)),
+              border:
+                  Border.all(color: theme.primaryColor.withValues(alpha: 0.1)),
             ),
             child: Row(
               children: [
@@ -724,46 +761,56 @@ class _PlanRowWidgetState extends ConsumerState<_PlanRowWidget> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(title, style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
+                      Text(title,
+                          style: theme.textTheme.titleSmall
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis),
                       const SizedBox(height: 2),
-                      Text(subtitle, style: theme.textTheme.bodySmall?.copyWith(color: theme.primaryColor)),
+                      Text(subtitle,
+                          style: theme.textTheme.bodySmall
+                              ?.copyWith(color: theme.primaryColor)),
                     ],
                   ),
                 ),
                 const SizedBox(width: 12),
                 TweenAnimationBuilder<double>(
-                  tween: Tween<double>(begin: beginPct, end: pct),
-                  duration: const Duration(milliseconds: 800),
-                  curve: Curves.easeOutCubic,
-                  builder: (context, value, _) {
-                    return SizedBox(
-                      width: 36,
-                      height: 36,
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          CircularProgressIndicator(
-                            value: 1.0,
-                            strokeWidth: 3,
-                            valueColor: AlwaysStoppedAnimation(theme.primaryColor.withValues(alpha: 0.15)),
-                          ),
-                          CircularProgressIndicator(
-                            value: value,
-                            strokeWidth: 3,
-                            valueColor: AlwaysStoppedAnimation(theme.primaryColor),
-                            strokeCap: StrokeCap.round,
-                          ),
-                          Center(
-                            child: Text(
-                              '${(value * 100).toStringAsFixed(0)}%',
-                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: theme.primaryColor),
+                    tween: Tween<double>(begin: beginPct, end: pct),
+                    duration: const Duration(milliseconds: 800),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, value, _) {
+                      return SizedBox(
+                        width: 36,
+                        height: 36,
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            CircularProgressIndicator(
+                              value: 1.0,
+                              strokeWidth: 3,
+                              valueColor: AlwaysStoppedAnimation(
+                                  theme.primaryColor.withValues(alpha: 0.15)),
                             ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-                ),
+                            CircularProgressIndicator(
+                              value: value,
+                              strokeWidth: 3,
+                              valueColor:
+                                  AlwaysStoppedAnimation(theme.primaryColor),
+                              strokeCap: StrokeCap.round,
+                            ),
+                            Center(
+                              child: Text(
+                                '${(value * 100).toStringAsFixed(0)}%',
+                                style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    color: theme.primaryColor),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
               ],
             ),
           ),
@@ -784,24 +831,28 @@ class CommentaryBanner extends ConsumerWidget {
     final commentaryAsync = ref.watch(commentaryProvider);
 
     String displayAuthor = 'Commentary';
-    String displayReference = activeVerse != null ? '${_parseReference(activeVerse).book} ${_parseReference(activeVerse).chapter}' : 'Genesis 1';
+    String displayReference = activeVerse != null
+        ? '${_parseReference(activeVerse).book} ${_parseReference(activeVerse).chapter}'
+        : 'Genesis 1';
     String displaySnippet = 'Explore commentary for this chapter.';
 
     if (activeVerse != null && commentaryAsync.value != null) {
       final entries = commentaryAsync.value!;
       final parsed = _parseReference(activeVerse);
-      
-      final matchingEntries = entries.where((e) => 
-        e.scope.book?.toLowerCase() == parsed.book.toLowerCase() && 
-        e.scope.chapter == parsed.chapter
-      ).toList();
+
+      final matchingEntries = entries
+          .where((e) =>
+              e.scope.book?.toLowerCase() == parsed.book.toLowerCase() &&
+              e.scope.chapter == parsed.chapter)
+          .toList();
 
       if (matchingEntries.isNotEmpty) {
         final entry = matchingEntries.first;
         displayAuthor = entry.author;
         displaySnippet = '"${entry.text.split('. ').take(2).join('. ')}..."';
       } else {
-        displaySnippet = 'Explore commentary for ${parsed.book} ${parsed.chapter}.';
+        displaySnippet =
+            'Explore commentary for ${parsed.book} ${parsed.chapter}.';
       }
     }
 
@@ -814,111 +865,120 @@ class CommentaryBanner extends ConsumerWidget {
           borderRadius: BorderRadius.circular(28),
           padding: EdgeInsets.zero,
           child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(28),
-            gradient: LinearGradient(
-              colors: [
-                theme.primaryColor.withValues(alpha: 0.1),
-                Colors.transparent,
-                theme.primaryColor.withValues(alpha: 0.05),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
+            decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(28),
-              onTap: () {
-                final refStr = activeVerse ?? 'Genesis 1';
-                String bookName = '';
-                int chapterNum = 1;
-                final lastSpaceIdx = refStr.lastIndexOf(' ');
-                if (lastSpaceIdx != -1) {
-                  bookName = refStr.substring(0, lastSpaceIdx);
-                  final refParts = refStr.substring(lastSpaceIdx + 1).split(':');
-                  if (refParts.isNotEmpty) chapterNum = int.tryParse(refParts[0]) ?? 1;
-                } else {
-                  bookName = refStr;
-                }
-                
-                Navigator.of(context).push(CupertinoPageRoute(builder: (_) => CommentaryHubScreen(
-                  book: bookName,
-                  chapter: chapterNum,
-                  verse: null, // Force chapter-level browse view
-                )));
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.library_books_rounded,
-                            size: 20, color: theme.primaryColor),
-                        const SizedBox(width: 8),
-                        Text(
-                          displayAuthor,
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: theme.primaryColor,
-                            letterSpacing: 1.5,
-                            fontWeight: FontWeight.bold,
+              gradient: LinearGradient(
+                colors: [
+                  theme.primaryColor.withValues(alpha: 0.1),
+                  Colors.transparent,
+                  theme.primaryColor.withValues(alpha: 0.05),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(28),
+                onTap: () {
+                  final refStr = activeVerse ?? 'Genesis 1';
+                  String bookName = '';
+                  int chapterNum = 1;
+                  final lastSpaceIdx = refStr.lastIndexOf(' ');
+                  if (lastSpaceIdx != -1) {
+                    bookName = refStr.substring(0, lastSpaceIdx);
+                    final refParts =
+                        refStr.substring(lastSpaceIdx + 1).split(':');
+                    if (refParts.isNotEmpty)
+                      chapterNum = int.tryParse(refParts[0]) ?? 1;
+                  } else {
+                    bookName = refStr;
+                  }
+
+                  Navigator.of(context).push(CupertinoPageRoute(
+                      builder: (_) => CommentaryHubScreen(
+                            book: bookName,
+                            chapter: chapterNum,
+                            verse: null, // Force chapter-level browse view
+                          )));
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.library_books_rounded,
+                              size: 20, color: theme.primaryColor),
+                          const SizedBox(width: 8),
+                          Text(
+                            displayAuthor,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.primaryColor,
+                              letterSpacing: 1.5,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        displayReference,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        displaySnippet,
+                        maxLines: size == CardSize.small
+                            ? 3
+                            : (size == CardSize.medium ? 6 : 10),
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          height: 1.5,
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.8),
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                      if (size == CardSize.large) ...[
+                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 8, horizontal: 16),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                                color:
+                                    theme.primaryColor.withValues(alpha: 0.3)),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Read Full Commentary',
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  color: theme.primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Icon(Icons.arrow_forward_rounded,
+                                  size: 16, color: theme.primaryColor),
+                            ],
                           ),
                         ),
                       ],
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      displayReference,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      displaySnippet,
-                      maxLines: size == CardSize.small ? 3 : (size == CardSize.medium ? 6 : 10),
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        height: 1.5,
-                        color: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.8),
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                    if (size == CardSize.large) ...[
-                      const SizedBox(height: 16),
-                      Container(
-                        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: theme.primaryColor.withValues(alpha: 0.3)),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'Read Full Commentary',
-                              style: theme.textTheme.labelMedium?.copyWith(
-                                color: theme.primaryColor,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Icon(Icons.arrow_forward_rounded, size: 16, color: theme.primaryColor),
-                          ],
-                        ),
-                      ),
                     ],
-                  ],
+                  ),
                 ),
               ),
             ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -940,86 +1000,85 @@ class VotdArchiveBanner extends ConsumerWidget {
           borderRadius: BorderRadius.circular(20),
           padding: EdgeInsets.zero,
           child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(20),
-            onTap: () {
-              Navigator.of(context).push(
-                CupertinoPageRoute(builder: (_) => const VotdArchiveScreen()),
-              );
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: theme.colorScheme.surface.withValues(alpha: 0.3),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 20.0, vertical: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.history_rounded,
-                            color: theme.primaryColor, size: 24),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(20),
+              onTap: () {
+                Navigator.of(context).push(
+                  CupertinoPageRoute(builder: (_) => const VotdArchiveScreen()),
+                );
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: theme.colorScheme.surface.withValues(alpha: 0.3),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0, vertical: 16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.history_rounded,
+                              color: theme.primaryColor, size: 24),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Verse of the Day Archive',
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  'Catch up on verses from days you missed.',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                      color: theme.textTheme.bodySmall?.color),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Icon(Icons.keyboard_arrow_right_rounded,
+                              color: theme.primaryColor),
+                        ],
+                      ),
+                      if (size == CardSize.medium ||
+                          size == CardSize.large) ...[
+                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.05),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
                             children: [
-                              Text(
-                                'Verse of the Day Archive',
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                'Catch up on verses from days you missed.',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.textTheme.bodySmall?.color
-                                ),
-                              ),
+                              Icon(Icons.auto_awesome,
+                                  color:
+                                      theme.primaryColor.withValues(alpha: 0.7),
+                                  size: 16),
+                              const SizedBox(width: 8),
+                              Text('Explore your past daily verses',
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                      color: theme.colorScheme.onSurface
+                                          .withValues(alpha: 0.7))),
                             ],
                           ),
                         ),
-                        Icon(Icons.keyboard_arrow_right_rounded,
-                            color: theme.primaryColor),
                       ],
-                    ),
-                    if (size == CardSize.medium || size == CardSize.large) ...[
-                      const SizedBox(height: 16),
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.onSurface
-                              .withValues(alpha: 0.05),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(Icons.auto_awesome,
-                                color:
-                                    theme.primaryColor.withValues(alpha: 0.7),
-                                size: 16),
-                            const SizedBox(width: 8),
-                            Text('Explore your past daily verses',
-                                style: theme.textTheme.labelSmall?.copyWith(
-                                    color: theme.colorScheme.onSurface
-                                        .withValues(alpha: 0.7))),
-                          ],
-                        ),
-                      ),
                     ],
-                  ],
+                  ),
                 ),
               ),
             ),
           ),
         ),
       ),
-      ),
     );
   }
 }
-

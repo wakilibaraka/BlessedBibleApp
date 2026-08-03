@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -37,12 +36,27 @@ class TodayScreen extends ConsumerWidget {
     final mq = MediaQuery.of(context);
     final now = DateTime.now();
     final weekdays = [
-      'Monday', 'Tuesday', 'Wednesday', 'Thursday',
-      'Friday', 'Saturday', 'Sunday'
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday'
     ];
     final months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
     ];
     final dayLabel =
         '${weekdays[now.weekday - 1]} · ${months[now.month - 1]} ${now.day}';
@@ -83,7 +97,8 @@ class TodayScreen extends ConsumerWidget {
                             icon: const Icon(Icons.arrow_back_ios_new_rounded),
                             color: theme.colorScheme.onSurface,
                             padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+                            constraints: const BoxConstraints(
+                                minWidth: 44, minHeight: 44),
                             onPressed: () => Navigator.of(context).pop(),
                           ),
                           trailing: const SizedBox.shrink(),
@@ -97,83 +112,84 @@ class TodayScreen extends ConsumerWidget {
                           ),
                         ),
 
-                    const SizedBox(height: 28),
+                        const SizedBox(height: 28),
 
-                    // ═══════════════════════════════════════════════════════
-                    // 1. GREETING / DATE HEADER
-                    // ═══════════════════════════════════════════════════════
-                    _GreetingHeader(greeting: greeting, theme: theme),
+                        // ═══════════════════════════════════════════════════════
+                        // 1. GREETING / DATE HEADER
+                        // ═══════════════════════════════════════════════════════
+                        _GreetingHeader(greeting: greeting, theme: theme),
 
-                    const SizedBox(height: 16),
-                    const _StreakHeroWidget(),
+                        const SizedBox(height: 16),
+                        const _StreakHeroWidget(),
 
-                    const SizedBox(height: 20),
+                        const SizedBox(height: 20),
 
-                    // Verse of the Day removed from expanded hub view
+                        // Verse of the Day removed from expanded hub view
 
-                    // ═══════════════════════════════════════════════════════
-                    // 3. TODAY'S READING
-                    // ═══════════════════════════════════════════════════════
-                    _SectionLabel(label: "TODAY'S READING", theme: theme),
-                    const SizedBox(height: 8),
-                    _TodaysReadingCard(theme: theme),
+                        // ═══════════════════════════════════════════════════════
+                        // 3. TODAY'S READING
+                        // ═══════════════════════════════════════════════════════
+                        _SectionLabel(label: "TODAY'S READING", theme: theme),
+                        const SizedBox(height: 8),
+                        _TodaysReadingCard(theme: theme),
 
-                    const SizedBox(height: 20),
+                        const SizedBox(height: 20),
 
-                    // ═══════════════════════════════════════════════════════
-                    // 4. LATEST NOTE / HIGHLIGHT
-                    // ═══════════════════════════════════════════════════════
-                    _SectionLabel(label: 'LATEST NOTE', theme: theme),
-                    const SizedBox(height: 8),
-                    _LatestNoteCard(theme: theme),
+                        // ═══════════════════════════════════════════════════════
+                        // 4. LATEST NOTE / HIGHLIGHT
+                        // ═══════════════════════════════════════════════════════
+                        _SectionLabel(label: 'LATEST NOTE', theme: theme),
+                        const SizedBox(height: 8),
+                        _LatestNoteCard(theme: theme),
 
-                    const SizedBox(height: 20),
+                        const SizedBox(height: 20),
 
-                    // ═══════════════════════════════════════════════════════
-                    // 5. STREAK / PROGRESS
-                    // ═══════════════════════════════════════════════════════
-                    _SectionLabel(label: 'READING STREAK', theme: theme),
-                    const SizedBox(height: 8),
-                    _StreakProgressCard(theme: theme),
+                        // ═══════════════════════════════════════════════════════
+                        // 5. STREAK / PROGRESS
+                        // ═══════════════════════════════════════════════════════
+                        _SectionLabel(label: 'READING STREAK', theme: theme),
+                        const SizedBox(height: 8),
+                        _StreakProgressCard(theme: theme),
 
-                    const SizedBox(height: 20),
+                        const SizedBox(height: 20),
 
-                    // ═══════════════════════════════════════════════════════
-                    // 6. QUICK ACTIONS
-                    // ═══════════════════════════════════════════════════════
-                    _SectionLabel(label: 'QUICK ACTIONS', theme: theme),
-                    const SizedBox(height: 8),
-                    _QuickActionsRow(theme: theme),
+                        // ═══════════════════════════════════════════════════════
+                        // 6. QUICK ACTIONS
+                        // ═══════════════════════════════════════════════════════
+                        _SectionLabel(label: 'QUICK ACTIONS', theme: theme),
+                        const SizedBox(height: 8),
+                        _QuickActionsRow(theme: theme),
 
-                    const SizedBox(height: 40),
-                    Center(
-                      child: TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        style: TextButton.styleFrom(
-                          minimumSize: const Size(88, 44),
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                        ),
-                        child: Text(
-                          'Done',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: theme.colorScheme.onSurface,
-                            fontWeight: FontWeight.w600,
+                        const SizedBox(height: 40),
+                        Center(
+                          child: TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            style: TextButton.styleFrom(
+                              minimumSize: const Size(88, 44),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 24, vertical: 12),
+                            ),
+                            child: Text(
+                              'Done',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                color: theme.colorScheme.onSurface,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                        // Bottom padding: clears the floating bottom nav
+                        SizedBox(height: mq.padding.bottom + 40),
+                      ],
                     ),
-                    // Bottom padding: clears the floating bottom nav
-                    SizedBox(height: mq.padding.bottom + 40),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-    ],
-  ),
-);
+    );
   }
 }
 
@@ -267,18 +283,21 @@ class _TodaysReadingCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final activePlanIds = ref.watch(activePlanIdsProvider);
-    final primaryPlanId = activePlanIds.isNotEmpty ? activePlanIds.first : 'chronological_1yr';
+    final primaryPlanId =
+        activePlanIds.isNotEmpty ? activePlanIds.first : 'chronological_1yr';
     final planState = ref.watch(readingPlanProvider(primaryPlanId));
     final totalDays = planState.planData.length;
     final currentDay = planState.currentDay;
-    
+
     final now = DateTime.now();
     final dayOfYear = now.difference(DateTime(now.year, 1, 1)).inDays + 1;
     final dayLabel = 'Day $dayOfYear of 365';
     final progress = dayOfYear / 365.0;
     List<String> chapters = [];
     if (totalDays > 0 && currentDay > 0 && currentDay <= totalDays) {
-      chapters = planState.planData[currentDay - 1].chapters.map((c) => '${c.bookName} ${c.chapterNum}').toList();
+      chapters = planState.planData[currentDay - 1].chapters
+          .map((c) => '${c.bookName} ${c.chapterNum}')
+          .toList();
     }
 
     return GlassContainer(
@@ -316,10 +335,9 @@ class _TodaysReadingCard extends ConsumerWidget {
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 5,
-              backgroundColor:
-                  AppColors.goldAccent.withValues(alpha: 0.15),
-              valueColor: const AlwaysStoppedAnimation<Color>(
-                  AppColors.goldAccent),
+              backgroundColor: AppColors.goldAccent.withValues(alpha: 0.15),
+              valueColor:
+                  const AlwaysStoppedAnimation<Color>(AppColors.goldAccent),
             ),
           ),
           const SizedBox(height: 14),
@@ -329,36 +347,35 @@ class _TodaysReadingCard extends ConsumerWidget {
               spacing: 8,
               runSpacing: 6,
               children: chapters
-                .map(
-                  (c) => Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: AppColors.goldAccent.withValues(alpha: 0.10),
-                      border: Border.all(
-                        color: AppColors.goldAccent.withValues(alpha: 0.25),
+                  .map(
+                    (c) => Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: AppColors.goldAccent.withValues(alpha: 0.10),
+                        border: Border.all(
+                          color: AppColors.goldAccent.withValues(alpha: 0.25),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.check_circle_outline,
+                              size: 13, color: AppColors.goldAccent),
+                          const SizedBox(width: 5),
+                          Text(
+                            c,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.check_circle_outline,
-                            size: 13,
-                            color: AppColors.goldAccent),
-                        const SizedBox(width: 5),
-                        Text(
-                          c,
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-                .toList(),
-          ),
+                  )
+                  .toList(),
+            ),
           const SizedBox(height: 14),
           SizedBox(
             width: double.infinity,
@@ -367,19 +384,24 @@ class _TodaysReadingCard extends ConsumerWidget {
                 final homeState = ref.read(homeProvider);
                 final refStr = homeState.verseOfTheDay.reference;
                 final lastSpaceIdx = refStr.lastIndexOf(' ');
-                final bookName = lastSpaceIdx != -1 ? refStr.substring(0, lastSpaceIdx) : refStr;
-                final refParts = lastSpaceIdx != -1 ? refStr.substring(lastSpaceIdx + 1).split(':') : [];
-                final chapterNum = refParts.isNotEmpty ? (int.tryParse(refParts[0]) ?? 1) : 1;
-                final verseNum = refParts.length > 1 ? int.tryParse(refParts[1]) : null;
+                final bookName = lastSpaceIdx != -1
+                    ? refStr.substring(0, lastSpaceIdx)
+                    : refStr;
+                final refParts = lastSpaceIdx != -1
+                    ? refStr.substring(lastSpaceIdx + 1).split(':')
+                    : [];
+                final chapterNum =
+                    refParts.isNotEmpty ? (int.tryParse(refParts[0]) ?? 1) : 1;
+                final verseNum =
+                    refParts.length > 1 ? int.tryParse(refParts[1]) : null;
 
                 Navigator.of(context).push(CupertinoPageRoute(
-                  builder: (_) => CommentaryHubScreen(
-                    book: bookName,
-                    chapter: chapterNum,
-                    verse: verseNum,
-                    verseText: homeState.verseOfTheDay.text,
-                  )
-                ));
+                    builder: (_) => CommentaryHubScreen(
+                          book: bookName,
+                          chapter: chapterNum,
+                          verse: verseNum,
+                          verseText: homeState.verseOfTheDay.text,
+                        )));
               },
               icon: const Icon(Icons.menu_book_outlined, size: 16),
               label: const Text("Continue Reading"),
@@ -412,7 +434,8 @@ class _LatestNoteCard extends ConsumerWidget {
     final notes = ref.watch(notesProvider);
     final hasNote = notes.isNotEmpty;
     final noteTitle = hasNote ? notes.first.title : 'No notes yet';
-    final notePreview = hasNote ? notes.first.content : 'Write your first note to see it here.';
+    final notePreview =
+        hasNote ? notes.first.content : 'Write your first note to see it here.';
     final noteDate = hasNote ? notes.first.date : '';
 
     return GlassContainer(
@@ -485,11 +508,14 @@ class _StreakProgressCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final activePlanIds = ref.watch(activePlanIdsProvider);
-    final primaryPlanId = activePlanIds.isNotEmpty ? activePlanIds.first : 'chronological_1yr';
+    final primaryPlanId =
+        activePlanIds.isNotEmpty ? activePlanIds.first : 'chronological_1yr';
     final planState = ref.watch(readingPlanProvider(primaryPlanId));
     final streakDays = planState.currentDay > 1 ? planState.currentDay - 1 : 0;
     final totalDays = planState.planData.length;
-    final totalCompleted = planState.currentDay > 1 && totalDays > 0 ? planState.currentDay - 1 : 0;
+    final totalCompleted = planState.currentDay > 1 && totalDays > 0
+        ? planState.currentDay - 1
+        : 0;
 
     return GlassContainer(
       padding: const EdgeInsets.all(20),
@@ -557,8 +583,7 @@ class _StreakProgressCard extends ConsumerWidget {
                 Text(
                   '${totalDays - totalCompleted} days remaining in the plan.',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color:
-                        theme.colorScheme.onSurface.withValues(alpha: 0.50),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.50),
                   ),
                 ),
               ],
@@ -598,7 +623,8 @@ class _QuickActionsRow extends ConsumerWidget {
         color: const Color(0xFF27AE60),
         onTap: () {
           Navigator.of(context).push(
-            CupertinoPageRoute(builder: (_) => const YourSpaceScreen(initialTab: 0)),
+            CupertinoPageRoute(
+                builder: (_) => const YourSpaceScreen(initialTab: 0)),
           );
         },
       ),
@@ -608,7 +634,8 @@ class _QuickActionsRow extends ConsumerWidget {
         color: const Color(0xFFE67E22),
         onTap: () {
           Navigator.of(context).push(
-            CupertinoPageRoute(builder: (_) => const YourSpaceScreen(initialTab: 1)),
+            CupertinoPageRoute(
+                builder: (_) => const YourSpaceScreen(initialTab: 1)),
           );
         },
       ),
@@ -693,8 +720,10 @@ class _StreakHeroWidget extends ConsumerWidget {
       return const SizedBox.shrink(); // Hide if no streak and haven't read
     }
 
-    final Color glowColor = isLit ? AppColors.goldAccent : Colors.grey.withValues(alpha: 0.5);
-    final String countText = count > 0 ? '$count Day Streak' : 'Read today to start streak!';
+    final Color glowColor =
+        isLit ? AppColors.goldAccent : Colors.grey.withValues(alpha: 0.5);
+    final String countText =
+        count > 0 ? '$count Day Streak' : 'Read today to start streak!';
 
     return Center(
       child: GlassContainer(
@@ -704,21 +733,27 @@ class _StreakHeroWidget extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              isLit ? Icons.local_fire_department_rounded : Icons.local_fire_department_outlined,
+              isLit
+                  ? Icons.local_fire_department_rounded
+                  : Icons.local_fire_department_outlined,
               color: glowColor,
               size: 24,
-              shadows: isLit ? [
-                Shadow(
-                  color: glowColor.withValues(alpha: 0.6),
-                  blurRadius: 10 + (count.clamp(0, 10).toDouble()),
-                )
-              ] : null,
+              shadows: isLit
+                  ? [
+                      Shadow(
+                        color: glowColor.withValues(alpha: 0.6),
+                        blurRadius: 10 + (count.clamp(0, 10).toDouble()),
+                      )
+                    ]
+                  : null,
             ),
             const SizedBox(width: 8),
             Text(
               countText,
               style: theme.textTheme.labelLarge?.copyWith(
-                color: isLit ? theme.colorScheme.onSurface : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                color: isLit
+                    ? theme.colorScheme.onSurface
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 fontWeight: FontWeight.bold,
               ),
             ),

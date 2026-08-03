@@ -12,7 +12,7 @@ class YourSpaceHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return TexturedGlassContainer(
       borderRadius: BorderRadius.circular(24),
       padding: EdgeInsets.zero,
@@ -38,7 +38,9 @@ class YourSpaceHero extends StatelessWidget {
                       color: AppColors.goldAccent,
                     ),
                   ),
-                  Icon(Icons.arrow_forward_ios_rounded, size: 16, color: theme.primaryColor.withValues(alpha: 0.5)),
+                  Icon(Icons.arrow_forward_ios_rounded,
+                      size: 16,
+                      color: theme.primaryColor.withValues(alpha: 0.5)),
                 ],
               ),
               const SizedBox(height: 12),

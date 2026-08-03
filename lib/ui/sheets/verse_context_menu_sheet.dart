@@ -23,7 +23,8 @@ class VerseContextMenuSheet extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<VerseContextMenuSheet> createState() => _VerseContextMenuSheetState();
+  ConsumerState<VerseContextMenuSheet> createState() =>
+      _VerseContextMenuSheetState();
 }
 
 class _VerseContextMenuSheetState extends ConsumerState<VerseContextMenuSheet> {
@@ -43,88 +44,100 @@ class _VerseContextMenuSheetState extends ConsumerState<VerseContextMenuSheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final bookAbbrev = _getBookAbbrev(ref, widget.bookName);
-    final verseKey = generateVerseKey(bookAbbrev, widget.chapterNum, widget.verseNumber);
+    final verseKey =
+        generateVerseKey(bookAbbrev, widget.chapterNum, widget.verseNumber);
 
-
-    final hasNote = ref.watch(notesProvider).any((n) => n.reference == verseKey);
+    final hasNote =
+        ref.watch(notesProvider).any((n) => n.reference == verseKey);
 
     final targetVerses = [widget.verseNumber];
 
     return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onVerticalDragUpdate: _preventDrag ? (_) {} : null,
-      child: SafeArea(
-        child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-        child: TexturedGlassContainer(
-          borderRadius: BorderRadius.circular(24),
+        behavior: HitTestBehavior.opaque,
+        onVerticalDragUpdate: _preventDrag ? (_) {} : null,
+        child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Expanded(
-                        child: _MenuButton(
-                          icon: const Icon(Icons.comment_bank_outlined, size: 24),
-                          label: 'Commentary',
-                          onTap: () {
-                            Navigator.of(context).pop();
-                            Navigator.of(context).push(CupertinoPageRoute(
-                              builder: (_) => CommentaryHubScreen(
-                                book: widget.bookName,
-                                chapter: widget.chapterNum,
-                                verse: widget.verseNumber,
-                              ),
-                            ));
-                          },
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+            child: TexturedGlassContainer(
+              borderRadius: BorderRadius.circular(24),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Expanded(
+                          child: _MenuButton(
+                            icon: const Icon(Icons.comment_bank_outlined,
+                                size: 24),
+                            label: 'Commentary',
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              Navigator.of(context).push(CupertinoPageRoute(
+                                builder: (_) => CommentaryHubScreen(
+                                  book: widget.bookName,
+                                  chapter: widget.chapterNum,
+                                  verse: widget.verseNumber,
+                                ),
+                              ));
+                            },
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        child: _MenuButton(
-                          icon: Icon(Icons.edit_document, size: 24),
-                          label: hasNote ? 'Edit Note' : 'Note',
-                          color: hasNote ? Colors.blue.shade600 : null,
-                          onTap: () {
-                            Navigator.of(context).pop();
-                            VerseActionLogic.handleNote(
-                              context, ref, theme, widget.bookName, widget.chapterNum, targetVerses,
-                            );
-                          },
+                        Expanded(
+                          child: _MenuButton(
+                            icon: Icon(Icons.edit_document, size: 24),
+                            label: hasNote ? 'Edit Note' : 'Note',
+                            color: hasNote ? Colors.blue.shade600 : null,
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              VerseActionLogic.handleNote(
+                                context,
+                                ref,
+                                theme,
+                                widget.bookName,
+                                widget.chapterNum,
+                                targetVerses,
+                              );
+                            },
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        child: _MenuButton(
-                          icon: Icon(Icons.ios_share_rounded, size: 24),
-                          label: 'Share',
-                          onTap: () {
-                            Navigator.of(context).pop();
-                            VerseActionLogic.handleShare(
-                              context, ref, widget.bookName, widget.chapterNum, targetVerses,
-                            );
-                          },
+                        Expanded(
+                          child: _MenuButton(
+                            icon: Icon(Icons.ios_share_rounded, size: 24),
+                            label: 'Share',
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              VerseActionLogic.handleShare(
+                                context,
+                                ref,
+                                widget.bookName,
+                                widget.chapterNum,
+                                targetVerses,
+                              );
+                            },
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        child: _MenuButton(
-                          icon: Icon(Icons.crop_free_rounded, size: 24),
-                          label: 'Select Text',
-                          onTap: () {
-                            Navigator.of(context).pop();
-                            widget.onCustomSelection();
-                          },
+                        Expanded(
+                          child: _MenuButton(
+                            icon: Icon(Icons.crop_free_rounded, size: 24),
+                            label: 'Select Text',
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              widget.onCustomSelection();
+                            },
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-              ],
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
-        ),
-      ),
-    ));
+        ));
   }
 
   String _getBookAbbrev(WidgetRef ref, String fullBookName) {
@@ -137,8 +150,6 @@ class _VerseContextMenuSheetState extends ConsumerState<VerseContextMenuSheet> {
     // Fallback if not found
     return fullBookName.substring(0, 3).toUpperCase();
   }
-
-
 }
 
 class _MenuButton extends StatelessWidget {

@@ -60,7 +60,9 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
 
     try {
       final book = bibleState.books.firstWhere(
-        (b) => b.name.toLowerCase() == widget.book.toLowerCase() || b.abbreviation.toLowerCase() == widget.book.toLowerCase(),
+        (b) =>
+            b.name.toLowerCase() == widget.book.toLowerCase() ||
+            b.abbreviation.toLowerCase() == widget.book.toLowerCase(),
       );
       if (widget.chapter > 0 && widget.chapter <= book.chapters.length) {
         final chapter = book.chapters[widget.chapter - 1];
@@ -83,12 +85,12 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
 
     final bookName = widget.book;
     final appThemeMode = ref.watch(themeProvider);
-    final is3DTheme = appThemeMode == AppThemeMode.dawn || 
-                      appThemeMode == AppThemeMode.lilies || 
-                      appThemeMode == AppThemeMode.roses || 
-                      appThemeMode == AppThemeMode.olives || 
-                      appThemeMode == AppThemeMode.dusk || 
-                      appThemeMode == AppThemeMode.fresh;
+    final is3DTheme = appThemeMode == AppThemeMode.dawn ||
+        appThemeMode == AppThemeMode.lilies ||
+        appThemeMode == AppThemeMode.roses ||
+        appThemeMode == AppThemeMode.olives ||
+        appThemeMode == AppThemeMode.dusk ||
+        appThemeMode == AppThemeMode.fresh;
 
     final chapterNum = widget.chapter;
     final displayVerse = widget.verse ?? _currentVerseNum;
@@ -97,7 +99,9 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
         ? '$bookName $chapterNum:$displayVerse'
         : '$bookName $chapterNum';
 
-    final isBookmarked = ref.read(commentaryBookmarksProvider.notifier).isBookmarked(bookName, chapterNum, displayVerse);
+    final isBookmarked = ref
+        .read(commentaryBookmarksProvider.notifier)
+        .isBookmarked(bookName, chapterNum, displayVerse);
     final fetchedVerseText = _lookupVerseText(ref, displayVerse);
 
     List<CommentaryEntry> verseEntries = [];
@@ -105,30 +109,43 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
     List<CommentaryEntry> bookEntries = [];
 
     if (widget.verse != null) {
-      verseEntries = commentaryNotifier.commentaryForVerse(bookName, chapterNum, widget.verse!);
+      verseEntries = commentaryNotifier.commentaryForVerse(
+          bookName, chapterNum, widget.verse!);
     } else {
-      verseEntries = commentaryNotifier.commentaryForChapterVerses(bookName, chapterNum);
+      verseEntries =
+          commentaryNotifier.commentaryForChapterVerses(bookName, chapterNum);
     }
-    chapterEntries = commentaryNotifier.commentaryForChapter(bookName, chapterNum);
+    chapterEntries =
+        commentaryNotifier.commentaryForChapter(bookName, chapterNum);
     bookEntries = commentaryNotifier.commentaryForBook(bookName);
 
-    final hasContent = verseEntries.isNotEmpty || chapterEntries.isNotEmpty || bookEntries.isNotEmpty;
+    final hasContent = verseEntries.isNotEmpty ||
+        chapterEntries.isNotEmpty ||
+        bookEntries.isNotEmpty;
 
     return PinchToZoomFontWrapper(
       child: Stack(
         children: [
           // Base: Scrollable Content
-          _buildScrollableContent(verseEntries, chapterEntries, bookEntries, commentaryAsync, hasContent, theme, tokens, is3DTheme, typography),
-          
+          _buildScrollableContent(
+              verseEntries,
+              chapterEntries,
+              bookEntries,
+              commentaryAsync,
+              hasContent,
+              theme,
+              tokens,
+              is3DTheme,
+              typography),
+
           // Floating Top Header
           Positioned(
             top: widget.isCompact ? 16 : MediaQuery.paddingOf(context).top + 16,
-            left: 16, 
+            left: 16,
             right: 16,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-
                 // 1. TOP ROW
                 Stack(
                   alignment: Alignment.center,
@@ -136,7 +153,8 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: IconButton(
-                        icon: Icon(Icons.arrow_back_ios_new_rounded, color: theme.primaryColor),
+                        icon: Icon(Icons.arrow_back_ios_new_rounded,
+                            color: theme.primaryColor),
                         onPressed: () {
                           if (widget.isCompact) {
                             Navigator.pop(context);
@@ -148,11 +166,13 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 6),
                       decoration: BoxDecoration(
                         color: Colors.transparent,
                         borderRadius: BorderRadius.circular(30),
-                        border: Border.all(color: tokens.readingAccent.withValues(alpha: 0.5)),
+                        border: Border.all(
+                            color: tokens.readingAccent.withValues(alpha: 0.5)),
                       ),
                       child: Text(
                         referenceString,
@@ -170,12 +190,21 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                         children: [
                           IconButton(
                             icon: Icon(
-                              isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded,
-                              color: isBookmarked ? tokens.readingAccent : tokens.readingInkMuted,
+                              isBookmarked
+                                  ? Icons.bookmark_rounded
+                                  : Icons.bookmark_outline_rounded,
+                              color: isBookmarked
+                                  ? tokens.readingAccent
+                                  : tokens.readingInkMuted,
                             ),
-                            tooltip: isBookmarked ? 'Remove Bookmark' : 'Bookmark Commentary',
+                            tooltip: isBookmarked
+                                ? 'Remove Bookmark'
+                                : 'Bookmark Commentary',
                             onPressed: () {
-                              ref.read(commentaryBookmarksProvider.notifier).toggleBookmark(bookName, chapterNum, displayVerse);
+                              ref
+                                  .read(commentaryBookmarksProvider.notifier)
+                                  .toggleBookmark(
+                                      bookName, chapterNum, displayVerse);
                             },
                           ),
                           if (widget.onExpand != null)
@@ -193,16 +222,20 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                     ),
                   ],
                 ),
-                
+
                 // 2. FLOATING VERSE CARD
                 if (fetchedVerseText != null)
                   Container(
                     margin: const EdgeInsets.only(top: 12),
                     padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
                     decoration: BoxDecoration(
-                      color: is3DTheme ? theme.colorScheme.surface : theme.scaffoldBackgroundColor,
+                      color: is3DTheme
+                          ? theme.colorScheme.surface
+                          : theme.scaffoldBackgroundColor,
                       borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: tokens.readingInkMuted.withValues(alpha: 0.15)),
+                      border: Border.all(
+                          color:
+                              tokens.readingInkMuted.withValues(alpha: 0.15)),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withValues(alpha: 0.08),
@@ -232,13 +265,13 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
   }
 
   Widget _buildScrollableContent(
-    List<CommentaryEntry> verseEntries, 
-    List<CommentaryEntry> chapterEntries, 
-    List<CommentaryEntry> bookEntries, 
-    AsyncValue<void> commentaryAsync, 
-    bool hasContent, 
-    ThemeData theme, 
-    ReadingTokens tokens, 
+    List<CommentaryEntry> verseEntries,
+    List<CommentaryEntry> chapterEntries,
+    List<CommentaryEntry> bookEntries,
+    AsyncValue<void> commentaryAsync,
+    bool hasContent,
+    ThemeData theme,
+    ReadingTokens tokens,
     bool is3DTheme,
     TypographyState typography,
   ) {
@@ -247,7 +280,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
         if (widget.verse == null && verseEntries.isNotEmpty) {
           int? topVerse;
           double minDy = double.infinity;
-          
+
           for (final entry in _entryKeys.entries) {
             final context = entry.value.currentContext;
             if (context != null) {
@@ -264,7 +297,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
               }
             }
           }
-          
+
           if (topVerse != null && topVerse != _currentVerseNum) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (mounted && _currentVerseNum != topVerse) {
@@ -283,8 +316,8 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
           // Spacer for floating header
           SliverToBoxAdapter(
             child: SizedBox(
-              height: widget.isCompact 
-                  ? 240.0 
+              height: widget.isCompact
+                  ? 240.0
                   : MediaQuery.paddingOf(context).top + 240.0,
             ),
           ),
@@ -298,7 +331,8 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
           else if (!hasContent)
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 child: _buildEmptyState(theme, tokens, is3DTheme),
               ),
             )
@@ -307,16 +341,17 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
               SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
-                    final key = _entryKeys.putIfAbsent(index, () => GlobalKey());
+                    final key =
+                        _entryKeys.putIfAbsent(index, () => GlobalKey());
                     return KeyedSubtree(
                       key: key,
-                      child: _buildEntryCard(theme, tokens, verseEntries[index], typography),
+                      child: _buildEntryCard(
+                          theme, tokens, verseEntries[index], typography),
                     );
                   },
                   childCount: verseEntries.length,
                 ),
               ),
-
             if (chapterEntries.isNotEmpty)
               SliverToBoxAdapter(
                 child: _buildCollapsibleSection(
@@ -329,7 +364,6 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                   onToggle: () => setState(() => _showChapter = !_showChapter),
                 ),
               ),
-
             if (bookEntries.isNotEmpty)
               SliverToBoxAdapter(
                 child: _buildCollapsibleSection(
@@ -348,19 +382,23 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
     );
   }
 
-
-  Widget _buildEmptyState(ThemeData theme, ReadingTokens tokens, bool is3DTheme) {
+  Widget _buildEmptyState(
+      ThemeData theme, ReadingTokens tokens, bool is3DTheme) {
     return Container(
       decoration: BoxDecoration(
         color: is3DTheme ? theme.colorScheme.surface : tokens.readingSurface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: is3DTheme ? Colors.white.withValues(alpha: 0.15) : tokens.readingBorder),
+        border: Border.all(
+            color: is3DTheme
+                ? Colors.white.withValues(alpha: 0.15)
+                : tokens.readingBorder),
       ),
       padding: const EdgeInsets.symmetric(vertical: 40.0, horizontal: 24.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.menu_book_rounded, size: 56, color: tokens.readingAccent.withValues(alpha: 0.4)),
+          Icon(Icons.menu_book_rounded,
+              size: 56, color: tokens.readingAccent.withValues(alpha: 0.4)),
           const SizedBox(height: 20),
           Text(
             'No commentary yet',
@@ -413,7 +451,11 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                       ),
                     ),
                   ),
-                  Icon(isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, color: tokens.readingAccent),
+                  Icon(
+                      isExpanded
+                          ? Icons.keyboard_arrow_up
+                          : Icons.keyboard_arrow_down,
+                      color: tokens.readingAccent),
                 ],
               ),
             ),
@@ -422,10 +464,13 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
             Padding(
               padding: const EdgeInsets.only(bottom: 20.0),
               child: Column(
-                children: entries.map((entry) => Padding(
-                  padding: const EdgeInsets.only(top: 16.0),
-                  child: _buildEntryContent(theme, tokens, entry, typography),
-                )).toList(),
+                children: entries
+                    .map((entry) => Padding(
+                          padding: const EdgeInsets.only(top: 16.0),
+                          child: _buildEntryContent(
+                              theme, tokens, entry, typography),
+                        ))
+                    .toList(),
               ),
             ),
         ],
@@ -433,14 +478,16 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
     );
   }
 
-  Widget _buildEntryCard(ThemeData theme, ReadingTokens tokens, CommentaryEntry entry, TypographyState typography) {
+  Widget _buildEntryCard(ThemeData theme, ReadingTokens tokens,
+      CommentaryEntry entry, TypographyState typography) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
       child: _buildEntryContent(theme, tokens, entry, typography),
     );
   }
 
-  Widget _buildEntryContent(ThemeData theme, ReadingTokens tokens, CommentaryEntry entry, TypographyState typography) {
+  Widget _buildEntryContent(ThemeData theme, ReadingTokens tokens,
+      CommentaryEntry entry, TypographyState typography) {
     final paragraphs = entry.text.split('\n\n');
 
     return SelectionArea(
@@ -448,17 +495,17 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ...paragraphs.map((p) => Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
-            child: Text(
-              p.trim(),
-              style: theme.textTheme.bodyLarge?.copyWith(
-                fontSize: typography.fontSize,
-                height: typography.lineHeight,
-                fontFamily: typography.fontFamily,
-                color: tokens.readingInk,
-              ),
-            ),
-          )),
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: Text(
+                  p.trim(),
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontSize: typography.fontSize,
+                    height: typography.lineHeight,
+                    fontFamily: typography.fontFamily,
+                    color: tokens.readingInk,
+                  ),
+                ),
+              )),
           const Divider(height: 24),
           Text(
             entry.author,
@@ -501,12 +548,12 @@ void showCommentaryBottomSheet(
           final tokens = Theme.of(context).extension<ReadingTokens>()!;
           final theme = Theme.of(context);
           final appThemeMode = ref.watch(themeProvider);
-          final is3DTheme = appThemeMode == AppThemeMode.dawn || 
-                            appThemeMode == AppThemeMode.lilies || 
-                            appThemeMode == AppThemeMode.roses || 
-                            appThemeMode == AppThemeMode.olives || 
-                            appThemeMode == AppThemeMode.dusk || 
-                            appThemeMode == AppThemeMode.fresh;
+          final is3DTheme = appThemeMode == AppThemeMode.dawn ||
+              appThemeMode == AppThemeMode.lilies ||
+              appThemeMode == AppThemeMode.roses ||
+              appThemeMode == AppThemeMode.olives ||
+              appThemeMode == AppThemeMode.dusk ||
+              appThemeMode == AppThemeMode.fresh;
 
           return DraggableScrollableSheet(
             initialChildSize: 0.65,
@@ -516,8 +563,12 @@ void showCommentaryBottomSheet(
             builder: (context, scrollController) {
               return Container(
                 decoration: BoxDecoration(
-                  color: theme.bottomSheetTheme.backgroundColor ?? (is3DTheme ? theme.colorScheme.surface : tokens.readingSurface),
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                  color: theme.bottomSheetTheme.backgroundColor ??
+                      (is3DTheme
+                          ? theme.colorScheme.surface
+                          : tokens.readingSurface),
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(28)),
                 ),
                 child: SafeArea(
                   top: false,

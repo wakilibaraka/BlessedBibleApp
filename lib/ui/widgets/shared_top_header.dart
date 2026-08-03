@@ -45,7 +45,8 @@ class SharedTopHeader extends ConsumerWidget {
           SizedBox(
             width: 48,
             height: 48,
-            child: trailing ?? _buildDefaultTrailing(context, ref, theme, appThemeMode),
+            child: trailing ??
+                _buildDefaultTrailing(context, ref, theme, appThemeMode),
           ),
         ],
       ),
@@ -66,7 +67,8 @@ class SharedTopHeader extends ConsumerWidget {
     );
   }
 
-  Widget _buildDefaultTrailing(BuildContext context, WidgetRef ref, ThemeData theme, AppThemeMode appThemeMode) {
+  Widget _buildDefaultTrailing(BuildContext context, WidgetRef ref,
+      ThemeData theme, AppThemeMode appThemeMode) {
     return Center(
       child: GestureDetector(
         onTap: () {
@@ -76,7 +78,8 @@ class SharedTopHeader extends ConsumerWidget {
           duration: const Duration(milliseconds: 350),
           transitionBuilder: (child, anim) => RotationTransition(
             turns: Tween<double>(begin: 0.75, end: 1.0).animate(anim),
-            child: FadeTransition(opacity: anim, alwaysIncludeSemantics: true, child: child),
+            child: FadeTransition(
+                opacity: anim, alwaysIncludeSemantics: true, child: child),
           ),
           child: switch (appThemeMode) {
             AppThemeMode.automatic => Icon(
@@ -92,10 +95,10 @@ class SharedTopHeader extends ConsumerWidget {
                 color: theme.primaryColor,
               ),
             AppThemeMode.dark => Icon(
-              Icons.dark_mode_rounded,
-              color: theme.colorScheme.onSurface,
-              size: 20,
-            ),
+                Icons.dark_mode_rounded,
+                color: theme.colorScheme.onSurface,
+                size: 20,
+              ),
             AppThemeMode.oled => Icon(
                 Icons.nightlight_round,
                 key: const ValueKey('dark'),

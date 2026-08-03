@@ -63,28 +63,29 @@ class MostReadNotifier extends Notifier<List<MostReadItem>> {
   List<MostReadItem> build() {
     final prefs = ref.watch(preferencesProvider);
     final map = prefs.getVerseVisits();
-    
+
     final List<MostReadItem> items = [];
     map.forEach((key, visits) {
       items.add(MostReadItem.fromKey(key, visits));
     });
-    
+
     // Sort descending by visits
     items.sort((a, b) => b.visits.compareTo(a.visits));
-    
+
     return items;
   }
 
-  void incrementVisit(String bookAbbrev, String bookName, int chapter, int verse) {
+  void incrementVisit(
+      String bookAbbrev, String bookName, int chapter, int verse) {
     final prefs = ref.read(preferencesProvider);
     final map = prefs.getVerseVisits();
-    
+
     final key = '$bookAbbrev|$bookName|$chapter|$verse';
     final currentVisits = map[key] ?? 0;
     map[key] = currentVisits + 1;
-    
+
     prefs.saveVerseVisits(map);
-    
+
     // Update state to trigger UI refresh (e.g. in SearchScreen empty state)
     // We recreate the list so it sorts correctly.
     final List<MostReadItem> items = [];
@@ -92,9 +93,10 @@ class MostReadNotifier extends Notifier<List<MostReadItem>> {
       items.add(MostReadItem.fromKey(k, v));
     });
     items.sort((a, b) => b.visits.compareTo(a.visits));
-    
+
     state = items;
   }
 }
 
-final mostReadProvider = NotifierProvider<MostReadNotifier, List<MostReadItem>>(MostReadNotifier.new);
+final mostReadProvider = NotifierProvider<MostReadNotifier, List<MostReadItem>>(
+    MostReadNotifier.new);

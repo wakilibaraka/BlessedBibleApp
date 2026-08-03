@@ -27,7 +27,9 @@ void main() async {
     }
     try {
       final file = dart_io.File('crash_log.txt');
-      file.writeAsStringSync('FlutterError: ${details.exception}\n${details.stack}\n', mode: dart_io.FileMode.append);
+      file.writeAsStringSync(
+          'FlutterError: ${details.exception}\n${details.stack}\n',
+          mode: dart_io.FileMode.append);
     } catch (_) {}
   };
 
@@ -38,11 +40,11 @@ void main() async {
     }
     try {
       final file = dart_io.File('crash_log.txt');
-      file.writeAsStringSync('Uncaught async error: $error\n$stack\n', mode: dart_io.FileMode.append);
+      file.writeAsStringSync('Uncaught async error: $error\n$stack\n',
+          mode: dart_io.FileMode.append);
     } catch (_) {}
     return true; // Handled, prevent process termination
   };
-
 
   // Override ErrorWidget.builder to render branded fallback in release mode
   ErrorWidget.builder = (FlutterErrorDetails details) {
@@ -52,11 +54,15 @@ void main() async {
     return AppErrorFallback(details: details);
   };
 
-  if (kStartupTrace) debugPrint('App start: ${startupStopwatch.elapsedMilliseconds} ms');
+  if (kStartupTrace)
+    debugPrint('App start: ${startupStopwatch.elapsedMilliseconds} ms');
   WidgetsFlutterBinding.ensureInitialized();
-  if (kStartupTrace) debugPrint('FlutterBinding initialized: ${startupStopwatch.elapsedMilliseconds} ms');
+  if (kStartupTrace)
+    debugPrint(
+        'FlutterBinding initialized: ${startupStopwatch.elapsedMilliseconds} ms');
   final prefs = await SharedPreferences.getInstance();
-  if (kStartupTrace) debugPrint('Prefs loaded: ${startupStopwatch.elapsedMilliseconds} ms');
+  if (kStartupTrace)
+    debugPrint('Prefs loaded: ${startupStopwatch.elapsedMilliseconds} ms');
 
   runApp(
     ProviderScope(
@@ -80,7 +86,9 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (kStartupTrace) debugPrint('First frame rendered: ${startupStopwatch.elapsedMilliseconds} ms');
+      if (kStartupTrace)
+        debugPrint(
+            'First frame rendered: ${startupStopwatch.elapsedMilliseconds} ms');
     });
   }
 
@@ -89,15 +97,6 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
     final themeMode = ref.watch(themeProvider);
     final isBibleLoading = ref.watch(bibleProvider.select((s) => s.isLoading));
     final readSettings = ref.watch(readSettingsProvider);
-    final isInstantMode = readSettings.gestureSensitivity == GestureSensitivity.instant;
-
-    final noAnimTransitions = PageTransitionsTheme(
-      builders: {
-        TargetPlatform.android: const NoAnimationPageTransitionsBuilder(),
-        TargetPlatform.iOS: const NoAnimationPageTransitionsBuilder(),
-        TargetPlatform.macOS: const NoAnimationPageTransitionsBuilder(),
-      },
-    );
 
     ThemeData lightBase = themeMode == AppThemeMode.lilies
         ? AppTheme.liliesTheme(14.0)
@@ -111,7 +110,7 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
                         ? AppTheme.galileeBlueTheme(14.0)
                         : themeMode == AppThemeMode.scarletRed
                             ? AppTheme.scarletRedTheme(14.0)
-                            : themeMode == AppThemeMode.sepia 
+                            : themeMode == AppThemeMode.sepia
                                 ? AppTheme.sepiaTheme(14.0)
                                 : AppTheme.lightTheme(14.0);
 
@@ -121,12 +120,8 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
             ? AppTheme.duskTheme(14.0)
             : themeMode == AppThemeMode.fresh
                 ? AppTheme.freshTheme(14.0)
-                : AppTheme.darkTheme(14.0, isAmoled: themeMode == AppThemeMode.oled);
-
-    if (isInstantMode) {
-      lightBase = lightBase.copyWith(pageTransitionsTheme: noAnimTransitions);
-      darkBase = darkBase.copyWith(pageTransitionsTheme: noAnimTransitions);
-    }
+                : AppTheme.darkTheme(14.0,
+                    isAmoled: themeMode == AppThemeMode.oled);
 
     return MaterialApp(
       title: 'The Blessed Bible',
@@ -151,7 +146,8 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
       },
       theme: lightBase,
       darkTheme: darkBase,
-      home: isBibleLoading ? const SplashLoadingScreen() : const MainNavScreen(),
+      home:
+          isBibleLoading ? const SplashLoadingScreen() : const MainNavScreen(),
     );
   }
 }

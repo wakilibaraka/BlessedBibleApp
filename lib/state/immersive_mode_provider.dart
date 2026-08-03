@@ -8,7 +8,8 @@ class ChromeHiddenNotifier extends Notifier<bool> {
   void set(bool value) => state = value;
 }
 
-final chromeHiddenProvider = NotifierProvider<ChromeHiddenNotifier, bool>(ChromeHiddenNotifier.new);
+final chromeHiddenProvider =
+    NotifierProvider<ChromeHiddenNotifier, bool>(ChromeHiddenNotifier.new);
 
 class NavHiddenNotifier extends Notifier<bool> {
   @override
@@ -18,4 +19,5 @@ class NavHiddenNotifier extends Notifier<bool> {
   void set(bool value) => state = value;
 }
 
-final navHiddenProvider = NotifierProvider<NavHiddenNotifier, bool>(NavHiddenNotifier.new);
+final navHiddenProvider =
+    NotifierProvider<NavHiddenNotifier, bool>(NavHiddenNotifier.new);

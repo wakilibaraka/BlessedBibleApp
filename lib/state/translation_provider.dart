@@ -32,16 +32,26 @@ class SecondaryTranslationNotifier extends Notifier<String?> {
   }
 }
 
-final activeTranslationProvider = NotifierProvider<TranslationNotifier, String>(TranslationNotifier.new);
-final secondaryTranslationProvider = NotifierProvider<SecondaryTranslationNotifier, String?>(SecondaryTranslationNotifier.new);
+final activeTranslationProvider =
+    NotifierProvider<TranslationNotifier, String>(TranslationNotifier.new);
+final secondaryTranslationProvider =
+    NotifierProvider<SecondaryTranslationNotifier, String?>(
+        SecondaryTranslationNotifier.new);
 
-final availableTranslationsProvider = FutureProvider<List<TranslationInfo>>((ref) async {
+final availableTranslationsProvider =
+    FutureProvider<List<TranslationInfo>>((ref) async {
   return await bibleDbService.getTranslations();
 });
 
-typedef VerseRequest = ({String translationId, int bookNumber, int chapter, int verse});
+typedef VerseRequest = ({
+  String translationId,
+  int bookNumber,
+  int chapter,
+  int verse
+});
 
-final verseTranslationProvider = FutureProvider.family<BibleVerse?, VerseRequest>((ref, request) async {
+final verseTranslationProvider =
+    FutureProvider.family<BibleVerse?, VerseRequest>((ref, request) async {
   return await bibleDbService.getVerse(
     request.translationId,
     request.bookNumber,

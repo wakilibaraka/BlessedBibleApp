@@ -37,7 +37,8 @@ class ReadingTokens extends ThemeExtension<ReadingTokens> {
   }
 
   @override
-  ThemeExtension<ReadingTokens> lerp(ThemeExtension<ReadingTokens>? other, double t) {
+  ThemeExtension<ReadingTokens> lerp(
+      ThemeExtension<ReadingTokens>? other, double t) {
     if (other is! ReadingTokens) return this;
     return ReadingTokens(
       readingPaper: Color.lerp(readingPaper, other.readingPaper, t)!,

@@ -7,14 +7,14 @@ import '../../state/surface_style_provider.dart';
 import '../../theme/reading_tokens.dart';
 
 // FROSTED GLASS TUNING CONSTANTS
-const double _kBlurSigma       = 40.0;
-const double _kTintLightAlpha  = 0.70;
-const double _kTintDarkAlpha   = 0.65;
-const double _kRimLightAlpha   = 0.55;
-const double _kRimDarkAlpha    = 0.30;
-const double _kNoiseAlphaDark  = 0.030;
+const double _kBlurSigma = 40.0;
+const double _kTintLightAlpha = 0.70;
+const double _kTintDarkAlpha = 0.65;
+const double _kRimLightAlpha = 0.55;
+const double _kRimDarkAlpha = 0.30;
+const double _kNoiseAlphaDark = 0.030;
 const double _kNoiseAlphaLight = 0.025;
-const double _kNoiseDensity    = 0.015;
+const double _kNoiseDensity = 0.015;
 
 class TexturedGlassContainer extends ConsumerWidget {
   final Widget child;
@@ -40,12 +40,12 @@ class TexturedGlassContainer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final appTheme     = ref.watch(themeProvider);
+    final appTheme = ref.watch(themeProvider);
     final surfaceStyle = ref.watch(surfaceStyleProvider);
-    final radius       = borderRadius ?? BorderRadius.circular(24);
+    final radius = borderRadius ?? BorderRadius.circular(24);
 
     final useBlur = surfaceStyle == SurfaceStyle.frosted && !isScrollable;
-    final is3D    = surfaceStyle == SurfaceStyle.threeDimensional;
+    final is3D = surfaceStyle == SurfaceStyle.threeDimensional;
 
     final tokens = Theme.of(context).extension<ReadingTokens>()!;
 
@@ -55,7 +55,8 @@ class TexturedGlassContainer extends ConsumerWidget {
     if (useBlur) {
       switch (appTheme.resolve(context)) {
         case AppThemeMode.sepia:
-          fillColor = const Color(0xFFF5EAD0).withValues(alpha: _kTintLightAlpha);
+          fillColor =
+              const Color(0xFFF5EAD0).withValues(alpha: _kTintLightAlpha);
           isDarkPanel = false;
           break;
         case AppThemeMode.light:
@@ -79,26 +80,38 @@ class TexturedGlassContainer extends ConsumerWidget {
           break;
       }
     } else if (surfaceStyle == SurfaceStyle.frosted && isScrollable) {
-      fillColor   = tokens.readingSurface.withValues(alpha: 0.92);
+      fillColor = tokens.readingSurface.withValues(alpha: 0.92);
       isDarkPanel = tokens.readingSurface.computeLuminance() < 0.4;
     } else {
-      fillColor   = tokens.readingSurface;
+      fillColor = tokens.readingSurface;
       isDarkPanel = tokens.readingSurface.computeLuminance() < 0.4;
     }
 
     final bgLuminance = tokens.readingSurface.computeLuminance();
-    final isDarkBg    = bgLuminance < 0.4;
+    final isDarkBg = bgLuminance < 0.4;
 
     final List<BoxShadow> shadows;
     if (is3D) {
       shadows = isDarkBg
           ? [
-              BoxShadow(color: Colors.white.withValues(alpha: 0.08), offset: const Offset(-2.0, -2.0), blurRadius: 4),
-              BoxShadow(color: Colors.black.withValues(alpha: 0.40), offset: const Offset(4.0, 4.0),   blurRadius: 6),
+              BoxShadow(
+                  color: Colors.white.withValues(alpha: 0.08),
+                  offset: const Offset(-2.0, -2.0),
+                  blurRadius: 4),
+              BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.40),
+                  offset: const Offset(4.0, 4.0),
+                  blurRadius: 6),
             ]
           : [
-              BoxShadow(color: Colors.white.withValues(alpha: 0.90), offset: const Offset(-2.0, -2.0), blurRadius: 4),
-              BoxShadow(color: Colors.black.withValues(alpha: 0.08), offset: const Offset(4.0, 4.0),   blurRadius: 6),
+              BoxShadow(
+                  color: Colors.white.withValues(alpha: 0.90),
+                  offset: const Offset(-2.0, -2.0),
+                  blurRadius: 4),
+              BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.08),
+                  offset: const Offset(4.0, 4.0),
+                  blurRadius: 6),
             ];
     } else if (surfaceStyle == SurfaceStyle.frosted) {
       shadows = [
@@ -117,7 +130,10 @@ class TexturedGlassContainer extends ConsumerWidget {
       ];
     } else {
       shadows = [
-        BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 8, offset: const Offset(0, 2)),
+        BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2)),
       ];
     }
 
@@ -195,17 +211,28 @@ class _RimAndNoisePainter extends CustomPainter {
     canvas.clipRRect(rrect);
 
     final random = math.Random(42);
-    final count  = (size.width * size.height * _kNoiseDensity).toInt().clamp(0, 800);
-    final darkPoints  = <Offset>[];
+    final count =
+        (size.width * size.height * _kNoiseDensity).toInt().clamp(0, 800);
+    final darkPoints = <Offset>[];
     final lightPoints = <Offset>[];
     for (int i = 0; i < count; i++) {
-      darkPoints.add(Offset(random.nextDouble() * size.width, random.nextDouble() * size.height));
-      lightPoints.add(Offset(random.nextDouble() * size.width, random.nextDouble() * size.height));
+      darkPoints.add(Offset(
+          random.nextDouble() * size.width, random.nextDouble() * size.height));
+      lightPoints.add(Offset(
+          random.nextDouble() * size.width, random.nextDouble() * size.height));
     }
-    canvas.drawPoints(PointMode.points, darkPoints,
-        Paint()..color = Colors.black.withValues(alpha: _kNoiseAlphaDark)..strokeWidth = 1.0);
-    canvas.drawPoints(PointMode.points, lightPoints,
-        Paint()..color = Colors.white.withValues(alpha: _kNoiseAlphaLight)..strokeWidth = 1.0);
+    canvas.drawPoints(
+        PointMode.points,
+        darkPoints,
+        Paint()
+          ..color = Colors.black.withValues(alpha: _kNoiseAlphaDark)
+          ..strokeWidth = 1.0);
+    canvas.drawPoints(
+        PointMode.points,
+        lightPoints,
+        Paint()
+          ..color = Colors.white.withValues(alpha: _kNoiseAlphaLight)
+          ..strokeWidth = 1.0);
 
     final rimPaint = Paint()
       ..shader = LinearGradient(
@@ -222,13 +249,15 @@ class _RimAndNoisePainter extends CustomPainter {
       ..strokeWidth = 1.2;
 
     canvas.drawRRect(
-      borderRadius.toRRect(Rect.fromLTWH(0.6, 0.6, size.width - 1.2, size.height - 1.2)),
+      borderRadius.toRRect(
+          Rect.fromLTWH(0.6, 0.6, size.width - 1.2, size.height - 1.2)),
       rimPaint,
     );
 
     if (!isDark) {
       canvas.drawRRect(
-        borderRadius.toRRect(Rect.fromLTWH(0.4, 0.4, size.width - 0.8, size.height - 0.8)),
+        borderRadius.toRRect(
+            Rect.fromLTWH(0.4, 0.4, size.width - 0.8, size.height - 0.8)),
         Paint()
           ..color = Colors.black.withValues(alpha: 0.08)
           ..style = PaintingStyle.stroke

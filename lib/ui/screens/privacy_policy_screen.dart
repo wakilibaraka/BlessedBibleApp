@@ -6,7 +6,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Privacy Policy'),
@@ -41,10 +41,11 @@ class PrivacyPolicyScreen extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             Text(
               'Introduction',
-              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: theme.primaryColor),
+              style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold, color: theme.primaryColor),
             ),
             const SizedBox(height: 8),
             Text(
@@ -52,10 +53,11 @@ class PrivacyPolicyScreen extends StatelessWidget {
               style: theme.textTheme.bodyMedium,
             ),
             const SizedBox(height: 24),
-            
+
             Text(
               'Data We Collect',
-              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: theme.primaryColor),
+              style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold, color: theme.primaryColor),
             ),
             const SizedBox(height: 8),
             Text(
@@ -69,10 +71,11 @@ class PrivacyPolicyScreen extends StatelessWidget {
               style: theme.textTheme.bodyMedium,
             ),
             const SizedBox(height: 24),
-            
+
             Text(
               'Data Storage',
-              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: theme.primaryColor),
+              style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold, color: theme.primaryColor),
             ),
             const SizedBox(height: 8),
             Text(
@@ -80,10 +83,11 @@ class PrivacyPolicyScreen extends StatelessWidget {
               style: theme.textTheme.bodyMedium,
             ),
             const SizedBox(height: 24),
-            
+
             Text(
               'Third-Party Services',
-              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: theme.primaryColor),
+              style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold, color: theme.primaryColor),
             ),
             const SizedBox(height: 8),
             Text(
@@ -91,10 +95,11 @@ class PrivacyPolicyScreen extends StatelessWidget {
               style: theme.textTheme.bodyMedium,
             ),
             const SizedBox(height: 24),
-            
+
             Text(
               'Contact',
-              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: theme.primaryColor),
+              style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold, color: theme.primaryColor),
             ),
             const SizedBox(height: 8),
             Text(

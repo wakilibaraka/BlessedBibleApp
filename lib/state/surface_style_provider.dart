@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'theme_provider.dart';
 
 enum EarthHeavenStyle { earth, heaven }
+
 enum SurfaceStyle { flat, frosted, threeDimensional }
 
 const Map<AppThemeMode, SurfaceStyle> _kEarthSurfaceMap = {
@@ -25,7 +26,7 @@ class EarthHeavenStyleNotifier extends Notifier<EarthHeavenStyle> {
 
   Future<void> _loadState() async {
     final prefs = await SharedPreferences.getInstance();
-    
+
     final migrated = prefs.getBool(_migrationKey) ?? false;
     if (!migrated) {
       final savedIndex = prefs.getInt(_surfaceStyleKey);
@@ -37,7 +38,9 @@ class EarthHeavenStyleNotifier extends Notifier<EarthHeavenStyle> {
       await prefs.setBool(_migrationKey, true);
     } else {
       final savedIndex = prefs.getInt(_surfaceStyleKey);
-      if (savedIndex != null && savedIndex >= 0 && savedIndex < EarthHeavenStyle.values.length) {
+      if (savedIndex != null &&
+          savedIndex >= 0 &&
+          savedIndex < EarthHeavenStyle.values.length) {
         state = EarthHeavenStyle.values[savedIndex];
       }
     }
@@ -50,7 +53,9 @@ class EarthHeavenStyleNotifier extends Notifier<EarthHeavenStyle> {
   }
 }
 
-final earthHeavenStyleProvider = NotifierProvider<EarthHeavenStyleNotifier, EarthHeavenStyle>(EarthHeavenStyleNotifier.new);
+final earthHeavenStyleProvider =
+    NotifierProvider<EarthHeavenStyleNotifier, EarthHeavenStyle>(
+        EarthHeavenStyleNotifier.new);
 
 final surfaceStyleProvider = Provider<SurfaceStyle>((ref) {
   final eh = ref.watch(earthHeavenStyleProvider);

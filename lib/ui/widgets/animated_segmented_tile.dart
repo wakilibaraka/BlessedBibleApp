@@ -52,7 +52,9 @@ class AnimatedSegmentedTile<T> extends StatelessWidget {
                       curve: Curves.easeOutCubic,
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       decoration: BoxDecoration(
-                        color: isSelected ? theme.colorScheme.surface : Colors.transparent,
+                        color: isSelected
+                            ? theme.colorScheme.surface
+                            : Colors.transparent,
                         borderRadius: BorderRadius.circular(8),
                         boxShadow: isSelected
                             ? [
@@ -69,10 +71,12 @@ class AnimatedSegmentedTile<T> extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 13,
-                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                          fontWeight:
+                              isSelected ? FontWeight.w600 : FontWeight.w400,
                           color: isSelected
                               ? theme.colorScheme.onSurface
-                              : theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                              : theme.colorScheme.onSurface
+                                  .withValues(alpha: 0.7),
                         ),
                       ),
                     ),

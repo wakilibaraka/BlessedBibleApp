@@ -11,9 +11,10 @@ class ChapterTitlesNotifier extends Notifier<Map<String, Map<String, String>>> {
 
   Future<void> _loadTitles() async {
     try {
-      final jsonString = await rootBundle.loadString('assets/data/chapter_titles.json');
+      final jsonString =
+          await rootBundle.loadString('assets/data/chapter_titles.json');
       final Map<String, dynamic> decoded = jsonDecode(jsonString);
-      
+
       final Map<String, Map<String, String>> result = {};
       for (final entry in decoded.entries) {
         final bookName = entry.key;
@@ -34,4 +35,6 @@ class ChapterTitlesNotifier extends Notifier<Map<String, Map<String, String>>> {
   }
 }
 
-final chapterTitlesProvider = NotifierProvider<ChapterTitlesNotifier, Map<String, Map<String, String>>>(ChapterTitlesNotifier.new);
+final chapterTitlesProvider =
+    NotifierProvider<ChapterTitlesNotifier, Map<String, Map<String, String>>>(
+        ChapterTitlesNotifier.new);

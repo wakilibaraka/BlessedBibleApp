@@ -18,7 +18,8 @@ class NoteCard extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.dividerTheme.color ?? Colors.grey.shade300),
+        side:
+            BorderSide(color: theme.dividerTheme.color ?? Colors.grey.shade300),
       ),
       margin: EdgeInsets.zero,
       child: Padding(

@@ -18,7 +18,9 @@ class JournalNotifier extends Notifier<List<JournalEntry>> {
     if (json == null) return [];
     try {
       final list = jsonDecode(json) as List;
-      return list.map((e) => JournalEntry.fromJson(e as Map<String, dynamic>)).toList();
+      return list
+          .map((e) => JournalEntry.fromJson(e as Map<String, dynamic>))
+          .toList();
     } catch (_) {
       return [];
     }
@@ -49,4 +51,5 @@ class JournalNotifier extends Notifier<List<JournalEntry>> {
   }
 }
 
-final journalProvider = NotifierProvider<JournalNotifier, List<JournalEntry>>(JournalNotifier.new);
+final journalProvider =
+    NotifierProvider<JournalNotifier, List<JournalEntry>>(JournalNotifier.new);

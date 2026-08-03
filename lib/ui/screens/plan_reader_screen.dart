@@ -56,7 +56,8 @@ class _PassageData {
   List<BibleVerse> get assignedVerses {
     if (startVerse == null) return chapter.verses;
     final s = (startVerse! - 1).clamp(0, chapter.verses.length - 1);
-    final e = (endVerse ?? chapter.verses.length).clamp(s, chapter.verses.length);
+    final e =
+        (endVerse ?? chapter.verses.length).clamp(s, chapter.verses.length);
     return chapter.verses.sublist(s, e);
   }
 }
@@ -70,7 +71,11 @@ class _ParsedRef {
   final int chapter;
   final int? startVerse;
   final int? endVerse;
-  const _ParsedRef({required this.bookName, required this.chapter, this.startVerse, this.endVerse});
+  const _ParsedRef(
+      {required this.bookName,
+      required this.chapter,
+      this.startVerse,
+      this.endVerse});
 }
 
 _ParsedRef? _parseRef(String ref) {
@@ -123,7 +128,8 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
 
   void _resolvePassages() {
     final planState = ref.read(readingPlanProvider(widget.planId));
-    if (planState.planData.isEmpty || widget.dayNum > planState.planData.length) return;
+    if (planState.planData.isEmpty || widget.dayNum > planState.planData.length)
+      return;
     final dayData = planState.planData[widget.dayNum - 1];
     final flatChapters = ref.read(flatChaptersProvider);
     if (flatChapters.isEmpty) return;
@@ -136,14 +142,12 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
 
         BibleBook? book;
         try {
-          book = flatChapters
-              .map((fc) => fc.book)
-              .firstWhere((b) => b.name.toLowerCase() == parsed.bookName.toLowerCase());
+          book = flatChapters.map((fc) => fc.book).firstWhere(
+              (b) => b.name.toLowerCase() == parsed.bookName.toLowerCase());
         } catch (_) {
           try {
-            book = flatChapters
-                .map((fc) => fc.book)
-                .firstWhere((b) => b.name.toLowerCase().startsWith(parsed.bookName.toLowerCase()));
+            book = flatChapters.map((fc) => fc.book).firstWhere((b) =>
+                b.name.toLowerCase().startsWith(parsed.bookName.toLowerCase()));
           } catch (_) {
             continue;
           }
@@ -155,7 +159,8 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
 
         String label;
         if (parsed.startVerse != null && parsed.endVerse != null) {
-          label = '${book.name} ${parsed.chapter}:${parsed.startVerse}–${parsed.endVerse}';
+          label =
+              '${book.name} ${parsed.chapter}:${parsed.startVerse}–${parsed.endVerse}';
         } else if (parsed.startVerse != null) {
           label = '${book.name} ${parsed.chapter}:${parsed.startVerse}';
         } else {
@@ -176,15 +181,17 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
     if (mounted) {
       setState(() {
         _passages = resolved;
-        _passageIndex = widget.initialPassageIndex.clamp(0, (resolved.length - 1).clamp(0, resolved.length));
+        _passageIndex = widget.initialPassageIndex
+            .clamp(0, (resolved.length - 1).clamp(0, resolved.length));
         _loaded = true;
       });
     }
   }
 
-  _PassageData? get _current => (_loaded && _passages.isNotEmpty && _passageIndex < _passages.length)
-      ? _passages[_passageIndex]
-      : null;
+  _PassageData? get _current =>
+      (_loaded && _passages.isNotEmpty && _passageIndex < _passages.length)
+          ? _passages[_passageIndex]
+          : null;
 
   bool get _isLastPassage => _passageIndex >= _passages.length - 1;
 
@@ -204,7 +211,9 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
 
   void _unmarkRead() {
     HapticFeedback.lightImpact();
-    ref.read(readingPlanProvider(widget.planId).notifier).markReadingIncomplete(widget.dayNum);
+    ref
+        .read(readingPlanProvider(widget.planId).notifier)
+        .markReadingIncomplete(widget.dayNum);
   }
 
   void _toggleVerseSelection(int verseNum) {
@@ -219,7 +228,8 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
 
   void _clearSelection() => setState(() => _selectedVerses.clear());
 
-  void _showCommentary(int verseNum, String verseText, String bookName, int chapterNum) {
+  void _showCommentary(
+      int verseNum, String verseText, String bookName, int chapterNum) {
     showCommentaryBottomSheet(
       context,
       book: bookName,
@@ -236,7 +246,10 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
     final typography = ref.watch(typographyProvider);
     final readSettings = ref.watch(readSettingsProvider);
     final appThemeMode = ref.watch(themeProvider);
-    final isDone = ref.watch(readingPlanProvider(widget.planId)).completedReadings.contains(widget.dayNum);
+    final isDone = ref
+        .watch(readingPlanProvider(widget.planId))
+        .completedReadings
+        .contains(widget.dayNum);
 
     final resolvedMode = appThemeMode.resolve(context);
     final Color redLetterColor = resolvedMode == AppThemeMode.light
@@ -254,13 +267,16 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
 
     if (_passages.isEmpty) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Passage not found'), backgroundColor: Colors.transparent),
+        appBar: AppBar(
+            title: const Text('Passage not found'),
+            backgroundColor: Colors.transparent),
         body: const Center(child: Text('Could not load passage data.')),
       );
     }
 
     final passage = _current!;
-    final verses = _showFullChapter ? passage.chapter.verses : passage.assignedVerses;
+    final verses =
+        _showFullChapter ? passage.chapter.verses : passage.assignedVerses;
     // Resolve highlights/bookmarks once before the builder — never inside it
     final highlights = ref.watch(highlightsProvider);
     final bookmarks = ref.watch(bookmarksProvider);
@@ -278,8 +294,10 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(color: gold),
                   foregroundColor: gold,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
                 ),
                 child: const Icon(Icons.arrow_back_rounded, size: 20),
               ),
@@ -288,16 +306,20 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
             child: _isLastPassage
                 ? ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: isDone ? gold.withValues(alpha: 0.6) : gold,
+                      backgroundColor:
+                          isDone ? gold.withValues(alpha: 0.6) : gold,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                     ),
                     onPressed: isDone ? _unmarkRead : _markReadAndPop,
                     child: Text(
                       isDone ? '✓ Completed' : 'Mark as Read',
                       style: const TextStyle(
-                          fontFamily: 'EB Garamond', fontSize: 18, fontWeight: FontWeight.bold),
+                          fontFamily: 'EB Garamond',
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
                     ),
                   )
                 : ElevatedButton(
@@ -305,7 +327,8 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
                       backgroundColor: gold,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                     ),
                     onPressed: () => _goToPassage(_passageIndex + 1),
                     child: const Row(
@@ -313,7 +336,9 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
                       children: [
                         Text('Next Passage',
                             style: TextStyle(
-                                fontFamily: 'EB Garamond', fontSize: 18, fontWeight: FontWeight.bold)),
+                                fontFamily: 'EB Garamond',
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold)),
                         SizedBox(width: 8),
                         Icon(Icons.arrow_forward_rounded, size: 20),
                       ],
@@ -344,318 +369,358 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
     }
 
     return PopScope(
-      canPop: _selectedVerses.isEmpty,
-      onPopInvokedWithResult: (didPop, result) {
-        if (didPop) return;
-        if (_selectedVerses.isNotEmpty) {
-          _clearSelection();
-        }
-      },
-      child: Scaffold(
-      backgroundColor: getThemeBackgroundColor(),
-      body: Stack(
-        children: [
-          Column(
+        canPop: _selectedVerses.isEmpty,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) return;
+          if (_selectedVerses.isNotEmpty) {
+            _clearSelection();
+          }
+        },
+        child: Scaffold(
+          backgroundColor: getThemeBackgroundColor(),
+          body: Stack(
             children: [
-          // ── Compact top bar ──────────────────────────────────────────────
-          Container(
-            color: getThemeBackgroundColor(),
-            padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 4),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+              Column(
+                children: [
+                  // ── Compact top bar ──────────────────────────────────────────────
+                  Container(
+                    color: getThemeBackgroundColor(),
+                    padding: EdgeInsets.only(
+                        top: MediaQuery.of(context).padding.top + 4),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        IconButton(
-                          icon: const Icon(Icons.arrow_back_rounded, size: 22),
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                          onPressed: () => Navigator.of(context).pop(),
-                        ),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                passage.label,
-                                style: TextStyle(
-                                  fontFamily: 'EB Garamond',
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: theme.textTheme.bodyLarge?.color,
-                                  height: 1.1,
+                        Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.arrow_back_rounded,
+                                      size: 22),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 8),
+                                  onPressed: () => Navigator.of(context).pop(),
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              Text(
-                                'KJV',
-                                style: theme.textTheme.labelSmall?.copyWith(
-                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
-                                  letterSpacing: 1.0,
-                                  fontSize: 10,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 90), // Clear center area
-                        // Full chapter toggle — compact pill
-                        GestureDetector(
-                          onTap: () => setState(() => _showFullChapter = !_showFullChapter),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            margin: const EdgeInsets.only(right: 12),
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                            decoration: BoxDecoration(
-                              color: _showFullChapter ? gold.withValues(alpha: 0.15) : Colors.transparent,
-                              border: Border.all(
-                                  color: _showFullChapter ? gold : theme.dividerColor, width: 1),
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Text(
-                              'Full chapter',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: _showFullChapter
-                                    ? gold
-                                    : theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (_passages.length > 1)
-                      IgnorePointer(
-                        child: Text(
-                          'Passage ${_passageIndex + 1} of ${_passages.length}',
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: gold.withValues(alpha: 0.75),
-                            letterSpacing: 1.0,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-                const Divider(height: 1, thickness: 0.5),
-              ],
-            ),
-          ),
-
-          // ── Verse list + nav footer ──────────────────────────────────────
-          Expanded(
-            child: GestureDetector(
-              onHorizontalDragEnd: (details) {
-                if (details.primaryVelocity == null) return;
-                final threshold = readSettings.horizontalSwipeVelocityThreshold;
-                if (details.primaryVelocity! < -threshold && !_isLastPassage) {
-                  _goToPassage(_passageIndex + 1);
-                } else if (details.primaryVelocity! > threshold && _passageIndex > 0) {
-                  _goToPassage(_passageIndex - 1);
-                }
-              },
-              child: ListView.builder(
-                // ValueKey resets scroll to top on passage/toggle change — no scrollTo needed
-                key: ValueKey('$_passageIndex-$_showFullChapter'),
-                padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-                // +1 for the nav footer appended after the last verse
-                itemCount: verses.length + 1,
-                itemBuilder: (context, i) {
-                  // Last item = nav footer (next/mark-as-read)
-                  if (i == verses.length) return navFooter;
-
-                  final verse = verses[i];
-                  final verseKey = generateVerseKey(
-                      passage.book.abbreviation, passage.chapterNum, verse.number);
-                  final isSelected = _selectedVerses.contains(verse.number);
-                  final isBookmarked = bookmarks.contains(verseKey);
-                  final savedColorIdx = highlights[verseKey];
-                  Color? highlightColor;
-                  if (savedColorIdx != null &&
-                      savedColorIdx >= 0 &&
-                      savedColorIdx < highlightPalette.length) {
-                    highlightColor = AppColors.getRenderedHighlightColor(
-                        highlightPalette[savedColorIdx],
-                        theme.brightness,
-                        theme.scaffoldBackgroundColor);
-                  }
-
-                  return GestureDetector(
-                    onTap: () => _toggleVerseSelection(verse.number),
-                    onDoubleTap: () {
-                      HapticFeedback.lightImpact();
-                      VerseActionLogic.handleBookmark(
-                        context,
-                        theme,
-                        ref,
-                        passage.book.name,
-                        passage.chapterNum,
-                        [verse.number]
-                      );
-                    },
-                    onLongPress: () {
-                      HapticFeedback.mediumImpact();
-                      showModalBottomSheet(
-                        context: context,
-                        backgroundColor: Colors.transparent,
-                        useRootNavigator: true,
-                        builder: (ctx) => VerseContextMenuSheet(
-                          verseNumber: verse.number,
-                          bookName: passage.book.name,
-                          chapterNum: passage.chapterNum,
-                          onCustomSelection: () {},
-                        ),
-                      );
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                      margin: const EdgeInsets.only(bottom: 2),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? (highlightColor != null
-                                ? highlightColor.withValues(alpha: 0.4)
-                                : theme.primaryColor.withValues(alpha: 0.15))
-                            : (highlightColor != null
-                                ? highlightColor.withValues(alpha: 0.3)
-                                : Colors.transparent),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Builder(builder: (ctx) {
-                        final fontStyle = TextStyle(
-                          fontFamily: 'EB Garamond',
-                          fontSize: typography.fontSize,
-                          height: typography.lineHeight,
-                          letterSpacing: 0.15,
-                          color: theme.textTheme.bodyLarge?.color,
-                          decoration: isBookmarked ? TextDecoration.underline : null,
-                          decorationColor: isBookmarked ? theme.primaryColor : null,
-                          decorationThickness: 2.0,
-                        );
-
-                        final List<TextSpan> spans = [];
-                        final redStyle = fontStyle.copyWith(color: redLetterColor);
-                        String text = verse.text;
-                        int cur = 0;
-                        while (cur < text.length) {
-                          final s = text.indexOf('‹', cur);
-                          if (s == -1) {
-                            spans.add(TextSpan(text: text.substring(cur), style: fontStyle));
-                            break;
-                          }
-                          if (s > cur) {
-                            spans.add(TextSpan(text: text.substring(cur, s), style: fontStyle));
-                          }
-                          final e = text.indexOf('›', s + 1);
-                          if (e == -1) {
-                            spans.add(TextSpan(
-                                text: text.substring(s + 1),
-                                style: readSettings.isRedLetterEnabled ? redStyle : fontStyle));
-                            break;
-                          }
-                          spans.add(TextSpan(
-                              text: text.substring(s + 1, e),
-                              style: readSettings.isRedLetterEnabled ? redStyle : fontStyle));
-                          cur = e + 1;
-                        }
-
-                        return RichText(
-                          text: TextSpan(
-                            style: fontStyle,
-                            children: [
-                              if (readSettings.showVerseNumbers)
-                                TextSpan(
-                                  text: '${verse.number}  ',
-                                  style: fontStyle.copyWith(
-                                    color: theme.primaryColor,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: typography.fontSize * 0.75,
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        passage.label,
+                                        style: TextStyle(
+                                          fontFamily: 'EB Garamond',
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color:
+                                              theme.textTheme.bodyLarge?.color,
+                                          height: 1.1,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      Text(
+                                        'KJV',
+                                        style: theme.textTheme.labelSmall
+                                            ?.copyWith(
+                                          color: theme.colorScheme.onSurface
+                                              .withValues(alpha: 0.4),
+                                          letterSpacing: 1.0,
+                                          fontSize: 10,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ...spans,
-                            ],
-                          ),
-                        );
-                      }),
+                                const SizedBox(width: 90), // Clear center area
+                                // Full chapter toggle — compact pill
+                                GestureDetector(
+                                  onTap: () => setState(() =>
+                                      _showFullChapter = !_showFullChapter),
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 200),
+                                    margin: const EdgeInsets.only(right: 12),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 5),
+                                    decoration: BoxDecoration(
+                                      color: _showFullChapter
+                                          ? gold.withValues(alpha: 0.15)
+                                          : Colors.transparent,
+                                      border: Border.all(
+                                          color: _showFullChapter
+                                              ? gold
+                                              : theme.dividerColor,
+                                          width: 1),
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: Text(
+                                      'Full chapter',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        color: _showFullChapter
+                                            ? gold
+                                            : theme.colorScheme.onSurface
+                                                .withValues(alpha: 0.5),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            if (_passages.length > 1)
+                              IgnorePointer(
+                                child: Text(
+                                  'Passage ${_passageIndex + 1} of ${_passages.length}',
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    color: gold.withValues(alpha: 0.75),
+                                    letterSpacing: 1.0,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                        const Divider(height: 1, thickness: 0.5),
+                      ],
                     ),
-                  );
-                },
+                  ),
+
+                  // ── Verse list + nav footer ──────────────────────────────────────
+                  Expanded(
+                    child: GestureDetector(
+                      onHorizontalDragEnd: (details) {
+                        if (details.primaryVelocity == null) return;
+                        final threshold = 300.0;
+                        if (details.primaryVelocity! < -threshold &&
+                            !_isLastPassage) {
+                          _goToPassage(_passageIndex + 1);
+                        } else if (details.primaryVelocity! > threshold &&
+                            _passageIndex > 0) {
+                          _goToPassage(_passageIndex - 1);
+                        }
+                      },
+                      child: ListView.builder(
+                        // ValueKey resets scroll to top on passage/toggle change — no scrollTo needed
+                        key: ValueKey('$_passageIndex-$_showFullChapter'),
+                        padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+                        // +1 for the nav footer appended after the last verse
+                        itemCount: verses.length + 1,
+                        itemBuilder: (context, i) {
+                          // Last item = nav footer (next/mark-as-read)
+                          if (i == verses.length) return navFooter;
+
+                          final verse = verses[i];
+                          final verseKey = generateVerseKey(
+                              passage.book.abbreviation,
+                              passage.chapterNum,
+                              verse.number);
+                          final isSelected =
+                              _selectedVerses.contains(verse.number);
+                          final isBookmarked = bookmarks.contains(verseKey);
+                          final savedColorIdx = highlights[verseKey];
+                          Color? highlightColor;
+                          if (savedColorIdx != null &&
+                              savedColorIdx >= 0 &&
+                              savedColorIdx < highlightPalette.length) {
+                            highlightColor =
+                                AppColors.getRenderedHighlightColor(
+                                    highlightPalette[savedColorIdx],
+                                    theme.brightness,
+                                    theme.scaffoldBackgroundColor);
+                          }
+
+                          return GestureDetector(
+                            onTap: () => _toggleVerseSelection(verse.number),
+                            onDoubleTap: () {
+                              HapticFeedback.lightImpact();
+                              VerseActionLogic.handleBookmark(
+                                  context,
+                                  theme,
+                                  ref,
+                                  passage.book.name,
+                                  passage.chapterNum,
+                                  [verse.number]);
+                            },
+                            onLongPress: () {
+                              HapticFeedback.mediumImpact();
+                              showModalBottomSheet(
+                                context: context,
+                                backgroundColor: Colors.transparent,
+                                useRootNavigator: true,
+                                builder: (ctx) => VerseContextMenuSheet(
+                                  verseNumber: verse.number,
+                                  bookName: passage.book.name,
+                                  chapterNum: passage.chapterNum,
+                                  onCustomSelection: () {},
+                                ),
+                              );
+                            },
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 7),
+                              margin: const EdgeInsets.only(bottom: 2),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? (highlightColor != null
+                                        ? highlightColor.withValues(alpha: 0.4)
+                                        : theme.primaryColor
+                                            .withValues(alpha: 0.15))
+                                    : (highlightColor != null
+                                        ? highlightColor.withValues(alpha: 0.3)
+                                        : Colors.transparent),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Builder(builder: (ctx) {
+                                final fontStyle = TextStyle(
+                                  fontFamily: 'EB Garamond',
+                                  fontSize: typography.fontSize,
+                                  height: typography.lineHeight,
+                                  letterSpacing: 0.15,
+                                  color: theme.textTheme.bodyLarge?.color,
+                                  decoration: isBookmarked
+                                      ? TextDecoration.underline
+                                      : null,
+                                  decorationColor:
+                                      isBookmarked ? theme.primaryColor : null,
+                                  decorationThickness: 2.0,
+                                );
+
+                                final List<TextSpan> spans = [];
+                                final redStyle =
+                                    fontStyle.copyWith(color: redLetterColor);
+                                String text = verse.text;
+                                int cur = 0;
+                                while (cur < text.length) {
+                                  final s = text.indexOf('‹', cur);
+                                  if (s == -1) {
+                                    spans.add(TextSpan(
+                                        text: text.substring(cur),
+                                        style: fontStyle));
+                                    break;
+                                  }
+                                  if (s > cur) {
+                                    spans.add(TextSpan(
+                                        text: text.substring(cur, s),
+                                        style: fontStyle));
+                                  }
+                                  final e = text.indexOf('›', s + 1);
+                                  if (e == -1) {
+                                    spans.add(TextSpan(
+                                        text: text.substring(s + 1),
+                                        style: readSettings.isRedLetterEnabled
+                                            ? redStyle
+                                            : fontStyle));
+                                    break;
+                                  }
+                                  spans.add(TextSpan(
+                                      text: text.substring(s + 1, e),
+                                      style: readSettings.isRedLetterEnabled
+                                          ? redStyle
+                                          : fontStyle));
+                                  cur = e + 1;
+                                }
+
+                                return RichText(
+                                  text: TextSpan(
+                                    style: fontStyle,
+                                    children: [
+                                      if (readSettings.showVerseNumbers)
+                                        TextSpan(
+                                          text: '${verse.number}  ',
+                                          style: fontStyle.copyWith(
+                                            color: theme.primaryColor,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize:
+                                                typography.fontSize * 0.75,
+                                          ),
+                                        ),
+                                      ...spans,
+                                    ],
+                                  ),
+                                );
+                              }),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ),
+
+              // ── Verse action bar (bottom anchored) ───────────────────────────
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 250),
+                  switchInCurve: Curves.easeOutCubic,
+                  switchOutCurve: Curves.easeInCubic,
+                  transitionBuilder: (child, animation) {
+                    if (child.key == const ValueKey('empty'))
+                      return const SizedBox.shrink();
+                    return SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(0, 1),
+                        end: Offset.zero,
+                      ).animate(animation),
+                      child: child,
+                    );
+                  },
+                  child: _selectedVerses.isNotEmpty
+                      ? SafeArea(
+                          top: false,
+                          key: const ValueKey('content'),
+                          child: _VerseActionBar(
+                            selectedVerses: _selectedVerses.toList()..sort(),
+                            bookName: passage.book.name,
+                            bookAbbrev: passage.book.abbreviation,
+                            chapterNum: passage.chapterNum,
+                            onDismiss: _clearSelection,
+                            onHighlight: () =>
+                                VerseActionLogic.handleHighlightInteraction(
+                              context: context,
+                              ref: ref,
+                              theme: theme,
+                              bookAbbrev: passage.book.abbreviation,
+                              chapterNum: passage.chapterNum,
+                              targetVerses: _selectedVerses.toList()..sort(),
+                              isLongPress: false,
+                              onClearSelection: _clearSelection,
+                            ),
+                            onHighlightLongPress: () =>
+                                VerseActionLogic.handleHighlightInteraction(
+                              context: context,
+                              ref: ref,
+                              theme: theme,
+                              bookAbbrev: passage.book.abbreviation,
+                              chapterNum: passage.chapterNum,
+                              targetVerses: _selectedVerses.toList()..sort(),
+                              isLongPress: true,
+                              onClearSelection: _clearSelection,
+                            ),
+                            onCommentary: (verseNum) {
+                              final vIdx = verseNum - 1;
+                              final verseText = vIdx >= 0 &&
+                                      vIdx < passage.chapter.verses.length
+                                  ? passage.chapter.verses[vIdx].text
+                                  : '';
+                              _showCommentary(verseNum, verseText,
+                                  passage.book.name, passage.chapterNum);
+                              _clearSelection();
+                            },
+                          ),
+                        )
+                      : const SizedBox.shrink(key: ValueKey('empty')),
+                ),
+              ),
             ],
           ),
-          
-          // ── Verse action bar (bottom anchored) ───────────────────────────
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 250),
-              switchInCurve: Curves.easeOutCubic,
-              switchOutCurve: Curves.easeInCubic,
-              transitionBuilder: (child, animation) {
-                if (child.key == const ValueKey('empty')) return const SizedBox.shrink();
-                return SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(0, 1),
-                    end: Offset.zero,
-                  ).animate(animation),
-                  child: child,
-                );
-              },
-              child: _selectedVerses.isNotEmpty
-                  ? SafeArea(
-                      top: false,
-                      key: const ValueKey('content'),
-                      child: _VerseActionBar(
-                        selectedVerses: _selectedVerses.toList()..sort(),
-                        bookName: passage.book.name,
-                          bookAbbrev: passage.book.abbreviation,
-                          chapterNum: passage.chapterNum,
-                          onDismiss: _clearSelection,
-                          onHighlight: () => VerseActionLogic.handleHighlightInteraction(
-                            context: context,
-                            ref: ref,
-                            theme: theme,
-                            bookAbbrev: passage.book.abbreviation,
-                            chapterNum: passage.chapterNum,
-                            targetVerses: _selectedVerses.toList()..sort(),
-                            isLongPress: false,
-                            onClearSelection: _clearSelection,
-                          ),
-                          onHighlightLongPress: () => VerseActionLogic.handleHighlightInteraction(
-                            context: context,
-                            ref: ref,
-                            theme: theme,
-                            bookAbbrev: passage.book.abbreviation,
-                            chapterNum: passage.chapterNum,
-                            targetVerses: _selectedVerses.toList()..sort(),
-                            isLongPress: true,
-                            onClearSelection: _clearSelection,
-                          ),
-                          onCommentary: (verseNum) {
-                            final vIdx = verseNum - 1;
-                            final verseText = vIdx >= 0 && vIdx < passage.chapter.verses.length
-                                ? passage.chapter.verses[vIdx].text
-                                : '';
-                            _showCommentary(verseNum, verseText, passage.book.name, passage.chapterNum);
-                            _clearSelection();
-                          },
-                        ),
-                    )
-                  : const SizedBox.shrink(key: ValueKey('empty')),
-            ),
-          ),
-        ],
-      ),
-    ));
+        ));
   }
 }
 
@@ -697,58 +762,62 @@ class _VerseActionBar extends ConsumerWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0),
-            child: Text('${selectedVerses.length} selected', style: theme.textTheme.labelMedium),
-          ),
-                  // Highlight — opens color palette sheet
-                  GestureDetector(
-                    onLongPress: onHighlightLongPress,
-                    child: IconButton(
-                      tooltip: 'Highlight',
-                      icon: Icon(Icons.highlight_rounded, color: gold),
-                      onPressed: onHighlight,
-                    ),
-                  ),
-          // Bookmark
-          IconButton(
-            tooltip: 'Bookmark',
-            icon: Icon(Icons.bookmark_rounded, color: gold),
-            onPressed: () {
-              VerseActionLogic.handleBookmark(context, theme, ref, bookName, chapterNum, selectedVerses);
-              onDismiss();
-            },
-          ),
-          // Note
-          IconButton(
-            tooltip: 'Add Note',
-            icon: Icon(Icons.note_add_rounded, color: gold),
-            onPressed: () async {
-              await VerseActionLogic.handleNote(context, ref, theme, bookName, chapterNum, selectedVerses);
-              onDismiss();
-            },
-          ),
-          // Commentary (first selected verse)
-          IconButton(
-            tooltip: 'Commentary',
-            icon: Icon(Icons.star_rounded, color: gold),
-            onPressed: () => onCommentary(selectedVerses.first),
-          ),
-          // Share
-          IconButton(
-            tooltip: 'Share',
-            icon: Icon(Icons.share_rounded, color: gold),
-            onPressed: () async {
-              await VerseActionLogic.handleShare(context, ref, bookName, chapterNum, selectedVerses);
-              onDismiss();
-            },
-          ),
-                  IconButton(
-                    icon: const Icon(Icons.close_rounded, size: 20), 
-                    onPressed: onDismiss,
-                  ),
-        ],
-      ),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Text('${selectedVerses.length} selected',
+                  style: theme.textTheme.labelMedium),
+            ),
+            // Highlight — opens color palette sheet
+            GestureDetector(
+              onLongPress: onHighlightLongPress,
+              child: IconButton(
+                tooltip: 'Highlight',
+                icon: Icon(Icons.highlight_rounded, color: gold),
+                onPressed: onHighlight,
+              ),
+            ),
+            // Bookmark
+            IconButton(
+              tooltip: 'Bookmark',
+              icon: Icon(Icons.bookmark_rounded, color: gold),
+              onPressed: () {
+                VerseActionLogic.handleBookmark(
+                    context, theme, ref, bookName, chapterNum, selectedVerses);
+                onDismiss();
+              },
+            ),
+            // Note
+            IconButton(
+              tooltip: 'Add Note',
+              icon: Icon(Icons.note_add_rounded, color: gold),
+              onPressed: () async {
+                await VerseActionLogic.handleNote(
+                    context, ref, theme, bookName, chapterNum, selectedVerses);
+                onDismiss();
+              },
+            ),
+            // Commentary (first selected verse)
+            IconButton(
+              tooltip: 'Commentary',
+              icon: Icon(Icons.star_rounded, color: gold),
+              onPressed: () => onCommentary(selectedVerses.first),
+            ),
+            // Share
+            IconButton(
+              tooltip: 'Share',
+              icon: Icon(Icons.share_rounded, color: gold),
+              onPressed: () async {
+                await VerseActionLogic.handleShare(
+                    context, ref, bookName, chapterNum, selectedVerses);
+                onDismiss();
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.close_rounded, size: 20),
+              onPressed: onDismiss,
+            ),
+          ],
+        ),
       ),
     );
   }

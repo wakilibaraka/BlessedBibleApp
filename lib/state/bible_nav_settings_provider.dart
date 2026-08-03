@@ -21,7 +21,8 @@ class BibleNavSettingsState {
   }) {
     return BibleNavSettingsState(
       depth: depth ?? this.depth,
-      autoCloseOnFinalSelection: autoCloseOnFinalSelection ?? this.autoCloseOnFinalSelection,
+      autoCloseOnFinalSelection:
+          autoCloseOnFinalSelection ?? this.autoCloseOnFinalSelection,
       swipeDownToNav: swipeDownToNav ?? this.swipeDownToNav,
     );
   }
@@ -40,13 +41,15 @@ class BibleNavSettingsNotifier extends Notifier<BibleNavSettingsState> {
 
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
-    
-    final depthIndex = prefs.getInt(_depthKey) ?? NavigationDepth.threePart.index;
+
+    final depthIndex =
+        prefs.getInt(_depthKey) ?? NavigationDepth.threePart.index;
     final autoClose = prefs.getBool(_autoCloseKey) ?? true;
     final swipeDown = prefs.getBool(_swipeDownKey) ?? true;
 
     state = state.copyWith(
-      depth: NavigationDepth.values[depthIndex.clamp(0, NavigationDepth.values.length - 1)],
+      depth: NavigationDepth
+          .values[depthIndex.clamp(0, NavigationDepth.values.length - 1)],
       autoCloseOnFinalSelection: autoClose,
       swipeDownToNav: swipeDown,
     );
@@ -71,4 +74,6 @@ class BibleNavSettingsNotifier extends Notifier<BibleNavSettingsState> {
   }
 }
 
-final bibleNavSettingsProvider = NotifierProvider<BibleNavSettingsNotifier, BibleNavSettingsState>(BibleNavSettingsNotifier.new);
+final bibleNavSettingsProvider =
+    NotifierProvider<BibleNavSettingsNotifier, BibleNavSettingsState>(
+        BibleNavSettingsNotifier.new);

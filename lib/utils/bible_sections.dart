@@ -89,23 +89,38 @@ const Map<String, BibleSection> _bookSections = {
 
 Color getSectionColor(String bookName, bool isDark) {
   final section = _bookSections[bookName] ?? BibleSection.historical;
-  
+
   // Tasteful tones fitting the cream/gold aesthetic
   switch (section) {
-    case BibleSection.pentateuch: return isDark ? const Color(0xFF383127) : const Color(0xFFF6ECE1);
-    case BibleSection.historical: return isDark ? const Color(0xFF323632) : const Color(0xFFE9F0E9);
-    case BibleSection.wisdom: return isDark ? const Color(0xFF36323B) : const Color(0xFFECE7F1);
-    case BibleSection.majorProphets: return isDark ? const Color(0xFF3A2D2D) : const Color(0xFFF3E5E5);
-    case BibleSection.minorProphetsPreExilic: return isDark ? const Color(0xFF383129) : const Color(0xFFF1E9E1);
-    case BibleSection.minorProphetsPostExilic: return isDark ? const Color(0xFF353328) : const Color(0xFFF0EBE0);
-    case BibleSection.gospels: return isDark ? const Color(0xFF3C3322) : const Color(0xFFF6EEE0);
-    case BibleSection.acts: return isDark ? const Color(0xFF2A343A) : const Color(0xFFE4EDF1);
-    case BibleSection.epistlesPauline: return isDark ? const Color(0xFF3A362D) : const Color(0xFFF4F0E5);
-    case BibleSection.epistlesPetrine: return isDark ? const Color(0xFF2D363A) : const Color(0xFFE5F0F4);
-    case BibleSection.epistlesJohannine: return isDark ? const Color(0xFF362D3A) : const Color(0xFFF0E5F4);
-    case BibleSection.epistleHebrews: return isDark ? const Color(0xFF313A2D) : const Color(0xFFEBF4E5);
-    case BibleSection.epistleJames: return isDark ? const Color(0xFF3A312A) : const Color(0xFFF4EBE0);
-    case BibleSection.epistleJude: return isDark ? const Color(0xFF303032) : const Color(0xFFEAEAEA);
-    case BibleSection.revelation: return isDark ? const Color(0xFF3C2A30) : const Color(0xFFF5E3E7);
+    case BibleSection.pentateuch:
+      return isDark ? const Color(0xFF383127) : const Color(0xFFF6ECE1);
+    case BibleSection.historical:
+      return isDark ? const Color(0xFF323632) : const Color(0xFFE9F0E9);
+    case BibleSection.wisdom:
+      return isDark ? const Color(0xFF36323B) : const Color(0xFFECE7F1);
+    case BibleSection.majorProphets:
+      return isDark ? const Color(0xFF3A2D2D) : const Color(0xFFF3E5E5);
+    case BibleSection.minorProphetsPreExilic:
+      return isDark ? const Color(0xFF383129) : const Color(0xFFF1E9E1);
+    case BibleSection.minorProphetsPostExilic:
+      return isDark ? const Color(0xFF353328) : const Color(0xFFF0EBE0);
+    case BibleSection.gospels:
+      return isDark ? const Color(0xFF3C3322) : const Color(0xFFF6EEE0);
+    case BibleSection.acts:
+      return isDark ? const Color(0xFF2A343A) : const Color(0xFFE4EDF1);
+    case BibleSection.epistlesPauline:
+      return isDark ? const Color(0xFF3A362D) : const Color(0xFFF4F0E5);
+    case BibleSection.epistlesPetrine:
+      return isDark ? const Color(0xFF2D363A) : const Color(0xFFE5F0F4);
+    case BibleSection.epistlesJohannine:
+      return isDark ? const Color(0xFF362D3A) : const Color(0xFFF0E5F4);
+    case BibleSection.epistleHebrews:
+      return isDark ? const Color(0xFF313A2D) : const Color(0xFFEBF4E5);
+    case BibleSection.epistleJames:
+      return isDark ? const Color(0xFF3A312A) : const Color(0xFFF4EBE0);
+    case BibleSection.epistleJude:
+      return isDark ? const Color(0xFF303032) : const Color(0xFFEAEAEA);
+    case BibleSection.revelation:
+      return isDark ? const Color(0xFF3C2A30) : const Color(0xFFF5E3E7);
   }
 }

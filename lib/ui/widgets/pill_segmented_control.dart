@@ -41,7 +41,8 @@ class PillSegmentedControl extends StatelessWidget {
                     color: isSelected
                         ? Colors.white
                         : theme.textTheme.bodyMedium?.color,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
                 ),
               ),

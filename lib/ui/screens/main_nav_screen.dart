@@ -54,381 +54,509 @@ class MainNavScreen extends ConsumerWidget {
     final appThemeMode = ref.watch(themeProvider);
 
     return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) return;
-        
-        if (!context.mounted) return;
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) async {
+          if (didPop) return;
 
-        // Ensure this PopScope only acts if we are truly at the root route.
-        // This prevents the exit dialog from firing when popping modal sheets.
-        if (ModalRoute.of(context)?.isCurrent != true) {
-          return;
-        }
-        
-        final selectedVerses = ref.read(readSelectionProvider);
-        if (selectedVerses.isNotEmpty) {
-          ref.read(readSelectionProvider.notifier).clear();
-          return;
-        }
+          if (!context.mounted) return;
 
-        // If we are not on the Home tab (0), navigating back should just take us Home.
-        final currentTab = ref.read(navProvider);
-        if (currentTab != 0) {
-          ref.read(navProvider.notifier).setIndex(0);
-          return;
-        }
+          // Ensure this PopScope only acts if we are truly at the root route.
+          // This prevents the exit dialog from firing when popping modal sheets.
+          if (ModalRoute.of(context)?.isCurrent != true) {
+            return;
+          }
 
-        final shouldExit = await showDialog<bool>(
-          context: context,
-          builder: (dialogContext) {
-            return AlertDialog(
-              title: const Text('Exit The Blessed Bible?'),
-              content: const Text('Are you sure you want to exit the app?'),
-              backgroundColor: Theme.of(dialogContext).scaffoldBackgroundColor,
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(dialogContext).pop(false),
-                  child: Text('Cancel', style: TextStyle(color: Theme.of(dialogContext).primaryColor)),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(dialogContext).pop(true),
-                  child: Text('Exit', style: TextStyle(color: Theme.of(dialogContext).primaryColor)),
-                ),
-              ],
-            );
-          },
-        );
-        
-        if (shouldExit == true) {
-          SystemNavigator.pop();
-        }
-      },
-      child: Scaffold(
-        extendBody: true,
-        body: Stack(
-          children: [
-            IndexedStack(
-            index: currentIndex,
-            children: screens.asMap().entries.map((entry) {
-              return Stack(
-                children: [
-                  Positioned.fill(
-                    child: AnimatedBackground(
-                      appThemeMode: appThemeMode,
-                      tabIndex: entry.key,
-                    ),
+          final selectedVerses = ref.read(readSelectionProvider);
+          if (selectedVerses.isNotEmpty) {
+            ref.read(readSelectionProvider.notifier).clear();
+            return;
+          }
+
+          // If we are not on the Home tab (0), navigating back should just take us Home.
+          final currentTab = ref.read(navProvider);
+          if (currentTab != 0) {
+            ref.read(navProvider.notifier).setIndex(0);
+            return;
+          }
+
+          final shouldExit = await showDialog<bool>(
+            context: context,
+            builder: (dialogContext) {
+              return AlertDialog(
+                title: const Text('Exit The Blessed Bible?'),
+                content: const Text('Are you sure you want to exit the app?'),
+                backgroundColor:
+                    Theme.of(dialogContext).scaffoldBackgroundColor,
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(dialogContext).pop(false),
+                    child: Text('Cancel',
+                        style: TextStyle(
+                            color: Theme.of(dialogContext).primaryColor)),
                   ),
-                  entry.value,
+                  TextButton(
+                    onPressed: () => Navigator.of(dialogContext).pop(true),
+                    child: Text('Exit',
+                        style: TextStyle(
+                            color: Theme.of(dialogContext).primaryColor)),
+                  ),
                 ],
               );
-            }).toList(),
-          ),
-        ],
-      ),
-      bottomNavigationBar: SafeArea(
-        child: Builder(
-          builder: (context) {
-            final style = ref.watch(readSettingsProvider.select((s) => s.verseActionStyle));
-            final isMinimalAction = currentIndex == 1 && selectedVerses.isNotEmpty && style == VerseActionStyle.horizontal;
-            final isRaindropAction = currentIndex == 1 && selectedVerses.isNotEmpty && style == VerseActionStyle.raindrop;
-            final effectiveNavHidden = isNavHidden && !isRaindropAction && !isMinimalAction;
-            final double rawWidth = MediaQuery.of(context).size.width;
-            final double availableWidth = rawWidth > 0 ? rawWidth : 360.0;
-            final double maxDockWidth = 450.0;
-            final double dockMaxWidth = math.max(
-                250.0, math.min(maxDockWidth, availableWidth - 40 - 72 - 16));
-            final double totalExpandedWidth = dockMaxWidth + 12.0 + 72.0;
-            final double rightOffset =
-                math.max(20.0, (availableWidth - totalExpandedWidth) / 2);
-            final double height =
-                (currentIndex == 1 && selectedVerses.isNotEmpty && style != VerseActionStyle.horizontal) ? 420.0 : 72.0;
+            },
+          );
 
-            return SizedBox(
-              height: height + (kBottomDockInset * 2),
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Positioned(
-                    right: rightOffset,
-                    bottom: kBottomDockInset,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        AnimatedOpacity(
-                          duration: const Duration(milliseconds: 250),
-                          opacity: effectiveNavHidden ? 0.0 : 1.0,
-                          alwaysIncludeSemantics: true,
-                          child: IgnorePointer(
-                            ignoring: effectiveNavHidden,
-                            child: Stack(
-                              clipBehavior: Clip.none,
-                              alignment: Alignment.bottomCenter,
-                              children: [
-                                _buildGlassWrapper(
-                                  key: const ValueKey('unified_bar_container'),
-                                  dockMaxWidth: dockMaxWidth,
-                                  child: _buildUnifiedDockContent(context, ref, Theme.of(context), currentIndex, isRaindropAction, isMinimalAction),
-                                ),
-                                if ((isMinimalAction || isRaindropAction) && selectedVerses.isNotEmpty)
-                                  Positioned(
-                                    top: -18,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                      decoration: BoxDecoration(
-                                        color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.9),
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(color: Theme.of(context).primaryColor.withValues(alpha: 0.2)),
-                                      ),
-                                      child: Text(
-                                        selectedVerses.length == 1 ? '1 verse selected' : '${selectedVerses.length} verses selected',
-                                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                          color: Theme.of(context).primaryColor,
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 10,
-                                          letterSpacing: 0.2,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
+          if (shouldExit == true) {
+            SystemNavigator.pop();
+          }
+        },
+        child: Scaffold(
+          extendBody: true,
+          body: Stack(
+            children: [
+              IndexedStack(
+                index: currentIndex,
+                children: screens.asMap().entries.map((entry) {
+                  return Stack(
+                    children: [
+                      Positioned.fill(
+                        child: AnimatedBackground(
+                          appThemeMode: appThemeMode,
+                          tabIndex: entry.key,
                         ),
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 400),
-                          width: effectiveNavHidden ? 0.0 : kBottomDockGap, // Collapse the gap too!
-                        ),
-                        // ── Dynamic Contextual FAB (Right) ──
-                        TweenAnimationBuilder<double>(
-                          duration: const Duration(milliseconds: 400),
-                          curve: Curves.easeOutCubic,
-                          tween: Tween<double>(
-                            begin: kBottomDockHeight,
-                            end: (currentIndex == 1 && selectedVerses.isNotEmpty && style == VerseActionStyle.classic) ? 400.0 : kBottomDockHeight,
-                          ),
-                          builder: (context, height, child) {
-                            final bool isClassicAction = currentIndex == 1 && selectedVerses.isNotEmpty && style == VerseActionStyle.classic;
-                            final bool isRaindropAction = currentIndex == 1 && selectedVerses.isNotEmpty && style == VerseActionStyle.raindrop;
-                            return Stack(
-                              alignment: Alignment.bottomRight,
-                              clipBehavior: Clip.none,
-                              children: [
-                                // Expand bounds to catch Top Pill hits
-                                if (isClassicAction)
-                                  SizedBox(width: 250, height: height + 70),
-                                  
-                                // Expand bounds to catch Raindrop Vertical Pill hits
-                                if (isRaindropAction)
-                                  SizedBox(width: kBottomDockHeight, height: 260),
-
-                                // ── Raindrop Vertical Pill ──
-                                if (isRaindropAction)
-                                  Positioned(
-                                    bottom: kBottomDockHeight + kBottomDockGap, // Above the FAB
-                                    right: 0,
-                                    child: BouncyEntrance(
-                                      isVisible: true,
-                                      delay: const Duration(milliseconds: 40),
-                                      child: Stack(
-                                        alignment: Alignment.center,
-                                        children: [
-                                          Positioned.fill(
-                                            child: GestureDetector(
-                                              behavior: HitTestBehavior.opaque,
-                                              onTap: () {},
-                                            ),
-                                          ),
-                                          TexturedGlassContainer(
-                                            borderRadius: BorderRadius.circular(kBottomDockHeight / 2),
-                                            padding: EdgeInsets.zero,
-                                            child: SizedBox(
-                                              width: kBottomDockHeight,
-                                              child: _buildActionMenuIcons(context, ref, Theme.of(context), showCloseIcon: false),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-
-                                // ── Classic Top Pill (Verse + Colors) ──
-                                Positioned(
-                                  bottom: height + kBottomDockGap,
-                                  left: 16,
-                                  right: 16,
-                                  child: IgnorePointer(
-                                    ignoring: !isClassicAction,
-                                    child: BouncyEntrance(
-                                      isVisible: isClassicAction,
-                                      delay: const Duration(milliseconds: 40),
-                                      child: Stack(
-                                        alignment: Alignment.center,
-                                        children: [
-                                          Positioned.fill(
-                                            child: GestureDetector(
-                                              behavior: HitTestBehavior.opaque,
-                                              onTap: () {}, // Eat taps on the background
-                                            ),
-                                          ),
-                                          GestureDetector(
-                                            behavior: HitTestBehavior.opaque,
-                                            onTap: () {}, // Also eat taps inside the container bounds
-                                            child: TexturedGlassContainer(
-                                            borderRadius: BorderRadius.circular(36),
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 16.0, vertical: 12.0),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.max,
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Text(
-                                              '${selectedVerses.length}',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleSmall
-                                                  ?.copyWith(
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Theme.of(context)
-                                                        .primaryColor,
-                                                  ),
-                                            ),
-                                            const SizedBox(width: 12),
-                                            ...List.generate(
-                                                highlightPalette.length, (i) {
-                                              final color = AppColors.getRenderedHighlightColor(highlightPaletteSwatches[i], Theme.of(context).brightness, Theme.of(context).scaffoldBackgroundColor);
-                                              final highlights =
-                                                  ref.watch(highlightsProvider);
-                                              final allHaveThisColor =
-                                                  selectedVerses.every((v) {
-                                                final refStr = generateVerseKey(
-                                                    readLoc.bookName,
-                                                    readLoc.chapter,
-                                                    v);
-                                                return highlights
-                                                        .containsKey(refStr) &&
-                                                    highlights[refStr] == i;
-                                              });
-
-                                              return _buildColorDot(
-                                                color,
-                                                isSelected: allHaveThisColor,
-                                                onTap: () {
-                                                  final currentTheme = Theme.of(context);
-                                                  Future(() {
-                                                    if (!context.mounted) return;
-                                                    ref.read(readSettingsProvider.notifier).setActiveHighlightColorIndex(i);
-                                                    VerseActionLogic.handleHighlight(context, currentTheme, ref, readLoc.bookName, readLoc.chapter, selectedVerses.toList(), i);
-                                                  });
-                                                },
-                                              );
-                                            }),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              ),
-                                // ── Morphing FAB / Bottom Pill ──
-                                GestureDetector(
-                                  behavior: HitTestBehavior.opaque,
-                                  onTap: () {},
-                                  child: TexturedGlassContainer(
-                                    borderRadius: BorderRadius.circular(kBottomDockHeight / 2),
-                                    padding: EdgeInsets.zero,
-                                    child: SizedBox(
-                                      width: kBottomDockHeight,
-                                      height: height,
-                                      child: ClipRect(
-                                        child: OverflowBox(
-                                          minHeight: kBottomDockHeight,
-                                          maxHeight: 400,
-                                          alignment: Alignment.bottomCenter,
-                                          child: AnimatedSwitcher(
-                                            duration:
-                                                const Duration(milliseconds: 300),
-                                            child: isClassicAction
-                                                ? _buildActionMenuIcons(context,
-                                                    ref, Theme.of(context))
-                                                : SizedBox(
-                                                    key: const ValueKey('fab'),
-                                                    height: kBottomDockHeight,
-                                                    child: Center(
-                                                      child: IconButton(
-                                                        icon: AnimatedSwitcher(
-                                                          duration:
-                                                              const Duration(
-                                                                  milliseconds:
-                                                                      300),
-                                                          transitionBuilder:
-                                                              (Widget child,
-                                                                  Animation<
-                                                                          double>
-                                                                      animation) {
-                                                            return ScaleTransition(
-                                                              scale: animation,
-                                                              child:
-                                                                  RotationTransition(
-                                                                turns: Tween<
-                                                                            double>(
-                                                                        begin:
-                                                                            0.5,
-                                                                        end: 1.0)
-                                                                    .animate(
-                                                                        animation),
-                                                                child: child,
-                                                              ),
-                                                            );
-                                                          },
-                                                          child: (currentIndex == 1 && selectedVerses.isNotEmpty) 
-                                                              ? const Icon(Icons.close_rounded, size: 28, key: ValueKey('raindrop_close'))
-                                                              : _buildFabIcon(
-                                                                  currentIndex,
-                                                                  ref),
-                                                        ),
-                                                        color: Theme.of(context)
-                                                            .primaryColor,
-                                                        onPressed: () {
-                                                          if (currentIndex == 1 && selectedVerses.isNotEmpty) {
-                                                            ref.read(readSelectionProvider.notifier).clear();
-                                                          } else {
-                                                            _handleFabTap(
-                                                                currentIndex,
-                                                                ref,
-                                                                context);
-                                                          }
-                                                        }
-                                                      ),
-                                                    ),
-                                                  ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                      ),
+                      entry.value,
+                    ],
+                  );
+                }).toList(),
               ),
-            );
-          },
-        ),
-      ),
-    ));
+            ],
+          ),
+          bottomNavigationBar: SafeArea(
+            child: Builder(
+              builder: (context) {
+                final style = ref.watch(
+                    readSettingsProvider.select((s) => s.verseActionStyle));
+                final isMinimalAction = currentIndex == 1 &&
+                    selectedVerses.isNotEmpty &&
+                    style == VerseActionStyle.horizontal;
+                final isRaindropAction = currentIndex == 1 &&
+                    selectedVerses.isNotEmpty &&
+                    style == VerseActionStyle.raindrop;
+                final effectiveNavHidden =
+                    isNavHidden && !isRaindropAction && !isMinimalAction;
+                final double rawWidth = MediaQuery.of(context).size.width;
+                final double availableWidth = rawWidth > 0 ? rawWidth : 360.0;
+                final double maxDockWidth = 450.0;
+                final double dockMaxWidth = math.max(250.0,
+                    math.min(maxDockWidth, availableWidth - 40 - 72 - 16));
+                final double totalExpandedWidth = dockMaxWidth + 12.0 + 72.0;
+                final double rightOffset =
+                    math.max(20.0, (availableWidth - totalExpandedWidth) / 2);
+                final double height = (currentIndex == 1 &&
+                        selectedVerses.isNotEmpty &&
+                        style != VerseActionStyle.horizontal)
+                    ? 420.0
+                    : 72.0;
+
+                return SizedBox(
+                  height: height + (kBottomDockInset * 2),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Positioned(
+                        right: rightOffset,
+                        bottom: kBottomDockInset,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            AnimatedOpacity(
+                              duration: const Duration(milliseconds: 250),
+                              opacity: effectiveNavHidden ? 0.0 : 1.0,
+                              alwaysIncludeSemantics: true,
+                              child: IgnorePointer(
+                                ignoring: effectiveNavHidden,
+                                child: Stack(
+                                  clipBehavior: Clip.none,
+                                  alignment: Alignment.bottomCenter,
+                                  children: [
+                                    _buildGlassWrapper(
+                                      key: const ValueKey(
+                                          'unified_bar_container'),
+                                      dockMaxWidth: dockMaxWidth,
+                                      child: _buildUnifiedDockContent(
+                                          context,
+                                          ref,
+                                          Theme.of(context),
+                                          currentIndex,
+                                          isRaindropAction,
+                                          isMinimalAction),
+                                    ),
+                                    if ((isMinimalAction || isRaindropAction) &&
+                                        selectedVerses.isNotEmpty)
+                                      Positioned(
+                                        top: -18,
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(context)
+                                                .scaffoldBackgroundColor
+                                                .withValues(alpha: 0.9),
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            border: Border.all(
+                                                color: Theme.of(context)
+                                                    .primaryColor
+                                                    .withValues(alpha: 0.2)),
+                                          ),
+                                          child: Text(
+                                            selectedVerses.length == 1
+                                                ? '1 verse selected'
+                                                : '${selectedVerses.length} verses selected',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .labelSmall
+                                                ?.copyWith(
+                                                  color: Theme.of(context)
+                                                      .primaryColor,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 10,
+                                                  letterSpacing: 0.2,
+                                                ),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 400),
+                              width: effectiveNavHidden
+                                  ? 0.0
+                                  : kBottomDockGap, // Collapse the gap too!
+                            ),
+                            // ── Dynamic Contextual FAB (Right) ──
+                            TweenAnimationBuilder<double>(
+                              duration: const Duration(milliseconds: 400),
+                              curve: Curves.easeOutCubic,
+                              tween: Tween<double>(
+                                begin: kBottomDockHeight,
+                                end: (currentIndex == 1 &&
+                                        selectedVerses.isNotEmpty &&
+                                        style == VerseActionStyle.classic)
+                                    ? 400.0
+                                    : kBottomDockHeight,
+                              ),
+                              builder: (context, height, child) {
+                                final bool isClassicAction =
+                                    currentIndex == 1 &&
+                                        selectedVerses.isNotEmpty &&
+                                        style == VerseActionStyle.classic;
+                                final bool isRaindropAction =
+                                    currentIndex == 1 &&
+                                        selectedVerses.isNotEmpty &&
+                                        style == VerseActionStyle.raindrop;
+                                return Stack(
+                                  alignment: Alignment.bottomRight,
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    // Expand bounds to catch Top Pill hits
+                                    if (isClassicAction)
+                                      SizedBox(width: 250, height: height + 70),
+
+                                    // Expand bounds to catch Raindrop Vertical Pill hits
+                                    if (isRaindropAction)
+                                      SizedBox(
+                                          width: kBottomDockHeight,
+                                          height: 260),
+
+                                    // ── Raindrop Vertical Pill ──
+                                    if (isRaindropAction)
+                                      Positioned(
+                                        bottom: kBottomDockHeight +
+                                            kBottomDockGap, // Above the FAB
+                                        right: 0,
+                                        child: BouncyEntrance(
+                                          isVisible: true,
+                                          delay:
+                                              const Duration(milliseconds: 40),
+                                          child: Stack(
+                                            alignment: Alignment.center,
+                                            children: [
+                                              Positioned.fill(
+                                                child: GestureDetector(
+                                                  behavior:
+                                                      HitTestBehavior.opaque,
+                                                  onTap: () {},
+                                                ),
+                                              ),
+                                              TexturedGlassContainer(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        kBottomDockHeight / 2),
+                                                padding: EdgeInsets.zero,
+                                                child: SizedBox(
+                                                  width: kBottomDockHeight,
+                                                  child: _buildActionMenuIcons(
+                                                      context,
+                                                      ref,
+                                                      Theme.of(context),
+                                                      showCloseIcon: false),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+
+                                    // ── Classic Top Pill (Verse + Colors) ──
+                                    Positioned(
+                                      bottom: height + kBottomDockGap,
+                                      left: 16,
+                                      right: 16,
+                                      child: IgnorePointer(
+                                        ignoring: !isClassicAction,
+                                        child: BouncyEntrance(
+                                          isVisible: isClassicAction,
+                                          delay:
+                                              const Duration(milliseconds: 40),
+                                          child: Stack(
+                                            alignment: Alignment.center,
+                                            children: [
+                                              Positioned.fill(
+                                                child: GestureDetector(
+                                                  behavior:
+                                                      HitTestBehavior.opaque,
+                                                  onTap:
+                                                      () {}, // Eat taps on the background
+                                                ),
+                                              ),
+                                              GestureDetector(
+                                                behavior:
+                                                    HitTestBehavior.opaque,
+                                                onTap:
+                                                    () {}, // Also eat taps inside the container bounds
+                                                child: TexturedGlassContainer(
+                                                  borderRadius:
+                                                      BorderRadius.circular(36),
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 16.0,
+                                                      vertical: 12.0),
+                                                  child: Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text(
+                                                        '${selectedVerses.length}',
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .titleSmall
+                                                            ?.copyWith(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color: Theme.of(
+                                                                      context)
+                                                                  .primaryColor,
+                                                            ),
+                                                      ),
+                                                      const SizedBox(width: 12),
+                                                      ...List.generate(
+                                                          highlightPalette
+                                                              .length, (i) {
+                                                        final color = AppColors
+                                                            .getRenderedHighlightColor(
+                                                                highlightPaletteSwatches[
+                                                                    i],
+                                                                Theme.of(
+                                                                        context)
+                                                                    .brightness,
+                                                                Theme.of(
+                                                                        context)
+                                                                    .scaffoldBackgroundColor);
+                                                        final highlights =
+                                                            ref.watch(
+                                                                highlightsProvider);
+                                                        final allHaveThisColor =
+                                                            selectedVerses
+                                                                .every((v) {
+                                                          final refStr =
+                                                              generateVerseKey(
+                                                                  readLoc
+                                                                      .bookName,
+                                                                  readLoc
+                                                                      .chapter,
+                                                                  v);
+                                                          return highlights
+                                                                  .containsKey(
+                                                                      refStr) &&
+                                                              highlights[
+                                                                      refStr] ==
+                                                                  i;
+                                                        });
+
+                                                        return _buildColorDot(
+                                                          color,
+                                                          isSelected:
+                                                              allHaveThisColor,
+                                                          onTap: () {
+                                                            final currentTheme =
+                                                                Theme.of(
+                                                                    context);
+                                                            Future(() {
+                                                              if (!context
+                                                                  .mounted)
+                                                                return;
+                                                              ref
+                                                                  .read(readSettingsProvider
+                                                                      .notifier)
+                                                                  .setActiveHighlightColorIndex(
+                                                                      i);
+                                                              VerseActionLogic.handleHighlight(
+                                                                  context,
+                                                                  currentTheme,
+                                                                  ref,
+                                                                  readLoc
+                                                                      .bookName,
+                                                                  readLoc
+                                                                      .chapter,
+                                                                  selectedVerses
+                                                                      .toList(),
+                                                                  i);
+                                                            });
+                                                          },
+                                                        );
+                                                      }),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    // ── Morphing FAB / Bottom Pill ──
+                                    GestureDetector(
+                                      behavior: HitTestBehavior.opaque,
+                                      onTap: () {},
+                                      child: TexturedGlassContainer(
+                                        borderRadius: BorderRadius.circular(
+                                            kBottomDockHeight / 2),
+                                        padding: EdgeInsets.zero,
+                                        child: SizedBox(
+                                          width: kBottomDockHeight,
+                                          height: height,
+                                          child: ClipRect(
+                                            child: OverflowBox(
+                                              minHeight: kBottomDockHeight,
+                                              maxHeight: 400,
+                                              alignment: Alignment.bottomCenter,
+                                              child: AnimatedSwitcher(
+                                                duration: const Duration(
+                                                    milliseconds: 300),
+                                                child: isClassicAction
+                                                    ? _buildActionMenuIcons(
+                                                        context,
+                                                        ref,
+                                                        Theme.of(context))
+                                                    : SizedBox(
+                                                        key: const ValueKey(
+                                                            'fab'),
+                                                        height:
+                                                            kBottomDockHeight,
+                                                        child: Center(
+                                                          child: IconButton(
+                                                              icon:
+                                                                  AnimatedSwitcher(
+                                                                duration:
+                                                                    const Duration(
+                                                                        milliseconds:
+                                                                            300),
+                                                                transitionBuilder: (Widget
+                                                                        child,
+                                                                    Animation<
+                                                                            double>
+                                                                        animation) {
+                                                                  return ScaleTransition(
+                                                                    scale:
+                                                                        animation,
+                                                                    child:
+                                                                        RotationTransition(
+                                                                      turns: Tween<double>(
+                                                                              begin: 0.5,
+                                                                              end: 1.0)
+                                                                          .animate(animation),
+                                                                      child:
+                                                                          child,
+                                                                    ),
+                                                                  );
+                                                                },
+                                                                child: (currentIndex ==
+                                                                            1 &&
+                                                                        selectedVerses
+                                                                            .isNotEmpty)
+                                                                    ? const Icon(
+                                                                        Icons
+                                                                            .close_rounded,
+                                                                        size:
+                                                                            28,
+                                                                        key: ValueKey(
+                                                                            'raindrop_close'))
+                                                                    : _buildFabIcon(
+                                                                        currentIndex,
+                                                                        ref),
+                                                              ),
+                                                              color: Theme.of(
+                                                                      context)
+                                                                  .primaryColor,
+                                                              onPressed: () {
+                                                                if (currentIndex ==
+                                                                        1 &&
+                                                                    selectedVerses
+                                                                        .isNotEmpty) {
+                                                                  ref
+                                                                      .read(readSelectionProvider
+                                                                          .notifier)
+                                                                      .clear();
+                                                                } else {
+                                                                  _handleFabTap(
+                                                                      currentIndex,
+                                                                      ref,
+                                                                      context);
+                                                                }
+                                                              }),
+                                                        ),
+                                                      ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ));
   }
 
-  Widget _buildFabIcon(
-      int currentIndex, WidgetRef ref) {
+  Widget _buildFabIcon(int currentIndex, WidgetRef ref) {
     if (currentIndex == 0) {
       return const Icon(
         Icons.settings,
@@ -486,7 +614,9 @@ class MainNavScreen extends ConsumerWidget {
       case 1:
         // Read -> Toggle actual visibility
         final isCurrentlyHidden = ref.read(navHiddenProvider);
-        ref.read(readSettingsProvider.notifier).setManualNavHidden(!isCurrentlyHidden);
+        ref
+            .read(readSettingsProvider.notifier)
+            .setManualNavHidden(!isCurrentlyHidden);
         ref.read(navHiddenProvider.notifier).set(!isCurrentlyHidden);
         break;
       case 2:
@@ -520,12 +650,13 @@ class MainNavScreen extends ConsumerWidget {
   }) {
     final theme = Theme.of(context);
     final isActiveNav = navIndex == currentIndex;
-    
+
     final navColor = isActiveNav
         ? theme.primaryColor
         : theme.colorScheme.onSurface.withValues(alpha: 0.4);
 
-    final currentIcon = isAction ? actionIcon : (isActiveNav ? navActiveIcon : navIcon);
+    final currentIcon =
+        isAction ? actionIcon : (isActiveNav ? navActiveIcon : navIcon);
     final currentColor = isAction ? actionColor : navColor;
     final currentLabel = isAction ? actionLabel : navLabel;
     final isNavActiveStyle = !isAction && isActiveNav;
@@ -537,7 +668,8 @@ class MainNavScreen extends ConsumerWidget {
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeOutCubic,
             tween: Tween<double>(begin: 0.0, end: isActiveNav ? 0.2 : 0.0),
-            builder: (context, rotation, child) => Transform.rotate(angle: rotation, child: child),
+            builder: (context, rotation, child) =>
+                Transform.rotate(angle: rotation, child: child),
             child: Icon(Icons.school, color: currentColor, size: 24),
           );
         } else if (navLabel == 'Search') {
@@ -545,7 +677,8 @@ class MainNavScreen extends ConsumerWidget {
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeOutBack,
             tween: Tween<double>(begin: 1.0, end: isActiveNav ? 1.2 : 1.0),
-            builder: (context, scale, child) => Transform.scale(scale: scale, child: child),
+            builder: (context, scale, child) =>
+                Transform.scale(scale: scale, child: child),
             child: Icon(Icons.search, color: currentColor, size: 24),
           );
         }
@@ -574,24 +707,33 @@ class MainNavScreen extends ConsumerWidget {
               children: [
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
-                  transitionBuilder: (child, anim) => FadeTransition(opacity: anim, alwaysIncludeSemantics: true, child: child),
+                  transitionBuilder: (child, anim) => FadeTransition(
+                      opacity: anim,
+                      alwaysIncludeSemantics: true,
+                      child: child),
                   child: KeyedSubtree(
-                    key: ValueKey('${isAction ? 'action' : 'nav'}_$currentIcon'),
+                    key:
+                        ValueKey('${isAction ? 'action' : 'nav'}_$currentIcon'),
                     child: buildIcon(),
                   ),
                 ),
                 const SizedBox(height: 4),
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
-                  transitionBuilder: (child, anim) => FadeTransition(opacity: anim, alwaysIncludeSemantics: true, child: child),
+                  transitionBuilder: (child, anim) => FadeTransition(
+                      opacity: anim,
+                      alwaysIncludeSemantics: true,
+                      child: child),
                   child: Text(
                     currentLabel,
                     key: ValueKey(currentLabel),
                     style: theme.textTheme.labelSmall?.copyWith(
-                          fontFamily: 'Inter',
-                          color: currentColor,
-                          fontWeight: isNavActiveStyle ? FontWeight.bold : FontWeight.normal,
-                        ),
+                      fontFamily: 'Inter',
+                      color: currentColor,
+                      fontWeight: isNavActiveStyle
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                    ),
                   ),
                 ),
               ],
@@ -629,12 +771,24 @@ class MainNavScreen extends ConsumerWidget {
             color: color.withValues(alpha: 0.8),
             shape: BoxShape.circle,
             border: Border.all(
-              color: isSelected ? Colors.white : Colors.black.withValues(alpha: 0.2), 
+              color: isSelected
+                  ? Colors.white
+                  : Colors.black.withValues(alpha: 0.2),
               width: isSelected ? 2 : 1,
             ),
             boxShadow: isSelected
-                ? [ BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 4, spreadRadius: 2) ]
-                : [ BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4, spreadRadius: 1) ],
+                ? [
+                    BoxShadow(
+                        color: color.withValues(alpha: 0.4),
+                        blurRadius: 4,
+                        spreadRadius: 2)
+                  ]
+                : [
+                    BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 4,
+                        spreadRadius: 1)
+                  ],
           ),
         ),
       ),
@@ -642,7 +796,8 @@ class MainNavScreen extends ConsumerWidget {
   }
 
   Widget _buildActionMenuIcons(
-      BuildContext context, WidgetRef ref, ThemeData theme, {bool showCloseIcon = true}) {
+      BuildContext context, WidgetRef ref, ThemeData theme,
+      {bool showCloseIcon = true}) {
     final readLoc = ref.watch(readLocationProvider);
     final selectedVerses = ref.watch(readSelectionProvider);
     final bookmarks = ref.watch(bookmarksProvider);
@@ -653,78 +808,84 @@ class MainNavScreen extends ConsumerWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-            _buildActionIcon(
-              selectedVerses.every((v) => bookmarks.contains(
-                      generateVerseKey(readLoc.bookName, readLoc.chapter, v)))
-                  ? Icons.bookmark_rounded
-                  : Icons.bookmark_border_rounded,
-              'Bookmark',
-              selectedVerses.every((v) => bookmarks.contains(
-                      generateVerseKey(readLoc.bookName, readLoc.chapter, v)))
-                  ? theme.primaryColor
-                  : theme.colorScheme.onSurface,
-              () {
-                VerseActionLogic.handleBookmark(context, theme, ref, readLoc.bookName, readLoc.chapter, selectedVerses.toList());
-                ref.read(readSelectionProvider.notifier).clear();
-              },
-            ),
+          _buildActionIcon(
+            selectedVerses.every((v) => bookmarks.contains(
+                    generateVerseKey(readLoc.bookName, readLoc.chapter, v)))
+                ? Icons.bookmark_rounded
+                : Icons.bookmark_border_rounded,
+            'Bookmark',
+            selectedVerses.every((v) => bookmarks.contains(
+                    generateVerseKey(readLoc.bookName, readLoc.chapter, v)))
+                ? theme.primaryColor
+                : theme.colorScheme.onSurface,
+            () {
+              VerseActionLogic.handleBookmark(context, theme, ref,
+                  readLoc.bookName, readLoc.chapter, selectedVerses.toList());
+              ref.read(readSelectionProvider.notifier).clear();
+            },
+          ),
+          const SizedBox(height: 2),
+          _buildActionIcon(
+            Icons.copy_rounded,
+            'Copy',
+            theme.colorScheme.onSurface,
+            () {
+              VerseActionLogic.handleCopy(context, ref, readLoc.bookName,
+                  readLoc.chapter, selectedVerses.toList());
+              ref.read(readSelectionProvider.notifier).clear();
+            },
+          ),
+          const SizedBox(height: 2),
+          _buildActionIcon(
+            Icons.note_add_outlined,
+            'Note',
+            theme.colorScheme.onSurface,
+            () async {
+              await VerseActionLogic.handleNote(context, ref, theme,
+                  readLoc.bookName, readLoc.chapter, selectedVerses.toList());
+              ref.read(readSelectionProvider.notifier).clear();
+            },
+          ),
+          const SizedBox(height: 2),
+          _buildActionIcon(
+            Icons.lightbulb_outline_rounded,
+            'Commentary',
+            theme.colorScheme.onSurface,
+            () {
+              VerseActionLogic.handleCommentary(context, ref, readLoc.bookName,
+                  readLoc.chapter, 1, selectedVerses.toList());
+            },
+          ),
+          const SizedBox(height: 2),
+          _buildActionIcon(
+            Icons.ios_share_rounded,
+            'Share',
+            theme.colorScheme.onSurface,
+            () async {
+              await VerseActionLogic.handleShare(context, ref, readLoc.bookName,
+                  readLoc.chapter, selectedVerses.toList());
+              ref.read(readSelectionProvider.notifier).clear();
+            },
+          ),
+          if (showCloseIcon) ...[
             const SizedBox(height: 2),
-            _buildActionIcon(
-              Icons.copy_rounded,
-              'Copy',
-              theme.colorScheme.onSurface,
-              () {
-                VerseActionLogic.handleCopy(context, ref, readLoc.bookName, readLoc.chapter, selectedVerses.toList());
-                ref.read(readSelectionProvider.notifier).clear();
-              },
+            IconButton(
+              icon: const Icon(Icons.close_rounded, size: 20),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              visualDensity: VisualDensity.compact,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+              onPressed: () => ref.read(readSelectionProvider.notifier).clear(),
             ),
-            const SizedBox(height: 2),
-            _buildActionIcon(
-              Icons.note_add_outlined,
-              'Note',
-              theme.colorScheme.onSurface,
-              () async {
-                await VerseActionLogic.handleNote(context, ref, theme, readLoc.bookName, readLoc.chapter, selectedVerses.toList());
-                ref.read(readSelectionProvider.notifier).clear();
-              },
-            ),
-            const SizedBox(height: 2),
-            _buildActionIcon(
-              Icons.lightbulb_outline_rounded,
-              'Commentary',
-              theme.colorScheme.onSurface,
-              () {
-                VerseActionLogic.handleCommentary(context, ref, readLoc.bookName, readLoc.chapter, 1, selectedVerses.toList());
-              },
-            ),
-            const SizedBox(height: 2),
-            _buildActionIcon(
-              Icons.ios_share_rounded,
-              'Share',
-              theme.colorScheme.onSurface,
-              () async {
-                await VerseActionLogic.handleShare(context, ref, readLoc.bookName, readLoc.chapter, selectedVerses.toList());
-                ref.read(readSelectionProvider.notifier).clear();
-              },
-            ),
-            if (showCloseIcon) ...[
-              const SizedBox(height: 2),
-              IconButton(
-                icon: const Icon(Icons.close_rounded, size: 20),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-                visualDensity: VisualDensity.compact,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                onPressed: () => ref.read(readSelectionProvider.notifier).clear(),
-              ),
-            ],
           ],
-        ),
+        ],
+      ),
     );
   }
 
   void _handleImFeelingLucky(BuildContext context, WidgetRef ref) {
-    final availableVerses = ref.read(commentaryProvider.notifier).versesWithCommentary;
+    final availableVerses =
+        ref.read(commentaryProvider.notifier).versesWithCommentary;
 
     if (availableVerses.isNotEmpty) {
       final randomVerse =
@@ -736,40 +897,49 @@ class MainNavScreen extends ConsumerWidget {
       final chapter = int.parse(refParts[0]);
       final verseNum = int.parse(refParts[1]);
 
-        final flatChapters = ref.read(flatChaptersProvider);
-        try {
-          final fc = flatChapters.firstWhere(
-              (c) => c.book.name == bookName && c.chapter.number == chapter);
-              
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) => const CastingLotsDialog(),
-          ).then((_) {
-            if (!context.mounted) return;
-            
-            HapticFeedback.selectionClick();
-            // Just push the VerseDetailScreen without switching the active tab.
-            ref.read(readLocationProvider.notifier).updateLocation(
-                  bookAbbrev: fc.book.abbreviation,
-                  bookName: bookName,
-                  chapter: chapter,
-                  verse: verseNum,
-                );
-            ref.read(activeStudyVerseProvider.notifier).setVerse('$bookName $chapter:$verseNum');
+      final flatChapters = ref.read(flatChaptersProvider);
+      try {
+        final fc = flatChapters.firstWhere(
+            (c) => c.book.name == bookName && c.chapter.number == chapter);
 
-            Navigator.of(context).push(CupertinoPageRoute(builder: (_) => CommentaryHubScreen(
-              book: bookName,
-              chapter: chapter,
-              verse: verseNum,
-              verseText: fc.chapter.verses[verseNum - 1].text,
-            )));
-          });
-        } catch (_) {}
-      }
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => const CastingLotsDialog(),
+        ).then((_) {
+          if (!context.mounted) return;
+
+          HapticFeedback.selectionClick();
+          // Just push the VerseDetailScreen without switching the active tab.
+          ref.read(readLocationProvider.notifier).updateLocation(
+                bookAbbrev: fc.book.abbreviation,
+                bookName: bookName,
+                chapter: chapter,
+                verse: verseNum,
+              );
+          ref
+              .read(activeStudyVerseProvider.notifier)
+              .setVerse('$bookName $chapter:$verseNum');
+
+          Navigator.of(context).push(CupertinoPageRoute(
+              builder: (_) => CommentaryHubScreen(
+                    book: bookName,
+                    chapter: chapter,
+                    verse: verseNum,
+                    verseText: fc.chapter.verses[verseNum - 1].text,
+                  )));
+        });
+      } catch (_) {}
+    }
   }
 
-  Widget _buildUnifiedDockContent(BuildContext context, WidgetRef ref, ThemeData theme, int currentIndex, bool isRaindropAction, bool isMinimalAction) {
+  Widget _buildUnifiedDockContent(
+      BuildContext context,
+      WidgetRef ref,
+      ThemeData theme,
+      int currentIndex,
+      bool isRaindropAction,
+      bool isMinimalAction) {
     if (isRaindropAction) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 0.0),
@@ -793,79 +963,104 @@ class MainNavScreen extends ConsumerWidget {
           child: Row(
             key: const ValueKey('unified_tabs'),
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _buildMorphingSlot(
-            context, ref,
-            isAction: isMinimalAction,
-            navIcon: Icons.home_outlined, navActiveIcon: Icons.home, navLabel: 'Home', navIndex: 0, currentIndex: currentIndex,
-            actionIcon: Icons.copy_rounded, actionLabel: 'Copy',
-            actionColor: actionIconColor,
-            onActionTap: () {
-              VerseActionLogic.handleCopy(context, ref, bookName, chapterNum, targetVerses);
-              ref.read(readSelectionProvider.notifier).clear();
-            },
+            children: [
+              _buildMorphingSlot(
+                context,
+                ref,
+                isAction: isMinimalAction,
+                navIcon: Icons.home_outlined,
+                navActiveIcon: Icons.home,
+                navLabel: 'Home',
+                navIndex: 0,
+                currentIndex: currentIndex,
+                actionIcon: Icons.copy_rounded,
+                actionLabel: 'Copy',
+                actionColor: actionIconColor,
+                onActionTap: () {
+                  VerseActionLogic.handleCopy(
+                      context, ref, bookName, chapterNum, targetVerses);
+                  ref.read(readSelectionProvider.notifier).clear();
+                },
+              ),
+              _buildMorphingSlot(
+                context,
+                ref,
+                isAction: isMinimalAction,
+                navIcon: Icons.menu_book_outlined,
+                navActiveIcon: Icons.menu_book,
+                navLabel: 'Read',
+                navIndex: 1,
+                currentIndex: currentIndex,
+                actionIcon: Icons.edit_document,
+                actionLabel: 'Notes',
+                actionColor: actionIconColor,
+                onActionTap: () async {
+                  await VerseActionLogic.handleNote(
+                      context, ref, theme, bookName, chapterNum, targetVerses);
+                  ref.read(readSelectionProvider.notifier).clear();
+                },
+              ),
+              _buildMorphingSlot(context, ref,
+                  isAction: isMinimalAction,
+                  navIcon: Icons.school_outlined,
+                  navActiveIcon: Icons.school,
+                  navLabel: 'Study',
+                  navIndex: 3,
+                  currentIndex: currentIndex,
+                  actionIcon: Icons.highlight_rounded,
+                  actionLabel: 'Highlight',
+                  actionColor: actionIconColor, onActionTap: () {
+                VerseActionLogic.handleHighlightInteraction(
+                  context: context,
+                  ref: ref,
+                  theme: theme,
+                  bookAbbrev: readLoc.bookAbbrev,
+                  chapterNum: chapterNum,
+                  targetVerses: targetVerses,
+                  isLongPress: false,
+                  onClearSelection: () =>
+                      ref.read(readSelectionProvider.notifier).clear(),
+                );
+              }, onActionLongPress: () {
+                VerseActionLogic.handleHighlightInteraction(
+                  context: context,
+                  ref: ref,
+                  theme: theme,
+                  bookAbbrev: readLoc.bookAbbrev,
+                  chapterNum: chapterNum,
+                  targetVerses: targetVerses,
+                  isLongPress: true,
+                  onClearSelection: () =>
+                      ref.read(readSelectionProvider.notifier).clear(),
+                );
+              }),
+              _buildMorphingSlot(
+                context,
+                ref,
+                isAction: isMinimalAction,
+                navIcon: Icons.search,
+                navActiveIcon: Icons.search,
+                navLabel: 'Search',
+                navIndex: 2,
+                currentIndex: currentIndex,
+                actionIcon: Icons.ios_share_rounded,
+                actionLabel: 'Share',
+                actionColor: actionIconColor,
+                onActionTap: () async {
+                  await VerseActionLogic.handleShare(
+                      context, ref, bookName, chapterNum, targetVerses);
+                  ref.read(readSelectionProvider.notifier).clear();
+                },
+              ),
+            ],
           ),
-          _buildMorphingSlot(
-            context, ref,
-            isAction: isMinimalAction,
-            navIcon: Icons.menu_book_outlined, navActiveIcon: Icons.menu_book, navLabel: 'Read', navIndex: 1, currentIndex: currentIndex,
-            actionIcon: Icons.edit_document, actionLabel: 'Notes',
-            actionColor: actionIconColor,
-            onActionTap: () async {
-              await VerseActionLogic.handleNote(context, ref, theme, bookName, chapterNum, targetVerses);
-              ref.read(readSelectionProvider.notifier).clear();
-            },
-          ),
-          _buildMorphingSlot(
-            context, ref,
-            isAction: isMinimalAction,
-            navIcon: Icons.school_outlined, navActiveIcon: Icons.school, navLabel: 'Study', navIndex: 3, currentIndex: currentIndex,
-            actionIcon: Icons.highlight_rounded, actionLabel: 'Highlight',
-            actionColor: actionIconColor,
-            onActionTap: () {
-              VerseActionLogic.handleHighlightInteraction(
-                context: context,
-                ref: ref,
-                theme: theme,
-                bookAbbrev: readLoc.bookAbbrev,
-                chapterNum: chapterNum,
-                targetVerses: targetVerses,
-                isLongPress: false,
-                onClearSelection: () => ref.read(readSelectionProvider.notifier).clear(),
-              );
-            },
-            onActionLongPress: () {
-              VerseActionLogic.handleHighlightInteraction(
-                context: context,
-                ref: ref,
-                theme: theme,
-                bookAbbrev: readLoc.bookAbbrev,
-                chapterNum: chapterNum,
-                targetVerses: targetVerses,
-                isLongPress: true,
-                onClearSelection: () => ref.read(readSelectionProvider.notifier).clear(),
-              );
-            }
-          ),
-          _buildMorphingSlot(
-            context, ref,
-            isAction: isMinimalAction,
-            navIcon: Icons.search, navActiveIcon: Icons.search, navLabel: 'Search', navIndex: 2, currentIndex: currentIndex,
-            actionIcon: Icons.ios_share_rounded, actionLabel: 'Share',
-            actionColor: actionIconColor,
-            onActionTap: () async {
-              await VerseActionLogic.handleShare(context, ref, bookName, chapterNum, targetVerses);
-              ref.read(readSelectionProvider.notifier).clear();
-            },
-          ),
-        ],
+        ),
       ),
-      ),
-    ),
     );
   }
 
-  Widget _buildGlassWrapper({required Key key, required double dockMaxWidth, required Widget child}) {
+  Widget _buildGlassWrapper(
+      {required Key key, required double dockMaxWidth, required Widget child}) {
     return TweenAnimationBuilder<BorderRadius?>(
       key: key,
       duration: const Duration(milliseconds: 400),
@@ -878,9 +1073,12 @@ class MainNavScreen extends ConsumerWidget {
         return Stack(
           alignment: Alignment.center,
           children: [
-            Positioned.fill(child: GestureDetector(behavior: HitTestBehavior.opaque, onTap: () {})),
+            Positioned.fill(
+                child: GestureDetector(
+                    behavior: HitTestBehavior.opaque, onTap: () {})),
             TexturedGlassContainer(
-              borderRadius: radius ?? BorderRadius.circular(kBottomDockHeight / 2),
+              borderRadius:
+                  radius ?? BorderRadius.circular(kBottomDockHeight / 2),
               padding: EdgeInsets.zero,
               child: childWidget!,
             ),
@@ -899,13 +1097,14 @@ class MainNavScreen extends ConsumerWidget {
     );
   }
 
-
-  Widget _buildColorDotRow(BuildContext context, WidgetRef ref, {List<int>? displayOrder}) {
+  Widget _buildColorDotRow(BuildContext context, WidgetRef ref,
+      {List<int>? displayOrder}) {
     final theme = Theme.of(context);
     final readLoc = ref.watch(readLocationProvider);
     final selectedVerses = ref.watch(readSelectionProvider);
     final highlights = ref.watch(highlightsProvider);
-    final order = displayOrder ?? List.generate(highlightPalette.length, (i) => i);
+    final order =
+        displayOrder ?? List.generate(highlightPalette.length, (i) => i);
 
     return Padding(
       padding: const EdgeInsets.only(left: 16.0, right: 64.0),
@@ -914,21 +1113,36 @@ class MainNavScreen extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: List.generate(order.length, (i) {
           final paletteIndex = order[i];
-          final allHaveThisColor = selectedVerses.isNotEmpty && selectedVerses.every((v) {
-            final refStr = generateVerseKey(readLoc.bookName, readLoc.chapter, v);
-            return highlights.containsKey(refStr) && highlights[refStr] == paletteIndex;
-          });
+          final allHaveThisColor = selectedVerses.isNotEmpty &&
+              selectedVerses.every((v) {
+                final refStr =
+                    generateVerseKey(readLoc.bookName, readLoc.chapter, v);
+                return highlights.containsKey(refStr) &&
+                    highlights[refStr] == paletteIndex;
+              });
 
           return _buildColorDot(
-            AppColors.getRenderedHighlightColor(highlightPaletteSwatches[paletteIndex], theme.brightness, theme.scaffoldBackgroundColor),
+            AppColors.getRenderedHighlightColor(
+                highlightPaletteSwatches[paletteIndex],
+                theme.brightness,
+                theme.scaffoldBackgroundColor),
             isSelected: allHaveThisColor,
             onTap: () {
               Future(() {
                 if (!context.mounted) return;
-                ref.read(readSettingsProvider.notifier).setActiveHighlightColorIndex(paletteIndex);
-                
+                ref
+                    .read(readSettingsProvider.notifier)
+                    .setActiveHighlightColorIndex(paletteIndex);
+
                 final targetVerses = ref.read(readSelectionProvider).toList();
-                VerseActionLogic.handleHighlight(context, theme, ref, readLoc.bookName, readLoc.chapter, targetVerses, paletteIndex);
+                VerseActionLogic.handleHighlight(
+                    context,
+                    theme,
+                    ref,
+                    readLoc.bookName,
+                    readLoc.chapter,
+                    targetVerses,
+                    paletteIndex);
                 ref.read(readSelectionProvider.notifier).clear();
               });
             },
@@ -938,7 +1152,8 @@ class MainNavScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildRaindropColorRow(BuildContext context, WidgetRef ref, ThemeData theme) {
+  Widget _buildRaindropColorRow(
+      BuildContext context, WidgetRef ref, ThemeData theme) {
     return SizedBox(
       height: kBottomDockHeight,
       child: Center(
@@ -1000,7 +1215,7 @@ class _CastingLotsDialogState extends State<CastingLotsDialog>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,

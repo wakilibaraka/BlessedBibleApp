@@ -26,31 +26,31 @@ class VersePreviewModal extends ConsumerWidget {
     final theme = Theme.of(context);
     final typography = ref.watch(typographyProvider);
     final bibleState = ref.watch(bibleProvider);
-    
+
     String verseText = 'Loading...';
-    
+
     if (!bibleState.isLoading) {
       final book = bibleState.books.cast<BibleBook?>().firstWhere(
-        (b) => b?.name == bookName,
-        orElse: () => null,
-      );
-      
-      if (book != null && chapter > 0 && chapter <= book.chapters.length) {
-        final chapterData = book.chapters[chapter - 1];
-        
-        final texts = <String>[];
-        final end = endVerse ?? startVerse;
-        
-        for (int i = startVerse; i <= end; i++) {
-          final verse = chapterData.verses.cast<BibleVerse?>().firstWhere(
-            (v) => v?.number == i,
+            (b) => b?.name == bookName,
             orElse: () => null,
           );
+
+      if (book != null && chapter > 0 && chapter <= book.chapters.length) {
+        final chapterData = book.chapters[chapter - 1];
+
+        final texts = <String>[];
+        final end = endVerse ?? startVerse;
+
+        for (int i = startVerse; i <= end; i++) {
+          final verse = chapterData.verses.cast<BibleVerse?>().firstWhere(
+                (v) => v?.number == i,
+                orElse: () => null,
+              );
           if (verse != null) {
             texts.add('${verse.number} ${verse.text}');
           }
         }
-        
+
         if (texts.isNotEmpty) {
           verseText = texts.join('\n\n');
         } else {
@@ -71,7 +71,8 @@ class VersePreviewModal extends ConsumerWidget {
           children: [
             // Header with title and close button
             Padding(
-              padding: const EdgeInsets.only(left: 24.0, right: 12.0, top: 12.0, bottom: 12.0),
+              padding: const EdgeInsets.only(
+                  left: 24.0, right: 12.0, top: 12.0, bottom: 12.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -86,16 +87,20 @@ class VersePreviewModal extends ConsumerWidget {
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.close_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                    icon: Icon(Icons.close_rounded,
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                 ],
               ),
             ),
-            
+
             // Divider
-            Divider(height: 1, color: theme.colorScheme.onSurface.withValues(alpha: 0.1)),
-            
+            Divider(
+                height: 1,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.1)),
+
             // Content
             Flexible(
               child: SingleChildScrollView(

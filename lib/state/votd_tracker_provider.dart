@@ -10,8 +10,9 @@ class VotdTrackerNotifier extends Notifier<Set<String>> {
 
   void markViewed(DateTime date) {
     // Format date to yyyy-MM-dd using basic string manipulation to avoid intl dependency
-    final String dateString = '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-    
+    final String dateString =
+        '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+
     if (!state.contains(dateString)) {
       final newState = Set<String>.from(state)..add(dateString);
       state = newState;
@@ -25,4 +26,5 @@ class VotdTrackerNotifier extends Notifier<Set<String>> {
   }
 }
 
-final votdTrackerProvider = NotifierProvider<VotdTrackerNotifier, Set<String>>(VotdTrackerNotifier.new);
+final votdTrackerProvider =
+    NotifierProvider<VotdTrackerNotifier, Set<String>>(VotdTrackerNotifier.new);

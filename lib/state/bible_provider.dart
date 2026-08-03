@@ -39,24 +39,33 @@ class BibleNotifier extends Notifier<BibleState> {
 
   Future<void> _loadBible() async {
     try {
-      final jsonString = await rootBundle.loadString('assets/data/kjvbible.json');
-      if (kStartupTrace) debugPrint('Bible JSON string loaded: ${startupStopwatch.elapsedMilliseconds} ms');
-      
+      final jsonString =
+          await rootBundle.loadString('assets/data/kjvbible.json');
+      if (kStartupTrace)
+        debugPrint(
+            'Bible JSON string loaded: ${startupStopwatch.elapsedMilliseconds} ms');
+
       final booksList = await compute(parseBibleJson, jsonString);
-      if (kStartupTrace) debugPrint('Bible data ready: ${startupStopwatch.elapsedMilliseconds} ms');
-      
+      if (kStartupTrace)
+        debugPrint(
+            'Bible data ready: ${startupStopwatch.elapsedMilliseconds} ms');
+
       // Await DB copy/initialization so the splash screen stays active until DB is fully ready
       await bibleDbService.database;
-      if (kStartupTrace) debugPrint('Database ready: ${startupStopwatch.elapsedMilliseconds} ms');
-      
+      if (kStartupTrace)
+        debugPrint(
+            'Database ready: ${startupStopwatch.elapsedMilliseconds} ms');
+
       state = state.copyWith(isLoading: false, books: booksList);
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: 'Failed to load Bible: $e');
+      state =
+          state.copyWith(isLoading: false, error: 'Failed to load Bible: $e');
     }
   }
 }
 
-final bibleProvider = NotifierProvider<BibleNotifier, BibleState>(BibleNotifier.new);
+final bibleProvider =
+    NotifierProvider<BibleNotifier, BibleState>(BibleNotifier.new);
 
 class FlatChapter {
   final BibleBook book;
@@ -67,7 +76,7 @@ class FlatChapter {
 final flatChaptersProvider = Provider<List<FlatChapter>>((ref) {
   final bibleState = ref.watch(bibleProvider);
   if (bibleState.isLoading || bibleState.books.isEmpty) return [];
-  
+
   List<FlatChapter> chapters = [];
   for (final book in bibleState.books) {
     for (final chapter in book.chapters) {
@@ -77,9 +86,15 @@ final flatChaptersProvider = Provider<List<FlatChapter>>((ref) {
   return chapters;
 });
 
-typedef ChapterKey = ({String translationId, int bookNumber, int chapterNumber});
+typedef ChapterKey = ({
+  String translationId,
+  int bookNumber,
+  int chapterNumber
+});
 
-final translationChapterProvider = FutureProvider.family<List<BibleVerse>, ChapterKey>((ref, key) async {
+final translationChapterProvider =
+    FutureProvider.family<List<BibleVerse>, ChapterKey>((ref, key) async {
   // If kjv, we could technically still use the loaded JSON, but DB is consistent.
-  return await bibleDbService.getChapter(key.translationId, key.bookNumber, key.chapterNumber);
+  return await bibleDbService.getChapter(
+      key.translationId, key.bookNumber, key.chapterNumber);
 });

@@ -17,6 +17,7 @@ class PreferencesService {
   static const String _lastReadLocKey = 'last_read_loc';
   static const String _studyLayoutKey = 'study_layout';
   static const String _readingPlanStateKey = 'reading_plan_state';
+
   /// Key for the user's chosen rest day in the reading plan.
   /// Sunday-first convention: 1=Sunday … 7=Saturday (default).
   static const String _readingPlanRestDayKey = 'reading_plan_rest_day';
@@ -27,7 +28,6 @@ class PreferencesService {
   static const String _defaultStartTabKey = 'default_start_tab';
   static const String _activeTranslationKey = 'active_translation';
   static const String _secondaryTranslationKey = 'secondary_translation';
-
 
   // Reading tips
   static const String _showReadingTipsKey = 'show_reading_tips';
@@ -73,7 +73,6 @@ class PreferencesService {
       await prefs.setString(_secondaryTranslationKey, translationId);
     }
   }
-
 
   List<SearchResult> getSearchHistory() {
     final jsonString = prefs.getString(_searchHistoryKey);
@@ -224,7 +223,7 @@ class PreferencesService {
   void saveCustomPlan(String id, Map<String, dynamic> data) {
     // Save the plan data
     prefs.setString('$_customPlansKeyPrefix$id', jsonEncode(data));
-    
+
     // Add to the list of IDs if not present
     List<String> ids = getCustomPlanIds();
     if (!ids.contains(id)) {
@@ -248,7 +247,7 @@ class PreferencesService {
   List<String> getCustomPlanIds() {
     return prefs.getStringList(_customPlanIdsKey) ?? [];
   }
-  
+
   void deleteCustomPlan(String id) {
     prefs.remove('$_customPlansKeyPrefix$id');
     List<String> ids = getCustomPlanIds();
@@ -263,7 +262,8 @@ class PreferencesService {
   int getReadingPlanRestDay() => prefs.getInt(_readingPlanRestDayKey) ?? 7;
 
   /// Persists the rest-day preference. [value] must be 1–7 (Sunday-first).
-  void setReadingPlanRestDay(int value) => prefs.setInt(_readingPlanRestDayKey, value);
+  void setReadingPlanRestDay(int value) =>
+      prefs.setInt(_readingPlanRestDayKey, value);
 
   void saveVotdViewedDays(List<String> days) {
     prefs.setStringList(_votdViewedDaysKey, days);
@@ -276,7 +276,8 @@ class PreferencesService {
   static const String _chapterPositionsKey = 'chapter_positions';
   static const int _expiryMillis = 7 * 24 * 60 * 60 * 1000; // 7 days
 
-  void saveChapterScrollPosition(String bookAbbrev, int chapter, int verseIndex) {
+  void saveChapterScrollPosition(
+      String bookAbbrev, int chapter, int verseIndex) {
     final jsonString = prefs.getString(_chapterPositionsKey);
     Map<String, dynamic> map = {};
     if (jsonString != null) {
@@ -284,29 +285,29 @@ class PreferencesService {
         map = jsonDecode(jsonString);
       } catch (_) {}
     }
-    
+
     final key = '${bookAbbrev}_$chapter';
     map[key] = {
       'verseIndex': verseIndex,
       'timestamp': DateTime.now().millisecondsSinceEpoch,
     };
-    
+
     prefs.setString(_chapterPositionsKey, jsonEncode(map));
   }
 
   int? getChapterScrollPosition(String bookAbbrev, int chapter) {
     final jsonString = prefs.getString(_chapterPositionsKey);
     if (jsonString == null) return null;
-    
+
     try {
       final map = jsonDecode(jsonString) as Map<String, dynamic>;
       final key = '${bookAbbrev}_$chapter';
       if (!map.containsKey(key)) return null;
-      
+
       final data = map[key] as Map<String, dynamic>;
       final timestamp = data['timestamp'] as int;
       final verseIndex = data['verseIndex'] as int;
-      
+
       if (DateTime.now().millisecondsSinceEpoch - timestamp < _expiryMillis) {
         return verseIndex;
       } else {
@@ -321,42 +322,55 @@ class PreferencesService {
   }
 
   // --- Reminders Getters & Setters ---
-  
-  bool getSabbathReminderEnabled() => prefs.getBool(_sabbathReminderEnabledKey) ?? false;
-  void setSabbathReminderEnabled(bool val) => prefs.setBool(_sabbathReminderEnabledKey, val);
+
+  bool getSabbathReminderEnabled() =>
+      prefs.getBool(_sabbathReminderEnabledKey) ?? false;
+  void setSabbathReminderEnabled(bool val) =>
+      prefs.setBool(_sabbathReminderEnabledKey, val);
 
   double? getSabbathLocationLat() => prefs.getDouble(_sabbathLocationLatKey);
-  void setSabbathLocationLat(double val) => prefs.setDouble(_sabbathLocationLatKey, val);
+  void setSabbathLocationLat(double val) =>
+      prefs.setDouble(_sabbathLocationLatKey, val);
 
   double? getSabbathLocationLng() => prefs.getDouble(_sabbathLocationLngKey);
-  void setSabbathLocationLng(double val) => prefs.setDouble(_sabbathLocationLngKey, val);
+  void setSabbathLocationLng(double val) =>
+      prefs.setDouble(_sabbathLocationLngKey, val);
 
   String? getSabbathLocationName() => prefs.getString(_sabbathLocationNameKey);
-  void setSabbathLocationName(String val) => prefs.setString(_sabbathLocationNameKey, val);
+  void setSabbathLocationName(String val) =>
+      prefs.setString(_sabbathLocationNameKey, val);
 
-  bool getDailyReminderEnabled() => prefs.getBool(_dailyReminderEnabledKey) ?? false;
-  void setDailyReminderEnabled(bool val) => prefs.setBool(_dailyReminderEnabledKey, val);
+  bool getDailyReminderEnabled() =>
+      prefs.getBool(_dailyReminderEnabledKey) ?? false;
+  void setDailyReminderEnabled(bool val) =>
+      prefs.setBool(_dailyReminderEnabledKey, val);
 
   int getDailyReminderHour() => prefs.getInt(_dailyReminderHourKey) ?? 18;
-  void setDailyReminderHour(int val) => prefs.setInt(_dailyReminderHourKey, val);
+  void setDailyReminderHour(int val) =>
+      prefs.setInt(_dailyReminderHourKey, val);
 
   int getDailyReminderMinute() => prefs.getInt(_dailyReminderMinuteKey) ?? 0;
-  void setDailyReminderMinute(int val) => prefs.setInt(_dailyReminderMinuteKey, val);
+  void setDailyReminderMinute(int val) =>
+      prefs.setInt(_dailyReminderMinuteKey, val);
 
-  bool getCustomWeeklyEnabled() => prefs.getBool(_customWeeklyEnabledKey) ?? false;
-  void setCustomWeeklyEnabled(bool val) => prefs.setBool(_customWeeklyEnabledKey, val);
+  bool getCustomWeeklyEnabled() =>
+      prefs.getBool(_customWeeklyEnabledKey) ?? false;
+  void setCustomWeeklyEnabled(bool val) =>
+      prefs.setBool(_customWeeklyEnabledKey, val);
 
-  int getCustomWeeklyDay() => prefs.getInt(_customWeeklyDayKey) ?? 1; // 1 = Monday, 7 = Sunday
+  int getCustomWeeklyDay() =>
+      prefs.getInt(_customWeeklyDayKey) ?? 1; // 1 = Monday, 7 = Sunday
   void setCustomWeeklyDay(int val) => prefs.setInt(_customWeeklyDayKey, val);
 
   int getCustomWeeklyHour() => prefs.getInt(_customWeeklyHourKey) ?? 8;
   void setCustomWeeklyHour(int val) => prefs.setInt(_customWeeklyHourKey, val);
 
   int getCustomWeeklyMinute() => prefs.getInt(_customWeeklyMinuteKey) ?? 0;
-  void setCustomWeeklyMinute(int val) => prefs.setInt(_customWeeklyMinuteKey, val);
+  void setCustomWeeklyMinute(int val) =>
+      prefs.setInt(_customWeeklyMinuteKey, val);
 
   // --- Verse Visits ---
-  
+
   Map<String, int> getVerseVisits() {
     final jsonString = prefs.getString(_verseVisitsKey);
     if (jsonString != null) {
@@ -412,9 +426,10 @@ class PreferencesService {
   void saveSeenHints(List<String> hints) {
     prefs.setStringList(_seenHintsKey, hints);
   }
-  
+
   bool get showReadingTips => prefs.getBool(_showReadingTipsKey) ?? true;
-  void setShowReadingTips(bool value) => prefs.setBool(_showReadingTipsKey, value);
+  void setShowReadingTips(bool value) =>
+      prefs.setBool(_showReadingTipsKey, value);
 }
 
 final preferencesProvider = Provider<PreferencesService>((ref) {

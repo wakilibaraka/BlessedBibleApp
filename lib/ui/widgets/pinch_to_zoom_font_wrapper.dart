@@ -9,10 +9,12 @@ class PinchToZoomFontWrapper extends ConsumerStatefulWidget {
   const PinchToZoomFontWrapper({super.key, required this.child});
 
   @override
-  ConsumerState<PinchToZoomFontWrapper> createState() => _PinchToZoomFontWrapperState();
+  ConsumerState<PinchToZoomFontWrapper> createState() =>
+      _PinchToZoomFontWrapperState();
 }
 
-class _PinchToZoomFontWrapperState extends ConsumerState<PinchToZoomFontWrapper> {
+class _PinchToZoomFontWrapperState
+    extends ConsumerState<PinchToZoomFontWrapper> {
   final Map<int, Offset> _activePointers = {};
   double _initialDistance = 0.0;
   double _initialFontSize = 18.0;
@@ -42,7 +44,7 @@ class _PinchToZoomFontWrapperState extends ConsumerState<PinchToZoomFontWrapper>
 
           // Map scale to font size: e.g. scale 1.1 -> +10% font size
           final newFontSize = (_initialFontSize * scale).clamp(12.0, 32.0);
-          
+
           final currentFontSize = ref.read(typographyProvider).fontSize;
           if ((newFontSize - currentFontSize).abs() > 0.5) {
             // Update live but debounced by distance threshold

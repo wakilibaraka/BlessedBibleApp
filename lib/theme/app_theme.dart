@@ -98,9 +98,11 @@ class AppTheme {
       AppColors.darkTextSecondary,
       baseFontSize,
     );
-    
-    final backgroundColor = isAmoled ? const Color(0xFF000000) : AppColors.darkBackground;
-    final surfaceColor = isAmoled ? const Color(0xFF101010) : AppColors.darkSurface;
+
+    final backgroundColor =
+        isAmoled ? const Color(0xFF000000) : AppColors.darkBackground;
+    final surfaceColor =
+        isAmoled ? const Color(0xFF101010) : AppColors.darkSurface;
 
     return ThemeData(
       brightness: Brightness.dark,
@@ -495,7 +497,10 @@ class AppTheme {
     );
   }
 
-  static ThemeData priestlyPurpleTheme(double baseFontSize) => customAccentTheme(baseFontSize, const Color(0xFF673AB7));
-  static ThemeData galileeBlueTheme(double baseFontSize) => customAccentTheme(baseFontSize, const Color(0xFF2196F3));
-  static ThemeData scarletRedTheme(double baseFontSize) => customAccentTheme(baseFontSize, const Color(0xFFE53935));
+  static ThemeData priestlyPurpleTheme(double baseFontSize) =>
+      customAccentTheme(baseFontSize, const Color(0xFF673AB7));
+  static ThemeData galileeBlueTheme(double baseFontSize) =>
+      customAccentTheme(baseFontSize, const Color(0xFF2196F3));
+  static ThemeData scarletRedTheme(double baseFontSize) =>
+      customAccentTheme(baseFontSize, const Color(0xFFE53935));
 }

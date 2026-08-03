@@ -75,7 +75,7 @@ class SearchNotifier extends Notifier<SearchState> {
       filterNotes: prefs.prefs.getBool('search_filter_notes') ?? true,
     );
   }
-  
+
   void _saveFilters() {
     final prefs = ref.read(preferencesProvider).prefs;
     prefs.setBool('search_filter_ot', state.filterOt);
@@ -86,7 +86,7 @@ class SearchNotifier extends Notifier<SearchState> {
 
   void setQuery(String query) {
     state = state.copyWith(query: query, isSearching: true);
-    
+
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 300), () {
       _performSearch();
@@ -114,7 +114,7 @@ class SearchNotifier extends Notifier<SearchState> {
     _performSearch();
     _saveFilters();
   }
-  
+
   void toggleNotesFilter() {
     state = state.copyWith(filterNotes: !state.filterNotes);
     _performSearch();
@@ -122,7 +122,10 @@ class SearchNotifier extends Notifier<SearchState> {
   }
 
   void addRecentPlace(SearchResult result) {
-    final updatedList = [result, ...state.recentPlaces.where((r) => r.title != result.title)].take(10).toList();
+    final updatedList = [
+      result,
+      ...state.recentPlaces.where((r) => r.title != result.title)
+    ].take(10).toList();
     state = state.copyWith(recentPlaces: updatedList);
     ref.read(preferencesProvider).saveSearchHistory(updatedList);
   }
@@ -155,4 +158,5 @@ class SearchNotifier extends Notifier<SearchState> {
   }
 }
 
-final searchStateProvider = NotifierProvider<SearchNotifier, SearchState>(SearchNotifier.new);
+final searchStateProvider =
+    NotifierProvider<SearchNotifier, SearchState>(SearchNotifier.new);

@@ -13,8 +13,9 @@ class ReadSelectionNotifier extends Notifier<Set<int>> {
   }
 
   void clear() => state = {};
-  
+
   void setSingle(int index) => state = {index};
 }
 
-final readSelectionProvider = NotifierProvider<ReadSelectionNotifier, Set<int>>(ReadSelectionNotifier.new);
+final readSelectionProvider = NotifierProvider<ReadSelectionNotifier, Set<int>>(
+    ReadSelectionNotifier.new);

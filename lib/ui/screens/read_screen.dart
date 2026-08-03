@@ -49,115 +49,6 @@ import '../widgets/commentary_view.dart';
 import '../sheets/verse_context_menu_sheet.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
-class LazyPageScrollPhysics extends ClampingScrollPhysics {
-  final GestureSensitivity sensitivity;
-
-  const LazyPageScrollPhysics({
-    super.parent,
-    required this.sensitivity,
-  });
-
-  @override
-  double get dragStartDistanceMotionThreshold =>
-      sensitivity == GestureSensitivity.instant ? 25.0 : super.dragStartDistanceMotionThreshold ?? 18.0;
-
-  @override
-  LazyPageScrollPhysics applyTo(ScrollPhysics? ancestor) {
-    return LazyPageScrollPhysics(
-      parent: buildParent(ancestor),
-      sensitivity: sensitivity,
-    );
-  }
-
-  double _getCustomPage(ScrollMetrics position) {
-    return position.pixels / position.viewportDimension;
-  }
-
-  double _getPixels(ScrollMetrics position, double page) {
-    return page * position.viewportDimension;
-  }
-
-  double _getCustomTargetPixels(ScrollMetrics position, Tolerance tolerance, double velocity) {
-    double page = _getCustomPage(position);
-    
-    final double flickVelocity = sensitivity == GestureSensitivity.firm 
-        ? 300.0 
-        : (sensitivity == GestureSensitivity.fluid ? 50.0 : 10.0);
-
-    if (velocity < -flickVelocity) {
-      page -= 0.5;
-    } else if (velocity > flickVelocity) {
-      page += 0.5;
-    } else {
-      // Distance threshold. Apple standard for firm is 0.5 (50%). 
-      // Fluid uses 0.15 (15%). 
-      // Instant reduces length required by 90% (0.05 from 0.5, or 0.015 for extreme sensitivity).
-      final double distanceThreshold = sensitivity == GestureSensitivity.firm 
-          ? 0.5 
-          : (sensitivity == GestureSensitivity.fluid ? 0.15 : 0.015);
-
-      double fraction = page - page.roundToDouble();
-      if (fraction > distanceThreshold) {
-        page = page.roundToDouble() + 1.0;
-      } else if (fraction < -distanceThreshold) {
-        page = page.roundToDouble() - 1.0;
-      }
-    }
-    return _getPixels(position, page.roundToDouble());
-  }
-
-  @override
-  Simulation? createBallisticSimulation(ScrollMetrics position, double velocity) {
-
-    if ((velocity <= 0.0 && position.pixels <= position.minScrollExtent) ||
-        (velocity >= 0.0 && position.pixels >= position.maxScrollExtent)) {
-      return super.createBallisticSimulation(position, velocity);
-    }
-    final Tolerance tolerance = toleranceFor(position);
-    final double target = _getCustomTargetPixels(position, tolerance, velocity);
-    if (target != position.pixels) {
-      return SpringSimulation(spring, position.pixels, target, velocity, tolerance: tolerance);
-    }
-    return null;
-  }
-
-  @override
-  SpringDescription get spring {
-    if (sensitivity == GestureSensitivity.instant) {
-      return SpringDescription.withDampingRatio(mass: 0.1, stiffness: 2000.0, ratio: 1.0);
-    }
-    if (sensitivity == GestureSensitivity.fluid) {
-      return super.spring;
-    }
-    return SpringDescription.withDampingRatio(
-      mass: 0.25,
-      stiffness: 280.0,
-      ratio: 0.95,
-    );
-  }
-
-  @override
-  bool get allowImplicitScrolling => false;
-}
-
-class AntiGravityScrollPhysics extends BouncingScrollPhysics {
-  const AntiGravityScrollPhysics({super.parent});
-
-  @override
-  AntiGravityScrollPhysics applyTo(ScrollPhysics? ancestor) {
-    return AntiGravityScrollPhysics(parent: buildParent(ancestor));
-  }
-
-  @override
-  SpringDescription get spring {
-    return const SpringDescription(
-      mass: 0.1,
-      stiffness: 400.0,
-      damping: 0.5,
-    );
-  }
-}
-
 class StrictVerticalScrollPhysics extends ScrollPhysics {
   final ValueNotifier<bool> isPageSwiping;
 
@@ -204,60 +95,106 @@ class ExpandedChipsNotifier extends Notifier<Map<int, String?>> {
   }
 }
 
-final expandedChipsProvider = NotifierProvider<ExpandedChipsNotifier, Map<int, String?>>(ExpandedChipsNotifier.new);
+final expandedChipsProvider =
+    NotifierProvider<ExpandedChipsNotifier, Map<int, String?>>(
+        ExpandedChipsNotifier.new);
 
 String _getTranslationGlyph(String languageName) {
   switch (languageName.toLowerCase()) {
-    case 'english': return '英';
-    case 'french': return '法';
-    case 'chinese': return '中';
-    case 'korean': return '韓';
-    case 'russian': return '俄';
-    case 'german': return '德';
-    case 'spanish': return '西';
-    case 'japanese': return '日';
-    case 'arabic': return '阿';
-    case 'hindi': return '印';
-    case 'italian': return '意';
-    case 'portuguese': return '葡';
-    case 'dutch': return '荷';
-    case 'ukrainian': return '烏';
-    case 'polish': return '波';
-    case 'swahili': return '斯';
-    case 'tagalog': return '塔';
-    default: return languageName.isNotEmpty ? languageName[0].toUpperCase() : 'A';
+    case 'english':
+      return '英';
+    case 'french':
+      return '法';
+    case 'chinese':
+      return '中';
+    case 'korean':
+      return '韓';
+    case 'russian':
+      return '俄';
+    case 'german':
+      return '德';
+    case 'spanish':
+      return '西';
+    case 'japanese':
+      return '日';
+    case 'arabic':
+      return '阿';
+    case 'hindi':
+      return '印';
+    case 'italian':
+      return '意';
+    case 'portuguese':
+      return '葡';
+    case 'dutch':
+      return '荷';
+    case 'ukrainian':
+      return '烏';
+    case 'polish':
+      return '波';
+    case 'swahili':
+      return '斯';
+    case 'tagalog':
+      return '塔';
+    default:
+      return languageName.isNotEmpty ? languageName[0].toUpperCase() : 'A';
   }
 }
 
 String _getLanguageAbbr(String languageName) {
   switch (languageName.toLowerCase()) {
-    case 'english': return 'EN';
-    case 'swahili': return 'SW';
-    case 'french': return 'FR';
-    case 'italian': return 'IT';
-    case 'spanish': return 'ES';
-    case 'tagalog': return 'TL';
-    case 'arabic': return 'AR';
-    case 'chinese': return 'ZH';
-    case 'hindi': return 'HI';
-    case 'korean': return 'KO';
-    case 'russian': return 'RU';
-    case 'german': return 'DE';
-    case 'japanese': return 'JA';
-    case 'portuguese': return 'PT';
-    case 'dutch': return 'NL';
-    case 'romanian': return 'RO';
-    case 'ukrainian': return 'UK';
-    case 'polish': return 'PL';
-    case 'indonesian': return 'ID';
-    default: return languageName.length >= 2 ? languageName.substring(0, 2).toUpperCase() : languageName.toUpperCase();
+    case 'english':
+      return 'EN';
+    case 'swahili':
+      return 'SW';
+    case 'french':
+      return 'FR';
+    case 'italian':
+      return 'IT';
+    case 'spanish':
+      return 'ES';
+    case 'tagalog':
+      return 'TL';
+    case 'arabic':
+      return 'AR';
+    case 'chinese':
+      return 'ZH';
+    case 'hindi':
+      return 'HI';
+    case 'korean':
+      return 'KO';
+    case 'russian':
+      return 'RU';
+    case 'german':
+      return 'DE';
+    case 'japanese':
+      return 'JA';
+    case 'portuguese':
+      return 'PT';
+    case 'dutch':
+      return 'NL';
+    case 'romanian':
+      return 'RO';
+    case 'ukrainian':
+      return 'UK';
+    case 'polish':
+      return 'PL';
+    case 'indonesian':
+      return 'ID';
+    default:
+      return languageName.length >= 2
+          ? languageName.substring(0, 2).toUpperCase()
+          : languageName.toUpperCase();
   }
 }
 
-String _getTranslationLabel(String translationId, List<TranslationInfo> allInstalled, {String? defaultName}) {
+String _getTranslationLabel(
+    String translationId, List<TranslationInfo> allInstalled,
+    {String? defaultName}) {
   try {
-    final info = allInstalled.firstWhere((t) => t.translationId == translationId);
-    final sameLanguageVersions = allInstalled.where((t) => t.languageName == info.languageName).toList();
+    final info =
+        allInstalled.firstWhere((t) => t.translationId == translationId);
+    final sameLanguageVersions =
+        allInstalled.where((t) => t.languageName == info.languageName).toList();
     if (sameLanguageVersions.length > 1) {
       return info.abbreviation.toUpperCase();
     }
@@ -268,9 +205,12 @@ String _getTranslationLabel(String translationId, List<TranslationInfo> allInsta
   }
 }
 
-String _getTranslationCombinedLabel(String translationId, List<TranslationInfo> allInstalled, {String? defaultName}) {
+String _getTranslationCombinedLabel(
+    String translationId, List<TranslationInfo> allInstalled,
+    {String? defaultName}) {
   try {
-    final info = allInstalled.firstWhere((t) => t.translationId == translationId);
+    final info =
+        allInstalled.firstWhere((t) => t.translationId == translationId);
     final label = _getTranslationLabel(translationId, allInstalled);
     return '${_getTranslationGlyph(info.languageName)} $label';
   } catch (_) {
@@ -378,7 +318,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   //   Hold time : 700 ms — the drag must be held for at least this long
   //   Max vel   : 250 px/s  — any faster is a flick, not a deliberate drag
   static const double _kOverscrollDistanceThreshold = 100.0;
-  
+
   double _overscrollAccum = 0.0; // total negative overscroll pixels seen
   bool _navTriggeredThisDrag = false;
   bool _hasFiredArmedHaptic = false;
@@ -402,7 +342,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
   void _enterPageSelection() {
     int topIndex = 0;
-    final positions = _itemPositionsListeners[_currentPageIndex]?.itemPositions.value;
+    final positions =
+        _itemPositionsListeners[_currentPageIndex]?.itemPositions.value;
     if (positions != null && positions.isNotEmpty) {
       final visible = positions.where((p) => p.itemTrailingEdge > 0).toList();
       visible.sort((a, b) => a.itemLeadingEdge.compareTo(b.itemLeadingEdge));
@@ -418,10 +359,12 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_selectionTargetIndex >= 0 && _selectionTargetIndex < _selectionVerseKeys.length) {
+      if (_selectionTargetIndex >= 0 &&
+          _selectionTargetIndex < _selectionVerseKeys.length) {
         final key = _selectionVerseKeys[_selectionTargetIndex];
         if (key.currentContext != null) {
-          Scrollable.ensureVisible(key.currentContext!, alignment: 0.0, duration: Duration.zero);
+          Scrollable.ensureVisible(key.currentContext!,
+              alignment: 0.0, duration: Duration.zero);
         }
       }
     });
@@ -436,12 +379,14 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         final box = ctx.findRenderObject() as RenderBox?;
         final scrollableState = Scrollable.maybeOf(ctx);
         if (box != null && scrollableState != null) {
-          final scrollableBox = scrollableState.context.findRenderObject() as RenderBox?;
+          final scrollableBox =
+              scrollableState.context.findRenderObject() as RenderBox?;
           if (scrollableBox != null) {
-            final position = box.localToGlobal(Offset.zero, ancestor: scrollableBox);
+            final position =
+                box.localToGlobal(Offset.zero, ancestor: scrollableBox);
             if (position.dy >= 0) {
-               topIndex = i;
-               break;
+              topIndex = i;
+              break;
             }
           }
         }
@@ -704,18 +649,15 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     );
   }
 
-  Widget _buildTopRow(
-      BuildContext context,
-      WidgetRef ref,
-      ThemeData theme,
-      String currentBookName,
-      int currentChapter,
-      List<BibleBook> allBooks) {
+  Widget _buildTopRow(BuildContext context, WidgetRef ref, ThemeData theme,
+      String currentBookName, int currentChapter, List<BibleBook> allBooks) {
     final tokens = theme.extension<ReadingTokens>()!;
 
     final centerPill = _buildThemedPill(
       tokens: tokens,
-      onTap: _isPageSelectionMode ? () {} : () => _showSelectorBottomSheet(allBooks),
+      onTap: _isPageSelectionMode
+          ? () {}
+          : () => _showSelectorBottomSheet(allBooks),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -746,32 +688,34 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       ),
     );
 
-    final leadingButton = _isPageSelectionMode 
-      ? const SizedBox(width: 48)
-      : Consumer(builder: (context, ref, _) {
-      final activeTransId = ref.watch(activeTranslationProvider);
-      final installed = ref.watch(availableTranslationsProvider).value ?? [];
-      final activeTransLabel = _getTranslationLabel(activeTransId, installed);
-      
-      return _buildSideButton(
-          context,
-          tokens,
-          Text(
-            activeTransLabel,
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w700,
-              color: tokens.readingInk,
-            ),
-          ), () {
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          useRootNavigator: true,
-          backgroundColor: Colors.transparent,
-          builder: (ctx) => const TranslationPickerSheet(),
-        );
-      });
-    });
+    final leadingButton = _isPageSelectionMode
+        ? const SizedBox(width: 48)
+        : Consumer(builder: (context, ref, _) {
+            final activeTransId = ref.watch(activeTranslationProvider);
+            final installed =
+                ref.watch(availableTranslationsProvider).value ?? [];
+            final activeTransLabel =
+                _getTranslationLabel(activeTransId, installed);
+
+            return _buildSideButton(
+                context,
+                tokens,
+                Text(
+                  activeTransLabel,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: tokens.readingInk,
+                  ),
+                ), () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                useRootNavigator: true,
+                backgroundColor: Colors.transparent,
+                builder: (ctx) => const TranslationPickerSheet(),
+              );
+            });
+          });
 
     final trailingButton = _isPageSelectionMode
         ? _buildSideButton(
@@ -787,17 +731,17 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
             ),
             _exitPageSelection)
         : _buildSideButton(
-        context,
-        tokens,
-        Text(
-          'Aa',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: tokens.readingInk,
-            letterSpacing: -0.5,
-          ),
-        ),
-        _showTypographyBottomSheet);
+            context,
+            tokens,
+            Text(
+              'Aa',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: tokens.readingInk,
+                letterSpacing: -0.5,
+              ),
+            ),
+            _showTypographyBottomSheet);
 
     return SizedBox(
       height: 48,
@@ -891,10 +835,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           if (targetIndex != -1 && _pageController.hasClients) {
             final currentPage = _pageController.page?.round() ?? 0;
             if (currentPage != targetIndex) {
-              final readSettings = ref.read(readSettingsProvider);
-              if (readSettings.gestureSensitivity == GestureSensitivity.instant) {
-                _pageController.jumpToPage(targetIndex);
-              } else if ((currentPage - targetIndex).abs() == 1) {
+              if ((currentPage - targetIndex).abs() == 1) {
                 _pageController.animateToPage(targetIndex,
                     duration: const Duration(milliseconds: 300),
                     curve: Curves.easeInOut);
@@ -993,633 +934,780 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                             : NotificationListener<ScrollNotification>(
                                 onNotification: (notification) {
                                   // Axis-lock: freeze the vertical list while PageView is swiping horizontally
-                                  if (notification.metrics.axis == Axis.horizontal) {
-                                    if (notification is ScrollStartNotification) {
+                                  if (notification.metrics.axis ==
+                                      Axis.horizontal) {
+                                    if (notification
+                                        is ScrollStartNotification) {
                                       _isPageSwiping.value = true;
-                                    } else if (notification is ScrollEndNotification) {
+                                    } else if (notification
+                                        is ScrollEndNotification) {
                                       // Give one frame for the page snap to settle before unlocking
-                                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                                        if (mounted) _isPageSwiping.value = false;
+                                      WidgetsBinding.instance
+                                          .addPostFrameCallback((_) {
+                                        if (mounted)
+                                          _isPageSwiping.value = false;
                                       });
                                     }
                                   }
                                   return false; // let notifications bubble
                                 },
                                 child: PageView.builder(
-                                dragStartBehavior: DragStartBehavior.start,
-                                physics: _isPageSelectionMode
-                                    ? const NeverScrollableScrollPhysics()
-                                    : LazyPageScrollPhysics(
-                                        sensitivity: ref.watch(readSettingsProvider.select((s) => s.gestureSensitivity)),
-                                      ),
-                                controller: _pageController,
-                                itemCount: flatChapters.length,
-                                onPageChanged: (pageIndex) {
-                                  debugPrint(
-                                      'STEP0: onPageChanged gesture started for page $pageIndex');
-                                  setState(() {
-                                    _currentPageIndex = pageIndex;
-                                  });
-
-                                  _pageDebounceTimer?.cancel();
-                                  _pageDebounceTimer = Timer(
-                                      const Duration(milliseconds: 120), () {
-                                    if (!mounted) return;
-                                    final fc = flatChapters[pageIndex];
-                                    final currentLoc =
-                                        ref.read(readLocationProvider);
-                                    if ((currentLoc.bookAbbrev.toLowerCase() !=
-                                                fc.book.abbreviation
-                                                    .toLowerCase() &&
-                                            currentLoc.bookName.toLowerCase() !=
-                                                fc.book.name.toLowerCase()) ||
-                                        currentLoc.chapter !=
-                                            fc.chapter.number) {
-                                      ref
-                                          .read(readLocationProvider.notifier)
-                                          .updateLocation(
-                                            bookAbbrev: fc.book.abbreviation,
-                                            bookName: fc.book.name,
-                                            chapter: fc.chapter.number,
-                                          );
-                                    }
-                                  });
-                                  _clearSelection();
-                                },
-                                itemBuilder: (context, pageIndex) {
-                                  final buildStartMs =
-                                      DateTime.now().millisecondsSinceEpoch;
-                                  final fc = flatChapters[pageIndex];
-
-                                  WidgetsBinding.instance
-                                      .addPostFrameCallback((_) {
-                                    final paintMs =
-                                        DateTime.now().millisecondsSinceEpoch -
-                                            buildStartMs;
+                                  allowImplicitScrolling: true,
+                                  dragStartBehavior: DragStartBehavior.start,
+                                  physics: _isPageSelectionMode
+                                      ? const NeverScrollableScrollPhysics()
+                                      : const PageScrollPhysics(),
+                                  controller: _pageController,
+                                  itemCount: flatChapters.length,
+                                  onPageChanged: (pageIndex) {
                                     debugPrint(
-                                        'STEP0: Chapter ${fc.book.abbreviation} ${fc.chapter.number} painted in $paintMs ms');
-                                  });
-                                  _itemScrollControllers[pageIndex] ??=
-                                      ItemScrollController();
-                                  if (!_itemPositionsListeners
-                                      .containsKey(pageIndex)) {
-                                    final listener =
-                                        ItemPositionsListener.create();
-                                    _itemPositionsListeners[pageIndex] =
-                                        listener;
-                                    listener.itemPositions.addListener(() {
-                                      final positions =
-                                          listener.itemPositions.value;
-                                      if (positions.isNotEmpty) {
-                                        final activeTrans =
-                                            ref.read(activeTranslationProvider);
+                                        'STEP0: onPageChanged gesture started for page $pageIndex');
+                                    setState(() {
+                                      _currentPageIndex = pageIndex;
+                                    });
+
+                                    _pageDebounceTimer?.cancel();
+                                    _pageDebounceTimer = Timer(
+                                        const Duration(milliseconds: 120), () {
+                                      if (!mounted) return;
+                                      final fc = flatChapters[pageIndex];
+                                      final currentLoc =
+                                          ref.read(readLocationProvider);
+                                      if ((currentLoc.bookAbbrev
+                                                      .toLowerCase() !=
+                                                  fc.book.abbreviation
+                                                      .toLowerCase() &&
+                                              currentLoc.bookName
+                                                      .toLowerCase() !=
+                                                  fc.book.name.toLowerCase()) ||
+                                          currentLoc.chapter !=
+                                              fc.chapter.number) {
+                                        ref
+                                            .read(readLocationProvider.notifier)
+                                            .updateLocation(
+                                              bookAbbrev: fc.book.abbreviation,
+                                              bookName: fc.book.name,
+                                              chapter: fc.chapter.number,
+                                            );
+                                      }
+                                    });
+                                    _clearSelection();
+                                  },
+                                  itemBuilder: (context, pageIndex) {
+                                    final buildStartMs =
+                                        DateTime.now().millisecondsSinceEpoch;
+                                    final fc = flatChapters[pageIndex];
+
+                                    WidgetsBinding.instance
+                                        .addPostFrameCallback((_) {
+                                      final paintMs = DateTime.now()
+                                              .millisecondsSinceEpoch -
+                                          buildStartMs;
+                                      debugPrint(
+                                          'STEP0: Chapter ${fc.book.abbreviation} ${fc.chapter.number} painted in $paintMs ms');
+                                    });
+                                    _itemScrollControllers[pageIndex] ??=
+                                        ItemScrollController();
+                                    if (!_itemPositionsListeners
+                                        .containsKey(pageIndex)) {
+                                      final listener =
+                                          ItemPositionsListener.create();
+                                      _itemPositionsListeners[pageIndex] =
+                                          listener;
+                                      listener.itemPositions.addListener(() {
+                                        final positions =
+                                            listener.itemPositions.value;
+                                        if (positions.isNotEmpty) {
+                                          final activeTrans = ref
+                                              .read(activeTranslationProvider);
+                                          final bookNum =
+                                              allBooks.indexOf(fc.book) + 1;
+                                          final currentVersesAsync = ref
+                                              .read(translationChapterProvider((
+                                            translationId: activeTrans,
+                                            bookNumber: bookNum,
+                                            chapterNumber: fc.chapter.number,
+                                          )));
+                                          final currentVerses =
+                                              currentVersesAsync.value ??
+                                                  fc.chapter.verses;
+
+                                          final firstVisible = positions
+                                              .where(
+                                                  (p) => p.itemTrailingEdge > 0)
+                                              .reduce((min, p) =>
+                                                  p.itemLeadingEdge <
+                                                          min.itemLeadingEdge
+                                                      ? p
+                                                      : min);
+                                          if (firstVisible.index <
+                                              currentVerses.length) {
+                                            _scrollDebounceTimer?.cancel();
+                                            _visitTimer?.cancel();
+                                            _scrollDebounceTimer = Timer(
+                                                const Duration(
+                                                    milliseconds: 500), () {
+                                              if (!mounted) return;
+                                              final currentBookName =
+                                                  fc.book.name;
+                                              final currentChapter =
+                                                  fc.chapter.number;
+                                              final currentAbbrev =
+                                                  fc.book.abbreviation;
+                                              final prefs =
+                                                  ref.read(preferencesProvider);
+                                              prefs.saveLastReadLocation(
+                                                bookAbbrev: currentAbbrev,
+                                                bookName: currentBookName,
+                                                chapter: currentChapter,
+                                                verseIndex: firstVisible.index,
+                                              );
+                                              prefs.saveChapterScrollPosition(
+                                                currentAbbrev,
+                                                currentChapter,
+                                                firstVisible.index,
+                                              );
+                                            });
+                                            _visitTimer = Timer(
+                                                const Duration(seconds: 4), () {
+                                              if (!mounted) return;
+                                              ref
+                                                  .read(
+                                                      mostReadProvider.notifier)
+                                                  .incrementVisit(
+                                                    fc.book.abbreviation,
+                                                    fc.book.name,
+                                                    fc.chapter.number,
+                                                    currentVerses[
+                                                            firstVisible.index]
+                                                        .number,
+                                                  );
+                                            });
+                                          }
+                                        }
+                                      });
+                                    }
+
+                                    return Consumer(
+                                      builder: (context, ref, child) {
+                                        final activeTrans = ref
+                                            .watch(activeTranslationProvider);
+                                        final secondaryTrans = ref.watch(
+                                            secondaryTranslationProvider);
+                                        final readingLayout = ref
+                                            .watch(readSettingsProvider)
+                                            .readingLayout;
                                         final bookNum =
                                             allBooks.indexOf(fc.book) + 1;
-                                        final currentVersesAsync = ref
-                                            .read(translationChapterProvider((
+                                        final chapterData = ref
+                                            .watch(translationChapterProvider((
                                           translationId: activeTrans,
                                           bookNumber: bookNum,
                                           chapterNumber: fc.chapter.number,
                                         )));
-                                        final currentVerses =
-                                            currentVersesAsync.value ??
-                                                fc.chapter.verses;
 
-                                        final firstVisible = positions
-                                            .where(
-                                                (p) => p.itemTrailingEdge > 0)
-                                            .reduce((min, p) =>
-                                                p.itemLeadingEdge <
-                                                        min.itemLeadingEdge
-                                                    ? p
-                                                    : min);
-                                        if (firstVisible.index <
-                                            currentVerses.length) {
-                                          _scrollDebounceTimer?.cancel();
-                                          _visitTimer?.cancel();
-                                          _scrollDebounceTimer = Timer(
-                                              const Duration(milliseconds: 500),
-                                              () {
-                                            if (!mounted) return;
-                                            final currentBookName =
-                                                fc.book.name;
-                                            final currentChapter =
-                                                fc.chapter.number;
-                                            final currentAbbrev =
-                                                fc.book.abbreviation;
-                                            final prefs =
-                                                ref.read(preferencesProvider);
-                                            prefs.saveLastReadLocation(
-                                              bookAbbrev: currentAbbrev,
-                                              bookName: currentBookName,
-                                              chapter: currentChapter,
-                                              verseIndex: firstVisible.index,
-                                            );
-                                            prefs.saveChapterScrollPosition(
-                                              currentAbbrev,
-                                              currentChapter,
-                                              firstVisible.index,
-                                            );
-                                          });
-                                          _visitTimer = Timer(
-                                              const Duration(seconds: 4), () {
-                                            if (!mounted) return;
-                                            ref
-                                                .read(mostReadProvider.notifier)
-                                                .incrementVisit(
-                                                  fc.book.abbreviation,
-                                                  fc.book.name,
-                                                  fc.chapter.number,
-                                                  currentVerses[
-                                                          firstVisible.index]
-                                                      .number,
-                                                );
-                                          });
+                                        List<BibleVerse>? secondaryVerses;
+                                        if (secondaryTrans != null &&
+                                            readingLayout !=
+                                                ReadingLayout.single) {
+                                          final secondaryChapterData =
+                                              ref.watch(
+                                                  translationChapterProvider((
+                                            translationId: secondaryTrans,
+                                            bookNumber: bookNum,
+                                            chapterNumber: fc.chapter.number,
+                                          )));
+                                          secondaryVerses =
+                                              secondaryChapterData.value;
                                         }
-                                      }
-                                    });
-                                  }
 
-                                  return Consumer(
-                                    builder: (context, ref, child) {
-                                      final activeTrans =
-                                          ref.watch(activeTranslationProvider);
-                                      final secondaryTrans =
-                                          ref.watch(secondaryTranslationProvider);
-                                      final readingLayout =
-                                          ref.watch(readSettingsProvider).readingLayout;
-                                      final bookNum =
-                                          allBooks.indexOf(fc.book) + 1;
-                                      final chapterData =
-                                          ref.watch(translationChapterProvider((
-                                        translationId: activeTrans,
-                                        bookNumber: bookNum,
-                                        chapterNumber: fc.chapter.number,
-                                      )));
-                                      
-                                      List<BibleVerse>? secondaryVerses;
-                                      if (secondaryTrans != null && readingLayout != ReadingLayout.single) {
-                                        final secondaryChapterData =
-                                            ref.watch(translationChapterProvider((
-                                          translationId: secondaryTrans,
-                                          bookNumber: bookNum,
-                                          chapterNumber: fc.chapter.number,
-                                        )));
-                                        secondaryVerses = secondaryChapterData.value;
-                                      }
-                                      
-                                      final verses = chapterData.value ??
-                                          fc.chapter.verses;
-                                          
-                                      final secondaryVerseMap = <int, BibleVerse>{};
-                                      if (secondaryVerses != null) {
-                                        for (final v in secondaryVerses) {
-                                          secondaryVerseMap[v.number] = v;
+                                        final verses = chapterData.value ??
+                                            fc.chapter.verses;
+
+                                        final secondaryVerseMap =
+                                            <int, BibleVerse>{};
+                                        if (secondaryVerses != null) {
+                                          for (final v in secondaryVerses) {
+                                            secondaryVerseMap[v.number] = v;
+                                          }
                                         }
-                                      }
 
-                                      return RepaintBoundary(
-                                        child: GestureDetector(
-                                          onTap: _isPageSelectionMode ? null : () {
-                                            if (selectedVerses.isNotEmpty) {
-                                              _clearSelection();
-                                            }
-                                          },
-                                          behavior: HitTestBehavior.translucent,
-                                          child: NotificationListener<
-                                              ScrollNotification>(
-                                            onNotification: (notification) {
-                                              if (notification
-                                                      is ScrollStartNotification ||
-                                                  notification
-                                                      is ScrollUpdateNotification) {
-                                                if (!_isScrolling.value) {
-                                                  _isScrolling.value = true;
-                                                }
-                                                _scrollEndTimer?.cancel();
-                                              } else if (notification
-                                                  is ScrollEndNotification) {
-                                                _scrollEndTimer?.cancel();
-                                                _scrollEndTimer = Timer(
-                                                    const Duration(
-                                                        milliseconds: 150), () {
-                                                  if (mounted) {
-                                                    _isScrolling.value = false;
-                                                  }
-                                                });
-                                              }
-
-
-                                              // ── Deliberate-drag gate for navigation ──
-                                              if (_isPageSelectionMode) return false;
-
-                                              if (bibleNavSettings
-                                                  .swipeDownToNav) {
+                                        return RepaintBoundary(
+                                          child: GestureDetector(
+                                            onTap: _isPageSelectionMode
+                                                ? null
+                                                : () {
+                                                    if (selectedVerses
+                                                        .isNotEmpty) {
+                                                      _clearSelection();
+                                                    }
+                                                  },
+                                            behavior:
+                                                HitTestBehavior.translucent,
+                                            child: NotificationListener<
+                                                ScrollNotification>(
+                                              onNotification: (notification) {
                                                 if (notification
-                                                        is OverscrollNotification &&
-                                                    notification.overscroll <
-                                                        0) {
-                                                  // Reject inertial overscrolls (flicks) — dragDetails is null
-                                                  // when the user's finger is no longer on the screen.
-                                                  if (notification
-                                                          .dragDetails ==
-                                                      null) {
-                                                    _resetOverscrollGate();
-                                                    return false;
+                                                        is ScrollStartNotification ||
+                                                    notification
+                                                        is ScrollUpdateNotification) {
+                                                  if (!_isScrolling.value) {
+                                                    _isScrolling.value = true;
                                                   }
-
-                                                  // Elastic resistance (rubber-banding)
-                                                  final delta =
-                                                      -notification.overscroll;
-                                                  final resistance = (1.0 -
-                                                      (_overscrollAccum /
-                                                              (_kOverscrollDistanceThreshold *
-                                                                  2.5))
-                                                          .clamp(0.0, 0.8));
-
-                                                  _overscrollAccum += delta * resistance;
-
-                                                  if (_overscrollAccum >=
-                                                          _kOverscrollDistanceThreshold &&
-                                                      !_hasFiredArmedHaptic) {
-                                                    _hasFiredArmedHaptic = true;
-                                                    HapticFeedback.mediumImpact();
-                                                  }
-
-                                                  if (mounted) setState(() {});
+                                                  _scrollEndTimer?.cancel();
                                                 } else if (notification
                                                     is ScrollEndNotification) {
-                                                  // Drag released
-                                                  if (_overscrollAccum > 0) {
+                                                  _scrollEndTimer?.cancel();
+                                                  _scrollEndTimer = Timer(
+                                                      const Duration(
+                                                          milliseconds: 150),
+                                                      () {
+                                                    if (mounted) {
+                                                      _isScrolling.value =
+                                                          false;
+                                                    }
+                                                  });
+                                                }
+
+                                                // ── Deliberate-drag gate for navigation ──
+                                                if (_isPageSelectionMode)
+                                                  return false;
+
+                                                if (bibleNavSettings
+                                                    .swipeDownToNav) {
+                                                  if (notification
+                                                          is OverscrollNotification &&
+                                                      notification.overscroll <
+                                                          0) {
+                                                    // Reject inertial overscrolls (flicks) — dragDetails is null
+                                                    // when the user's finger is no longer on the screen.
+                                                    if (notification
+                                                            .dragDetails ==
+                                                        null) {
+                                                      _resetOverscrollGate();
+                                                      return false;
+                                                    }
+
+                                                    // Elastic resistance (rubber-banding)
+                                                    final delta = -notification
+                                                        .overscroll;
+                                                    final resistance = (1.0 -
+                                                        (_overscrollAccum /
+                                                                (_kOverscrollDistanceThreshold *
+                                                                    2.5))
+                                                            .clamp(0.0, 0.8));
+
+                                                    _overscrollAccum +=
+                                                        delta * resistance;
+
                                                     if (_overscrollAccum >=
                                                             _kOverscrollDistanceThreshold &&
-                                                        !_navTriggeredThisDrag &&
-                                                        ModalRoute.of(context)
-                                                                ?.isCurrent ==
-                                                            true) {
-                                                      _navTriggeredThisDrag =
+                                                        !_hasFiredArmedHaptic) {
+                                                      _hasFiredArmedHaptic =
                                                           true;
-                                                      _showSelectorBottomSheet(
-                                                          allBooks);
+                                                      HapticFeedback
+                                                          .mediumImpact();
                                                     }
+
+                                                    if (mounted)
+                                                      setState(() {});
+                                                  } else if (notification
+                                                      is ScrollEndNotification) {
+                                                    // Drag released
+                                                    if (_overscrollAccum > 0) {
+                                                      if (_overscrollAccum >=
+                                                              _kOverscrollDistanceThreshold &&
+                                                          !_navTriggeredThisDrag &&
+                                                          ModalRoute.of(context)
+                                                                  ?.isCurrent ==
+                                                              true) {
+                                                        _navTriggeredThisDrag =
+                                                            true;
+                                                        _showSelectorBottomSheet(
+                                                            allBooks);
+                                                      }
+                                                      _resetOverscrollGate();
+                                                    }
+                                                  } else if (notification
+                                                          is ScrollUpdateNotification &&
+                                                      _overscrollAccum > 0) {
+                                                    // Scroll changed direction
                                                     _resetOverscrollGate();
                                                   }
+                                                }
+
+                                                if (notification
+                                                    is UserScrollNotification) {
+                                                  if (notification
+                                                          .metrics.axis !=
+                                                      Axis.vertical)
+                                                    return false;
+
+                                                  final isImmersive = ref
+                                                          .read(
+                                                              readSettingsProvider)
+                                                          .readingViewMode ==
+                                                      ReadingViewMode.immersive;
+
+                                                  if (notification.direction ==
+                                                      ScrollDirection.forward) {
+                                                    if (mounted &&
+                                                        isImmersive) {
+                                                      ref
+                                                          .read(
+                                                              chromeHiddenProvider
+                                                                  .notifier)
+                                                          .set(false);
+                                                    }
+                                                  } else if (notification
+                                                          .direction ==
+                                                      ScrollDirection.reverse) {
+                                                    if (mounted &&
+                                                        isImmersive) {
+                                                      ref
+                                                          .read(
+                                                              chromeHiddenProvider
+                                                                  .notifier)
+                                                          .set(true);
+                                                    }
+                                                  }
                                                 } else if (notification
-                                                        is ScrollUpdateNotification &&
-                                                    _overscrollAccum > 0) {
-                                                  // Scroll changed direction
-                                                  _resetOverscrollGate();
+                                                    is ScrollEndNotification) {
+                                                  // No longer need to cancel timers
                                                 }
-                                              }
-
-                                              if (notification
-                                                  is UserScrollNotification) {
-                                                if (notification.metrics.axis != Axis.vertical) return false;
-                                                
-                                                final isImmersive = ref.read(readSettingsProvider).readingViewMode == ReadingViewMode.immersive;
-
-                                                if (notification.direction == ScrollDirection.forward) {
-                                                  if (mounted && isImmersive) {
-                                                    ref.read(chromeHiddenProvider.notifier).set(false);
-                                                  }
-                                                } else if (notification.direction == ScrollDirection.reverse) {
-                                                  if (mounted && isImmersive) {
-                                                    ref.read(chromeHiddenProvider.notifier).set(true);
-                                                  }
-                                                }
-                                              } else if (notification
-                                                  is ScrollEndNotification) {
-                                                // No longer need to cancel timers
-                                              }
-                                              return false;
-                                            },
-                                            child: Directionality(
-                                              textDirection: () {
-                                                final availableTrans = ref
-                                                        .watch(
-                                                            availableTranslationsProvider)
-                                                        .value ??
-                                                    [];
-                                                final activeTransId = ref.watch(
-                                                    activeTranslationProvider);
-                                                final transInfo =
-                                                    availableTrans.firstWhere(
-                                                        (t) =>
-                                                            t.translationId ==
-                                                            activeTransId,
-                                                        orElse: () => availableTrans
-                                                                .isNotEmpty
-                                                            ? availableTrans
-                                                                .first
-                                                            : throw Exception(
-                                                                'No translation'));
-                                                final isRtl = [
-                                                  'ar',
-                                                  'he',
-                                                  'fa',
-                                                  'ur'
-                                                ].contains(
-                                                    transInfo.languageCode);
-                                                return isRtl
-                                                    ? TextDirection.rtl
-                                                    : TextDirection.ltr;
-                                              }(),
-                                              child: Center(
-                                                child: ConstrainedBox(
-                                                  constraints:
-                                                      const BoxConstraints(
-                                                          maxWidth: 800),
-                                                  child: Builder(
-                                                    builder: (context) {
+                                                return false;
+                                              },
+                                              child: Directionality(
+                                                textDirection: () {
+                                                  final availableTrans = ref
+                                                          .watch(
+                                                              availableTranslationsProvider)
+                                                          .value ??
+                                                      [];
+                                                  final activeTransId = ref.watch(
+                                                      activeTranslationProvider);
+                                                  final transInfo =
+                                                      availableTrans.firstWhere(
+                                                          (t) =>
+                                                              t.translationId ==
+                                                              activeTransId,
+                                                          orElse: () => availableTrans
+                                                                  .isNotEmpty
+                                                              ? availableTrans
+                                                                  .first
+                                                              : throw Exception(
+                                                                  'No translation'));
+                                                  final isRtl = [
+                                                    'ar',
+                                                    'he',
+                                                    'fa',
+                                                    'ur'
+                                                  ].contains(
+                                                      transInfo.languageCode);
+                                                  return isRtl
+                                                      ? TextDirection.rtl
+                                                      : TextDirection.ltr;
+                                                }(),
+                                                child: Center(
+                                                  child: ConstrainedBox(
+                                                    constraints:
+                                                        const BoxConstraints(
+                                                            maxWidth: 800),
+                                                    child: Builder(
+                                                        builder: (context) {
                                                       final listPadding = EdgeInsets.only(
-                                                          top: MediaQuery.of(context).padding.top + 80.0,
-                                                          left: math.max(MediaQuery.of(context).padding.left, MediaQuery.of(context).size.width * (typography.marginPercent / 100.0)),
-                                                          right: math.max(MediaQuery.of(context).padding.right, MediaQuery.of(context).size.width * (typography.marginPercent / 100.0)),
+                                                          top:
+                                                              MediaQuery.of(context).padding.top +
+                                                                  80.0,
+                                                          left: math.max(
+                                                              MediaQuery.of(context)
+                                                                  .padding
+                                                                  .left,
+                                                              MediaQuery.of(context)
+                                                                      .size
+                                                                      .width *
+                                                                  (typography.marginPercent /
+                                                                      100.0)),
+                                                          right: math.max(
+                                                              MediaQuery.of(context)
+                                                                  .padding
+                                                                  .right,
+                                                              MediaQuery.of(context)
+                                                                      .size
+                                                                      .width *
+                                                                  (typography.marginPercent /
+                                                                      100.0)),
                                                           bottom: MediaQuery.of(context).padding.bottom + 80.0);
 
-                                                      Widget buildVerseItem(BuildContext context, int index) {
-                                                      if (index ==
-                                                          verses.length) {
-                                                        bool
-                                                            hasChapterCommentary =
-                                                            chaptersWithCommentary
-                                                                .contains(
-                                                                    '${fc.book.name}|${fc.chapter.number}');
-                                                        return _buildEndOfChapterBlock(
-                                                            fc,
-                                                            pageIndex,
-                                                            theme,
-                                                            hasChapterCommentary);
-                                                      }
-                                                      final verse =
-                                                          verses[index];
-                                                      final isSelected =
-                                                          selectedVerses
-                                                              .contains(
-                                                                  verse.number);
-                                                      final isSelectionMode =
-                                                          selectedVerses
-                                                              .isNotEmpty;
+                                                      Widget buildVerseItem(
+                                                          BuildContext context,
+                                                          int index) {
+                                                        if (index ==
+                                                            verses.length) {
+                                                          bool
+                                                              hasChapterCommentary =
+                                                              chaptersWithCommentary
+                                                                  .contains(
+                                                                      '${fc.book.name}|${fc.chapter.number}');
+                                                          return _buildEndOfChapterBlock(
+                                                              fc,
+                                                              pageIndex,
+                                                              theme,
+                                                              hasChapterCommentary);
+                                                        }
+                                                        final verse =
+                                                            verses[index];
+                                                        final isSelected =
+                                                            selectedVerses
+                                                                .contains(verse
+                                                                    .number);
+                                                        final isSelectionMode =
+                                                            selectedVerses
+                                                                .isNotEmpty;
 
-                                                      final bookData =
-                                                          chapterTitles[
-                                                              fc.book.name];
-                                                      final chapterTitle =
-                                                          bookData?[fc
-                                                              .chapter.number
-                                                              .toString()];
+                                                        final bookData =
+                                                            chapterTitles[
+                                                                fc.book.name];
+                                                        final chapterTitle =
+                                                            bookData?[fc
+                                                                .chapter.number
+                                                                .toString()];
 
-                                                      return Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .stretch,
-                                                        children: [
-                                                          if (index == 0 &&
-                                                              chapterTitle !=
-                                                                  null) ...[
-                                                            Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      top: 16.0,
-                                                                      bottom:
-                                                                          8.0,
-                                                                      left:
-                                                                          15.0,
-                                                                      right:
-                                                                          12.0),
-                                                              child: Text(
-                                                                _toHeadingCase(
-                                                                    chapterTitle),
-                                                                style: theme
-                                                                    .textTheme
-                                                                    .titleSmall
-                                                                    ?.copyWith(
-                                                                  color: theme
-                                                                      .primaryColor,
-                                                                  fontSize:
-                                                                      typography
-                                                                              .fontSize *
-                                                                          1.25,
-                                                                  fontFamily:
-                                                                      typography
-                                                                          .fontFamily,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w700,
-                                                                  letterSpacing:
-                                                                      0.2,
+                                                        return Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .stretch,
+                                                          children: [
+                                                            if (index == 0 &&
+                                                                chapterTitle !=
+                                                                    null) ...[
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        top:
+                                                                            16.0,
+                                                                        bottom:
+                                                                            8.0,
+                                                                        left:
+                                                                            15.0,
+                                                                        right:
+                                                                            12.0),
+                                                                child: Text(
+                                                                  _toHeadingCase(
+                                                                      chapterTitle),
+                                                                  style: theme
+                                                                      .textTheme
+                                                                      .titleSmall
+                                                                      ?.copyWith(
+                                                                    color: theme
+                                                                        .primaryColor,
+                                                                    fontSize:
+                                                                        typography.fontSize *
+                                                                            1.25,
+                                                                    fontFamily:
+                                                                        typography
+                                                                            .fontFamily,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w700,
+                                                                    letterSpacing:
+                                                                        0.2,
+                                                                  ),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .left,
                                                                 ),
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .left,
                                                               ),
+                                                            ],
+                                                            // Check for commentary
+                                                            AnimatedOpacity(
+                                                              duration:
+                                                                  const Duration(
+                                                                      milliseconds:
+                                                                          250),
+                                                              opacity:
+                                                                  (isSelectionMode &&
+                                                                          !isSelected)
+                                                                      ? 0.85
+                                                                      : 1.0,
+                                                              alwaysIncludeSemantics:
+                                                                  true,
+                                                              child: Consumer(
+                                                                  builder:
+                                                                      (context,
+                                                                          itemRef,
+                                                                          _) {
+                                                                bool
+                                                                    hasCommentary =
+                                                                    versesWithCommentary
+                                                                        .contains(
+                                                                            '${fc.book.name}|${fc.chapter.number}|${verse.number}');
+
+                                                                final highlights =
+                                                                    itemRef.watch(
+                                                                        highlightsProvider);
+                                                                final bookmarks =
+                                                                    itemRef.watch(
+                                                                        bookmarksProvider);
+                                                                final refStr = generateVerseKey(
+                                                                    fc.book
+                                                                        .abbreviation,
+                                                                    fc.chapter
+                                                                        .number,
+                                                                    verse
+                                                                        .number);
+                                                                final isBookmarked =
+                                                                    bookmarks
+                                                                        .contains(
+                                                                            refStr);
+                                                                final savedColorIndex =
+                                                                    highlights[
+                                                                        refStr];
+                                                                Color?
+                                                                    highlightColor;
+                                                                if (savedColorIndex !=
+                                                                        null &&
+                                                                    savedColorIndex >=
+                                                                        0 &&
+                                                                    savedColorIndex <
+                                                                        highlightPalette
+                                                                            .length) {
+                                                                  highlightColor = AppColors.getRenderedHighlightColor(
+                                                                      highlightPalette[
+                                                                          savedColorIndex],
+                                                                      theme
+                                                                          .brightness,
+                                                                      theme
+                                                                          .scaffoldBackgroundColor);
+                                                                }
+
+                                                                if (kHighlightDebug) {
+                                                                  debugPrint(
+                                                                      '[HIGHLIGHT_DEBUG] RENDER verse key=$refStr found=${highlights.containsKey(refStr)} color=$savedColorIndex highlightColor=$highlightColor isBookmarked=$isBookmarked timestamp=${DateTime.now().millisecondsSinceEpoch}');
+                                                                }
+
+                                                                if (kHighlightDebug &&
+                                                                    (isBookmarked ||
+                                                                        highlightColor !=
+                                                                            null)) {
+                                                                  debugPrint(
+                                                                      'DEBUG RENDER: $refStr isBookmarked=$isBookmarked, highlightColor=$highlightColor');
+                                                                }
+
+                                                                final verseWidget =
+                                                                    _buildReadingLayoutVerse(
+                                                                  context,
+                                                                  ref,
+                                                                  verse,
+                                                                  secondaryVerseMap[
+                                                                      verse
+                                                                          .number],
+                                                                  allBooks.indexOf(
+                                                                          fc.book) +
+                                                                      1,
+                                                                  fc.chapter
+                                                                      .number,
+                                                                  readSettings
+                                                                      .readingLayout,
+                                                                  theme,
+                                                                  typography,
+                                                                  appThemeMode,
+                                                                  hasCommentary:
+                                                                      hasCommentary,
+                                                                  onCommentaryTap: () =>
+                                                                      _showCommentaryBottomSheet(
+                                                                          verse
+                                                                              .number,
+                                                                          verse
+                                                                              .text),
+                                                                  isBookmarked:
+                                                                      isBookmarked,
+                                                                  isRedLetterEnabled:
+                                                                      readSettings
+                                                                          .isRedLetterEnabled,
+                                                                  isSelectionMode:
+                                                                      _isPageSelectionMode,
+                                                                );
+
+                                                                return GestureDetector(
+                                                                  behavior:
+                                                                      HitTestBehavior
+                                                                          .opaque,
+                                                                  onDoubleTap:
+                                                                      _isPageSelectionMode
+                                                                          ? null
+                                                                          : () {
+                                                                              HapticFeedback.lightImpact();
+                                                                              VerseActionLogic.handleBookmark(context, theme, ref, fc.book.name, fc.chapter.number, [
+                                                                                verse.number
+                                                                              ]);
+                                                                            },
+                                                                  onTap: _isPageSelectionMode
+                                                                      ? null
+                                                                      : () => _toggleVerseSelection(
+                                                                          verse
+                                                                              .number),
+                                                                  onLongPress:
+                                                                      _isPageSelectionMode
+                                                                          ? null
+                                                                          : () {
+                                                                              HapticFeedback.mediumImpact();
+                                                                              showModalBottomSheet(
+                                                                                context: context,
+                                                                                backgroundColor: Colors.transparent,
+                                                                                useRootNavigator: true,
+                                                                                builder: (ctx) => VerseContextMenuSheet(
+                                                                                  verseNumber: verse.number,
+                                                                                  bookName: fc.book.name,
+                                                                                  chapterNum: fc.chapter.number,
+                                                                                  onCustomSelection: _enterPageSelection,
+                                                                                ),
+                                                                              );
+                                                                            },
+                                                                  child: Stack(
+                                                                    children: [
+                                                                      AnimatedContainer(
+                                                                        duration:
+                                                                            const Duration(milliseconds: 250),
+                                                                        clipBehavior:
+                                                                            Clip.antiAlias,
+                                                                        padding: const EdgeInsets
+                                                                            .only(
+                                                                            top:
+                                                                                6.0,
+                                                                            bottom:
+                                                                                6.0,
+                                                                            left:
+                                                                                12.0,
+                                                                            right:
+                                                                                12.0),
+                                                                        decoration:
+                                                                            BoxDecoration(
+                                                                          color: isSelected
+                                                                              ? (highlightColor != null ? highlightColor.withValues(alpha: 0.35) : theme.primaryColor.withValues(alpha: 0.15))
+                                                                              : (_navigatedVerseIndex == index ? theme.primaryColor.withValues(alpha: 0.15) : (highlightColor != null ? highlightColor.withValues(alpha: 0.35) : Colors.transparent)),
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(12),
+                                                                          border: (isSelected && highlightColor != null)
+                                                                              ? Border.all(color: theme.primaryColor.withValues(alpha: 0.5), width: 1.5)
+                                                                              : Border.all(color: Colors.transparent, width: 1.5),
+                                                                        ),
+                                                                        child:
+                                                                            verseWidget,
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                );
+                                                              }),
                                                             ),
                                                           ],
-                                                          // Check for commentary
-                                                          AnimatedOpacity(
-                                                            duration:
-                                                                const Duration(
-                                                                    milliseconds:
-                                                                        250),
-                                                            opacity:
-                                                                (isSelectionMode &&
-                                                                        !isSelected)
-                                                                    ? 0.85
-                                                                    : 1.0,
-                                                            alwaysIncludeSemantics:
-                                                                true,
-                                                            child: Consumer(
-                                                                builder:
-                                                                    (context,
-                                                                        itemRef,
-                                                                        _) {
-                                                              bool
-                                                                  hasCommentary =
-                                                                  versesWithCommentary
-                                                                      .contains(
-                                                                          '${fc.book.name}|${fc.chapter.number}|${verse.number}');
+                                                        );
+                                                      } // end buildVerseItem
 
-                                                              final highlights =
-                                                                  itemRef.watch(
-                                                                      highlightsProvider);
-                                                              final bookmarks =
-                                                                  itemRef.watch(
-                                                                      bookmarksProvider);
-                                                              final refStr =
-                                                                  generateVerseKey(
+                                                      final ScrollPhysics
+                                                          basePhysics =
+                                                          const BouncingScrollPhysics();
+
+                                                      Widget listWidget;
+                                                      if (_isPageSelectionMode) {
+                                                        if (_selectionVerseKeys
+                                                                .length !=
+                                                            verses.length + 1) {
+                                                          _selectionVerseKeys
+                                                              .clear();
+                                                          _selectionVerseKeys
+                                                              .addAll(List.generate(
+                                                                  verses.length +
+                                                                      1,
+                                                                  (_) =>
+                                                                      GlobalKey()));
+                                                        }
+
+                                                        // Axis-lock: freeze the vertical list while PageView swipes horizontally
+                                                        listWidget =
+                                                            SingleChildScrollView(
+                                                          padding: listPadding,
+                                                          dragStartBehavior:
+                                                              DragStartBehavior
+                                                                  .down,
+                                                          physics: StrictVerticalScrollPhysics(
+                                                                  isPageSwiping:
+                                                                      _isPageSwiping)
+                                                              .applyTo(
+                                                                  basePhysics),
+                                                          child: SelectionArea(
+                                                            child: Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .stretch,
+                                                              children:
+                                                                  List.generate(
+                                                                      verses.length +
+                                                                          1,
+                                                                      (index) {
+                                                                return KeyedSubtree(
+                                                                  key: _selectionVerseKeys[
+                                                                      index],
+                                                                  child: Builder(
+                                                                      builder: (ctx) =>
+                                                                          buildVerseItem(
+                                                                              ctx,
+                                                                              index)),
+                                                                );
+                                                              }),
+                                                            ),
+                                                          ),
+                                                        );
+                                                      } else {
+                                                        // Axis-lock: freeze the vertical list while PageView swipes horizontally
+                                                        listWidget =
+                                                            ScrollablePositionedList
+                                                                .builder(
+                                                          itemScrollController:
+                                                              _itemScrollControllers[
+                                                                  pageIndex],
+                                                          itemPositionsListener:
+                                                              _itemPositionsListeners[
+                                                                  pageIndex],
+                                                          initialScrollIndex: (pageIndex ==
+                                                                      _currentPageIndex
+                                                                  ? _navigatedVerseIndex
+                                                                  : null) ??
+                                                              ref
+                                                                  .read(
+                                                                      preferencesProvider)
+                                                                  .getChapterScrollPosition(
                                                                       fc.book
                                                                           .abbreviation,
                                                                       fc.chapter
-                                                                          .number,
-                                                                      verse
-                                                                          .number);
-                                                              final isBookmarked =
-                                                                  bookmarks
-                                                                      .contains(
-                                                                          refStr);
-                                                              final savedColorIndex =
-                                                                  highlights[
-                                                                      refStr];
-                                                              Color?
-                                                                  highlightColor;
-                                                              if (savedColorIndex !=
-                                                                      null &&
-                                                                  savedColorIndex >=
-                                                                      0 &&
-                                                                  savedColorIndex <
-                                                                      highlightPalette
-                                                                          .length) {
-                                                                highlightColor = AppColors.getRenderedHighlightColor(
-                                                                    highlightPalette[
-                                                                        savedColorIndex],
-                                                                    theme
-                                                                        .brightness,
-                                                                    theme
-                                                                        .scaffoldBackgroundColor);
-                                                              }
-
-                                                              if (kHighlightDebug) {
-                                                                debugPrint(
-                                                                    '[HIGHLIGHT_DEBUG] RENDER verse key=$refStr found=${highlights.containsKey(refStr)} color=$savedColorIndex highlightColor=$highlightColor isBookmarked=$isBookmarked timestamp=${DateTime.now().millisecondsSinceEpoch}');
-                                                              }
-
-                                                              if (kHighlightDebug &&
-                                                                  (isBookmarked ||
-                                                                      highlightColor !=
-                                                                          null)) {
-                                                                debugPrint(
-                                                                    'DEBUG RENDER: $refStr isBookmarked=$isBookmarked, highlightColor=$highlightColor');
-                                                              }
-
-                                                              final verseWidget = _buildReadingLayoutVerse(
-                                                                context,
-                                                                ref,
-                                                                verse,
-                                                                secondaryVerseMap[verse.number],
-                                                                allBooks.indexOf(fc.book) + 1,
-                                                                fc.chapter.number,
-                                                                readSettings.readingLayout,
-                                                                theme,
-                                                                typography,
-                                                                appThemeMode,
-                                                                hasCommentary: hasCommentary,
-                                                                onCommentaryTap: () => _showCommentaryBottomSheet(
-                                                                    verse.number,
-                                                                    verse.text),
-                                                                isBookmarked: isBookmarked,
-                                                                isRedLetterEnabled: readSettings.isRedLetterEnabled,
-                                                                isSelectionMode: _isPageSelectionMode,
-                                                              );
-
-                                                              return GestureDetector(
-                                                                behavior: HitTestBehavior.opaque,
-                                                                onDoubleTap: _isPageSelectionMode ? null : () {
-                                                                  HapticFeedback.lightImpact();
-                                                                  VerseActionLogic.handleBookmark(context, theme, ref, fc.book.name, fc.chapter.number, [verse.number]);
-                                                                },
-                                                                onTap: _isPageSelectionMode ? null : () => _toggleVerseSelection(verse.number),
-                                                                onLongPress: _isPageSelectionMode ? null : () {
-                                                                  HapticFeedback.mediumImpact();
-                                                                  showModalBottomSheet(
-                                                                    context: context,
-                                                                    backgroundColor: Colors.transparent,
-                                                                    useRootNavigator: true,
-                                                                    builder: (ctx) => VerseContextMenuSheet(
-                                                                      verseNumber: verse.number,
-                                                                      bookName: fc.book.name,
-                                                                      chapterNum: fc.chapter.number,
-                                                                      onCustomSelection: _enterPageSelection,
-                                                                    ),
-                                                                  );
-                                                                },
-                                                                child: Stack(
-                                                                  children: [
-                                                                    AnimatedContainer(
-                                                                      duration: const Duration(milliseconds: 250),
-                                                                      clipBehavior: Clip.antiAlias,
-                                                                      padding: const EdgeInsets.only(
-                                                                          top: 6.0,
-                                                                          bottom: 6.0,
-                                                                          left: 12.0,
-                                                                          right: 12.0),
-                                                                      decoration: BoxDecoration(
-                                                                        color: isSelected
-                                                                            ? (highlightColor != null
-                                                                                ? highlightColor.withValues(alpha: 0.35)
-                                                                                : theme.primaryColor.withValues(alpha: 0.15))
-                                                                            : (_navigatedVerseIndex == index ? theme.primaryColor.withValues(alpha: 0.15) : (highlightColor != null ? highlightColor.withValues(alpha: 0.35) : Colors.transparent)),
-                                                                        borderRadius: BorderRadius.circular(12),
-                                                                        border: (isSelected && highlightColor != null)
-                                                                            ? Border.all(color: theme.primaryColor.withValues(alpha: 0.5), width: 1.5)
-                                                                            : Border.all(color: Colors.transparent, width: 1.5),
-                                                                      ),
-                                                                      child: verseWidget,
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              );
-                                                            }),
-                                                          ),
-                                                        ],
-                                                      );
-                                                    } // end buildVerseItem
-
-                                                    // Base vertical physics — instant = Clamping, otherwise Bouncing
-                                                    final ScrollPhysics basePhysics = readSettings.gestureSensitivity == GestureSensitivity.instant
-                                                        ? const ClampingScrollPhysics()
-                                                        : const BouncingScrollPhysics();
-
-                                                    Widget listWidget;
-                                                    if (_isPageSelectionMode) {
-                                                      if (_selectionVerseKeys.length != verses.length + 1) {
-                                                        _selectionVerseKeys.clear();
-                                                        _selectionVerseKeys.addAll(List.generate(verses.length + 1, (_) => GlobalKey()));
+                                                                          .number) ??
+                                                              0,
+                                                          padding: listPadding,
+                                                          itemCount:
+                                                              verses.length + 1,
+                                                          itemBuilder:
+                                                              buildVerseItem,
+                                                          physics: StrictVerticalScrollPhysics(
+                                                                  isPageSwiping:
+                                                                      _isPageSwiping)
+                                                              .applyTo(
+                                                                  basePhysics),
+                                                        );
                                                       }
-
-                                                      // Axis-lock: freeze the vertical list while PageView swipes horizontally
-                                                      listWidget = SingleChildScrollView(
-                                                        padding: listPadding,
-                                                        dragStartBehavior: DragStartBehavior.down,
-                                                        physics: StrictVerticalScrollPhysics(isPageSwiping: _isPageSwiping).applyTo(basePhysics),
-                                                        child: SelectionArea(
-                                                          child: Column(
-                                                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                                                            children: List.generate(verses.length + 1, (index) {
-                                                              return KeyedSubtree(
-                                                                key: _selectionVerseKeys[index],
-                                                                child: Builder(builder: (ctx) => buildVerseItem(ctx, index)),
-                                                              );
-                                                            }),
-                                                          ),
-                                                        ),
-                                                      );
-                                                    } else {
-                                                      // Axis-lock: freeze the vertical list while PageView swipes horizontally
-                                                      listWidget = ScrollablePositionedList.builder(
-                                                        itemScrollController: _itemScrollControllers[pageIndex],
-                                                      itemPositionsListener: _itemPositionsListeners[pageIndex],
-                                                        initialScrollIndex: (pageIndex == _currentPageIndex ? _navigatedVerseIndex : null) ??
-                                                            ref.read(preferencesProvider).getChapterScrollPosition(fc.book.abbreviation, fc.chapter.number) ?? 0,
-                                                        padding: listPadding,
-                                                        itemCount: verses.length + 1,
-                                                        itemBuilder: buildVerseItem,
-                                                        physics: StrictVerticalScrollPhysics(isPageSwiping: _isPageSwiping).applyTo(basePhysics),
-                                                      );
-                                                    }
-                                                    return listWidget;
-                                                }), // end Builder
-                                                ), // end ConstrainedBox
-                                              ), // end Center
-                                            ), // end Directionality
-                                          ), // end NotificationListener
-                                        ), // end GestureDetector
-                                      ); // end RepaintBoundary
-                                    }, // end Consumer's builder
-                                  );
-                                },
-                              ),
-                            ), // end NotificationListener (axis-lock)
+                                                      return listWidget;
+                                                    }), // end Builder
+                                                  ), // end ConstrainedBox
+                                                ), // end Center
+                                              ), // end Directionality
+                                            ), // end NotificationListener
+                                          ), // end GestureDetector
+                                        ); // end RepaintBoundary
+                                      }, // end Consumer's builder
+                                    );
+                                  },
+                                ),
+                              ), // end NotificationListener (axis-lock)
                   ),
                   // Top Navigation Bar Layer (Floating pills allowing text to flow behind)
                   Positioned(
@@ -1628,15 +1716,19 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                     right: 0,
                     child: Builder(builder: (context) {
                       final isChromeHidden = ref.watch(chromeHiddenProvider);
-                      final isImmersive = ref.watch(readSettingsProvider).readingViewMode == ReadingViewMode.immersive;
+                      final isImmersive =
+                          ref.watch(readSettingsProvider).readingViewMode ==
+                              ReadingViewMode.immersive;
                       final shouldHideTopChrome = isChromeHidden && isImmersive;
-                      
+
                       return IgnorePointer(
                         ignoring: shouldHideTopChrome,
                         child: AnimatedSlide(
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeOutCubic,
-                          offset: shouldHideTopChrome ? const Offset(0, -1) : Offset.zero,
+                          offset: shouldHideTopChrome
+                              ? const Offset(0, -1)
+                              : Offset.zero,
                           child: AnimatedOpacity(
                             duration: const Duration(milliseconds: 300),
                             curve: Curves.easeOutCubic,
@@ -1791,7 +1883,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                           style: FilledButton.styleFrom(
                             backgroundColor: theme.primaryColor,
                             foregroundColor: theme.colorScheme.onPrimary,
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 12),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30),
                             ),
@@ -1856,14 +1949,16 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     if (layout == ReadingLayout.interleaved) {
       final tokens = theme.extension<ReadingTokens>()!;
       final secondaryColor = tokens.readingInk.withValues(alpha: 0.65);
-      
+
       final secondaryTypography = typography.copyWith(
         fontSize: typography.fontSize * 0.95,
       );
 
-      final installedTranslations = ref.watch(availableTranslationsProvider).value ?? [];
+      final installedTranslations =
+          ref.watch(availableTranslationsProvider).value ?? [];
       final secondaryId = ref.read(secondaryTranslationProvider) ?? '';
-      final badgeLabel = _getTranslationCombinedLabel(secondaryId, installedTranslations);
+      final badgeLabel =
+          _getTranslationCombinedLabel(secondaryId, installedTranslations);
 
       final secondary = _buildNormalVerse(
         secondaryVerse,
@@ -1903,18 +1998,20 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         ],
       );
     }
-    
+
     if (layout == ReadingLayout.sideBySide) {
       final tokens = theme.extension<ReadingTokens>()!;
       final secondaryColor = tokens.readingInk.withValues(alpha: 0.75);
-      
+
       final secondaryTypography = typography.copyWith(
         fontSize: typography.fontSize * 0.95,
       );
 
-      final installedTranslations = ref.watch(availableTranslationsProvider).value ?? [];
+      final installedTranslations =
+          ref.watch(availableTranslationsProvider).value ?? [];
       final secondaryId = ref.read(secondaryTranslationProvider) ?? '';
-      final badgeLabel = _getTranslationCombinedLabel(secondaryId, installedTranslations);
+      final badgeLabel =
+          _getTranslationCombinedLabel(secondaryId, installedTranslations);
 
       final secondary = _buildNormalVerse(
         secondaryVerse,
@@ -1953,14 +2050,14 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         ],
       );
     }
-    
+
     if (layout == ReadingLayout.chips) {
       final expandedChipsMap = ref.watch(expandedChipsProvider);
       final activeChipId = expandedChipsMap[primaryVerse.number];
-      
+
       final tokens = theme.extension<ReadingTokens>()!;
       final secondaryColor = tokens.readingInk.withValues(alpha: 0.75);
-      
+
       final secondaryTypography = typography.copyWith(
         fontSize: typography.fontSize * 0.95,
       );
@@ -1973,9 +2070,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         'Spanish': 'ES',
         'Tagalog': 'TL',
       };
-      
-      final installedTranslations = ref.watch(availableTranslationsProvider).value ?? [];
-      final availableChips = <String, String>{}; 
+
+      final installedTranslations =
+          ref.watch(availableTranslationsProvider).value ?? [];
+      final availableChips = <String, String>{};
       for (final t in installedTranslations) {
         if (targetLanguages.containsKey(t.languageName)) {
           final label = targetLanguages[t.languageName]!;
@@ -1993,7 +2091,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           chapter: chapterNumber,
           verse: primaryVerse.number,
         )));
-        
+
         activeTranslationWidget = verseAsync.when(
           data: (verse) {
             if (verse == null) return const SizedBox.shrink();
@@ -2013,8 +2111,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           loading: () => Padding(
             padding: const EdgeInsets.all(8.0),
             child: SizedBox(
-              height: 16, width: 16,
-              child: CircularProgressIndicator(strokeWidth: 2, color: theme.primaryColor),
+              height: 16,
+              width: 16,
+              child: CircularProgressIndicator(
+                  strokeWidth: 2, color: theme.primaryColor),
             ),
           ),
           error: (_, __) => const SizedBox.shrink(),
@@ -2031,76 +2131,89 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
             child: Row(
               children: [
                 for (final langEntry in targetLanguages.entries)
-                  Builder(
-                    builder: (context) {
-                      final isInstalled = availableChips.containsKey(langEntry.value);
-                      final translationId = availableChips[langEntry.value];
-                      final isSelected = activeChipId == translationId;
+                  Builder(builder: (context) {
+                    final isInstalled =
+                        availableChips.containsKey(langEntry.value);
+                    final translationId = availableChips[langEntry.value];
+                    final isSelected = activeChipId == translationId;
 
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: Material(
-                          color: isSelected
-                              ? theme.primaryColor.withValues(alpha: 0.15)
-                              : theme.colorScheme.surface,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            side: BorderSide(
-                              color: isSelected
-                                  ? theme.primaryColor.withValues(alpha: 0.5)
-                                  : theme.colorScheme.onSurface.withValues(alpha: isInstalled ? 0.15 : 0.05),
-                            ),
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: Material(
+                        color: isSelected
+                            ? theme.primaryColor.withValues(alpha: 0.15)
+                            : theme.colorScheme.surface,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          side: BorderSide(
+                            color: isSelected
+                                ? theme.primaryColor.withValues(alpha: 0.5)
+                                : theme.colorScheme.onSurface.withValues(
+                                    alpha: isInstalled ? 0.15 : 0.05),
                           ),
-                          clipBehavior: Clip.antiAlias,
-                          child: InkWell(
-                            onTap: () {
-                              if (isInstalled) {
-                                if (isSelected) {
-                                  ref.read(expandedChipsProvider.notifier).clear(primaryVerse.number);
-                                } else {
-                                  ref.read(expandedChipsProvider.notifier).setLanguage(primaryVerse.number, translationId!);
-                                }
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: InkWell(
+                          onTap: () {
+                            if (isInstalled) {
+                              if (isSelected) {
+                                ref
+                                    .read(expandedChipsProvider.notifier)
+                                    .clear(primaryVerse.number);
                               } else {
-                                // Uninstalled: Prompt download by opening picker
-                                showModalBottomSheet(
-                                  context: context,
-                                  isScrollControlled: true,
-                                  useRootNavigator: true,
-                                  backgroundColor: Colors.transparent,
-                                  builder: (context) => const TranslationPickerSheet(),
-                                );
+                                ref
+                                    .read(expandedChipsProvider.notifier)
+                                    .setLanguage(
+                                        primaryVerse.number, translationId!);
                               }
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    _getTranslationCombinedLabel(
-                                      isInstalled ? translationId! : langEntry.value, 
-                                      installedTranslations, 
-                                      defaultName: langEntry.key
-                                    ),
-                                    style: theme.textTheme.labelMedium?.copyWith(
-                                      color: isSelected
-                                          ? theme.primaryColor
-                                          : theme.colorScheme.onSurface.withValues(alpha: isInstalled ? 0.7 : 0.3),
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                            } else {
+                              // Uninstalled: Prompt download by opening picker
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                useRootNavigator: true,
+                                backgroundColor: Colors.transparent,
+                                builder: (context) =>
+                                    const TranslationPickerSheet(),
+                              );
+                            }
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12.0, vertical: 6.0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  _getTranslationCombinedLabel(
+                                      isInstalled
+                                          ? translationId!
+                                          : langEntry.value,
+                                      installedTranslations,
+                                      defaultName: langEntry.key),
+                                  style: theme.textTheme.labelMedium?.copyWith(
+                                    color: isSelected
+                                        ? theme.primaryColor
+                                        : theme.colorScheme.onSurface
+                                            .withValues(
+                                                alpha: isInstalled ? 0.7 : 0.3),
+                                    fontWeight: FontWeight.w600,
                                   ),
-                                  if (!isInstalled) ...[
-                                    const SizedBox(width: 4),
-                                    Icon(Icons.download_rounded, size: 12, color: theme.colorScheme.onSurface.withValues(alpha: 0.3)),
-                                  ]
-                                ],
-                              ),
+                                ),
+                                if (!isInstalled) ...[
+                                  const SizedBox(width: 4),
+                                  Icon(Icons.download_rounded,
+                                      size: 12,
+                                      color: theme.colorScheme.onSurface
+                                          .withValues(alpha: 0.3)),
+                                ]
+                              ],
                             ),
                           ),
                         ),
-                      );
-                    }
-                  ),
+                      ),
+                    );
+                  }),
               ],
             ),
           ),
@@ -2111,7 +2224,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         ],
       );
     }
-    
+
     // Fallback for other modes not implemented yet
     return primary;
   }
@@ -2216,7 +2329,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     final textSpan = TextSpan(
       style: fontStyle,
       children: [
-        if (ref.watch(readSettingsProvider).showVerseNumbers && !hideVerseNumber)
+        if (ref.watch(readSettingsProvider).showVerseNumbers &&
+            !hideVerseNumber)
           TextSpan(
             text: '${verse.number}  ',
             style: theme.textTheme.titleMedium?.copyWith(
@@ -2332,13 +2446,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
               if (hasPrevious)
                 TextButton(
                   onPressed: () {
-                    if (readSettings.gestureSensitivity == GestureSensitivity.instant) {
-                      _pageController.jumpToPage(pageIndex - 1);
-                    } else {
-                      _pageController.animateToPage(pageIndex - 1,
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut);
-                    }
+                    _pageController.animateToPage(pageIndex - 1,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut);
                   },
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
@@ -2354,13 +2464,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
               if (hasNext)
                 TextButton(
                   onPressed: () {
-                    if (readSettings.gestureSensitivity == GestureSensitivity.instant) {
-                      _pageController.jumpToPage(pageIndex + 1);
-                    } else {
-                      _pageController.animateToPage(pageIndex + 1,
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut);
-                    }
+                    _pageController.animateToPage(pageIndex + 1,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut);
                   },
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
@@ -3210,9 +3316,6 @@ class _TypographyBottomSheet extends ConsumerWidget {
     final typography = ref.watch(typographyProvider);
     final typographyNotifier = ref.read(typographyProvider.notifier);
 
-
-
-
     final fonts = [
       'EB Garamond',
       'Inter',
@@ -3645,8 +3748,6 @@ class _AlignmentButton extends StatelessWidget {
   }
 }
 
-
-
 class VerseActionLogic {
   static void _showFeedback(
       BuildContext context, ThemeData theme, String message) {
@@ -3696,8 +3797,11 @@ class VerseActionLogic {
                   GestureDetector(
                     onTap: () {
                       for (var v in targetVerses) {
-                        final refStr = generateVerseKey(bookAbbrev, chapterNum, v);
-                        ref.read(highlightsProvider.notifier).removeHighlight(refStr);
+                        final refStr =
+                            generateVerseKey(bookAbbrev, chapterNum, v);
+                        ref
+                            .read(highlightsProvider.notifier)
+                            .removeHighlight(refStr);
                       }
                       Navigator.of(ctx).pop();
                       onClearSelection();
@@ -3721,7 +3825,10 @@ class VerseActionLogic {
                                   spreadRadius: 1)
                             ],
                           ),
-                          child: Icon(Icons.block, size: 20, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                          child: Icon(Icons.block,
+                              size: 20,
+                              color: theme.colorScheme.onSurface
+                                  .withValues(alpha: 0.6)),
                         ),
                         const SizedBox(height: 6),
                         Text('None',
@@ -3733,50 +3840,50 @@ class VerseActionLogic {
                     ),
                   ),
                   ...List.generate(highlightPalette.length, (i) {
-                  final color = AppColors.getRenderedHighlightColor(
-                      highlightPaletteSwatches[i],
-                      theme.brightness,
-                      theme.scaffoldBackgroundColor);
-                  return GestureDetector(
-                    onTap: () {
-                      ref
-                          .read(readSettingsProvider.notifier)
-                          .setActiveHighlightColorIndex(i);
-                      VerseActionLogic.handleHighlight(ctx, theme, ref,
-                          bookAbbrev, chapterNum, targetVerses, i);
-                      Navigator.of(ctx).pop();
-                      onClearSelection();
-                    },
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: color,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                                color: Colors.black.withValues(alpha: 0.2),
-                                width: 1.5),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.1),
-                                  blurRadius: 4,
-                                  spreadRadius: 1)
-                            ],
+                    final color = AppColors.getRenderedHighlightColor(
+                        highlightPaletteSwatches[i],
+                        theme.brightness,
+                        theme.scaffoldBackgroundColor);
+                    return GestureDetector(
+                      onTap: () {
+                        ref
+                            .read(readSettingsProvider.notifier)
+                            .setActiveHighlightColorIndex(i);
+                        VerseActionLogic.handleHighlight(ctx, theme, ref,
+                            bookAbbrev, chapterNum, targetVerses, i);
+                        Navigator.of(ctx).pop();
+                        onClearSelection();
+                      },
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: color,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                  color: Colors.black.withValues(alpha: 0.2),
+                                  width: 1.5),
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.1),
+                                    blurRadius: 4,
+                                    spreadRadius: 1)
+                              ],
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(highlightPaletteNames[i],
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.7),
-                            )),
-                      ],
-                    ),
-                  );
-                }),
+                          const SizedBox(height: 6),
+                          Text(highlightPaletteNames[i],
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: theme.colorScheme.onSurface
+                                    .withValues(alpha: 0.7),
+                              )),
+                        ],
+                      ),
+                    );
+                  }),
                 ],
               ),
             ],
@@ -3946,4 +4053,3 @@ class VerseActionLogic {
     await ShareService.shareText(body: text);
   }
 }
-

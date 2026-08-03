@@ -22,11 +22,11 @@ class AppColors {
 
   // Warm Gold / Amber Glow Theme (Matte Sepia)
   static const Color warmGoldBackground = Color(0xFFF4EAD5);
-  static const Color warmGoldSurface    = Color(0xFFEFE3C3);
-  static const Color warmGoldTextPrimary    = Color(0xFF2C221E);
-  static const Color warmGoldTextSecondary  = Color(0xFF5C4B41);
-  static const Color warmGoldBorder     = Color(0xFFD8CDB6);
-  static const Color warmGoldAccent     = Color(0xFF9E6B00);
+  static const Color warmGoldSurface = Color(0xFFEFE3C3);
+  static const Color warmGoldTextPrimary = Color(0xFF2C221E);
+  static const Color warmGoldTextSecondary = Color(0xFF5C4B41);
+  static const Color warmGoldBorder = Color(0xFFD8CDB6);
+  static const Color warmGoldAccent = Color(0xFF9E6B00);
 
   // Dark Theme
   static const Color darkBackground = Color(0xFF121212);
@@ -97,10 +97,13 @@ class AppColors {
 
   /// Helper to ensure highlight colors render beautifully and with adequate WCAG AA contrast against specific backgrounds.
   /// For example, the default yellow highlight clashes with the Sepia/Cream backgrounds.
-  static Color getRenderedHighlightColor(Color baseColor, Brightness brightness, Color scaffoldBackgroundColor) {
+  static Color getRenderedHighlightColor(
+      Color baseColor, Brightness brightness, Color scaffoldBackgroundColor) {
     if (baseColor == const Color(0xFFFEF08A)) {
-      if (scaffoldBackgroundColor == sepiaBackground || scaffoldBackgroundColor == warmGoldBackground) {
-        return Colors.amber.shade700; // Deeper, more saturated yellow-gold for sepia themes
+      if (scaffoldBackgroundColor == sepiaBackground ||
+          scaffoldBackgroundColor == warmGoldBackground) {
+        return Colors.amber
+            .shade700; // Deeper, more saturated yellow-gold for sepia themes
       }
     }
     return baseColor;

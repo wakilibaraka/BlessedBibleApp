@@ -39,7 +39,7 @@ class BackupService {
       };
 
       final jsonString = jsonEncode(backup);
-      
+
       final tempDir = await getTemporaryDirectory();
       final file = File('${tempDir.path}/blessed_bible_backup.json');
       await file.writeAsString(jsonString);
@@ -50,7 +50,8 @@ class BackupService {
         await Share.shareXFiles(
           [XFile(file.path)],
           subject: 'The Blessed Bible Backup',
-          sharePositionOrigin: box != null ? box.localToGlobal(Offset.zero) & box.size : null,
+          sharePositionOrigin:
+              box != null ? box.localToGlobal(Offset.zero) & box.size : null,
         );
       }
     } catch (e) {
@@ -62,10 +63,13 @@ class BackupService {
     }
   }
 
-  static Future<void> importData(BuildContext context, WidgetRef ref, String jsonString) async {
+  static Future<void> importData(
+      BuildContext context, WidgetRef ref, String jsonString) async {
     try {
       final decoded = jsonDecode(jsonString);
-      if (decoded is! Map || !decoded.containsKey('version') || !decoded.containsKey('data')) {
+      if (decoded is! Map ||
+          !decoded.containsKey('version') ||
+          !decoded.containsKey('data')) {
         throw const FormatException('Invalid backup file format');
       }
 
@@ -78,7 +82,8 @@ class BackupService {
         context: context,
         builder: (ctx) => AlertDialog(
           title: const Text('Confirm Restore'),
-          content: const Text('This will overwrite all existing notes, highlights, bookmarks, and settings. Are you sure?'),
+          content: const Text(
+              'This will overwrite all existing notes, highlights, bookmarks, and settings. Are you sure?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(false),
@@ -86,8 +91,10 @@ class BackupService {
             ),
             ElevatedButton(
               onPressed: () => Navigator.of(ctx).pop(true),
-              style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.error),
-              child: const Text('Restore', style: TextStyle(color: Colors.white)),
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.error),
+              child:
+                  const Text('Restore', style: TextStyle(color: Colors.white)),
             ),
           ],
         ),
@@ -145,7 +152,9 @@ class BackupService {
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Restore failed: Invalid or corrupted backup ($e)')),
+          SnackBar(
+              content:
+                  Text('Restore failed: Invalid or corrupted backup ($e)')),
         );
       }
     }

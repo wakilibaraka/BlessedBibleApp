@@ -44,12 +44,15 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
       canPop: !_showAdvanced,
       onPopInvokedWithResult: (didPop, result) {
         if (!didPop) {
-          setState(() { _showAdvanced = false; });
+          setState(() {
+            _showAdvanced = false;
+          });
         }
       },
       child: Container(
         constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * kAppearanceSheetHeightFactor,
+          maxHeight:
+              MediaQuery.of(context).size.height * kAppearanceSheetHeightFactor,
         ),
         child: TexturedGlassContainer(
           sigmaX: 45.0,
@@ -65,301 +68,361 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
               bottom: MediaQuery.of(context).padding.bottom + 20,
             ),
             child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Container(
-              width: 36,
-              height: 4,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  if (_showAdvanced) ...[
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
-                      onPressed: () => setState(() => _showAdvanced = false),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
-                    const SizedBox(width: 12),
-                  ],
-                  Text(
-                    _showAdvanced ? 'Advanced Appearance' : 'Appearance',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 36,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                ],
-              ),
-              if (!_showAdvanced)
-                IconButton(
-                  icon: Icon(Icons.tune_rounded, size: 20, color: theme.colorScheme.onSurface),
-                  onPressed: () {
-                    HapticFeedback.selectionClick();
-                    setState(() { _showAdvanced = true; });
-                  },
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
                 ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          const SizedBox(height: 16),
-          ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 520.0),
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 250),
-              child: _showAdvanced ? _buildAdvancedContent(theme, readSettings, engineMode) : Container(
-                key: const ValueKey('appearance_main'),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                    Consumer(builder: (context, ref, _) {
-                      final surfaceStyle = ref.watch(earthHeavenStyleProvider);
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          AnimatedSegmentedTile<EarthHeavenStyle>(
-                            title: 'Surface Style',
-                            subtitle: 'Visual depth and material styling',
-                            selectedValue: surfaceStyle,
-                            options: const [
-                              MapEntry(EarthHeavenStyle.heaven, 'Heaven'),
-                              MapEntry(EarthHeavenStyle.earth, 'Earth'),
-                            ],
-                            onChanged: (val) {
-                              HapticFeedback.selectionClick();
-                              ref.read(earthHeavenStyleProvider.notifier).setStyle(val);
-                            },
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        if (_showAdvanced) ...[
+                          IconButton(
+                            icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                                size: 18),
+                            onPressed: () =>
+                                setState(() => _showAdvanced = false),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 4.0, left: 2.0),
-                            child: Text(
-                              surfaceStyle == EarthHeavenStyle.heaven
-                                  ? 'Layered depth'
-                                  : 'Flat surfaces',
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                                fontSize: 10,
-                              ),
+                          const SizedBox(width: 12),
+                        ],
+                        Text(
+                          _showAdvanced ? 'Advanced Appearance' : 'Appearance',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (!_showAdvanced)
+                      IconButton(
+                        icon: Icon(Icons.tune_rounded,
+                            size: 20, color: theme.colorScheme.onSurface),
+                        onPressed: () {
+                          HapticFeedback.selectionClick();
+                          setState(() {
+                            _showAdvanced = true;
+                          });
+                        },
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                const SizedBox(height: 16),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(minHeight: 520.0),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 250),
+                    child: _showAdvanced
+                        ? _buildAdvancedContent(theme, readSettings, engineMode)
+                        : Container(
+                            key: const ValueKey('appearance_main'),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Consumer(builder: (context, ref, _) {
+                                  final surfaceStyle =
+                                      ref.watch(earthHeavenStyleProvider);
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      AnimatedSegmentedTile<EarthHeavenStyle>(
+                                        title: 'Surface Style',
+                                        subtitle:
+                                            'Visual depth and material styling',
+                                        selectedValue: surfaceStyle,
+                                        options: const [
+                                          MapEntry(EarthHeavenStyle.heaven,
+                                              'Heaven'),
+                                          MapEntry(
+                                              EarthHeavenStyle.earth, 'Earth'),
+                                        ],
+                                        onChanged: (val) {
+                                          HapticFeedback.selectionClick();
+                                          ref
+                                              .read(earthHeavenStyleProvider
+                                                  .notifier)
+                                              .setStyle(val);
+                                        },
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            top: 4.0, left: 2.0),
+                                        child: Text(
+                                          surfaceStyle ==
+                                                  EarthHeavenStyle.heaven
+                                              ? 'Layered depth'
+                                              : 'Flat surfaces',
+                                          style: theme.textTheme.labelSmall
+                                              ?.copyWith(
+                                            color: theme.colorScheme.onSurface
+                                                .withValues(alpha: 0.5),
+                                            fontSize: 10,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                }),
+                                const SizedBox(height: 12),
+                                const SizedBox(height: 12),
+                                Text(
+                                  'FOUNDATIONS',
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    color: theme.primaryColor,
+                                    letterSpacing: 1.2,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: _ThemePill(
+                                        label: 'Dawn',
+                                        mode: AppThemeMode.light,
+                                        currentMode: currentMode,
+                                        fillColor: AppColors.lightBackground,
+                                        textColor: AppColors.lightTextPrimary,
+                                        swatchColors: const [
+                                          AppColors.lightBackground,
+                                          AppColors.lightSurface,
+                                          AppColors.lightAccent
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: _ThemePill(
+                                        label: 'Fresh',
+                                        mode: AppThemeMode.sepia,
+                                        currentMode: currentMode,
+                                        fillColor: AppColors.sepiaBackground,
+                                        textColor: AppColors.sepiaTextPrimary,
+                                        swatchColors: const [
+                                          AppColors.sepiaBackground,
+                                          AppColors.sepiaSurface,
+                                          AppColors.sepiaTextPrimary
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: _DarkThemePill(
+                                          currentMode: currentMode),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'FIRMAMENT',
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    color: theme.primaryColor,
+                                    letterSpacing: 1.2,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: _ThemePill(
+                                        label: 'Sun',
+                                        mode: AppThemeMode.dawn,
+                                        currentMode: currentMode,
+                                        fillColor: AppColors.dawnBackground,
+                                        textColor: AppColors.dawnTextPrimary,
+                                        swatchColors: const [
+                                          AppColors.dawnPrimary,
+                                          AppColors.dawnAccent,
+                                          AppColors.dawnBackground
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: _ThemePill(
+                                        label: 'Moon',
+                                        mode: AppThemeMode.fresh,
+                                        currentMode: currentMode,
+                                        fillColor: AppColors.freshBackground,
+                                        textColor: AppColors.freshTextPrimary,
+                                        swatchColors: const [
+                                          AppColors.freshPrimary,
+                                          AppColors.freshAccent,
+                                          AppColors.freshBackground
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: _ThemePill(
+                                        label: 'Stars',
+                                        mode: AppThemeMode.dusk,
+                                        currentMode: currentMode,
+                                        fillColor: AppColors.duskBackground,
+                                        textColor: AppColors.duskTextPrimary,
+                                        swatchColors: const [
+                                          AppColors.duskPrimary,
+                                          AppColors.duskAccent,
+                                          AppColors.duskBackground
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'EDEN',
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    color: theme.primaryColor,
+                                    letterSpacing: 1.2,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: _ThemePill(
+                                        label: 'Lilies',
+                                        mode: AppThemeMode.lilies,
+                                        currentMode: currentMode,
+                                        fillColor: AppColors.liliesBackground,
+                                        textColor: AppColors.liliesTextPrimary,
+                                        swatchColors: const [
+                                          AppColors.liliesPrimary,
+                                          AppColors.liliesAccent,
+                                          AppColors.liliesBackground
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: _ThemePill(
+                                        label: 'Roses',
+                                        mode: AppThemeMode.roses,
+                                        currentMode: currentMode,
+                                        fillColor: AppColors.rosesBackground,
+                                        textColor: AppColors.rosesTextPrimary,
+                                        swatchColors: const [
+                                          AppColors.rosesPrimary,
+                                          AppColors.rosesAccent,
+                                          AppColors.rosesBackground
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: _ThemePill(
+                                        label: 'Olives',
+                                        mode: AppThemeMode.olives,
+                                        currentMode: currentMode,
+                                        fillColor: AppColors.olivesBackground,
+                                        textColor: AppColors.olivesTextPrimary,
+                                        swatchColors: const [
+                                          AppColors.olivesPrimary,
+                                          AppColors.olivesAccent,
+                                          AppColors.olivesBackground
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'SANCTUARY',
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    color: theme.primaryColor,
+                                    letterSpacing: 1.2,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: _ThemePill(
+                                        label: 'Priestly\nPurple',
+                                        mode: AppThemeMode.priestlyPurple,
+                                        currentMode: currentMode,
+                                        fillColor: AppColors.lightBackground,
+                                        textColor: const Color(0xFF673AB7),
+                                        swatchColors: const [
+                                          Color(0xFF673AB7),
+                                          Color(0xFF9575CD),
+                                          AppColors.lightBackground
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: _ThemePill(
+                                        label: 'Galilee\nBlue',
+                                        mode: AppThemeMode.galileeBlue,
+                                        currentMode: currentMode,
+                                        fillColor: AppColors.lightBackground,
+                                        textColor: const Color(0xFF2196F3),
+                                        swatchColors: const [
+                                          Color(0xFF2196F3),
+                                          Color(0xFF64B5F6),
+                                          AppColors.lightBackground
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: _ThemePill(
+                                        label: 'Scarlet\nRed',
+                                        mode: AppThemeMode.scarletRed,
+                                        currentMode: currentMode,
+                                        fillColor: AppColors.lightBackground,
+                                        textColor: const Color(0xFFE53935),
+                                        swatchColors: const [
+                                          Color(0xFFE53935),
+                                          Color(0xFFEF5350),
+                                          AppColors.lightBackground
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+                              ],
                             ),
                           ),
-                        ],
-                      );
-                    }),
-                    const SizedBox(height: 12),
-
-                    const SizedBox(height: 12),
-
-                  Text(
-                    'FOUNDATIONS',
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.primaryColor,
-                      letterSpacing: 1.2,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 10,
-                    ),
                   ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _ThemePill(
-                          label: 'Dawn',
-                          mode: AppThemeMode.light,
-                          currentMode: currentMode,
-                          fillColor: AppColors.lightBackground,
-                          textColor: AppColors.lightTextPrimary,
-                          swatchColors: const [AppColors.lightBackground, AppColors.lightSurface, AppColors.lightAccent],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _ThemePill(
-                          label: 'Fresh',
-                          mode: AppThemeMode.sepia,
-                          currentMode: currentMode,
-                          fillColor: AppColors.sepiaBackground,
-                          textColor: AppColors.sepiaTextPrimary,
-                          swatchColors: const [AppColors.sepiaBackground, AppColors.sepiaSurface, AppColors.sepiaTextPrimary],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _DarkThemePill(currentMode: currentMode),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  Text(
-                    'FIRMAMENT',
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.primaryColor,
-                      letterSpacing: 1.2,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 10,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _ThemePill(
-                          label: 'Sun',
-                          mode: AppThemeMode.dawn,
-                          currentMode: currentMode,
-                          fillColor: AppColors.dawnBackground,
-                          textColor: AppColors.dawnTextPrimary,
-                          swatchColors: const [AppColors.dawnPrimary, AppColors.dawnAccent, AppColors.dawnBackground],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _ThemePill(
-                          label: 'Moon',
-                          mode: AppThemeMode.fresh,
-                          currentMode: currentMode,
-                          fillColor: AppColors.freshBackground,
-                          textColor: AppColors.freshTextPrimary,
-                          swatchColors: const [AppColors.freshPrimary, AppColors.freshAccent, AppColors.freshBackground],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _ThemePill(
-                          label: 'Stars',
-                          mode: AppThemeMode.dusk,
-                          currentMode: currentMode,
-                          fillColor: AppColors.duskBackground,
-                          textColor: AppColors.duskTextPrimary,
-                          swatchColors: const [AppColors.duskPrimary, AppColors.duskAccent, AppColors.duskBackground],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  Text(
-                    'EDEN',
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.primaryColor,
-                      letterSpacing: 1.2,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 10,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _ThemePill(
-                          label: 'Lilies',
-                          mode: AppThemeMode.lilies,
-                          currentMode: currentMode,
-                          fillColor: AppColors.liliesBackground,
-                          textColor: AppColors.liliesTextPrimary,
-                          swatchColors: const [AppColors.liliesPrimary, AppColors.liliesAccent, AppColors.liliesBackground],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _ThemePill(
-                          label: 'Roses',
-                          mode: AppThemeMode.roses,
-                          currentMode: currentMode,
-                          fillColor: AppColors.rosesBackground,
-                          textColor: AppColors.rosesTextPrimary,
-                          swatchColors: const [AppColors.rosesPrimary, AppColors.rosesAccent, AppColors.rosesBackground],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _ThemePill(
-                          label: 'Olives',
-                          mode: AppThemeMode.olives,
-                          currentMode: currentMode,
-                          fillColor: AppColors.olivesBackground,
-                          textColor: AppColors.olivesTextPrimary,
-                          swatchColors: const [AppColors.olivesPrimary, AppColors.olivesAccent, AppColors.olivesBackground],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  Text(
-                    'SANCTUARY',
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.primaryColor,
-                      letterSpacing: 1.2,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 10,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _ThemePill(
-                          label: 'Priestly\nPurple',
-                          mode: AppThemeMode.priestlyPurple,
-                          currentMode: currentMode,
-                          fillColor: AppColors.lightBackground,
-                          textColor: const Color(0xFF673AB7),
-                          swatchColors: const [Color(0xFF673AB7), Color(0xFF9575CD), AppColors.lightBackground],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _ThemePill(
-                          label: 'Galilee\nBlue',
-                          mode: AppThemeMode.galileeBlue,
-                          currentMode: currentMode,
-                          fillColor: AppColors.lightBackground,
-                          textColor: const Color(0xFF2196F3),
-                          swatchColors: const [Color(0xFF2196F3), Color(0xFF64B5F6), AppColors.lightBackground],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _ThemePill(
-                          label: 'Scarlet\nRed',
-                          mode: AppThemeMode.scarletRed,
-                          currentMode: currentMode,
-                          fillColor: AppColors.lightBackground,
-                          textColor: const Color(0xFFE53935),
-                          swatchColors: const [Color(0xFFE53935), Color(0xFFEF5350), AppColors.lightBackground],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-          ),
-        ],
-      ),
-      ),
-      ),
+        ),
       ),
     );
   }
 
-  Widget _buildAdvancedContent(ThemeData theme, ReadSettingsState readSettings, ThemeEngineMode engineMode) {
+  Widget _buildAdvancedContent(ThemeData theme, ReadSettingsState readSettings,
+      ThemeEngineMode engineMode) {
     return Container(
       key: const ValueKey('advanced_main'),
       child: Column(
@@ -377,8 +440,8 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
           GestureDetector(
             onTap: () {
               HapticFeedback.selectionClick();
-              final newMode = engineMode == ThemeEngineMode.locked 
-                  ? ThemeEngineMode.timeBased 
+              final newMode = engineMode == ThemeEngineMode.locked
+                  ? ThemeEngineMode.timeBased
                   : ThemeEngineMode.locked;
               ref.read(themeProvider.notifier).setEngineMode(newMode);
             },
@@ -388,27 +451,38 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
               decoration: BoxDecoration(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: theme.colorScheme.onSurface.withValues(alpha: 0.1)),
+                border: Border.all(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.1)),
               ),
               child: Row(
                 children: [
-                  Icon(engineMode == ThemeEngineMode.locked ? Icons.lock_rounded : Icons.schedule_rounded, size: 16, color: theme.colorScheme.onSurface),
+                  Icon(
+                      engineMode == ThemeEngineMode.locked
+                          ? Icons.lock_rounded
+                          : Icons.schedule_rounded,
+                      size: 16,
+                      color: theme.colorScheme.onSurface),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      engineMode == ThemeEngineMode.locked ? 'Locked Theme' : 'Time-Based',
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                      engineMode == ThemeEngineMode.locked
+                          ? 'Locked Theme'
+                          : 'Time-Based',
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 13),
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Text(
                       engineMode == ThemeEngineMode.locked ? 'Locked' : 'Auto',
-                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 11, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],
@@ -427,8 +501,11 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
           const SizedBox(height: 12),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
-            title: const Text('Enable Background Glow', style: TextStyle(fontSize: 14)),
-            subtitle: const Text('Renders a subtle animated light behind the reader in 3D surface style', style: TextStyle(fontSize: 12)),
+            title: const Text('Enable Background Glow',
+                style: TextStyle(fontSize: 14)),
+            subtitle: const Text(
+                'Renders a subtle animated light behind the reader in 3D surface style',
+                style: TextStyle(fontSize: 12)),
             value: readSettings.isGlowEnabled,
             onChanged: (value) {
               HapticFeedback.selectionClick();
@@ -447,7 +524,9 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
               ],
               onChanged: (val) {
                 HapticFeedback.selectionClick();
-                ref.read(readSettingsProvider.notifier).setBackgroundGlowStyle(val);
+                ref
+                    .read(readSettingsProvider.notifier)
+                    .setBackgroundGlowStyle(val);
               },
             ),
             const SizedBox(height: 16),
@@ -494,7 +573,8 @@ class _ThemePill extends ConsumerStatefulWidget {
   ConsumerState<_ThemePill> createState() => _ThemePillState();
 }
 
-class _ThemePillState extends ConsumerState<_ThemePill> with SingleTickerProviderStateMixin {
+class _ThemePillState extends ConsumerState<_ThemePill>
+    with SingleTickerProviderStateMixin {
   late AnimationController _sparkleController;
 
   @override
@@ -524,7 +604,9 @@ class _ThemePillState extends ConsumerState<_ThemePill> with SingleTickerProvide
             widget.mode == AppThemeMode.automatic.resolve(context) &&
             widget.mode != AppThemeMode.automatic);
 
-    final bgLuminance = (isSelected ? widget.fillColor : theme.colorScheme.surface).computeLuminance();
+    final bgLuminance =
+        (isSelected ? widget.fillColor : theme.colorScheme.surface)
+            .computeLuminance();
     final isDarkBg = bgLuminance < 0.4;
 
     final neumorphicShadows = isDarkBg
@@ -553,7 +635,9 @@ class _ThemePillState extends ConsumerState<_ThemePill> with SingleTickerProvide
             ),
           ];
 
-    final accentColor = widget.swatchColors.length > 1 ? widget.swatchColors[1] : theme.primaryColor;
+    final accentColor = widget.swatchColors.length > 1
+        ? widget.swatchColors[1]
+        : theme.primaryColor;
 
     return GestureDetector(
       onTap: () {
@@ -565,10 +649,14 @@ class _ThemePillState extends ConsumerState<_ThemePill> with SingleTickerProvide
         duration: const Duration(milliseconds: 300),
         height: 46,
         decoration: BoxDecoration(
-          color: isSelected ? widget.fillColor : theme.colorScheme.onSurface.withValues(alpha: 0.05),
+          color: isSelected
+              ? widget.fillColor
+              : theme.colorScheme.onSurface.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(26),
           border: Border.all(
-            color: isSelected ? theme.primaryColor : theme.colorScheme.onSurface.withValues(alpha: 0.1),
+            color: isSelected
+                ? theme.primaryColor
+                : theme.colorScheme.onSurface.withValues(alpha: 0.1),
             width: isSelected ? 2 : 1,
           ),
           boxShadow: neumorphicShadows,
@@ -587,11 +675,15 @@ class _ThemePillState extends ConsumerState<_ThemePill> with SingleTickerProvide
                 alignment: Alignment.center,
                 child: Text(
                   widget.label,
-                  textAlign: widget.label.contains('\n') ? TextAlign.left : TextAlign.center,
+                  textAlign: widget.label.contains('\n')
+                      ? TextAlign.left
+                      : TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.visible,
                   style: TextStyle(
-                    color: isSelected ? widget.textColor : theme.colorScheme.onSurface,
+                    color: isSelected
+                        ? widget.textColor
+                        : theme.colorScheme.onSurface,
                     fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
                     fontSize: 10,
                     height: 1.1,
@@ -602,7 +694,8 @@ class _ThemePillState extends ConsumerState<_ThemePill> with SingleTickerProvide
             AnimatedAlign(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeOutCubic,
-              alignment: isSelected ? Alignment.centerRight : Alignment.centerLeft,
+              alignment:
+                  isSelected ? Alignment.centerRight : Alignment.centerLeft,
               child: Padding(
                 padding: const EdgeInsets.all(4.0),
                 child: Container(
@@ -610,7 +703,10 @@ class _ThemePillState extends ConsumerState<_ThemePill> with SingleTickerProvide
                   height: 32,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    gradient: SweepGradient(colors: [...widget.swatchColors, widget.swatchColors.first]),
+                    gradient: SweepGradient(colors: [
+                      ...widget.swatchColors,
+                      widget.swatchColors.first
+                    ]),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: 0.2),
@@ -646,7 +742,8 @@ class _DarkThemePill extends ConsumerStatefulWidget {
   ConsumerState<_DarkThemePill> createState() => _DarkThemePillState();
 }
 
-class _DarkThemePillState extends ConsumerState<_DarkThemePill> with SingleTickerProviderStateMixin {
+class _DarkThemePillState extends ConsumerState<_DarkThemePill>
+    with SingleTickerProviderStateMixin {
   late AnimationController _sparkleController;
 
   @override
@@ -685,13 +782,16 @@ class _DarkThemePillState extends ConsumerState<_DarkThemePill> with SingleTicke
         ? (isOledActive ? AppThemeMode.oled : AppThemeMode.dark)
         : _lastDarkVariant;
 
-    final fillColor = activeVariant == AppThemeMode.oled ? Colors.black : const Color(0xFF333333);
+    final fillColor = activeVariant == AppThemeMode.oled
+        ? Colors.black
+        : const Color(0xFF333333);
     final textColor = AppColors.darkTextPrimary;
     final swatchColors = activeVariant == AppThemeMode.oled
         ? const [Colors.black, Color(0xFF222222), Colors.black]
         : const [Color(0xFF444444), Color(0xFF222222), Color(0xFF555555)];
 
-    final bgLuminance = (isSelected ? fillColor : theme.colorScheme.surface).computeLuminance();
+    final bgLuminance =
+        (isSelected ? fillColor : theme.colorScheme.surface).computeLuminance();
     final isDarkBg = bgLuminance < 0.4;
 
     final neumorphicShadows = isDarkBg
@@ -720,7 +820,8 @@ class _DarkThemePillState extends ConsumerState<_DarkThemePill> with SingleTicke
             ),
           ];
 
-    final accentColor = activeVariant == AppThemeMode.oled ? Colors.amber : Colors.cyanAccent;
+    final accentColor =
+        activeVariant == AppThemeMode.oled ? Colors.amber : Colors.cyanAccent;
 
     return GestureDetector(
       onTap: () {
@@ -740,10 +841,14 @@ class _DarkThemePillState extends ConsumerState<_DarkThemePill> with SingleTicke
         duration: const Duration(milliseconds: 300),
         height: 46,
         decoration: BoxDecoration(
-          color: isSelected ? fillColor : theme.colorScheme.onSurface.withValues(alpha: 0.05),
+          color: isSelected
+              ? fillColor
+              : theme.colorScheme.onSurface.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(26),
           border: Border.all(
-            color: isSelected ? theme.primaryColor : theme.colorScheme.onSurface.withValues(alpha: 0.1),
+            color: isSelected
+                ? theme.primaryColor
+                : theme.colorScheme.onSurface.withValues(alpha: 0.1),
             width: isSelected ? 2 : 1,
           ),
           boxShadow: neumorphicShadows,
@@ -761,7 +866,9 @@ class _DarkThemePillState extends ConsumerState<_DarkThemePill> with SingleTicke
               child: Align(
                 alignment: Alignment.center,
                 child: Text(
-                  activeVariant == AppThemeMode.oled ? 'OLED\nDark' : 'Dusk\nOLED',
+                  activeVariant == AppThemeMode.oled
+                      ? 'OLED\nDark'
+                      : 'Dusk\nOLED',
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.visible,
@@ -777,7 +884,8 @@ class _DarkThemePillState extends ConsumerState<_DarkThemePill> with SingleTicke
             AnimatedAlign(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeOutCubic,
-              alignment: isSelected ? Alignment.centerRight : Alignment.centerLeft,
+              alignment:
+                  isSelected ? Alignment.centerRight : Alignment.centerLeft,
               child: Padding(
                 padding: const EdgeInsets.all(4.0),
                 child: Container(
@@ -785,7 +893,8 @@ class _DarkThemePillState extends ConsumerState<_DarkThemePill> with SingleTicke
                   height: 32,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    gradient: SweepGradient(colors: [...swatchColors, swatchColors.first]),
+                    gradient: SweepGradient(
+                        colors: [...swatchColors, swatchColors.first]),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: 0.2),
@@ -821,11 +930,11 @@ class _SparkleBurst extends StatelessWidget {
 
   static const _sparkleSpecs = [
     _SparkleSpec(-0.38, -0.50, -0.6, -0.8), // Top-left
-    _SparkleSpec(0.00, -0.50, 0.0, -1.0),  // Top-center
-    _SparkleSpec(0.38, -0.50, 0.6, -0.8),  // Top-right
-    _SparkleSpec(0.38, 0.50, 0.6, 0.8),   // Bottom-right
-    _SparkleSpec(0.00, 0.50, 0.0, 1.0),   // Bottom-center
-    _SparkleSpec(-0.38, 0.50, -0.6, 0.8),  // Bottom-left
+    _SparkleSpec(0.00, -0.50, 0.0, -1.0), // Top-center
+    _SparkleSpec(0.38, -0.50, 0.6, -0.8), // Top-right
+    _SparkleSpec(0.38, 0.50, 0.6, 0.8), // Bottom-right
+    _SparkleSpec(0.00, 0.50, 0.0, 1.0), // Bottom-center
+    _SparkleSpec(-0.38, 0.50, -0.6, 0.8), // Bottom-left
   ];
 
   @override
@@ -850,7 +959,8 @@ class _SparkleBurst extends StatelessWidget {
 
         final fadeProgress = value <= 0.3
             ? 1.0
-            : Curves.easeOut.transform((1.0 - (value - 0.3) / 0.7).clamp(0.0, 1.0));
+            : Curves.easeOut
+                .transform((1.0 - (value - 0.3) / 0.7).clamp(0.0, 1.0));
         final opacity = fadeProgress;
 
         return ExcludeSemantics(
@@ -901,4 +1011,3 @@ class _SparkleSpec {
 
   const _SparkleSpec(this.relX, this.relY, this.dirX, this.dirY);
 }
-

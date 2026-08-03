@@ -30,8 +30,10 @@ class ReadLocationState {
       bookAbbrev: bookAbbrev ?? this.bookAbbrev,
       bookName: bookName ?? this.bookName,
       chapter: chapter ?? this.chapter,
-      requestedVerse: clearVerse ? null : (requestedVerse ?? this.requestedVerse),
-      openCommentary: clearCommentary ? false : (openCommentary ?? this.openCommentary),
+      requestedVerse:
+          clearVerse ? null : (requestedVerse ?? this.requestedVerse),
+      openCommentary:
+          clearCommentary ? false : (openCommentary ?? this.openCommentary),
     );
   }
 }
@@ -41,7 +43,7 @@ class ReadLocationNotifier extends Notifier<ReadLocationState> {
   ReadLocationState build() {
     final prefs = ref.watch(preferencesProvider);
     final lastLoc = prefs.getLastReadLocation();
-    
+
     if (lastLoc != null) {
       return ReadLocationState(
         bookAbbrev: (lastLoc['bookAbbrev'] as String? ?? 'gn').toLowerCase(),
@@ -50,7 +52,7 @@ class ReadLocationNotifier extends Notifier<ReadLocationState> {
         requestedVerse: (lastLoc['verseIndex'] as int? ?? 0) + 1,
       );
     }
-    
+
     return const ReadLocationState();
   }
 
@@ -68,7 +70,8 @@ class ReadLocationNotifier extends Notifier<ReadLocationState> {
       requestedVerse: verse,
       clearVerse: verse == null && (bookAbbrev != null || chapter != null),
       openCommentary: openCommentary,
-      clearCommentary: !openCommentary && (bookAbbrev != null || chapter != null),
+      clearCommentary:
+          !openCommentary && (bookAbbrev != null || chapter != null),
     );
   }
 
@@ -81,4 +84,6 @@ class ReadLocationNotifier extends Notifier<ReadLocationState> {
   }
 }
 
-final readLocationProvider = NotifierProvider<ReadLocationNotifier, ReadLocationState>(ReadLocationNotifier.new);
+final readLocationProvider =
+    NotifierProvider<ReadLocationNotifier, ReadLocationState>(
+        ReadLocationNotifier.new);

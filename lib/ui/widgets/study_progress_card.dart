@@ -20,7 +20,8 @@ class StudyProgressCard extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.dividerTheme.color ?? Colors.grey.shade300),
+        side:
+            BorderSide(color: theme.dividerTheme.color ?? Colors.grey.shade300),
       ),
       margin: EdgeInsets.zero,
       child: Padding(
@@ -44,7 +45,8 @@ class StudyProgressCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(2),
               child: LinearProgressIndicator(
                 value: progress,
-                backgroundColor: theme.dividerTheme.color ?? Colors.grey.shade200,
+                backgroundColor:
+                    theme.dividerTheme.color ?? Colors.grey.shade200,
                 valueColor: AlwaysStoppedAnimation<Color>(theme.primaryColor),
                 minHeight: 4,
               ),

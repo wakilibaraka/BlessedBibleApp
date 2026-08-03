@@ -72,18 +72,19 @@ class _VerseLinkTextState extends State<VerseLinkText> {
       },
     );
   }
-  
+
   void _handleTap(String reference) {
     // Parse the reference string (e.g. "Song of Solomon 2:1-4")
     // This simple parsing assumes VerseLinker output format.
-    final match = RegExp(r'(.+?)\s+(\d+):(\d+)(?:-(\d+))?').firstMatch(reference);
+    final match =
+        RegExp(r'(.+?)\s+(\d+):(\d+)(?:-(\d+))?').firstMatch(reference);
     if (match != null) {
       final bookName = match.group(1)!;
       final chapter = int.parse(match.group(2)!);
       final startVerse = int.parse(match.group(3)!);
       final endVerseStr = match.group(4);
       final endVerse = endVerseStr != null ? int.parse(endVerseStr) : null;
-      
+
       showModalBottomSheet(
         context: context,
         backgroundColor: Colors.transparent,
@@ -92,7 +93,8 @@ class _VerseLinkTextState extends State<VerseLinkText> {
         builder: (context) {
           // Wrap in a constrained box if needed, or let the modal handle max height
           return ConstrainedBox(
-            constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.6),
+            constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.6),
             child: VersePreviewModal(
               reference: reference,
               bookName: bookName,

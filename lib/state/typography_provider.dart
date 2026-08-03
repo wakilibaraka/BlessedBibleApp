@@ -53,7 +53,7 @@ class TypographyNotifier extends Notifier<TypographyState> {
     final family = prefs.getString(_fontFamilyKey);
     final size = prefs.getDouble(_fontSizeKey);
     final height = prefs.getDouble(_lineHeightKey);
-    
+
     // Migrate margin from old String enum representation if it exists
     double? marginPercent;
     if (prefs.containsKey(_marginModeKey)) {
@@ -74,13 +74,18 @@ class TypographyNotifier extends Notifier<TypographyState> {
         marginPercent = marginValue.toDouble();
       }
     }
-    
+
     final alignStr = prefs.getString(_textAlignModeKey);
     final textAlignMode = alignStr != null
-        ? TextAlignMode.values.firstWhere((e) => e.name == alignStr, orElse: () => TextAlignMode.left)
+        ? TextAlignMode.values.firstWhere((e) => e.name == alignStr,
+            orElse: () => TextAlignMode.left)
         : TextAlignMode.left;
 
-    if (family != null || size != null || height != null || marginPercent != null || alignStr != null) {
+    if (family != null ||
+        size != null ||
+        height != null ||
+        marginPercent != null ||
+        alignStr != null) {
       state = state.copyWith(
         fontFamily: family,
         fontSize: size,
@@ -122,4 +127,6 @@ class TypographyNotifier extends Notifier<TypographyState> {
   }
 }
 
-final typographyProvider = NotifierProvider<TypographyNotifier, TypographyState>(TypographyNotifier.new);
+final typographyProvider =
+    NotifierProvider<TypographyNotifier, TypographyState>(
+        TypographyNotifier.new);

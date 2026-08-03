@@ -69,61 +69,61 @@ class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-              // ── Segmented Control Header ──
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: _SegmentTab(
-                        label: 'Highlights',
-                        isSelected: _selectedIndex == 0,
-                        onTap: () => _onTabTapped(0),
-                        theme: theme,
+                // ── Segmented Control Header ──
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: _SegmentTab(
+                          label: 'Highlights',
+                          isSelected: _selectedIndex == 0,
+                          onTap: () => _onTabTapped(0),
+                          theme: theme,
+                        ),
                       ),
-                    ),
-                    Expanded(
-                      child: _SegmentTab(
-                        label: 'Bookmarks',
-                        isSelected: _selectedIndex == 1,
-                        onTap: () => _onTabTapped(1),
-                        theme: theme,
+                      Expanded(
+                        child: _SegmentTab(
+                          label: 'Bookmarks',
+                          isSelected: _selectedIndex == 1,
+                          onTap: () => _onTabTapped(1),
+                          theme: theme,
+                        ),
                       ),
-                    ),
-                    Expanded(
-                      child: _SegmentTab(
-                        label: 'Notes',
-                        isSelected: _selectedIndex == 2,
-                        onTap: () => _onTabTapped(2),
-                        theme: theme,
+                      Expanded(
+                        child: _SegmentTab(
+                          label: 'Notes',
+                          isSelected: _selectedIndex == 2,
+                          onTap: () => _onTabTapped(2),
+                          theme: theme,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              
-              Divider(
-                height: 1,
-                thickness: 1,
-                color: theme.dividerColor.withValues(alpha: 0.1),
-              ),
-              
-              // ── Segment Content ──
-              Expanded(
-                child: PageView(
-                  controller: _pageController,
-                  onPageChanged: (index) {
-                    setState(() => _selectedIndex = index);
-                  },
-                  children: [
-                    _HighlightsSegment(theme: theme),
-                    _BookmarksSegment(theme: theme),
-                    _NotesSegment(theme: theme),
-                  ],
+
+                Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: theme.dividerColor.withValues(alpha: 0.1),
                 ),
-              ),
-            ],
-          ),
+
+                // ── Segment Content ──
+                Expanded(
+                  child: PageView(
+                    controller: _pageController,
+                    onPageChanged: (index) {
+                      setState(() => _selectedIndex = index);
+                    },
+                    children: [
+                      _HighlightsSegment(theme: theme),
+                      _BookmarksSegment(theme: theme),
+                      _NotesSegment(theme: theme),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -155,17 +155,23 @@ class _SegmentTab extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 4),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.goldAccent.withValues(alpha: 0.15) : Colors.transparent,
+          color: isSelected
+              ? AppColors.goldAccent.withValues(alpha: 0.15)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? AppColors.goldAccent.withValues(alpha: 0.5) : Colors.transparent,
+            color: isSelected
+                ? AppColors.goldAccent.withValues(alpha: 0.5)
+                : Colors.transparent,
           ),
         ),
         child: Text(
           label,
           style: theme.textTheme.labelMedium?.copyWith(
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-            color: isSelected ? AppColors.goldAccent : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+            color: isSelected
+                ? AppColors.goldAccent
+                : theme.colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),
       ),
@@ -206,27 +212,37 @@ class _HighlightsSegment extends ConsumerWidget {
           child: groupedHighlights.isEmpty
               ? const SizedBox.shrink()
               : ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   itemCount: highlightPalette.length,
                   itemBuilder: (context, colorIndex) {
                     final refs = groupedHighlights[colorIndex];
-                    if (refs == null || refs.isEmpty) return const SizedBox.shrink();
-                    
+                    if (refs == null || refs.isEmpty)
+                      return const SizedBox.shrink();
+
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 4.0),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 12.0, horizontal: 4.0),
                           child: Row(
                             children: [
                               Container(
-                                width: 12, height: 12,
-                                decoration: BoxDecoration(color: AppColors.getRenderedHighlightColor(highlightPalette[colorIndex], theme.brightness, theme.scaffoldBackgroundColor), shape: BoxShape.circle),
+                                width: 12,
+                                height: 12,
+                                decoration: BoxDecoration(
+                                    color: AppColors.getRenderedHighlightColor(
+                                        highlightPalette[colorIndex],
+                                        theme.brightness,
+                                        theme.scaffoldBackgroundColor),
+                                    shape: BoxShape.circle),
                               ),
                               const SizedBox(width: 10),
                               Text(
                                 'Highlighted',
-                                style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.bold),
+                                style: theme.textTheme.labelMedium
+                                    ?.copyWith(fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),
@@ -234,7 +250,9 @@ class _HighlightsSegment extends ConsumerWidget {
                         ...refs.map((refStr) {
                           final data = _parseVerseRef(refStr, flatChapters);
                           if (data == null) return const SizedBox.shrink();
-                          return _buildRealVerseCard(context, ref, refStr, data, theme, highlightColorIndex: colorIndex);
+                          return _buildRealVerseCard(
+                              context, ref, refStr, data, theme,
+                              highlightColorIndex: colorIndex);
                         }),
                       ],
                     );
@@ -274,13 +292,16 @@ class _BookmarksSegment extends ConsumerWidget {
           child: bookmarks.isEmpty
               ? const SizedBox.shrink()
               : ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   itemCount: bookmarks.length,
                   itemBuilder: (context, index) {
                     final refStr = bookmarks[index];
                     final data = _parseVerseRef(refStr, flatChapters);
                     if (data == null) return const SizedBox.shrink();
-                    return _buildRealVerseCard(context, ref, refStr, data, theme, isBookmarked: true);
+                    return _buildRealVerseCard(
+                        context, ref, refStr, data, theme,
+                        isBookmarked: true);
                   },
                 ),
         ),
@@ -330,11 +351,14 @@ class _NotesSegment extends ConsumerWidget {
                   child: Text(
                     'No notes yet.\nTap + to create one.',
                     textAlign: TextAlign.center,
-                    style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.5)),
                   ),
                 )
               : ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   itemCount: notes.length,
                   itemBuilder: (context, index) {
                     final note = notes[index];
@@ -342,23 +366,29 @@ class _NotesSegment extends ConsumerWidget {
                       padding: const EdgeInsets.only(bottom: 12.0),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.surface.withValues(alpha: 0.5),
+                          color:
+                              theme.colorScheme.surface.withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
+                          border: Border.all(
+                              color: theme.dividerColor.withValues(alpha: 0.1)),
                         ),
                         child: InkWell(
                           borderRadius: BorderRadius.circular(16),
                           onTap: () {
                             if (note.reference != null) {
-                              final data = _parseVerseRef(note.reference!, flatChapters);
+                              final data =
+                                  _parseVerseRef(note.reference!, flatChapters);
                               if (data != null) {
-                                ref.read(readLocationProvider.notifier).updateLocation(
-                                  bookAbbrev: data.bookAbbrev,
-                                  bookName: data.bookName,
-                                  chapter: data.chapter,
-                                  verse: data.verseNum,
-                                );
-                                Navigator.of(context).pop(); // dismiss your space screen
+                                ref
+                                    .read(readLocationProvider.notifier)
+                                    .updateLocation(
+                                      bookAbbrev: data.bookAbbrev,
+                                      bookName: data.bookName,
+                                      chapter: data.chapter,
+                                      verse: data.verseNum,
+                                    );
+                                Navigator.of(context)
+                                    .pop(); // dismiss your space screen
                                 ref.read(navProvider.notifier).setIndex(1);
                               }
                             }
@@ -369,18 +399,23 @@ class _NotesSegment extends ConsumerWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Expanded(
                                       child: Text(
                                         note.title,
-                                        style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                                        style: theme.textTheme.titleSmall
+                                            ?.copyWith(
+                                                fontWeight: FontWeight.bold),
                                       ),
                                     ),
                                     Text(
                                       note.date,
-                                      style: theme.textTheme.bodySmall?.copyWith(
-                                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                                      style:
+                                          theme.textTheme.bodySmall?.copyWith(
+                                        color: theme.colorScheme.onSurface
+                                            .withValues(alpha: 0.5),
                                         fontSize: 10,
                                       ),
                                     ),
@@ -402,7 +437,8 @@ class _NotesSegment extends ConsumerWidget {
                                   maxLines: 3,
                                   overflow: TextOverflow.ellipsis,
                                   style: theme.textTheme.bodySmall?.copyWith(
-                                    color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                                    color: theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.8),
                                     height: 1.4,
                                   ),
                                 ),
@@ -420,12 +456,9 @@ class _NotesSegment extends ConsumerWidget {
   }
 }
 
-
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
-
 
 class _ParsedVerseData {
   final String bookAbbrev;
@@ -446,13 +479,14 @@ class _ParsedVerseData {
 /// Parses a verse reference key in the format produced by generateVerseKey:
 /// "ABBREV_chapter:verse" (e.g. "GN_1:1", "MT_5:3").
 /// Returns null if the key is malformed or the verse cannot be found in flatChapters.
-_ParsedVerseData? _parseVerseRef(String refStr, List<FlatChapter> flatChapters) {
+_ParsedVerseData? _parseVerseRef(
+    String refStr, List<FlatChapter> flatChapters) {
   // Format: "ABBREV_chapter:verse"
   final underscoreIdx = refStr.indexOf('_');
   if (underscoreIdx == -1) return null;
 
   final abbrevUpper = refStr.substring(0, underscoreIdx); // e.g. "GN"
-  final cvStr = refStr.substring(underscoreIdx + 1);       // e.g. "1:1"
+  final cvStr = refStr.substring(underscoreIdx + 1); // e.g. "1:1"
 
   final cvParts = cvStr.split(':');
   if (cvParts.length != 2) return null;
@@ -463,7 +497,9 @@ _ParsedVerseData? _parseVerseRef(String refStr, List<FlatChapter> flatChapters) 
 
   // Match by abbreviation case-insensitively (JSON stores lowercase, key stores uppercase)
   final fcIndex = flatChapters.indexWhere(
-    (c) => c.book.abbreviation.toUpperCase() == abbrevUpper && c.chapter.number == chapter,
+    (c) =>
+        c.book.abbreviation.toUpperCase() == abbrevUpper &&
+        c.chapter.number == chapter,
   );
   if (fcIndex == -1) return null;
 
@@ -480,12 +516,17 @@ _ParsedVerseData? _parseVerseRef(String refStr, List<FlatChapter> flatChapters) 
   );
 }
 
-Widget _buildRealVerseCard(
-    BuildContext context, WidgetRef ref, String refStr, _ParsedVerseData data, ThemeData theme,
+Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
+    _ParsedVerseData data, ThemeData theme,
     {int? highlightColorIndex, bool isBookmarked = false}) {
   final formattedRef = '${data.bookName} ${data.chapter}:${data.verseNum}';
-  final highlightColor = (highlightColorIndex != null && highlightColorIndex >= 0 && highlightColorIndex < highlightPalette.length)
-      ? AppColors.getRenderedHighlightColor(highlightPalette[highlightColorIndex], theme.brightness, theme.scaffoldBackgroundColor)
+  final highlightColor = (highlightColorIndex != null &&
+          highlightColorIndex >= 0 &&
+          highlightColorIndex < highlightPalette.length)
+      ? AppColors.getRenderedHighlightColor(
+          highlightPalette[highlightColorIndex],
+          theme.brightness,
+          theme.scaffoldBackgroundColor)
       : null;
 
   return Padding(
@@ -506,11 +547,11 @@ Widget _buildRealVerseCard(
         borderRadius: BorderRadius.circular(16),
         onTap: () {
           ref.read(readLocationProvider.notifier).updateLocation(
-            bookAbbrev: data.bookAbbrev,
-            bookName: data.bookName,
-            chapter: data.chapter,
-            verse: data.verseNum,
-          );
+                bookAbbrev: data.bookAbbrev,
+                bookName: data.bookName,
+                chapter: data.chapter,
+                verse: data.verseNum,
+              );
           Navigator.of(context).pop(); // dismiss your space screen
           ref.read(navProvider.notifier).setIndex(1);
         },
@@ -531,13 +572,17 @@ Widget _buildRealVerseCard(
                     ),
                   ),
                   if (isBookmarked)
-                    Icon(Icons.bookmark_rounded, size: 16, color: theme.primaryColor.withValues(alpha: 0.7)),
+                    Icon(Icons.bookmark_rounded,
+                        size: 16,
+                        color: theme.primaryColor.withValues(alpha: 0.7)),
                   if (highlightColor != null)
                     Padding(
                       padding: const EdgeInsets.only(left: 6),
                       child: Container(
-                        width: 12, height: 12,
-                        decoration: BoxDecoration(color: highlightColor, shape: BoxShape.circle),
+                        width: 12,
+                        height: 12,
+                        decoration: BoxDecoration(
+                            color: highlightColor, shape: BoxShape.circle),
                       ),
                     ),
                 ],
@@ -559,4 +604,3 @@ Widget _buildRealVerseCard(
     ),
   );
 }
-
