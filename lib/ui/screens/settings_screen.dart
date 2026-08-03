@@ -68,11 +68,14 @@ class SettingsScreen extends ConsumerWidget {
               final sensitivity = ref.watch(readSettingsProvider.select((s) => s.gestureSensitivity));
               return AnimatedSegmentedTile<GestureSensitivity>(
                 title: 'Gesture Sensitivity',
-                subtitle: sensitivity == GestureSensitivity.fluid
-                    ? 'Fluid: Light, flick-responsive gestures across the app.'
-                    : 'Firm: Deliberate gestures, resistant to accidental swipes.',
+                subtitle: sensitivity == GestureSensitivity.instant
+                    ? 'Instant: Snappy, zero-delay switching.'
+                    : (sensitivity == GestureSensitivity.fluid
+                        ? 'Fluid: Light, flick-responsive gestures across the app.'
+                        : 'Firm: Deliberate gestures, resistant to accidental swipes.'),
                 selectedValue: sensitivity,
                 options: const [
+                  MapEntry(GestureSensitivity.instant, 'Instant'),
                   MapEntry(GestureSensitivity.fluid, 'Fluid'),
                   MapEntry(GestureSensitivity.firm, 'Firm'),
                 ],

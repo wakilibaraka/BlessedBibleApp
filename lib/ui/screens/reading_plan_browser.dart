@@ -10,6 +10,7 @@ import 'plan_reader_screen.dart';
 import '../../state/streak_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
+import '../../state/read_settings_provider.dart';
 import 'package:flutter/cupertino.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -580,6 +581,8 @@ class _TodayViewBody extends ConsumerWidget {
     final isScheduled = planState.paceMode == 'scheduled';
 
     final appThemeMode = ref.watch(themeProvider);
+    final readSettings = ref.watch(readSettingsProvider);
+    final double swipeThreshold = readSettings.gestureSensitivity == GestureSensitivity.firm ? 300.0 : 50.0;
 
     Color getThemeBackgroundColor() {
       switch (appThemeMode) {
@@ -698,6 +701,7 @@ class _TodayViewBody extends ConsumerWidget {
               isScheduled: isScheduled,
               gold: gold,
               theme: theme,
+              swipeThreshold: swipeThreshold,
               onDayTap: (dayNum) {
                 HapticFeedback.selectionClick();
                 Navigator.push(context, MaterialPageRoute(builder: (_) => DayView(planId: planState.planId, dayNum: dayNum)));
@@ -1072,6 +1076,7 @@ class _DayViewState extends ConsumerState<DayView> with TickerProviderStateMixin
     );
 
     final appThemeMode = ref.watch(themeProvider);
+    final readSettings = ref.watch(readSettingsProvider);
 
     Color getThemeBackgroundColor() {
       switch (appThemeMode) {
@@ -1113,9 +1118,10 @@ class _DayViewState extends ConsumerState<DayView> with TickerProviderStateMixin
         body: GestureDetector(
           onHorizontalDragEnd: (details) {
             if (details.primaryVelocity == null) return;
-            if (details.primaryVelocity! < -300) {
+            final double swipeThreshold = readSettings.gestureSensitivity == GestureSensitivity.firm ? 300.0 : 50.0;
+            if (details.primaryVelocity! < -swipeThreshold) {
               _nextDay();
-            } else if (details.primaryVelocity! > 300) {
+            } else if (details.primaryVelocity! > swipeThreshold) {
               _prevDay();
             }
           },
@@ -1185,9 +1191,10 @@ class _DayViewState extends ConsumerState<DayView> with TickerProviderStateMixin
       body: GestureDetector(
         onHorizontalDragEnd: (details) {
           if (details.primaryVelocity == null) return;
-          if (details.primaryVelocity! < -300) {
+          final double swipeThreshold = readSettings.gestureSensitivity == GestureSensitivity.firm ? 300.0 : 50.0;
+          if (details.primaryVelocity! < -swipeThreshold) {
             _nextDay();
-          } else if (details.primaryVelocity! > 300) {
+          } else if (details.primaryVelocity! > swipeThreshold) {
             _prevDay();
           }
         },
@@ -1493,6 +1500,7 @@ class _AdaptivePlanCalendar extends StatelessWidget {
   final Color gold;
   final ThemeData theme;
   final void Function(int dayNum) onDayTap;
+  final double swipeThreshold;
 
   const _AdaptivePlanCalendar({
     required this.planState,
@@ -1508,6 +1516,7 @@ class _AdaptivePlanCalendar extends StatelessWidget {
     required this.gold,
     required this.theme,
     required this.onDayTap,
+    required this.swipeThreshold,
   });
 
   @override

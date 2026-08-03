@@ -113,6 +113,9 @@ class LazyPageScrollPhysics extends PageScrollPhysics {
 
   @override
   SpringDescription get spring {
+    if (sensitivity == GestureSensitivity.instant) {
+      return const SpringDescription(mass: 0.1, stiffness: 2000.0, damping: 1.0);
+    }
     if (sensitivity == GestureSensitivity.fluid) {
       return super.spring;
     }

@@ -8,7 +8,7 @@ import '../../state/bible_provider.dart';
 import 'package:flutter/cupertino.dart';
 import '../screens/commentary_hub_screen.dart';
 
-class VerseContextMenuSheet extends ConsumerWidget {
+class VerseContextMenuSheet extends ConsumerStatefulWidget {
   final int verseNumber;
   final String bookName;
   final int chapterNum;
@@ -23,18 +23,36 @@ class VerseContextMenuSheet extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<VerseContextMenuSheet> createState() => _VerseContextMenuSheetState();
+}
+
+class _VerseContextMenuSheetState extends ConsumerState<VerseContextMenuSheet> {
+  bool _preventDrag = true;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(milliseconds: 250), () {
+      if (mounted) {
+        setState(() => _preventDrag = false);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final bookAbbrev = _getBookAbbrev(ref, bookName);
-    final verseKey = generateVerseKey(bookAbbrev, chapterNum, verseNumber);
+    final bookAbbrev = _getBookAbbrev(ref, widget.bookName);
+    final verseKey = generateVerseKey(bookAbbrev, widget.chapterNum, widget.verseNumber);
 
 
     final hasNote = ref.watch(notesProvider).any((n) => n.reference == verseKey);
 
-    final targetVerses = [verseNumber];
+    final targetVerses = [widget.verseNumber];
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
+      onVerticalDragUpdate: _preventDrag ? (_) {} : null,
       child: SafeArea(
         child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
@@ -56,9 +74,9 @@ class VerseContextMenuSheet extends ConsumerWidget {
                             Navigator.of(context).pop();
                             Navigator.of(context).push(CupertinoPageRoute(
                               builder: (_) => CommentaryHubScreen(
-                                book: bookName,
-                                chapter: chapterNum,
-                                verse: verseNumber,
+                                book: widget.bookName,
+                                chapter: widget.chapterNum,
+                                verse: widget.verseNumber,
                               ),
                             ));
                           },
@@ -72,7 +90,7 @@ class VerseContextMenuSheet extends ConsumerWidget {
                           onTap: () {
                             Navigator.of(context).pop();
                             VerseActionLogic.handleNote(
-                              context, ref, theme, bookName, chapterNum, targetVerses,
+                              context, ref, theme, widget.bookName, widget.chapterNum, targetVerses,
                             );
                           },
                         ),
@@ -84,7 +102,7 @@ class VerseContextMenuSheet extends ConsumerWidget {
                           onTap: () {
                             Navigator.of(context).pop();
                             VerseActionLogic.handleShare(
-                              context, ref, bookName, chapterNum, targetVerses,
+                              context, ref, widget.bookName, widget.chapterNum, targetVerses,
                             );
                           },
                         ),
@@ -95,7 +113,7 @@ class VerseContextMenuSheet extends ConsumerWidget {
                           label: 'Select Text',
                           onTap: () {
                             Navigator.of(context).pop();
-                            onCustomSelection();
+                            widget.onCustomSelection();
                           },
                         ),
                       ),

@@ -5,7 +5,7 @@ enum ReadingViewMode { immersive, pinned }
 enum BackgroundGlowStyle { top, full }
 enum VerseActionStyle { classic, detached, horizontal, raindrop }
 enum ReadingLayout { single, interleaved, sideBySide, chips }
-enum GestureSensitivity { fluid, firm }
+enum GestureSensitivity { fluid, firm, instant }
 
 class ReadSettingsState {
   final ReadingViewMode readingViewMode;

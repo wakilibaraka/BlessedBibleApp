@@ -30,6 +30,7 @@ import '../../state/theme_provider.dart';
 import '../widgets/commentary_view.dart';
 import '../../theme/app_colors.dart';
 import 'read_screen.dart' show VerseActionLogic;
+import '../sheets/verse_context_menu_sheet.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Data model for one resolved passage
@@ -342,7 +343,15 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
       }
     }
 
-    return Scaffold(
+    return PopScope(
+      canPop: _selectedVerses.isEmpty,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (_selectedVerses.isNotEmpty) {
+          _clearSelection();
+        }
+      },
+      child: Scaffold(
       backgroundColor: getThemeBackgroundColor(),
       body: Stack(
         children: [
@@ -479,18 +488,29 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
 
                   return GestureDetector(
                     onTap: () => _toggleVerseSelection(verse.number),
+                    onDoubleTap: () {
+                      HapticFeedback.lightImpact();
+                      VerseActionLogic.handleBookmark(
+                        context,
+                        theme,
+                        ref,
+                        passage.book.name,
+                        passage.chapterNum,
+                        [verse.number]
+                      );
+                    },
                     onLongPress: () {
                       HapticFeedback.mediumImpact();
-                      setState(() => _selectedVerses.add(verse.number));
-                      VerseActionLogic.handleHighlightInteraction(
+                      showModalBottomSheet(
                         context: context,
-                        ref: ref,
-                        theme: Theme.of(context),
-                        bookAbbrev: passage.book.abbreviation,
-                        chapterNum: passage.chapterNum,
-                        targetVerses: [verse.number],
-                        isLongPress: true,
-                        onClearSelection: _clearSelection,
+                        backgroundColor: Colors.transparent,
+                        useRootNavigator: true,
+                        builder: (ctx) => VerseContextMenuSheet(
+                          verseNumber: verse.number,
+                          bookName: passage.book.name,
+                          chapterNum: passage.chapterNum,
+                          onCustomSelection: () {},
+                        ),
                       );
                     },
                     child: AnimatedContainer(
@@ -634,7 +654,7 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
           ),
         ],
       ),
-    );
+    ));
   }
 }
 
