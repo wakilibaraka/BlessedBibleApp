@@ -96,16 +96,17 @@ class VotdArchiveScreen extends ConsumerWidget {
                   final date = dates[index];
                   final isToday = index == 0;
 
+                  final pool = ref.watch(votdPoolProvider);
+
                   // Compute VotD for this specific date
-                  final dayIndex = date.difference(epoch).inDays %
-                      HomeNotifier.votdList.length;
+                  final dayIndex = date.difference(epoch).inDays % pool.length;
                   // Handle negative modulo correctly just in case
                   final validDayIndex = dayIndex < 0
-                      ? dayIndex + HomeNotifier.votdList.length
+                      ? dayIndex + pool.length
                       : dayIndex;
-                  final votdEntry = HomeNotifier.votdList[validDayIndex];
-                  final reference = votdEntry[0];
-                  final text = votdEntry[1];
+                  final votdEntry = pool[validDayIndex];
+                  final reference = votdEntry.reference;
+                  final text = votdEntry.text;
 
                   String displayDate;
                   if (index == 0) {

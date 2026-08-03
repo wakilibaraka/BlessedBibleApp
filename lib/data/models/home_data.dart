@@ -20,7 +20,8 @@ class HomeData {
 class VerseOfTheDay {
   final String reference;
   final String text;
-  VerseOfTheDay(this.reference, this.text);
+  final String? commentarySnippet;
+  VerseOfTheDay(this.reference, this.text, {this.commentarySnippet});
 }
 
 class StudyProgress {

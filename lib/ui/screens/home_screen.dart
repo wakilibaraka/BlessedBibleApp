@@ -156,31 +156,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       BuildContext context, HomeData data, AppThemeMode appThemeMode) {
     final theme = Theme.of(context);
 
-    // Get dynamic commentary for VOTD
-    final commentaryState = ref.watch(commentaryProvider);
-    String? excerpt;
-    if (commentaryState.value != null) {
-      final refRegex = RegExp(r'^(.+?)[_\s]+(\d+):(\d+)$');
-      final match = refRegex.firstMatch(data.verseOfTheDay.reference.trim());
-      if (match != null) {
-        final bookName = match.group(1)!.trim();
-        final chapterNum = int.tryParse(match.group(2)!);
-        final verseNum = int.tryParse(match.group(3)!);
-        final entries = commentaryState.value!;
-
-        final matchingEntries = entries
-            .where((e) =>
-                e.scope.type == 'verse' &&
-                e.scope.book?.toLowerCase() == bookName.toLowerCase() &&
-                e.scope.chapter == chapterNum &&
-                e.scope.verse == verseNum)
-            .toList();
-
-        if (matchingEntries.isNotEmpty) {
-          excerpt = matchingEntries.first.text;
-        }
-      }
-    }
+    // Get dynamic commentary snippet for VOTD
+    String? excerpt = data.verseOfTheDay.commentarySnippet;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
