@@ -377,11 +377,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   //   Distance  : 60 logical pixels of overscroll accumulated
   //   Hold time : 700 ms — the drag must be held for at least this long
   //   Max vel   : 250 px/s  — any faster is a flick, not a deliberate drag
-  static const double _kOverscrollDistanceThreshold = 60.0;
-  static const int _kHoldMillis = 700;
-
+  static const double _kOverscrollDistanceThreshold = 100.0;
+  
   double _overscrollAccum = 0.0; // total negative overscroll pixels seen
-  DateTime? _overscrollStart; // when the drag crossed the first threshold
   bool _navTriggeredThisDrag = false;
   bool _hasFiredArmedHaptic = false;
 
@@ -392,7 +390,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
   void _resetOverscrollGate() {
     _overscrollAccum = 0.0;
-    _overscrollStart = null;
     _navTriggeredThisDrag = false;
     _hasFiredArmedHaptic = false;
     if (mounted) setState(() {});
@@ -1240,45 +1237,16 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                   2.5))
                                                           .clamp(0.0, 0.8));
 
-                                                  if (_overscrollAccum == 0.0 &&
-                                                      delta > 4.0) {
-                                                    _overscrollStart =
-                                                        DateTime.now();
-                                                  }
-
-                                                  _overscrollAccum +=
-                                                      delta * resistance;
+                                                  _overscrollAccum += delta * resistance;
 
                                                   if (_overscrollAccum >=
                                                           _kOverscrollDistanceThreshold &&
                                                       !_hasFiredArmedHaptic) {
                                                     _hasFiredArmedHaptic = true;
-                                                    HapticFeedback
-                                                        .mediumImpact();
+                                                    HapticFeedback.mediumImpact();
                                                   }
 
                                                   if (mounted) setState(() {});
-
-                                                  // Check if both thresholds are satisfied
-                                                  if (!_navTriggeredThisDrag &&
-                                                      _overscrollAccum >=
-                                                          _kOverscrollDistanceThreshold &&
-                                                      _overscrollStart !=
-                                                          null &&
-                                                      DateTime.now().difference(
-                                                              _overscrollStart!) >=
-                                                          Duration(
-                                                              milliseconds:
-                                                                  _kHoldMillis) &&
-                                                      ModalRoute.of(context)
-                                                              ?.isCurrent ==
-                                                          true) {
-                                                    _navTriggeredThisDrag =
-                                                        true;
-                                                    _resetOverscrollGate();
-                                                    _showSelectorBottomSheet(
-                                                        allBooks);
-                                                  }
                                                 } else if (notification
                                                     is ScrollEndNotification) {
                                                   // Drag released
