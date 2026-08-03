@@ -613,11 +613,15 @@ class MainNavScreen extends ConsumerWidget {
         break;
       case 1:
         // Read -> Toggle actual visibility
-        final isCurrentlyHidden = ref.read(navHiddenProvider);
-        ref
-            .read(readSettingsProvider.notifier)
-            .setManualNavHidden(!isCurrentlyHidden);
-        ref.read(navHiddenProvider.notifier).set(!isCurrentlyHidden);
+        final isVisuallyHidden = !ref.read(bottomNavVisibilityProvider);
+        if (isVisuallyHidden) {
+          ref.read(readSettingsProvider.notifier).setManualNavHidden(false);
+          ref.read(navHiddenProvider.notifier).set(false);
+          ref.read(chromeHiddenProvider.notifier).set(false);
+        } else {
+          ref.read(readSettingsProvider.notifier).setManualNavHidden(true);
+          ref.read(navHiddenProvider.notifier).set(true);
+        }
         break;
       case 2:
         // Search tab: no FAB action (search bar is in the screen itself)

@@ -268,6 +268,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   Timer? _visitTimer;
   Timer? _scrollEndTimer;
   Timer? _pageDebounceTimer;
+  Timer? _immersiveHideTimer;
 
   final ValueNotifier<bool> _isScrolling = ValueNotifier(false);
   // True while PageView is mid-swipe; used to freeze vertical child list.
@@ -451,6 +452,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     _visitTimer?.cancel();
     _scrollEndTimer?.cancel();
     _pageDebounceTimer?.cancel();
+    _immersiveHideTimer?.cancel();
     _isScrolling.dispose();
     _pageController.dispose();
     WidgetsBinding.instance.removeObserver(this);
@@ -1251,24 +1253,21 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
                                                   if (notification.direction ==
                                                       ScrollDirection.forward) {
-                                                    if (mounted &&
-                                                        isImmersive) {
-                                                      ref
-                                                          .read(
-                                                              chromeHiddenProvider
-                                                                  .notifier)
-                                                          .set(false);
-                                                    }
+                                                    // Do nothing, wait for FAB tap to unhide
                                                   } else if (notification
                                                           .direction ==
                                                       ScrollDirection.reverse) {
                                                     if (mounted &&
                                                         isImmersive) {
-                                                      ref
-                                                          .read(
-                                                              chromeHiddenProvider
-                                                                  .notifier)
-                                                          .set(true);
+                                                      _immersiveHideTimer?.cancel();
+                                                      _immersiveHideTimer = Timer(const Duration(seconds: 3), () {
+                                                        if (mounted) {
+                                                          final stillImmersive = ref.read(readSettingsProvider).readingViewMode == ReadingViewMode.immersive;
+                                                          if (stillImmersive) {
+                                                            ref.read(chromeHiddenProvider.notifier).set(true);
+                                                          }
+                                                        }
+                                                      });
                                                     }
                                                   }
                                                 } else if (notification
@@ -1715,40 +1714,19 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                     left: 0,
                     right: 0,
                     child: Builder(builder: (context) {
-                      final isChromeHidden = ref.watch(chromeHiddenProvider);
-                      final isImmersive =
-                          ref.watch(readSettingsProvider).readingViewMode ==
-                              ReadingViewMode.immersive;
-                      final shouldHideTopChrome = isChromeHidden && isImmersive;
-
-                      return IgnorePointer(
-                        ignoring: shouldHideTopChrome,
-                        child: AnimatedSlide(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeOutCubic,
-                          offset: shouldHideTopChrome
-                              ? const Offset(0, -1)
-                              : Offset.zero,
-                          child: AnimatedOpacity(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeOutCubic,
-                            opacity: shouldHideTopChrome ? 0.0 : 1.0,
-                            child: Padding(
-                              padding: EdgeInsets.only(
-                                top: MediaQuery.of(context).padding.top + 8.0,
-                                left: 24.0,
-                                right: 24.0,
-                              ),
-                              child: _buildTopRow(
-                                context,
-                                ref,
-                                theme,
-                                currentBookName,
-                                currentChapter,
-                                allBooks,
-                              ),
-                            ),
-                          ),
+                      return Padding(
+                        padding: EdgeInsets.only(
+                          top: MediaQuery.of(context).padding.top + 8.0,
+                          left: 24.0,
+                          right: 24.0,
+                        ),
+                        child: _buildTopRow(
+                          context,
+                          ref,
+                          theme,
+                          currentBookName,
+                          currentChapter,
+                          allBooks,
                         ),
                       );
                     }),
