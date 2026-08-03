@@ -10,7 +10,6 @@ import 'plan_reader_screen.dart';
 import '../../state/streak_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
-import '../../state/read_settings_provider.dart';
 import 'package:flutter/cupertino.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -795,7 +794,6 @@ class _TodayViewBody extends ConsumerWidget {
     final isScheduled = planState.paceMode == 'scheduled';
 
     final appThemeMode = ref.watch(themeProvider);
-    final readSettings = ref.watch(readSettingsProvider);
 
     Color getThemeBackgroundColor() {
       switch (appThemeMode) {
@@ -1390,7 +1388,6 @@ class _DayViewState extends ConsumerState<DayView>
     );
 
     final appThemeMode = ref.watch(themeProvider);
-    final readSettings = ref.watch(readSettingsProvider);
 
     Color getThemeBackgroundColor() {
       switch (appThemeMode) {

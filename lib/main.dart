@@ -10,7 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'data/local_storage/preferences_service.dart';
 import 'ui/screens/splash_loading_screen.dart';
 import 'state/bible_provider.dart';
-import 'state/read_settings_provider.dart';
+import 'ui/screens/onboarding_screen.dart';
 
 import 'package:flutter/foundation.dart';
 import 'ui/widgets/app_error_fallback.dart';
@@ -96,7 +96,6 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
   Widget build(BuildContext context) {
     final themeMode = ref.watch(themeProvider);
     final isBibleLoading = ref.watch(bibleProvider.select((s) => s.isLoading));
-    final readSettings = ref.watch(readSettingsProvider);
 
     ThemeData lightBase = themeMode == AppThemeMode.lilies
         ? AppTheme.liliesTheme(14.0)
@@ -123,6 +122,9 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
                 : AppTheme.darkTheme(14.0,
                     isAmoled: themeMode == AppThemeMode.oled);
 
+    final prefsService = ref.watch(preferencesProvider);
+    final hasCompletedOnboarding = prefsService.hasCompletedOnboarding();
+
     return MaterialApp(
       title: 'The Blessed Bible',
       debugShowCheckedModeBanner: false,
@@ -146,8 +148,9 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
       },
       theme: lightBase,
       darkTheme: darkBase,
-      home:
-          isBibleLoading ? const SplashLoadingScreen() : const MainNavScreen(),
+      home: !hasCompletedOnboarding
+          ? const OnboardingScreen()
+          : (isBibleLoading ? const SplashLoadingScreen() : const MainNavScreen()),
     );
   }
 }

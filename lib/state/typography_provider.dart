@@ -11,10 +11,10 @@ class TypographyState {
   final TextAlignMode textAlignMode;
 
   const TypographyState({
-    this.fontFamily = 'Lexend',
+    this.fontFamily = 'Gentium Book Plus',
     this.fontSize = 18.0,
     this.lineHeight = 1.5,
-    this.marginPercent = 8.0,
+    this.marginPercent = 3.0,
     this.textAlignMode = TextAlignMode.left,
   });
 

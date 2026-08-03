@@ -430,6 +430,17 @@ class PreferencesService {
   bool get showReadingTips => prefs.getBool(_showReadingTipsKey) ?? true;
   void setShowReadingTips(bool value) =>
       prefs.setBool(_showReadingTipsKey, value);
+
+  // --- Onboarding ---
+  static const String _onboardingCompleteKey = 'onboarding_complete';
+
+  bool hasCompletedOnboarding() {
+    return prefs.getBool(_onboardingCompleteKey) ?? false;
+  }
+
+  void setOnboardingComplete(bool value) {
+    prefs.setBool(_onboardingCompleteKey, value);
+  }
 }
 
 final preferencesProvider = Provider<PreferencesService>((ref) {

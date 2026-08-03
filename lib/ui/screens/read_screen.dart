@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:ui';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:flutter/physics.dart';
 import '../../theme/app_colors.dart';
 import '../widgets/pinch_to_zoom_font_wrapper.dart';
 import '../widgets/pill_segmented_control.dart';
@@ -2349,7 +2348,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   Widget _buildEndOfChapterBlock(FlatChapter fc, int pageIndex, ThemeData theme,
       bool hasChapterCommentary) {
     final flatChapters = ref.read(flatChaptersProvider);
-    final readSettings = ref.read(readSettingsProvider);
     final hasPrevious = pageIndex > 0;
     final hasNext = pageIndex < flatChapters.length - 1;
     final tokens = theme.extension<ReadingTokens>()!;

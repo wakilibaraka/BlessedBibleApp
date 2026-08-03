@@ -7,7 +7,6 @@ import '../../data/models/home_data.dart';
 import '../../state/home_provider.dart';
 import '../../state/votd_tracker_provider.dart';
 import '../../state/theme_provider.dart';
-import '../../state/commentary_provider.dart';
 import '../../state/nav_provider.dart';
 import '../widgets/shared_top_header.dart';
 import '../widgets/glass_container.dart';
@@ -16,7 +15,6 @@ import 'commentary_hub_screen.dart';
 import 'today_screen.dart';
 import '../../services/share_service.dart';
 import '../sheets/theme_picker_sheet.dart';
-import '../../state/read_settings_provider.dart';
 
 class StrictHorizontalDragGestureRecognizer
     extends HorizontalDragGestureRecognizer {
