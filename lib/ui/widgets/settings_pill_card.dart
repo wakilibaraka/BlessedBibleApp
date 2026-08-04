@@ -16,10 +16,13 @@ class SettingsPillCard extends StatelessWidget {
       child: TexturedGlassContainer(
         borderRadius: BorderRadius.circular(24),
         padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: children,
+        child: Material(
+          color: Colors.transparent,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: children,
+          ),
         ),
       ),
     );

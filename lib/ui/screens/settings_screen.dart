@@ -362,53 +362,61 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
       SettingsPillCard(
         children: [
           Consumer(builder: (context, ref, _) {
-            final brightness = ref.watch(readSettingsProvider.select((s) => s.displayBrightness));
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Brightness', style: TextStyle(fontWeight: FontWeight.w500)),
-                      Text('${(brightness * 100).toInt()}%'),
-                    ],
-                  ),
-                  Slider(
-                    value: brightness,
-                    onChanged: (val) {
-                      ref.read(readSettingsProvider.notifier).setDisplayBrightness(val);
-                    },
-                  ),
-                ],
-              ),
+            final activeTranslationId = ref.watch(activeTranslationProvider);
+            final allTranslations = ref.watch(availableTranslationsProvider);
+            final activeTranslationName = allTranslations.maybeWhen(
+              data: (list) => list
+                  .firstWhere(
+                    (t) => t.translationId == activeTranslationId,
+                    orElse: () => list.first,
+                  )
+                  .translationName,
+              orElse: () => activeTranslationId.toUpperCase(),
+            );
+
+            return ListTile(
+              title: const Text('Bible Translation'),
+              subtitle: Text(activeTranslationName),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (ctx) => const TranslationPickerSheet(),
+                );
+              },
             );
           }),
           const Divider(height: 1, indent: 16),
           Consumer(builder: (context, ref, _) {
-            final warmth = ref.watch(readSettingsProvider.select((s) => s.sepiaWarmth));
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Sepia Warmth', style: TextStyle(fontWeight: FontWeight.w500)),
-                      Text('${(warmth * 100).toInt()}%'),
-                    ],
-                  ),
-                  Slider(
-                    value: warmth,
-                    activeColor: Colors.orange.shade300,
-                    onChanged: (val) {
-                      ref.read(readSettingsProvider.notifier).setSepiaWarmth(val);
-                    },
-                  ),
-                ],
-              ),
+            final readingLayout =
+                ref.watch(readSettingsProvider.select((s) => s.readingLayout));
+            return AnimatedSegmentedTile<ReadingLayout>(
+              title: 'Reading Layout',
+              subtitle: () {
+                switch (readingLayout) {
+                  case ReadingLayout.single:
+                    return 'One translation';
+                  case ReadingLayout.interleaved:
+                    return 'Two translations stacked per verse';
+                  case ReadingLayout.sideBySide:
+                    return 'Two translations in side-by-side columns';
+                  case ReadingLayout.chips:
+                    return 'Tap a verse to switch its translation';
+                }
+              }(),
+              selectedValue: readingLayout,
+              options: const [
+                MapEntry(ReadingLayout.single, 'Single'),
+                MapEntry(ReadingLayout.interleaved, 'Bilingual'),
+                MapEntry(ReadingLayout.sideBySide, 'Parallel'),
+                MapEntry(ReadingLayout.chips, 'Chips'),
+              ],
+              onChanged: (val) {
+                HapticFeedback.selectionClick();
+                ref.read(readSettingsProvider.notifier).setReadingLayout(val);
+              },
             );
           }),
         ],

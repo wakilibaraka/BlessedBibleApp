@@ -504,7 +504,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
           ),
           const SizedBox(height: 16),
           Text(
-            'BACKGROUND GLOW',
+            'FINE-TUNING',
             style: theme.textTheme.labelSmall?.copyWith(
               color: theme.primaryColor,
               fontWeight: FontWeight.bold,
@@ -512,6 +512,50 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
             ),
           ),
           const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Brightness', style: TextStyle(fontWeight: FontWeight.w500)),
+                    Text('${(readSettings.displayBrightness * 100).toInt()}%'),
+                  ],
+                ),
+                Slider(
+                  value: readSettings.displayBrightness,
+                  onChanged: (val) {
+                    ref.read(readSettingsProvider.notifier).setDisplayBrightness(val);
+                  },
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Sepia Warmth', style: TextStyle(fontWeight: FontWeight.w500)),
+                    Text('${(readSettings.sepiaWarmth * 100).toInt()}%'),
+                  ],
+                ),
+                Slider(
+                  value: readSettings.sepiaWarmth,
+                  activeColor: Colors.orange.shade300,
+                  onChanged: (val) {
+                    ref.read(readSettingsProvider.notifier).setSepiaWarmth(val);
+                  },
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 16, indent: 16),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
             title: const Text('Enable Background Glow',
