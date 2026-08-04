@@ -59,6 +59,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   late final Animation<double> _verseFade;
 
   bool _hasFiredArmedHaptic = false;
+  double _overscrollAccum = 0.0;
+  static const double _kOverscrollThreshold = 80.0;
 
   @override
   void initState() {
@@ -120,21 +122,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               },
               child: NotificationListener<ScrollNotification>(
                 onNotification: (notification) {
-                  if (notification is ScrollUpdateNotification) {
-                    if (notification.metrics.pixels < -80 &&
-                        !_hasFiredArmedHaptic &&
-                        notification.dragDetails != null) {
+                  if (notification is OverscrollNotification &&
+                      notification.overscroll < 0) {
+                    if (notification.dragDetails == null) {
+                      _overscrollAccum = 0.0;
+                      if (mounted) setState(() {});
+                      return false;
+                    }
+                    final delta = -notification.overscroll;
+                    final resistance = (1.0 -
+                            (_overscrollAccum / (_kOverscrollThreshold * 2.5))
+                                .clamp(0.0, 0.8));
+                    _overscrollAccum += delta * resistance;
+
+                    if (_overscrollAccum >= _kOverscrollThreshold &&
+                        !_hasFiredArmedHaptic) {
                       _hasFiredArmedHaptic = true;
                       HapticFeedback.mediumImpact();
-                    } else if (notification.metrics.pixels >= -80 &&
-                        _hasFiredArmedHaptic) {
-                      _hasFiredArmedHaptic = false;
                     }
+                    if (mounted) setState(() {});
                   } else if (notification is ScrollEndNotification) {
-                    if (notification.metrics.pixels < -80) {
-                      ref.read(navProvider.notifier).setIndex(4);
+                    if (_overscrollAccum > 0) {
+                      if (_overscrollAccum >= _kOverscrollThreshold) {
+                        ref.read(navProvider.notifier).setIndex(4);
+                      }
+                      _overscrollAccum = 0.0;
+                      _hasFiredArmedHaptic = false;
+                      if (mounted) setState(() {});
                     }
-                    _hasFiredArmedHaptic = false;
                   }
                   return false;
                 },
@@ -149,6 +164,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               ),
             ),
           ),
+          // Pull-to-Settings Indicator
+          if (_overscrollAccum > 0)
+            Positioned(
+              top: MediaQuery.paddingOf(context).top + 16,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Opacity(
+                  opacity: (_overscrollAccum / _kOverscrollThreshold)
+                      .clamp(0.0, 1.0),
+                  child: Transform.scale(
+                    scale: 0.5 +
+                        0.5 *
+                            (_overscrollAccum / _kOverscrollThreshold)
+                                .clamp(0.0, 1.0),
+                    child: Icon(
+                      Icons.settings_rounded,
+                      color: appThemeMode == AppThemeMode.dark
+                          ? Colors.white.withValues(alpha: 0.7)
+                          : Colors.black.withValues(alpha: 0.5),
+                      size: 28,
+                    ),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );

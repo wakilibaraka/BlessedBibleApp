@@ -2657,8 +2657,48 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
               );
             },
           ),
-        ],
-      ),
+            // ── Pull to Search Indicator ──────────────────────────────────
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 100),
+              curve: Curves.easeOut,
+              top: _overscrollAccum > 0
+                  ? MediaQuery.of(context).padding.top +
+                      8.0 +
+                      (_overscrollAccum * 0.4).clamp(0.0, 40.0)
+                  : -100.0,
+              left: 16.0,
+              right: 16.0,
+              child: Opacity(
+                opacity: (_overscrollAccum / _kOverscrollDistanceThreshold)
+                    .clamp(0.0, 1.0),
+                child: TexturedGlassContainer(
+                  borderRadius: BorderRadius.circular(100),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.search_rounded,
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.7),
+                          size: 20),
+                      const SizedBox(width: 12),
+                      Text(
+                        _overscrollAccum >= _kOverscrollDistanceThreshold
+                            ? 'Release to Search'
+                            : 'Pull to Search',
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.85),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
     );
   }
 }

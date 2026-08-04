@@ -570,7 +570,7 @@ class MainNavScreen extends ConsumerWidget {
         key: ValueKey('settings_entry'),
       );
     } else if (currentIndex == 4) {
-      return const Icon(Icons.close_rounded,
+      return const Icon(Icons.arrow_back_ios_new_rounded,
           size: 28, key: ValueKey('settings_close'));
     }
 
