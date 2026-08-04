@@ -49,9 +49,18 @@ class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
     final theme = Theme.of(context);
     final appThemeMode = ref.watch(themeProvider);
 
-    return Scaffold(
-      extendBody: true,
-      extendBodyBehindAppBar: true,
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onHorizontalDragEnd: (details) {
+        if (details.primaryVelocity != null && details.primaryVelocity! > 300) {
+          if (_selectedIndex == 0) {
+            Navigator.pop(context);
+          }
+        }
+      },
+      child: Scaffold(
+        extendBody: true,
+        extendBodyBehindAppBar: true,
       appBar: SharedAppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -126,6 +135,7 @@ class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
             ),
           ),
         ],
+      ),
       ),
     );
   }

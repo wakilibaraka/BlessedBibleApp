@@ -59,9 +59,16 @@ class _TranslationPickerSheetState
 
     final availableTranslations = ref.watch(availableTranslationsProvider);
 
-    return FractionallySizedBox(
-        heightFactor: 0.75,
-        child: TexturedGlassContainer(
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onVerticalDragEnd: (details) {
+        if (details.primaryVelocity != null && details.primaryVelocity! > 300) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: FractionallySizedBox(
+          heightFactor: 0.75,
+          child: TexturedGlassContainer(
           borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
           padding: EdgeInsets.only(
             top: 24,
@@ -152,23 +159,34 @@ class _TranslationPickerSheetState
                 const SizedBox(height: 16),
               ],
               Expanded(
-                child: SingleChildScrollView(
-                  physics: const ClampingScrollPhysics(),
-                  child: availableTranslations.when(
-                    data: (installed) => _buildTranslationList(
-                        context, ref, theme, activeTranslationId, installed),
-                    loading: () => const Center(
-                        child: Padding(
-                            padding: EdgeInsets.all(32),
-                            child: CircularProgressIndicator())),
-                    error: (e, st) =>
-                        Center(child: Text('Error loading translations: $e')),
+                child: NotificationListener<ScrollUpdateNotification>(
+                  onNotification: (notification) {
+                    if (notification.metrics.pixels < -60) {
+                      Navigator.of(context).pop();
+                      return true;
+                    }
+                    return false;
+                  },
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: availableTranslations.when(
+                      data: (installed) => _buildTranslationList(
+                          context, ref, theme, activeTranslationId, installed),
+                      loading: () => const Center(
+                          child: Padding(
+                              padding: EdgeInsets.all(32),
+                              child: CircularProgressIndicator())),
+                      error: (e, st) =>
+                          Center(child: Text('Error loading translations: $e')),
+                    ),
                   ),
                 ),
               ),
             ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   Widget _buildTabButton(

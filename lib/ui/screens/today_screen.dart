@@ -69,9 +69,16 @@ class TodayScreen extends ConsumerWidget {
             ? greetings[1]
             : greetings[2];
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Stack(
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onHorizontalDragEnd: (details) {
+        if (details.primaryVelocity != null && details.primaryVelocity! > 300) {
+          Navigator.pop(context);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Stack(
         children: [
           Positioned.fill(
             child: AnimatedBackground(
@@ -188,6 +195,7 @@ class TodayScreen extends ConsumerWidget {
             ),
           ),
         ],
+      ),
       ),
     );
   }
