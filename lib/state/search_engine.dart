@@ -84,15 +84,27 @@ class IndexBuildArgs {
 class SearchQueryArgs {
   final String query;
   final IndexData indexData;
+  final List<BibleBook>? bibleBooks;
+  final List<CommentaryEntry>? commentaryData;
+  final List<PersonalNote> notes;
   final bool includeOt;
   final bool includeNt;
   final bool includeCommentary;
   final bool includeNotes;
-  final List<BibleBook>? bibleBooks; // Needed for reference matching
-  final List<PersonalNote> notes;
+  final bool exactMatch;
 
-  SearchQueryArgs(this.query, this.indexData, this.includeOt, this.includeNt,
-      this.includeCommentary, this.includeNotes, this.bibleBooks, this.notes);
+  SearchQueryArgs(
+    this.query,
+    this.indexData,
+    this.bibleBooks,
+    this.commentaryData,
+    this.notes,
+    this.includeOt,
+    this.includeNt,
+    this.includeCommentary,
+    this.includeNotes,
+    this.exactMatch,
+  );
 }
 
 List<String> _tokenize(String text) {
@@ -404,11 +416,14 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
       matchedItems.add(item);
     }
 
-    // Add Exact Phrase boosting
-    for (final item in matchedItems) {
-      if (item.text.toLowerCase().contains(queryLower)) {
-        matchQuality[item.id] =
-            (matchQuality[item.id] ?? 0) + 50; // Exact phrase = 50 pts
+    // Add Exact Phrase boosting and enforce exact match if requested
+    for (int i = matchedItems.length - 1; i >= 0; i--) {
+      final item = matchedItems[i];
+      final isExact = item.text.toLowerCase().contains(queryLower);
+      if (args.exactMatch && !isExact) {
+        matchedItems.removeAt(i);
+      } else if (isExact) {
+        matchQuality[item.id] = (matchQuality[item.id] ?? 0) + 50; // Exact phrase = 50 pts
       }
     }
 
@@ -449,11 +464,25 @@ class SearchEngine {
     bool includeNt = true,
     bool includeCommentary = true,
     bool includeNotes = true,
+    bool exactMatch = false,
   }) async {
     final indexData = await baseIndexFuture;
-    final args = SearchQueryArgs(query, indexData, includeOt, includeNt,
-        includeCommentary, includeNotes, bibleBooks, notes);
-    return await compute(_searchIsolate, args);
+
+    return compute(
+      _searchIsolate,
+      SearchQueryArgs(
+        query,
+        indexData,
+        bibleBooks,
+        null, // Don't pass commentary data directly if we can avoid it due to size, but we do need it if we didn't index it. Wait, the base index handles this.
+        notes,
+        includeOt,
+        includeNt,
+        includeCommentary,
+        includeNotes,
+        exactMatch,
+      ),
+    );
   }
 }
 

@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../state/study_provider.dart';
+import '../../state/nav_provider.dart';
 import '../../state/commentary_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../theme/app_colors.dart';
@@ -51,6 +53,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
   final List<String> _commentaryAuthors = ['Uriah Smith'];
   Timer? _timer;
   bool _isEditing = false;
+  bool _hasFiredArmedHaptic = false;
 
   @override
   void initState() {
@@ -113,9 +116,31 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 800),
-              child: ReorderableListView.builder(
-                padding: const EdgeInsets.only(
-                    left: 20.0, right: 20.0, top: 16.0, bottom: 180.0),
+              child: NotificationListener<ScrollNotification>(
+                onNotification: (notification) {
+                  if (notification is ScrollUpdateNotification) {
+                    if (notification.metrics.pixels < -80 &&
+                        !_hasFiredArmedHaptic &&
+                        notification.dragDetails != null) {
+                      _hasFiredArmedHaptic = true;
+                      HapticFeedback.mediumImpact();
+                    } else if (notification.metrics.pixels >= -80 &&
+                        _hasFiredArmedHaptic) {
+                      _hasFiredArmedHaptic = false;
+                    }
+                  } else if (notification is ScrollEndNotification) {
+                    if (notification.metrics.pixels < -80) {
+                      ref.read(navProvider.notifier).setIndex(4);
+                    }
+                    _hasFiredArmedHaptic = false;
+                  }
+                  return false;
+                },
+                child: ReorderableListView.builder(
+                  physics: const BouncingScrollPhysics(
+                      parent: AlwaysScrollableScrollPhysics()),
+                  padding: const EdgeInsets.only(
+                      left: 20.0, right: 20.0, top: 16.0, bottom: 180.0),
                 buildDefaultDragHandles: false,
                 proxyDecorator: (child, index, animation) {
                   return AnimatedBuilder(
@@ -460,6 +485,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                   }
                   return card;
                 },
+              ),
               ),
             ),
           ),

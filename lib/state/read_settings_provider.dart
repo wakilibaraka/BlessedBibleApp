@@ -24,6 +24,8 @@ class ReadSettingsState {
   final bool keepScreenAwake;
   final int defaultStartTab; // 0=Home, 1=Read, 2=Search, 3=Study
   final ReadingLayout readingLayout;
+  final double displayBrightness;
+  final double sepiaWarmth;
 
   const ReadSettingsState({
     this.readingViewMode = ReadingViewMode.pinned,
@@ -40,6 +42,8 @@ class ReadSettingsState {
     this.keepScreenAwake = false,
     this.defaultStartTab = 0,
     this.readingLayout = ReadingLayout.single,
+    this.displayBrightness = 1.0,
+    this.sepiaWarmth = 0.0,
   });
 
   ReadSettingsState copyWith({
@@ -57,6 +61,8 @@ class ReadSettingsState {
     bool? keepScreenAwake,
     int? defaultStartTab,
     ReadingLayout? readingLayout,
+    double? displayBrightness,
+    double? sepiaWarmth,
   }) {
     return ReadSettingsState(
       readingViewMode: readingViewMode ?? this.readingViewMode,
@@ -76,6 +82,8 @@ class ReadSettingsState {
       keepScreenAwake: keepScreenAwake ?? this.keepScreenAwake,
       defaultStartTab: defaultStartTab ?? this.defaultStartTab,
       readingLayout: readingLayout ?? this.readingLayout,
+      displayBrightness: displayBrightness ?? this.displayBrightness,
+      sepiaWarmth: sepiaWarmth ?? this.sepiaWarmth,
     );
   }
 }
@@ -94,6 +102,8 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
       'read_settings_secondary_highlight_color';
   static const _isManualNavHiddenKey = 'read_settings_is_manual_nav_hidden';
   static const _readingLayoutKey = 'read_settings_reading_layout';
+  static const _displayBrightnessKey = 'read_settings_display_brightness';
+  static const _sepiaWarmthKey = 'read_settings_sepia_warmth';
 
   @override
   ReadSettingsState build() {
@@ -118,6 +128,8 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     final keepScreenAwake = prefs.getBool('keep_screen_awake') ?? false;
     final defaultStartTab = prefs.getInt('default_start_tab') ?? 0;
     final layoutString = prefs.getString(_readingLayoutKey);
+    final brightness = prefs.getDouble(_displayBrightnessKey) ?? 1.0;
+    final warmth = prefs.getDouble(_sepiaWarmthKey) ?? 0.0;
 
     ReadingViewMode mode = ReadingViewMode.pinned;
     if (modeString != null) {
@@ -166,7 +178,21 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
       keepScreenAwake: keepScreenAwake,
       defaultStartTab: defaultStartTab,
       readingLayout: layout,
+      displayBrightness: brightness,
+      sepiaWarmth: warmth,
     );
+  }
+
+  Future<void> setDisplayBrightness(double val) async {
+    state = state.copyWith(displayBrightness: val);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble(_displayBrightnessKey, val);
+  }
+
+  Future<void> setSepiaWarmth(double val) async {
+    state = state.copyWith(sepiaWarmth: val);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble(_sepiaWarmthKey, val);
   }
 
   Future<void> setReadingLayout(ReadingLayout layout) async {

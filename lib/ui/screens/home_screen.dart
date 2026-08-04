@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/home_data.dart';
@@ -57,6 +58,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   late final AnimationController _verseController;
   late final Animation<double> _verseFade;
 
+  bool _hasFiredArmedHaptic = false;
+
   @override
   void initState() {
     super.initState();
@@ -83,19 +86,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     super.dispose();
   }
 
-  Future<void> _onRefresh() async {
-    // Re-evaluate Home content and streak tracker.
-    // Structured as an async method for future drop-in cloud fetches.
-    ref.invalidate(homeProvider);
-    ref.invalidate(votdTrackerProvider);
-  }
-
   @override
   Widget build(BuildContext context) {
     final homeState = ref.watch(homeProvider);
     final appThemeMode = ref.watch(themeProvider);
-    final isDark = (appThemeMode == AppThemeMode.dark ||
-        appThemeMode == AppThemeMode.oled);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -113,27 +107,37 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   () => StrictHorizontalDragGestureRecognizer(),
                   (StrictHorizontalDragGestureRecognizer instance) {
                     instance
-                      ..onUpdate = (details) {
-                        // Empty callback ensures this recognizer actively competes in the arena.
-                      }
+                      ..onUpdate = (details) {}
                       ..onEnd = (details) {
                         if (details.primaryVelocity == null) return;
-                        if (details.primaryVelocity! > 300) {
-                          // Swipe Right -> Appearance Sheet
+                        if (details.primaryVelocity!.abs() > 300) {
+                          // Swipe Left/Right -> Appearance Sheet
                           ThemePickerSheet.show(context);
-                        } else if (details.primaryVelocity! < -300) {
-                          // Swipe Left -> Settings
-                          ref.read(navProvider.notifier).setIndex(4);
                         }
                       };
                   },
                 ),
               },
-              child: RefreshIndicator(
-                onRefresh: _onRefresh,
-                color: const Color(0xFFC9A227),
-                backgroundColor:
-                    isDark ? const Color(0xFF2C2A28) : Colors.white,
+              child: NotificationListener<ScrollNotification>(
+                onNotification: (notification) {
+                  if (notification is ScrollUpdateNotification) {
+                    if (notification.metrics.pixels < -80 &&
+                        !_hasFiredArmedHaptic &&
+                        notification.dragDetails != null) {
+                      _hasFiredArmedHaptic = true;
+                      HapticFeedback.mediumImpact();
+                    } else if (notification.metrics.pixels >= -80 &&
+                        _hasFiredArmedHaptic) {
+                      _hasFiredArmedHaptic = false;
+                    }
+                  } else if (notification is ScrollEndNotification) {
+                    if (notification.metrics.pixels < -80) {
+                      ref.read(navProvider.notifier).setIndex(4);
+                    }
+                    _hasFiredArmedHaptic = false;
+                  }
+                  return false;
+                },
                 child: SingleChildScrollView(
                   physics: const BouncingScrollPhysics(
                       parent: AlwaysScrollableScrollPhysics()),

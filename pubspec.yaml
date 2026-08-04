@@ -108,3 +108,8 @@ flutter:
           weight: 700
         - asset: assets/fonts/EBGaramond-Italic.ttf
           style: italic
+    - family: OpenDyslexic
+      fonts:
+        - asset: assets/fonts/OpenDyslexic-Regular.otf
+        - asset: assets/fonts/OpenDyslexic-Bold.otf
+          weight: 700

@@ -10,6 +10,7 @@ class SearchState {
   final bool filterNt;
   final bool filterCommentary;
   final bool filterNotes;
+  final bool exactMatch;
   final List<SearchResult> results;
   final bool isSearching;
   final List<SearchResult> recentPlaces;
@@ -21,6 +22,7 @@ class SearchState {
     this.filterNt = true,
     this.filterCommentary = true,
     this.filterNotes = true,
+    this.exactMatch = false,
     this.results = const [],
     this.isSearching = false,
     this.recentPlaces = const [],
@@ -33,6 +35,7 @@ class SearchState {
     bool? filterNt,
     bool? filterCommentary,
     bool? filterNotes,
+    bool? exactMatch,
     List<SearchResult>? results,
     bool? isSearching,
     List<SearchResult>? recentPlaces,
@@ -44,6 +47,7 @@ class SearchState {
       filterNt: filterNt ?? this.filterNt,
       filterCommentary: filterCommentary ?? this.filterCommentary,
       filterNotes: filterNotes ?? this.filterNotes,
+      exactMatch: exactMatch ?? this.exactMatch,
       results: results ?? this.results,
       isSearching: isSearching ?? this.isSearching,
       recentPlaces: recentPlaces ?? this.recentPlaces,
@@ -73,6 +77,7 @@ class SearchNotifier extends Notifier<SearchState> {
       filterNt: prefs.prefs.getBool('search_filter_nt') ?? true,
       filterCommentary: prefs.prefs.getBool('search_filter_comm') ?? true,
       filterNotes: prefs.prefs.getBool('search_filter_notes') ?? true,
+      exactMatch: prefs.prefs.getBool('search_exact_match') ?? false,
     );
   }
 
@@ -82,6 +87,7 @@ class SearchNotifier extends Notifier<SearchState> {
     prefs.setBool('search_filter_nt', state.filterNt);
     prefs.setBool('search_filter_comm', state.filterCommentary);
     prefs.setBool('search_filter_notes', state.filterNotes);
+    prefs.setBool('search_exact_match', state.exactMatch);
   }
 
   void setQuery(String query) {
@@ -121,6 +127,12 @@ class SearchNotifier extends Notifier<SearchState> {
     _saveFilters();
   }
 
+  void toggleExactMatch() {
+    state = state.copyWith(exactMatch: !state.exactMatch);
+    _performSearch();
+    _saveFilters();
+  }
+
   void addRecentPlace(SearchResult result) {
     final updatedList = [
       result,
@@ -148,6 +160,7 @@ class SearchNotifier extends Notifier<SearchState> {
       includeNt: state.filterNt,
       includeCommentary: state.filterCommentary,
       includeNotes: state.filterNotes,
+      exactMatch: state.exactMatch,
     );
 
     // If query changed while searching, don't update results

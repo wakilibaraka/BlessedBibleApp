@@ -49,12 +49,24 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
           });
         }
       },
-      child: Container(
-        constraints: BoxConstraints(
-          maxHeight:
-              MediaQuery.of(context).size.height * kAppearanceSheetHeightFactor,
-        ),
-        child: TexturedGlassContainer(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onHorizontalDragEnd: (details) {
+          if (details.primaryVelocity == null) return;
+          if (details.primaryVelocity! < -300 && !_showAdvanced) {
+            HapticFeedback.selectionClick();
+            setState(() => _showAdvanced = true);
+          } else if (details.primaryVelocity! > 300 && _showAdvanced) {
+            HapticFeedback.selectionClick();
+            setState(() => _showAdvanced = false);
+          }
+        },
+        child: Container(
+          constraints: BoxConstraints(
+            maxHeight:
+                MediaQuery.of(context).size.height * kAppearanceSheetHeightFactor,
+          ),
+          child: TexturedGlassContainer(
           sigmaX: 45.0,
           sigmaY: 45.0,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
@@ -417,6 +429,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
             ),
           ),
         ),
+      ),
       ),
     );
   }
