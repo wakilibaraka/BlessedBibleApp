@@ -323,6 +323,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   bool _navTriggeredThisDrag = false;
   bool _hasFiredArmedHaptic = false;
 
+  double _dragStartY = 0.0;
+  bool _isDragging = false;
+
   /// Called from the indicator widget to provide the current pull fraction
   /// (0.0 → 1.0, capped) so a subtle indicator can be drawn.
   double get _overscrollFraction =>
@@ -1150,8 +1153,59 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                   },
                                             behavior:
                                                 HitTestBehavior.translucent,
-                                            child: NotificationListener<
-                                                ScrollNotification>(
+                                            child: Listener(
+                                              onPointerDown: (e) {
+                                                if (!_isPageSelectionMode && bibleNavSettings.swipeDownToNav) {
+                                                  _dragStartY = e.position.dy;
+                                                  _isDragging = true;
+                                                }
+                                              },
+                                              onPointerMove: (e) {
+                                                if (!_isDragging) return;
+                                                
+                                                bool isAtTop = true;
+                                                final positions = _itemPositionsListeners[_currentPageIndex]?.itemPositions.value;
+                                                if (positions != null && positions.isNotEmpty) {
+                                                  final visible = positions.where((p) => p.itemTrailingEdge > 0).toList();
+                                                  if (visible.isNotEmpty) {
+                                                    visible.sort((a, b) => a.itemLeadingEdge.compareTo(b.itemLeadingEdge));
+                                                    if (visible.first.index > 0 || visible.first.itemLeadingEdge < 0) {
+                                                      isAtTop = false;
+                                                    }
+                                                  }
+                                                }
+                                                if (!isAtTop) return;
+                                                
+                                                final dy = e.position.dy - _dragStartY;
+                                                if (dy < -10) {
+                                                  _isDragging = false;
+                                                  _resetOverscrollGate();
+                                                  return;
+                                                }
+                                                
+                                                if (dy > 0) {
+                                                  _overscrollAccum = dy;
+                                                  if (_overscrollAccum >= _kOverscrollDistanceThreshold && !_hasFiredArmedHaptic) {
+                                                    _hasFiredArmedHaptic = true;
+                                                    HapticFeedback.mediumImpact();
+                                                  }
+                                                  if (mounted) setState(() {});
+                                                }
+                                              },
+                                              onPointerUp: (e) {
+                                                _isDragging = false;
+                                                if (_overscrollAccum >= _kOverscrollDistanceThreshold && !_navTriggeredThisDrag && ModalRoute.of(context)?.isCurrent == true) {
+                                                  _navTriggeredThisDrag = true;
+                                                  _showSelectorBottomSheet(allBooks);
+                                                }
+                                                _resetOverscrollGate();
+                                              },
+                                              onPointerCancel: (e) {
+                                                _isDragging = false;
+                                                _resetOverscrollGate();
+                                              },
+                                              child: NotificationListener<
+                                                  ScrollNotification>(
                                               onNotification: (notification) {
                                                 if (notification
                                                         is ScrollStartNotification ||
@@ -1175,74 +1229,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                   });
                                                 }
 
-                                                // ── Deliberate-drag gate for navigation ──
-                                                if (_isPageSelectionMode) {
-                                                  return false;
-                                                }
-
-                                                if (bibleNavSettings
-                                                    .swipeDownToNav) {
-                                                  if (notification
-                                                          is OverscrollNotification &&
-                                                      notification.overscroll <
-                                                          0) {
-                                                    // Reject inertial overscrolls (flicks) — dragDetails is null
-                                                    // when the user's finger is no longer on the screen.
-                                                    if (notification
-                                                            .dragDetails ==
-                                                        null) {
-                                                      _resetOverscrollGate();
-                                                      return false;
-                                                    }
-
-                                                    // Elastic resistance (rubber-banding)
-                                                    final delta = -notification
-                                                        .overscroll;
-                                                    final resistance = (1.0 -
-                                                        (_overscrollAccum /
-                                                                (_kOverscrollDistanceThreshold *
-                                                                    2.5))
-                                                            .clamp(0.0, 0.8));
-
-                                                    _overscrollAccum +=
-                                                        delta * resistance;
-
-                                                    if (_overscrollAccum >=
-                                                            _kOverscrollDistanceThreshold &&
-                                                        !_hasFiredArmedHaptic) {
-                                                      _hasFiredArmedHaptic =
-                                                          true;
-                                                      HapticFeedback
-                                                          .mediumImpact();
-                                                    }
-
-                                                    if (mounted) {
-                                                      setState(() {});
-                                                    }
-                                                  } else if (notification
-                                                      is ScrollEndNotification) {
-                                                    // Drag released
-                                                    if (_overscrollAccum > 0) {
-                                                      if (_overscrollAccum >=
-                                                              _kOverscrollDistanceThreshold &&
-                                                          !_navTriggeredThisDrag &&
-                                                          ModalRoute.of(context)
-                                                                  ?.isCurrent ==
-                                                              true) {
-                                                        _navTriggeredThisDrag =
-                                                            true;
-                                                        _showSelectorBottomSheet(
-                                                            allBooks);
-                                                      }
-                                                      _resetOverscrollGate();
-                                                    }
-                                                  } else if (notification
-                                                          is ScrollUpdateNotification &&
-                                                      _overscrollAccum > 0) {
-                                                    // Scroll changed direction
-                                                    _resetOverscrollGate();
-                                                  }
-                                                }
+                                                // (Swipe down gesture is now handled by Listener above)
                                                 if (notification is UserScrollNotification) {
                                                   if (notification.metrics.axis != Axis.vertical) {
                                                     return false;
@@ -1687,6 +1674,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                 ), // end Center
                                               ), // end Directionality
                                             ), // end NotificationListener
+                                            ), // end Listener
                                           ), // end GestureDetector
                                         ); // end RepaintBoundary
                                       }, // end Consumer's builder

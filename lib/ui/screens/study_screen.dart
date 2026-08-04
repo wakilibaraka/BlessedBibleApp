@@ -54,6 +54,12 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
   Timer? _timer;
   bool _isEditing = false;
   bool _hasFiredArmedHaptic = false;
+  double _overscrollAccum = 0.0;
+  static const double _kOverscrollThreshold = 80.0;
+
+  double _dragStartY = 0.0;
+  bool _isDragging = false;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -71,6 +77,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
   @override
   void dispose() {
     _timer?.cancel();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -116,27 +123,54 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 800),
-              child: NotificationListener<ScrollNotification>(
-                onNotification: (notification) {
-                  if (notification is ScrollUpdateNotification) {
-                    if (notification.metrics.pixels < -80 &&
-                        !_hasFiredArmedHaptic &&
-                        notification.dragDetails != null) {
+              child: Listener(
+                onPointerDown: (e) {
+                  _dragStartY = e.position.dy;
+                  _isDragging = true;
+                },
+                onPointerMove: (e) {
+                  if (!_isDragging) return;
+
+                  bool isAtTop = true;
+                  if (_scrollController.hasClients) {
+                    isAtTop = _scrollController.offset <= 16.0;
+                  }
+                  if (!isAtTop) return;
+
+                  final dy = e.position.dy - _dragStartY;
+                  if (dy < -10) {
+                    _isDragging = false;
+                    _overscrollAccum = 0.0;
+                    if (mounted) setState(() {});
+                    return;
+                  }
+                  
+                  if (dy > 0) {
+                    _overscrollAccum = dy;
+                    if (_overscrollAccum >= _kOverscrollThreshold && !_hasFiredArmedHaptic) {
                       _hasFiredArmedHaptic = true;
                       HapticFeedback.mediumImpact();
-                    } else if (notification.metrics.pixels >= -80 &&
-                        _hasFiredArmedHaptic) {
-                      _hasFiredArmedHaptic = false;
                     }
-                  } else if (notification is ScrollEndNotification) {
-                    if (notification.metrics.pixels < -80) {
-                      ref.read(navProvider.notifier).setIndex(4);
-                    }
-                    _hasFiredArmedHaptic = false;
+                    if (mounted) setState(() {});
                   }
-                  return false;
+                },
+                onPointerUp: (e) {
+                  _isDragging = false;
+                  if (_overscrollAccum >= _kOverscrollThreshold) {
+                    ref.read(navProvider.notifier).setIndex(4); // 4 = Settings
+                  }
+                  _overscrollAccum = 0.0;
+                  _hasFiredArmedHaptic = false;
+                  if (mounted) setState(() {});
+                },
+                onPointerCancel: (e) {
+                  _isDragging = false;
+                  _overscrollAccum = 0.0;
+                  _hasFiredArmedHaptic = false;
+                  if (mounted) setState(() {});
                 },
                 child: ReorderableListView.builder(
+                  scrollController: _scrollController,
                   physics: const BouncingScrollPhysics(
                       parent: AlwaysScrollableScrollPhysics()),
                   padding: const EdgeInsets.only(

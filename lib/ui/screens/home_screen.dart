@@ -61,6 +61,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   bool _hasFiredArmedHaptic = false;
   double _overscrollAccum = 0.0;
   static const double _kOverscrollThreshold = 80.0;
+  
+  double _dragStartY = 0.0;
+  bool _isDragging = false;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -85,6 +89,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   @override
   void dispose() {
     _verseController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -120,40 +125,55 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   },
                 ),
               },
-              child: NotificationListener<ScrollNotification>(
-                onNotification: (notification) {
-                  if (notification is OverscrollNotification &&
-                      notification.overscroll < 0) {
-                    if (notification.dragDetails == null) {
-                      _overscrollAccum = 0.0;
-                      if (mounted) setState(() {});
-                      return false;
-                    }
-                    final delta = -notification.overscroll;
-                    final resistance = (1.0 -
-                            (_overscrollAccum / (_kOverscrollThreshold * 2.5))
-                                .clamp(0.0, 0.8));
-                    _overscrollAccum += delta * resistance;
+              child: Listener(
+                onPointerDown: (e) {
+                  _dragStartY = e.position.dy;
+                  _isDragging = true;
+                },
+                onPointerMove: (e) {
+                  if (!_isDragging) return;
 
-                    if (_overscrollAccum >= _kOverscrollThreshold &&
-                        !_hasFiredArmedHaptic) {
+                  bool isAtTop = true;
+                  if (_scrollController.hasClients) {
+                    isAtTop = _scrollController.offset <= 16.0;
+                  }
+                  if (!isAtTop) return;
+
+                  final dy = e.position.dy - _dragStartY;
+                  if (dy < -10) {
+                    _isDragging = false;
+                    _overscrollAccum = 0.0;
+                    if (mounted) setState(() {});
+                    return;
+                  }
+                  
+                  // Map drag delta to overscroll accumulator for the indicator
+                  if (dy > 0) {
+                    _overscrollAccum = dy;
+                    if (_overscrollAccum >= _kOverscrollThreshold && !_hasFiredArmedHaptic) {
                       _hasFiredArmedHaptic = true;
                       HapticFeedback.mediumImpact();
                     }
                     if (mounted) setState(() {});
-                  } else if (notification is ScrollEndNotification) {
-                    if (_overscrollAccum > 0) {
-                      if (_overscrollAccum >= _kOverscrollThreshold) {
-                        ref.read(navProvider.notifier).setIndex(4);
-                      }
-                      _overscrollAccum = 0.0;
-                      _hasFiredArmedHaptic = false;
-                      if (mounted) setState(() {});
-                    }
                   }
-                  return false;
+                },
+                onPointerUp: (e) {
+                  _isDragging = false;
+                  if (_overscrollAccum >= _kOverscrollThreshold) {
+                    ref.read(navProvider.notifier).setIndex(4); // 4 = Settings
+                  }
+                  _overscrollAccum = 0.0;
+                  _hasFiredArmedHaptic = false;
+                  if (mounted) setState(() {});
+                },
+                onPointerCancel: (e) {
+                  _isDragging = false;
+                  _overscrollAccum = 0.0;
+                  _hasFiredArmedHaptic = false;
+                  if (mounted) setState(() {});
                 },
                 child: SingleChildScrollView(
+                  controller: _scrollController,
                   physics: const BouncingScrollPhysics(
                       parent: AlwaysScrollableScrollPhysics()),
                   child: FadeTransition(
