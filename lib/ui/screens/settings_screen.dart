@@ -19,8 +19,6 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'privacy_policy_screen.dart';
 import '../../data/local_storage/preferences_service.dart';
-import '../widgets/typography_controls.dart';
-
 final packageInfoProvider = FutureProvider<PackageInfo>((ref) async {
   return await PackageInfo.fromPlatform();
 });
@@ -80,7 +78,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
                 unselectedLabelColor: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 tabs: const [
                   Tab(text: 'General'),
-                  Tab(text: 'Reading'),
+                  Tab(text: 'Reminders'),
                   Tab(text: 'Navigation'),
                   Tab(text: 'Info'),
                 ],
@@ -90,7 +88,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
                   controller: _tabController,
                   children: [
                     _buildGeneralPage(context, ref),
-                    _buildReadingPage(context, ref),
+                    _buildRemindersPage(context, ref),
                     _buildNavigationPage(context, ref),
                     _buildInfoPage(context, ref),
                   ],
@@ -156,20 +154,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
           }),
         ],
       ),
-    ]);
-  }
 
-  // --- Page 2: Reading ---
-  Widget _buildReadingPage(BuildContext context, WidgetRef ref) {
-    return _buildPageContainer(context, [
-      SettingsPillCard(
-        children: const [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: TypographyControls(),
-          ),
-        ],
-      ),
       SettingsPillCard(
         children: [
           Consumer(builder: (context, ref, _) {
@@ -342,18 +327,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
           }),
         ],
       ),
-      // --- Reminders Section ---
-      Padding(
-        padding: const EdgeInsets.only(left: 16.0, bottom: 8.0, top: 8.0),
-        child: Text(
-          'Reminders',
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: Theme.of(context).primaryColor,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.2,
-              ),
-        ),
-      ),
+    ]);
+  }
+
+  // --- Page 2: Reminders ---
+  Widget _buildRemindersPage(BuildContext context, WidgetRef ref) {
+    return _buildPageContainer(context, [
       Consumer(builder: (context, ref, _) {
         final remindersState = ref.watch(remindersProvider);
         final notifier = ref.read(remindersProvider.notifier);
