@@ -267,7 +267,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   Timer? _visitTimer;
   Timer? _scrollEndTimer;
   Timer? _pageDebounceTimer;
-  Timer? _immersiveHideTimer;
+
 
   final ValueNotifier<bool> _isScrolling = ValueNotifier(false);
   // True while PageView is mid-swipe; used to freeze vertical child list.
@@ -451,7 +451,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     _visitTimer?.cancel();
     _scrollEndTimer?.cancel();
     _pageDebounceTimer?.cancel();
-    _immersiveHideTimer?.cancel();
+
     _isScrolling.dispose();
     _pageController.dispose();
     WidgetsBinding.instance.removeObserver(this);
@@ -1138,9 +1138,13 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                             onTap: _isPageSelectionMode
                                                 ? null
                                                 : () {
-                                                    if (selectedVerses
-                                                        .isNotEmpty) {
+                                                    if (selectedVerses.isNotEmpty) {
                                                       _clearSelection();
+                                                    } else {
+                                                      final mode = ref.read(readSettingsProvider).readingViewMode;
+                                                      if (mode == ReadingViewMode.full || mode == ReadingViewMode.partial) {
+                                                        ref.read(chromeHiddenProvider.notifier).toggle();
+                                                      }
                                                     }
                                                   },
                                             behavior:
@@ -1236,41 +1240,20 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                     _resetOverscrollGate();
                                                   }
                                                 }
-
-                                                if (notification
-                                                    is UserScrollNotification) {
-                                                  if (notification
-                                                          .metrics.axis !=
-                                                      Axis.vertical)
+                                                if (notification is UserScrollNotification) {
+                                                  if (notification.metrics.axis != Axis.vertical) {
                                                     return false;
-
-                                                  final isImmersive = ref
-                                                          .read(
-                                                              readSettingsProvider)
-                                                          .readingViewMode ==
-                                                      ReadingViewMode.immersive;
-
-                                                  if (notification.direction ==
-                                                      ScrollDirection.forward) {
-                                                    // Do nothing, wait for FAB tap to unhide
-                                                  } else if (notification
-                                                          .direction ==
-                                                      ScrollDirection.reverse) {
-                                                    if (mounted &&
-                                                        isImmersive) {
-                                                      _immersiveHideTimer?.cancel();
-                                                      _immersiveHideTimer = Timer(const Duration(seconds: 3), () {
-                                                        if (mounted) {
-                                                          final stillImmersive = ref.read(readSettingsProvider).readingViewMode == ReadingViewMode.immersive;
-                                                          if (stillImmersive) {
-                                                            ref.read(chromeHiddenProvider.notifier).set(true);
-                                                          }
-                                                        }
-                                                      });
+                                                  }
+                                                  final mode = ref.read(readSettingsProvider).readingViewMode;
+                                                  final isImmersive = mode == ReadingViewMode.full || mode == ReadingViewMode.partial;
+                                                  if (isImmersive && mounted) {
+                                                    if (notification.direction == ScrollDirection.forward) {
+                                                      ref.read(chromeHiddenProvider.notifier).set(false);
+                                                    } else if (notification.direction == ScrollDirection.reverse) {
+                                                      ref.read(chromeHiddenProvider.notifier).set(true);
                                                     }
                                                   }
-                                                } else if (notification
-                                                    is ScrollEndNotification) {
+                                                } else if (notification is ScrollEndNotification) {
                                                   // No longer need to cancel timers
                                                 }
                                                 return false;
@@ -1713,19 +1696,31 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                     left: 0,
                     right: 0,
                     child: Builder(builder: (context) {
-                      return Padding(
-                        padding: EdgeInsets.only(
-                          top: MediaQuery.of(context).padding.top + 8.0,
-                          left: 24.0,
-                          right: 24.0,
-                        ),
-                        child: _buildTopRow(
-                          context,
-                          ref,
-                          theme,
-                          currentBookName,
-                          currentChapter,
-                          allBooks,
+                      final isHidden = ref.watch(chromeHiddenProvider);
+                      final mode = ref.watch(readSettingsProvider).readingViewMode;
+                      final hideTopNav = isHidden && mode == ReadingViewMode.full;
+                      return AnimatedSlide(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeOutCubic,
+                        offset: hideTopNav ? const Offset(0, -1.0) : Offset.zero,
+                        child: AnimatedOpacity(
+                          duration: const Duration(milliseconds: 300),
+                          opacity: hideTopNav ? 0.0 : 1.0,
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                              top: MediaQuery.of(context).padding.top + 8.0,
+                              left: 24.0,
+                              right: 24.0,
+                            ),
+                            child: _buildTopRow(
+                              context,
+                              ref,
+                              theme,
+                              currentBookName,
+                              currentChapter,
+                              allBooks,
+                            ),
+                          ),
                         ),
                       );
                     }),

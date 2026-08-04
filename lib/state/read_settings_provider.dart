@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum ReadingViewMode { immersive, pinned }
+enum ReadingViewMode { full, partial, pinned }
 
 enum BackgroundGlowStyle { top, full }
 
@@ -178,12 +178,12 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
   Future<void> setReadingViewMode(ReadingViewMode mode) async {
     state = state.copyWith(
         readingViewMode: mode,
-        isManualNavHidden: mode == ReadingViewMode.immersive
+        isManualNavHidden: mode == ReadingViewMode.full || mode == ReadingViewMode.partial
             ? false
             : state.isManualNavHidden);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_readingViewModeKey, mode.name);
-    if (mode == ReadingViewMode.immersive) {
+    if (mode == ReadingViewMode.full || mode == ReadingViewMode.partial) {
       await prefs.setBool(_isManualNavHiddenKey, false);
     }
   }

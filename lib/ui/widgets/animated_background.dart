@@ -53,10 +53,10 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground>
     final readSettings = ref.watch(readSettingsProvider);
     final surfaceStyle = ref.watch(surfaceStyleProvider);
     final isReadTab = widget.tabIndex == 1;
-    final isImmersiveOn =
-        readSettings.readingViewMode == ReadingViewMode.immersive;
+    final isFull =
+        readSettings.readingViewMode == ReadingViewMode.full;
     final disableGlow = surfaceStyle != SurfaceStyle.threeDimensional ||
-        (isReadTab && isImmersiveOn) ||
+        (isReadTab && isFull) ||
         !readSettings.isGlowEnabled;
 
     final shouldAnimate = isRouteCurrent && isTabActive && !disableGlow;

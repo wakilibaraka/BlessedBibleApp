@@ -101,21 +101,47 @@ class SettingsScreen extends ConsumerWidget {
               Consumer(builder: (context, ref, _) {
                 final viewMode = ref.watch(
                     readSettingsProvider.select((s) => s.readingViewMode));
-                return AnimatedSegmentedTile<ReadingViewMode>(
-                  title: 'Immersive Reading',
-                  subtitle:
-                      'Auto-hides the top bar and bottom navigation while you scroll for a cleaner read',
-                  selectedValue: viewMode,
-                  options: const [
-                    MapEntry(ReadingViewMode.immersive, 'On'),
-                    MapEntry(ReadingViewMode.pinned, 'Off'),
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
+                      child: Text('Immersive Reading', style: TextStyle(fontSize: 16)),
+                    ),
+                    _buildImmersiveTile(
+                      context,
+                      title: 'Anchored (Off)',
+                      subtitle: 'Navigation remains visible at all times',
+                      value: ReadingViewMode.pinned,
+                      groupValue: viewMode,
+                      onTap: (val) {
+                        HapticFeedback.selectionClick();
+                        ref.read(readSettingsProvider.notifier).setReadingViewMode(val);
+                      },
+                    ),
+                    _buildImmersiveTile(
+                      context,
+                      title: 'Guided (Partial)',
+                      subtitle: 'Auto-hides main navigation, but leaves the book & chapter pill',
+                      value: ReadingViewMode.partial,
+                      groupValue: viewMode,
+                      onTap: (val) {
+                        HapticFeedback.selectionClick();
+                        ref.read(readSettingsProvider.notifier).setReadingViewMode(val);
+                      },
+                    ),
+                    _buildImmersiveTile(
+                      context,
+                      title: 'Deep Waters (Full)',
+                      subtitle: 'Total immersion. All menus hide when scrolling',
+                      value: ReadingViewMode.full,
+                      groupValue: viewMode,
+                      onTap: (val) {
+                        HapticFeedback.selectionClick();
+                        ref.read(readSettingsProvider.notifier).setReadingViewMode(val);
+                      },
+                    ),
                   ],
-                  onChanged: (val) {
-                    HapticFeedback.selectionClick();
-                    ref
-                        .read(readSettingsProvider.notifier)
-                        .setReadingViewMode(val);
-                  },
                 );
               }),
               Consumer(builder: (context, ref, _) {
@@ -673,7 +699,7 @@ class SettingsScreen extends ConsumerWidget {
                                   await ref
                                       .read(readSettingsProvider.notifier)
                                       .setReadingViewMode(
-                                          ReadingViewMode.immersive);
+                                          ReadingViewMode.full);
                                   await ref
                                       .read(readSettingsProvider.notifier)
                                       .setBackgroundGlowStyle(
@@ -897,6 +923,50 @@ class SettingsScreen extends ConsumerWidget {
         notifier.setSabbathLocation(name, lat, lng);
         Navigator.pop(context);
       },
+    );
+  }
+
+  Widget _buildImmersiveTile(
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required ReadingViewMode value,
+    required ReadingViewMode groupValue,
+    required ValueChanged<ReadingViewMode> onTap,
+  }) {
+    final theme = Theme.of(context);
+    final isSelected = value == groupValue;
+    return InkWell(
+      onTap: () => onTap(value),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        color: isSelected ? theme.primaryColor.withValues(alpha: 0.05) : Colors.transparent,
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title,
+                      style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                          color: isSelected ? theme.primaryColor : theme.colorScheme.onSurface)),
+                  const SizedBox(height: 2),
+                  Text(subtitle,
+                      style: TextStyle(
+                          fontSize: 13,
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
+                ],
+              ),
+            ),
+            if (isSelected)
+              Icon(Icons.check_circle_rounded, color: theme.primaryColor)
+            else
+              const SizedBox(width: 24),
+          ],
+        ),
+      ),
     );
   }
 }

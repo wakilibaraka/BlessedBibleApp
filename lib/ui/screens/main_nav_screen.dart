@@ -238,18 +238,22 @@ class MainNavScreen extends ConsumerWidget {
                                   : kBottomDockGap, // Collapse the gap too!
                             ),
                             // ── Dynamic Contextual FAB (Right) ──
-                            TweenAnimationBuilder<double>(
-                              duration: const Duration(milliseconds: 400),
+                            AnimatedScale(
+                              scale: (currentIndex == 1 && ref.watch(readSettingsProvider).readingViewMode == ReadingViewMode.full && ref.watch(chromeHiddenProvider)) ? 0.0 : 1.0,
+                              duration: const Duration(milliseconds: 300),
                               curve: Curves.easeOutCubic,
-                              tween: Tween<double>(
-                                begin: kBottomDockHeight,
-                                end: (currentIndex == 1 &&
-                                        selectedVerses.isNotEmpty &&
-                                        style == VerseActionStyle.classic)
-                                    ? 400.0
-                                    : kBottomDockHeight,
-                              ),
-                              builder: (context, height, child) {
+                              child: TweenAnimationBuilder<double>(
+                                duration: const Duration(milliseconds: 400),
+                                curve: Curves.easeOutCubic,
+                                tween: Tween<double>(
+                                  begin: kBottomDockHeight,
+                                  end: (currentIndex == 1 &&
+                                          selectedVerses.isNotEmpty &&
+                                          style == VerseActionStyle.classic)
+                                      ? 400.0
+                                      : kBottomDockHeight,
+                                ),
+                                builder: (context, height, child) {
                                 final bool isClassicAction =
                                     currentIndex == 1 &&
                                         selectedVerses.isNotEmpty &&
@@ -543,7 +547,8 @@ class MainNavScreen extends ConsumerWidget {
                                   ],
                                 );
                               },
-                            ),
+                            ), // TweenAnimationBuilder
+                            ), // AnimatedScale
                           ],
                         ),
                       ),
