@@ -20,25 +20,135 @@ class BibleDatabaseService {
   Future<Database> _initDB() async {
     final dbDir = await getApplicationSupportDirectory();
     final dbPath = join(dbDir.path, _dbName);
+    final backupPath = join(dbDir.path, 'bible_backup.db');
 
     final prefs = await SharedPreferences.getInstance();
     final currentDbVersion = prefs.getInt('db_version') ?? 1;
-    const requiredDbVersion = 2; // Bump this to force re-copy from assets
+    const requiredDbVersion = 3;
 
-    // If the database doesn't exist locally, or is old, copy it from assets
-    if (!await File(dbPath).exists() || currentDbVersion < requiredDbVersion) {
+    final dbFile = File(dbPath);
+    final backupFile = File(backupPath);
+
+    if (!await dbFile.exists()) {
+      await Directory(dirname(dbPath)).create(recursive: true);
+      final data = await rootBundle.load('assets/bible/$_dbName');
+      final bytes =
+          data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+      await dbFile.writeAsBytes(bytes, flush: true);
+      await prefs.setInt('db_version', requiredDbVersion);
+    } else if (currentDbVersion < requiredDbVersion) {
       try {
-        if (await File(dbPath).exists()) {
-          await File(dbPath).delete();
+        if (await backupFile.exists()) {
+          await backupFile.delete();
         }
-        await Directory(dirname(dbPath)).create(recursive: true);
+        await dbFile.rename(backupPath);
+
         final data = await rootBundle.load('assets/bible/$_dbName');
         final bytes =
             data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
-        await File(dbPath).writeAsBytes(bytes, flush: true);
+        await dbFile.writeAsBytes(bytes, flush: true);
+
+        final mainDb = await openDatabase(
+          dbPath,
+          onConfigure: (db) async {
+            await db.rawQuery('PRAGMA journal_mode=WAL;');
+          },
+        );
+
+        final mainCols =
+            await mainDb.rawQuery('PRAGMA table_info(translations);');
+        if (!mainCols.any((c) => c['name'] == 'is_downloaded')) {
+          await mainDb.execute(
+              'ALTER TABLE translations ADD COLUMN is_downloaded INTEGER NOT NULL DEFAULT 0;');
+        }
+
+        final escapedBackupPath = backupPath.replaceAll("'", "''");
+        await mainDb.execute("ATTACH DATABASE '$escapedBackupPath' AS backup;");
+
+        final backupCols =
+            await mainDb.rawQuery('PRAGMA backup.table_info(translations);');
+        final hasIsDownloadedInBackup =
+            backupCols.any((c) => c['name'] == 'is_downloaded');
+
+        await mainDb.transaction((txn) async {
+          if (!hasIsDownloadedInBackup) {
+            // One-time deduction backfill (v1/v2 -> v3)
+            final unbundledRows = await txn.rawQuery('''
+              SELECT translation_id, language_code, language_name, translation_name, abbreviation, license, is_complete
+              FROM backup.translations
+              WHERE translation_id NOT IN (SELECT translation_id FROM main.translations)
+            ''');
+
+            for (final row in unbundledRows) {
+              final tid = row['translation_id'] as String;
+              await txn.rawInsert('''
+                INSERT OR REPLACE INTO main.translations 
+                (translation_id, language_code, language_name, translation_name, abbreviation, license, is_complete, is_downloaded)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 1)
+              ''', [
+                row['translation_id'],
+                row['language_code'],
+                row['language_name'],
+                row['translation_name'],
+                row['abbreviation'],
+                row['license'],
+                row['is_complete'],
+              ]);
+
+              await txn.rawInsert('''
+                INSERT INTO main.verses (translation_id, language_code, book_number, chapter, verse, text)
+                SELECT translation_id, language_code, book_number, chapter, verse, text
+                FROM backup.verses
+                WHERE translation_id = ?
+              ''', [tid]);
+            }
+          } else {
+            // Future migrations (v3+): read is_downloaded flag directly
+            final downloadedRows = await txn.rawQuery('''
+              SELECT translation_id, language_code, language_name, translation_name, abbreviation, license, is_complete
+              FROM backup.translations
+              WHERE is_downloaded = 1
+            ''');
+
+            for (final row in downloadedRows) {
+              final tid = row['translation_id'] as String;
+              await txn.rawInsert('''
+                INSERT OR REPLACE INTO main.translations 
+                (translation_id, language_code, language_name, translation_name, abbreviation, license, is_complete, is_downloaded)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 1)
+              ''', [
+                row['translation_id'],
+                row['language_code'],
+                row['language_name'],
+                row['translation_name'],
+                row['abbreviation'],
+                row['license'],
+                row['is_complete'],
+              ]);
+
+              await txn.rawInsert('''
+                INSERT INTO main.verses (translation_id, language_code, book_number, chapter, verse, text)
+                SELECT translation_id, language_code, book_number, chapter, verse, text
+                FROM backup.verses
+                WHERE translation_id = ?
+              ''', [tid]);
+            }
+          }
+        });
+
+        await mainDb.execute('DETACH DATABASE backup;');
+        await mainDb.close();
+
+        if (await backupFile.exists()) {
+          await backupFile.delete();
+        }
+
         await prefs.setInt('db_version', requiredDbVersion);
       } catch (e) {
-        throw Exception('Error copying database from assets: $e');
+        stderr.writeln('DB migration error: $e');
+        if (await backupFile.exists() && !await dbFile.exists()) {
+          await backupFile.copy(dbPath);
+        }
       }
     }
 
@@ -47,6 +157,13 @@ class BibleDatabaseService {
       readOnly: false,
       onConfigure: (db) async {
         await db.rawQuery('PRAGMA journal_mode=WAL;');
+      },
+      onOpen: (db) async {
+        final cols = await db.rawQuery('PRAGMA table_info(translations);');
+        if (!cols.any((c) => c['name'] == 'is_downloaded')) {
+          await db.execute(
+              'ALTER TABLE translations ADD COLUMN is_downloaded INTEGER NOT NULL DEFAULT 0;');
+        }
       },
     );
   }
@@ -111,9 +228,11 @@ class BibleDatabaseService {
       TranslationInfo info, List<Map<String, dynamic>> verses) async {
     final db = await database;
     await db.transaction((txn) async {
+      final map = info.toMap();
+      map['is_downloaded'] = 1;
       await txn.insert(
         'translations',
-        info.toMap(),
+        map,
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
 

@@ -6,6 +6,7 @@ class TranslationInfo {
   final String abbreviation;
   final String license;
   final bool isComplete;
+  final bool isDownloaded;
 
   TranslationInfo({
     required this.translationId,
@@ -15,6 +16,7 @@ class TranslationInfo {
     required this.abbreviation,
     required this.license,
     required this.isComplete,
+    this.isDownloaded = false,
   });
 
   factory TranslationInfo.fromMap(Map<String, dynamic> map) {
@@ -25,7 +27,8 @@ class TranslationInfo {
       translationName: map['translation_name'] as String,
       abbreviation: map['abbreviation'] as String,
       license: map['license'] as String,
-      isComplete: (map['is_complete'] as int) == 1,
+      isComplete: (map['is_complete'] as int? ?? 0) == 1,
+      isDownloaded: (map['is_downloaded'] as int? ?? 0) == 1,
     );
   }
 
@@ -38,6 +41,7 @@ class TranslationInfo {
       'abbreviation': abbreviation,
       'license': license,
       'is_complete': isComplete ? 1 : 0,
+      'is_downloaded': isDownloaded ? 1 : 0,
     };
   }
 }

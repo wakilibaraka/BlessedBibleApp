@@ -144,6 +144,7 @@ class TranslationDownloader {
       abbreviation: meta['abbr'] as String,
       license: meta['license'] as String,
       isComplete: true,
+      isDownloaded: true,
     );
 
     final List<Map<String, dynamic>> dbVerses = [];
