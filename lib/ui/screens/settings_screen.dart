@@ -19,8 +19,6 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'privacy_policy_screen.dart';
 import '../../data/local_storage/preferences_service.dart';
-import '../../state/translation_provider.dart';
-import '../sheets/translation_picker_sheet.dart';
 import '../widgets/typography_controls.dart';
 
 final packageInfoProvider = FutureProvider<PackageInfo>((ref) async {
@@ -40,7 +38,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 5, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -56,13 +54,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onHorizontalDragEnd: (details) {
-        // Only trigger back if we are on the first tab and swiping right,
-        // or just let TabBarView handle internal swiping.
-        // For a global back swipe, we can rely on standard iOS back swipe or handle it here
-        // if they swipe hard from the left edge.
         if (details.primaryVelocity != null && details.primaryVelocity! > 300) {
-          // A bit risky with a TabBarView since it also takes horizontal swipes.
-          // Let's only pop if they are on the first tab and swiping right.
           if (_tabController.index == 0) {
             ref.read(navProvider.notifier).goBack();
           }
@@ -74,7 +66,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
           title: const Text('Settings'),
           backgroundColor: Colors.transparent,
           elevation: 0,
-          // SharedAppBar handles the back arrow natively if automaticallyImplyLeading is true.
         ),
         body: SafeArea(
           bottom: false,
@@ -83,15 +74,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
               TabBar(
                 controller: _tabController,
                 isScrollable: true,
+                tabAlignment: TabAlignment.start,
                 indicatorColor: theme.primaryColor,
                 labelColor: theme.primaryColor,
                 unselectedLabelColor: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 tabs: const [
                   Tab(text: 'General'),
-                  Tab(text: 'Appearance'),
                   Tab(text: 'Reading'),
                   Tab(text: 'Navigation'),
-                  Tab(text: 'Reminders'),
+                  Tab(text: 'Info'),
                 ],
               ),
               Expanded(
@@ -99,10 +90,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
                   controller: _tabController,
                   children: [
                     _buildGeneralPage(context, ref),
-                    _buildAppearancePage(context, ref),
                     _buildReadingPage(context, ref),
                     _buildNavigationPage(context, ref),
-                    _buildRemindersPage(context, ref),
+                    _buildInfoPage(context, ref),
                   ],
                 ),
               ),
@@ -125,7 +115,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
     );
   }
 
-  // --- Page 1: General / System ---
+  // --- Page 1: General ---
   Widget _buildGeneralPage(BuildContext context, WidgetRef ref) {
     return _buildPageContainer(context, [
       SettingsPillCard(
@@ -166,265 +156,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
           }),
         ],
       ),
-      SettingsPillCard(
-        children: [
-          ListTile(
-            leading: const Icon(Icons.upload_file_rounded),
-            title: const Text('Back up my data'),
-            subtitle: const Text('Export notes, highlights, and settings'),
-            onTap: () => BackupService.exportData(context, ref),
-          ),
-          const Divider(height: 1, indent: 16),
-          ListTile(
-            leading: const Icon(Icons.download_rounded),
-            title: const Text('Restore from backup'),
-            subtitle: const Text('Import your data from a backup JSON'),
-            onTap: () {
-              final controller = TextEditingController();
-              showDialog(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                  title: const Text('Restore from Backup'),
-                  content: TextField(
-                    controller: controller,
-                    maxLines: 5,
-                    decoration: const InputDecoration(
-                      hintText: 'Paste your backup JSON here...',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(ctx).pop(),
-                      child: const Text('Cancel'),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        final text = controller.text.trim();
-                        Navigator.of(ctx).pop();
-                        if (text.isNotEmpty) {
-                          BackupService.importData(context, ref, text);
-                        }
-                      },
-                      child: const Text('Restore'),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-          const Divider(height: 1, indent: 16),
-          ListTile(
-            leading: const Icon(Icons.delete_sweep_rounded),
-            title: const Text('Clear cache/downloaded data'),
-            subtitle: const Text('Free up space by removing cached files'),
-            onTap: () {
-              // TODO: Implement clear cache action later
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Not yet implemented')),
-              );
-            },
-          ),
-        ],
-      ),
-      SettingsPillCard(
-        children: [
-          ListTile(
-            leading: Icon(Icons.restore_rounded,
-                color: Theme.of(context).colorScheme.error),
-            title: Text('Reset to Default',
-                style: TextStyle(color: Theme.of(context).colorScheme.error)),
-            subtitle: const Text('Restore original app settings (content is kept)'),
-            onTap: () {
-              showDialog(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                  title: const Text('Reset settings?'),
-                  content: const Text(
-                      'Reset all settings to default? This won\'t affect your bookmarks, notes, or highlights.'),
-                  actions: [
-                    TextButton(
-                        onPressed: () => Navigator.of(ctx).pop(),
-                        child: const Text('Cancel')),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.error,
-                        foregroundColor: Theme.of(context).colorScheme.onError,
-                      ),
-                      onPressed: () async {
-                        Navigator.of(ctx).pop();
-                        await ref
-                            .read(themeProvider.notifier)
-                            .setTheme(AppThemeMode.light);
-                        await ref
-                            .read(typographyProvider.notifier)
-                            .setFontFamily('Lexend');
-                        await ref
-                            .read(typographyProvider.notifier)
-                            .setFontSize(18.0);
-                        await ref
-                            .read(readSettingsProvider.notifier)
-                            .setReadingViewMode(ReadingViewMode.full);
-                        await ref
-                            .read(readSettingsProvider.notifier)
-                            .setBackgroundGlowStyle(BackgroundGlowStyle.top);
-                        await ref
-                            .read(readSettingsProvider.notifier)
-                            .setVerseActionStyle(VerseActionStyle.classic);
-                        await ref
-                            .read(readSettingsProvider.notifier)
-                            .setActiveHighlightColorIndex(2);
-                        await ref
-                            .read(readSettingsProvider.notifier)
-                            .setManualNavHidden(false);
-                        await ref
-                            .read(bibleNavSettingsProvider.notifier)
-                            .setSwipeDown(true);
-
-                        ref.read(hintsProvider.notifier).resetHints();
-
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                              content: Text('Settings reset to default.')));
-                        }
-                      },
-                      child: const Text('Reset'),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-      SettingsPillCard(
-        children: [
-          Consumer(builder: (context, ref, _) {
-            final packageInfoAsync = ref.watch(packageInfoProvider);
-            return ListTile(
-              title: const Text('Version'),
-              trailing: packageInfoAsync.when(
-                data: (info) => Text(info.version,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.6))),
-                loading: () => const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2)),
-                error: (_, __) => const Text('Unknown'),
-              ),
-            );
-          }),
-          const Divider(height: 1, indent: 16),
-          ListTile(
-            title: const Text('Send Feedback'),
-            trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
-            onTap: () async {
-              final uri = Uri.parse(
-                  'mailto:placeholder@example.com?subject=The Blessed Bible Feedback');
-              if (await canLaunchUrl(uri)) {
-                await launchUrl(uri);
-              }
-            },
-          ),
-          const Divider(height: 1, indent: 16),
-          ListTile(
-            title: const Text('Privacy Policy'),
-            trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) => const PrivacyPolicyScreen()));
-            },
-          ),
-          const Divider(height: 1, indent: 16),
-          const ListTile(
-            title: Text('Bible Translations'),
-            subtitle: Text(
-                'Most translations (KJV, WEB, Spanish RV1909, French LSG, German Luther, Italian Diodati, Romanian BTF, Russian Synodal, Chinese CUV, Arabic Van Dyck, Korean 1910, Dutch 1917, Ukrainian Kulish) are in the Public Domain.\n\n'
-                'Creative Commons:\n'
-                '• Swahili ULB & Tagalog ULB (CC BY-SA 4.0)\n'
-                '• Portuguese Bíblia Livre (CC BY 4.0)\n'
-                '• Hindi Indian Revised Version (CC BY-SA 4.0)'),
-          ),
-        ],
-      ),
     ]);
   }
 
-  // --- Page 2: Display & Appearance ---
-  Widget _buildAppearancePage(BuildContext context, WidgetRef ref) {
-    return _buildPageContainer(context, [
-      SettingsPillCard(
-        children: [
-          Consumer(builder: (context, ref, _) {
-            final activeTranslationId = ref.watch(activeTranslationProvider);
-            final allTranslations = ref.watch(availableTranslationsProvider);
-            final activeTranslationName = allTranslations.maybeWhen(
-              data: (list) => list
-                  .firstWhere(
-                    (t) => t.translationId == activeTranslationId,
-                    orElse: () => list.first,
-                  )
-                  .translationName,
-              orElse: () => activeTranslationId.toUpperCase(),
-            );
-
-            return ListTile(
-              title: const Text('Bible Translation'),
-              subtitle: Text(activeTranslationName),
-              trailing: const Icon(Icons.chevron_right_rounded),
-              onTap: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  builder: (ctx) => const TranslationPickerSheet(),
-                );
-              },
-            );
-          }),
-          const Divider(height: 1, indent: 16),
-          Consumer(builder: (context, ref, _) {
-            final readingLayout =
-                ref.watch(readSettingsProvider.select((s) => s.readingLayout));
-            return AnimatedSegmentedTile<ReadingLayout>(
-              title: 'Reading Layout',
-              subtitle: () {
-                switch (readingLayout) {
-                  case ReadingLayout.single:
-                    return 'One translation';
-                  case ReadingLayout.interleaved:
-                    return 'Two translations stacked per verse';
-                  case ReadingLayout.sideBySide:
-                    return 'Two translations in side-by-side columns';
-                  case ReadingLayout.chips:
-                    return 'Tap a verse to switch its translation';
-                }
-              }(),
-              selectedValue: readingLayout,
-              options: const [
-                MapEntry(ReadingLayout.single, 'Single'),
-                MapEntry(ReadingLayout.interleaved, 'Bilingual'),
-                MapEntry(ReadingLayout.sideBySide, 'Parallel'),
-                MapEntry(ReadingLayout.chips, 'Chips'),
-              ],
-              onChanged: (val) {
-                HapticFeedback.selectionClick();
-                ref.read(readSettingsProvider.notifier).setReadingLayout(val);
-              },
-            );
-          }),
-        ],
-      ),
-    ]);
-  }
-
-  // --- Page 3: Reading Experience ---
+  // --- Page 2: Reading ---
   Widget _buildReadingPage(BuildContext context, WidgetRef ref) {
     return _buildPageContainer(context, [
       SettingsPillCard(
@@ -433,68 +168,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
             padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: TypographyControls(),
           ),
-        ],
-      ),
-      SettingsPillCard(
-        children: [
-          Consumer(builder: (context, ref, _) {
-            final activeTranslationId = ref.watch(activeTranslationProvider);
-            final allTranslations = ref.watch(availableTranslationsProvider);
-            final activeTranslationName = allTranslations.maybeWhen(
-              data: (list) => list
-                  .firstWhere(
-                    (t) => t.translationId == activeTranslationId,
-                    orElse: () => list.first,
-                  )
-                  .translationName,
-              orElse: () => activeTranslationId.toUpperCase(),
-            );
-
-            return ListTile(
-              title: const Text('Bible Translation'),
-              subtitle: Text(activeTranslationName),
-              trailing: const Icon(Icons.chevron_right_rounded),
-              onTap: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  builder: (ctx) => const TranslationPickerSheet(),
-                );
-              },
-            );
-          }),
-          const Divider(height: 1, indent: 16),
-          Consumer(builder: (context, ref, _) {
-            final readingLayout =
-                ref.watch(readSettingsProvider.select((s) => s.readingLayout));
-            return AnimatedSegmentedTile<ReadingLayout>(
-              title: 'Reading Layout',
-              subtitle: () {
-                switch (readingLayout) {
-                  case ReadingLayout.single:
-                    return 'One translation';
-                  case ReadingLayout.interleaved:
-                    return 'Two translations stacked per verse';
-                  case ReadingLayout.sideBySide:
-                    return 'Two translations in side-by-side columns';
-                  case ReadingLayout.chips:
-                    return 'Tap a verse to switch its translation';
-                }
-              }(),
-              selectedValue: readingLayout,
-              options: const [
-                MapEntry(ReadingLayout.single, 'Single'),
-                MapEntry(ReadingLayout.interleaved, 'Bilingual'),
-                MapEntry(ReadingLayout.sideBySide, 'Parallel'),
-                MapEntry(ReadingLayout.chips, 'Chips'),
-              ],
-              onChanged: (val) {
-                HapticFeedback.selectionClick();
-                ref.read(readSettingsProvider.notifier).setReadingLayout(val);
-              },
-            );
-          }),
         ],
       ),
       SettingsPillCard(
@@ -668,81 +341,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
             });
           }),
         ],
-      )
-    ]);
-  }
-
-  // --- Page 4: Navigation & Gestures ---
-  Widget _buildNavigationPage(BuildContext context, WidgetRef ref) {
-    return _buildPageContainer(context, [
-      SettingsPillCard(
-        children: [
-          Consumer(builder: (context, ref, _) {
-            final depth =
-                ref.watch(bibleNavSettingsProvider.select((s) => s.depth));
-            return AnimatedSegmentedTile<NavigationDepth>(
-              title: 'Navigation Steps',
-              subtitle:
-                  'How many steps to reach a verse. 2-step: Book → Chapter. 3-step: Book → Chapter → Verse. 4-step: Testament → Book → Chapter → Verse.',
-              selectedValue: depth,
-              options: const [
-                MapEntry(NavigationDepth.twoPart, '2-step'),
-                MapEntry(NavigationDepth.threePart, '3-step'),
-                MapEntry(NavigationDepth.fourPart, '4-step'),
-              ],
-              onChanged: (val) {
-                HapticFeedback.selectionClick();
-                ref.read(bibleNavSettingsProvider.notifier).setDepth(val);
-              },
-            );
-          }),
-          const Divider(height: 1, indent: 16),
-          Consumer(builder: (context, ref, _) {
-            final swipeDown =
-                ref.watch(bibleNavSettingsProvider.select((s) => s.swipeDownToNav));
-            return SwitchListTile(
-              title: Text(
-                'Swipe Down to Open Navigation',
-                style: Theme.of(context)
-                    .textTheme
-                    .titleSmall
-                    ?.copyWith(fontWeight: FontWeight.bold),
-              ),
-              subtitle: Text(
-                'Pull down at the top of a chapter to quickly open the Book/Chapter selector.',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-              value: swipeDown,
-              activeTrackColor: Theme.of(context).primaryColor,
-              onChanged: (val) {
-                HapticFeedback.selectionClick();
-                ref.read(bibleNavSettingsProvider.notifier).setSwipeDown(val);
-              },
-            );
-          }),
-          const Divider(height: 1, indent: 16),
-          Consumer(builder: (context, ref, _) {
-            final autoClose = ref.watch(
-                bibleNavSettingsProvider.select((s) => s.autoCloseOnFinalSelection));
-            return SwitchListTile(
-              title: const Text('Auto-close sheet on final selection'),
-              subtitle:
-                  const Text('Automatically dismiss the picker after the last step'),
-              value: autoClose,
-              onChanged: (value) {
-                HapticFeedback.selectionClick();
-                ref.read(bibleNavSettingsProvider.notifier).setAutoClose(value);
-              },
-            );
-          }),
-        ],
       ),
-    ]);
-  }
-
-  // --- Page 5: Reminders ---
-  Widget _buildRemindersPage(BuildContext context, WidgetRef ref) {
-    return _buildPageContainer(context, [
+      // --- Reminders Section ---
+      Padding(
+        padding: const EdgeInsets.only(left: 16.0, bottom: 8.0, top: 8.0),
+        child: Text(
+          'Reminders',
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                color: Theme.of(context).primaryColor,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.2,
+              ),
+        ),
+      ),
       Consumer(builder: (context, ref, _) {
         final remindersState = ref.watch(remindersProvider);
         final notifier = ref.read(remindersProvider.notifier);
@@ -883,6 +494,266 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
           ],
         );
       }),
+    ]);
+  }
+
+  // --- Page 3: Navigation ---
+  Widget _buildNavigationPage(BuildContext context, WidgetRef ref) {
+    return _buildPageContainer(context, [
+      SettingsPillCard(
+        children: [
+          Consumer(builder: (context, ref, _) {
+            final depth =
+                ref.watch(bibleNavSettingsProvider.select((s) => s.depth));
+            return AnimatedSegmentedTile<NavigationDepth>(
+              title: 'Navigation Steps',
+              subtitle:
+                  'How many steps to reach a verse. 2-step: Book → Chapter. 3-step: Book → Chapter → Verse. 4-step: Testament → Book → Chapter → Verse.',
+              selectedValue: depth,
+              options: const [
+                MapEntry(NavigationDepth.twoPart, '2-step'),
+                MapEntry(NavigationDepth.threePart, '3-step'),
+                MapEntry(NavigationDepth.fourPart, '4-step'),
+              ],
+              onChanged: (val) {
+                HapticFeedback.selectionClick();
+                ref.read(bibleNavSettingsProvider.notifier).setDepth(val);
+              },
+            );
+          }),
+          const Divider(height: 1, indent: 16),
+          Consumer(builder: (context, ref, _) {
+            final swipeDown =
+                ref.watch(bibleNavSettingsProvider.select((s) => s.swipeDownToNav));
+            return SwitchListTile(
+              title: Text(
+                'Swipe Down to Open Navigation',
+                style: Theme.of(context)
+                    .textTheme
+                    .titleSmall
+                    ?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(
+                'Pull down at the top of a chapter to quickly open the Book/Chapter selector.',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              value: swipeDown,
+              activeTrackColor: Theme.of(context).primaryColor,
+              onChanged: (val) {
+                HapticFeedback.selectionClick();
+                ref.read(bibleNavSettingsProvider.notifier).setSwipeDown(val);
+              },
+            );
+          }),
+          const Divider(height: 1, indent: 16),
+          Consumer(builder: (context, ref, _) {
+            final autoClose = ref.watch(
+                bibleNavSettingsProvider.select((s) => s.autoCloseOnFinalSelection));
+            return SwitchListTile(
+              title: const Text('Auto-close sheet on final selection'),
+              subtitle:
+                  const Text('Automatically dismiss the picker after the last step'),
+              value: autoClose,
+              onChanged: (value) {
+                HapticFeedback.selectionClick();
+                ref.read(bibleNavSettingsProvider.notifier).setAutoClose(value);
+              },
+            );
+          }),
+        ],
+      ),
+    ]);
+  }
+
+  // --- Page 4: Info ---
+  Widget _buildInfoPage(BuildContext context, WidgetRef ref) {
+    return _buildPageContainer(context, [
+      SettingsPillCard(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.upload_file_rounded),
+            title: const Text('Back up my data'),
+            subtitle: const Text('Export notes, highlights, and settings'),
+            onTap: () => BackupService.exportData(context, ref),
+          ),
+          const Divider(height: 1, indent: 16),
+          ListTile(
+            leading: const Icon(Icons.download_rounded),
+            title: const Text('Restore from backup'),
+            subtitle: const Text('Import your data from a backup JSON'),
+            onTap: () {
+              final controller = TextEditingController();
+              showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Text('Restore from Backup'),
+                  content: TextField(
+                    controller: controller,
+                    maxLines: 5,
+                    decoration: const InputDecoration(
+                      hintText: 'Paste your backup JSON here...',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(ctx).pop(),
+                      child: const Text('Cancel'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        final text = controller.text.trim();
+                        Navigator.of(ctx).pop();
+                        if (text.isNotEmpty) {
+                          BackupService.importData(context, ref, text);
+                        }
+                      },
+                      child: const Text('Restore'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          const Divider(height: 1, indent: 16),
+          ListTile(
+            leading: const Icon(Icons.delete_sweep_rounded),
+            title: const Text('Clear cache/downloaded data'),
+            subtitle: const Text('Free up space by removing cached files'),
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Not yet implemented')),
+              );
+            },
+          ),
+        ],
+      ),
+      SettingsPillCard(
+        children: [
+          ListTile(
+            leading: Icon(Icons.restore_rounded,
+                color: Theme.of(context).colorScheme.error),
+            title: Text('Reset to Default',
+                style: TextStyle(color: Theme.of(context).colorScheme.error)),
+            subtitle: const Text('Restore original app settings (content is kept)'),
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Text('Reset settings?'),
+                  content: const Text(
+                      'Reset all settings to default? This won\'t affect your bookmarks, notes, or highlights.'),
+                  actions: [
+                    TextButton(
+                        onPressed: () => Navigator.of(ctx).pop(),
+                        child: const Text('Cancel')),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.error,
+                        foregroundColor: Theme.of(context).colorScheme.onError,
+                      ),
+                      onPressed: () async {
+                        Navigator.of(ctx).pop();
+                        await ref
+                            .read(themeProvider.notifier)
+                            .setTheme(AppThemeMode.light);
+                        await ref
+                            .read(typographyProvider.notifier)
+                            .setFontFamily('Lexend');
+                        await ref
+                            .read(typographyProvider.notifier)
+                            .setFontSize(18.0);
+                        await ref
+                            .read(readSettingsProvider.notifier)
+                            .setReadingViewMode(ReadingViewMode.full);
+                        await ref
+                            .read(readSettingsProvider.notifier)
+                            .setBackgroundGlowStyle(BackgroundGlowStyle.top);
+                        await ref
+                            .read(readSettingsProvider.notifier)
+                            .setVerseActionStyle(VerseActionStyle.classic);
+                        await ref
+                            .read(readSettingsProvider.notifier)
+                            .setActiveHighlightColorIndex(2);
+                        await ref
+                            .read(readSettingsProvider.notifier)
+                            .setManualNavHidden(false);
+                        await ref
+                            .read(bibleNavSettingsProvider.notifier)
+                            .setSwipeDown(true);
+
+                        ref.read(hintsProvider.notifier).resetHints();
+
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                              content: Text('Settings reset to default.')));
+                        }
+                      },
+                      child: const Text('Reset'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+      SettingsPillCard(
+        children: [
+          Consumer(builder: (context, ref, _) {
+            final packageInfoAsync = ref.watch(packageInfoProvider);
+            return ListTile(
+              title: const Text('Version'),
+              trailing: packageInfoAsync.when(
+                data: (info) => Text(info.version,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.6))),
+                loading: () => const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2)),
+                error: (_, __) => const Text('Unknown'),
+              ),
+            );
+          }),
+          const Divider(height: 1, indent: 16),
+          ListTile(
+            title: const Text('Send Feedback'),
+            trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+            onTap: () async {
+              final uri = Uri.parse(
+                  'mailto:placeholder@example.com?subject=The Blessed Bible Feedback');
+              if (await canLaunchUrl(uri)) {
+                await launchUrl(uri);
+              }
+            },
+          ),
+          const Divider(height: 1, indent: 16),
+          ListTile(
+            title: const Text('Privacy Policy'),
+            trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => const PrivacyPolicyScreen()));
+            },
+          ),
+          const Divider(height: 1, indent: 16),
+          const ListTile(
+            title: Text('Bible Translations'),
+            subtitle: Text(
+                'Most translations (KJV, WEB, Spanish RV1909, French LSG, German Luther, Italian Diodati, Romanian BTF, Russian Synodal, Chinese CUV, Arabic Van Dyck, Korean 1910, Dutch 1917, Ukrainian Kulish) are in the Public Domain.\n\n'
+                'Creative Commons:\n'
+                '• Swahili ULB & Tagalog ULB (CC BY-SA 4.0)\n'
+                '• Portuguese Bíblia Livre (CC BY 4.0)\n'
+                '• Hindi Indian Revised Version (CC BY-SA 4.0)'),
+          ),
+        ],
+      ),
     ]);
   }
 
