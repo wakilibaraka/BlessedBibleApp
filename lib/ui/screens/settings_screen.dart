@@ -71,15 +71,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
             children: [
               TabBar(
                 controller: _tabController,
-                isScrollable: true,
-                tabAlignment: TabAlignment.start,
+                isScrollable: false,
+                tabAlignment: TabAlignment.fill,
                 indicatorColor: theme.primaryColor,
                 labelColor: theme.primaryColor,
                 unselectedLabelColor: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 tabs: const [
                   Tab(text: 'General'),
-                  Tab(text: 'Reminders'),
                   Tab(text: 'Navigation'),
+                  Tab(text: 'Reminders'),
                   Tab(text: 'Info'),
                 ],
               ),
@@ -88,8 +88,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
                   controller: _tabController,
                   children: [
                     _buildGeneralPage(context, ref),
-                    _buildRemindersPage(context, ref),
                     _buildNavigationPage(context, ref),
+                    _buildRemindersPage(context, ref),
                     _buildInfoPage(context, ref),
                   ],
                 ),
