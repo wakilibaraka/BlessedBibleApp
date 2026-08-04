@@ -123,8 +123,8 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     final secondaryHighlightIndex =
         prefs.getInt(_secondaryHighlightColorIndexKey);
     final isManualNavHidden = prefs.getBool(_isManualNavHiddenKey) ?? false;
-    final isRedLetterEnabled = prefs.getBool('red_letter_enabled') ?? true;
-    final showVerseNumbers = prefs.getBool('show_verse_numbers') ?? true;
+    final isRedLetterEnabled = true;
+    final showVerseNumbers = true;
     final keepScreenAwake = prefs.getBool('keep_screen_awake') ?? false;
     final defaultStartTab = prefs.getInt('default_start_tab') ?? 0;
     final layoutString = prefs.getString(_readingLayoutKey);

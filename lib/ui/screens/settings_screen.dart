@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import '../../state/nav_provider.dart';
 import '../../state/hints_provider.dart';
 import '../../state/theme_provider.dart';
-import '../../state/user_data_provider.dart';
 import '../../state/typography_provider.dart';
 import '../../state/search_settings_provider.dart';
 import '../../state/bible_nav_settings_provider.dart';
@@ -137,21 +135,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
               },
             );
           }),
-          const Divider(height: 1, indent: 16),
-          Consumer(builder: (context, ref, _) {
-            final autoOpen = ref.watch(
-                searchSettingsProvider.select((s) => s.autoOpenSingleSearchResult));
-            return SwitchListTile(
-              title: const Text('Auto-open single search result'),
-              subtitle: const Text(
-                  'Automatically navigate when a search returns exactly one result'),
-              value: autoOpen,
-              onChanged: (value) {
-                HapticFeedback.selectionClick();
-                ref.read(searchSettingsProvider.notifier).toggleAutoOpen(value);
-              },
-            );
-          }),
         ],
       ),
 
@@ -206,37 +189,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
           }),
         ],
       ),
-      SettingsPillCard(
-        children: [
-          Consumer(builder: (context, ref, _) {
-            final isRedLetter =
-                ref.watch(readSettingsProvider.select((s) => s.isRedLetterEnabled));
-            return SwitchListTile(
-              title: const Text('Words of Jesus in Red'),
-              subtitle: const Text('Render words spoken by Jesus in red'),
-              value: isRedLetter,
-              onChanged: (val) {
-                HapticFeedback.selectionClick();
-                ref.read(readSettingsProvider.notifier).setRedLetterEnabled(val);
-              },
-            );
-          }),
-          const Divider(height: 1, indent: 16),
-          Consumer(builder: (context, ref, _) {
-            final showNumbers =
-                ref.watch(readSettingsProvider.select((s) => s.showVerseNumbers));
-            return SwitchListTile(
-              title: const Text('Show Verse Numbers'),
-              subtitle: const Text('Display verse numbers in the text'),
-              value: showNumbers,
-              onChanged: (val) {
-                HapticFeedback.selectionClick();
-                ref.read(readSettingsProvider.notifier).setShowVerseNumbers(val);
-              },
-            );
-          }),
-        ],
-      ),
+
       SettingsPillCard(
         children: [
           Consumer(builder: (context, ref, _) {
@@ -260,36 +213,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
           }),
         ],
       ),
-      SettingsPillCard(
-        children: [
-          Consumer(builder: (context, ref, _) {
-            final primaryIndex = ref.watch(
-                readSettingsProvider.select((s) => s.primaryHighlightColorIndex));
-            final secondaryIndex = ref.watch(
-                readSettingsProvider.select((s) => s.secondaryHighlightColorIndex));
-            return Column(
-              children: [
-                _buildColorPicker(
-                    context,
-                    'Primary Highlight Color',
-                    'Default color applied when tapping the Highlight action',
-                    primaryIndex,
-                    (i) => ref
-                        .read(readSettingsProvider.notifier)
-                        .setPrimaryHighlightColorIndex(i)),
-                _buildColorPicker(
-                    context,
-                    'Secondary Highlight Color',
-                    'Second color presented in quick action menus',
-                    secondaryIndex,
-                    (i) => ref
-                        .read(readSettingsProvider.notifier)
-                        .setSecondaryHighlightColorIndex(i)),
-              ],
-            );
-          }),
-        ],
-      ),
+
       SettingsPillCard(
         children: [
           Consumer(builder: (context, ref, _) {
@@ -539,6 +463,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
               },
             );
           }),
+          const Divider(height: 1, indent: 16),
+          Consumer(builder: (context, ref, _) {
+            final autoOpen = ref.watch(
+                searchSettingsProvider.select((s) => s.autoOpenSingleSearchResult));
+            return SwitchListTile(
+              title: const Text('Auto-open single search result'),
+              subtitle: const Text(
+                  'Automatically navigate when a search returns exactly one result'),
+              value: autoOpen,
+              onChanged: (value) {
+                HapticFeedback.selectionClick();
+                ref.read(searchSettingsProvider.notifier).toggleAutoOpen(value);
+              },
+            );
+          }),
         ],
       ),
     ]);
@@ -738,102 +677,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
 
   // --- Helper methods ---
 
-  Widget _buildColorPicker(BuildContext context, String title, String subtitle,
-      int selectedIndex, Function(int) onChanged) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: Theme.of(context).textTheme.titleMedium),
-          if (subtitle.isNotEmpty) ...[
-            const SizedBox(height: 4),
-            Text(subtitle,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.6))),
-          ],
-          const SizedBox(height: 12),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: List.generate(6, (index) {
-                final i = index - 1;
 
-                Color color;
-                if (i == -1) {
-                  color = Theme.of(context).cardColor;
-                } else {
-                  color = AppColors.getRenderedHighlightColor(
-                      highlightPaletteSwatches[i],
-                      Theme.of(context).brightness,
-                      Theme.of(context).scaffoldBackgroundColor);
-                }
-
-                final isSelected = i == selectedIndex;
-
-                return Padding(
-                  padding: const EdgeInsets.only(right: 12),
-                  child: Column(
-                    children: [
-                      GestureDetector(
-                        onTap: () => onChanged(i),
-                        child: Container(
-                          width: 32,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            color: color,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: isSelected
-                                  ? Theme.of(context).primaryColor
-                                  : (i == -1
-                                      ? Theme.of(context).dividerColor
-                                      : Colors.black.withValues(alpha: 0.2)),
-                              width: isSelected ? 2 : 1,
-                            ),
-                            boxShadow: (isSelected || i == -1)
-                                ? null
-                                : [
-                                    BoxShadow(
-                                        color: Colors.black.withValues(alpha: 0.1),
-                                        blurRadius: 4,
-                                        spreadRadius: 1)
-                                  ],
-                          ),
-                          child: i == -1
-                              ? Icon(Icons.question_mark_rounded,
-                                  size: 16,
-                                  color: Theme.of(context).colorScheme.onSurface)
-                              : (isSelected
-                                  ? Icon(Icons.check,
-                                      size: 16,
-                                      color: Theme.of(context).primaryColor)
-                                  : null),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        i == -1 ? 'Ask' : highlightPaletteNames[i],
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            fontSize: 10,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.6)),
-                      ),
-                    ],
-                  ),
-                );
-              }),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   String _weekdayName(int day) {
     const names = [
