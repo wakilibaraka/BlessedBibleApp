@@ -147,7 +147,9 @@ class ReadingPlanState {
     if (paceMode == 'flexible' ||
         planData.isEmpty ||
         planStartedOn == null ||
-        isComplete) return {};
+        isComplete) {
+      return {};
+    }
 
     final today = todayReadingDay;
     if (today == null) return {};

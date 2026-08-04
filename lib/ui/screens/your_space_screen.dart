@@ -217,8 +217,9 @@ class _HighlightsSegment extends ConsumerWidget {
                   itemCount: highlightPalette.length,
                   itemBuilder: (context, colorIndex) {
                     final refs = groupedHighlights[colorIndex];
-                    if (refs == null || refs.isEmpty)
+                    if (refs == null || refs.isEmpty) {
                       return const SizedBox.shrink();
+                    }
 
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

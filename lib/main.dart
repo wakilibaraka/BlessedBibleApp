@@ -54,15 +54,18 @@ void main() async {
     return AppErrorFallback(details: details);
   };
 
-  if (kStartupTrace)
+  if (kStartupTrace) {
     debugPrint('App start: ${startupStopwatch.elapsedMilliseconds} ms');
+  }
   WidgetsFlutterBinding.ensureInitialized();
-  if (kStartupTrace)
+  if (kStartupTrace) {
     debugPrint(
         'FlutterBinding initialized: ${startupStopwatch.elapsedMilliseconds} ms');
+  }
   final prefs = await SharedPreferences.getInstance();
-  if (kStartupTrace)
+  if (kStartupTrace) {
     debugPrint('Prefs loaded: ${startupStopwatch.elapsedMilliseconds} ms');
+  }
 
   runApp(
     ProviderScope(
@@ -86,9 +89,10 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (kStartupTrace)
+      if (kStartupTrace) {
         debugPrint(
             'First frame rendered: ${startupStopwatch.elapsedMilliseconds} ms');
+      }
     });
   }
 

@@ -890,8 +890,9 @@ class CommentaryBanner extends ConsumerWidget {
                     bookName = refStr.substring(0, lastSpaceIdx);
                     final refParts =
                         refStr.substring(lastSpaceIdx + 1).split(':');
-                    if (refParts.isNotEmpty)
+                    if (refParts.isNotEmpty) {
                       chapterNum = int.tryParse(refParts[0]) ?? 1;
+                    }
                   } else {
                     bookName = refStr;
                   }

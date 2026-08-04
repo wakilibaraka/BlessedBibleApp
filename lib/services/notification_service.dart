@@ -224,8 +224,9 @@ class NotificationService {
       // Schedule daily reminder
       tz.TZDateTime scheduledDate =
           tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
-      if (scheduledDate.isBefore(now))
+      if (scheduledDate.isBefore(now)) {
         scheduledDate = scheduledDate.add(const Duration(days: 1));
+      }
 
       await _flutterLocalNotificationsPlugin.zonedSchedule(
         id: 100,
@@ -251,8 +252,9 @@ class NotificationService {
         while (scheduledDate.weekday != i) {
           scheduledDate = scheduledDate.add(const Duration(days: 1));
         }
-        if (scheduledDate.isBefore(now))
+        if (scheduledDate.isBefore(now)) {
           scheduledDate = scheduledDate.add(const Duration(days: 7));
+        }
 
         await _flutterLocalNotificationsPlugin.zonedSchedule(
           id: 100 + i,

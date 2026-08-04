@@ -297,8 +297,9 @@ const _restDayReflections = [
 ]; // TODO: replace with curated content file
 
 int _logicalDayForReadingDay(int readingDay, ReadingPlanState s) {
-  if (s.paceMode != 'scheduled' || s.restDay == null || s.planStartedOn == null)
+  if (s.paceMode != 'scheduled' || s.restDay == null || s.planStartedOn == null) {
     return readingDay;
+  }
   final date = _dateForReadingDay(s.planStartedOn!, readingDay, s.restDay);
   return date
           .difference(DateTime.utc(s.planStartedOn!.year,
@@ -308,8 +309,9 @@ int _logicalDayForReadingDay(int readingDay, ReadingPlanState s) {
 }
 
 int _totalLogicalDays(ReadingPlanState s) {
-  if (s.paceMode != 'scheduled' || s.restDay == null || s.planStartedOn == null)
+  if (s.paceMode != 'scheduled' || s.restDay == null || s.planStartedOn == null) {
     return s.planData.length;
+  }
   final date =
       _dateForReadingDay(s.planStartedOn!, s.planData.length, s.restDay);
   return date
@@ -320,8 +322,9 @@ int _totalLogicalDays(ReadingPlanState s) {
 }
 
 int? _readingDayForLogicalDay(int logicalDay, ReadingPlanState s) {
-  if (s.paceMode != 'scheduled' || s.restDay == null || s.planStartedOn == null)
+  if (s.paceMode != 'scheduled' || s.restDay == null || s.planStartedOn == null) {
     return logicalDay;
+  }
   final d = DateTime.utc(
           s.planStartedOn!.year, s.planStartedOn!.month, s.planStartedOn!.day)
       .add(Duration(days: logicalDay - 1));
@@ -1064,9 +1067,10 @@ class _PlanMonthCalendar extends StatelessWidget {
               final isRestDay = restDay != null && cellAppWeekday == restDay;
 
               int? readingDay;
-              if (isScheduled && isCurrentMonth)
+              if (isScheduled && isCurrentMonth) {
                 readingDay = scheduledMap[
                     '${cellDate.year}-${cellDate.month}-${cellDate.day}'];
+              }
 
               return _DayCell(
                 dayNum: cellDate.day,

@@ -945,8 +945,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                       // Give one frame for the page snap to settle before unlocking
                                       WidgetsBinding.instance
                                           .addPostFrameCallback((_) {
-                                        if (mounted)
+                                        if (mounted) {
                                           _isPageSwiping.value = false;
+                                        }
                                       });
                                     }
                                   }
@@ -1175,8 +1176,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                 }
 
                                                 // ── Deliberate-drag gate for navigation ──
-                                                if (_isPageSelectionMode)
+                                                if (_isPageSelectionMode) {
                                                   return false;
+                                                }
 
                                                 if (bibleNavSettings
                                                     .swipeDownToNav) {
@@ -1214,8 +1216,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                           .mediumImpact();
                                                     }
 
-                                                    if (mounted)
+                                                    if (mounted) {
                                                       setState(() {});
+                                                    }
                                                   } else if (notification
                                                       is ScrollEndNotification) {
                                                     // Drag released

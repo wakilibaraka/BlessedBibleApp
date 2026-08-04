@@ -100,14 +100,16 @@ class HighlightsNotifier extends Notifier<Map<String, int>> {
     final current = Map<String, int>.from(state);
     if (current.containsKey(reference) && current[reference] == colorIndex) {
       current.remove(reference);
-      if (kHighlightDebug)
+      if (kHighlightDebug) {
         debugPrint(
             '[HIGHLIGHT_DEBUG] NOTIFIER removing highlight for $reference');
+      }
     } else {
       current[reference] = colorIndex;
-      if (kHighlightDebug)
+      if (kHighlightDebug) {
         debugPrint(
             '[HIGHLIGHT_DEBUG] NOTIFIER adding highlight for $reference -> $colorIndex');
+      }
     }
     state = current;
     ref.read(preferencesProvider).saveHighlights(current);

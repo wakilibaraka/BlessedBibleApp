@@ -252,8 +252,9 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
   // Helper for snippet
   String highlightSnippet(String text, String queryLower) {
     final index = text.toLowerCase().indexOf(queryLower);
-    if (index == -1)
+    if (index == -1) {
       return text.length > 100 ? '${text.substring(0, 100)}...' : text;
+    }
 
     final start = (index - 30).clamp(0, text.length);
     final end = (index + queryLower.length + 30).clamp(0, text.length);

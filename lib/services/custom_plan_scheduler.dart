@@ -30,8 +30,9 @@ class CustomPlanScheduler {
     if (type == 'whole') return whole;
     if (type == 'ot') return whole.where((c) => _isOT(c.bookName)).toList();
     if (type == 'nt') return whole.where((c) => !_isOT(c.bookName)).toList();
-    if (type == 'book' && startBook != null)
+    if (type == 'book' && startBook != null) {
       return whole.where((c) => c.bookName == startBook).toList();
+    }
     if (type == 'slice' && startBook != null && startChapter != null) {
       int idx = whole.indexWhere(
           (c) => c.bookName == startBook && c.chapterNum == startChapter);

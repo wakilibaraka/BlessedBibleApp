@@ -128,8 +128,9 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
 
   void _resolvePassages() {
     final planState = ref.read(readingPlanProvider(widget.planId));
-    if (planState.planData.isEmpty || widget.dayNum > planState.planData.length)
+    if (planState.planData.isEmpty || widget.dayNum > planState.planData.length) {
       return;
+    }
     final dayData = planState.planData[widget.dayNum - 1];
     final flatChapters = ref.read(flatChaptersProvider);
     if (flatChapters.isEmpty) return;
@@ -661,8 +662,9 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
                   switchInCurve: Curves.easeOutCubic,
                   switchOutCurve: Curves.easeInCubic,
                   transitionBuilder: (child, animation) {
-                    if (child.key == const ValueKey('empty'))
+                    if (child.key == const ValueKey('empty')) {
                       return const SizedBox.shrink();
+                    }
                     return SlideTransition(
                       position: Tween<Offset>(
                         begin: const Offset(0, 1),

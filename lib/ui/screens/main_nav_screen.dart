@@ -415,8 +415,9 @@ class MainNavScreen extends ConsumerWidget {
                                                                     context);
                                                             Future(() {
                                                               if (!context
-                                                                  .mounted)
+                                                                  .mounted) {
                                                                 return;
+                                                              }
                                                               ref
                                                                   .read(readSettingsProvider
                                                                       .notifier)

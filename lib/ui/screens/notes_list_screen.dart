@@ -233,7 +233,9 @@ Future<void> showAddNoteSheet(
             ),
             onPressed: () {
               if (titleController.text.trim().isEmpty ||
-                  contentController.text.trim().isEmpty) return;
+                  contentController.text.trim().isEmpty) {
+                return;
+              }
 
               final now = DateTime.now();
               const months = [

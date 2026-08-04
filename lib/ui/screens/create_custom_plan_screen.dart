@@ -198,10 +198,12 @@ class _CreateCustomPlanScreenState
 
     bool isValid = corpus.isNotEmpty && schedule.isNotEmpty;
     if (_useDuration &&
-        (durationDays == null || durationDays < 1 || durationDays > 1095))
+        (durationDays == null || durationDays < 1 || durationDays > 1095)) {
       isValid = false;
-    if (!_useDuration && _targetEndDate.isBefore(DateTime.now()))
+    }
+    if (!_useDuration && _targetEndDate.isBefore(DateTime.now())) {
       isValid = false;
+    }
 
     int totalReadingDays = schedule.length;
     double avgPerDay =

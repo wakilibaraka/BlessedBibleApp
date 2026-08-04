@@ -117,8 +117,9 @@ class ReadingPlansHubScreen extends ConsumerWidget {
                     (context, index) {
                       final planId = inProgressPlanIds[index];
                       final planState = ref.watch(readingPlanProvider(planId));
-                      if (planState.planData.isEmpty && !planState.isLoading)
+                      if (planState.planData.isEmpty && !planState.isLoading) {
                         return const SizedBox.shrink();
+                      }
                       return Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16.0, vertical: 8.0),
@@ -150,8 +151,9 @@ class ReadingPlansHubScreen extends ConsumerWidget {
                     (context, index) {
                       final planId = completedPlanIds[index];
                       final planState = ref.watch(readingPlanProvider(planId));
-                      if (planState.planData.isEmpty && !planState.isLoading)
+                      if (planState.planData.isEmpty && !planState.isLoading) {
                         return const SizedBox.shrink();
+                      }
                       return Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16.0, vertical: 8.0),
