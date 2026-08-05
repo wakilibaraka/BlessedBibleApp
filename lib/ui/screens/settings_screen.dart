@@ -190,29 +190,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
         ],
       ),
 
-      SettingsPillCard(
-        children: [
-          Consumer(builder: (context, ref, _) {
-            final actionStyle =
-                ref.watch(readSettingsProvider.select((s) => s.verseActionStyle));
-            return AnimatedSegmentedTile<VerseActionStyle>(
-              title: 'Verse Action Style',
-              subtitle:
-                  'Layout for highlight & action controls when a verse is selected',
-              selectedValue: actionStyle,
-              options: const [
-                MapEntry(VerseActionStyle.classic, 'Classic'),
-                MapEntry(VerseActionStyle.horizontal, 'Minimal'),
-                MapEntry(VerseActionStyle.raindrop, 'Raindrop'),
-              ],
-              onChanged: (val) {
-                HapticFeedback.selectionClick();
-                ref.read(readSettingsProvider.notifier).setVerseActionStyle(val);
-              },
-            );
-          }),
-        ],
-      ),
+
 
       SettingsPillCard(
         children: [
@@ -475,6 +453,29 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
               onChanged: (value) {
                 HapticFeedback.selectionClick();
                 ref.read(searchSettingsProvider.notifier).toggleAutoOpen(value);
+              },
+            );
+          }),
+        ],
+      ),
+      SettingsPillCard(
+        children: [
+          Consumer(builder: (context, ref, _) {
+            final actionStyle =
+                ref.watch(readSettingsProvider.select((s) => s.verseActionStyle));
+            return AnimatedSegmentedTile<VerseActionStyle>(
+              title: 'Verse Action Style',
+              subtitle:
+                  'Layout for highlight & action controls when a verse is selected',
+              selectedValue: actionStyle,
+              options: const [
+                MapEntry(VerseActionStyle.classic, 'Classic'),
+                MapEntry(VerseActionStyle.horizontal, 'Minimal'),
+                MapEntry(VerseActionStyle.raindrop, 'Raindrop'),
+              ],
+              onChanged: (val) {
+                HapticFeedback.selectionClick();
+                ref.read(readSettingsProvider.notifier).setVerseActionStyle(val);
               },
             );
           }),
