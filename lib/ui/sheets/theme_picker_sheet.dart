@@ -160,10 +160,12 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                                             'Visual depth and material styling',
                                         selectedValue: surfaceStyle,
                                         options: const [
-                                          MapEntry(EarthHeavenStyle.heaven,
-                                              'Heaven'),
                                           MapEntry(
                                               EarthHeavenStyle.earth, 'Earth'),
+                                          MapEntry(EarthHeavenStyle.heaven,
+                                              'Heaven'),
+                                          MapEntry(EarthHeavenStyle.threeD,
+                                              '3D'),
                                         ],
                                         onChanged: (val) {
                                           HapticFeedback.selectionClick();
@@ -178,9 +180,12 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                                             top: 4.0, left: 2.0),
                                         child: Text(
                                           surfaceStyle ==
-                                                  EarthHeavenStyle.heaven
-                                              ? 'Layered depth'
-                                              : 'Flat surfaces',
+                                                  EarthHeavenStyle.threeD
+                                              ? 'Modern 3D depth'
+                                              : surfaceStyle ==
+                                                      EarthHeavenStyle.heaven
+                                                  ? 'Layered depth'
+                                                  : 'Flat surfaces',
                                           style: theme.textTheme.labelSmall
                                               ?.copyWith(
                                             color: theme.colorScheme.onSurface

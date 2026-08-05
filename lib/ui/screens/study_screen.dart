@@ -567,22 +567,8 @@ class _ReadingPlanBannerState extends ConsumerState<ReadingPlanBanner>
     return AnimatedSize(
       duration: const Duration(milliseconds: 250),
       curve: Curves.easeInOut,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: theme.brightness == Brightness.dark
-                  ? Colors.black.withValues(alpha: 0.3)
-                  : AppColors.goldAccent.withValues(alpha: 0.1),
-              blurRadius: 16,
-              spreadRadius: 2,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: RepaintBoundary(
-          child: TexturedGlassContainer(
+      child: RepaintBoundary(
+        child: TexturedGlassContainer(
             isScrollable: true,
             borderRadius: BorderRadius.circular(24),
             padding: EdgeInsets.zero,
@@ -675,8 +661,7 @@ class _ReadingPlanBannerState extends ConsumerState<ReadingPlanBanner>
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 }
 

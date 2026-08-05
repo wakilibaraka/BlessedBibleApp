@@ -44,7 +44,8 @@ class TexturedGlassContainer extends ConsumerWidget {
     final surfaceStyle = ref.watch(surfaceStyleProvider);
     final radius = borderRadius ?? BorderRadius.circular(24);
 
-    final useBlur = surfaceStyle == SurfaceStyle.frosted && !isScrollable;
+    final isDepth3D = surfaceStyle == SurfaceStyle.depth3D;
+    final useBlur = (surfaceStyle == SurfaceStyle.frosted || isDepth3D) && !isScrollable;
     final is3D = surfaceStyle == SurfaceStyle.threeDimensional;
 
     final tokens = Theme.of(context).extension<ReadingTokens>()!;
@@ -79,8 +80,8 @@ class TexturedGlassContainer extends ConsumerWidget {
           isDarkPanel = true;
           break;
       }
-    } else if (surfaceStyle == SurfaceStyle.frosted && isScrollable) {
-      fillColor = tokens.readingSurface.withValues(alpha: 0.92);
+    } else if ((surfaceStyle == SurfaceStyle.frosted || isDepth3D) && isScrollable) {
+      fillColor = tokens.readingSurface.withValues(alpha: 0.95);
       isDarkPanel = tokens.readingSurface.computeLuminance() < 0.4;
     } else {
       fillColor = tokens.readingSurface;
@@ -91,7 +92,23 @@ class TexturedGlassContainer extends ConsumerWidget {
     final isDarkBg = bgLuminance < 0.4;
 
     final List<BoxShadow> shadows;
-    if (is3D) {
+    if (isDepth3D) {
+      shadows = isDarkBg
+          ? [
+              BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.40),
+                  offset: const Offset(0, 6),
+                  blurRadius: 20,
+                  spreadRadius: -4),
+            ]
+          : [
+              BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.06),
+                  offset: const Offset(0, 4),
+                  blurRadius: 16,
+                  spreadRadius: -2),
+            ];
+    } else if (is3D) {
       shadows = isDarkBg
           ? [
               BoxShadow(
@@ -147,10 +164,17 @@ class TexturedGlassContainer extends ConsumerWidget {
         borderRadius: radius,
         border: useBlur
             ? null
-            : Border.all(
-                width: is3D ? 0.0 : 0.5,
-                color: is3D ? Colors.transparent : tokens.readingBorder,
-              ),
+            : isDepth3D
+                ? Border.all(
+                    width: 1.0,
+                    color: isDarkBg
+                        ? Colors.white.withValues(alpha: 0.10)
+                        : Colors.black.withValues(alpha: 0.05),
+                  )
+                : Border.all(
+                    width: is3D ? 0.0 : 0.5,
+                    color: is3D ? Colors.transparent : tokens.readingBorder,
+                  ),
       ),
       child: child,
     );

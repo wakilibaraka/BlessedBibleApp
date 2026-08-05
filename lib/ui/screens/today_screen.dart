@@ -254,7 +254,8 @@ class _GreetingHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GlassContainer(
+    return TexturedGlassContainer(
+      isScrollable: true,
       padding: const EdgeInsets.all(20),
       child: Row(
         children: [
@@ -327,7 +328,8 @@ class _TodaysReadingCard extends ConsumerWidget {
           .toList();
     }
 
-    return GlassContainer(
+    return TexturedGlassContainer(
+      isScrollable: true,
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -465,7 +467,8 @@ class _LatestNoteCard extends ConsumerWidget {
         hasNote ? notes.first.content : 'Write your first note to see it here.';
     final noteDate = hasNote ? notes.first.date : '';
 
-    return GlassContainer(
+    return TexturedGlassContainer(
+      isScrollable: true,
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -548,7 +551,8 @@ class _StreakProgressCard extends ConsumerWidget {
         ? planState.currentDay - 1
         : 0;
 
-    return GlassContainer(
+    return TexturedGlassContainer(
+      isScrollable: true,
       padding: const EdgeInsets.all(20),
       child: Row(
         children: [
@@ -672,7 +676,8 @@ class _QuickActionsRow extends ConsumerWidget {
       ),
     ];
 
-    return GlassContainer(
+    return TexturedGlassContainer(
+      isScrollable: true,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
