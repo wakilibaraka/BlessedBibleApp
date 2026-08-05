@@ -120,17 +120,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            backgroundColor: Colors.transparent,
-            builder: (ctx) => const SearchSettingsSheet(),
-          );
-        },
-        child: const Icon(Icons.tune_rounded),
-      ),
       body: SafeArea(
         bottom: false,
         child: FadeTransition(

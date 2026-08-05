@@ -223,6 +223,8 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                   ],
                 ),
 
+                const Divider(height: 24),
+
                 // 2. FLOATING VERSE CARD
                 if (fetchedVerseText != null)
                   Container(

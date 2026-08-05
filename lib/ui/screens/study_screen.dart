@@ -11,7 +11,6 @@ import '../../state/theme_provider.dart';
 import '../../theme/app_colors.dart';
 import '../widgets/textured_glass_container.dart';
 import '../widgets/your_space_hero.dart';
-import 'votd_archive_screen.dart';
 import '../../state/study_layout_provider.dart';
 import '../widgets/jiggle_animator.dart';
 import '../../state/reading_plan_provider.dart';
@@ -248,58 +247,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                                 onTap: () {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text(streak.count > 0
-                                          ? '${streak.count} Day Streak! Keep it up!'
-                                          : 'Read today to start your streak!'),
-                                      behavior: SnackBarBehavior.floating,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12)),
-                                    ),
-                                  );
-                                },
-                                child: Row(
-                                  children: [
-                                    if (streak.count > 0 || isLit) ...[
-                                      Icon(
-                                          isLit
-                                              ? Icons
-                                                  .local_fire_department_rounded
-                                              : Icons
-                                                  .local_fire_department_outlined,
-                                          color: glowColor,
-                                          shadows: isLit
-                                              ? [
-                                                  Shadow(
-                                                    color: glowColor.withValues(
-                                                        alpha: 0.6),
-                                                    blurRadius: 10 +
-                                                        (streak.count
-                                                            .clamp(0, 10)
-                                                            .toDouble()),
-                                                  )
-                                                ]
-                                              : null,
-                                          size: 24),
-                                      const SizedBox(width: 4),
-                                      Text('${streak.count}',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              color: isLit
-                                                  ? theme.colorScheme.onSurface
-                                                  : theme.colorScheme.onSurface
-                                                      .withValues(alpha: 0.6))),
-                                    ],
-                                  ],
-                                ),
-                              ),
-                              if (streak.count > 0 || isLit)
-                                const SizedBox(width: 16),
-                              GestureDetector(
-                                behavior: HitTestBehavior.opaque,
-                                onTap: () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
                                       content: Text(showNudge
                                           ? 'Read today to save your streak!'
                                           : 'Notifications coming soon!'),
@@ -373,9 +320,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                       break;
                     case 'commentary':
                       cardWidget = CommentaryBanner(size: config.size);
-                      break;
-                    case 'saved_verses':
-                      cardWidget = VotdArchiveBanner(size: config.size);
                       break;
                     default:
                       cardWidget = const SizedBox.shrink();
@@ -651,8 +595,14 @@ class _ReadingPlanBannerState extends ConsumerState<ReadingPlanBanner>
                     borderRadius:
                         const BorderRadius.vertical(top: Radius.circular(24)),
                     onTap: () {
-                      Navigator.of(context).push(CupertinoPageRoute(
-                          builder: (_) => const ReadingPlansHubScreen()));
+                      if (activePlanIds.isNotEmpty) {
+                        Navigator.of(context).push(CupertinoPageRoute(
+                            builder: (_) => ReadingPlanBrowser(
+                                planId: activePlanIds.first)));
+                      } else {
+                        Navigator.of(context).push(CupertinoPageRoute(
+                            builder: (_) => const ReadingPlansHubScreen()));
+                      }
                     },
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
@@ -793,19 +743,10 @@ class _PlanRowWidgetState extends ConsumerState<_PlanRowWidget> {
           onTap: () {
             if (planState.currentDay == 0) {
               ref.read(readingPlanProvider(planId).notifier).startPlan();
-              Navigator.of(context).push(CupertinoPageRoute(
-                builder: (_) => DayView(planId: planId, dayNum: 1),
-              ));
-            } else if (planState.isPlanComplete) {
-              Navigator.of(context).push(CupertinoPageRoute(
-                builder: (_) => ReadingPlanBrowser(planId: planId),
-              ));
-            } else {
-              Navigator.of(context).push(CupertinoPageRoute(
-                builder: (_) =>
-                    DayView(planId: planId, dayNum: planState.currentDay),
-              ));
             }
+            Navigator.of(context).push(CupertinoPageRoute(
+              builder: (_) => ReadingPlanBrowser(planId: planId),
+            ));
           },
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -1045,101 +986,3 @@ class CommentaryBanner extends ConsumerWidget {
   }
 }
 
-class VotdArchiveBanner extends ConsumerWidget {
-  final CardSize size;
-  const VotdArchiveBanner({super.key, required this.size});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    return AnimatedSize(
-      duration: const Duration(milliseconds: 250),
-      curve: Curves.easeInOut,
-      child: RepaintBoundary(
-        child: TexturedGlassContainer(
-          isScrollable: true,
-          borderRadius: BorderRadius.circular(20),
-          padding: EdgeInsets.zero,
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(20),
-              onTap: () {
-                Navigator.of(context).push(
-                  CupertinoPageRoute(builder: (_) => const VotdArchiveScreen()),
-                );
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: theme.colorScheme.surface.withValues(alpha: 0.3),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 20.0, vertical: 16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.history_rounded,
-                              color: theme.primaryColor, size: 24),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Verse of the Day Archive',
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(
-                                  'Catch up on verses from days you missed.',
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                      color: theme.textTheme.bodySmall?.color),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Icon(Icons.keyboard_arrow_right_rounded,
-                              color: theme.primaryColor),
-                        ],
-                      ),
-                      if (size == CardSize.medium ||
-                          size == CardSize.large) ...[
-                        const SizedBox(height: 16),
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.onSurface
-                                .withValues(alpha: 0.05),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.auto_awesome,
-                                  color:
-                                      theme.primaryColor.withValues(alpha: 0.7),
-                                  size: 16),
-                              const SizedBox(width: 8),
-                              Text('Explore your past daily verses',
-                                  style: theme.textTheme.labelSmall?.copyWith(
-                                      color: theme.colorScheme.onSurface
-                                          .withValues(alpha: 0.7))),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}

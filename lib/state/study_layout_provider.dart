@@ -61,7 +61,6 @@ class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
     StudyCardConfig(id: 'your_space', size: CardSize.large),
     StudyCardConfig(id: 'reading_plan', size: CardSize.large),
     StudyCardConfig(id: 'commentary', size: CardSize.large),
-    StudyCardConfig(id: 'saved_verses', size: CardSize.medium),
   ];
 
   @override
@@ -72,6 +71,7 @@ class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
         final List<dynamic> decoded = jsonDecode(prefsJson);
         final loaded = decoded
             .map((e) => StudyCardConfig.fromJson(e as Map<String, dynamic>))
+            .where((c) => c.id != 'saved_verses')
             .toList();
 
         // Ensure all default cards are present (in case of updates)

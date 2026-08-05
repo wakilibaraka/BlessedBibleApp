@@ -1592,20 +1592,50 @@ class _DayViewState extends ConsumerState<DayView>
           '${_weekdayShort[d.weekday - 1]}, ${_monthNamesShort[d.month - 1]} ${d.day}, ${d.year}';
     }
 
+    // ── Derive plan display name ──────────────────────────────────────────────
+    String planDisplayName;
+    String planSubtitle;
+    if (widget.planId == 'chronological_1yr') {
+      planDisplayName = 'Chronological Bible in a Year';
+      planSubtitle = 'Guthrie · Read the Bible for Life · 52 wks';
+    } else if (widget.planId == 'great_controversy') {
+      planDisplayName = 'The Great Controversy';
+      planSubtitle = 'Ellen G. White';
+    } else if (widget.planId == 'prophetic_timeline') {
+      planDisplayName = 'Prophetic Timeline';
+      planSubtitle = '';
+    } else {
+      final customPlan =
+          ref.read(preferencesProvider).getCustomPlan(widget.planId);
+      planDisplayName = customPlan?['title'] ?? 'Reading Plan';
+      planSubtitle = '';
+    }
+
+    final progressPct =
+        (planState.percentComplete * 100).toStringAsFixed(1);
+
+    // ── Passage subtitle line ─────────────────────────────────────────────────
+    final passageSubtitle =
+        dayData.passages.map((p) => _expandLabel(p)).join(' · ');
+
     return Scaffold(
       backgroundColor: getThemeBackgroundColor(),
       extendBodyBehindAppBar: true,
+      // Transparent app bar — back arrow left, settings gear right
       appBar: SharedAppBar(
         title: const Text(''),
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
           IconButton(
-            icon: Icon(Icons.settings_rounded, color: gold),
-            onPressed: () {}, // Reserved for settings
+            icon: Icon(Icons.settings_rounded,
+                color: gold.withValues(alpha: 0.8)),
+            onPressed: () {},
+            tooltip: 'Plan Settings',
           ),
         ],
       ),
+      // Bottom nav: Reading X of Y with prev/next
       bottomNavigationBar: navBar,
       body: GestureDetector(
         onHorizontalDragEnd: (details) {
@@ -1618,38 +1648,138 @@ class _DayViewState extends ConsumerState<DayView>
         },
         child: Stack(
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+            // ── Main scrollable body ──────────────────────────────────────────
+            ListView(
+              padding: EdgeInsets.zero,
               children: [
+                // ── HERO HEADER — editorial title zone ───────────────────────
                 Container(
-                  color: gold.withValues(alpha: 0.10),
-                  padding: const EdgeInsets.only(
-                      top: 72, bottom: 16, left: 24, right: 24),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        gold.withValues(alpha: 0.13),
+                        gold.withValues(alpha: 0.0),
+                      ],
+                    ),
+                  ),
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.paddingOf(context).top + 48,
+                    bottom: 20,
+                    left: 20,
+                    right: 20,
+                  ),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(dateHeader,
-                          style: theme.textTheme.labelMedium?.copyWith(
-                              letterSpacing: 1.1,
-                              color: gold.withValues(alpha: 0.8))),
-                      const SizedBox(height: 4),
-                      Text(dayData.title,
-                          style: const TextStyle(
-                              fontFamily: 'EB Garamond',
-                              fontSize: 26,
-                              fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.center),
+                      // Eyebrow date label
+                      Text(
+                        dateHeader.toUpperCase(),
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          letterSpacing: 1.4,
+                          color: gold.withValues(alpha: 0.75),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      // Large expressive plan-section title
+                      Text(
+                        dayData.title,
+                        style: const TextStyle(
+                          fontFamily: 'EB Garamond',
+                          fontSize: 38,
+                          fontWeight: FontWeight.bold,
+                          height: 1.15,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 6),
+                      // Passage subtitle — muted, smaller
+                      Text(
+                        passageSubtitle,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: gold.withValues(alpha: 0.85),
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 0.2,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ],
                   ),
                 ),
-                Expanded(
-                  child: ListView(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                    children: [
-                      ...dayData.passages.asMap().entries.map((entry) {
+
+                // ── MARK AS READ — full-width primary CTA ────────────────────
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+                  child: AnimatedBuilder(
+                    animation: _glowAnimation,
+                    builder: (context, child) => Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: _glowAnimation.value > 0
+                            ? [
+                                BoxShadow(
+                                  color: gold.withValues(
+                                      alpha: 0.55 * _glowAnimation.value),
+                                  blurRadius: 22 * _glowAnimation.value,
+                                  spreadRadius: 4 * _glowAnimation.value,
+                                )
+                              ]
+                            : [],
+                      ),
+                      child: child,
+                    ),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              isDone ? gold : theme.cardColor,
+                          foregroundColor: isDone ? Colors.white : gold,
+                          side: isDone
+                              ? BorderSide.none
+                              : BorderSide(color: gold, width: 2),
+                          padding:
+                              const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18)),
+                          elevation: isDone ? 3 : 0,
+                        ),
+                        onPressed: () => _toggleDone(isDone, readingDay),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                                isDone
+                                    ? Icons.check_circle_rounded
+                                    : Icons.circle_outlined,
+                                size: 22),
+                            const SizedBox(width: 10),
+                            Text(
+                              isDone ? 'COMPLETED' : 'MARK AS READ',
+                              style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 2.0),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                // ── Passage tap-cards — compact row under the CTA ────────────
+                if (dayData.passages.length > 1)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+                    child: Column(
+                      children: dayData.passages.asMap().entries.map((entry) {
                         final idx = entry.key + 1;
                         final passage = entry.value;
                         return Padding(
-                          padding: const EdgeInsets.only(bottom: 14),
+                          padding: const EdgeInsets.only(bottom: 8),
                           child: Material(
                             color: theme.cardColor,
                             borderRadius: BorderRadius.circular(12),
@@ -1668,7 +1798,8 @@ class _DayViewState extends ConsumerState<DayView>
                                 );
                                 if (markedComplete == true && mounted) {
                                   final isDoneNow = ref
-                                      .read(readingPlanProvider(widget.planId))
+                                      .read(readingPlanProvider(
+                                          widget.planId))
                                       .completedReadings
                                       .contains(readingDay);
                                   if (!isDoneNow) {
@@ -1678,156 +1809,172 @@ class _DayViewState extends ConsumerState<DayView>
                               },
                               borderRadius: BorderRadius.circular(12),
                               child: Container(
-                                height: 52,
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 18),
+                                height: 48,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 14),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: theme.dividerColor),
+                                  border:
+                                      Border.all(color: theme.dividerColor),
                                 ),
                                 child: Row(
                                   children: [
                                     Container(
-                                      width: 28,
-                                      height: 28,
+                                      width: 24,
+                                      height: 24,
                                       decoration: BoxDecoration(
                                           shape: BoxShape.circle,
-                                          color: gold.withValues(alpha: 0.12)),
+                                          color:
+                                              gold.withValues(alpha: 0.12)),
                                       child: Center(
                                           child: Text('$idx',
                                               style: TextStyle(
-                                                  fontSize: 12,
+                                                  fontSize: 11,
                                                   fontWeight: FontWeight.bold,
                                                   color: gold))),
                                     ),
-                                    const SizedBox(width: 14),
+                                    const SizedBox(width: 10),
                                     Expanded(
                                         child: Text(_expandLabel(passage),
                                             style: const TextStyle(
                                                 fontFamily: 'EB Garamond',
-                                                fontSize: 18,
+                                                fontSize: 16,
                                                 fontWeight: FontWeight.w600))),
-                                    Icon(Icons.menu_book_rounded,
-                                        size: 18,
-                                        color: gold.withValues(alpha: 0.6)),
+                                    Icon(Icons.arrow_forward_ios_rounded,
+                                        size: 12,
+                                        color: gold.withValues(alpha: 0.5)),
                                   ],
                                 ),
                               ),
                             ),
                           ),
                         );
-                      }),
-                      const SizedBox(height: 12),
-                      AnimatedBuilder(
-                        animation: _glowAnimation,
-                        builder: (context, child) => Container(
-                          decoration: BoxDecoration(
-                            boxShadow: _glowAnimation.value > 0
-                                ? [
-                                    BoxShadow(
-                                      color: gold.withValues(
-                                          alpha: 0.55 * _glowAnimation.value),
-                                      blurRadius: 22 * _glowAnimation.value,
-                                      spreadRadius: 4 * _glowAnimation.value,
-                                    )
-                                  ]
-                                : [],
-                          ),
-                          child: child,
-                        ),
-                        child: SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: isDone ? gold : theme.cardColor,
-                              foregroundColor: isDone ? Colors.white : gold,
-                              side: isDone
-                                  ? BorderSide.none
-                                  : BorderSide(color: gold, width: 2),
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16)),
-                            ),
-                            onPressed: () => _toggleDone(isDone, readingDay),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                    isDone
-                                        ? Icons.check_circle_rounded
-                                        : Icons.circle_outlined,
-                                    size: 20),
-                                const SizedBox(width: 10),
-                                Text(
-                                  isDone ? 'COMPLETED' : 'MARK AS READ',
-                                  style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 1.8),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      _AdaptivePlanCalendar(
-                        planState: planState,
-                        displayMonth: _displayMonth,
-                        isYearView: _isYearView,
-                        onPrevMonth: _prevMonth,
-                        onNextMonth: _nextMonth,
-                        onJumpToMonth: _jumpToMonth,
-                        onToggleYearView: _toggleYearView,
-                        scheduledMap: planState.paceMode == 'scheduled'
-                            ? _buildDateToReadingMap(planState)
-                            : <String, int>{},
-                        realToday: DateTime.now(),
-                        isScheduled: planState.paceMode == 'scheduled',
-                        gold: gold,
-                        theme: theme,
-                        onDayTap: (dayNum) {
-                          HapticFeedback.selectionClick();
-                          final logicalDay =
-                              _logicalDayForReadingDay(dayNum, planState);
-                          setState(() => _currentLogicalDay = logicalDay);
-                        },
-                      ),
-                      const SizedBox(height: 24),
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: theme.scaffoldBackgroundColor,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(
-                              color: theme.dividerColor.withValues(alpha: 0.5)),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(Icons.info_outline_rounded,
-                                size: 24, color: gold.withValues(alpha: 0.5)),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('Chronological Bible in a Year',
-                                      style: TextStyle(
-                                          fontFamily: 'EB Garamond',
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: gold)),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                      'Guthrie – Read the Bible for Life • 52 weeks',
-                                      style: theme.textTheme.labelSmall
-                                          ?.copyWith(
-                                              color: theme.colorScheme.onSurface
-                                                  .withValues(alpha: 0.6))),
-                                ],
+                      }).toList(),
+                    ),
+                  )
+                else
+                  // Single passage — tap the whole title zone to open reader
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () async {
+                          final markedComplete =
+                              await Navigator.push<bool>(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => PlanReaderScreen(
+                                planId: widget.planId,
+                                dayNum: readingDay,
+                                initialPassageIndex: 0,
                               ),
                             ),
-                          ],
+                          );
+                          if (markedComplete == true && mounted) {
+                            final isDoneNow = ref
+                                .read(readingPlanProvider(widget.planId))
+                                .completedReadings
+                                .contains(readingDay);
+                            if (!isDoneNow) {
+                              _toggleDone(false, readingDay);
+                            }
+                          }
+                        },
+                        borderRadius: BorderRadius.circular(8),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.menu_book_rounded,
+                                  size: 14,
+                                  color: gold.withValues(alpha: 0.7)),
+                              const SizedBox(width: 6),
+                              Text(
+                                'Open in reader',
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  color: gold.withValues(alpha: 0.7),
+                                  fontWeight: FontWeight.w500,
+                                  letterSpacing: 0.3,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                // ── CALENDAR — HERO section ───────────────────────────────────
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                  child: _AdaptivePlanCalendar(
+                    planState: planState,
+                    displayMonth: _displayMonth,
+                    isYearView: _isYearView,
+                    onPrevMonth: _prevMonth,
+                    onNextMonth: _nextMonth,
+                    onJumpToMonth: _jumpToMonth,
+                    onToggleYearView: _toggleYearView,
+                    scheduledMap: planState.paceMode == 'scheduled'
+                        ? _buildDateToReadingMap(planState)
+                        : <String, int>{},
+                    realToday: DateTime.now(),
+                    isScheduled: planState.paceMode == 'scheduled',
+                    gold: gold,
+                    theme: theme,
+                    onDayTap: (dayNum) {
+                      HapticFeedback.selectionClick();
+                      final logicalDay =
+                          _logicalDayForReadingDay(dayNum, planState);
+                      setState(() => _currentLogicalDay = logicalDay);
+                    },
+                  ),
+                ),
+
+                // ── PLAN INFO — compact footer strip ─────────────────────────
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
+                  child: Row(
+                    children: [
+                      Icon(Icons.auto_stories_rounded,
+                          size: 14, color: gold.withValues(alpha: 0.5)),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: planDisplayName,
+                                style: TextStyle(
+                                  fontFamily: 'EB Garamond',
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: gold.withValues(alpha: 0.8),
+                                ),
+                              ),
+                              if (planSubtitle.isNotEmpty)
+                                TextSpan(
+                                  text: '  ·  $planSubtitle',
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    color: theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.45),
+                                  ),
+                                ),
+                            ],
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '$progressPct%',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: gold.withValues(alpha: 0.7),
                         ),
                       ),
                     ],
@@ -1835,6 +1982,8 @@ class _DayViewState extends ConsumerState<DayView>
                 ),
               ],
             ),
+
+            // ── Confetti overlay ──────────────────────────────────────────────
             Align(
               alignment: Alignment.topCenter,
               child: ConfettiWidget(
@@ -2074,8 +2223,9 @@ class _AdaptivePlanCalendar extends ConsumerWidget {
       final displayTotalMonths =
           totalMonths > 12 && totalDays <= 366 ? 12 : totalMonths;
       final pct = totalDays > 0
-          ? (planState.completedReadings.length / totalDays * 100).floor()
-          : 0;
+          ? (planState.completedReadings.length / totalDays * 100)
+              .toStringAsFixed(1)
+          : '0.0';
 
       calendarWidget = Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -2088,6 +2238,7 @@ class _AdaptivePlanCalendar extends ConsumerWidget {
                 style: theme.textTheme.labelMedium?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
               ),
               ToggleButtons(
                 isSelected: [!isYearView, isYearView],

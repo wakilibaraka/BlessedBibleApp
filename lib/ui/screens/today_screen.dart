@@ -14,6 +14,9 @@ import '../../state/nav_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'your_space_screen.dart';
 import 'commentary_hub_screen.dart';
+import 'votd_archive_screen.dart';
+import 'notes_list_screen.dart';
+import '../widgets/textured_glass_container.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TODAY SCREEN — static scaffold (Stage 1: design / no data wiring)
@@ -63,13 +66,21 @@ class TodayScreen extends ConsumerWidget {
 
     final greetings = ['Good morning', 'Good afternoon', 'Good evening'];
     final hour = now.hour;
-    final greeting = hour < 12
-        ? greetings[0]
-        : hour < 17
-            ? greetings[1]
-            : greetings[2];
+    final greeting = hour < 4
+        ? 'Good night'
+        : hour < 12
+            ? greetings[0]
+            : hour < 17
+                ? greetings[1]
+                : greetings[2];
 
-    return GestureDetector(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        Navigator.of(context).pop();
+      },
+      child: GestureDetector(
       behavior: HitTestBehavior.opaque,
       onHorizontalDragEnd: (details) {
         if (details.primaryVelocity != null && details.primaryVelocity! > 300) {
@@ -143,6 +154,13 @@ class TodayScreen extends ConsumerWidget {
                         const SizedBox(height: 20),
 
                         // ═══════════════════════════════════════════════════════
+                        // 3b. VOTD ARCHIVE
+                        // ═══════════════════════════════════════════════════════
+                        _VotdArchiveCard(theme: theme),
+
+                        const SizedBox(height: 20),
+
+                        // ═══════════════════════════════════════════════════════
                         // 4. LATEST NOTE / HIGHLIGHT
                         // ═══════════════════════════════════════════════════════
                         _SectionLabel(label: 'LATEST NOTE', theme: theme),
@@ -197,6 +215,7 @@ class TodayScreen extends ConsumerWidget {
         ],
       ),
       ),
+    ),
     );
   }
 }
@@ -488,7 +507,11 @@ class _LatestNoteCard extends ConsumerWidget {
           Align(
             alignment: Alignment.centerRight,
             child: TextButton.icon(
-              onPressed: null, // Stage 2: open NotesListScreen
+              onPressed: () {
+                Navigator.of(context).push(
+                  CupertinoPageRoute(builder: (_) => const NotesListScreen()),
+                );
+              },
               icon: const Icon(Icons.arrow_forward_rounded, size: 14),
               label: const Text('View all notes'),
               style: TextButton.styleFrom(
@@ -519,7 +542,7 @@ class _StreakProgressCard extends ConsumerWidget {
     final primaryPlanId =
         activePlanIds.isNotEmpty ? activePlanIds.first : 'chronological_1yr';
     final planState = ref.watch(readingPlanProvider(primaryPlanId));
-    final streakDays = planState.currentDay > 1 ? planState.currentDay - 1 : 0;
+    final streakDays = ref.watch(streakProvider).count;
     final totalDays = planState.planData.length;
     final totalCompleted = planState.currentDay > 1 && totalDays > 0
         ? planState.currentDay - 1
@@ -766,6 +789,89 @@ class _StreakHeroWidget extends ConsumerWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 7. VOTD Archive Card
+// ─────────────────────────────────────────────────────────────────────────────
+class _VotdArchiveCard extends StatelessWidget {
+  final ThemeData theme;
+  const _VotdArchiveCard({required this.theme});
+
+  @override
+  Widget build(BuildContext context) {
+    return TexturedGlassContainer(
+      borderRadius: BorderRadius.circular(20),
+      padding: EdgeInsets.zero,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () {
+            Navigator.of(context).push(
+              CupertinoPageRoute(builder: (_) => const VotdArchiveScreen()),
+            );
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: theme.colorScheme.surface.withValues(alpha: 0.3),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.history_rounded, color: theme.primaryColor, size: 24),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Verse of the Day Archive',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              'Catch up on verses from days you missed.',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.textTheme.bodySmall?.color),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Icon(Icons.keyboard_arrow_right_rounded, color: theme.primaryColor),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.auto_awesome, color: theme.primaryColor.withValues(alpha: 0.7), size: 16),
+                        const SizedBox(width: 8),
+                        Text('Explore your past daily verses',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                                color: theme.colorScheme.onSurface.withValues(alpha: 0.7))),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );
