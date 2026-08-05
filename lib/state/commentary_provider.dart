@@ -158,22 +158,48 @@ class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
   }
 
   List<String>? _versesCache;
+  Set<String>? _versesSetCache;
+  Set<String>? _chaptersSetCache;
 
-  List<String> get versesWithCommentary {
-    if (_versesCache != null) return _versesCache!;
+  void _buildCachesIfNeeded() {
+    if (_versesCache != null && _versesSetCache != null && _chaptersSetCache != null) return;
     
     final list = state.value ?? [];
-    final verses = <String>{};
+    final versesList = <String>{};
+    final versesSet = <String>{};
+    final chaptersSet = <String>{};
+    
     for (final e in list) {
-      if (e.scope.type == 'verse' &&
-          e.scope.book != null &&
-          e.scope.chapter != null &&
-          e.scope.verse != null) {
-        // Format exactly like standard references
-        verses.add('${e.scope.book} ${e.scope.chapter}:${e.scope.verse}');
+      final b = e.scope.book;
+      final c = e.scope.chapter;
+      final v = e.scope.verse;
+      
+      if (b != null && c != null) {
+        if (e.scope.type == 'chapter') {
+          chaptersSet.add('$b|$c');
+        } else if (e.scope.type == 'verse' && v != null) {
+          versesSet.add('$b|$c|$v');
+          versesList.add('$b $c:$v');
+        }
       }
     }
-    _versesCache = verses.toList()..sort();
+    _versesCache = versesList.toList()..sort();
+    _versesSetCache = versesSet;
+    _chaptersSetCache = chaptersSet;
+  }
+
+  Set<String> get versesWithCommentarySet {
+    _buildCachesIfNeeded();
+    return _versesSetCache!;
+  }
+
+  Set<String> get chaptersWithCommentarySet {
+    _buildCachesIfNeeded();
+    return _chaptersSetCache!;
+  }
+
+  List<String> get versesWithCommentary {
+    _buildCachesIfNeeded();
     return _versesCache!;
   }
 }

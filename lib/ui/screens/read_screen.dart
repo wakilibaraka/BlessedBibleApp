@@ -780,24 +780,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     final readSettings = ref.watch(readSettingsProvider);
     final selectedVerses = ref.watch(readSelectionProvider);
 
-    final commentaryState = ref.watch(commentaryProvider);
-    final Set<String> versesWithCommentary = {};
-    final Set<String> chaptersWithCommentary = {};
-    if (commentaryState.value != null) {
-      for (final entry in commentaryState.value!) {
-        final b = entry.scope.book;
-        final c = entry.scope.chapter;
-        final v = entry.scope.verse;
-        if (b != null && c != null) {
-          if (entry.scope.type == 'chapter') {
-            chaptersWithCommentary.add('$b|$c');
-          }
-          if (entry.scope.type == 'verse' && v != null) {
-            versesWithCommentary.add('$b|$c|$v');
-          }
-        }
-      }
-    }
+    ref.watch(commentaryProvider);
+    final versesWithCommentary = ref.read(commentaryProvider.notifier).versesWithCommentarySet;
+    final chaptersWithCommentary = ref.read(commentaryProvider.notifier).chaptersWithCommentarySet;
 
     final bibleState = ref.watch(bibleProvider);
     final isLoading = bibleState.isLoading;
