@@ -140,95 +140,128 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
 
           // Floating Top Header
           Positioned(
-            top: widget.isCompact ? 16 : MediaQuery.paddingOf(context).top + 16,
-            left: 16,
-            right: 16,
+            top: 0,
+            left: 0,
+            right: 0,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // 1. TOP ROW
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: IconButton(
-                        icon: Icon(Icons.arrow_back_ios_new_rounded,
-                            color: theme.primaryColor),
-                        onPressed: () {
-                          if (widget.isCompact) {
-                            Navigator.pop(context);
-                          } else {
-                            Navigator.pop(context);
-                          }
-                        },
-                        tooltip: 'Back',
-                      ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Container(
+                    margin: EdgeInsets.only(
+                      top: widget.isCompact
+                          ? 16
+                          : MediaQuery.paddingOf(context).top + 16,
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.transparent,
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(
-                            color: tokens.readingAccent.withValues(alpha: 0.5)),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: is3DTheme
+                          ? theme.colorScheme.surface
+                          : theme.scaffoldBackgroundColor,
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: tokens.readingInkMuted.withValues(alpha: 0.15),
                       ),
-                      child: Text(
-                        referenceString,
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          color: tokens.readingAccent,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.08),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
+                        )
+                      ],
                     ),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: Icon(
-                              isBookmarked
-                                  ? Icons.bookmark_rounded
-                                  : Icons.bookmark_outline_rounded,
-                              color: isBookmarked
-                                  ? tokens.readingAccent
-                                  : tokens.readingInkMuted,
-                            ),
-                            tooltip: isBookmarked
-                                ? 'Remove Bookmark'
-                                : 'Bookmark Commentary',
-                            onPressed: () {
-                              ref
-                                  .read(commentaryBookmarksProvider.notifier)
-                                  .toggleBookmark(
-                                      bookName, chapterNum, displayVerse);
-                            },
-                          ),
-                          if (widget.onExpand != null)
-                            IconButton(
-                              icon: Icon(
-                                Icons.open_in_full_rounded,
-                                color: tokens.readingAccent,
-                                size: 20,
+                    child: Column(
+                      children: [
+                        // 1. TOP ROW
+                        Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: IconButton(
+                                icon: Icon(Icons.arrow_back_ios_new_rounded,
+                                    color: theme.primaryColor),
+                                onPressed: () {
+                                  if (widget.isCompact) {
+                                    Navigator.pop(context);
+                                  } else {
+                                    Navigator.pop(context);
+                                  }
+                                },
+                                tooltip: 'Back',
                               ),
-                              tooltip: 'Expand to full screen',
-                              onPressed: widget.onExpand,
                             ),
-                        ],
-                      ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: Colors.transparent,
+                                borderRadius: BorderRadius.circular(30),
+                                border: Border.all(
+                                    color: tokens.readingAccent
+                                        .withValues(alpha: 0.5)),
+                              ),
+                              child: Text(
+                                referenceString,
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  color: tokens.readingAccent,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(
+                                      isBookmarked
+                                          ? Icons.bookmark_rounded
+                                          : Icons.bookmark_outline_rounded,
+                                      color: isBookmarked
+                                          ? tokens.readingAccent
+                                          : tokens.readingInkMuted,
+                                    ),
+                                    tooltip: isBookmarked
+                                        ? 'Remove Bookmark'
+                                        : 'Bookmark Commentary',
+                                    onPressed: () {
+                                      ref
+                                          .read(commentaryBookmarksProvider
+                                              .notifier)
+                                          .toggleBookmark(
+                                              bookName, chapterNum, displayVerse);
+                                    },
+                                  ),
+                                  if (widget.onExpand != null)
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.open_in_full_rounded,
+                                        color: tokens.readingAccent,
+                                        size: 20,
+                                      ),
+                                      tooltip: 'Expand to full screen',
+                                      onPressed: widget.onExpand,
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-
-                const Divider(height: 24),
 
                 // 2. FLOATING VERSE CARD
                 if (fetchedVerseText != null)
-                  Container(
-                    margin: const EdgeInsets.only(top: 12),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Container(
+                      margin: const EdgeInsets.only(top: 12),
                     padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
                     decoration: BoxDecoration(
                       color: is3DTheme
@@ -258,6 +291,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                       ),
                     ),
                   ),
+                ),
               ],
             ),
           ),

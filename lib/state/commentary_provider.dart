@@ -1,8 +1,77 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/commentary_entry.dart';
 import '../data/local_storage/preferences_service.dart';
+
+// Parse JSON completely in the background to prevent main thread blocking
+List<CommentaryEntry> _parseCommentaryJson(Uint8List bytes) {
+  try {
+    final jsonString = utf8.decode(bytes);
+    final decoded = jsonDecode(jsonString);
+
+    List<dynamic> entriesList;
+    if (decoded is Map<String, dynamic> && decoded.containsKey('entries')) {
+      entriesList = decoded['entries'] as List<dynamic>;
+    } else if (decoded is List) {
+      entriesList = decoded;
+    } else {
+      return [];
+    }
+
+    return entriesList
+        .map((e) => CommentaryEntry.fromJson(e as Map<String, dynamic>))
+        .toList();
+  } catch (_) {
+    return [];
+  }
+}
+
+class CommentaryBook {
+  final String title;
+  final String author;
+  final String id;
+  final bool isComingSoon;
+
+  const CommentaryBook({
+    required this.title,
+    required this.author,
+    required this.id,
+    this.isComingSoon = false,
+  });
+}
+
+const List<CommentaryBook> kAvailableCommentaries = [
+  CommentaryBook(
+    title: 'Daniel and the Revelation',
+    author: 'Uriah Smith',
+    id: 'daniel_revelation',
+  ),
+  CommentaryBook(
+    title: 'The Epistle to the Hebrews',
+    author: 'M.L. Andreasen',
+    id: 'hebrews',
+  ),
+  CommentaryBook(
+    title: 'The Glad Tidings',
+    author: 'E.J. Waggoner',
+    id: 'glad_tidings',
+    isComingSoon: true,
+  ),
+  CommentaryBook(
+    title: 'The Cross and Its Shadow',
+    author: 'S.N. Haskell',
+    id: 'cross_shadow',
+    isComingSoon: true,
+  ),
+  CommentaryBook(
+    title: 'The Three Angels\' Messages',
+    author: 'J.N. Andrews',
+    id: 'three_angels',
+    isComingSoon: true,
+  ),
+];
 
 class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
   @override
@@ -12,22 +81,10 @@ class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
 
   Future<List<CommentaryEntry>> _loadCommentary() async {
     try {
-      final jsonString =
-          await rootBundle.loadString('assets/commentary/commentary.json');
-      final decoded = jsonDecode(jsonString);
-
-      List<dynamic> entriesList;
-      if (decoded is Map<String, dynamic> && decoded.containsKey('entries')) {
-        entriesList = decoded['entries'] as List<dynamic>;
-      } else if (decoded is List) {
-        entriesList = decoded;
-      } else {
-        return [];
-      }
-
-      return entriesList
-          .map((e) => CommentaryEntry.fromJson(e as Map<String, dynamic>))
-          .toList();
+      final byteData =
+          await rootBundle.load('assets/commentary/commentary.json');
+      return await compute(
+          _parseCommentaryJson, byteData.buffer.asUint8List());
     } catch (e) {
       // If the file is missing or empty, do not crash; return empty list
       return [];
@@ -100,7 +157,11 @@ class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
             e.scope.book?.toLowerCase() == book.toLowerCase()));
   }
 
+  List<String>? _versesCache;
+
   List<String> get versesWithCommentary {
+    if (_versesCache != null) return _versesCache!;
+    
     final list = state.value ?? [];
     final verses = <String>{};
     for (final e in list) {
@@ -112,8 +173,8 @@ class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
         verses.add('${e.scope.book} ${e.scope.chapter}:${e.scope.verse}');
       }
     }
-    final sorted = verses.toList()..sort();
-    return sorted;
+    _versesCache = verses.toList()..sort();
+    return _versesCache!;
   }
 }
 

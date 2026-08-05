@@ -139,3 +139,4 @@ class HighlightsNotifier extends Notifier<Map<String, int>> {
 final highlightsProvider =
     NotifierProvider<HighlightsNotifier, Map<String, int>>(
         HighlightsNotifier.new);
+

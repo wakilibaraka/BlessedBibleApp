@@ -8,6 +8,7 @@ import '../widgets/typography_controls.dart';
 
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -46,6 +47,7 @@ import '../../state/translation_provider.dart';
 import '../../theme/reading_tokens.dart';
 import '../widgets/commentary_view.dart';
 import '../sheets/verse_context_menu_sheet.dart';
+import 'highlights_screen.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 class StrictVerticalScrollPhysics extends ScrollPhysics {
@@ -1558,8 +1560,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                         decoration:
                                                                             BoxDecoration(
                                                                           color: isSelected
-                                                                              ? (highlightColor != null ? highlightColor.withValues(alpha: 0.35) : theme.primaryColor.withValues(alpha: 0.15))
-                                                                              : (_navigatedVerseIndex == index ? theme.primaryColor.withValues(alpha: 0.15) : (highlightColor != null ? highlightColor.withValues(alpha: 0.35) : Colors.transparent)),
+                                                                              ? (highlightColor ?? theme.primaryColor.withValues(alpha: 0.15))
+                                                                              : (_navigatedVerseIndex == index ? theme.primaryColor.withValues(alpha: 0.15) : (highlightColor ?? Colors.transparent)),
                                                                           borderRadius:
                                                                               BorderRadius.circular(12),
                                                                           border: (isSelected && highlightColor != null)
@@ -1919,11 +1921,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         fontSize: typography.fontSize * 0.95,
       );
 
-      final installedTranslations =
-          ref.watch(availableTranslationsProvider).value ?? [];
-      final secondaryId = ref.read(secondaryTranslationProvider) ?? '';
-      final badgeLabel =
-          _getTranslationCombinedLabel(secondaryId, installedTranslations);
+
 
       final secondary = _buildNormalVerse(
         secondaryVerse,
@@ -1948,14 +1946,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  badgeLabel,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: secondaryColor.withValues(alpha: 0.7),
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 4),
+
                 secondary,
               ],
             ),
@@ -1972,11 +1963,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         fontSize: typography.fontSize * 0.95,
       );
 
-      final installedTranslations =
-          ref.watch(availableTranslationsProvider).value ?? [];
-      final secondaryId = ref.read(secondaryTranslationProvider) ?? '';
-      final badgeLabel =
-          _getTranslationCombinedLabel(secondaryId, installedTranslations);
 
       final secondary = _buildNormalVerse(
         secondaryVerse,
@@ -2000,14 +1986,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  badgeLabel,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: secondaryColor.withValues(alpha: 0.7),
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 4),
+
                 secondary,
               ],
             ),
@@ -2038,10 +2017,19 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
       final installedTranslations =
           ref.watch(availableTranslationsProvider).value ?? [];
+      final activeTransId = ref.read(activeTranslationProvider);
+      
       final availableChips = <String, String>{};
       for (final t in installedTranslations) {
         if (targetLanguages.containsKey(t.languageName)) {
           final label = targetLanguages[t.languageName]!;
+          
+          // Skip the active translation to prevent showing it twice
+          // (e.g. if KJV is active, the EN chip will show WEB instead)
+          if (t.translationId == activeTransId) {
+            continue;
+          }
+          
           if (!availableChips.containsKey(label)) {
             availableChips[label] = t.translationId;
           }
@@ -3368,7 +3356,7 @@ class _TypographyBottomSheet extends ConsumerWidget {
 
 class VerseActionLogic {
   static void _showFeedback(
-      BuildContext context, ThemeData theme, String message) {
+      BuildContext context, ThemeData theme, String message, {VoidCallback? onAction, String? actionLabel}) {
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -3377,6 +3365,13 @@ class VerseActionLogic {
                 color: theme.colorScheme.onInverseSurface,
                 fontWeight: FontWeight.bold)),
         backgroundColor: theme.colorScheme.inverseSurface,
+        action: onAction != null && actionLabel != null
+            ? SnackBarAction(
+                label: actionLabel,
+                textColor: theme.colorScheme.onInverseSurface,
+                onPressed: onAction,
+              )
+            : null,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         margin: const EdgeInsets.only(left: 24, right: 24, bottom: 120),
@@ -3575,7 +3570,11 @@ class VerseActionLogic {
         theme,
         isRemoving
             ? '$count Highlight(s) removed'
-            : '$count verse(s) highlighted');
+            : '$count verse(s) highlighted',
+        actionLabel: isRemoving ? null : 'View',
+        onAction: isRemoving ? null : () {
+          Navigator.of(context).push(CupertinoPageRoute(builder: (_) => const HighlightsScreen()));
+        });
   }
 
   static void handleBookmark(

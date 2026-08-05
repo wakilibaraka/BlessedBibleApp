@@ -90,7 +90,7 @@ class ReadingPlanState {
     this.planId = '',
     this.planStartedOn,
     this.paceMode = 'scheduled',
-    this.restDay = 7,
+    this.restDay,
     this.completedReadings = const {},
     this.planData = const [],
     this.reminderEnabled = false,
@@ -229,7 +229,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
       String planId = targetPlanId;
       DateTime? planStartedOn;
       String paceMode = 'scheduled';
-      int? restDay = 7;
+      int? restDay;
       Set<int> completedReadings = {};
       bool reminderEnabled = false;
       int reminderTimeHour = 8;
@@ -314,7 +314,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
   void startPlan(
       {String? planId,
       String paceMode = 'scheduled',
-      int? restDay = 7,
+      int? restDay,
       List<PlanDayData>? customPlanData}) {
     final next = state.copyWith(
       planId: planId ?? _planId,

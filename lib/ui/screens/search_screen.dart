@@ -11,7 +11,6 @@ import '../../state/search_settings_provider.dart';
 import '../../state/most_read_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../widgets/textured_glass_container.dart';
-import '../sheets/search_settings_sheet.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});

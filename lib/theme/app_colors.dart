@@ -99,13 +99,22 @@ class AppColors {
   /// For example, the default yellow highlight clashes with the Sepia/Cream backgrounds.
   static Color getRenderedHighlightColor(
       Color baseColor, Brightness brightness, Color scaffoldBackgroundColor) {
+    Color finalColor = baseColor;
+    
     if (baseColor == const Color(0xFFFEF08A)) {
       if (scaffoldBackgroundColor == sepiaBackground ||
           scaffoldBackgroundColor == warmGoldBackground) {
-        return Colors.amber
-            .shade700; // Deeper, more saturated yellow-gold for sepia themes
+        finalColor = Colors.amber.shade700; // Deeper, more saturated yellow-gold for sepia themes
       }
     }
-    return baseColor;
+    
+    // Reduce the intensity for readability. 
+    // In dark themes, bright pastels need very low opacity to not wash out the white text.
+    // In light themes, they need moderate opacity so the dark text remains readable.
+    if (brightness == Brightness.dark) {
+      return finalColor.withValues(alpha: 0.35); // 50% reduction from 0.85
+    } else {
+      return finalColor.withValues(alpha: 0.55); // ~30% reduction from 0.85
+    }
   }
 }

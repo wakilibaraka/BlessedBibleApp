@@ -12,7 +12,7 @@ import '../../state/nav_provider.dart';
 import '../widgets/shared_top_header.dart';
 import '../widgets/glass_container.dart';
 import '../widgets/bouncy_entrance.dart';
-import 'commentary_hub_screen.dart';
+import '../widgets/commentary_view.dart';
 import 'today_screen.dart';
 import '../../services/share_service.dart';
 import '../sheets/theme_picker_sheet.dart';
@@ -371,11 +371,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                 : null;
 
                             Navigator.of(context).push(CupertinoPageRoute(
-                                builder: (_) => CommentaryHubScreen(
-                                      book: bookName,
-                                      chapter: chapterNum,
-                                      verse: verseNum,
-                                      verseText: data.verseOfTheDay.text,
+                                builder: (_) => Scaffold(
+                                      body: CommentaryView(
+                                        book: bookName,
+                                        chapter: chapterNum,
+                                        verse: verseNum,
+                                        verseText: data.verseOfTheDay.text,
+                                        isCompact: false,
+                                      ),
                                     )));
                           },
                         ),

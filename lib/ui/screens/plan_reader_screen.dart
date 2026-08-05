@@ -761,8 +761,10 @@ class _VerseActionBar extends ConsumerWidget {
       child: TexturedGlassContainer(
         borderRadius: BorderRadius.circular(32),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
@@ -819,6 +821,7 @@ class _VerseActionBar extends ConsumerWidget {
               onPressed: onDismiss,
             ),
           ],
+        ),
         ),
       ),
     );

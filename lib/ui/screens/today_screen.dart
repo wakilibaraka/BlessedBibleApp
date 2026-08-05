@@ -6,14 +6,14 @@ import '../widgets/shared_top_header.dart';
 import '../../state/theme_provider.dart';
 import '../widgets/animated_background.dart';
 import '../widgets/glass_container.dart';
-import '../../state/home_provider.dart';
 import '../../state/reading_plan_provider.dart';
 import '../../state/notes_provider.dart';
 import '../../state/streak_provider.dart';
 import '../../state/nav_provider.dart';
 import 'package:flutter/cupertino.dart';
-import 'your_space_screen.dart';
-import 'commentary_hub_screen.dart';
+import 'reading_plan_browser.dart';
+import 'highlights_screen.dart';
+import 'bookmarks_screen.dart';
 import 'votd_archive_screen.dart';
 import 'notes_list_screen.dart';
 import '../widgets/textured_glass_container.dart';
@@ -147,9 +147,7 @@ class TodayScreen extends ConsumerWidget {
                         // ═══════════════════════════════════════════════════════
                         // 3. TODAY'S READING
                         // ═══════════════════════════════════════════════════════
-                        _SectionLabel(label: "TODAY'S READING", theme: theme),
-                        const SizedBox(height: 8),
-                        _TodaysReadingCard(theme: theme),
+                        _HeroReadingPill(theme: theme),
 
                         const SizedBox(height: 20),
 
@@ -304,144 +302,139 @@ class _GreetingHeader extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 // 3. Today's Reading card
 // ─────────────────────────────────────────────────────────────────────────────
-class _TodaysReadingCard extends ConsumerWidget {
+class _HeroReadingPill extends ConsumerWidget {
   final ThemeData theme;
-  const _TodaysReadingCard({required this.theme});
+  const _HeroReadingPill({required this.theme});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final activePlanIds = ref.watch(activePlanIdsProvider);
-    final primaryPlanId =
-        activePlanIds.isNotEmpty ? activePlanIds.first : 'chronological_1yr';
+    final primaryPlanId = activePlanIds.isNotEmpty ? activePlanIds.first : 'chronological_1yr';
     final planState = ref.watch(readingPlanProvider(primaryPlanId));
     final totalDays = planState.planData.length;
     final currentDay = planState.currentDay;
+    
+    final progress = totalDays > 0 ? currentDay / totalDays.toDouble() : 0.0;
+    final todayData = (totalDays > 0 && currentDay > 0 && currentDay <= totalDays) ? planState.planData[currentDay - 1] : null;
+    final subHeadline = todayData?.title ?? 'Start your journey';
 
-    final now = DateTime.now();
-    final dayOfYear = now.difference(DateTime(now.year, 1, 1)).inDays + 1;
-    final dayLabel = 'Day $dayOfYear of 365';
-    final progress = dayOfYear / 365.0;
-    List<String> chapters = [];
-    if (totalDays > 0 && currentDay > 0 && currentDay <= totalDays) {
-      chapters = planState.planData[currentDay - 1].chapters
-          .map((c) => '${c.bookName} ${c.chapterNum}')
-          .toList();
-    }
-
-    return TexturedGlassContainer(
-      isScrollable: true,
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(40),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.goldAccent.withValues(alpha: 0.15),
+            blurRadius: 40,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Stack(
+        clipBehavior: Clip.none,
         children: [
-          Row(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.calendar_today_outlined,
-                  color: AppColors.goldAccent, size: 17),
-              const SizedBox(width: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Chronological Bible in a Year',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        height: 1.2,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: AppColors.goldAccent.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      'Day $currentDay / $totalDays',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: AppColors.goldAccent,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
               Text(
-                dayLabel,
-                style: theme.textTheme.labelMedium?.copyWith(
-                  color: AppColors.goldAccent,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.4,
+                subHeadline,
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  fontFamily: 'EB Garamond',
+                  height: 1.1,
+                  color: theme.primaryColor,
                 ),
               ),
-              const Spacer(),
-              Text(
-                '${(progress * 100).round()}%',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.45),
-                  fontWeight: FontWeight.w600,
+              const SizedBox(height: 32),
+              // Thick capsule progress bar
+              Container(
+                height: 12,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: theme.dividerColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: FractionallySizedBox(
+                  alignment: Alignment.centerLeft,
+                  widthFactor: progress.clamp(0.0, 1.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      gradient: LinearGradient(
+                        colors: [
+                          AppColors.goldAccent.withValues(alpha: 0.7),
+                          AppColors.goldAccent,
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          // Progress bar
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: progress,
-              minHeight: 5,
-              backgroundColor: AppColors.goldAccent.withValues(alpha: 0.15),
-              valueColor:
-                  const AlwaysStoppedAnimation<Color>(AppColors.goldAccent),
-            ),
-          ),
-          const SizedBox(height: 14),
-          // Chapter chips
-          if (chapters.isNotEmpty)
-            Wrap(
-              spacing: 8,
-              runSpacing: 6,
-              children: chapters
-                  .map(
-                    (c) => Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: AppColors.goldAccent.withValues(alpha: 0.10),
-                        border: Border.all(
-                          color: AppColors.goldAccent.withValues(alpha: 0.25),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.check_circle_outline,
-                              size: 13, color: AppColors.goldAccent),
-                          const SizedBox(width: 5),
-                          Text(
-                            c,
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                  .toList(),
-            ),
-          const SizedBox(height: 14),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton.icon(
-              onPressed: () {
-                final homeState = ref.read(homeProvider);
-                final refStr = homeState.verseOfTheDay.reference;
-                final lastSpaceIdx = refStr.lastIndexOf(' ');
-                final bookName = lastSpaceIdx != -1
-                    ? refStr.substring(0, lastSpaceIdx)
-                    : refStr;
-                final refParts = lastSpaceIdx != -1
-                    ? refStr.substring(lastSpaceIdx + 1).split(':')
-                    : [];
-                final chapterNum =
-                    refParts.isNotEmpty ? (int.tryParse(refParts[0]) ?? 1) : 1;
-                final verseNum =
-                    refParts.length > 1 ? int.tryParse(refParts[1]) : null;
-
-                Navigator.of(context).push(CupertinoPageRoute(
-                    builder: (_) => CommentaryHubScreen(
-                          book: bookName,
-                          chapter: chapterNum,
-                          verse: verseNum,
-                          verseText: homeState.verseOfTheDay.text,
-                        )));
-              },
-              icon: const Icon(Icons.menu_book_outlined, size: 16),
-              label: const Text("Continue Reading"),
-              style: FilledButton.styleFrom(
+          // Floating start button
+          Positioned(
+            right: -8,
+            bottom: -16,
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.goldAccent.withValues(alpha: 0.4),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+                child: FloatingActionButton(
+                heroTag: 'hero_reading_play_btn',
+                onPressed: () {
+                  final activePlanIds = ref.read(activePlanIdsProvider);
+                  final planId = activePlanIds.isNotEmpty
+                      ? activePlanIds.first
+                      : 'chronological_1yr';
+                   Navigator.of(context).push(CupertinoPageRoute(
+                     builder: (_) => ReadingPlanBrowser(planId: planId),
+                   ));
+                },
                 backgroundColor: AppColors.goldAccent,
-                foregroundColor: Colors.white,
-                textStyle: theme.textTheme.labelMedium
-                    ?.copyWith(fontWeight: FontWeight.w700),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14)),
-                padding: const EdgeInsets.symmetric(vertical: 13),
+                elevation: 0,
+                child: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 32),
               ),
             ),
           ),
@@ -654,12 +647,12 @@ class _QuickActionsRow extends ConsumerWidget {
       ),
       (
         icon: Icons.self_improvement_rounded,
-        label: 'Your Space',
+        label: 'Highlights',
         color: const Color(0xFF27AE60),
         onTap: () {
           Navigator.of(context).push(
             CupertinoPageRoute(
-                builder: (_) => const YourSpaceScreen(initialTab: 0)),
+                builder: (_) => const HighlightsScreen()),
           );
         },
       ),
@@ -670,7 +663,7 @@ class _QuickActionsRow extends ConsumerWidget {
         onTap: () {
           Navigator.of(context).push(
             CupertinoPageRoute(
-                builder: (_) => const YourSpaceScreen(initialTab: 1)),
+                builder: (_) => const BookmarksScreen()),
           );
         },
       ),

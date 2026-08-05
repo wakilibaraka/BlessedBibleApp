@@ -10,6 +10,7 @@ import '../../state/theme_provider.dart';
 import '../widgets/animated_background.dart';
 import '../widgets/shared_app_bar.dart';
 import 'notes_list_screen.dart'; // for showAddNoteSheet
+import 'note_editor_screen.dart';
 
 class YourSpaceScreen extends ConsumerStatefulWidget {
   final int initialTab; // 0=Highlights, 1=Bookmarks, 2=Notes
@@ -375,85 +376,89 @@ class _NotesSegment extends ConsumerWidget {
                     final note = notes[index];
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 12.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color:
-                              theme.colorScheme.surface.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                              color: theme.dividerColor.withValues(alpha: 0.1)),
+                      child: Dismissible(
+                        key: ValueKey(note.title + note.date + index.toString()),
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          alignment: Alignment.centerRight,
+                          padding: const EdgeInsets.only(right: 20),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withValues(alpha: 0.8),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: const Icon(Icons.delete, color: Colors.white),
                         ),
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(16),
-                          onTap: () {
-                            if (note.reference != null) {
-                              final data =
-                                  _parseVerseRef(note.reference!, flatChapters);
-                              if (data != null) {
-                                ref
-                                    .read(readLocationProvider.notifier)
-                                    .updateLocation(
-                                      bookAbbrev: data.bookAbbrev,
-                                      bookName: data.bookName,
-                                      chapter: data.chapter,
-                                      verse: data.verseNum,
-                                    );
-                                Navigator.of(context)
-                                    .pop(); // dismiss your space screen
-                                ref.read(navProvider.notifier).setIndex(1);
-                              }
-                            }
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        note.title,
-                                        style: theme.textTheme.titleSmall
-                                            ?.copyWith(
-                                                fontWeight: FontWeight.bold),
+                        onDismissed: (_) {
+                          ref.read(notesProvider.notifier).remove(index);
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color:
+                                theme.colorScheme.surface.withValues(alpha: 0.5),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                                color: theme.dividerColor.withValues(alpha: 0.1)),
+                          ),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(16),
+                            onTap: () {
+                               Navigator.of(context).push(MaterialPageRoute(
+                                 builder: (_) => NoteEditorScreen(
+                                   initialNote: note,
+                                   noteIndex: index,
+                                 ),
+                               ));
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          note.title.isNotEmpty ? note.title : 'New Note',
+                                          style: theme.textTheme.titleSmall
+                                              ?.copyWith(
+                                                  fontWeight: FontWeight.bold),
+                                        ),
                                       ),
-                                    ),
+                                      Text(
+                                        note.date,
+                                        style:
+                                            theme.textTheme.bodySmall?.copyWith(
+                                          color: theme.colorScheme.onSurface
+                                              .withValues(alpha: 0.5),
+                                          fontSize: 10,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  if (note.reference != null) ...[
+                                    const SizedBox(height: 4),
                                     Text(
-                                      note.date,
-                                      style:
-                                          theme.textTheme.bodySmall?.copyWith(
-                                        color: theme.colorScheme.onSurface
-                                            .withValues(alpha: 0.5),
-                                        fontSize: 10,
+                                      note.reference!,
+                                      style: theme.textTheme.labelSmall?.copyWith(
+                                        color: theme.primaryColor,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                   ],
-                                ),
-                                if (note.reference != null) ...[
-                                  const SizedBox(height: 4),
+                                  const SizedBox(height: 8),
                                   Text(
-                                    note.reference!,
-                                    style: theme.textTheme.labelSmall?.copyWith(
-                                      color: theme.primaryColor,
-                                      fontWeight: FontWeight.w600,
+                                    note.content.isNotEmpty ? note.content.replaceAll('\n', ' ') : 'No additional text',
+                                    maxLines: 3,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: theme.colorScheme.onSurface
+                                          .withValues(alpha: 0.8),
                                     ),
                                   ),
                                 ],
-                                const SizedBox(height: 8),
-                                Text(
-                                  note.content,
-                                  maxLines: 3,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: theme.colorScheme.onSurface
-                                        .withValues(alpha: 0.8),
-                                    height: 1.4,
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
                           ),
                         ),
@@ -461,6 +466,7 @@ class _NotesSegment extends ConsumerWidget {
                     );
                   },
                 ),
+
         ),
       ],
     );

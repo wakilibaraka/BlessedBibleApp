@@ -17,6 +17,15 @@ class PreferencesService {
   static const String _lastReadLocKey = 'last_read_loc';
   static const String _studyLayoutKey = 'study_layout';
   static const String _readingPlanStateKey = 'reading_plan_state';
+  static const String _bentoPresetKey = 'bento_preset';
+
+  void saveBentoPreset(String preset) {
+    prefs.setString(_bentoPresetKey, preset);
+  }
+
+  String getBentoPreset() {
+    return prefs.getString(_bentoPresetKey) ?? 'halfAndHalf';
+  }
 
   /// Key for the user's chosen rest day in the reading plan.
   /// Sunday-first convention: 1=Sunday … 7=Saturday (default).

@@ -26,7 +26,7 @@ import '../../state/bible_provider.dart';
 import '../../state/read_settings_provider.dart';
 import '../../state/study_provider.dart';
 import '../../state/commentary_provider.dart';
-import 'commentary_hub_screen.dart';
+import '../widgets/commentary_view.dart';
 
 const double kBottomDockHeight = 64.0;
 const double kBottomDockInset = 16.0;
@@ -783,7 +783,7 @@ class MainNavScreen extends ConsumerWidget {
             border: Border.all(
               color: isSelected
                   ? Colors.white
-                  : Colors.black.withValues(alpha: 0.2),
+                  : Colors.white.withValues(alpha: 0.35),
               width: isSelected ? 2 : 1,
             ),
             boxShadow: isSelected
@@ -902,15 +902,23 @@ class MainNavScreen extends ConsumerWidget {
           availableVerses[math.Random().nextInt(availableVerses.length)];
 
       final lastSpaceIdx = randomVerse.lastIndexOf(' ');
+      if (lastSpaceIdx == -1) return; // malformed reference guard
+
       final bookName = randomVerse.substring(0, lastSpaceIdx);
       final refParts = randomVerse.substring(lastSpaceIdx + 1).split(':');
-      final chapter = int.parse(refParts[0]);
-      final verseNum = int.parse(refParts[1]);
+      if (refParts.length < 2) return; // must have chapter:verse
+
+      final chapter = int.tryParse(refParts[0]);
+      final verseNum = int.tryParse(refParts[1]);
+      if (chapter == null || verseNum == null) return; // non-numeric guard
 
       final flatChapters = ref.read(flatChaptersProvider);
       try {
         final fc = flatChapters.firstWhere(
             (c) => c.book.name == bookName && c.chapter.number == chapter);
+
+        // Guard: verse index must be within the chapter's verse list.
+        if (verseNum < 1 || verseNum > fc.chapter.verses.length) return;
 
         showDialog(
           context: context,
@@ -932,14 +940,27 @@ class MainNavScreen extends ConsumerWidget {
               .setVerse('$bookName $chapter:$verseNum');
 
           Navigator.of(context).push(CupertinoPageRoute(
-              builder: (_) => CommentaryHubScreen(
-                    book: bookName,
-                    chapter: chapter,
-                    verse: verseNum,
-                    verseText: fc.chapter.verses[verseNum - 1].text,
+              builder: (_) => Scaffold(
+                    body: CommentaryView(
+                      book: bookName,
+                      chapter: chapter,
+                      verse: verseNum,
+                      verseText: fc.chapter.verses[verseNum - 1].text,
+                      isCompact: false,
+                    ),
                   )));
         });
-      } catch (_) {}
+      } catch (e, st) {
+        debugPrint('Casting lots error: $e\n$st');
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Could not cast lots — please try again.'),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
     }
   }
 

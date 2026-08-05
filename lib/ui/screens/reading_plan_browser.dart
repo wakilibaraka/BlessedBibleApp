@@ -7,6 +7,7 @@ import '../../state/reading_plan_provider.dart';
 import '../../theme/app_colors.dart';
 import '../widgets/shared_app_bar.dart';
 import 'plan_reader_screen.dart';
+import 'journey_map_screen.dart';
 import '../../state/streak_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../state/surface_style_provider.dart';
@@ -391,7 +392,7 @@ class _PlanSetupSheetState extends State<PlanSetupSheet> {
   }
 
   int? get _effectiveRestDay {
-    if (_restDayChoice == null) return -1;
+    if (_restDayChoice == null) return null;
     if (_restDayChoice == 7) return 7;
     return _customDay;
   }
@@ -693,7 +694,7 @@ class TodayView extends StatefulWidget {
 
 class _TodayViewState extends State<TodayView> {
   late DateTime _displayMonth;
-  bool _isYearView = false;
+  CalendarViewMode _viewMode = CalendarViewMode.month;
 
   @override
   void initState() {
@@ -718,13 +719,13 @@ class _TodayViewState extends State<TodayView> {
     HapticFeedback.lightImpact();
     setState(() {
       _displayMonth = month;
-      _isYearView = false;
+      _viewMode = CalendarViewMode.month;
     });
   }
 
-  void _toggleYearView() {
+  void _setViewMode(CalendarViewMode mode) {
     HapticFeedback.selectionClick();
-    setState(() => _isYearView = !_isYearView);
+    setState(() => _viewMode = mode);
   }
 
   @override
@@ -732,11 +733,11 @@ class _TodayViewState extends State<TodayView> {
     return _TodayViewBody(
       planState: widget.planState,
       displayMonth: _displayMonth,
-      isYearView: _isYearView,
+      viewMode: _viewMode,
       onPrevMonth: _prevMonth,
       onNextMonth: _nextMonth,
       onJumpToMonth: _jumpToMonth,
-      onToggleYearView: _toggleYearView,
+      onSetViewMode: _setViewMode,
     );
   }
 }
@@ -744,20 +745,20 @@ class _TodayViewState extends State<TodayView> {
 class _TodayViewBody extends ConsumerWidget {
   final ReadingPlanState planState;
   final DateTime displayMonth;
-  final bool isYearView;
+  final CalendarViewMode viewMode;
   final VoidCallback onPrevMonth;
   final VoidCallback onNextMonth;
   final void Function(DateTime) onJumpToMonth;
-  final VoidCallback onToggleYearView;
+  final void Function(CalendarViewMode) onSetViewMode;
 
   const _TodayViewBody({
     required this.planState,
     required this.displayMonth,
-    required this.isYearView,
+    required this.viewMode,
     required this.onPrevMonth,
     required this.onNextMonth,
     required this.onJumpToMonth,
-    required this.onToggleYearView,
+    required this.onSetViewMode,
   });
 
   void _openSettings(
@@ -933,11 +934,11 @@ class _TodayViewBody extends ConsumerWidget {
             _AdaptivePlanCalendar(
               planState: planState,
               displayMonth: displayMonth,
-              isYearView: isYearView,
+              viewMode: viewMode,
               onPrevMonth: onPrevMonth,
               onNextMonth: onNextMonth,
               onJumpToMonth: onJumpToMonth,
-              onToggleYearView: onToggleYearView,
+              onSetViewMode: onSetViewMode,
               scheduledMap: scheduledMap,
               realToday: realNow,
               isScheduled: isScheduled,
@@ -1176,9 +1177,11 @@ class _DayCell extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
           Container(
             width: 34,
             height: 34,
@@ -1220,6 +1223,7 @@ class _DayCell extends StatelessWidget {
             ),
         ],
       ),
+      ),
     );
   }
 }
@@ -1247,7 +1251,7 @@ class _DayViewState extends ConsumerState<DayView>
 
   // Calendar State
   late DateTime _displayMonth;
-  bool _isYearView = false;
+  CalendarViewMode _viewMode = CalendarViewMode.month;
 
   @override
   void initState() {
@@ -1282,13 +1286,13 @@ class _DayViewState extends ConsumerState<DayView>
     HapticFeedback.lightImpact();
     setState(() {
       _displayMonth = month;
-      _isYearView = false;
+      _viewMode = CalendarViewMode.month;
     });
   }
 
-  void _toggleYearView() {
+  void _setViewMode(CalendarViewMode mode) {
     HapticFeedback.selectionClick();
-    setState(() => _isYearView = !_isYearView);
+    setState(() => _viewMode = mode);
   }
 
   @override
@@ -1555,11 +1559,11 @@ class _DayViewState extends ConsumerState<DayView>
                 _AdaptivePlanCalendar(
                   planState: planState,
                   displayMonth: _displayMonth,
-                  isYearView: _isYearView,
+                  viewMode: _viewMode,
                   onPrevMonth: _prevMonth,
                   onNextMonth: _nextMonth,
                   onJumpToMonth: _jumpToMonth,
-                  onToggleYearView: _toggleYearView,
+                  onSetViewMode: _setViewMode,
                   scheduledMap: planState.paceMode == 'scheduled'
                       ? _buildDateToReadingMap(planState)
                       : <String, int>{},
@@ -1696,15 +1700,33 @@ class _DayViewState extends ConsumerState<DayView>
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 6),
-                      // Passage subtitle — muted, smaller
-                      Text(
-                        passageSubtitle,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: gold.withValues(alpha: 0.85),
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 0.2,
+                      // Passage subtitle — more visible with checkbox
+                      GestureDetector(
+                        onTap: () => _toggleDone(isDone, readingDay),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              isDone
+                                  ? Icons.check_circle_rounded
+                                  : Icons.circle_outlined,
+                              color: gold,
+                              size: 22,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              passageSubtitle,
+                              style: TextStyle(
+                                fontFamily: 'EB Garamond',
+                                color: gold,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
                         ),
-                        textAlign: TextAlign.center,
                       ),
                     ],
                   ),
@@ -1747,20 +1769,36 @@ class _DayViewState extends ConsumerState<DayView>
                               borderRadius: BorderRadius.circular(18)),
                           elevation: isDone ? 3 : 0,
                         ),
-                        onPressed: () => _toggleDone(isDone, readingDay),
+                        onPressed: () async {
+                          final markedComplete = await Navigator.push<bool>(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => PlanReaderScreen(
+                                planId: widget.planId,
+                                dayNum: readingDay,
+                                initialPassageIndex: 0,
+                              ),
+                            ),
+                          );
+                          if (markedComplete == true && mounted) {
+                            final isDoneNow = ref
+                                .read(readingPlanProvider(widget.planId))
+                                .completedReadings
+                                .contains(readingDay);
+                            if (!isDoneNow) {
+                              _toggleDone(false, readingDay);
+                            }
+                          }
+                        },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                                isDone
-                                    ? Icons.check_circle_rounded
-                                    : Icons.circle_outlined,
-                                size: 22),
+                            const Icon(Icons.menu_book_rounded, size: 22),
                             const SizedBox(width: 10),
-                            Text(
-                              isDone ? 'COMPLETED' : 'MARK AS READ',
-                              style: const TextStyle(
-                                  fontSize: 15,
+                            const Text(
+                              'START READING',
+                              style: TextStyle(
+                                  fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   letterSpacing: 2.0),
                             ),
@@ -1852,59 +1890,6 @@ class _DayViewState extends ConsumerState<DayView>
                         );
                       }).toList(),
                     ),
-                  )
-                else
-                  // Single passage — tap the whole title zone to open reader
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () async {
-                          final markedComplete =
-                              await Navigator.push<bool>(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => PlanReaderScreen(
-                                planId: widget.planId,
-                                dayNum: readingDay,
-                                initialPassageIndex: 0,
-                              ),
-                            ),
-                          );
-                          if (markedComplete == true && mounted) {
-                            final isDoneNow = ref
-                                .read(readingPlanProvider(widget.planId))
-                                .completedReadings
-                                .contains(readingDay);
-                            if (!isDoneNow) {
-                              _toggleDone(false, readingDay);
-                            }
-                          }
-                        },
-                        borderRadius: BorderRadius.circular(8),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.menu_book_rounded,
-                                  size: 14,
-                                  color: gold.withValues(alpha: 0.7)),
-                              const SizedBox(width: 6),
-                              Text(
-                                'Open in reader',
-                                style: theme.textTheme.labelMedium?.copyWith(
-                                  color: gold.withValues(alpha: 0.7),
-                                  fontWeight: FontWeight.w500,
-                                  letterSpacing: 0.3,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
                   ),
 
                 // ── CALENDAR — HERO section ───────────────────────────────────
@@ -1913,11 +1898,11 @@ class _DayViewState extends ConsumerState<DayView>
                   child: _AdaptivePlanCalendar(
                     planState: planState,
                     displayMonth: _displayMonth,
-                    isYearView: _isYearView,
+                    viewMode: _viewMode,
                     onPrevMonth: _prevMonth,
                     onNextMonth: _nextMonth,
                     onJumpToMonth: _jumpToMonth,
-                    onToggleYearView: _toggleYearView,
+                    onSetViewMode: _setViewMode,
                     scheduledMap: planState.paceMode == 'scheduled'
                         ? _buildDateToReadingMap(planState)
                         : <String, int>{},
@@ -2006,6 +1991,8 @@ class _DayViewState extends ConsumerState<DayView>
 // ─────────────────────────────────────────────────────────────────────────────
 // ENTRY POINT — Reading Plan Browser (router widget)
 // ─────────────────────────────────────────────────────────────────────────────
+
+enum CalendarViewMode { week, month, year }
 
 class ReadingPlanBrowser extends ConsumerStatefulWidget {
   final String planId;
@@ -2130,15 +2117,13 @@ class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
         ),
       );
     }
-
-    final initialDay = planState.currentDay == 0 
-        ? 1 
-        : (planState.currentDay > planState.planData.length ? planState.planData.length : planState.currentDay);
-
-    return Stack(
-      children: [
-        DayView(planId: widget.planId, dayNum: initialDay),
-      ],
+    if (widget.planId == 'chronological_1yr') {
+      return JourneyMapScreen(planId: widget.planId);
+    }
+    
+    return DayView(
+      planId: widget.planId,
+      dayNum: planState.currentDay > 0 ? planState.currentDay : 1,
     );
   }
 }
@@ -2146,11 +2131,11 @@ class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
 class _AdaptivePlanCalendar extends ConsumerWidget {
   final ReadingPlanState planState;
   final DateTime displayMonth;
-  final bool isYearView;
+  final CalendarViewMode viewMode;
   final VoidCallback onPrevMonth;
   final VoidCallback onNextMonth;
   final void Function(DateTime) onJumpToMonth;
-  final VoidCallback onToggleYearView;
+  final void Function(CalendarViewMode) onSetViewMode;
   final Map<String, int> scheduledMap;
   final DateTime realToday;
   final bool isScheduled;
@@ -2161,11 +2146,11 @@ class _AdaptivePlanCalendar extends ConsumerWidget {
   const _AdaptivePlanCalendar({
     required this.planState,
     required this.displayMonth,
-    required this.isYearView,
+    required this.viewMode,
     required this.onPrevMonth,
     required this.onNextMonth,
     required this.onJumpToMonth,
-    required this.onToggleYearView,
+    required this.onSetViewMode,
     required this.scheduledMap,
     required this.realToday,
     required this.isScheduled,
@@ -2242,11 +2227,18 @@ class _AdaptivePlanCalendar extends ConsumerWidget {
                 overflow: TextOverflow.ellipsis,
               ),
               ToggleButtons(
-                isSelected: [!isYearView, isYearView],
+                isSelected: [
+                  viewMode == CalendarViewMode.week,
+                  viewMode == CalendarViewMode.month,
+                  viewMode == CalendarViewMode.year,
+                ],
                 onPressed: (index) {
-                  if ((index == 0 && isYearView) ||
-                      (index == 1 && !isYearView)) {
-                    onToggleYearView();
+                  if (index == 0) {
+                    onSetViewMode(CalendarViewMode.week);
+                  } else if (index == 1) {
+                    onSetViewMode(CalendarViewMode.month);
+                  } else {
+                    onSetViewMode(CalendarViewMode.year);
                   }
                 },
                 borderRadius: BorderRadius.circular(8),
@@ -2255,6 +2247,12 @@ class _AdaptivePlanCalendar extends ConsumerWidget {
                 selectedColor: gold,
                 fillColor: gold.withValues(alpha: 0.15),
                 children: const [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    child: Text('Week',
+                        style: TextStyle(
+                            fontSize: 12, fontWeight: FontWeight.bold)),
+                  ),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 8),
                     child: Text('Month',
@@ -2272,7 +2270,7 @@ class _AdaptivePlanCalendar extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 16),
-          if (isYearView)
+          if (viewMode == CalendarViewMode.year)
             _PlanYearCalendar(
               planState: planState,
               startedOn: startedOn,
@@ -2280,6 +2278,28 @@ class _AdaptivePlanCalendar extends ConsumerWidget {
               gold: gold,
               theme: theme,
               onMonthTap: onJumpToMonth,
+            )
+          else if (viewMode == CalendarViewMode.week)
+            GestureDetector(
+              onHorizontalDragEnd: (details) {
+                if (details.primaryVelocity == null) return;
+                if (details.primaryVelocity! < -300.0) {
+                  onNextMonth();
+                } else if (details.primaryVelocity! > 300.0) {
+                  onPrevMonth();
+                }
+              },
+              child: _PlanWeekCalendar(
+                planState: planState,
+                displayDate: displayMonth,
+                onPrevWeek: onPrevMonth, // reusing the month callbacks for now to navigate time
+                onNextWeek: onNextMonth,
+                scheduledMap: scheduledMap,
+                realToday: realToday,
+                isScheduled: isScheduled,
+                gold: gold,
+                onDayTap: onDayTap,
+              ),
             )
           else
             GestureDetector(
@@ -2532,6 +2552,142 @@ class _PlanYearCalendar extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _PlanWeekCalendar extends StatelessWidget {
+  final ReadingPlanState planState;
+  final DateTime displayDate;
+  final VoidCallback onPrevWeek;
+  final VoidCallback onNextWeek;
+  final Map<String, int> scheduledMap;
+  final DateTime realToday;
+  final bool isScheduled;
+  final Color gold;
+  final void Function(int dayNum) onDayTap;
+
+  const _PlanWeekCalendar({
+    required this.planState,
+    required this.displayDate,
+    required this.onPrevWeek,
+    required this.onNextWeek,
+    required this.scheduledMap,
+    required this.realToday,
+    required this.isScheduled,
+    required this.gold,
+    required this.onDayTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final int year = displayDate.year;
+    final int month = displayDate.month;
+    final int? restDay = planState.restDay;
+
+    // Find the Sunday of the current week
+    final int currentWeekday = displayDate.weekday; // 1=Mon, 7=Sun
+    final int daysToSubtract = currentWeekday == 7 ? 0 : currentWeekday;
+    final DateTime startOfWeek = displayDate.subtract(Duration(days: daysToSubtract));
+
+    return Container(
+      color: Colors.transparent,
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                  icon: const Icon(Icons.chevron_left_rounded),
+                  onPressed: onPrevWeek,
+                  color: gold),
+              Text('${_monthNames[month - 1]} $year',
+                  style: TextStyle(
+                      fontFamily: 'EB Garamond',
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: gold)),
+              IconButton(
+                  icon: const Icon(Icons.chevron_right_rounded),
+                  onPressed: onNextWeek,
+                  color: gold),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Row(
+            children: List.generate(
+                7,
+                (i) => Expanded(
+                      child: Center(
+                        child: Text(
+                          _weekdayShort[i][0],
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: i == 0
+                                ? gold.withValues(alpha: 0.7)
+                                : theme.colorScheme.onSurface
+                                    .withValues(alpha: 0.4),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    )),
+          ),
+          const SizedBox(height: 0),
+          GridView.builder(
+            padding: EdgeInsets.zero,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 7,
+              mainAxisSpacing: 0,
+              crossAxisSpacing: 0,
+              childAspectRatio: 1.0,
+            ),
+            itemCount: 7,
+            itemBuilder: (context, index) {
+              final cellDate = startOfWeek.add(Duration(days: index));
+              
+              final isCurrentMonth = cellDate.month == month;
+              
+              final isRealToday = cellDate.year == realToday.year &&
+                  cellDate.month == realToday.month &&
+                  cellDate.day == realToday.day;
+              final cellAppWeekday = appWeekday(cellDate);
+              final isRestDay = restDay != null && cellAppWeekday == restDay;
+
+              int? readingDay;
+              if (isScheduled && isCurrentMonth) {
+                readingDay = scheduledMap[
+                    '${cellDate.year}-${cellDate.month}-${cellDate.day}'];
+              } else if (isScheduled) {
+                readingDay = scheduledMap[
+                    '${cellDate.year}-${cellDate.month}-${cellDate.day}'];
+              }
+
+              return _DayCell(
+                dayNum: cellDate.day,
+                isRealToday: isRealToday,
+                isRestDay: isRestDay,
+                readingDay: readingDay,
+                isCompleted: readingDay != null &&
+                    planState.completedReadings.contains(readingDay),
+                isMissed: readingDay != null &&
+                    planState.missedDays.contains(readingDay),
+                isToday: readingDay != null &&
+                    readingDay == planState.todayReadingDay,
+                isScheduled: isScheduled,
+                isCurrentMonth: isCurrentMonth, 
+                theme: theme,
+                gold: gold,
+                onTap: (readingDay != null)
+                    ? () => onDayTap(readingDay!)
+                    : null,
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 }
