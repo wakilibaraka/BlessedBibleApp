@@ -9,8 +9,10 @@ import '../widgets/shared_app_bar.dart';
 import 'plan_reader_screen.dart';
 import '../../state/streak_provider.dart';
 import '../../state/theme_provider.dart';
+import '../../state/surface_style_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
 import 'package:flutter/cupertino.dart';
+import '../widgets/textured_glass_container.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HELPERS
@@ -1038,9 +1040,9 @@ class _PlanMonthCalendar extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 7,
-              mainAxisSpacing: 8,
+              mainAxisSpacing: 2,
               crossAxisSpacing: 4,
-              childAspectRatio: 0.9,
+              childAspectRatio: 0.82,
             ),
             itemCount: 42,
             itemBuilder: (context, index) {
@@ -1242,6 +1244,10 @@ class _DayViewState extends ConsumerState<DayView>
   late int _currentLogicalDay;
   late int _totalLogicalDaysCount;
 
+  // Calendar State
+  late DateTime _displayMonth;
+  bool _isYearView = false;
+
   @override
   void initState() {
     super.initState();
@@ -1254,6 +1260,34 @@ class _DayViewState extends ConsumerState<DayView>
         CurvedAnimation(parent: _glowController, curve: Curves.easeOut));
     _confettiController =
         ConfettiController(duration: const Duration(seconds: 3));
+
+    final now = DateTime.now();
+    _displayMonth = DateTime(now.year, now.month, 1);
+  }
+
+  void _prevMonth() {
+    HapticFeedback.lightImpact();
+    setState(() => _displayMonth =
+        DateTime(_displayMonth.year, _displayMonth.month - 1, 1));
+  }
+
+  void _nextMonth() {
+    HapticFeedback.lightImpact();
+    setState(() => _displayMonth =
+        DateTime(_displayMonth.year, _displayMonth.month + 1, 1));
+  }
+
+  void _jumpToMonth(DateTime month) {
+    HapticFeedback.lightImpact();
+    setState(() {
+      _displayMonth = month;
+      _isYearView = false;
+    });
+  }
+
+  void _toggleYearView() {
+    HapticFeedback.selectionClick();
+    setState(() => _isYearView = !_isYearView);
   }
 
   @override
@@ -1516,6 +1550,29 @@ class _DayViewState extends ConsumerState<DayView>
                   child: const Text('I reflected today',
                       style: TextStyle(letterSpacing: 1.0)),
                 ),
+                const SizedBox(height: 48),
+                _AdaptivePlanCalendar(
+                  planState: planState,
+                  displayMonth: _displayMonth,
+                  isYearView: _isYearView,
+                  onPrevMonth: _prevMonth,
+                  onNextMonth: _nextMonth,
+                  onJumpToMonth: _jumpToMonth,
+                  onToggleYearView: _toggleYearView,
+                  scheduledMap: planState.paceMode == 'scheduled'
+                      ? _buildDateToReadingMap(planState)
+                      : <String, int>{},
+                  realToday: DateTime.now(),
+                  isScheduled: planState.paceMode == 'scheduled',
+                  gold: gold,
+                  theme: theme,
+                  onDayTap: (dayNum) {
+                    HapticFeedback.selectionClick();
+                    final logicalDay =
+                        _logicalDayForReadingDay(dayNum, planState);
+                    setState(() => _currentLogicalDay = logicalDay);
+                  },
+                ),
               ],
             ),
           ),
@@ -1539,9 +1596,16 @@ class _DayViewState extends ConsumerState<DayView>
       backgroundColor: getThemeBackgroundColor(),
       extendBodyBehindAppBar: true,
       appBar: SharedAppBar(
-          title: const Text(''),
-          backgroundColor: Colors.transparent,
-          elevation: 0),
+        title: const Text(''),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.settings_rounded, color: gold),
+            onPressed: () {}, // Reserved for settings
+          ),
+        ],
+      ),
       bottomNavigationBar: navBar,
       body: GestureDetector(
         onHorizontalDragEnd: (details) {
@@ -1560,18 +1624,18 @@ class _DayViewState extends ConsumerState<DayView>
                 Container(
                   color: gold.withValues(alpha: 0.10),
                   padding: const EdgeInsets.only(
-                      top: 96, bottom: 32, left: 24, right: 24),
+                      top: 72, bottom: 16, left: 24, right: 24),
                   child: Column(
                     children: [
                       Text(dateHeader,
                           style: theme.textTheme.labelMedium?.copyWith(
                               letterSpacing: 1.1,
                               color: gold.withValues(alpha: 0.8))),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 4),
                       Text(dayData.title,
                           style: const TextStyle(
                               fontFamily: 'EB Garamond',
-                              fontSize: 30,
+                              fontSize: 26,
                               fontWeight: FontWeight.bold),
                           textAlign: TextAlign.center),
                     ],
@@ -1579,7 +1643,7 @@ class _DayViewState extends ConsumerState<DayView>
                 ),
                 Expanded(
                   child: ListView(
-                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 40),
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
                     children: [
                       ...dayData.passages.asMap().entries.map((entry) {
                         final idx = entry.key + 1;
@@ -1614,7 +1678,7 @@ class _DayViewState extends ConsumerState<DayView>
                               },
                               borderRadius: BorderRadius.circular(12),
                               child: Container(
-                                height: 64,
+                                height: 52,
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 18),
                                 decoration: BoxDecoration(
@@ -1653,7 +1717,7 @@ class _DayViewState extends ConsumerState<DayView>
                           ),
                         );
                       }),
-                      const SizedBox(height: 28),
+                      const SizedBox(height: 12),
                       AnimatedBuilder(
                         animation: _glowAnimation,
                         builder: (context, child) => Container(
@@ -1680,7 +1744,7 @@ class _DayViewState extends ConsumerState<DayView>
                               side: isDone
                                   ? BorderSide.none
                                   : BorderSide(color: gold, width: 2),
-                              padding: const EdgeInsets.symmetric(vertical: 20),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16)),
                             ),
@@ -1706,32 +1770,63 @@ class _DayViewState extends ConsumerState<DayView>
                           ),
                         ),
                       ),
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 16),
+                      _AdaptivePlanCalendar(
+                        planState: planState,
+                        displayMonth: _displayMonth,
+                        isYearView: _isYearView,
+                        onPrevMonth: _prevMonth,
+                        onNextMonth: _nextMonth,
+                        onJumpToMonth: _jumpToMonth,
+                        onToggleYearView: _toggleYearView,
+                        scheduledMap: planState.paceMode == 'scheduled'
+                            ? _buildDateToReadingMap(planState)
+                            : <String, int>{},
+                        realToday: DateTime.now(),
+                        isScheduled: planState.paceMode == 'scheduled',
+                        gold: gold,
+                        theme: theme,
+                        onDayTap: (dayNum) {
+                          HapticFeedback.selectionClick();
+                          final logicalDay =
+                              _logicalDayForReadingDay(dayNum, planState);
+                          setState(() => _currentLogicalDay = logicalDay);
+                        },
+                      ),
+                      const SizedBox(height: 24),
                       Container(
-                        padding: const EdgeInsets.all(18),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: theme.scaffoldBackgroundColor,
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
                               color: theme.dividerColor.withValues(alpha: 0.5)),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        child: Row(
                           children: [
-                            Text('From the plan:',
-                                style: theme.textTheme.labelSmall?.copyWith(
-                                    color: theme.colorScheme.onSurface
-                                        .withValues(alpha: 0.45))),
-                            const SizedBox(height: 8),
-                            Text('Chronological Bible in a Year',
-                                style: TextStyle(
-                                    fontFamily: 'EB Garamond',
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: gold)),
-                            const SizedBox(height: 4),
-                            Text('Guthrie – Read the Bible for Life\n52 weeks',
-                                style: theme.textTheme.bodySmall),
+                            Icon(Icons.info_outline_rounded,
+                                size: 24, color: gold.withValues(alpha: 0.5)),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('Chronological Bible in a Year',
+                                      style: TextStyle(
+                                          fontFamily: 'EB Garamond',
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: gold)),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                      'Guthrie – Read the Bible for Life • 52 weeks',
+                                      style: theme.textTheme.labelSmall
+                                          ?.copyWith(
+                                              color: theme.colorScheme.onSurface
+                                                  .withValues(alpha: 0.6))),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -1886,26 +1981,19 @@ class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
       );
     }
 
+    final initialDay = planState.currentDay == 0 
+        ? 1 
+        : (planState.currentDay > planState.planData.length ? planState.planData.length : planState.currentDay);
+
     return Stack(
       children: [
-        TodayView(planState: planState),
-        Align(
-          alignment: Alignment.topCenter,
-          child: ConfettiWidget(
-            confettiController: _confettiController,
-            blastDirectionality: BlastDirectionality.explosive,
-            shouldLoop: false,
-            colors: [gold, gold.withValues(alpha: 0.8), Colors.white],
-            emissionFrequency: 0.05,
-            numberOfParticles: 40,
-          ),
-        ),
+        DayView(planId: widget.planId, dayNum: initialDay),
       ],
     );
   }
 }
 
-class _AdaptivePlanCalendar extends StatelessWidget {
+class _AdaptivePlanCalendar extends ConsumerWidget {
   final ReadingPlanState planState;
   final DateTime displayMonth;
   final bool isYearView;
@@ -1937,18 +2025,22 @@ class _AdaptivePlanCalendar extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final surfaceStyle = ref.watch(surfaceStyleProvider);
+    final is3D = surfaceStyle == SurfaceStyle.threeDimensional;
+
     final totalDays = planState.planData.length;
 
+    Widget calendarWidget;
     if (totalDays <= 14) {
-      return _PlanCompactCalendar(
+      calendarWidget = _PlanCompactCalendar(
         planState: planState,
         gold: gold,
         theme: theme,
         onDayTap: onDayTap,
       );
     } else if (totalDays <= 90) {
-      return GestureDetector(
+      calendarWidget = GestureDetector(
         onHorizontalDragEnd: (details) {
           if (details.primaryVelocity == null) return;
           if (details.primaryVelocity! < -300.0) {
@@ -1985,7 +2077,7 @@ class _AdaptivePlanCalendar extends StatelessWidget {
           ? (planState.completedReadings.length / totalDays * 100).floor()
           : 0;
 
-      return Column(
+      calendarWidget = Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
@@ -2062,6 +2154,15 @@ class _AdaptivePlanCalendar extends StatelessWidget {
         ],
       );
     }
+
+    if (is3D) {
+      return TexturedGlassContainer(
+        borderRadius: BorderRadius.circular(24),
+        padding: const EdgeInsets.all(20),
+        child: calendarWidget,
+      );
+    }
+    return calendarWidget;
   }
 }
 
