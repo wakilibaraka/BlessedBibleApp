@@ -6,9 +6,8 @@ import '../models/commentary_entry.dart';
 import '../data/local_storage/preferences_service.dart';
 
 // Parse JSON completely in the background to prevent main thread blocking
-List<CommentaryEntry> _parseCommentaryJson(Uint8List bytes) {
+List<CommentaryEntry> _parseCommentaryJsonString(String jsonString) {
   try {
-    final jsonString = utf8.decode(bytes);
     final decoded = jsonDecode(jsonString);
 
     List<dynamic> entriesList;
@@ -81,10 +80,10 @@ class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
 
   Future<List<CommentaryEntry>> _loadCommentary() async {
     try {
-      final byteData =
-          await rootBundle.load('assets/commentary/commentary.json');
+      final jsonString =
+          await rootBundle.loadString('assets/commentary/commentary.json');
       return await compute(
-          _parseCommentaryJson, byteData.buffer.asUint8List());
+          _parseCommentaryJsonString, jsonString);
     } catch (e) {
       // If the file is missing or empty, do not crash; return empty list
       return [];
