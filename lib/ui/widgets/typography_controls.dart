@@ -20,7 +20,9 @@ class TypographyControls extends ConsumerWidget {
       'Lora',
       'Literata',
       'Lexend',
-      'OpenDyslexic'
+      'OpenDyslexic',
+      'Bonheur Royale',
+      'Shadows Into Light',
     ];
 
     final sectionLabelStyle = theme.textTheme.labelSmall?.copyWith(
@@ -324,17 +326,24 @@ class TypographyControls extends ConsumerWidget {
                     color: isSelected ? theme.primaryColor : Colors.transparent,
                   ),
                 ),
-                child: Text(
-                  font,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: font,
-                    color: isSelected
-                        ? theme.colorScheme.surface
-                        : theme.primaryColor,
-                    fontWeight:
-                        isSelected ? FontWeight.bold : FontWeight.normal,
-                    fontSize: 13,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    child: Text(
+                      font,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontFamily: font,
+                        color: isSelected
+                            ? theme.colorScheme.surface
+                            : theme.primaryColor,
+                        fontWeight:
+                            isSelected ? FontWeight.bold : FontWeight.normal,
+                        fontSize: 13,
+                      ),
+                    ),
                   ),
                 ),
               ),

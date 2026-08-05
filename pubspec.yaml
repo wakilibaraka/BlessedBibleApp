@@ -113,3 +113,9 @@ flutter:
         - asset: assets/fonts/OpenDyslexic-Regular.otf
         - asset: assets/fonts/OpenDyslexic-Bold.otf
           weight: 700
+    - family: Bonheur Royale
+      fonts:
+        - asset: assets/fonts/BonheurRoyale-Regular.ttf
+    - family: Shadows Into Light
+      fonts:
+        - asset: assets/fonts/ShadowsIntoLight-Regular.ttf
