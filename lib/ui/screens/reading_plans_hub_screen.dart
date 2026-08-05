@@ -321,6 +321,7 @@ class ReadingPlansHubScreen extends ConsumerWidget {
         );
       },
       child: TexturedGlassContainer(
+        isScrollable: true,
         borderRadius: BorderRadius.circular(16),
         padding: EdgeInsets.zero,
         child: Container(
@@ -600,6 +601,7 @@ class ReadingPlansHubScreen extends ConsumerWidget {
 
   Widget _buildOtherPlanCard(ThemeData theme, PlanMetadata plan) {
     return TexturedGlassContainer(
+      isScrollable: true,
       borderRadius: BorderRadius.circular(20),
       padding: EdgeInsets.zero,
       child: Container(
@@ -662,6 +664,7 @@ class ReadingPlansHubScreen extends ConsumerWidget {
   Widget _buildFixedPlanCard(
       BuildContext context, WidgetRef ref, ThemeData theme, PlanMetadata plan) {
     return TexturedGlassContainer(
+      isScrollable: true,
       borderRadius: BorderRadius.circular(20),
       padding: EdgeInsets.zero,
       child: Container(
@@ -819,6 +822,7 @@ class ReadingPlansHubScreen extends ConsumerWidget {
           );
         },
         child: TexturedGlassContainer(
+          isScrollable: true,
           borderRadius: BorderRadius.circular(16),
           padding: EdgeInsets.zero,
           child: Container(

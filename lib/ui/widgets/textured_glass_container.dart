@@ -93,21 +93,41 @@ class TexturedGlassContainer extends ConsumerWidget {
 
     final List<BoxShadow> shadows;
     if (isDepth3D) {
-      shadows = isDarkBg
-          ? [
-              BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.40),
-                  offset: const Offset(0, 6),
-                  blurRadius: 20,
-                  spreadRadius: -4),
-            ]
-          : [
-              BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.06),
-                  offset: const Offset(0, 4),
-                  blurRadius: 16,
-                  spreadRadius: -2),
-            ];
+      if (useBlur) {
+        // Tier 3: Floating Modals / Hero Headers
+        shadows = isDarkBg
+            ? [
+                BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.50),
+                    offset: const Offset(0, 16),
+                    blurRadius: 32,
+                    spreadRadius: -8),
+              ]
+            : [
+                BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.12),
+                    offset: const Offset(0, 16),
+                    blurRadius: 32,
+                    spreadRadius: -8),
+              ];
+      } else {
+        // Tier 2: Raised Cards
+        shadows = isDarkBg
+            ? [
+                BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.40),
+                    offset: const Offset(0, 6),
+                    blurRadius: 20,
+                    spreadRadius: -4),
+              ]
+            : [
+                BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.06),
+                    offset: const Offset(0, 4),
+                    blurRadius: 16,
+                    spreadRadius: -2),
+              ];
+      }
     } else if (is3D) {
       shadows = isDarkBg
           ? [

@@ -14,6 +14,7 @@ class YourSpaceHero extends StatelessWidget {
     final theme = Theme.of(context);
 
     return TexturedGlassContainer(
+      isScrollable: true,
       borderRadius: BorderRadius.circular(24),
       padding: EdgeInsets.zero,
       child: InkWell(

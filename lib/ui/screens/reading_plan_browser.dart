@@ -1034,15 +1034,16 @@ class _PlanMonthCalendar extends StatelessWidget {
                       ),
                     )),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 0),
           GridView.builder(
+            padding: EdgeInsets.zero,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 7,
-              mainAxisSpacing: 2,
-              crossAxisSpacing: 4,
-              childAspectRatio: 0.82,
+              mainAxisSpacing: 0,
+              crossAxisSpacing: 0,
+              childAspectRatio: 1.0,
             ),
             itemCount: 42,
             itemBuilder: (context, index) {
@@ -1179,8 +1180,8 @@ class _DayCell extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: 38,
-            height: 38,
+            width: 34,
+            height: 34,
             decoration: BoxDecoration(
               color: circleBg,
               shape: BoxShape.circle,
@@ -1197,20 +1198,20 @@ class _DayCell extends StatelessWidget {
                           : theme.colorScheme.onSurface.withValues(alpha: 0.15))
                   : Text('$dayNum',
                       style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 15,
                           fontWeight: FontWeight.w600,
                           color: textColor)),
             ),
           ),
           if (indicator != null) ...[
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             indicator,
           ] else if (readingDay != null &&
               !isCompleted &&
               !isRestDay &&
               isCurrentMonth)
             Container(
-              margin: const EdgeInsets.only(top: 4),
+              margin: const EdgeInsets.only(top: 2),
               width: 5,
               height: 5,
               decoration: BoxDecoration(
@@ -2176,7 +2177,7 @@ class _AdaptivePlanCalendar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final surfaceStyle = ref.watch(surfaceStyleProvider);
-    final is3D = surfaceStyle == SurfaceStyle.threeDimensional;
+    final is3D = surfaceStyle == SurfaceStyle.threeDimensional || surfaceStyle == SurfaceStyle.depth3D;
 
     final totalDays = planState.planData.length;
 

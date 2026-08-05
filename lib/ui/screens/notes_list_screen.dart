@@ -68,6 +68,7 @@ class NotesListScreen extends ConsumerWidget {
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: 12.0),
                     child: TexturedGlassContainer(
+                      isScrollable: true,
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Column(

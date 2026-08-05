@@ -645,6 +645,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
       child: GestureDetector(
         onTap: () => _onResultTap(result),
         child: TexturedGlassContainer(
+          isScrollable: true,
           borderRadius: BorderRadius.circular(20),
           padding: const EdgeInsets.all(16.0),
           child: Column(

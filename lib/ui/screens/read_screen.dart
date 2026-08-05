@@ -2481,6 +2481,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
               return Padding(
                 padding: const EdgeInsets.only(top: 32.0, bottom: 16.0),
                 child: TexturedGlassContainer(
+                  isScrollable: true,
                   borderRadius: BorderRadius.circular(24),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
