@@ -207,26 +207,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
               },
             );
           }),
-          const Divider(height: 1, indent: 16),
-          Consumer(builder: (context, ref, _) {
-            final prefs = ref.watch(preferencesProvider);
-            return StatefulBuilder(builder: (context, setState) {
-              return SwitchListTile(
-                title: const Text('Show reading tips'),
-                subtitle: const Text(
-                    'Show guided hints for reading actions like highlighting and swiping'),
-                value: prefs.showReadingTips,
-                onChanged: (val) {
-                  HapticFeedback.selectionClick();
-                  prefs.setShowReadingTips(val);
-                  setState(() {});
-                  if (val) {
-                    ref.read(hintsProvider.notifier).resetHints();
-                  }
-                },
-              );
-            });
-          }),
         ],
       ),
     ]);
@@ -375,6 +355,29 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
           ],
         );
       }),
+      SettingsPillCard(
+        children: [
+          Consumer(builder: (context, ref, _) {
+            final prefs = ref.watch(preferencesProvider);
+            return StatefulBuilder(builder: (context, setState) {
+              return SwitchListTile(
+                title: const Text('Show reading tips'),
+                subtitle: const Text(
+                    'Show guided hints for reading actions like highlighting and swiping'),
+                value: prefs.showReadingTips,
+                onChanged: (val) {
+                  HapticFeedback.selectionClick();
+                  prefs.setShowReadingTips(val);
+                  setState(() {});
+                  if (val) {
+                    ref.read(hintsProvider.notifier).resetHints();
+                  }
+                },
+              );
+            });
+          }),
+        ],
+      ),
     ]);
   }
 
