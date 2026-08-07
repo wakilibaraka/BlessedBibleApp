@@ -486,7 +486,7 @@ class _WelcomePage extends ConsumerWidget {
 
               // Title
               Text(
-                'The Blessed\nBible',
+                'The\nBlessed\nBible',
                 style: theme.textTheme.displaySmall?.copyWith(
                   fontWeight: FontWeight.w900,
                   height: 1.05,
@@ -675,7 +675,6 @@ class _ThemePageState extends ConsumerState<_ThemePage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final currentMode = _highlightMode ?? ref.watch(themeProvider);
-    final bottom = MediaQuery.of(context).padding.bottom;
     final top = MediaQuery.of(context).padding.top;
 
     final selectedMeta = _colorThemes.firstWhere(
@@ -791,8 +790,6 @@ class _ThemePageState extends ConsumerState<_ThemePage> {
               },
             ),
           ),
-
-          SizedBox(height: bottom + 120),
         ],
       ),
     );
