@@ -528,9 +528,9 @@ class _ThemePageState extends ConsumerState<_ThemePage> {
     final random = Random();
     int ticks = 0;
     
-    _shuffleTimer = Timer.periodic(const Duration(milliseconds: 300), (timer) {
+    _shuffleTimer = Timer.periodic(const Duration(milliseconds: 400), (timer) {
       ticks++;
-      if (ticks >= 8) {
+      if (ticks >= 9) {
         timer.cancel();
         // Land on a color theme
         final colorThemes = _kThemes.where((t) => 
@@ -657,7 +657,7 @@ class _ThemePageState extends ConsumerState<_ThemePage> {
             child: _NavRow(
               onBack: widget.onBack,
               onNext: widget.onNext,
-              nextLabel: 'Next: Typography',
+              nextLabel: 'Typography',
               accentColor: accent,
             ),
           ),
@@ -945,6 +945,7 @@ class _TypographyPage extends ConsumerWidget {
                     label: 'Small',
                     isSelected: typoState.fontSize < 18,
                     accentColor: accent,
+                    fontSize: 12,
                     onTap: () {
                       HapticFeedback.lightImpact();
                       ref.read(typographyProvider.notifier).setFontSize(15.0);
@@ -957,6 +958,7 @@ class _TypographyPage extends ConsumerWidget {
                     label: 'Medium',
                     isSelected: typoState.fontSize == 18,
                     accentColor: accent,
+                    fontSize: 15,
                     onTap: () {
                       HapticFeedback.lightImpact();
                       ref.read(typographyProvider.notifier).setFontSize(18.0);
@@ -969,6 +971,7 @@ class _TypographyPage extends ConsumerWidget {
                     label: 'Big',
                     isSelected: typoState.fontSize > 18,
                     accentColor: accent,
+                    fontSize: 18,
                     onTap: () {
                       HapticFeedback.lightImpact();
                       ref.read(typographyProvider.notifier).setFontSize(22.0);
@@ -1040,7 +1043,7 @@ class _TypographyPage extends ConsumerWidget {
             child: _NavRow(
               onBack: onBack,
               onNext: onNext,
-              nextLabel: 'Next: Translation',
+              nextLabel: 'Translation',
               accentColor: accent,
             ),
           ),
@@ -1054,12 +1057,14 @@ class _SizeButton extends StatelessWidget {
   final String label;
   final bool isSelected;
   final Color accentColor;
+  final double? fontSize;
   final VoidCallback onTap;
 
   const _SizeButton({
     required this.label,
     required this.isSelected,
     required this.accentColor,
+    this.fontSize,
     required this.onTap,
   });
 
@@ -1087,7 +1092,7 @@ class _SizeButton extends StatelessWidget {
           child: Text(
             label,
             style: TextStyle(
-              fontSize: 13,
+              fontSize: fontSize ?? 13,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
               color: isSelected ? accentColor : theme.colorScheme.onSurface,
             ),
@@ -1417,7 +1422,7 @@ class _TranslationPageState extends ConsumerState<_TranslationPage> {
                   widget.onNext();
                 }
               },
-              nextLabel: !_isSlideB ? 'Next: Optional Second' : 'Almost done!',
+              nextLabel: !_isSlideB ? 'Secondary Language (Optional)' : 'Almost done!',
               accentColor: primary,
             ),
           ),
