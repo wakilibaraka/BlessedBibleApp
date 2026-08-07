@@ -63,18 +63,18 @@ const List<_ThemeMeta> _kThemes = [
     accent: AppColors.dawnPrimary,
   ),
   _ThemeMeta(
-    mode: AppThemeMode.dusk,
-    label: 'Stars',
-    bg: AppColors.duskBackground,
-    text: AppColors.duskTextPrimary,
-    accent: AppColors.duskPrimary,
-  ),
-  _ThemeMeta(
     mode: AppThemeMode.fresh,
     label: 'Moon',
     bg: AppColors.freshBackground,
     text: AppColors.freshTextPrimary,
     accent: AppColors.freshPrimary,
+  ),
+  _ThemeMeta(
+    mode: AppThemeMode.dusk,
+    label: 'Stars',
+    bg: AppColors.duskBackground,
+    text: AppColors.duskTextPrimary,
+    accent: AppColors.duskPrimary,
   ),
   _ThemeMeta(
     mode: AppThemeMode.lilies,
@@ -520,11 +520,7 @@ class _ThemePageState extends ConsumerState<_ThemePage> {
   @override
   void initState() {
     super.initState();
-    _colorThemes = _kThemes.where((t) => 
-      t.mode != AppThemeMode.light && 
-      t.mode != AppThemeMode.dark && 
-      t.mode != AppThemeMode.oled
-    ).toList();
+    _colorThemes = _kThemes.toList();
   }
 
   @override
