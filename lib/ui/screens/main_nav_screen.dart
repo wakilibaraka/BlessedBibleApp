@@ -15,6 +15,7 @@ import 'read_screen.dart';
 import 'search_screen.dart';
 import 'study_screen.dart';
 import 'settings_screen.dart';
+import '../sheets/search_settings_sheet.dart';
 import '../widgets/animated_background.dart';
 import '../widgets/bouncy_entrance.dart';
 import '../widgets/textured_glass_container.dart';
@@ -630,7 +631,13 @@ class MainNavScreen extends ConsumerWidget {
         }
         break;
       case 2:
-        // Search tab: no FAB action (search bar is in the screen itself)
+        // Search tab: open Search Settings
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (ctx) => const SearchSettingsSheet(),
+        );
         break;
       case 3:
         // Study -> I'm Feeling Lucky

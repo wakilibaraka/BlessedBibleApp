@@ -11,8 +11,6 @@ import '../../state/search_settings_provider.dart';
 import '../../state/most_read_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../widgets/textured_glass_container.dart';
-import '../sheets/search_settings_sheet.dart';
-
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
 
@@ -120,17 +118,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            backgroundColor: Colors.transparent,
-            builder: (ctx) => const SearchSettingsSheet(),
-          );
-        },
-        child: const Icon(Icons.tune_rounded),
-      ),
       body: SafeArea(
         bottom: false,
         child: FadeTransition(
