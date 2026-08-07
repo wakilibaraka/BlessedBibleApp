@@ -233,10 +233,8 @@ class _TranslationPickerSheetState
     // 1. Beta Feature Flag: Set to true to re-enable downloadable translations
     bool kEnableDownloads = false;
 
-    // First add installed (and ensure they are actually downloaded/bundled)
+    // First add installed (they are guaranteed local because they are in the DB)
     for (final t in installed) {
-      if (!kEnableDownloads && !t.isDownloaded) continue;
-
       final lang = t.languageName;
       allTranslations[lang] = allTranslations[lang] ?? [];
       allTranslations[lang]!.add(t);
