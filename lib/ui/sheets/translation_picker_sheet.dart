@@ -230,21 +230,29 @@ class _TranslationPickerSheetState
     final allTranslations = <String,
         List<dynamic>>{}; // map of langName -> list of (TranslationInfo OR Map)
 
-    // First add installed
+    // 1. Beta Feature Flag: Set to true to re-enable downloadable translations
+    bool kEnableDownloads = false;
+
+    // First add installed (and ensure they are actually downloaded/bundled)
     for (final t in installed) {
+      if (!kEnableDownloads && !t.isDownloaded) continue;
+
       final lang = t.languageName;
       allTranslations[lang] = allTranslations[lang] ?? [];
       allTranslations[lang]!.add(t);
     }
 
     // Then add downloadable (if not installed)
-    final installedIds = installed.map((t) => t.translationId).toSet();
-    for (final t in TranslationDownloader.downloadableTranslations) {
-      final tid = t['db_id'] ?? t['id'];
-      if (!installedIds.contains(tid)) {
-        final lang = t['langName'] as String;
-        allTranslations[lang] = allTranslations[lang] ?? [];
-        allTranslations[lang]!.add(t);
+    // ignore: dead_code
+    if (kEnableDownloads) {
+      final installedIds = installed.map((t) => t.translationId).toSet();
+      for (final t in TranslationDownloader.downloadableTranslations) {
+        final tid = t['db_id'] ?? t['id'];
+        if (!installedIds.contains(tid)) {
+          final lang = t['langName'] as String;
+          allTranslations[lang] = allTranslations[lang] ?? [];
+          allTranslations[lang]!.add(t);
+        }
       }
     }
 
