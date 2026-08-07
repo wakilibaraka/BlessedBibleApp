@@ -18,6 +18,7 @@ import '../widgets/settings_pill_card.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'privacy_policy_screen.dart';
+import 'onboarding_screen.dart';
 import '../../data/local_storage/preferences_service.dart';
 final packageInfoProvider = FutureProvider<PackageInfo>((ref) async {
   return await PackageInfo.fromPlatform();
@@ -324,6 +325,46 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
                 },
               );
             });
+          }),
+        ],
+      ),
+      SettingsPillCard(
+        children: [
+          Consumer(builder: (context, ref, _) {
+            final theme = Theme.of(context);
+            return ListTile(
+              title: const Text('Restart onboarding'),
+              subtitle: const Text('Replay the first-time setup'),
+              trailing: Icon(Icons.restart_alt_rounded, color: theme.primaryColor),
+              onTap: () {
+                HapticFeedback.selectionClick();
+                showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('Restart onboarding?'),
+                    content: const Text(
+                        'This will replay the first-time setup. Your current theme, font, and translation stay unless you change them.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(ctx).pop(),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(ctx).pop();
+                          ref.read(preferencesProvider).setOnboardingComplete(false);
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+                            (route) => false,
+                          );
+                        },
+                        child: Text('Restart', style: TextStyle(color: theme.primaryColor, fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
           }),
         ],
       ),

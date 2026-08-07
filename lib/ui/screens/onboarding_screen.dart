@@ -292,6 +292,38 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               ),
             ),
 
+
+          // Shared Nav Row (floating over content)
+          if (_currentPage > 0 && _currentPage < 4)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(24, 0, 24, MediaQuery.of(context).padding.bottom + 68),
+                child: _NavRow(
+                  onBack: () => _goToPage(_currentPage - 1),
+                  onNext: () {
+                     if (_currentPage == 3) {
+                       _completeOnboarding();
+                     } else {
+                       _goToPage(_currentPage + 1);
+                     }
+                  },
+                  nextLabel: _currentPage == 1
+                      ? 'Typography'
+                      : _currentPage == 2
+                          ? 'Translation'
+                          : 'DONE!',
+                  accentColor: _currentPage == 3
+                      ? theme.primaryColor
+                      : _kThemes.firstWhere(
+                          (t) => t.mode == ref.watch(themeProvider),
+                          orElse: () => _kThemes.first).accent,
+                ),
+              ),
+            ),
+
           // Progress dots — bottom
           if (_currentPage < 4)
             Positioned(
@@ -1076,7 +1108,7 @@ class _TypographyPage extends ConsumerWidget {
           const SizedBox(height: 16),
           Expanded(
             child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+              padding: EdgeInsets.only(left: 20, right: 20, top: 4, bottom: bottom + 140),
               itemCount: fonts.length,
               itemBuilder: (context, index) {
                 final font = fonts[index];
@@ -1129,16 +1161,7 @@ class _TypographyPage extends ConsumerWidget {
               },
             ),
           ),
-          const SizedBox(height: 12),
-          Padding(
-            padding: EdgeInsets.fromLTRB(24, 0, 24, bottom + 68),
-            child: _NavRow(
-              onBack: onBack,
-              onNext: onNext,
-              nextLabel: 'Translation',
-              accentColor: accent,
-            ),
-          ),
+
         ],
       ),
     );
@@ -1282,7 +1305,7 @@ class _TranslationPageState extends ConsumerState<_TranslationPage> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Change your version and add more languages anytime in Settings.',
+                  'Change your version anytime in Settings.',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
@@ -1469,17 +1492,7 @@ class _TranslationPageState extends ConsumerState<_TranslationPage> {
                 : const SizedBox.shrink(),
           ),
 
-          const SizedBox(height: 10),
-
-          Padding(
-            padding: EdgeInsets.fromLTRB(24, 0, 24, bottom + 68),
-            child: _NavRow(
-              onBack: widget.onBack,
-              onNext: widget.onNext,
-              nextLabel: 'DONE!',
-              accentColor: primary,
-            ),
-          ),
+          SizedBox(height: bottom + 120),
         ],
       ),
     );
