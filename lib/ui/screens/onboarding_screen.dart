@@ -765,7 +765,7 @@ class _ThemePageState extends ConsumerState<_ThemePage> {
           Expanded(
             child: GridView.builder(
               physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+              padding: const EdgeInsets.only(left: 24, right: 24, top: 32, bottom: 8),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
                 childAspectRatio: 0.85,
@@ -1700,9 +1700,33 @@ class _GetStartedPageState extends ConsumerState<_GetStartedPage> {
 
                   const Spacer(flex: 3),
 
+                  _FloatingPill(
+                    color: primary.withValues(alpha: 0.85),
+                    borderRadius: BorderRadius.circular(16),
+                    child: FilledButton(
+                      onPressed: () {
+                        HapticFeedback.selectionClick();
+                        widget.onComplete();
+                      },
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                        foregroundColor: primary.computeLuminance() > 0.4
+                            ? Colors.black87
+                            : Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16)),
+                      ),
+                      child: const Center(
+                        child: Text('Start Reading',
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                  ),
 
-
-                  SizedBox(height: bottom + 16),
+                  SizedBox(height: bottom + 68),
                 ],
               ),
             ),
