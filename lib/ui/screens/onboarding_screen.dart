@@ -528,9 +528,9 @@ class _ThemePageState extends ConsumerState<_ThemePage> {
     final random = Random();
     int ticks = 0;
     
-    _shuffleTimer = Timer.periodic(const Duration(milliseconds: 150), (timer) {
+    _shuffleTimer = Timer.periodic(const Duration(milliseconds: 300), (timer) {
       ticks++;
-      if (ticks >= 10) {
+      if (ticks >= 8) {
         timer.cancel();
         // Land on a color theme
         final colorThemes = _kThemes.where((t) => 
