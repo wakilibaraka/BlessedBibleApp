@@ -451,7 +451,7 @@ class _WelcomePage extends ConsumerWidget {
             theme.scaffoldBackgroundColor,
             theme.scaffoldBackgroundColor,
           ],
-          stops: const [0.0, 0.45, 1.0],
+          stops: const [0.0, 0.8, 1.0],
         ),
       ),
       child: SafeArea(
@@ -486,7 +486,7 @@ class _WelcomePage extends ConsumerWidget {
 
               // Title
               Text(
-                'Blessed\nBible',
+                'The Blessed\nBible',
                 style: theme.textTheme.displaySmall?.copyWith(
                   fontWeight: FontWeight.w900,
                   height: 1.05,
@@ -558,7 +558,7 @@ class _FeatureHints extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final items = [
-      (Icons.palette_rounded, '14 beautiful themes'),
+      (Icons.palette_rounded, '12+ beautiful themes'),
       (Icons.translate_rounded, 'Multi-translation support'),
       (Icons.bookmark_rounded, 'Highlights & bookmarks'),
     ];
@@ -792,15 +792,7 @@ class _ThemePageState extends ConsumerState<_ThemePage> {
             ),
           ),
 
-          Padding(
-            padding: EdgeInsets.fromLTRB(24, 0, 24, bottom + 68),
-            child: _NavRow(
-              onBack: widget.onBack,
-              onNext: widget.onNext,
-              nextLabel: 'Typography',
-              accentColor: accent,
-            ),
-          ),
+          SizedBox(height: bottom + 120),
         ],
       ),
     );
@@ -1023,7 +1015,7 @@ class _TypographyPage extends ConsumerWidget {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           // Live sample preview
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -1277,13 +1269,10 @@ class _TranslationPageState extends ConsumerState<_TranslationPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: primary.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+                _FloatingPill(
+                  color: primary.withValues(alpha: 0.20),
+                  borderRadius: BorderRadius.circular(20),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   child: Text(
                     'STEP 3 OF 3',
                     style: TextStyle(
@@ -1314,7 +1303,7 @@ class _TranslationPageState extends ConsumerState<_TranslationPage> {
             ),
           ),
 
-          const SizedBox(height: 44),
+          const SizedBox(height: 20),
 
           // Translation list (Primary)
           Expanded(
