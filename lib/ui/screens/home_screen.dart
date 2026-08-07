@@ -16,7 +16,6 @@ import 'commentary_hub_screen.dart';
 import '../../state/commentary_provider.dart';
 import 'today_screen.dart';
 import '../../services/share_service.dart';
-import '../sheets/theme_picker_sheet.dart';
 
 class StrictHorizontalDragGestureRecognizer
     extends HorizontalDragGestureRecognizer {
@@ -111,9 +110,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       ..onUpdate = (details) {}
                       ..onEnd = (details) {
                         if (details.primaryVelocity == null) return;
-                        if (details.primaryVelocity!.abs() > 300) {
-                          // Swipe Left/Right -> Appearance Sheet
-                          ThemePickerSheet.show(context);
+                        // Swipe Left → go to Read tab
+                        if (details.primaryVelocity! < -300) {
+                          HapticFeedback.selectionClick();
+                          ref.read(navProvider.notifier).setIndex(1);
                         }
                       };
                   },

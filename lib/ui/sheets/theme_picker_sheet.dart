@@ -19,6 +19,7 @@ class ThemePickerSheet extends ConsumerStatefulWidget {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      enableDrag: true,
       backgroundColor: Colors.transparent,
       builder: (context) => const ThemePickerSheet(),
     );
@@ -59,6 +60,13 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
           } else if (details.primaryVelocity! > 300 && _showAdvanced) {
             HapticFeedback.selectionClick();
             setState(() => _showAdvanced = false);
+          }
+        },
+        onVerticalDragEnd: (details) {
+          // Swipe down quickly → dismiss the sheet
+          if ((details.primaryVelocity ?? 0) > 400) {
+            HapticFeedback.lightImpact();
+            Navigator.of(context).pop();
           }
         },
         child: Container(
