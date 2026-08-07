@@ -1203,7 +1203,7 @@ class _TranslationPage extends ConsumerStatefulWidget {
 }
 
 class _TranslationPageState extends ConsumerState<_TranslationPage> {
-  bool _isSlideB = false;
+  bool _showSecondary = false;
 
   String _getSecondarySampleText(String id) {
     switch (id) {
@@ -1273,7 +1273,7 @@ class _TranslationPageState extends ConsumerState<_TranslationPage> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  !_isSlideB ? 'Pick your\ntranslation' : 'Bilingual Mode',
+                  'Pick your\nversion / translation',
                   style: theme.textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.w900,
                     height: 1.1,
@@ -1282,18 +1282,9 @@ class _TranslationPageState extends ConsumerState<_TranslationPage> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  !_isSlideB 
-                    ? 'Choose your primary Bible translation. More languages are downloadable in Settings.' 
-                    : 'Select an optional secondary translation to display alongside your primary.',
+                  'Change your version and add more languages anytime in Settings.',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'You can change this anytime in Settings.',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                   ),
                 ),
               ],
@@ -1302,7 +1293,7 @@ class _TranslationPageState extends ConsumerState<_TranslationPage> {
 
           const SizedBox(height: 44),
 
-          // Translation list
+          // Translation list (Primary)
           Expanded(
             child: translationsAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
@@ -1321,9 +1312,7 @@ class _TranslationPageState extends ConsumerState<_TranslationPage> {
                   separatorBuilder: (_, __) => const SizedBox(height: 8),
                   itemBuilder: (context, i) {
                     final t = displayList[i];
-                    final isSelected = _isSlideB 
-                        ? secondaryId == t.translationId
-                        : activeId == t.translationId;
+                    final isSelected = activeId == t.translationId;
                     return _TranslationTile(
                       translationName: t.translationName,
                       abbreviation: t.abbreviation,
@@ -1332,17 +1321,9 @@ class _TranslationPageState extends ConsumerState<_TranslationPage> {
                       accentColor: primary,
                       onTap: () {
                         HapticFeedback.selectionClick();
-                        if (_isSlideB) {
-                          ref
-                              .read(secondaryTranslationProvider.notifier)
-                              .setTranslation(
-                                secondaryId == t.translationId ? null : t.translationId,
-                              );
-                        } else {
-                          ref
-                              .read(activeTranslationProvider.notifier)
-                              .setTranslation(t.translationId);
-                        }
+                        ref
+                            .read(activeTranslationProvider.notifier)
+                            .setTranslation(t.translationId);
                       },
                     );
                   },
@@ -1351,116 +1332,151 @@ class _TranslationPageState extends ConsumerState<_TranslationPage> {
             ),
           ),
 
-          const SizedBox(height: 4),
-
-          // View Choice & Preview Area (Slide B only)
-          AnimatedSize(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOutCubic,
-            child: (_isSlideB && secondaryId != null)
-                ? Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.onSurface.withValues(alpha: 0.04),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: primary.withValues(alpha: 0.2)),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(Icons.visibility_rounded, size: 14, color: primary),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    'Layout Preview',
-                                    style: theme.textTheme.labelSmall?.copyWith(
-                                      color: primary,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'In the beginning God created the heaven and the earth.',
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                      fontFamily: ref.watch(typographyProvider).fontFamily,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    _getSecondarySampleText(secondaryId),
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                      fontFamily: ref.watch(typographyProvider).fontFamily,
-                                      fontSize: 16,
-                                      color: theme.colorScheme.onSurface.withValues(alpha: 0.65),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
-                : const SizedBox.shrink(),
-          ),
-
-          const SizedBox(height: 4),
-
-          // Download note (only on slide A)
-          if (!_isSlideB)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+          // Expander for Secondary Translation
+          GestureDetector(
+            onTap: () {
+              setState(() => _showSecondary = !_showSecondary);
+              HapticFeedback.selectionClick();
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               child: Row(
                 children: [
-                  Icon(Icons.download_rounded,
-                      size: 14,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.4)),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      'More languages available to download in Settings',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color:
-                            theme.colorScheme.onSurface.withValues(alpha: 0.45),
-                      ),
+                  Icon(
+                    _showSecondary
+                        ? Icons.keyboard_arrow_up_rounded
+                        : Icons.add_circle_outline_rounded,
+                    color: primary,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    _showSecondary ? 'Hide secondary translation' : 'Add a second translation',
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      color: primary,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
               ),
             ),
+          ),
+
+          // Secondary Translation List & Preview
+          AnimatedSize(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOutCubic,
+            child: _showSecondary
+                ? Column(
+                    children: [
+                      // Secondary translation picker (Horizontal)
+                      SizedBox(
+                        height: 76,
+                        child: translationsAsync.when(
+                          loading: () => const SizedBox.shrink(),
+                          error: (e, _) => const SizedBox.shrink(),
+                          data: (translations) {
+                            final bundled = translations.where((t) => t.isDownloaded).toList();
+                            final displayList = bundled.isEmpty ? translations : bundled;
+                            
+                            return ListView.separated(
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              scrollDirection: Axis.horizontal,
+                              itemCount: displayList.length,
+                              separatorBuilder: (_, __) => const SizedBox(width: 8),
+                              itemBuilder: (context, i) {
+                                final t = displayList[i];
+                                final isSelected = secondaryId == t.translationId;
+                                return SizedBox(
+                                  width: 280,
+                                  child: _TranslationTile(
+                                    translationName: t.translationName,
+                                    abbreviation: t.abbreviation,
+                                    languageName: t.languageName,
+                                    isSelected: isSelected,
+                                    accentColor: primary,
+                                    onTap: () {
+                                      HapticFeedback.selectionClick();
+                                      ref
+                                          .read(secondaryTranslationProvider.notifier)
+                                          .setTranslation(
+                                            secondaryId == t.translationId
+                                                ? null
+                                                : t.translationId,
+                                          );
+                                    },
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                      
+                      // Preview Area
+                      if (secondaryId != null)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                          child: _FloatingPill(
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.04),
+                            borderRadius: BorderRadius.circular(16),
+                            padding: const EdgeInsets.all(16),
+                            border: Border.all(color: primary.withValues(alpha: 0.2)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(Icons.visibility_rounded, size: 14, color: primary),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      'Layout Preview',
+                                      style: theme.textTheme.labelSmall?.copyWith(
+                                        color: primary,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'In the beginning God created the heaven and the earth.',
+                                      style: theme.textTheme.bodyMedium?.copyWith(
+                                        fontFamily: ref.watch(typographyProvider).fontFamily,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      _getSecondarySampleText(secondaryId),
+                                      style: theme.textTheme.bodyMedium?.copyWith(
+                                        fontFamily: ref.watch(typographyProvider).fontFamily,
+                                        fontSize: 16,
+                                        color: theme.colorScheme.onSurface.withValues(alpha: 0.65),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
+                  )
+                : const SizedBox.shrink(),
+          ),
 
           const SizedBox(height: 10),
 
           Padding(
             padding: EdgeInsets.fromLTRB(24, 0, 24, bottom + 68),
             child: _NavRow(
-              onBack: () {
-                if (_isSlideB) {
-                  setState(() => _isSlideB = false);
-                } else {
-                  widget.onBack();
-                }
-              },
-              onNext: () {
-                if (!_isSlideB) {
-                  setState(() => _isSlideB = true);
-                } else {
-                  widget.onNext();
-                }
-              },
-              nextLabel: !_isSlideB ? 'Bilingual Mode (Optional)' : 'DONE!',
+              onBack: widget.onBack,
+              onNext: widget.onNext,
+              nextLabel: 'DONE!',
               accentColor: primary,
             ),
           ),
