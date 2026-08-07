@@ -140,14 +140,22 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
 
           // Floating Top Header
           Positioned(
-            top: widget.isCompact ? 16 : MediaQuery.paddingOf(context).top + 16,
-            left: 16,
-            right: 16,
+            top: 0,
+            left: 0,
+            right: 0,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // 1. TOP ROW
-                Stack(
+                // 1. OPAQUE HEADER ZONE
+                Container(
+                  color: is3DTheme ? theme.colorScheme.surface : theme.scaffoldBackgroundColor,
+                  padding: EdgeInsets.only(
+                    top: widget.isCompact ? 16 : MediaQuery.paddingOf(context).top + 16,
+                    left: 16,
+                    right: 16,
+                    bottom: 12,
+                  ),
+                  child: Stack(
                   alignment: Alignment.center,
                   children: [
                     Align(
@@ -222,12 +230,29 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                     ),
                   ],
                 ),
+              ),
+                // 2. DIVIDER & BLUR BAND BRIDGE
+                Divider(height: 1, thickness: 1, color: tokens.readingBorder),
+                Container(
+                  height: 16,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        is3DTheme ? theme.colorScheme.surface : theme.scaffoldBackgroundColor,
+                        (is3DTheme ? theme.colorScheme.surface : theme.scaffoldBackgroundColor).withValues(alpha: 0.0),
+                      ],
+                    ),
+                  ),
+                ),
 
-                // 2. FLOATING VERSE CARD
+                // 3. FLOATING VERSE CARD
                 if (fetchedVerseText != null)
-                  Container(
-                    margin: const EdgeInsets.only(top: 12),
-                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Container(
+                      padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
                     decoration: BoxDecoration(
                       color: is3DTheme
                           ? theme.colorScheme.surface
@@ -256,6 +281,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                       ),
                     ),
                   ),
+                ),
               ],
             ),
           ),
