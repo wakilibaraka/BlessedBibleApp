@@ -7,6 +7,7 @@ import '../screens/read_screen.dart' show VerseActionLogic;
 import '../../state/bible_provider.dart';
 import 'package:flutter/cupertino.dart';
 import '../screens/commentary_hub_screen.dart';
+import '../../state/commentary_provider.dart';
 
 class VerseContextMenuSheet extends ConsumerStatefulWidget {
   final int verseNumber;
@@ -69,23 +70,25 @@ class _VerseContextMenuSheetState extends ConsumerState<VerseContextMenuSheet> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Expanded(
-                          child: _MenuButton(
-                            icon: const Icon(Icons.comment_bank_outlined,
-                                size: 24),
-                            label: 'Commentary',
-                            onTap: () {
-                              Navigator.of(context).pop();
-                              Navigator.of(context).push(CupertinoPageRoute(
-                                builder: (_) => CommentaryHubScreen(
-                                  book: widget.bookName,
-                                  chapter: widget.chapterNum,
-                                  verse: widget.verseNumber,
-                                ),
-                              ));
-                            },
+                        if (ref.watch(commentaryForChapterProvider(
+                              (widget.bookName, widget.chapterNum))))
+                          Expanded(
+                            child: _MenuButton(
+                              icon: const Icon(Icons.comment_bank_outlined,
+                                  size: 24),
+                              label: 'Commentary',
+                              onTap: () {
+                                Navigator.of(context).pop();
+                                Navigator.of(context).push(CupertinoPageRoute(
+                                  builder: (_) => CommentaryHubScreen(
+                                    book: widget.bookName,
+                                    chapter: widget.chapterNum,
+                                    verse: widget.verseNumber,
+                                  ),
+                                ));
+                              },
+                            ),
                           ),
-                        ),
                         Expanded(
                           child: _MenuButton(
                             icon: Icon(Icons.edit_document, size: 24),

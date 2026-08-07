@@ -13,6 +13,7 @@ import '../widgets/shared_top_header.dart';
 import '../widgets/glass_container.dart';
 import '../widgets/bouncy_entrance.dart';
 import 'commentary_hub_screen.dart';
+import '../../state/commentary_provider.dart';
 import 'today_screen.dart';
 import '../../services/share_service.dart';
 import '../sheets/theme_picker_sheet.dart';
@@ -161,6 +162,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     // Get dynamic commentary snippet for VOTD
     String? excerpt = data.verseOfTheDay.commentarySnippet;
 
+    // Parse VOTD reference for availability check
+    final votdRef = data.verseOfTheDay.reference;
+    final votdLastSpace = votdRef.lastIndexOf(' ');
+    final votdBook = votdLastSpace != -1 ? votdRef.substring(0, votdLastSpace) : votdRef;
+    final votdChapterStr = votdLastSpace != -1 ? votdRef.substring(votdLastSpace + 1).split(':').first : '1';
+    final votdChapter = int.tryParse(votdChapterStr) ?? 1;
+    final hasVotdCommentary = ref.watch(
+        commentaryForChapterProvider((votdBook, votdChapter)));
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
       child: Column(
@@ -288,37 +298,38 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   // Primary action row: Go Deeper + Share
                   Row(
                     children: [
-                      Expanded(
-                        flex: 3,
-                        child: _PillButton(
-                          label: 'Go Deeper',
-                          filled: true,
-                          onPressed: () {
-                            final refStr = data.verseOfTheDay.reference;
-                            final lastSpaceIdx = refStr.lastIndexOf(' ');
-                            final bookName = lastSpaceIdx != -1
-                                ? refStr.substring(0, lastSpaceIdx)
-                                : refStr;
-                            final refParts = lastSpaceIdx != -1
-                                ? refStr.substring(lastSpaceIdx + 1).split(':')
-                                : [];
-                            final chapterNum = refParts.isNotEmpty
-                                ? (int.tryParse(refParts[0]) ?? 1)
-                                : 1;
-                            final verseNum = refParts.length > 1
-                                ? int.tryParse(refParts[1])
-                                : null;
+                      if (hasVotdCommentary)
+                        Expanded(
+                          flex: 3,
+                          child: _PillButton(
+                            label: 'Go Deeper',
+                            filled: true,
+                            onPressed: () {
+                              final refStr = data.verseOfTheDay.reference;
+                              final lastSpaceIdx = refStr.lastIndexOf(' ');
+                              final bookName = lastSpaceIdx != -1
+                                  ? refStr.substring(0, lastSpaceIdx)
+                                  : refStr;
+                              final refParts = lastSpaceIdx != -1
+                                  ? refStr.substring(lastSpaceIdx + 1).split(':')
+                                  : [];
+                              final chapterNum = refParts.isNotEmpty
+                                  ? (int.tryParse(refParts[0]) ?? 1)
+                                  : 1;
+                              final verseNum = refParts.length > 1
+                                  ? int.tryParse(refParts[1])
+                                  : null;
 
-                            Navigator.of(context).push(CupertinoPageRoute(
-                                builder: (_) => CommentaryHubScreen(
-                                      book: bookName,
-                                      chapter: chapterNum,
-                                      verse: verseNum,
-                                      verseText: data.verseOfTheDay.text,
-                                    )));
-                          },
+                              Navigator.of(context).push(CupertinoPageRoute(
+                                  builder: (_) => CommentaryHubScreen(
+                                        book: bookName,
+                                        chapter: chapterNum,
+                                        verse: verseNum,
+                                        verseText: data.verseOfTheDay.text,
+                                      )));
+                            },
+                          ),
                         ),
-                      ),
                       const SizedBox(width: 10),
                       Expanded(
                         flex: 2,

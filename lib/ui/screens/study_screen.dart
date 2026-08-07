@@ -17,6 +17,7 @@ import '../widgets/jiggle_animator.dart';
 import '../../state/reading_plan_provider.dart';
 import 'reading_plans_hub_screen.dart';
 import 'commentary_hub_screen.dart';
+import 'commentary_library_screen.dart';
 import '../../state/streak_provider.dart';
 import 'reading_plan_browser.dart';
 import '../../data/local_storage/preferences_service.dart';
@@ -882,6 +883,12 @@ class CommentaryBanner extends ConsumerWidget {
       }
     }
 
+    final parsedRef = activeVerse != null
+        ? _parseReference(activeVerse)
+        : _ParsedRef('Genesis', 1, null);
+    final hasChapterCommentary = ref.watch(
+        commentaryForChapterProvider((parsedRef.book, parsedRef.chapter)));
+
     return AnimatedSize(
       duration: const Duration(milliseconds: 250),
       curve: Curves.easeInOut,
@@ -908,6 +915,11 @@ class CommentaryBanner extends ConsumerWidget {
               child: InkWell(
                 borderRadius: BorderRadius.circular(28),
                 onTap: () {
+                  if (!hasChapterCommentary) {
+                    Navigator.of(context).push(CupertinoPageRoute(
+                        builder: (_) => const CommentaryLibraryScreen()));
+                    return;
+                  }
                   final refStr = activeVerse ?? 'Genesis 1';
                   String bookName = '';
                   int chapterNum = 1;
@@ -927,7 +939,7 @@ class CommentaryBanner extends ConsumerWidget {
                       builder: (_) => CommentaryHubScreen(
                             book: bookName,
                             chapter: chapterNum,
-                            verse: null, // Force chapter-level browse view
+                            verse: null,
                           )));
                 },
                 child: Padding(
@@ -986,7 +998,9 @@ class CommentaryBanner extends ConsumerWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                'Read Full Commentary',
+                                hasChapterCommentary
+                                    ? 'Read Full Commentary'
+                                    : 'Browse Available Commentary',
                                 style: theme.textTheme.labelMedium?.copyWith(
                                   color: theme.primaryColor,
                                   fontWeight: FontWeight.bold,

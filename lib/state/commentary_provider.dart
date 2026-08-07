@@ -151,3 +151,21 @@ final commentaryBookmarksProvider =
     NotifierProvider<CommentaryBookmarksNotifier, Set<String>>(
   CommentaryBookmarksNotifier.new,
 );
+
+/// Returns true if ANY commentary entry exists for [book]/[chapter].
+/// Widgets can call: ref.watch(commentaryForChapterProvider(('Hebrews', 12)))
+final commentaryForChapterProvider =
+    Provider.family<bool, (String, int)>((ref, args) {
+  final (book, chapter) = args;
+  final notifier = ref.watch(commentaryProvider.notifier);
+  return notifier.hasCommentary(book, chapter, null);
+});
+
+/// Returns the set of books that have ANY commentary — used by Library.
+final commentaryAvailableBooksProvider = Provider<Set<String>>((ref) {
+  final list = ref.watch(commentaryProvider).value ?? [];
+  return list
+      .where((e) => e.scope.book != null)
+      .map((e) => e.scope.book!)
+      .toSet();
+});

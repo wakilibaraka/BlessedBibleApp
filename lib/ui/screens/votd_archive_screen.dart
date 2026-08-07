@@ -6,6 +6,7 @@ import '../../state/home_provider.dart';
 import '../../state/votd_tracker_provider.dart';
 import '../../state/theme_provider.dart';
 import 'commentary_hub_screen.dart';
+import '../../state/commentary_provider.dart';
 import '../../theme/reading_tokens.dart';
 import '../../theme/app_colors.dart';
 
@@ -207,13 +208,19 @@ class VotdArchiveScreen extends ConsumerWidget {
                                   ? int.tryParse(refParts[1])
                                   : null;
 
+                              // Only navigate if commentary exists
+                              final hasComm = ref.read(
+                                  commentaryForChapterProvider(
+                                      (bookName, chapterNum)));
+                              if (!hasComm) return;
+
                               Navigator.of(context).push(CupertinoPageRoute(
                                 builder: (_) => CommentaryHubScreen(
                                   book: bookName,
                                   chapter: chapterNum,
                                   verse: verseNum,
                                   verseText:
-                                      null, // text is fetched inside if needed
+                                      null,
                                 ),
                               ));
                             },

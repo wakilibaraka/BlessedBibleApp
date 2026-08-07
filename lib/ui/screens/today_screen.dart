@@ -14,6 +14,7 @@ import '../../state/nav_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'your_space_screen.dart';
 import 'commentary_hub_screen.dart';
+import '../../state/commentary_provider.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TODAY SCREEN — static scaffold (Stage 1: design / no data wiring)
@@ -385,45 +386,58 @@ class _TodaysReadingCard extends ConsumerWidget {
                   .toList(),
             ),
           const SizedBox(height: 14),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton.icon(
-              onPressed: () {
-                final homeState = ref.read(homeProvider);
-                final refStr = homeState.verseOfTheDay.reference;
-                final lastSpaceIdx = refStr.lastIndexOf(' ');
-                final bookName = lastSpaceIdx != -1
-                    ? refStr.substring(0, lastSpaceIdx)
-                    : refStr;
-                final refParts = lastSpaceIdx != -1
-                    ? refStr.substring(lastSpaceIdx + 1).split(':')
-                    : [];
-                final chapterNum =
-                    refParts.isNotEmpty ? (int.tryParse(refParts[0]) ?? 1) : 1;
-                final verseNum =
-                    refParts.length > 1 ? int.tryParse(refParts[1]) : null;
-
-                Navigator.of(context).push(CupertinoPageRoute(
-                    builder: (_) => CommentaryHubScreen(
-                          book: bookName,
-                          chapter: chapterNum,
-                          verse: verseNum,
-                          verseText: homeState.verseOfTheDay.text,
-                        )));
-              },
-              icon: const Icon(Icons.menu_book_outlined, size: 16),
-              label: const Text("Continue Reading"),
-              style: FilledButton.styleFrom(
-                backgroundColor: AppColors.goldAccent,
-                foregroundColor: Colors.white,
-                textStyle: theme.textTheme.labelMedium
-                    ?.copyWith(fontWeight: FontWeight.w700),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14)),
-                padding: const EdgeInsets.symmetric(vertical: 13),
+          Builder(builder: (context) {
+            final homeState = ref.watch(homeProvider);
+            final votdRef = homeState.verseOfTheDay.reference;
+            final votdLastSpace = votdRef.lastIndexOf(' ');
+            final votdBook = votdLastSpace != -1
+                ? votdRef.substring(0, votdLastSpace)
+                : votdRef;
+            final votdChStr = votdLastSpace != -1
+                ? votdRef.substring(votdLastSpace + 1).split(':').first
+                : '1';
+            final votdCh = int.tryParse(votdChStr) ?? 1;
+            final hasVotdCommentary = ref.watch(
+                commentaryForChapterProvider((votdBook, votdCh)));
+            if (!hasVotdCommentary) return const SizedBox.shrink();
+            return SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: () {
+                  final refStr = homeState.verseOfTheDay.reference;
+                  final lastSpaceIdx = refStr.lastIndexOf(' ');
+                  final bookName = lastSpaceIdx != -1
+                      ? refStr.substring(0, lastSpaceIdx)
+                      : refStr;
+                  final refParts = lastSpaceIdx != -1
+                      ? refStr.substring(lastSpaceIdx + 1).split(':')
+                      : [];
+                  final chapterNum =
+                      refParts.isNotEmpty ? (int.tryParse(refParts[0]) ?? 1) : 1;
+                  final verseNum =
+                      refParts.length > 1 ? int.tryParse(refParts[1]) : null;
+                  Navigator.of(context).push(CupertinoPageRoute(
+                      builder: (_) => CommentaryHubScreen(
+                            book: bookName,
+                            chapter: chapterNum,
+                            verse: verseNum,
+                            verseText: homeState.verseOfTheDay.text,
+                          )));
+                },
+                icon: const Icon(Icons.menu_book_outlined, size: 16),
+                label: const Text("Continue Reading"),
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.goldAccent,
+                  foregroundColor: Colors.white,
+                  textStyle: theme.textTheme.labelMedium
+                      ?.copyWith(fontWeight: FontWeight.w700),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14)),
+                  padding: const EdgeInsets.symmetric(vertical: 13),
+                ),
               ),
-            ),
-          ),
+            );
+          }),
         ],
       ),
     );
