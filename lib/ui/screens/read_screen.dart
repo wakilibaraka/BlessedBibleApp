@@ -1931,12 +1931,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         fontSize: typography.fontSize * 0.95,
       );
 
-      final installedTranslations =
-          ref.watch(availableTranslationsProvider).value ?? [];
-      final secondaryId = ref.read(secondaryTranslationProvider) ?? '';
-      final badgeLabel =
-          _getTranslationCombinedLabel(secondaryId, installedTranslations);
-
       final secondary = _buildNormalVerse(
         secondaryVerse,
         theme,
@@ -1960,14 +1954,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  badgeLabel,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: secondaryColor.withValues(alpha: 0.7),
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 4),
                 secondary,
               ],
             ),
@@ -1983,12 +1969,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       final secondaryTypography = typography.copyWith(
         fontSize: typography.fontSize * 0.95,
       );
-
-      final installedTranslations =
-          ref.watch(availableTranslationsProvider).value ?? [];
-      final secondaryId = ref.read(secondaryTranslationProvider) ?? '';
-      final badgeLabel =
-          _getTranslationCombinedLabel(secondaryId, installedTranslations);
 
       final secondary = _buildNormalVerse(
         secondaryVerse,
@@ -2012,14 +1992,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  badgeLabel,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: secondaryColor.withValues(alpha: 0.7),
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 4),
                 secondary,
               ],
             ),
