@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:confetti/confetti.dart';
 
 import '../../data/local_storage/preferences_service.dart';
+import '../../state/read_settings_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../state/translation_provider.dart';
 import '../../state/typography_provider.dart';
@@ -54,13 +55,7 @@ const List<_ThemeMeta> _kThemes = [
     text: AppColors.darkTextPrimary,
     accent: AppColors.goldAccent,
   ),
-  _ThemeMeta(
-    mode: AppThemeMode.oled,
-    label: 'OLED',
-    bg: Color(0xFF000000),
-    text: Color(0xFFFFFFFF),
-    accent: AppColors.goldAccent,
-  ),
+
   _ThemeMeta(
     mode: AppThemeMode.dawn,
     label: 'Sun',
@@ -144,17 +139,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   @override
   void initState() {
     super.initState();
-    // 1. Randomized bright default theme
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final brightThemes = _kThemes.where((t) => 
-        t.mode != AppThemeMode.dark && 
-        t.mode != AppThemeMode.oled && 
-        t.mode != AppThemeMode.dusk
-      ).toList();
-      
-      final randomTheme = brightThemes[Random().nextInt(brightThemes.length)];
-      ref.read(themeProvider.notifier).setTheme(randomTheme.mode);
-    });
   }
 
   @override
@@ -207,6 +191,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             children: [
               _WelcomePage(onNext: () => _goToPage(1)),
               _ThemePage(
+                isActive: _currentPage == 1,
                 onNext: () => _goToPage(2),
                 onBack: () => _goToPage(0),
               ),
@@ -505,14 +490,69 @@ class _FeatureHints extends StatelessWidget {
 // Page 2: Theme Picker
 // ─────────────────────────────────────────────
 
-class _ThemePage extends ConsumerWidget {
+class _ThemePage extends ConsumerStatefulWidget {
+  final bool isActive;
   final VoidCallback onNext;
   final VoidCallback onBack;
 
-  const _ThemePage({required this.onNext, required this.onBack});
+  const _ThemePage({
+    required this.isActive,
+    required this.onNext,
+    required this.onBack,
+  });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_ThemePage> createState() => _ThemePageState();
+}
+
+class _ThemePageState extends ConsumerState<_ThemePage> {
+  bool _hasShuffled = false;
+  Timer? _shuffleTimer;
+
+  @override
+  void didUpdateWidget(covariant _ThemePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isActive && !oldWidget.isActive && !_hasShuffled) {
+      _startShuffle();
+    }
+  }
+
+  @override
+  void dispose() {
+    _shuffleTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startShuffle() {
+    _hasShuffled = true;
+    final random = Random();
+    int ticks = 0;
+    
+    _shuffleTimer = Timer.periodic(const Duration(milliseconds: 150), (timer) {
+      ticks++;
+      if (ticks >= 10) {
+        timer.cancel();
+        // Land on a color theme
+        final colorThemes = _kThemes.where((t) => 
+          t.mode != AppThemeMode.light && 
+          t.mode != AppThemeMode.sepia && 
+          t.mode != AppThemeMode.dark && 
+          t.mode != AppThemeMode.oled
+        ).toList();
+        final finalTheme = colorThemes[random.nextInt(colorThemes.length)];
+        ref.read(themeProvider.notifier).setTheme(finalTheme.mode);
+        HapticFeedback.lightImpact();
+      } else {
+        // Cycle through all
+        final t = _kThemes[random.nextInt(_kThemes.length)];
+        ref.read(themeProvider.notifier).setTheme(t.mode);
+        HapticFeedback.selectionClick();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final currentMode = ref.watch(themeProvider);
     final bottom = MediaQuery.of(context).padding.bottom;
@@ -586,40 +626,37 @@ class _ThemePage extends ConsumerWidget {
 
           const SizedBox(height: 20),
 
-          // Theme horizontal list
-          SizedBox(
-            height: 180,
-            child: ListView.separated(
+          // Theme grid
+          Expanded(
+            child: GridView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-              scrollDirection: Axis.horizontal,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                childAspectRatio: 0.75,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 16,
+              ),
               itemCount: _kThemes.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 16),
               itemBuilder: (context, index) {
                 final meta = _kThemes[index];
                 final isSelected = currentMode == meta.mode;
-                // Width = approx 2.5 items visible (1/2.8)
-                return SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.32,
-                  child: _ThemeCard(
-                    meta: meta,
-                    isSelected: isSelected,
-                    onTap: () {
-                      HapticFeedback.mediumImpact();
-                      ref.read(themeProvider.notifier).setTheme(meta.mode);
-                    },
-                  ),
+                return _ThemeCard(
+                  meta: meta,
+                  isSelected: isSelected,
+                  onTap: () {
+                    HapticFeedback.mediumImpact();
+                    ref.read(themeProvider.notifier).setTheme(meta.mode);
+                  },
                 );
               },
             ),
           ),
 
-          const Spacer(),
-
           Padding(
             padding: EdgeInsets.fromLTRB(24, 0, 24, bottom + 68),
             child: _NavRow(
-              onBack: onBack,
-              onNext: onNext,
+              onBack: widget.onBack,
+              onNext: widget.onNext,
               nextLabel: 'Next: Typography',
               accentColor: accent,
             ),
@@ -887,8 +924,8 @@ class _TypographyPage extends ConsumerWidget {
                 duration: const Duration(milliseconds: 300),
                 style: TextStyle(
                   fontFamily: typoState.fontFamily,
-                  fontSize: 18,
-                  height: typoState.lineHeight,
+                  fontSize: typoState.fontSize,
+                  height: 1.5,
                   color: selectedMeta.text,
                 ),
                 child: const Text(
@@ -904,37 +941,37 @@ class _TypographyPage extends ConsumerWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: _SpacingButton(
-                    label: 'Tight',
-                    isSelected: typoState.lineHeight < 1.4,
+                  child: _SizeButton(
+                    label: 'Small',
+                    isSelected: typoState.fontSize < 18,
                     accentColor: accent,
                     onTap: () {
                       HapticFeedback.lightImpact();
-                      ref.read(typographyProvider.notifier).setLineHeight(1.3);
+                      ref.read(typographyProvider.notifier).setFontSize(15.0);
                     },
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: _SpacingButton(
-                    label: 'Normal',
-                    isSelected: typoState.lineHeight >= 1.4 && typoState.lineHeight < 1.7,
+                  child: _SizeButton(
+                    label: 'Medium',
+                    isSelected: typoState.fontSize == 18,
                     accentColor: accent,
                     onTap: () {
                       HapticFeedback.lightImpact();
-                      ref.read(typographyProvider.notifier).setLineHeight(1.5);
+                      ref.read(typographyProvider.notifier).setFontSize(18.0);
                     },
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: _SpacingButton(
-                    label: 'Relaxed',
-                    isSelected: typoState.lineHeight >= 1.7,
+                  child: _SizeButton(
+                    label: 'Big',
+                    isSelected: typoState.fontSize > 18,
                     accentColor: accent,
                     onTap: () {
                       HapticFeedback.lightImpact();
-                      ref.read(typographyProvider.notifier).setLineHeight(1.8);
+                      ref.read(typographyProvider.notifier).setFontSize(22.0);
                     },
                   ),
                 ),
@@ -1013,13 +1050,13 @@ class _TypographyPage extends ConsumerWidget {
   }
 }
 
-class _SpacingButton extends StatelessWidget {
+class _SizeButton extends StatelessWidget {
   final String label;
   final bool isSelected;
   final Color accentColor;
   final VoidCallback onTap;
 
-  const _SpacingButton({
+  const _SizeButton({
     required this.label,
     required this.isSelected,
     required this.accentColor,
@@ -1072,7 +1109,7 @@ class _TranslationPage extends ConsumerStatefulWidget {
 }
 
 class _TranslationPageState extends ConsumerState<_TranslationPage> {
-  bool _pickingSecondary = false;
+  bool _isSlideB = false;
 
   String _getSecondarySampleText(String id) {
     switch (id) {
@@ -1099,6 +1136,7 @@ class _TranslationPageState extends ConsumerState<_TranslationPage> {
     final activeId = ref.watch(activeTranslationProvider);
     final secondaryId = ref.watch(secondaryTranslationProvider);
     final translationsAsync = ref.watch(availableTranslationsProvider);
+    final readSettings = ref.watch(readSettingsProvider);
     final bottom = MediaQuery.of(context).padding.bottom;
     final top = MediaQuery.of(context).padding.top;
     final primary = theme.primaryColor;
@@ -1142,7 +1180,7 @@ class _TranslationPageState extends ConsumerState<_TranslationPage> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'Pick your\ntranslation',
+                  !_isSlideB ? 'Pick your\ntranslation' : 'Add a second\ntranslation?',
                   style: theme.textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.w900,
                     height: 1.1,
@@ -1151,7 +1189,9 @@ class _TranslationPageState extends ConsumerState<_TranslationPage> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Choose your primary Bible translation. More languages are downloadable in Settings.',
+                  !_isSlideB 
+                    ? 'Choose your primary Bible translation. More languages are downloadable in Settings.' 
+                    : 'Select an optional secondary translation and how they display together.',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
@@ -1172,88 +1212,40 @@ class _TranslationPageState extends ConsumerState<_TranslationPage> {
               ),
               data: (translations) {
                 // Show bundled (downloaded) translations first
-                final bundled =
-                    translations.where((t) => t.isDownloaded).toList();
+                final bundled = translations.where((t) => t.isDownloaded).toList();
                 final displayList = bundled.isEmpty ? translations : bundled;
 
-                return Column(
-                  children: [
-                    if (_pickingSecondary)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Secondary Translation',
-                              style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                setState(() => _pickingSecondary = false);
-                              },
-                              style: TextButton.styleFrom(
-                                padding: EdgeInsets.zero,
-                                minimumSize: const Size(40, 30),
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              ),
-                              child: Text('Done', style: TextStyle(color: primary)),
-                            ),
-                          ],
-                        ),
-                      ),
-                    Expanded(
-                      child: ListView.separated(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        itemCount: displayList.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 8),
-                        itemBuilder: (context, i) {
-                          final t = displayList[i];
-                          final isSelected = _pickingSecondary 
-                              ? secondaryId == t.translationId
-                              : activeId == t.translationId;
-                          return _TranslationTile(
-                            translationName: t.translationName,
-                            abbreviation: t.abbreviation,
-                            languageName: t.languageName,
-                            isSelected: isSelected,
-                            accentColor: primary,
-                            onTap: () {
-                              HapticFeedback.selectionClick();
-                              if (_pickingSecondary) {
-                                ref
-                                    .read(secondaryTranslationProvider.notifier)
-                                    .setTranslation(
-                                      secondaryId == t.translationId ? null : t.translationId,
-                                    );
-                              } else {
-                                ref
-                                    .read(activeTranslationProvider.notifier)
-                                    .setTranslation(t.translationId);
-                              }
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                    if (!_pickingSecondary)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8, bottom: 4),
-                        child: TextButton.icon(
-                          onPressed: () {
-                            HapticFeedback.lightImpact();
-                            setState(() => _pickingSecondary = true);
-                          },
-                          icon: Icon(Icons.splitscreen_rounded, size: 16, color: primary),
-                          label: Text(
-                            secondaryId == null 
-                                ? 'Add Parallel Language (Bilingual Mode)'
-                                : 'Edit Parallel Language',
-                            style: TextStyle(color: primary, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ),
-                  ],
+                return ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  itemCount: displayList.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  itemBuilder: (context, i) {
+                    final t = displayList[i];
+                    final isSelected = _isSlideB 
+                        ? secondaryId == t.translationId
+                        : activeId == t.translationId;
+                    return _TranslationTile(
+                      translationName: t.translationName,
+                      abbreviation: t.abbreviation,
+                      languageName: t.languageName,
+                      isSelected: isSelected,
+                      accentColor: primary,
+                      onTap: () {
+                        HapticFeedback.selectionClick();
+                        if (_isSlideB) {
+                          ref
+                              .read(secondaryTranslationProvider.notifier)
+                              .setTranslation(
+                                secondaryId == t.translationId ? null : t.translationId,
+                              );
+                        } else {
+                          ref
+                              .read(activeTranslationProvider.notifier)
+                              .setTranslation(t.translationId);
+                        }
+                      },
+                    );
+                  },
                 );
               },
             ),
@@ -1261,93 +1253,171 @@ class _TranslationPageState extends ConsumerState<_TranslationPage> {
 
           const SizedBox(height: 4),
 
-          // Bilingual preview area
+          // View Choice & Preview Area (Slide B only)
           AnimatedSize(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeOutCubic,
-            child: secondaryId != null
-                ? Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.04),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: primary.withValues(alpha: 0.2)),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(Icons.splitscreen_rounded, size: 14, color: primary),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Bilingual Preview',
-                                style: theme.textTheme.labelSmall?.copyWith(
-                                  color: primary,
-                                  fontWeight: FontWeight.bold,
-                                ),
+            child: (_isSlideB && secondaryId != null)
+                ? Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: _SizeButton(
+                                label: 'Stacked',
+                                isSelected: readSettings.readingLayout != ReadingLayout.sideBySide,
+                                accentColor: primary,
+                                onTap: () {
+                                  HapticFeedback.lightImpact();
+                                  ref.read(readSettingsProvider.notifier).setReadingLayout(ReadingLayout.interleaved);
+                                },
                               ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: _SizeButton(
+                                label: 'Side-by-side',
+                                isSelected: readSettings.readingLayout == ReadingLayout.sideBySide,
+                                accentColor: primary,
+                                onTap: () {
+                                  HapticFeedback.lightImpact();
+                                  ref.read(readSettingsProvider.notifier).setReadingLayout(ReadingLayout.sideBySide);
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.04),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: primary.withValues(alpha: 0.2)),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(Icons.visibility_rounded, size: 14, color: primary),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Layout Preview',
+                                    style: theme.textTheme.labelSmall?.copyWith(
+                                      color: primary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              if (readSettings.readingLayout == ReadingLayout.sideBySide)
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        'In the beginning God created the heaven and the earth.',
+                                        style: theme.textTheme.bodyMedium?.copyWith(
+                                          fontFamily: ref.watch(typographyProvider).fontFamily,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        _getSecondarySampleText(secondaryId),
+                                        style: theme.textTheme.bodyMedium?.copyWith(
+                                          fontFamily: ref.watch(typographyProvider).fontFamily,
+                                          fontSize: 16,
+                                          color: theme.colorScheme.onSurface.withValues(alpha: 0.65),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              else
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'In the beginning God created the heaven and the earth.',
+                                      style: theme.textTheme.bodyMedium?.copyWith(
+                                        fontFamily: ref.watch(typographyProvider).fontFamily,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      _getSecondarySampleText(secondaryId),
+                                      style: theme.textTheme.bodyMedium?.copyWith(
+                                        fontFamily: ref.watch(typographyProvider).fontFamily,
+                                        fontSize: 16,
+                                        color: theme.colorScheme.onSurface.withValues(alpha: 0.65),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                             ],
                           ),
-                          const SizedBox(height: 12),
-                          Text(
-                            'In the beginning God created the heaven and the earth.',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              fontFamily: ref.watch(typographyProvider).fontFamily,
-                              fontSize: 16,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          // hardcoded secondary text - real text for a few languages
-                          Text(
-                            _getSecondarySampleText(secondaryId),
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              fontFamily: ref.watch(typographyProvider).fontFamily,
-                              fontSize: 16,
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.65),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
                   )
                 : const SizedBox.shrink(),
           ),
 
           const SizedBox(height: 4),
 
-          // Download note
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Row(
-              children: [
-                Icon(Icons.download_rounded,
-                    size: 14,
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.4)),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    'More languages available to download in Settings',
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color:
-                          theme.colorScheme.onSurface.withValues(alpha: 0.45),
+          // Download note (only on slide A)
+          if (!_isSlideB)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Row(
+                children: [
+                  Icon(Icons.download_rounded,
+                      size: 14,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.4)),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      'More languages available to download in Settings',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.45),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
 
           const SizedBox(height: 10),
 
           Padding(
             padding: EdgeInsets.fromLTRB(24, 0, 24, bottom + 68),
             child: _NavRow(
-              onBack: widget.onBack,
-              onNext: widget.onNext,
-              nextLabel: 'Almost done!',
+              onBack: () {
+                if (_isSlideB) {
+                  setState(() => _isSlideB = false);
+                } else {
+                  widget.onBack();
+                }
+              },
+              onNext: () {
+                if (!_isSlideB) {
+                  setState(() => _isSlideB = true);
+                } else {
+                  widget.onNext();
+                }
+              },
+              nextLabel: !_isSlideB ? 'Next: Optional Second' : 'Almost done!',
               accentColor: primary,
             ),
           ),
