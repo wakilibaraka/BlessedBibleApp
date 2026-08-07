@@ -15,6 +15,7 @@ import 'package:flutter/cupertino.dart';
 import 'your_space_screen.dart';
 import 'commentary_hub_screen.dart';
 import '../../state/commentary_provider.dart';
+import 'notes_list_screen.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TODAY SCREEN — static scaffold (Stage 1: design / no data wiring)
@@ -502,7 +503,12 @@ class _LatestNoteCard extends ConsumerWidget {
           Align(
             alignment: Alignment.centerRight,
             child: TextButton.icon(
-              onPressed: null, // Stage 2: open NotesListScreen
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const NotesListScreen()),
+                );
+              },
               icon: const Icon(Icons.arrow_forward_rounded, size: 14),
               label: const Text('View all notes'),
               style: TextButton.styleFrom(

@@ -778,8 +778,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     final commentaryState = ref.watch(commentaryProvider);
     final Set<String> versesWithCommentary = {};
     final Set<String> chaptersWithCommentary = {};
-    if (commentaryState.value != null) {
-      for (final entry in commentaryState.value!) {
+    final currentCommentary = commentaryState.value;
+    if (currentCommentary != null) {
+      for (final entry in currentCommentary) {
         final b = entry.scope.book;
         final c = entry.scope.chapter;
         final v = entry.scope.verse;
@@ -847,11 +848,12 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           }
         }
 
-        if (next.requestedVerse != null) {
-          _scrollToVerse(next.requestedVerse!, next);
+        final reqVerse = next.requestedVerse;
+        if (reqVerse != null) {
+          _scrollToVerse(reqVerse, next);
           ref.read(readLocationProvider.notifier).clearRequestedVerse();
         }
-        if (next.openCommentary && next.requestedVerse != null) {
+        if (next.openCommentary && reqVerse != null) {
           if (!isLoading && allBooks.isNotEmpty) {
             try {
               int bookIdx =
@@ -864,11 +866,11 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                   book.chapters.indexWhere((c) => c.number == next.chapter);
               if (chapIdx == -1) chapIdx = 0;
               final chapter = book.chapters[chapIdx];
-              if (next.requestedVerse! <= chapter.verses.length) {
-                final verseText = chapter.verses[next.requestedVerse! - 1].text;
+              if (reqVerse <= chapter.verses.length) {
+                final verseText = chapter.verses[reqVerse - 1].text;
                 Future.delayed(const Duration(milliseconds: 500), () {
                   if (mounted) {
-                    _showCommentaryBottomSheet(next.requestedVerse!, verseText);
+                    _showCommentaryBottomSheet(reqVerse, verseText);
                   }
                 });
               }
@@ -962,8 +964,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                   controller: _pageController,
                                   itemCount: flatChapters.length,
                                   onPageChanged: (pageIndex) {
-                                    debugPrint(
-                                        'STEP0: onPageChanged gesture started for page $pageIndex');
                                     setState(() {
                                       _currentPageIndex = pageIndex;
                                     });
@@ -996,18 +996,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                     _clearSelection();
                                   },
                                   itemBuilder: (context, pageIndex) {
-                                    final buildStartMs =
-                                        DateTime.now().millisecondsSinceEpoch;
                                     final fc = flatChapters[pageIndex];
 
-                                    WidgetsBinding.instance
-                                        .addPostFrameCallback((_) {
-                                      final paintMs = DateTime.now()
-                                              .millisecondsSinceEpoch -
-                                          buildStartMs;
-                                      debugPrint(
-                                          'STEP0: Chapter ${fc.book.abbreviation} ${fc.chapter.number} painted in $paintMs ms');
-                                    });
                                     _itemScrollControllers[pageIndex] ??=
                                         ItemScrollController();
                                     if (!_itemPositionsListeners
@@ -1464,19 +1454,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                           .scaffoldBackgroundColor);
                                                                 }
 
-                                                                if (kHighlightDebug) {
-                                                                  debugPrint(
-                                                                      '[HIGHLIGHT_DEBUG] RENDER verse key=$refStr found=${highlights.containsKey(refStr)} color=$savedColorIndex highlightColor=$highlightColor isBookmarked=$isBookmarked timestamp=${DateTime.now().millisecondsSinceEpoch}');
-                                                                }
-
-                                                                if (kHighlightDebug &&
-                                                                    (isBookmarked ||
-                                                                        highlightColor !=
-                                                                            null)) {
-                                                                  debugPrint(
-                                                                      'DEBUG RENDER: $refStr isBookmarked=$isBookmarked, highlightColor=$highlightColor');
-                                                                }
-
                                                                 final verseWidget =
                                                                     _buildReadingLayoutVerse(
                                                                   context,
@@ -1924,8 +1901,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     }
 
     if (layout == ReadingLayout.interleaved) {
-      final tokens = theme.extension<ReadingTokens>()!;
-      final secondaryColor = tokens.readingInk.withValues(alpha: 0.65);
+      final tokens = theme.extension<ReadingTokens>();
+      final secondaryColor = tokens?.readingInk.withValues(alpha: 0.65) ?? Colors.black.withValues(alpha: 0.65);
 
       final secondaryTypography = typography.copyWith(
         fontSize: typography.fontSize * 0.95,
@@ -1963,8 +1940,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     }
 
     if (layout == ReadingLayout.sideBySide) {
-      final tokens = theme.extension<ReadingTokens>()!;
-      final secondaryColor = tokens.readingInk.withValues(alpha: 0.75);
+      final tokens = theme.extension<ReadingTokens>();
+      final secondaryColor = tokens?.readingInk.withValues(alpha: 0.75) ?? Colors.black.withValues(alpha: 0.75);
 
       final secondaryTypography = typography.copyWith(
         fontSize: typography.fontSize * 0.95,
@@ -2004,8 +1981,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       final expandedChipsMap = ref.watch(expandedChipsProvider);
       final activeChipId = expandedChipsMap[primaryVerse.number];
 
-      final tokens = theme.extension<ReadingTokens>()!;
-      final secondaryColor = tokens.readingInk.withValues(alpha: 0.75);
+      final tokens = theme.extension<ReadingTokens>();
+      final secondaryColor = tokens?.readingInk.withValues(alpha: 0.75) ?? Colors.black.withValues(alpha: 0.75);
 
       final secondaryTypography = typography.copyWith(
         fontSize: typography.fontSize * 0.95,
@@ -2110,10 +2087,12 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                     .read(expandedChipsProvider.notifier)
                                     .clear(primaryVerse.number);
                               } else {
-                                ref
-                                    .read(expandedChipsProvider.notifier)
-                                    .setLanguage(
-                                        primaryVerse.number, translationId!);
+                                if (translationId != null) {
+                                  ref
+                                      .read(expandedChipsProvider.notifier)
+                                      .setLanguage(
+                                          primaryVerse.number, translationId);
+                                }
                               }
                             } else {
                               // Uninstalled: Prompt download by opening picker
@@ -2136,7 +2115,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                 Text(
                                   _getTranslationCombinedLabel(
                                       isInstalled
-                                          ? translationId!
+                                          ? (translationId ?? langEntry.value)
                                           : langEntry.value,
                                       installedTranslations,
                                       defaultName: langEntry.key),
@@ -2187,13 +2166,13 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       Color? overrideColor,
       bool hideVerseNumber = false,
       bool isSelectionMode = false}) {
-    final tokens = theme.extension<ReadingTokens>()!;
+    final tokens = theme.extension<ReadingTokens>();
     final fontStyle = theme.textTheme.bodyMedium?.copyWith(
           fontFamily: typography.fontFamily,
           fontSize: typography.fontSize,
           height: typography.lineHeight,
           letterSpacing: 0.15,
-          color: overrideColor ?? tokens.readingInk,
+          color: overrideColor ?? tokens?.readingInk ?? Colors.black,
           decoration: isBookmarked ? TextDecoration.underline : null,
           decorationColor: isBookmarked ? theme.primaryColor : null,
           decorationStyle: isBookmarked ? TextDecorationStyle.solid : null,
@@ -2283,7 +2262,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           TextSpan(
             text: '${verse.number}  ',
             style: theme.textTheme.titleMedium?.copyWith(
-              color: tokens.readingAccent,
+              color: tokens?.readingAccent ?? theme.primaryColor,
               fontWeight: FontWeight.bold,
               fontSize: typography.fontSize * 0.75, // Scale number down
             ),
@@ -2322,7 +2301,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     final flatChapters = ref.read(flatChaptersProvider);
     final hasPrevious = pageIndex > 0;
     final hasNext = pageIndex < flatChapters.length - 1;
-    final tokens = theme.extension<ReadingTokens>()!;
+    final tokens = theme.extension<ReadingTokens>();
 
     return Padding(
       padding:
@@ -2333,7 +2312,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(width: 40, height: 1, color: tokens.readingBorder),
+              Container(width: 40, height: 1, color: tokens?.readingBorder ?? theme.dividerColor),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Text(
@@ -2367,20 +2346,20 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                 : null,
             icon: Icon(Icons.school_rounded,
                 color: hasChapterCommentary
-                    ? tokens.readingAccent
+                    ? (tokens?.readingAccent ?? theme.primaryColor)
                     : theme.disabledColor),
             label: Text(
               'Read commentary on this chapter',
               style: theme.textTheme.titleSmall?.copyWith(
                 color: hasChapterCommentary
-                    ? tokens.readingInk
+                    ? (tokens?.readingInk ?? Colors.black)
                     : theme.disabledColor,
                 fontWeight: FontWeight.w600,
               ),
             ),
             style: TextButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              backgroundColor: tokens.readingInk.withValues(alpha: 0.05),
+              backgroundColor: (tokens?.readingInk ?? Colors.black).withValues(alpha: 0.05),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16)),
             ),
@@ -2404,7 +2383,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                   ),
                   child: Text('‹ Previous',
                       style: theme.textTheme.titleMedium
-                          ?.copyWith(color: tokens.readingAccent)),
+                          ?.copyWith(color: tokens?.readingAccent ?? theme.primaryColor)),
                 )
               else
                 const SizedBox(width: 100),
@@ -2422,7 +2401,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                   ),
                   child: Text('Next ›',
                       style: theme.textTheme.titleMedium
-                          ?.copyWith(color: tokens.readingAccent)),
+                          ?.copyWith(color: tokens?.readingAccent ?? theme.primaryColor)),
                 )
               else
                 const SizedBox(width: 100),
@@ -2547,8 +2526,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                     break;
                                                   }
                                                 }
-                                                firstUnread ??=
-                                                    nextDayTarget.chapters.last;
+                                                if (firstUnread == null) {
+                                                  if (nextDayTarget.chapters.isEmpty) return;
+                                                  firstUnread = nextDayTarget.chapters.last;
+                                                }
                                                 final fcList = ref
                                                     .read(flatChaptersProvider);
                                                 final match = fcList
@@ -2768,14 +2749,16 @@ class __BookChapterSelectorSheetState
   void _onChapterSelected(int chapter, BibleNavSettingsState settings) {
     if (settings.depth == NavigationDepth.twoPart) {
       ref.read(_sheetStateProvider.notifier).setChapter(chapter, false);
-      final book = ref.read(_sheetStateProvider).book!;
-      widget.onSelectionChanged(
-        book.abbreviation,
-        book.name,
-        chapter,
-        1,
-        autoClose: true,
-      );
+      final book = ref.read(_sheetStateProvider).book;
+      if (book != null) {
+        widget.onSelectionChanged(
+          book.abbreviation,
+          book.name,
+          chapter,
+          1,
+          autoClose: true,
+        );
+      }
     } else {
       ref.read(_sheetStateProvider.notifier).setChapter(chapter, true);
     }
@@ -2784,13 +2767,16 @@ class __BookChapterSelectorSheetState
   void _onVerseSelected(int verse, BibleNavSettingsState settings) {
     ref.read(_sheetStateProvider.notifier).setVerse(verse);
     final sheetState = ref.read(_sheetStateProvider);
-    widget.onSelectionChanged(
-      sheetState.book!.abbreviation,
-      sheetState.book!.name,
-      sheetState.chapter,
-      verse,
-      autoClose: settings.autoCloseOnFinalSelection,
-    );
+    final book = sheetState.book;
+    if (book != null) {
+      widget.onSelectionChanged(
+        book.abbreviation,
+        book.name,
+        sheetState.chapter,
+        verse,
+        autoClose: settings.autoCloseOnFinalSelection,
+      );
+    }
   }
 
   @override
@@ -2859,10 +2845,10 @@ class __BookChapterSelectorSheetState
             }),
           Consumer(builder: (context, ref, _) {
             final bookName =
-                ref.watch(_sheetStateProvider.select((s) => s.book!.name));
+                ref.watch(_sheetStateProvider.select((s) => s.book?.name ?? ''));
             final mode = ref.watch(_sheetStateProvider.select((s) => s.mode));
             return _buildBreadcrumbSegment(
-                'Book', bookName, SelectionMode.book, mode, theme);
+                'Book', bookName.isEmpty ? 'Select Book' : bookName, SelectionMode.book, mode, theme);
           }),
           Consumer(builder: (context, ref, _) {
             final chapter =
@@ -2999,7 +2985,7 @@ class __BookChapterSelectorSheetState
           isOldTestament ? oldTestamentBooks : newTestamentBooks;
       return Consumer(builder: (context, ref, _) {
         final selectedBookAbbrev =
-            ref.watch(_sheetStateProvider.select((s) => s.book!.abbreviation));
+            ref.watch(_sheetStateProvider.select((s) => s.book?.abbreviation));
         return GridView.builder(
           padding: const EdgeInsets.only(bottom: 4),
           gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
@@ -3039,7 +3025,7 @@ class __BookChapterSelectorSheetState
               Expanded(
                 child: Consumer(builder: (context, ref, _) {
                   final selectedBookAbbrev = ref.watch(
-                      _sheetStateProvider.select((s) => s.book!.abbreviation));
+                      _sheetStateProvider.select((s) => s.book?.abbreviation));
                   return ListView.builder(
                     padding: EdgeInsets.only(
                         bottom: MediaQuery.of(context).padding.bottom + 4),
@@ -3081,7 +3067,7 @@ class __BookChapterSelectorSheetState
               Expanded(
                 child: Consumer(builder: (context, ref, _) {
                   final selectedBookAbbrev = ref.watch(
-                      _sheetStateProvider.select((s) => s.book!.abbreviation));
+                      _sheetStateProvider.select((s) => s.book?.abbreviation));
                   return ListView.builder(
                     padding: EdgeInsets.only(
                         bottom: MediaQuery.of(context).padding.bottom + 4),
@@ -3113,7 +3099,8 @@ class __BookChapterSelectorSheetState
 
   Widget _buildChapterSelection(
       ThemeData theme, BibleNavSettingsState settings) {
-    final book = ref.read(_sheetStateProvider).book!;
+    final book = ref.read(_sheetStateProvider).book;
+    if (book == null) return const SizedBox.shrink();
     final chapters = book.chapters.length;
 
     return Consumer(builder: (context, ref, _) {
@@ -3144,10 +3131,10 @@ class __BookChapterSelectorSheetState
   }
 
   Widget _buildVerseSelection(ThemeData theme, BibleNavSettingsState settings) {
-    final book = ref.read(_sheetStateProvider).book!;
+    final book = ref.read(_sheetStateProvider).book;
     final selectedChapter = ref.read(_sheetStateProvider).chapter;
 
-    if (book.chapters.isEmpty) return const SizedBox.shrink();
+    if (book == null || book.chapters.isEmpty) return const SizedBox.shrink();
     int chapIdx = book.chapters.indexWhere((c) => c.number == selectedChapter);
     if (chapIdx == -1) chapIdx = 0;
     final chapterData = book.chapters[chapIdx];
@@ -3464,22 +3451,8 @@ class VerseActionLogic {
     required bool isLongPress,
     required VoidCallback onClearSelection,
   }) {
-    final primaryIndex =
-        ref.read(readSettingsProvider).primaryHighlightColorIndex;
-
-    if (primaryIndex == -1 || isLongPress) {
-      showHighlightPaletteModal(context, theme, ref, bookAbbrev, chapterNum,
-          targetVerses, onClearSelection);
-    } else {
-      // Guard against invalid array accesses for primaryIndex if it somehow became out of bounds (but not -1)
-      final safeIndex =
-          (primaryIndex >= 0 && primaryIndex < highlightPalette.length)
-              ? primaryIndex
-              : 0;
-      handleHighlight(
-          context, theme, ref, bookAbbrev, chapterNum, targetVerses, safeIndex);
-      onClearSelection();
-    }
+    showHighlightPaletteModal(context, theme, ref, bookAbbrev, chapterNum,
+        targetVerses, onClearSelection);
   }
 
   static void handleHighlight(
@@ -3490,10 +3463,6 @@ class VerseActionLogic {
       int chapterNum,
       List<int> targetVerses,
       int activeIndex) {
-    if (kHighlightDebug) {
-      debugPrint(
-          '[HIGHLIGHT_DEBUG] WRITE handleHighlight: bookAbbrev=$bookAbbrev, chapterNum=$chapterNum, targetVerses=$targetVerses, activeIndex=$activeIndex');
-    }
     bool isRemoving = targetVerses.every((v) {
       final refStr = generateVerseKey(bookAbbrev, chapterNum, v);
       return ref.read(highlightsProvider)[refStr] == activeIndex;

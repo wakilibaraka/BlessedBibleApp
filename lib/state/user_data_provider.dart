@@ -85,53 +85,26 @@ class HighlightsNotifier extends Notifier<Map<String, int>> {
       Future.microtask(() => prefs.saveHighlights(data));
     }
 
-    if (kHighlightDebug) {
-      debugPrint(
-          '[HIGHLIGHT_DEBUG] NOTIFIER init: loaded ${data.length} highlights');
-    }
     return data;
   }
 
   void toggleHighlight(String reference, int colorIndex) {
-    if (kHighlightDebug) {
-      debugPrint(
-          '[HIGHLIGHT_DEBUG] NOTIFIER toggleHighlight called: ref=$reference, color=$colorIndex');
-    }
     final current = Map<String, int>.from(state);
     if (current.containsKey(reference) && current[reference] == colorIndex) {
       current.remove(reference);
-      if (kHighlightDebug) {
-        debugPrint(
-            '[HIGHLIGHT_DEBUG] NOTIFIER removing highlight for $reference');
-      }
     } else {
       current[reference] = colorIndex;
-      if (kHighlightDebug) {
-        debugPrint(
-            '[HIGHLIGHT_DEBUG] NOTIFIER adding highlight for $reference -> $colorIndex');
-      }
     }
     state = current;
     ref.read(preferencesProvider).saveHighlights(current);
-    if (kHighlightDebug) {
-      debugPrint('[HIGHLIGHT_DEBUG] NOTIFIER map after write: $current');
-    }
   }
 
   void removeHighlight(String reference) {
-    if (kHighlightDebug) {
-      debugPrint(
-          '[HIGHLIGHT_DEBUG] NOTIFIER removeHighlight called: ref=$reference');
-    }
     final current = Map<String, int>.from(state);
     if (current.containsKey(reference)) {
       current.remove(reference);
       state = current;
       ref.read(preferencesProvider).saveHighlights(current);
-      if (kHighlightDebug) {
-        debugPrint(
-            '[HIGHLIGHT_DEBUG] NOTIFIER map after remove write: $current');
-      }
     }
   }
 }
