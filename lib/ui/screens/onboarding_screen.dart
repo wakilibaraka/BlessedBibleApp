@@ -513,6 +513,19 @@ class _ThemePage extends ConsumerStatefulWidget {
 class _ThemePageState extends ConsumerState<_ThemePage> {
   bool _hasShuffled = false;
   Timer? _shuffleTimer;
+  AppThemeMode? _highlightMode;
+  bool _isShuffling = false;
+  late List<_ThemeMeta> _colorThemes;
+
+  @override
+  void initState() {
+    super.initState();
+    _colorThemes = _kThemes.where((t) => 
+      t.mode != AppThemeMode.light && 
+      t.mode != AppThemeMode.dark && 
+      t.mode != AppThemeMode.oled
+    ).toList();
+  }
 
   @override
   void didUpdateWidget(covariant _ThemePage oldWidget) {
@@ -529,28 +542,31 @@ class _ThemePageState extends ConsumerState<_ThemePage> {
   }
 
   void _startShuffle() {
+    if (_isShuffling) return;
+    _isShuffling = true;
     _hasShuffled = true;
     final random = Random();
     int ticks = 0;
     
+    _shuffleTimer?.cancel();
     _shuffleTimer = Timer.periodic(const Duration(milliseconds: 400), (timer) {
       ticks++;
       if (ticks >= 9) {
         timer.cancel();
         // Land on a color theme
-        final colorThemes = _kThemes.where((t) => 
-          t.mode != AppThemeMode.light && 
-          t.mode != AppThemeMode.sepia && 
-          t.mode != AppThemeMode.dark && 
-          t.mode != AppThemeMode.oled
-        ).toList();
-        final finalTheme = colorThemes[random.nextInt(colorThemes.length)];
+        final finalTheme = _colorThemes[random.nextInt(_colorThemes.length)];
+        setState(() {
+          _highlightMode = finalTheme.mode;
+          _isShuffling = false;
+        });
         ref.read(themeProvider.notifier).setTheme(finalTheme.mode);
         HapticFeedback.lightImpact();
       } else {
         // Cycle through all
-        final t = _kThemes[random.nextInt(_kThemes.length)];
-        ref.read(themeProvider.notifier).setTheme(t.mode);
+        final t = _colorThemes[random.nextInt(_colorThemes.length)];
+        setState(() {
+          _highlightMode = t.mode;
+        });
         HapticFeedback.selectionClick();
       }
     });
@@ -559,14 +575,13 @@ class _ThemePageState extends ConsumerState<_ThemePage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final currentMode = ref.watch(themeProvider);
+    final currentMode = _highlightMode ?? ref.watch(themeProvider);
     final bottom = MediaQuery.of(context).padding.bottom;
     final top = MediaQuery.of(context).padding.top;
 
-    // Find the selected theme meta for accent color
-    final selectedMeta = _kThemes.firstWhere(
+    final selectedMeta = _colorThemes.firstWhere(
       (t) => t.mode == currentMode,
-      orElse: () => _kThemes.first,
+      orElse: () => _colorThemes.first,
     );
     final accent = selectedMeta.accent;
 
@@ -579,7 +594,7 @@ class _ThemePageState extends ConsumerState<_ThemePage> {
           end: Alignment.bottomCenter,
           colors: [
             accent.withValues(alpha: 0.15),
-            theme.scaffoldBackgroundColor,
+            selectedMeta.bg,
           ],
         ),
       ),
@@ -610,19 +625,39 @@ class _ThemePageState extends ConsumerState<_ThemePage> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                Text(
-                  'Pick your\ntheme',
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    height: 1.1,
-                    letterSpacing: -0.5,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Pick your\ntheme',
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.w900,
+                        height: 1.1,
+                        letterSpacing: -0.5,
+                        color: selectedMeta.text,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: _startShuffle,
+                      icon: Icon(Icons.shuffle_rounded, color: accent),
+                      style: IconButton.styleFrom(
+                        backgroundColor: accent.withValues(alpha: 0.15),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 6),
                 Text(
                   'The app recolors live as you tap. Your choice is saved.',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    color: selectedMeta.text.withValues(alpha: 0.6),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'You can change this anytime in Settings.',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: selectedMeta.text.withValues(alpha: 0.4),
                   ),
                 ),
               ],
@@ -634,22 +669,26 @@ class _ThemePageState extends ConsumerState<_ThemePage> {
           // Theme grid
           Expanded(
             child: GridView.builder(
+              physics: const NeverScrollableScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
-                childAspectRatio: 0.75,
+                childAspectRatio: 0.85,
                 crossAxisSpacing: 12,
-                mainAxisSpacing: 16,
+                mainAxisSpacing: 12,
               ),
-              itemCount: _kThemes.length,
+              itemCount: _colorThemes.length,
               itemBuilder: (context, index) {
-                final meta = _kThemes[index];
+                final meta = _colorThemes[index];
                 final isSelected = currentMode == meta.mode;
                 return _ThemeCard(
                   meta: meta,
                   isSelected: isSelected,
                   onTap: () {
                     HapticFeedback.mediumImpact();
+                    setState(() {
+                      _highlightMode = meta.mode;
+                    });
                     ref.read(themeProvider.notifier).setTheme(meta.mode);
                   },
                 );
@@ -1205,6 +1244,13 @@ class _TranslationPageState extends ConsumerState<_TranslationPage> {
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
+                const SizedBox(height: 4),
+                Text(
+                  'You can change this anytime in Settings.',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                  ),
+                ),
               ],
             ),
           ),
@@ -1369,7 +1415,7 @@ class _TranslationPageState extends ConsumerState<_TranslationPage> {
                   widget.onNext();
                 }
               },
-              nextLabel: !_isSlideB ? 'Bilingual Mode (Optional)' : 'Almost done!',
+              nextLabel: !_isSlideB ? 'Bilingual Mode (Optional)' : 'DONE!',
               accentColor: primary,
             ),
           ),
@@ -1597,33 +1643,7 @@ class _GetStartedPageState extends ConsumerState<_GetStartedPage> {
 
                   const Spacer(flex: 3),
 
-                  // Get Started CTA
-                  FilledButton(
-                    onPressed: () {
-                      HapticFeedback.mediumImpact();
-                      _timer?.cancel(); // skip wait
-                      widget.onComplete();
-                    },
-                    style: FilledButton.styleFrom(
-                      backgroundColor: primary,
-                      foregroundColor: primary.computeLuminance() > 0.4
-                          ? Colors.black87
-                          : Colors.white,
-                      minimumSize: const Size(double.infinity, 58),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18)),
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('Open Blessed Bible',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold)),
-                        SizedBox(width: 8),
-                        Icon(Icons.auto_stories_rounded, size: 20),
-                      ],
-                    ),
-                  ),
+
 
                   SizedBox(height: bottom + 16),
                 ],
