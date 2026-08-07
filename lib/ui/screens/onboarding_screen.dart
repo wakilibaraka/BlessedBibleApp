@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:math';
@@ -123,6 +124,66 @@ const List<_ThemeMeta> _kThemes = [
 // ─────────────────────────────────────────────
 // Root onboarding screen
 // ─────────────────────────────────────────────
+
+
+class _FloatingPill extends StatelessWidget {
+  final Widget child;
+  final Color color;
+  final BorderRadius borderRadius;
+  final BoxBorder? border;
+  final EdgeInsetsGeometry? padding;
+
+  const _FloatingPill({
+    required this.child,
+    required this.color,
+    required this.borderRadius,
+    this.border,
+    this.padding,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDarkBg = Theme.of(context).scaffoldBackgroundColor.computeLuminance() < 0.4;
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+      decoration: BoxDecoration(
+        borderRadius: borderRadius,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDarkBg ? 0.35 : 0.12),
+            blurRadius: 32,
+            spreadRadius: -4,
+            offset: const Offset(0, 12),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDarkBg ? 0.15 : 0.04),
+            blurRadius: 8,
+            spreadRadius: 0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: borderRadius,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+            padding: padding,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: borderRadius,
+              border: border,
+            ),
+            child: child,
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -286,35 +347,45 @@ class _NavRow extends StatelessWidget {
     final accent = accentColor ?? theme.primaryColor;
     return Row(
       children: [
-        IconButton(
-          onPressed: onBack,
-          style: IconButton.styleFrom(
-            backgroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.06),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        _FloatingPill(
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(14),
+          child: IconButton(
+            onPressed: onBack,
+            style: IconButton.styleFrom(
+              backgroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              shape:
+                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            ),
+            icon: Icon(Icons.arrow_back_ios_new_rounded,
+                size: 18, color: theme.colorScheme.onSurface),
           ),
-          icon: Icon(Icons.arrow_back_ios_new_rounded,
-              size: 18, color: theme.colorScheme.onSurface),
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: FilledButton(
-            onPressed: () {
-              HapticFeedback.selectionClick();
-              onNext();
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor: accent,
-              foregroundColor: accent.computeLuminance() > 0.4
-                  ? Colors.black87
-                  : Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
+          child: _FloatingPill(
+            color: accent.withValues(alpha: 0.85),
+            borderRadius: BorderRadius.circular(16),
+            child: FilledButton(
+              onPressed: () {
+                HapticFeedback.selectionClick();
+                onNext();
+              },
+              style: FilledButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                foregroundColor: accent.computeLuminance() > 0.4
+                    ? Colors.black87
+                    : Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
+              ),
+              child: Text(nextLabel,
+                  style:
+                      const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             ),
-            child: Text(nextLabel,
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           ),
         ),
       ],
@@ -603,13 +674,10 @@ class _ThemePageState extends ConsumerState<_ThemePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Step label
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: accent.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+                _FloatingPill(
+                  color: accent.withValues(alpha: 0.20),
+                  borderRadius: BorderRadius.circular(20),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   child: Text(
                     'STEP 1 OF 3',
                     style: TextStyle(
@@ -722,25 +790,12 @@ class _ThemeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.easeOut,
-        decoration: BoxDecoration(
-          color: meta.bg,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: isSelected ? meta.accent : Colors.transparent,
-            width: 2.5,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: isSelected
-                  ? meta.accent.withValues(alpha: 0.4)
-                  : Colors.black.withValues(alpha: 0.08),
-              blurRadius: isSelected ? 12 : 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
+      child: _FloatingPill(
+        color: meta.bg.withValues(alpha: 0.85),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isSelected ? meta.accent : Colors.transparent,
+          width: 2.5,
         ),
         child: Stack(
           children: [
@@ -903,13 +958,10 @@ class _TypographyPage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: accent.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+                _FloatingPill(
+                  color: accent.withValues(alpha: 0.20),
+                  borderRadius: BorderRadius.circular(20),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   child: Text(
                     'STEP 2 OF 3',
                     style: TextStyle(
@@ -1113,20 +1165,17 @@ class _SizeButton extends StatelessWidget {
     final theme = Theme.of(context);
     return GestureDetector(
       onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+      child: _FloatingPill(
+        color: isSelected
+            ? accentColor.withValues(alpha: 0.20)
+            : theme.colorScheme.surface.withValues(alpha: 0.85),
+        borderRadius: BorderRadius.circular(12),
         padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(
+        border: Border.all(
           color: isSelected
-              ? accentColor.withValues(alpha: 0.12)
-              : theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected
-                ? accentColor
-                : theme.dividerColor.withValues(alpha: 0.5),
-            width: isSelected ? 2 : 1,
-          ),
+              ? accentColor
+              : theme.dividerColor.withValues(alpha: 0.5),
+          width: isSelected ? 2 : 1,
         ),
         child: Center(
           child: Text(
@@ -1251,7 +1300,7 @@ class _TranslationPageState extends ConsumerState<_TranslationPage> {
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 44),
 
           // Translation list
           Expanded(
@@ -1443,18 +1492,15 @@ class _TranslationTile extends StatelessWidget {
     final theme = Theme.of(context);
     return GestureDetector(
       onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+      child: _FloatingPill(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? accentColor.withValues(alpha: 0.12)
-              : theme.colorScheme.onSurface.withValues(alpha: 0.04),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: isSelected ? accentColor : Colors.transparent,
-            width: 2,
-          ),
+        color: isSelected
+            ? accentColor.withValues(alpha: 0.20)
+            : theme.colorScheme.onSurface.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isSelected ? accentColor : Colors.transparent,
+          width: 2,
         ),
         child: Row(
           children: [
