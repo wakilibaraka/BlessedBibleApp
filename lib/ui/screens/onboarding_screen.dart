@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:math';
+import 'dart:async';
+import 'package:confetti/confetti.dart';
 
 import '../../data/local_storage/preferences_service.dart';
 import '../../state/theme_provider.dart';
@@ -137,6 +140,22 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // 1. Randomized bright default theme
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final brightThemes = _kThemes.where((t) => 
+        t.mode != AppThemeMode.dark && 
+        t.mode != AppThemeMode.oled && 
+        t.mode != AppThemeMode.dusk
+      ).toList();
+      
+      final randomTheme = brightThemes[Random().nextInt(brightThemes.length)];
+      ref.read(themeProvider.notifier).setTheme(randomTheme.mode);
+    });
+  }
 
   @override
   void dispose() {
@@ -567,33 +586,34 @@ class _ThemePage extends ConsumerWidget {
 
           const SizedBox(height: 20),
 
-          // Theme grid — scrollable
-          Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                childAspectRatio: 1.6,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-              ),
+          // Theme horizontal list
+          SizedBox(
+            height: 180,
+            child: ListView.separated(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+              scrollDirection: Axis.horizontal,
               itemCount: _kThemes.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 16),
               itemBuilder: (context, index) {
                 final meta = _kThemes[index];
                 final isSelected = currentMode == meta.mode;
-                return _ThemeCard(
-                  meta: meta,
-                  isSelected: isSelected,
-                  onTap: () {
-                    HapticFeedback.mediumImpact();
-                    ref.read(themeProvider.notifier).setTheme(meta.mode);
-                  },
+                // Width = approx 2.5 items visible (1/2.8)
+                return SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.32,
+                  child: _ThemeCard(
+                    meta: meta,
+                    isSelected: isSelected,
+                    onTap: () {
+                      HapticFeedback.mediumImpact();
+                      ref.read(themeProvider.notifier).setTheme(meta.mode);
+                    },
+                  ),
                 );
               },
             ),
           ),
 
-          const SizedBox(height: 12),
+          const Spacer(),
 
           Padding(
             padding: EdgeInsets.fromLTRB(24, 0, 24, bottom + 68),
@@ -647,37 +667,72 @@ class _ThemeCard extends StatelessWidget {
         ),
         child: Stack(
           children: [
-            // Color accent bar at top
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                height: 5,
-                decoration: BoxDecoration(
-                  color: meta.accent,
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(12),
-                  ),
-                ),
-              ),
-            ),
-            // Label
+            // Mini screen background and layout
             Padding(
-              padding: const EdgeInsets.fromLTRB(8, 12, 8, 6),
+              padding: const EdgeInsets.all(8.0),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 4),
-                  Text(
-                    meta.label,
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    style: TextStyle(
-                      color: meta.text,
-                      fontSize: 11,
-                      fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                      height: 1.2,
+                  // Mock app bar
+                  Row(
+                    children: [
+                      Container(
+                        width: 12,
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: meta.accent.withValues(alpha: 0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                            child: Icon(Icons.menu_book,
+                                size: 6, color: meta.accent)),
+                      ),
+                      const SizedBox(width: 6),
+                      Container(
+                        height: 6,
+                        width: 30,
+                        decoration: BoxDecoration(
+                          color: meta.text.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  // Mock content title
+                  Container(
+                    height: 8,
+                    width: 45,
+                    decoration: BoxDecoration(
+                      color: meta.text.withValues(alpha: 0.6),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  // Mock text lines
+                  ...List.generate(
+                    4,
+                    (i) => Container(
+                      margin: const EdgeInsets.only(bottom: 6),
+                      height: 4,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: meta.text.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const Spacer(),
+                  // Label at bottom
+                  Center(
+                    child: Text(
+                      meta.label,
+                      style: TextStyle(
+                        color: meta.text,
+                        fontSize: 12,
+                        fontWeight:
+                            isSelected ? FontWeight.w800 : FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],
@@ -686,17 +741,23 @@ class _ThemeCard extends StatelessWidget {
             // Check mark when selected
             if (isSelected)
               Positioned(
-                top: 7,
-                right: 7,
+                top: -6,
+                right: -6,
                 child: Container(
-                  width: 16,
-                  height: 16,
+                  padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     color: meta.accent,
                     shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: meta.accent.withValues(alpha: 0.3),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      )
+                    ],
                   ),
                   child: const Icon(Icons.check_rounded,
-                      size: 10, color: Colors.white),
+                      size: 14, color: Colors.white),
                 ),
               ),
           ],
@@ -801,7 +862,86 @@ class _TypographyPage extends ConsumerWidget {
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
+          // Live sample preview
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: selectedMeta.bg,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: selectedMeta.accent.withValues(alpha: 0.3),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 300),
+                style: TextStyle(
+                  fontFamily: typoState.fontFamily,
+                  fontSize: 18,
+                  height: typoState.lineHeight,
+                  color: selectedMeta.text,
+                ),
+                child: const Text(
+                  'In the beginning God created the heaven and the earth.',
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Spacing controls
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _SpacingButton(
+                    label: 'Tight',
+                    isSelected: typoState.lineHeight < 1.4,
+                    accentColor: accent,
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      ref.read(typographyProvider.notifier).setLineHeight(1.3);
+                    },
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _SpacingButton(
+                    label: 'Normal',
+                    isSelected: typoState.lineHeight >= 1.4 && typoState.lineHeight < 1.7,
+                    accentColor: accent,
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      ref.read(typographyProvider.notifier).setLineHeight(1.5);
+                    },
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _SpacingButton(
+                    label: 'Relaxed',
+                    isSelected: typoState.lineHeight >= 1.7,
+                    accentColor: accent,
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      ref.read(typographyProvider.notifier).setLineHeight(1.8);
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
@@ -873,16 +1013,91 @@ class _TypographyPage extends ConsumerWidget {
   }
 }
 
-class _TranslationPage extends ConsumerWidget {
+class _SpacingButton extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final Color accentColor;
+  final VoidCallback onTap;
+
+  const _SpacingButton({
+    required this.label,
+    required this.isSelected,
+    required this.accentColor,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? accentColor.withValues(alpha: 0.12)
+              : theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected
+                ? accentColor
+                : theme.dividerColor.withValues(alpha: 0.5),
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+              color: isSelected ? accentColor : theme.colorScheme.onSurface,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TranslationPage extends ConsumerStatefulWidget {
   final VoidCallback onNext;
   final VoidCallback onBack;
 
   const _TranslationPage({required this.onNext, required this.onBack});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_TranslationPage> createState() => _TranslationPageState();
+}
+
+class _TranslationPageState extends ConsumerState<_TranslationPage> {
+  bool _pickingSecondary = false;
+
+  String _getSecondarySampleText(String id) {
+    switch (id) {
+      case 'cuv':
+      case 'rcuv':
+        return '起初神創造天地。';
+      case 'bbe':
+        return 'At the first God made the heaven and the earth.';
+      case 'esv':
+        return 'In the beginning, God created the heavens and the earth.';
+      case 'suv':
+        return 'Hapo mwanzo Mungu aliziumba mbingu na nchi.';
+      case 'nav':
+        return 'Tʼáá áłtséedi Diyin God yádiłhił dóó nahasdzáán áyiilaa.';
+      default:
+        // fallback to KJV if unknown
+        return 'In the beginning God created the heaven and the earth.';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final activeId = ref.watch(activeTranslationProvider);
+    final secondaryId = ref.watch(secondaryTranslationProvider);
     final translationsAsync = ref.watch(availableTranslationsProvider);
     final bottom = MediaQuery.of(context).padding.bottom;
     final top = MediaQuery.of(context).padding.top;
@@ -961,33 +1176,147 @@ class _TranslationPage extends ConsumerWidget {
                     translations.where((t) => t.isDownloaded).toList();
                 final displayList = bundled.isEmpty ? translations : bundled;
 
-                return ListView.separated(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  itemCount: displayList.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 8),
-                  itemBuilder: (context, i) {
-                    final t = displayList[i];
-                    final isSelected = activeId == t.translationId;
-                    return _TranslationTile(
-                      translationName: t.translationName,
-                      abbreviation: t.abbreviation,
-                      languageName: t.languageName,
-                      isSelected: isSelected,
-                      accentColor: primary,
-                      onTap: () {
-                        HapticFeedback.selectionClick();
-                        ref
-                            .read(activeTranslationProvider.notifier)
-                            .setTranslation(t.translationId);
-                      },
-                    );
-                  },
+                return Column(
+                  children: [
+                    if (_pickingSecondary)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Secondary Translation',
+                              style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                setState(() => _pickingSecondary = false);
+                              },
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.zero,
+                                minimumSize: const Size(40, 30),
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                              child: Text('Done', style: TextStyle(color: primary)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    Expanded(
+                      child: ListView.separated(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        itemCount: displayList.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 8),
+                        itemBuilder: (context, i) {
+                          final t = displayList[i];
+                          final isSelected = _pickingSecondary 
+                              ? secondaryId == t.translationId
+                              : activeId == t.translationId;
+                          return _TranslationTile(
+                            translationName: t.translationName,
+                            abbreviation: t.abbreviation,
+                            languageName: t.languageName,
+                            isSelected: isSelected,
+                            accentColor: primary,
+                            onTap: () {
+                              HapticFeedback.selectionClick();
+                              if (_pickingSecondary) {
+                                ref
+                                    .read(secondaryTranslationProvider.notifier)
+                                    .setTranslation(
+                                      secondaryId == t.translationId ? null : t.translationId,
+                                    );
+                              } else {
+                                ref
+                                    .read(activeTranslationProvider.notifier)
+                                    .setTranslation(t.translationId);
+                              }
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                    if (!_pickingSecondary)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8, bottom: 4),
+                        child: TextButton.icon(
+                          onPressed: () {
+                            HapticFeedback.lightImpact();
+                            setState(() => _pickingSecondary = true);
+                          },
+                          icon: Icon(Icons.splitscreen_rounded, size: 16, color: primary),
+                          label: Text(
+                            secondaryId == null 
+                                ? 'Add Parallel Language (Bilingual Mode)'
+                                : 'Edit Parallel Language',
+                            style: TextStyle(color: primary, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                  ],
                 );
               },
             ),
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
+
+          // Bilingual preview area
+          AnimatedSize(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOutCubic,
+            child: secondaryId != null
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.04),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: primary.withValues(alpha: 0.2)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.splitscreen_rounded, size: 14, color: primary),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Bilingual Preview',
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: primary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'In the beginning God created the heaven and the earth.',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontFamily: ref.watch(typographyProvider).fontFamily,
+                              fontSize: 16,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          // hardcoded secondary text - real text for a few languages
+                          Text(
+                            _getSecondarySampleText(secondaryId),
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontFamily: ref.watch(typographyProvider).fontFamily,
+                              fontSize: 16,
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.65),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
+
+          const SizedBox(height: 4),
 
           // Download note
           Padding(
@@ -1016,8 +1345,8 @@ class _TranslationPage extends ConsumerWidget {
           Padding(
             padding: EdgeInsets.fromLTRB(24, 0, 24, bottom + 68),
             child: _NavRow(
-              onBack: onBack,
-              onNext: onNext,
+              onBack: widget.onBack,
+              onNext: widget.onNext,
               nextLabel: 'Almost done!',
               accentColor: primary,
             ),
@@ -1131,13 +1460,48 @@ class _TranslationTile extends StatelessWidget {
 // Page 4: Get Started
 // ─────────────────────────────────────────────
 
-class _GetStartedPage extends ConsumerWidget {
+class _GetStartedPage extends ConsumerStatefulWidget {
   final VoidCallback onComplete;
 
   const _GetStartedPage({required this.onComplete});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_GetStartedPage> createState() => _GetStartedPageState();
+}
+
+class _GetStartedPageState extends ConsumerState<_GetStartedPage> {
+  late ConfettiController _confettiController;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _confettiController =
+        ConfettiController(duration: const Duration(seconds: 2));
+    
+    // Auto-fire confetti and start timer when this page becomes visible.
+    // We delay slightly to let the page transition finish.
+    Future.delayed(const Duration(milliseconds: 400), () {
+      if (mounted) {
+        _confettiController.play();
+        _timer = Timer(const Duration(milliseconds: 3500), () {
+          if (mounted) {
+            widget.onComplete();
+          }
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final primary = theme.primaryColor;
     final size = MediaQuery.of(context).size;
@@ -1163,83 +1527,103 @@ class _GetStartedPage extends ConsumerWidget {
           stops: const [0.0, 0.5, 1.0],
         ),
       ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Spacer(flex: 2),
+      child: Stack(
+        children: [
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Spacer(flex: 2),
 
-              // Big check circle
-              Center(
-                child: Container(
-                  width: size.width * 0.3,
-                  height: size.width * 0.3,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: primary.withValues(alpha: 0.12),
-                    border: Border.all(
-                        color: primary.withValues(alpha: 0.3), width: 2.5),
+                  // Big check circle
+                  Center(
+                    child: Container(
+                      width: size.width * 0.3,
+                      height: size.width * 0.3,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: primary.withValues(alpha: 0.12),
+                        border: Border.all(
+                            color: primary.withValues(alpha: 0.3), width: 2.5),
+                      ),
+                      child: Icon(Icons.check_rounded,
+                          size: size.width * 0.15, color: primary),
+                    ),
                   ),
-                  child: Icon(Icons.check_rounded,
-                      size: size.width * 0.15, color: primary),
-                ),
+
+                  const Spacer(flex: 2),
+
+                  Text(
+                    'You\'re all\nset! 🎉',
+                    style: theme.textTheme.displaySmall?.copyWith(
+                      fontWeight: FontWeight.w900,
+                      height: 1.05,
+                      letterSpacing: -1,
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Summary
+                  _SetupSummaryCard(
+                    themeName: themeMeta.label,
+                    themeAccent: themeMeta.accent,
+                    translationId: activeId,
+                  ),
+
+                  const Spacer(flex: 3),
+
+                  // Get Started CTA
+                  FilledButton(
+                    onPressed: () {
+                      HapticFeedback.mediumImpact();
+                      _timer?.cancel(); // skip wait
+                      widget.onComplete();
+                    },
+                    style: FilledButton.styleFrom(
+                      backgroundColor: primary,
+                      foregroundColor: primary.computeLuminance() > 0.4
+                          ? Colors.black87
+                          : Colors.white,
+                      minimumSize: const Size(double.infinity, 58),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18)),
+                    ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Open Blessed Bible',
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold)),
+                        SizedBox(width: 8),
+                        Icon(Icons.auto_stories_rounded, size: 20),
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(height: bottom + 16),
+                ],
               ),
-
-              const Spacer(flex: 2),
-
-              Text(
-                'You\'re all\nset! 🎉',
-                style: theme.textTheme.displaySmall?.copyWith(
-                  fontWeight: FontWeight.w900,
-                  height: 1.05,
-                  letterSpacing: -1,
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // Summary
-              _SetupSummaryCard(
-                themeName: themeMeta.label,
-                themeAccent: themeMeta.accent,
-                translationId: activeId,
-              ),
-
-              const Spacer(flex: 3),
-
-              // Get Started CTA
-              FilledButton(
-                onPressed: () {
-                  HapticFeedback.mediumImpact();
-                  onComplete();
-                },
-                style: FilledButton.styleFrom(
-                  backgroundColor: primary,
-                  foregroundColor: primary.computeLuminance() > 0.4
-                      ? Colors.black87
-                      : Colors.white,
-                  minimumSize: const Size(double.infinity, 58),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18)),
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Open Blessed Bible',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
-                    SizedBox(width: 8),
-                    Icon(Icons.auto_stories_rounded, size: 20),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: bottom + 16),
-            ],
+            ),
           ),
-        ),
+          Align(
+            alignment: Alignment.topCenter,
+            child: ConfettiWidget(
+              confettiController: _confettiController,
+              blastDirectionality: BlastDirectionality.explosive,
+              shouldLoop: false,
+              colors: [
+                primary,
+                themeMeta.accent,
+                Colors.yellow,
+                Colors.orange,
+                Colors.lightBlue
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
