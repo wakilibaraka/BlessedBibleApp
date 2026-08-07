@@ -148,7 +148,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
               children: [
                 // 1. OPAQUE HEADER ZONE
                 Container(
-                  color: is3DTheme ? theme.colorScheme.surface : theme.scaffoldBackgroundColor,
+                  color: tokens.readingSurface,
                   padding: EdgeInsets.only(
                     top: widget.isCompact ? 16 : MediaQuery.paddingOf(context).top + 16,
                     left: 16,
@@ -231,8 +231,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                   ],
                 ),
               ),
-                // 2. DIVIDER & BLUR BAND BRIDGE
-                Divider(height: 1, thickness: 1, color: tokens.readingBorder),
+                // 2. BLUR BAND BRIDGE
                 Container(
                   height: 16,
                   decoration: BoxDecoration(
@@ -240,8 +239,8 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        is3DTheme ? theme.colorScheme.surface : theme.scaffoldBackgroundColor,
-                        (is3DTheme ? theme.colorScheme.surface : theme.scaffoldBackgroundColor).withValues(alpha: 0.0),
+                        tokens.readingSurface,
+                        tokens.readingSurface.withValues(alpha: 0.0),
                       ],
                     ),
                   ),
@@ -254,9 +253,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                     child: Container(
                       padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
                     decoration: BoxDecoration(
-                      color: is3DTheme
-                          ? theme.colorScheme.surface
-                          : theme.scaffoldBackgroundColor,
+                      color: tokens.readingSurface,
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(
                           color:
