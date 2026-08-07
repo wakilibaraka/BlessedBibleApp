@@ -6,7 +6,6 @@ import 'dart:async';
 import 'package:confetti/confetti.dart';
 
 import '../../data/local_storage/preferences_service.dart';
-import '../../state/read_settings_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../state/translation_provider.dart';
 import '../../state/typography_provider.dart';
@@ -167,11 +166,17 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
         pageBuilder: (_, animation, __) => const MainNavScreen(),
-        transitionsBuilder: (_, animation, __, child) => FadeTransition(
-          opacity: animation,
-          child: child,
-        ),
-        transitionDuration: const Duration(milliseconds: 500),
+        transitionsBuilder: (_, animation, __, child) {
+          final curve = CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeInOutCubic,
+          );
+          return FadeTransition(
+            opacity: curve,
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 1500),
       ),
     );
   }
@@ -1141,7 +1146,6 @@ class _TranslationPageState extends ConsumerState<_TranslationPage> {
     final activeId = ref.watch(activeTranslationProvider);
     final secondaryId = ref.watch(secondaryTranslationProvider);
     final translationsAsync = ref.watch(availableTranslationsProvider);
-    final readSettings = ref.watch(readSettingsProvider);
     final bottom = MediaQuery.of(context).padding.bottom;
     final top = MediaQuery.of(context).padding.top;
     final primary = theme.primaryColor;
@@ -1185,7 +1189,7 @@ class _TranslationPageState extends ConsumerState<_TranslationPage> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  !_isSlideB ? 'Pick your\ntranslation' : 'Add a second\ntranslation?',
+                  !_isSlideB ? 'Pick your\ntranslation' : 'Bilingual Mode',
                   style: theme.textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.w900,
                     height: 1.1,
@@ -1196,7 +1200,7 @@ class _TranslationPageState extends ConsumerState<_TranslationPage> {
                 Text(
                   !_isSlideB 
                     ? 'Choose your primary Bible translation. More languages are downloadable in Settings.' 
-                    : 'Select an optional secondary translation and how they display together.',
+                    : 'Select an optional secondary translation to display alongside your primary.',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
@@ -1267,36 +1271,6 @@ class _TranslationPageState extends ConsumerState<_TranslationPage> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: _SizeButton(
-                                label: 'Stacked',
-                                isSelected: readSettings.readingLayout != ReadingLayout.sideBySide,
-                                accentColor: primary,
-                                onTap: () {
-                                  HapticFeedback.lightImpact();
-                                  ref.read(readSettingsProvider.notifier).setReadingLayout(ReadingLayout.interleaved);
-                                },
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: _SizeButton(
-                                label: 'Side-by-side',
-                                isSelected: readSettings.readingLayout == ReadingLayout.sideBySide,
-                                accentColor: primary,
-                                onTap: () {
-                                  HapticFeedback.lightImpact();
-                                  ref.read(readSettingsProvider.notifier).setReadingLayout(ReadingLayout.sideBySide);
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                         child: Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
@@ -1321,54 +1295,27 @@ class _TranslationPageState extends ConsumerState<_TranslationPage> {
                                 ],
                               ),
                               const SizedBox(height: 12),
-                              if (readSettings.readingLayout == ReadingLayout.sideBySide)
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        'In the beginning God created the heaven and the earth.',
-                                        style: theme.textTheme.bodyMedium?.copyWith(
-                                          fontFamily: ref.watch(typographyProvider).fontFamily,
-                                          fontSize: 16,
-                                        ),
-                                      ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'In the beginning God created the heaven and the earth.',
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      fontFamily: ref.watch(typographyProvider).fontFamily,
+                                      fontSize: 16,
                                     ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Text(
-                                        _getSecondarySampleText(secondaryId),
-                                        style: theme.textTheme.bodyMedium?.copyWith(
-                                          fontFamily: ref.watch(typographyProvider).fontFamily,
-                                          fontSize: 16,
-                                          color: theme.colorScheme.onSurface.withValues(alpha: 0.65),
-                                        ),
-                                      ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    _getSecondarySampleText(secondaryId),
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      fontFamily: ref.watch(typographyProvider).fontFamily,
+                                      fontSize: 16,
+                                      color: theme.colorScheme.onSurface.withValues(alpha: 0.65),
                                     ),
-                                  ],
-                                )
-                              else
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'In the beginning God created the heaven and the earth.',
-                                      style: theme.textTheme.bodyMedium?.copyWith(
-                                        fontFamily: ref.watch(typographyProvider).fontFamily,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      _getSecondarySampleText(secondaryId),
-                                      style: theme.textTheme.bodyMedium?.copyWith(
-                                        fontFamily: ref.watch(typographyProvider).fontFamily,
-                                        fontSize: 16,
-                                        color: theme.colorScheme.onSurface.withValues(alpha: 0.65),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
+                              ),
                             ],
                           ),
                         ),
@@ -1422,7 +1369,7 @@ class _TranslationPageState extends ConsumerState<_TranslationPage> {
                   widget.onNext();
                 }
               },
-              nextLabel: !_isSlideB ? 'Secondary Language (Optional)' : 'Almost done!',
+              nextLabel: !_isSlideB ? 'Bilingual Mode (Optional)' : 'Almost done!',
               accentColor: primary,
             ),
           ),
