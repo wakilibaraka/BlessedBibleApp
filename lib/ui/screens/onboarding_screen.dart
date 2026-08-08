@@ -657,7 +657,7 @@ class _ThemePageState extends ConsumerState<_ThemePage> {
     if (temple.isNotEmpty) sequence.add(temple[random.nextInt(temple.length)]);
 
     // 3. Shuffle the sequence order
-    sequence.shuffle(random);
+    // sequence.shuffle(random); // Removed to keep sequential top-down order
 
     int ticks = 0;
     
