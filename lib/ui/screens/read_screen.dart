@@ -1249,8 +1249,15 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                   .isNotEmpty
                                                               ? availableTrans
                                                                   .first
-                                                              : throw Exception(
-                                                                  'No translation'));
+                                                              : TranslationInfo(
+                                                                  translationId: 'kjv',
+                                                                  languageCode: 'en',
+                                                                  languageName: 'English',
+                                                                  translationName: 'King James Version',
+                                                                  abbreviation: 'KJV',
+                                                                  license: 'Public Domain',
+                                                                  isComplete: true,
+                                                                ));
                                                   final isRtl = [
                                                     'ar',
                                                     'he',
