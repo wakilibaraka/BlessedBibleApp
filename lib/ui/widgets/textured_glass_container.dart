@@ -197,6 +197,8 @@ class _RimAndNoisePainter extends CustomPainter {
   final double rimAlpha;
   final bool isDark;
 
+  static final Map<Size, (List<Offset>, List<Offset>)> _noiseCache = {};
+
   _RimAndNoisePainter({
     required this.borderRadius,
     required this.rimAlpha,
@@ -210,17 +212,26 @@ class _RimAndNoisePainter extends CustomPainter {
     canvas.save();
     canvas.clipRRect(rrect);
 
-    final random = math.Random(42);
-    final count =
-        (size.width * size.height * _kNoiseDensity).toInt().clamp(0, 800);
-    final darkPoints = <Offset>[];
-    final lightPoints = <Offset>[];
-    for (int i = 0; i < count; i++) {
-      darkPoints.add(Offset(
-          random.nextDouble() * size.width, random.nextDouble() * size.height));
-      lightPoints.add(Offset(
-          random.nextDouble() * size.width, random.nextDouble() * size.height));
+    if (!_noiseCache.containsKey(size)) {
+      final random = math.Random(42);
+      final count =
+          (size.width * size.height * _kNoiseDensity).toInt().clamp(0, 800);
+      final darkPoints = <Offset>[];
+      final lightPoints = <Offset>[];
+      for (int i = 0; i < count; i++) {
+        darkPoints.add(Offset(
+            random.nextDouble() * size.width, random.nextDouble() * size.height));
+        lightPoints.add(Offset(
+            random.nextDouble() * size.width, random.nextDouble() * size.height));
+      }
+      // Simple bounded cache to prevent memory leaks if size animates
+      if (_noiseCache.length > 20) _noiseCache.clear();
+      _noiseCache[size] = (darkPoints, lightPoints);
     }
+
+    final cached = _noiseCache[size]!;
+    final darkPoints = cached.$1;
+    final lightPoints = cached.$2;
     canvas.drawPoints(
         PointMode.points,
         darkPoints,

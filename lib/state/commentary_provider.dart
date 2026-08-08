@@ -1,10 +1,16 @@
-import 'dart:convert';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/commentary_entry.dart';
 import '../data/local_storage/preferences_service.dart';
+import 'package:flutter/foundation.dart';
+import '../utils/isolate_parsers.dart';
 
 class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
+  List<String> _cachedFormattedVerses = [];
+  Set<String> _cachedVerses = {};
+  Set<String> _cachedChapters = {};
+
   @override
   Future<List<CommentaryEntry>> build() async {
     return _loadCommentary();
@@ -14,25 +20,42 @@ class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
     try {
       final jsonString =
           await rootBundle.loadString('assets/commentary/commentary.json');
-      final decoded = jsonDecode(jsonString);
+      
+      final entries = await compute(parseCommentaryJson, jsonString);
 
-      List<dynamic> entriesList;
-      if (decoded is Map<String, dynamic> && decoded.containsKey('entries')) {
-        entriesList = decoded['entries'] as List<dynamic>;
-      } else if (decoded is List) {
-        entriesList = decoded;
-      } else {
-        return [];
+      final verses = <String>{};
+      final vSet = <String>{};
+      final cSet = <String>{};
+      
+      for (final e in entries) {
+        final b = e.scope.book;
+        final c = e.scope.chapter;
+        final v = e.scope.verse;
+        
+        if (b != null && c != null) {
+          if (e.scope.type == 'chapter') {
+            cSet.add('$b|$c');
+          }
+          if (e.scope.type == 'verse' && v != null) {
+            vSet.add('$b|$c|$v');
+            verses.add('$b $c:$v');
+          }
+        }
       }
-
-      return entriesList
-          .map((e) => CommentaryEntry.fromJson(e as Map<String, dynamic>))
-          .toList();
+      
+      _cachedChapters = cSet;
+      _cachedVerses = vSet;
+      _cachedFormattedVerses = verses.toList()..sort();
+      
+      return entries;
     } catch (e) {
       // If the file is missing or empty, do not crash; return empty list
       return [];
     }
   }
+
+  Set<String> get versesWithCommentarySet => _cachedVerses;
+  Set<String> get chaptersWithCommentarySet => _cachedChapters;
 
   List<CommentaryEntry> commentaryForVerse(
       String book, int chapter, int verse) {
@@ -100,21 +123,7 @@ class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
             e.scope.book?.toLowerCase() == book.toLowerCase()));
   }
 
-  List<String> get versesWithCommentary {
-    final list = state.value ?? [];
-    final verses = <String>{};
-    for (final e in list) {
-      if (e.scope.type == 'verse' &&
-          e.scope.book != null &&
-          e.scope.chapter != null &&
-          e.scope.verse != null) {
-        // Format exactly like standard references
-        verses.add('${e.scope.book} ${e.scope.chapter}:${e.scope.verse}');
-      }
-    }
-    final sorted = verses.toList()..sort();
-    return sorted;
-  }
+  List<String> get versesWithCommentary => _cachedFormattedVerses;
 }
 
 final commentaryProvider =
