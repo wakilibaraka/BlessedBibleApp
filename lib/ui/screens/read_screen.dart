@@ -2217,6 +2217,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
               fontSize: typography.fontSize * 0.75, // Scale number down
             ),
           ),
+        ...textSpans,
       ],
     );
 
