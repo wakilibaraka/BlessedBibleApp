@@ -639,15 +639,45 @@ class _ThemePageState extends ConsumerState<_ThemePage> {
     _isShuffling = true;
     _hasShuffled = true;
     final random = Random();
+
+    // 1. Group allowed themes into categories (excluding Dawn and Dark)
+    final basics = _colorThemes.where((t) => t.mode == AppThemeMode.sepia).toList();
+    final firmament = _colorThemes.where((t) => 
+        [AppThemeMode.dawn, AppThemeMode.fresh, AppThemeMode.dusk].contains(t.mode)).toList();
+    final eden = _colorThemes.where((t) => 
+        [AppThemeMode.lilies, AppThemeMode.roses, AppThemeMode.olives].contains(t.mode)).toList();
+    final temple = _colorThemes.where((t) => 
+        [AppThemeMode.priestlyPurple, AppThemeMode.galileeBlue, AppThemeMode.scarletRed].contains(t.mode)).toList();
+
+    // 2. Pick 1 random theme from each category
+    final sequence = <_ThemeMeta>[];
+    if (basics.isNotEmpty) sequence.add(basics[random.nextInt(basics.length)]);
+    if (firmament.isNotEmpty) sequence.add(firmament[random.nextInt(firmament.length)]);
+    if (eden.isNotEmpty) sequence.add(eden[random.nextInt(eden.length)]);
+    if (temple.isNotEmpty) sequence.add(temple[random.nextInt(temple.length)]);
+
+    // 3. Shuffle the sequence order
+    sequence.shuffle(random);
+
     int ticks = 0;
     
     _shuffleTimer?.cancel();
-    _shuffleTimer = Timer.periodic(const Duration(milliseconds: 400), (timer) {
-      ticks++;
-      if (ticks >= 9) {
+    // 4. Run timer every 1000ms
+    _shuffleTimer = Timer.periodic(const Duration(milliseconds: 1000), (timer) {
+      if (!mounted) {
         timer.cancel();
-        // Land on a color theme
-        final finalTheme = _colorThemes[random.nextInt(_colorThemes.length)];
+        return;
+      }
+      
+      if (ticks >= sequence.length) {
+        timer.cancel();
+        // Settle on a random theme from all allowed themes (excluding dawn and dark)
+        final allowedAll = _colorThemes.where((t) => 
+            t.mode != AppThemeMode.light && t.mode != AppThemeMode.dark).toList();
+        final finalTheme = allowedAll.isNotEmpty 
+            ? allowedAll[random.nextInt(allowedAll.length)] 
+            : _colorThemes.first;
+            
         setState(() {
           _highlightMode = finalTheme.mode;
           _isShuffling = false;
@@ -655,12 +685,13 @@ class _ThemePageState extends ConsumerState<_ThemePage> {
         ref.read(themeProvider.notifier).setTheme(finalTheme.mode);
         HapticFeedback.lightImpact();
       } else {
-        // Cycle through all
-        final t = _colorThemes[random.nextInt(_colorThemes.length)];
+        // Preview current sequence theme
+        final t = sequence[ticks];
         setState(() {
           _highlightMode = t.mode;
         });
         HapticFeedback.selectionClick();
+        ticks++;
       }
     });
   }
@@ -776,6 +807,12 @@ class _ThemePageState extends ConsumerState<_ThemePage> {
                   isSelected: isSelected,
                   onTap: () {
                     HapticFeedback.mediumImpact();
+                    if (_isShuffling) {
+                      _shuffleTimer?.cancel();
+                      setState(() {
+                        _isShuffling = false;
+                      });
+                    }
                     setState(() {
                       _highlightMode = meta.mode;
                     });
