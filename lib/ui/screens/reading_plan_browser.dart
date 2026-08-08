@@ -1298,7 +1298,6 @@ class _DayViewState extends ConsumerState<DayView>
 
       if (celebrations.isNotEmpty) {
         _confettiController.play();
-        debugPrint('Celebrations triggered: $celebrations');
 
         if (celebrations.contains('Plan 100% complete') && mounted) {
           String planTitle = 'Custom Plan';

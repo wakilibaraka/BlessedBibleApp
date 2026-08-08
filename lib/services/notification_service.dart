@@ -43,7 +43,6 @@ class NotificationService {
     );
 
     _initialized = true;
-    debugPrint('NotificationService initialized successfully.');
   }
 
   Future<void> requestPermissions() async {
@@ -94,8 +93,6 @@ class NotificationService {
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       matchDateTimeComponents: DateTimeComponents.time,
     );
-    debugPrint(
-        "NotificationService: scheduled daily reminder at $hour:$minute");
   }
 
   Future<void> scheduleWeeklyReminder(int weekday, int hour, int minute) async {
@@ -132,8 +129,6 @@ class NotificationService {
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
     );
-    debugPrint(
-        "NotificationService: scheduled weekly reminder on weekday $weekday at $hour:$minute");
   }
 
   Future<void> scheduleSabbathReminder(double lat, double lng) async {
@@ -182,25 +177,20 @@ class NotificationService {
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       );
     }
-    debugPrint(
-        "NotificationService: scheduled next 4 Sabbath reminders starting at ${sunset.toLocal()}");
   }
 
   Future<void> cancelDailyReminder() async {
     await _flutterLocalNotificationsPlugin.cancel(id: 0);
-    debugPrint('NotificationService: cancelled daily reminder');
   }
 
   Future<void> cancelWeeklyReminder() async {
     await _flutterLocalNotificationsPlugin.cancel(id: 1);
-    debugPrint('NotificationService: cancelled weekly reminder');
   }
 
   Future<void> cancelSabbathReminders() async {
     for (int i = 0; i < 4; i++) {
       await _flutterLocalNotificationsPlugin.cancel(id: 10 + i);
     }
-    debugPrint('NotificationService: cancelled Sabbath reminders');
   }
 
   // Legacy support for previous Mock
@@ -241,8 +231,6 @@ class NotificationService {
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         matchDateTimeComponents: DateTimeComponents.time,
       );
-      debugPrint(
-          "NotificationService: scheduled daily reading plan reminder at $hour:$minute");
     } else {
       // Schedule weekly reminder for the 6 non-rest days
       for (int i = 1; i <= 7; i++) {
@@ -270,8 +258,6 @@ class NotificationService {
           matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
         );
       }
-      debugPrint(
-          "NotificationService: scheduled 6 weekly reading plan reminders at $hour:$minute (skipping rest day $restDay)");
     }
   }
 }

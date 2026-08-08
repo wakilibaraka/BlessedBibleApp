@@ -42,21 +42,15 @@ class BibleNotifier extends Notifier<BibleState> {
       final jsonString =
           await rootBundle.loadString('assets/data/kjvbible.json');
       if (kStartupTrace) {
-        debugPrint(
-            'Bible JSON string loaded: ${startupStopwatch.elapsedMilliseconds} ms');
       }
 
       final booksList = await compute(parseBibleJson, jsonString);
       if (kStartupTrace) {
-        debugPrint(
-            'Bible data ready: ${startupStopwatch.elapsedMilliseconds} ms');
       }
 
       // Await DB copy/initialization so the splash screen stays active until DB is fully ready
       await bibleDbService.database;
       if (kStartupTrace) {
-        debugPrint(
-            'Database ready: ${startupStopwatch.elapsedMilliseconds} ms');
       }
 
       state = state.copyWith(isLoading: false, books: booksList);

@@ -2512,20 +2512,20 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                   }
                                                 }
                                                 if (firstUnread == null) {
-                                                  if (nextDayTarget.chapters.isEmpty) return;
-                                                  firstUnread = nextDayTarget.chapters.last;
+                                                  return;
                                                 }
+                                                final targetUnread = firstUnread;
                                                 final fcList = ref
                                                     .read(flatChaptersProvider);
                                                 final match = fcList
                                                     .where((c) =>
                                                         c.book.name
                                                                 .toLowerCase() ==
-                                                            firstUnread!
+                                                            targetUnread
                                                                 .bookName
                                                                 .toLowerCase() &&
                                                         c.chapter.number ==
-                                                            firstUnread
+                                                            targetUnread
                                                                 .chapterNum)
                                                     .toList();
                                                 if (match.isNotEmpty) {
@@ -2554,14 +2554,15 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                 }
                               }
                               if (nextUnread != null) {
+                                final targetUnread = nextUnread;
                                 final fcList = ref.read(flatChaptersProvider);
                                 final match = fcList
                                     .where((c) =>
                                         c.book.name.toLowerCase() ==
-                                            nextUnread!.bookName
+                                            targetUnread.bookName
                                                 .toLowerCase() &&
                                         c.chapter.number ==
-                                            nextUnread.chapterNum)
+                                            targetUnread.chapterNum)
                                     .toList();
                                 if (match.isNotEmpty) {
                                   ref
@@ -3456,15 +3457,12 @@ class VerseActionLogic {
     for (var v in targetVerses) {
       final refStr = generateVerseKey(bookAbbrev, chapterNum, v);
       if (kHighlightDebug) {
-        debugPrint('[HIGHLIGHT_DEBUG] WRITE key=$refStr color=$activeIndex');
       }
       ref
           .read(highlightsProvider.notifier)
           .toggleHighlight(refStr, activeIndex);
     }
     if (kHighlightDebug) {
-      debugPrint(
-          '[HIGHLIGHT_DEBUG] MAP after write: ${ref.read(highlightsProvider)}');
     }
     final count = targetVerses.length;
     _showFeedback(
