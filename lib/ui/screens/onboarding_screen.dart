@@ -303,18 +303,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 padding: EdgeInsets.fromLTRB(24, 0, 24, MediaQuery.of(context).padding.bottom + 68),
                 child: _NavRow(
                   onBack: () => _goToPage(_currentPage - 1),
-                  onNext: () {
-                     if (_currentPage == 3) {
-                       _completeOnboarding();
-                     } else {
-                       _goToPage(_currentPage + 1);
-                     }
-                  },
+                  onNext: () => _goToPage(_currentPage + 1),
                   nextLabel: _currentPage == 1
                       ? 'Typography'
                       : _currentPage == 2
                           ? 'Translation'
-                          : 'DONE!',
+                          : 'Finish',
                   accentColor: _currentPage == 3
                       ? theme.primaryColor
                       : _kThemes.firstWhere(
