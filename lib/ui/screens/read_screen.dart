@@ -2229,7 +2229,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                 padding: const EdgeInsets.only(
                     left: 4.0, right: 8.0, top: 2.0, bottom: 8.0),
                 child: Icon(
-                  Icons.star_rounded,
+                  Icons.lightbulb_rounded,
                   color: starColor,
                   size: typography.fontSize *
                       0.85, // Slightly larger star for visibility
