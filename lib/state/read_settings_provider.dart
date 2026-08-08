@@ -16,16 +16,12 @@ class ReadSettingsState {
   final double glowIntensity;
   final VerseActionStyle verseActionStyle;
   final int activeHighlightColorIndex;
-  final int primaryHighlightColorIndex;
-  final int secondaryHighlightColorIndex;
   final bool isManualNavHidden;
   final bool isRedLetterEnabled;
   final bool showVerseNumbers;
   final bool keepScreenAwake;
   final int defaultStartTab; // 0=Home, 1=Read, 2=Search, 3=Study
   final ReadingLayout readingLayout;
-  final double displayBrightness;
-  final double sepiaWarmth;
 
   const ReadSettingsState({
     this.readingViewMode = ReadingViewMode.pinned,
@@ -34,16 +30,12 @@ class ReadSettingsState {
     this.glowIntensity = 1.0,
     this.verseActionStyle = VerseActionStyle.horizontal,
     this.activeHighlightColorIndex = 2,
-    this.primaryHighlightColorIndex = -1, // Ask every time
-    this.secondaryHighlightColorIndex = 1, // Green
     this.isManualNavHidden = false,
     this.isRedLetterEnabled = true,
     this.showVerseNumbers = true,
     this.keepScreenAwake = false,
     this.defaultStartTab = 0,
     this.readingLayout = ReadingLayout.single,
-    this.displayBrightness = 1.0,
-    this.sepiaWarmth = 0.0,
   });
 
   ReadSettingsState copyWith({
@@ -53,16 +45,12 @@ class ReadSettingsState {
     double? glowIntensity,
     VerseActionStyle? verseActionStyle,
     int? activeHighlightColorIndex,
-    int? primaryHighlightColorIndex,
-    int? secondaryHighlightColorIndex,
     bool? isManualNavHidden,
     bool? isRedLetterEnabled,
     bool? showVerseNumbers,
     bool? keepScreenAwake,
     int? defaultStartTab,
     ReadingLayout? readingLayout,
-    double? displayBrightness,
-    double? sepiaWarmth,
   }) {
     return ReadSettingsState(
       readingViewMode: readingViewMode ?? this.readingViewMode,
@@ -72,18 +60,12 @@ class ReadSettingsState {
       verseActionStyle: verseActionStyle ?? this.verseActionStyle,
       activeHighlightColorIndex:
           activeHighlightColorIndex ?? this.activeHighlightColorIndex,
-      primaryHighlightColorIndex:
-          primaryHighlightColorIndex ?? this.primaryHighlightColorIndex,
-      secondaryHighlightColorIndex:
-          secondaryHighlightColorIndex ?? this.secondaryHighlightColorIndex,
       isManualNavHidden: isManualNavHidden ?? this.isManualNavHidden,
       isRedLetterEnabled: isRedLetterEnabled ?? this.isRedLetterEnabled,
       showVerseNumbers: showVerseNumbers ?? this.showVerseNumbers,
       keepScreenAwake: keepScreenAwake ?? this.keepScreenAwake,
       defaultStartTab: defaultStartTab ?? this.defaultStartTab,
       readingLayout: readingLayout ?? this.readingLayout,
-      displayBrightness: displayBrightness ?? this.displayBrightness,
-      sepiaWarmth: sepiaWarmth ?? this.sepiaWarmth,
     );
   }
 }
@@ -96,14 +78,8 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
   static const _verseActionStyleKey = 'read_settings_verse_action_style';
   static const _activeHighlightColorIndexKey =
       'read_settings_active_highlight_color';
-  static const _primaryHighlightColorIndexKey =
-      'read_settings_primary_highlight_color';
-  static const _secondaryHighlightColorIndexKey =
-      'read_settings_secondary_highlight_color';
   static const _isManualNavHiddenKey = 'read_settings_is_manual_nav_hidden';
   static const _readingLayoutKey = 'read_settings_reading_layout';
-  static const _displayBrightnessKey = 'read_settings_display_brightness';
-  static const _sepiaWarmthKey = 'read_settings_sepia_warmth';
 
   @override
   ReadSettingsState build() {
@@ -119,17 +95,12 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     final glowIntensity = prefs.getDouble(_glowIntensityKey) ?? 1.0;
     final verseStyleString = prefs.getString(_verseActionStyleKey);
     final activeHighlightIndex = prefs.getInt(_activeHighlightColorIndexKey);
-    final primaryHighlightIndex = prefs.getInt(_primaryHighlightColorIndexKey);
-    final secondaryHighlightIndex =
-        prefs.getInt(_secondaryHighlightColorIndexKey);
     final isManualNavHidden = prefs.getBool(_isManualNavHiddenKey) ?? false;
     final isRedLetterEnabled = prefs.getBool('red_letter_enabled') ?? true;
     final showVerseNumbers = prefs.getBool('show_verse_numbers') ?? true;
     final keepScreenAwake = prefs.getBool('keep_screen_awake') ?? false;
     final defaultStartTab = prefs.getInt('default_start_tab') ?? 0;
     final layoutString = prefs.getString(_readingLayoutKey);
-    final brightness = prefs.getDouble(_displayBrightnessKey) ?? 1.0;
-    final warmth = prefs.getDouble(_sepiaWarmthKey) ?? 0.0;
 
     ReadingViewMode mode = ReadingViewMode.pinned;
     if (modeString != null) {
@@ -170,29 +141,13 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
       glowIntensity: glowIntensity,
       verseActionStyle: verseStyle,
       activeHighlightColorIndex: activeHighlightIndex ?? 2,
-      primaryHighlightColorIndex: primaryHighlightIndex ?? -1,
-      secondaryHighlightColorIndex: secondaryHighlightIndex ?? 1,
       isManualNavHidden: isManualNavHidden,
       isRedLetterEnabled: isRedLetterEnabled,
       showVerseNumbers: showVerseNumbers,
       keepScreenAwake: keepScreenAwake,
       defaultStartTab: defaultStartTab,
       readingLayout: layout,
-      displayBrightness: brightness,
-      sepiaWarmth: warmth,
     );
-  }
-
-  Future<void> setDisplayBrightness(double val) async {
-    state = state.copyWith(displayBrightness: val);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble(_displayBrightnessKey, val);
-  }
-
-  Future<void> setSepiaWarmth(double val) async {
-    state = state.copyWith(sepiaWarmth: val);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble(_sepiaWarmthKey, val);
   }
 
   Future<void> setReadingLayout(ReadingLayout layout) async {
@@ -242,18 +197,6 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     state = state.copyWith(activeHighlightColorIndex: index);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_activeHighlightColorIndexKey, index);
-  }
-
-  Future<void> setPrimaryHighlightColorIndex(int index) async {
-    state = state.copyWith(primaryHighlightColorIndex: index);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_primaryHighlightColorIndexKey, index);
-  }
-
-  Future<void> setSecondaryHighlightColorIndex(int index) async {
-    state = state.copyWith(secondaryHighlightColorIndex: index);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_secondaryHighlightColorIndexKey, index);
   }
 
   Future<void> setManualNavHidden(bool isHidden) async {

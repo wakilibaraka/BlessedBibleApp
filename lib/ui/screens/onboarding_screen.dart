@@ -697,6 +697,7 @@ class _ThemePageState extends ConsumerState<_ThemePage> {
         ),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           SizedBox(height: top + 56), // room for skip button
           Padding(
@@ -972,6 +973,7 @@ class _TypographyPage extends ConsumerWidget {
         ),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           SizedBox(height: top + 56),
           Padding(
@@ -1258,6 +1260,7 @@ class _TranslationPageState extends ConsumerState<_TranslationPage> {
         ),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           SizedBox(height: top + 56),
 
@@ -1426,11 +1429,13 @@ class _TranslationPageState extends ConsumerState<_TranslationPage> {
                       if (secondaryId != null)
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                          child: _FloatingPill(
-                            color: theme.colorScheme.onSurface.withValues(alpha: 0.04),
-                            borderRadius: BorderRadius.circular(16),
+                          child: Container(
                             padding: const EdgeInsets.all(16),
-                            border: Border.all(color: primary.withValues(alpha: 0.2)),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.04),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: primary.withValues(alpha: 0.2)),
+                            ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -1507,15 +1512,18 @@ class _TranslationTile extends StatelessWidget {
     final theme = Theme.of(context);
     return GestureDetector(
       onTap: onTap,
-      child: _FloatingPill(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        color: isSelected
-            ? accentColor.withValues(alpha: 0.20)
-            : theme.colorScheme.onSurface.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: isSelected ? accentColor : Colors.transparent,
-          width: 2,
+        decoration: BoxDecoration(
+          color: isSelected
+              ? accentColor.withValues(alpha: 0.20)
+              : theme.colorScheme.onSurface.withValues(alpha: 0.06),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isSelected ? accentColor : Colors.transparent,
+            width: 2,
+          ),
         ),
         child: Row(
           children: [
