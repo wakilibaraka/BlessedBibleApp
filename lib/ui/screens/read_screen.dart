@@ -1171,8 +1171,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                   } else if (notification
                                                           is ScrollUpdateNotification &&
                                                       _overscrollAccum > 0) {
-                                                    // Scroll changed direction
-                                                    _resetOverscrollGate();
+                                                    // Only reset if user scrolls UP (canceling the down-drag)
+                                                    if (notification.scrollDelta != null && notification.scrollDelta! > 0) {
+                                                      _resetOverscrollGate();
+                                                    }
                                                   }
                                                 }
                                                 if (notification is UserScrollNotification) {
