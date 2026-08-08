@@ -496,7 +496,7 @@ class _QuickActionsRow extends ConsumerWidget {
         },
       ),
       (
-        icon: Icons.auto_awesome_rounded,
+        icon: Icons.casino_rounded,
         label: 'Surprise Me',
         color: theme.colorScheme.primary,
         onTap: () {
