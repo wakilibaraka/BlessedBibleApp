@@ -421,10 +421,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           if (!prefs.showReadingTips) return;
 
           final hints = ref.read(hintsProvider);
-          if (!hints.contains('seen_highlight_hint')) {
-            _tryShowHint('seen_highlight_hint',
-                'Long-press a verse to highlight or take notes');
-          } else if (!hints.contains('seen_commentary_hint')) {
+          if (!hints.contains('seen_commentary_hint')) {
             _tryShowHint('seen_commentary_hint',
                 'Tap the bulb icon next to a verse for commentary');
           }
