@@ -60,3 +60,7 @@ task.md
 *.db-shm
 *-wal
 *-shm
+
+# Release artifacts
+*.apk
+release-artifacts/
