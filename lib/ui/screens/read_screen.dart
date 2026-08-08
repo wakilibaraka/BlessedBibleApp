@@ -98,46 +98,6 @@ final expandedChipsProvider =
     NotifierProvider<ExpandedChipsNotifier, Map<int, String?>>(
         ExpandedChipsNotifier.new);
 
-String _getTranslationGlyph(String languageName) {
-  switch (languageName.toLowerCase()) {
-    case 'english':
-      return '英';
-    case 'french':
-      return '法';
-    case 'chinese':
-      return '中';
-    case 'korean':
-      return '韓';
-    case 'russian':
-      return '俄';
-    case 'german':
-      return '德';
-    case 'spanish':
-      return '西';
-    case 'japanese':
-      return '日';
-    case 'arabic':
-      return '阿';
-    case 'hindi':
-      return '印';
-    case 'italian':
-      return '意';
-    case 'portuguese':
-      return '葡';
-    case 'dutch':
-      return '荷';
-    case 'ukrainian':
-      return '烏';
-    case 'polish':
-      return '波';
-    case 'swahili':
-      return '斯';
-    case 'tagalog':
-      return '塔';
-    default:
-      return languageName.isNotEmpty ? languageName[0].toUpperCase() : 'A';
-  }
-}
 
 String _getLanguageAbbr(String languageName) {
   switch (languageName.toLowerCase()) {
@@ -204,19 +164,6 @@ String _getTranslationLabel(
   }
 }
 
-String _getTranslationCombinedLabel(
-    String translationId, List<TranslationInfo> allInstalled,
-    {String? defaultName}) {
-  try {
-    final info =
-        allInstalled.firstWhere((t) => t.translationId == translationId);
-    final label = _getTranslationLabel(translationId, allInstalled);
-    return '${_getTranslationGlyph(info.languageName)} $label';
-  } catch (_) {
-    final name = defaultName ?? translationId;
-    return '${_getTranslationGlyph(name)} ${_getTranslationLabel(translationId, allInstalled, defaultName: defaultName)}';
-  }
-}
 
 String _toHeadingCase(String text) {
   if (text.isEmpty) return text;
@@ -2102,7 +2049,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
-                                  _getTranslationCombinedLabel(
+                                  _getTranslationLabel(
                                       isInstalled
                                           ? (translationId ?? langEntry.value)
                                           : langEntry.value,
