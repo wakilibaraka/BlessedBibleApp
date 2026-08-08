@@ -6,15 +6,11 @@ import '../widgets/shared_top_header.dart';
 import '../../state/theme_provider.dart';
 import '../widgets/animated_background.dart';
 import '../widgets/glass_container.dart';
-import '../../state/home_provider.dart';
-import '../../state/reading_plan_provider.dart';
 import '../../state/notes_provider.dart';
 import '../../state/streak_provider.dart';
 import '../../state/nav_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'your_space_screen.dart';
-import 'commentary_hub_screen.dart';
-import '../../state/commentary_provider.dart';
 import 'notes_list_screen.dart';
 import 'reading_plans_hub_screen.dart';
 
@@ -144,33 +140,10 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                         // ═══════════════════════════════════════════════════════
                         _GreetingHeader(greeting: greeting, theme: theme),
 
-                        const SizedBox(height: 16),
-                        const _StreakHeroWidget(),
-
-                        const SizedBox(height: 20),
-
-                        // Verse of the Day removed from expanded hub view
-
-                        // ═══════════════════════════════════════════════════════
-                        // 3. TODAY'S READING
-                        // ═══════════════════════════════════════════════════════
-                        _SectionLabel(label: "TODAY'S READING", theme: theme),
-                        const SizedBox(height: 8),
-                        _TodaysReadingCard(theme: theme),
-
                         const SizedBox(height: 20),
 
                         // ═══════════════════════════════════════════════════════
-                        // 4. LATEST NOTE / HIGHLIGHT
-                        // ═══════════════════════════════════════════════════════
-                        _SectionLabel(label: 'LATEST NOTE', theme: theme),
-                        const SizedBox(height: 8),
-                        _LatestNoteCard(theme: theme),
-
-                        const SizedBox(height: 20),
-
-                        // ═══════════════════════════════════════════════════════
-                        // 5. STREAK / PROGRESS
+                        // 2. READING STREAK
                         // ═══════════════════════════════════════════════════════
                         _SectionLabel(label: 'READING STREAK', theme: theme),
                         const SizedBox(height: 8),
@@ -179,7 +152,16 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                         const SizedBox(height: 20),
 
                         // ═══════════════════════════════════════════════════════
-                        // 6. QUICK ACTIONS
+                        // 3. LATEST NOTE / HIGHLIGHT
+                        // ═══════════════════════════════════════════════════════
+                        _SectionLabel(label: 'LATEST NOTE', theme: theme),
+                        const SizedBox(height: 8),
+                        _LatestNoteCard(theme: theme),
+
+                        const SizedBox(height: 20),
+
+                        // ═══════════════════════════════════════════════════════
+                        // 4. QUICK ACTIONS
                         // ═══════════════════════════════════════════════════════
                         _SectionLabel(label: 'QUICK ACTIONS', theme: theme),
                         const SizedBox(height: 8),
@@ -253,7 +235,11 @@ class _GreetingHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GlassContainer(
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(24),
+      ),
       padding: const EdgeInsets.all(20),
       child: Row(
         children: [
@@ -263,11 +249,11 @@ class _GreetingHeader extends StatelessWidget {
             height: 48,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.goldAccent.withValues(alpha: 0.12),
+              color: theme.colorScheme.primary.withValues(alpha: 0.12),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.wb_sunny_outlined,
-              color: AppColors.goldAccent,
+              color: theme.colorScheme.primary,
               size: 24,
             ),
           ),
@@ -279,6 +265,7 @@ class _GreetingHeader extends StatelessWidget {
                 Text(
                   greeting,
                   style: theme.textTheme.headlineSmall?.copyWith(
+                    color: theme.colorScheme.onSurface,
                     fontWeight: FontWeight.w700,
                     height: 1.15,
                   ),
@@ -299,167 +286,6 @@ class _GreetingHeader extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// 3. Today's Reading card
-// ─────────────────────────────────────────────────────────────────────────────
-class _TodaysReadingCard extends ConsumerWidget {
-  final ThemeData theme;
-  const _TodaysReadingCard({required this.theme});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final activePlanIds = ref.watch(activePlanIdsProvider);
-    final primaryPlanId =
-        activePlanIds.isNotEmpty ? activePlanIds.first : 'chronological_1yr';
-    final planState = ref.watch(readingPlanProvider(primaryPlanId));
-    final totalDays = planState.planData.length;
-    final currentDay = planState.currentDay;
-
-    final now = DateTime.now();
-    final dayOfYear = now.difference(DateTime(now.year, 1, 1)).inDays + 1;
-    final dayLabel = 'Day $dayOfYear of 365';
-    final progress = dayOfYear / 365.0;
-    List<String> chapters = [];
-    if (totalDays > 0 && currentDay > 0 && currentDay <= totalDays) {
-      chapters = planState.planData[currentDay - 1].chapters
-          .map((c) => '${c.bookName} ${c.chapterNum}')
-          .toList();
-    }
-
-    return GlassContainer(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.calendar_today_outlined,
-                  color: AppColors.goldAccent, size: 17),
-              const SizedBox(width: 8),
-              Text(
-                dayLabel,
-                style: theme.textTheme.labelMedium?.copyWith(
-                  color: AppColors.goldAccent,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.4,
-                ),
-              ),
-              const Spacer(),
-              Text(
-                '${(progress * 100).round()}%',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.45),
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          // Progress bar
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: progress,
-              minHeight: 5,
-              backgroundColor: AppColors.goldAccent.withValues(alpha: 0.15),
-              valueColor:
-                  const AlwaysStoppedAnimation<Color>(AppColors.goldAccent),
-            ),
-          ),
-          const SizedBox(height: 14),
-          // Chapter chips
-          if (chapters.isNotEmpty)
-            Wrap(
-              spacing: 8,
-              runSpacing: 6,
-              children: chapters
-                  .map(
-                    (c) => Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: AppColors.goldAccent.withValues(alpha: 0.10),
-                        border: Border.all(
-                          color: AppColors.goldAccent.withValues(alpha: 0.25),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.check_circle_outline,
-                              size: 13, color: AppColors.goldAccent),
-                          const SizedBox(width: 5),
-                          Text(
-                            c,
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                  .toList(),
-            ),
-          const SizedBox(height: 14),
-          Builder(builder: (context) {
-            final homeState = ref.watch(homeProvider);
-            final votdRef = homeState.verseOfTheDay.reference;
-            final votdLastSpace = votdRef.lastIndexOf(' ');
-            final votdBook = votdLastSpace != -1
-                ? votdRef.substring(0, votdLastSpace)
-                : votdRef;
-            final votdChStr = votdLastSpace != -1
-                ? votdRef.substring(votdLastSpace + 1).split(':').first
-                : '1';
-            final votdCh = int.tryParse(votdChStr) ?? 1;
-            final hasVotdCommentary = ref.watch(
-                commentaryForChapterProvider((votdBook, votdCh)));
-            if (!hasVotdCommentary) return const SizedBox.shrink();
-            return SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                onPressed: () {
-                  final refStr = homeState.verseOfTheDay.reference;
-                  final lastSpaceIdx = refStr.lastIndexOf(' ');
-                  final bookName = lastSpaceIdx != -1
-                      ? refStr.substring(0, lastSpaceIdx)
-                      : refStr;
-                  final refParts = lastSpaceIdx != -1
-                      ? refStr.substring(lastSpaceIdx + 1).split(':')
-                      : [];
-                  final chapterNum =
-                      refParts.isNotEmpty ? (int.tryParse(refParts[0]) ?? 1) : 1;
-                  final verseNum =
-                      refParts.length > 1 ? int.tryParse(refParts[1]) : null;
-                  Navigator.of(context).push(CupertinoPageRoute(
-                      builder: (_) => CommentaryHubScreen(
-                            book: bookName,
-                            chapter: chapterNum,
-                            verse: verseNum,
-                            verseText: homeState.verseOfTheDay.text,
-                          )));
-                },
-                icon: const Icon(Icons.menu_book_outlined, size: 16),
-                label: const Text("Continue Reading"),
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.goldAccent,
-                  foregroundColor: Colors.white,
-                  textStyle: theme.textTheme.labelMedium
-                      ?.copyWith(fontWeight: FontWeight.w700),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14)),
-                  padding: const EdgeInsets.symmetric(vertical: 13),
-                ),
-              ),
-            );
-          }),
-        ],
-      ),
-    );
-  }
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 4. Latest Note card
@@ -560,12 +386,17 @@ class _StreakProgressCard extends ConsumerWidget {
     final nextYear = DateTime(year + 1, 1, 1);
     final daysRemaining = nextYear.difference(now).inDays;
 
-    return GlassContainer(
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(24),
+      ),
       padding: const EdgeInsets.all(20),
       child: Row(
         children: [
-          // Flame / streak icon
+          // Left Side: Flame + Label
           Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Container(
                 width: 56,
@@ -577,29 +408,27 @@ class _StreakProgressCard extends ConsumerWidget {
                 child: Icon(Icons.local_fire_department_rounded,
                     color: theme.colorScheme.primary, size: 28),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 8),
               Text(
-                '$streakDays days',
+                streakDays == 1 ? '1 day streak' : '$streakDays days streak',
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.primary,
                   fontWeight: FontWeight.w700,
                 ),
-              ),
-              Text(
-                'streak',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.45),
-                  fontSize: 10,
-                ),
+                textAlign: TextAlign.center,
               ),
             ],
           ),
 
           const SizedBox(width: 20),
-          const VerticalDivider(width: 1),
+          Container(
+            width: 1,
+            height: 80,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+          ),
           const SizedBox(width: 20),
 
-          // Chapters done
+          // Right Side: Progress
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -607,6 +436,7 @@ class _StreakProgressCard extends ConsumerWidget {
                 Text(
                   '$totalCompleted / 365 days',
                   style: theme.textTheme.titleSmall?.copyWith(
+                    color: theme.colorScheme.onSurface,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -657,13 +487,13 @@ class _QuickActionsRow extends ConsumerWidget {
       (
         icon: Icons.menu_book_outlined,
         label: 'Study',
-        color: theme.colorScheme.secondary,
+        color: theme.colorScheme.primary,
         onTap: () => ref.read(navProvider.notifier).setIndex(3),
       ),
       (
         icon: Icons.calendar_today_rounded,
         label: 'Reading Plan',
-        color: theme.colorScheme.tertiary,
+        color: theme.colorScheme.primary,
         onTap: () {
           Navigator.of(context).push(
             CupertinoPageRoute(
@@ -674,7 +504,7 @@ class _QuickActionsRow extends ConsumerWidget {
       (
         icon: Icons.self_improvement_rounded,
         label: 'Your Space',
-        color: theme.colorScheme.primaryContainer,
+        color: theme.colorScheme.primary,
         onTap: () {
           Navigator.of(context).push(
             CupertinoPageRoute(
@@ -684,7 +514,11 @@ class _QuickActionsRow extends ConsumerWidget {
       ),
     ];
 
-    return GlassContainer(
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(24),
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -739,6 +573,7 @@ class _QuickActionButton extends StatelessWidget {
           Text(
             label,
             style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurface,
               fontWeight: FontWeight.w600,
               fontSize: 11,
             ),
@@ -749,52 +584,4 @@ class _QuickActionButton extends StatelessWidget {
   }
 }
 
-class _StreakHeroWidget extends ConsumerWidget {
-  const _StreakHeroWidget();
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final streak = ref.watch(streakProvider);
-    final count = streak.count;
-
-    if (count == 0) {
-      return const SizedBox.shrink(); 
-    }
-
-    final Color glowColor = theme.colorScheme.primary;
-    final String countText =
-        count > 1 ? '$count Days Streak' : '$count Day Streak';
-
-    return Center(
-      child: GlassContainer(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        borderRadius: BorderRadius.circular(30),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.local_fire_department_rounded,
-              color: glowColor,
-              size: 24,
-              shadows: [
-                Shadow(
-                  color: glowColor.withValues(alpha: 0.6),
-                  blurRadius: 10 + (count.clamp(0, 10).toDouble()),
-                )
-              ],
-            ),
-            const SizedBox(width: 8),
-            Text(
-              countText,
-              style: theme.textTheme.labelLarge?.copyWith(
-                color: theme.colorScheme.onSurface,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
