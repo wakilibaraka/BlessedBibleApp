@@ -12,6 +12,7 @@ import '../../models/commentary_entry.dart';
 
 import 'pinch_to_zoom_font_wrapper.dart';
 import '../screens/commentary_hub_screen.dart';
+import '../screens/standalone_reader_screen.dart';
 
 class CommentaryView extends ConsumerStatefulWidget {
   final String book;
@@ -250,35 +251,70 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                 if (fetchedVerseText != null)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Container(
-                      padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-                    decoration: BoxDecoration(
-                      color: tokens.readingSurface,
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(
-                          color:
-                              tokens.readingInkMuted.withValues(alpha: 0.15)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.08),
-                          blurRadius: 20,
-                          offset: const Offset(0, 8),
-                        )
-                      ],
-                    ),
-                    child: Text(
-                      '\u201c$fetchedVerseText\u201d',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        height: 1.42,
-                        fontSize: typography.fontSize * 1.05,
-                        fontFamily: typography.fontFamily,
-                        color: tokens.readingInk,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (_) => StandaloneReaderScreen(
+                            bookName: bookName,
+                            chapterNum: chapterNum,
+                            verseNum: displayVerse,
+                          ),
+                        ));
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+                        decoration: BoxDecoration(
+                          color: tokens.readingSurface,
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(
+                              color:
+                                  tokens.readingInkMuted.withValues(alpha: 0.15)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.08),
+                              blurRadius: 20,
+                              offset: const Offset(0, 8),
+                            )
+                          ],
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '\u201c$fetchedVerseText\u201d',
+                              textAlign: TextAlign.center,
+                              style: theme.textTheme.headlineMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                height: 1.42,
+                                fontSize: typography.fontSize * 1.05,
+                                fontFamily: typography.fontFamily,
+                                color: tokens.readingInk,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Tap to read in context',
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    color: tokens.readingInkMuted.withValues(alpha: 0.6),
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Icon(
+                                  Icons.open_in_new_rounded,
+                                  size: 12,
+                                  color: tokens.readingInkMuted.withValues(alpha: 0.6),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
               ],
             ),
           ),
