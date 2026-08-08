@@ -23,7 +23,7 @@ import '../../state/streak_provider.dart';
 import '../../state/most_read_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../../data/models/translation_model.dart';
-import '../../state/hints_provider.dart';
+
 import '../../utils/bible_sections.dart';
 import '../../services/share_service.dart';
 import 'notes_list_screen.dart';
@@ -220,39 +220,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   // True while PageView is mid-swipe; used to freeze vertical child list.
   final ValueNotifier<bool> _isPageSwiping = ValueNotifier(false);
 
-  // ── Hints ────────────────────────────────────────────────────────
-  String? _currentHintId;
-  String? _currentHintMessage;
-  Timer? _hintTimer;
-
-  void _showHint(String id, String message) {
-    if (mounted && _currentHintId == null) {
-      setState(() {
-        _currentHintId = id;
-        _currentHintMessage = message;
-      });
-      _hintTimer?.cancel();
-      _hintTimer = Timer(const Duration(seconds: 8), _dismissHint);
-    }
-  }
-
-  void _dismissHint() {
-    if (mounted && _currentHintId != null) {
-      ref.read(hintsProvider.notifier).markSeen(_currentHintId!);
-      setState(() {
-        _currentHintId = null;
-        _currentHintMessage = null;
-      });
-    }
-  }
-
-  void _tryShowHint(String id, String message) {
-    if (ref.read(preferencesProvider).showReadingTips) {
-      ref.read(hintsProvider.notifier).maybeShowHint(id, () {
-        Future.microtask(() => _showHint(id, message));
-      });
-    }
-  }
   // ────────────────────────────────────────────────────────────────
 
   // ── Deliberate-drag-to-nav gate ──────────────────────────────────
@@ -361,18 +328,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         ref.read(streakProvider.notifier).markReadToday();
-
-        Future.delayed(const Duration(seconds: 2), () {
-          if (!mounted) return;
-          final prefs = ref.read(preferencesProvider);
-          if (!prefs.showReadingTips) return;
-
-          final hints = ref.read(hintsProvider);
-          if (!hints.contains('seen_commentary_hint')) {
-            _tryShowHint('seen_commentary_hint',
-                'Tap the bulb icon next to a verse for commentary');
-          }
-        });
       }
     });
   }
@@ -639,8 +594,21 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
             final activeTransId = ref.watch(activeTranslationProvider);
             final installed =
                 ref.watch(availableTranslationsProvider).value ?? [];
-            final activeTransLabel =
+            String activeTransLabel =
                 _getTranslationLabel(activeTransId, installed);
+
+            final readingLayout = ref.watch(readSettingsProvider).readingLayout;
+            final secondaryTransId = ref.watch(secondaryTranslationProvider);
+
+            if (readingLayout != ReadingLayout.single && readingLayout != ReadingLayout.chips) {
+              if (secondaryTransId != null && secondaryTransId != activeTransId) {
+                final secondaryLabel =
+                    _getTranslationLabel(secondaryTransId, installed);
+                if (secondaryLabel != activeTransLabel) {
+                  activeTransLabel = '$activeTransLabel / $secondaryLabel';
+                }
+              }
+            }
 
             return _buildSideButton(
                 context,
@@ -1709,57 +1677,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                     ),
 
                   // ── Hints UI ──────────────────────────────────────────────────
-                  if (_currentHintMessage != null)
-                    Positioned(
-                      bottom: 80,
-                      left: 20,
-                      right: 20,
-                      child: AnimatedOpacity(
-                        opacity: _currentHintMessage != null ? 1.0 : 0.0,
-                        duration: const Duration(milliseconds: 300),
-                        alwaysIncludeSemantics: true,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.surface,
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.1),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              )
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.lightbulb_rounded,
-                                  color: AppColors.goldAccent, size: 18),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  _currentHintMessage!,
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: theme.colorScheme.onSurface,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                              IconButton(
-                                icon: Icon(Icons.close_rounded,
-                                    size: 16,
-                                    color: theme.colorScheme.onSurface
-                                        .withValues(alpha: 0.6)),
-                                onPressed: _dismissHint,
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
                   if (_isPageSelectionMode)
                     Positioned(
                       bottom: 80,

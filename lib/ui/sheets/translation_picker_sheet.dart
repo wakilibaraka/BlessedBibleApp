@@ -57,6 +57,10 @@ class _TranslationPickerSheetState
         ? ref.watch(secondaryTranslationProvider)
         : ref.watch(activeTranslationProvider);
 
+    final otherTranslationId = _isSelectingSecondary
+        ? ref.watch(activeTranslationProvider)
+        : ref.watch(secondaryTranslationProvider);
+
     final availableTranslations = ref.watch(availableTranslationsProvider);
 
     return FractionallySizedBox(
@@ -156,7 +160,7 @@ class _TranslationPickerSheetState
                   physics: const BouncingScrollPhysics(),
                   child: availableTranslations.when(
                     data: (installed) => _buildTranslationList(
-                        context, ref, theme, activeTranslationId, installed),
+                        context, ref, theme, activeTranslationId, otherTranslationId, installed),
                     loading: () => const Center(
                         child: Padding(
                             padding: EdgeInsets.all(32),
@@ -207,6 +211,7 @@ class _TranslationPickerSheetState
     WidgetRef ref,
     ThemeData theme,
     String? activeTranslationId,
+    String? otherTranslationId,
     List<TranslationInfo> installed,
   ) {
     // Combine installed and downloadable
@@ -267,17 +272,20 @@ class _TranslationPickerSheetState
         if (item is TranslationInfo) {
           // Installed
           final isSelected = item.translationId == activeTranslationId;
+          final isOtherSelected = ref.read(readSettingsProvider).readingLayout != ReadingLayout.single && item.translationId == otherTranslationId;
           children.add(
             Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
-              child: Material(
-                color: isSelected
-                    ? theme.primaryColor.withValues(alpha: 0.1)
-                    : theme.colorScheme.surface,
+              child: Opacity(
+                opacity: isOtherSelected ? 0.4 : 1.0,
+                child: Material(
+                  color: isSelected
+                      ? theme.primaryColor.withValues(alpha: 0.1)
+                      : theme.colorScheme.surface,
                 borderRadius: BorderRadius.circular(16),
                 child: InkWell(
                   borderRadius: BorderRadius.circular(16),
-                  onTap: () {
+                  onTap: isOtherSelected ? null : () {
                     if (_isSelectingSecondary) {
                       ref
                           .read(secondaryTranslationProvider.notifier)
@@ -343,6 +351,7 @@ class _TranslationPickerSheetState
                           ),
                       ],
                     ),
+                  ),
                   ),
                 ),
               ),
