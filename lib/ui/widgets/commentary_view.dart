@@ -96,6 +96,11 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
     final chapterNum = widget.chapter;
     final displayVerse = widget.verse ?? _currentVerseNum;
 
+    final panelBackgroundColor = widget.isCompact
+        ? (theme.bottomSheetTheme.backgroundColor ??
+            (is3DTheme ? theme.colorScheme.surface : tokens.readingSurface))
+        : theme.scaffoldBackgroundColor;
+
     final referenceString = displayVerse != null
         ? '$bookName $chapterNum:$displayVerse'
         : '$bookName $chapterNum';
@@ -149,7 +154,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
               children: [
                 // 1. OPAQUE HEADER ZONE
                 Container(
-                  color: tokens.readingSurface,
+                  color: panelBackgroundColor,
                   padding: EdgeInsets.only(
                     top: widget.isCompact ? 16 : MediaQuery.paddingOf(context).top + 16,
                     left: 16,
@@ -240,8 +245,8 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        tokens.readingSurface,
-                        tokens.readingSurface.withValues(alpha: 0.0),
+                        panelBackgroundColor,
+                        panelBackgroundColor.withValues(alpha: 0.0),
                       ],
                     ),
                   ),
