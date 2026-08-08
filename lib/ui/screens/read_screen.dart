@@ -2217,33 +2217,36 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
               fontSize: typography.fontSize * 0.75, // Scale number down
             ),
           ),
-        ...textSpans,
-        if (hasCommentary && !isSelectionMode)
-          WidgetSpan(
-            alignment: PlaceholderAlignment.top,
-            child: GestureDetector(
-              onTap: onCommentaryTap,
-              behavior: HitTestBehavior.opaque,
-              child: Padding(
-                // Generous padding increases the invisible tap target area for all finger sizes
-                padding: const EdgeInsets.only(
-                    left: 4.0, right: 8.0, top: 2.0, bottom: 8.0),
-                child: Icon(
-                  Icons.lightbulb_rounded,
-                  color: starColor,
-                  size: typography.fontSize *
-                      0.85, // Slightly larger star for visibility
-                ),
-              ),
-            ),
-          ),
       ],
     );
 
-    if (isSelectionMode) {
-      return Text.rich(textSpan, textAlign: textAlign);
+    final Widget textWidget = isSelectionMode
+        ? Text.rich(textSpan, textAlign: textAlign)
+        : RichText(textAlign: textAlign, text: textSpan);
+
+    if (hasCommentary && !isSelectionMode) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Expanded(child: textWidget),
+          Padding(
+            // Generous padding increases the invisible tap target area
+            padding: const EdgeInsets.only(left: 4.0, bottom: 4.0, right: 4.0),
+            child: GestureDetector(
+              onTap: onCommentaryTap,
+              behavior: HitTestBehavior.opaque,
+              child: Icon(
+                Icons.lightbulb_rounded,
+                color: starColor,
+                size: typography.fontSize * 0.85,
+              ),
+            ),
+          ),
+        ],
+      );
     }
-    return RichText(textAlign: textAlign, text: textSpan);
+
+    return textWidget;
   }
 
   Widget _buildEndOfChapterBlock(FlatChapter fc, int pageIndex, ThemeData theme,
