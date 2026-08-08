@@ -9,10 +9,18 @@ import '../widgets/glass_container.dart';
 import '../../state/notes_provider.dart';
 import '../../state/streak_provider.dart';
 import '../../state/nav_provider.dart';
+import 'dart:math' as math;
+import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
 import 'your_space_screen.dart';
 import 'notes_list_screen.dart';
 import 'reading_plans_hub_screen.dart';
+import 'commentary_hub_screen.dart';
+import 'main_nav_screen.dart';
+import '../../state/read_location_provider.dart';
+import '../../state/bible_provider.dart';
+import '../../state/study_provider.dart';
+import '../../state/commentary_provider.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TODAY SCREEN — static scaffold (Stage 1: design / no data wiring)
@@ -482,13 +490,61 @@ class _QuickActionsRow extends ConsumerWidget {
         icon: Icons.menu_book_rounded,
         label: 'Read',
         color: theme.colorScheme.primary,
-        onTap: () => ref.read(navProvider.notifier).setIndex(1),
+        onTap: () {
+          Navigator.of(context).pop();
+          ref.read(navProvider.notifier).setIndex(1);
+        },
       ),
       (
-        icon: Icons.menu_book_outlined,
-        label: 'Study',
+        icon: Icons.auto_awesome_rounded,
+        label: 'Surprise Me',
         color: theme.colorScheme.primary,
-        onTap: () => ref.read(navProvider.notifier).setIndex(3),
+        onTap: () {
+          final availableVerses =
+              ref.read(commentaryProvider.notifier).versesWithCommentary;
+          if (availableVerses.isNotEmpty) {
+            final randomVerse =
+                availableVerses[math.Random().nextInt(availableVerses.length)];
+            final lastSpaceIdx = randomVerse.lastIndexOf(' ');
+            final bookName = randomVerse.substring(0, lastSpaceIdx);
+            final refParts = randomVerse.substring(lastSpaceIdx + 1).split(':');
+            final chapter = int.parse(refParts[0]);
+            final verseNum = int.parse(refParts[1]);
+
+            final flatChapters = ref.read(flatChaptersProvider);
+            try {
+              final fc = flatChapters.firstWhere((c) =>
+                  c.book.name == bookName && c.chapter.number == chapter);
+
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) => const CastingLotsDialog(),
+              ).then((_) {
+                if (!context.mounted) return;
+
+                HapticFeedback.selectionClick();
+                ref.read(readLocationProvider.notifier).updateLocation(
+                      bookAbbrev: fc.book.abbreviation,
+                      bookName: bookName,
+                      chapter: chapter,
+                      verse: verseNum,
+                    );
+                ref
+                    .read(activeStudyVerseProvider.notifier)
+                    .setVerse('$bookName $chapter:$verseNum');
+
+                Navigator.of(context).push(CupertinoPageRoute(
+                    builder: (_) => CommentaryHubScreen(
+                          book: bookName,
+                          chapter: chapter,
+                          verse: verseNum,
+                          verseText: fc.chapter.verses[verseNum - 1].text,
+                        )));
+              });
+            } catch (_) {}
+          }
+        },
       ),
       (
         icon: Icons.calendar_today_rounded,
