@@ -390,6 +390,16 @@ class PreferencesService {
 
   // --- Streak Tracking ---
 
+  static const String _appUsageDatesKey = 'app_usage_dates';
+
+  void saveAppUsageDates(List<String> dates) {
+    prefs.setStringList(_appUsageDatesKey, dates);
+  }
+
+  List<String> getAppUsageDates() {
+    return prefs.getStringList(_appUsageDatesKey) ?? [];
+  }
+
   void saveStreakCount(int count) {
     prefs.setInt(_streakCountKey, count);
   }

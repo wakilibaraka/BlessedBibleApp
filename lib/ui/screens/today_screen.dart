@@ -16,6 +16,7 @@ import 'your_space_screen.dart';
 import 'commentary_hub_screen.dart';
 import '../../state/commentary_provider.dart';
 import 'notes_list_screen.dart';
+import 'reading_plans_hub_screen.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TODAY SCREEN — static scaffold (Stage 1: design / no data wiring)
@@ -29,11 +30,24 @@ import 'notes_list_screen.dart';
 //   • Quick Actions     → navProvider.setIndex() + Navigator.push
 // ─────────────────────────────────────────────────────────────────────────────
 
-class TodayScreen extends ConsumerWidget {
+class TodayScreen extends ConsumerStatefulWidget {
   const TodayScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TodayScreen> createState() => _TodayScreenState();
+}
+
+class _TodayScreenState extends ConsumerState<TodayScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(streakProvider.notifier).markAppOpenedToday();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final mq = MediaQuery.of(context);
     final now = DateTime.now();
@@ -63,13 +77,15 @@ class TodayScreen extends ConsumerWidget {
     final dayLabel =
         '${weekdays[now.weekday - 1]} · ${months[now.month - 1]} ${now.day}';
 
-    final greetings = ['Good morning', 'Good afternoon', 'Good evening'];
+    final greetings = ['Good morning', 'Good afternoon', 'Good evening', 'Good night'];
     final hour = now.hour;
     final greeting = hour < 12
         ? greetings[0]
         : hour < 17
             ? greetings[1]
-            : greetings[2];
+            : hour < 21
+                ? greetings[2]
+                : greetings[3];
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -535,15 +551,14 @@ class _StreakProgressCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final activePlanIds = ref.watch(activePlanIdsProvider);
-    final primaryPlanId =
-        activePlanIds.isNotEmpty ? activePlanIds.first : 'chronological_1yr';
-    final planState = ref.watch(readingPlanProvider(primaryPlanId));
-    final streakDays = planState.currentDay > 1 ? planState.currentDay - 1 : 0;
-    final totalDays = planState.planData.length;
-    final totalCompleted = planState.currentDay > 1 && totalDays > 0
-        ? planState.currentDay - 1
-        : 0;
+    final streak = ref.watch(streakProvider);
+    final streakDays = streak.count;
+    final totalCompleted = streak.distinctDaysThisYear;
+    
+    final now = DateTime.now();
+    final year = now.year;
+    final nextYear = DateTime(year + 1, 1, 1);
+    final daysRemaining = nextYear.difference(now).inDays;
 
     return GlassContainer(
       padding: const EdgeInsets.all(20),
@@ -557,16 +572,16 @@ class _StreakProgressCard extends ConsumerWidget {
                 height: 56,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.orange.withValues(alpha: 0.12),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.12),
                 ),
-                child: const Icon(Icons.local_fire_department_rounded,
-                    color: Colors.orange, size: 28),
+                child: Icon(Icons.local_fire_department_rounded,
+                    color: theme.colorScheme.primary, size: 28),
               ),
               const SizedBox(height: 6),
               Text(
                 '$streakDays days',
                 style: theme.textTheme.labelSmall?.copyWith(
-                  color: Colors.orange,
+                  color: theme.colorScheme.primary,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -590,7 +605,7 @@ class _StreakProgressCard extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '$totalCompleted / $totalDays days complete',
+                  '$totalCompleted / 365 days',
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
@@ -599,17 +614,17 @@ class _StreakProgressCard extends ConsumerWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(4),
                   child: LinearProgressIndicator(
-                    value: totalDays > 0 ? totalCompleted / totalDays : 0.0,
+                    value: totalCompleted / 365.0,
                     minHeight: 7,
                     backgroundColor:
-                        AppColors.goldAccent.withValues(alpha: 0.14),
-                    valueColor: const AlwaysStoppedAnimation<Color>(
-                        AppColors.goldAccent),
+                        theme.colorScheme.primary.withValues(alpha: 0.14),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                        theme.colorScheme.primary),
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '${totalDays - totalCompleted} days remaining in the plan.',
+                  '$daysRemaining days to end of year.',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.50),
                   ),
@@ -636,34 +651,34 @@ class _QuickActionsRow extends ConsumerWidget {
       (
         icon: Icons.menu_book_rounded,
         label: 'Read',
-        color: const Color(0xFF4A90D9),
+        color: theme.colorScheme.primary,
         onTap: () => ref.read(navProvider.notifier).setIndex(1),
       ),
       (
-        icon: Icons.search_rounded,
-        label: 'Search',
-        color: const Color(0xFF9B59B6),
+        icon: Icons.menu_book_outlined,
+        label: 'Study',
+        color: theme.colorScheme.secondary,
         onTap: () => ref.read(navProvider.notifier).setIndex(3),
       ),
       (
-        icon: Icons.self_improvement_rounded,
-        label: 'Your Space',
-        color: const Color(0xFF27AE60),
+        icon: Icons.calendar_today_rounded,
+        label: 'Reading Plan',
+        color: theme.colorScheme.tertiary,
         onTap: () {
           Navigator.of(context).push(
             CupertinoPageRoute(
-                builder: (_) => const YourSpaceScreen(initialTab: 0)),
+                builder: (_) => const ReadingPlansHubScreen()),
           );
         },
       ),
       (
-        icon: Icons.bookmark_border_rounded,
-        label: 'Bookmarks',
-        color: const Color(0xFFE67E22),
+        icon: Icons.self_improvement_rounded,
+        label: 'Your Space',
+        color: theme.colorScheme.primaryContainer,
         onTap: () {
           Navigator.of(context).push(
             CupertinoPageRoute(
-                builder: (_) => const YourSpaceScreen(initialTab: 1)),
+                builder: (_) => const YourSpaceScreen(initialTab: 0)),
           );
         },
       ),
@@ -741,17 +756,15 @@ class _StreakHeroWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final streak = ref.watch(streakProvider);
-    final isLit = streak.readToday;
     final count = streak.count;
 
-    if (count == 0 && !isLit) {
-      return const SizedBox.shrink(); // Hide if no streak and haven't read
+    if (count == 0) {
+      return const SizedBox.shrink(); 
     }
 
-    final Color glowColor =
-        isLit ? AppColors.goldAccent : Colors.grey.withValues(alpha: 0.5);
+    final Color glowColor = theme.colorScheme.primary;
     final String countText =
-        count > 0 ? '$count Day Streak' : 'Read today to start streak!';
+        count > 1 ? '$count Days Streak' : '$count Day Streak';
 
     return Center(
       child: GlassContainer(
@@ -761,27 +774,21 @@ class _StreakHeroWidget extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              isLit
-                  ? Icons.local_fire_department_rounded
-                  : Icons.local_fire_department_outlined,
+              Icons.local_fire_department_rounded,
               color: glowColor,
               size: 24,
-              shadows: isLit
-                  ? [
-                      Shadow(
-                        color: glowColor.withValues(alpha: 0.6),
-                        blurRadius: 10 + (count.clamp(0, 10).toDouble()),
-                      )
-                    ]
-                  : null,
+              shadows: [
+                Shadow(
+                  color: glowColor.withValues(alpha: 0.6),
+                  blurRadius: 10 + (count.clamp(0, 10).toDouble()),
+                )
+              ],
             ),
             const SizedBox(width: 8),
             Text(
               countText,
               style: theme.textTheme.labelLarge?.copyWith(
-                color: isLit
-                    ? theme.colorScheme.onSurface
-                    : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                color: theme.colorScheme.onSurface,
                 fontWeight: FontWeight.bold,
               ),
             ),
