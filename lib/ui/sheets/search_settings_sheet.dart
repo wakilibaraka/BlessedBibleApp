@@ -55,6 +55,7 @@ class SearchSettingsSheet extends ConsumerWidget {
             Flexible(
               child: ListView(
                 shrinkWrap: true,
+                physics: const ClampingScrollPhysics(),
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 children: [
                   Padding(
