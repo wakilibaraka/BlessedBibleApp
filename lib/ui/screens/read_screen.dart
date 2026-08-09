@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
-import '../widgets/pinch_to_zoom_font_wrapper.dart';
+import '../widgets/pinch_to_nav_wrapper.dart';
 import '../widgets/typography_controls.dart';
 
 import 'package:flutter/rendering.dart';
@@ -48,28 +48,6 @@ import '../widgets/commentary_view.dart';
 import '../sheets/verse_context_menu_sheet.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
-class StrictVerticalScrollPhysics extends ScrollPhysics {
-  final ValueNotifier<bool> isPageSwiping;
-
-  const StrictVerticalScrollPhysics({
-    super.parent,
-    required this.isPageSwiping,
-  });
-
-  @override
-  StrictVerticalScrollPhysics applyTo(ScrollPhysics? ancestor) {
-    return StrictVerticalScrollPhysics(
-      parent: buildParent(ancestor),
-      isPageSwiping: isPageSwiping,
-    );
-  }
-
-  @override
-  bool shouldAcceptUserOffset(ScrollMetrics position) {
-    if (isPageSwiping.value) return false;
-    return super.shouldAcceptUserOffset(position);
-  }
-}
 
 class ExpandedChipsNotifier extends Notifier<Map<int, String?>> {
   @override
@@ -93,6 +71,18 @@ class ExpandedChipsNotifier extends Notifier<Map<int, String?>> {
     }
   }
 }
+
+
+/// A callback to open the book/chapter selector from outside ReadScreen (e.g. from FAB).
+class NavMenuTriggerNotifier extends Notifier<VoidCallback?> {
+  @override
+  VoidCallback? build() => null;
+  void set(VoidCallback? callback) => state = callback;
+}
+
+final navMenuTriggerProvider =
+    NotifierProvider<NavMenuTriggerNotifier, VoidCallback?>(
+        NavMenuTriggerNotifier.new);
 
 final expandedChipsProvider =
     NotifierProvider<ExpandedChipsNotifier, Map<int, String?>>(
@@ -217,8 +207,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
 
   final ValueNotifier<bool> _isScrolling = ValueNotifier(false);
-  // True while PageView is mid-swipe; used to freeze vertical child list.
-  final ValueNotifier<bool> _isPageSwiping = ValueNotifier(false);
 
   // ── Hints ────────────────────────────────────────────────────────
   String? _currentHintId;
@@ -252,34 +240,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         Future.microtask(() => _showHint(id, message));
       });
     }
-  }
-  // ────────────────────────────────────────────────────────────────
-
-  // ── Deliberate-drag-to-nav gate ──────────────────────────────────
-  // A fast flick must NOT open navigation. Only a slow, sustained pull
-  // past a distance threshold that has been held for a minimum duration
-  // qualifies as an intentional gesture.
-  //
-  // Thresholds (tuned for feel):
-  //   Distance  : 60 logical pixels of overscroll accumulated
-  //   Hold time : 700 ms — the drag must be held for at least this long
-  //   Max vel   : 250 px/s  — any faster is a flick, not a deliberate drag
-  static const double _kOverscrollDistanceThreshold = 100.0;
-
-  double _overscrollAccum = 0.0; // total negative overscroll pixels seen
-  bool _navTriggeredThisDrag = false;
-  bool _hasFiredArmedHaptic = false;
-
-  /// Called from the indicator widget to provide the current pull fraction
-  /// (0.0 → 1.0, capped) so a subtle indicator can be drawn.
-  double get _overscrollFraction =>
-      (_overscrollAccum / _kOverscrollDistanceThreshold).clamp(0.0, 1.0);
-
-  void _resetOverscrollGate() {
-    _overscrollAccum = 0.0;
-    _navTriggeredThisDrag = false;
-    _hasFiredArmedHaptic = false;
-    if (mounted) setState(() {});
   }
   // ────────────────────────────────────────────────────────────────
 
@@ -741,9 +701,17 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     final isLoading = bibleState.isLoading;
     final allBooks = bibleState.books;
 
+    // Register the trigger for the FAB
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ref.read(navMenuTriggerProvider.notifier).set(
+            () => _showSelectorBottomSheet(allBooks));
+      }
+    });
+
     final flatChapters = ref.watch(flatChaptersProvider);
     final loc = ref.watch(readLocationProvider);
-    final bibleNavSettings = ref.watch(bibleNavSettingsProvider);
+
 
     if (flatChapters.isNotEmpty) {
       final targetIndex = flatChapters.indexWhere((fc) =>
@@ -856,7 +824,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
     return Scaffold(
       backgroundColor: getThemeBackgroundColor(),
-      body: PinchToZoomFontWrapper(
+      body: PinchToNavWrapper(
+        onPinchNav: () => _showSelectorBottomSheet(allBooks),
         child: Stack(
           children: [
             // ── Scripture Content Layer ──────────────────────────────────
@@ -876,28 +845,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                 child: Text('Passage not found.',
                                     style: theme.textTheme.bodyLarge),
                               )
-                            : NotificationListener<ScrollNotification>(
-                                onNotification: (notification) {
-                                  // Axis-lock: freeze the vertical list while PageView is swiping horizontally
-                                  if (notification.metrics.axis ==
-                                      Axis.horizontal) {
-                                    if (notification
-                                        is ScrollStartNotification) {
-                                      _isPageSwiping.value = true;
-                                    } else if (notification
-                                        is ScrollEndNotification) {
-                                      // Give one frame for the page snap to settle before unlocking
-                                      WidgetsBinding.instance
-                                          .addPostFrameCallback((_) {
-                                        if (mounted) {
-                                          _isPageSwiping.value = false;
-                                        }
-                                      });
-                                    }
-                                  }
-                                  return false; // let notifications bubble
-                                },
-                                child: PageView.builder(
+                            : PageView.builder(
                                   allowImplicitScrolling: true,
                                   dragStartBehavior: DragStartBehavior.start,
                                   physics: _isPageSelectionMode
@@ -1112,71 +1060,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                   return false;
                                                 }
 
-                                                if (bibleNavSettings
-                                                    .swipeDownToNav) {
-                                                  if (notification
-                                                          is OverscrollNotification &&
-                                                      notification.overscroll <
-                                                          0) {
-                                                    // Reject inertial overscrolls (flicks) — dragDetails is null
-                                                    // when the user's finger is no longer on the screen.
-                                                    if (notification
-                                                            .dragDetails ==
-                                                        null) {
-                                                      _resetOverscrollGate();
-                                                      return false;
-                                                    }
 
-                                                    // Elastic resistance (rubber-banding)
-                                                    final delta = -notification
-                                                        .overscroll;
-                                                    final resistance = (1.0 -
-                                                        (_overscrollAccum /
-                                                                (_kOverscrollDistanceThreshold *
-                                                                    2.5))
-                                                            .clamp(0.0, 0.8));
-
-                                                    _overscrollAccum +=
-                                                        delta * resistance;
-
-                                                    if (_overscrollAccum >=
-                                                            _kOverscrollDistanceThreshold &&
-                                                        !_hasFiredArmedHaptic) {
-                                                      _hasFiredArmedHaptic =
-                                                          true;
-                                                      HapticFeedback
-                                                          .mediumImpact();
-                                                    }
-
-                                                    if (mounted) {
-                                                      setState(() {});
-                                                    }
-                                                  } else if (notification
-                                                      is ScrollEndNotification) {
-                                                    // Drag released
-                                                    if (_overscrollAccum > 0) {
-                                                      if (_overscrollAccum >=
-                                                              _kOverscrollDistanceThreshold &&
-                                                          !_navTriggeredThisDrag &&
-                                                          ModalRoute.of(context)
-                                                                  ?.isCurrent ==
-                                                              true) {
-                                                        _navTriggeredThisDrag =
-                                                            true;
-                                                        _showSelectorBottomSheet(
-                                                            allBooks);
-                                                      }
-                                                      _resetOverscrollGate();
-                                                    }
-                                                  } else if (notification
-                                                          is ScrollUpdateNotification &&
-                                                      _overscrollAccum > 0) {
-                                                    // Only reset if user scrolls UP (canceling the down-drag)
-                                                    if (notification.scrollDelta != null && notification.scrollDelta! > 0) {
-                                                      _resetOverscrollGate();
-                                                    }
-                                                  }
-                                                }
                                                 if (notification is UserScrollNotification) {
                                                   if (notification.metrics.axis != Axis.vertical) {
                                                     return false;
@@ -1545,11 +1429,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                           dragStartBehavior:
                                                               DragStartBehavior
                                                                   .down,
-                                                          physics: StrictVerticalScrollPhysics(
-                                                                  isPageSwiping:
-                                                                      _isPageSwiping)
-                                                              .applyTo(
-                                                                  basePhysics),
+                                                          physics: basePhysics,
                                                           child: SelectionArea(
                                                             child: Column(
                                                               crossAxisAlignment:
@@ -1602,11 +1482,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                               verses.length + 1,
                                                           itemBuilder:
                                                               buildVerseItem,
-                                                          physics: StrictVerticalScrollPhysics(
-                                                                  isPageSwiping:
-                                                                      _isPageSwiping)
-                                                              .applyTo(
-                                                                  basePhysics),
+                                                          physics: basePhysics,
                                                         );
                                                       }
                                                       return listWidget;
@@ -1621,7 +1497,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                     );
                                   },
                                 ),
-                              ), // end NotificationListener (axis-lock)
+
                   ),
                   // Top Navigation Bar Layer (Floating pills allowing text to flow behind)
                   Positioned(
@@ -1659,69 +1535,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                     }),
                   ),
 
-                  // ── Pull-to-navigate progressive indicator ──────────────────────
-                  // Fades in and grows as the user sustains a deliberate downward
-                  // drag from the top edge. Vanishes if they release early.
-                  if (bibleNavSettings.swipeDownToNav &&
-                      _overscrollFraction > 0.01)
-                    Positioned(
-                      top: MediaQuery.of(context).padding.top +
-                          65, // Positioned in the gap between header and chapter title
-                      left: 0,
-                      right: 0,
-                      child: IgnorePointer(
-                        child: AnimatedOpacity(
-                          duration: const Duration(milliseconds: 200),
-                          opacity: _overscrollFraction,
-                          alwaysIncludeSemantics: true,
-                          child: Center(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: theme.primaryColor.withValues(
-                                      alpha: 0.12 + 0.18 * _overscrollFraction),
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
-                                    color: theme.primaryColor.withValues(
-                                        alpha: 0.25 * _overscrollFraction),
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons.menu_book_outlined,
-                                      size: 16,
-                                      color: theme.primaryColor.withValues(
-                                          alpha:
-                                              0.4 + 0.6 * _overscrollFraction),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      _overscrollFraction >= 1.0
-                                          ? 'Release to navigate'
-                                          : 'Pull to navigate',
-                                      style:
-                                          theme.textTheme.labelLarge?.copyWith(
-                                        color: theme.primaryColor.withValues(
-                                            alpha: 0.5 +
-                                                0.5 * _overscrollFraction),
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.w500,
-                                        letterSpacing: 0.2,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+
 
                   // ── Hints UI ──────────────────────────────────────────────────
                   if (_currentHintMessage != null)

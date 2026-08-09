@@ -511,25 +511,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
           }),
           const Divider(height: 1, indent: 16),
           Consumer(builder: (context, ref, _) {
-            final swipeDown =
-                ref.watch(bibleNavSettingsProvider.select((s) => s.swipeDownToNav));
+            final fabLongPress =
+                ref.watch(readSettingsProvider.select((s) => s.fabLongPressToNav));
             return SwitchListTile(
               title: Text(
-                'Swipe Down to Open Navigation',
+                'Long-press button to open navigation',
                 style: Theme.of(context)
                     .textTheme
                     .titleSmall
                     ?.copyWith(fontWeight: FontWeight.bold),
               ),
               subtitle: Text(
-                'Pull down at the top of a chapter to quickly open the Book/Chapter selector.',
+                'Long-press the bottom-right button to quickly open the Book/Chapter selector.',
                 style: Theme.of(context).textTheme.bodySmall,
               ),
-              value: swipeDown,
+              value: fabLongPress,
               activeTrackColor: Theme.of(context).primaryColor,
               onChanged: (val) {
                 HapticFeedback.selectionClick();
-                ref.read(bibleNavSettingsProvider.notifier).setSwipeDown(val);
+                ref.read(readSettingsProvider.notifier).setFabLongPressToNav(val);
               },
             );
           }),

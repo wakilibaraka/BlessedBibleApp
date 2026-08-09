@@ -22,6 +22,7 @@ class ReadSettingsState {
   final bool keepScreenAwake;
   final int defaultStartTab; // 0=Home, 1=Read, 2=Search, 3=Study
   final ReadingLayout readingLayout;
+  final bool fabLongPressToNav;
 
   const ReadSettingsState({
     this.readingViewMode = ReadingViewMode.pinned,
@@ -36,6 +37,7 @@ class ReadSettingsState {
     this.keepScreenAwake = false,
     this.defaultStartTab = 0,
     this.readingLayout = ReadingLayout.single,
+    this.fabLongPressToNav = true,
   });
 
   ReadSettingsState copyWith({
@@ -51,6 +53,7 @@ class ReadSettingsState {
     bool? keepScreenAwake,
     int? defaultStartTab,
     ReadingLayout? readingLayout,
+    bool? fabLongPressToNav,
   }) {
     return ReadSettingsState(
       readingViewMode: readingViewMode ?? this.readingViewMode,
@@ -66,6 +69,7 @@ class ReadSettingsState {
       keepScreenAwake: keepScreenAwake ?? this.keepScreenAwake,
       defaultStartTab: defaultStartTab ?? this.defaultStartTab,
       readingLayout: readingLayout ?? this.readingLayout,
+      fabLongPressToNav: fabLongPressToNav ?? this.fabLongPressToNav,
     );
   }
 }
@@ -101,6 +105,7 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     final keepScreenAwake = prefs.getBool('keep_screen_awake') ?? false;
     final defaultStartTab = prefs.getInt('default_start_tab') ?? 0;
     final layoutString = prefs.getString(_readingLayoutKey);
+    final fabLongPressToNav = prefs.getBool('fab_long_press_to_nav') ?? true;
 
     ReadingViewMode mode = ReadingViewMode.pinned;
     if (modeString != null) {
@@ -147,7 +152,14 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
       keepScreenAwake: keepScreenAwake,
       defaultStartTab: defaultStartTab,
       readingLayout: layout,
+      fabLongPressToNav: fabLongPressToNav,
     );
+  }
+
+  Future<void> setFabLongPressToNav(bool value) async {
+    state = state.copyWith(fabLongPressToNav: value);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('fab_long_press_to_nav', value);
   }
 
   Future<void> setReadingLayout(ReadingLayout layout) async {

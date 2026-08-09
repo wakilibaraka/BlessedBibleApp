@@ -537,7 +537,15 @@ class MainNavScreen extends ConsumerWidget {
                                                                       ref,
                                                                       context);
                                                                 }
-                                                              }),
+                                                              },
+                                                              onLongPress: () {
+                                                                if (currentIndex == 1 &&
+                                                                    ref.read(readSettingsProvider).fabLongPressToNav) {
+                                                                  HapticFeedback.heavyImpact();
+                                                                  ref.read(navMenuTriggerProvider)?.call();
+                                                                }
+                                                              },
+                                                            ),
                                                         ),
                                                       ),
                                               ),

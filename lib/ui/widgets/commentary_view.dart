@@ -10,7 +10,6 @@ import '../../state/theme_provider.dart';
 
 import '../../models/commentary_entry.dart';
 
-import 'pinch_to_zoom_font_wrapper.dart';
 import '../screens/commentary_hub_screen.dart';
 import '../screens/standalone_reader_screen.dart';
 
@@ -129,8 +128,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
         chapterEntries.isNotEmpty ||
         bookEntries.isNotEmpty;
 
-    return PinchToZoomFontWrapper(
-      child: Stack(
+    return Stack(
         children: [
           // Base: Scrollable Content
           _buildScrollableContent(
@@ -323,8 +321,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
               ],
             ),
           ),
-        ],
-      ),
+      ],
     );
   }
 
