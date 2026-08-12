@@ -45,7 +45,7 @@ class YourSpaceHero extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'Highlights, Bookmarks, Notes & Journal',
+                'Highlights, Bookmarks & Notes',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                   height: 1.4,

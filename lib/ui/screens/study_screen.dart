@@ -141,7 +141,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                   physics: const BouncingScrollPhysics(
                       parent: AlwaysScrollableScrollPhysics()),
                   padding: const EdgeInsets.only(
-                      left: 20.0, right: 20.0, top: 16.0, bottom: 180.0),
+                      left: 20.0, right: 20.0, top: 32.0, bottom: 180.0),
                 buildDefaultDragHandles: false,
                 proxyDecorator: (child, index, animation) {
                   return AnimatedBuilder(
@@ -324,7 +324,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                         }),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 32),
                     if (_isEditing)
                       Padding(
                         padding: const EdgeInsets.only(bottom: 16.0),
@@ -372,7 +372,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                     key: ValueKey(config.id),
                     child: _KeepAliveWrapper(
                       child: Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0),
+                        padding: const EdgeInsets.only(bottom: 32.0),
                         child: GestureDetector(
                           behavior: HitTestBehavior.opaque,
                           onLongPress: () {

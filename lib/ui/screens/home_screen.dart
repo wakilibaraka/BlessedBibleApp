@@ -16,8 +16,6 @@ import 'commentary_hub_screen.dart';
 import '../../state/commentary_provider.dart';
 import 'today_screen.dart';
 import '../../services/share_service.dart';
-import '../../state/user_data_provider.dart';
-import 'read_screen.dart' show VerseActionLogic;
 
 class StrictHorizontalDragGestureRecognizer
     extends HorizontalDragGestureRecognizer {
@@ -332,50 +330,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           },
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      Consumer(builder: (context, ref, _) {
-                        final refStr = data.verseOfTheDay.reference;
-                        final lastSpaceIdx = refStr.lastIndexOf(' ');
-                        final bookName = lastSpaceIdx != -1
-                            ? refStr.substring(0, lastSpaceIdx)
-                            : refStr;
-                        final refParts = lastSpaceIdx != -1
-                            ? refStr.substring(lastSpaceIdx + 1).split(':')
-                            : [];
-                        final chapterNum = refParts.isNotEmpty
-                            ? (int.tryParse(refParts[0]) ?? 1)
-                            : 1;
-                        final verseNum = refParts.length > 1
-                            ? int.tryParse(refParts[1])
-                            : null;
-                            
-                        // Let's use a simpler check since we don't have the canonical abbreviation easily here without searching flatChapters.
-                        // For display, we can just rely on tapping the button to toggle it, but ideally we show active state.
-                        // I will use an outline icon and color it if we find it.
-                        bool isMarked = false;
-                        if (verseNum != null) {
-                           for (var b in ref.watch(bookmarksProvider)) {
-                             if (b.endsWith('_$chapterNum:$verseNum')) {
-                               isMarked = true;
-                               break;
-                             }
-                           }
-                        }
 
-                        return IconButton(
-                          icon: Icon(
-                            isMarked ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
-                            color: isMarked ? theme.primaryColor : theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                          ),
-                          onPressed: () {
-                            if (verseNum != null) {
-                               VerseActionLogic.handleBookmark(
-                                 context, theme, ref, bookName, chapterNum, [verseNum]
-                               );
-                            }
-                          },
-                        );
-                      }),
                     ],
                   ),
                 ],
