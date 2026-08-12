@@ -13,6 +13,7 @@ import 'notes_list_screen.dart'; // for showAddNoteSheet
 import '../../services/share_service.dart';
 import '../../state/translation_provider.dart';
 import '../../state/read_settings_provider.dart';
+import '../../data/models/bookmark_model.dart';
 
 class YourSpaceScreen extends ConsumerStatefulWidget {
   final int initialTab; // 0=Highlights, 1=Bookmarks, 2=Notes
@@ -300,44 +301,356 @@ class _HighlightsSegment extends ConsumerWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 // BOOKMARKS SEGMENT
 // ─────────────────────────────────────────────────────────────────────────────
-class _BookmarksSegment extends ConsumerWidget {
+// ─────────────────────────────────────────────────────────────────────────────
+// BOOKMARK FOLDER DIALOGS
+// ─────────────────────────────────────────────────────────────────────────────
+
+void _showAddFolderDialog(BuildContext context, WidgetRef ref) {
+  final nameController = TextEditingController();
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('New Folder'),
+        content: TextField(
+          controller: nameController,
+          autofocus: true,
+          decoration: const InputDecoration(hintText: 'Folder name'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              if (nameController.text.trim().isNotEmpty) {
+                ref.read(bookmarkDataProvider.notifier).addFolder(nameController.text.trim());
+              }
+              Navigator.pop(context);
+            },
+            child: const Text('Create'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+void _showRenameFolderDialog(BuildContext context, WidgetRef ref, String folderId, String currentName) {
+  final nameController = TextEditingController(text: currentName);
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Rename Folder'),
+        content: TextField(
+          controller: nameController,
+          autofocus: true,
+          decoration: const InputDecoration(hintText: 'Folder name'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              if (nameController.text.trim().isNotEmpty) {
+                ref.read(bookmarkDataProvider.notifier).renameFolder(folderId, nameController.text.trim());
+              }
+              Navigator.pop(context);
+            },
+            child: const Text('Rename'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+void _showDeleteFolderDialog(BuildContext context, WidgetRef ref, String folderId, String folderName) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Delete Folder?'),
+        content: Text('Are you sure you want to delete "$folderName"?\n\nYour bookmarks inside this folder will NOT be deleted; they will be moved to Unfiled.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              ref.read(bookmarkDataProvider.notifier).deleteFolder(folderId);
+              Navigator.pop(context);
+            },
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+void _showMoveToFolderSheet(BuildContext context, WidgetRef ref, String refStr, ThemeData theme) {
+  final bookmarkData = ref.read(bookmarkDataProvider);
+  final currentFolderId = bookmarkData.nodes[refStr]?.folderId;
+
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: theme.scaffoldBackgroundColor,
+    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+    builder: (context) {
+      return SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text('Move to Folder', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+              ),
+              ListTile(
+                title: const Text('Unfiled'),
+                trailing: currentFolderId == null ? Icon(Icons.check, color: theme.primaryColor) : null,
+                onTap: () {
+                  ref.read(bookmarkDataProvider.notifier).moveBookmark(refStr, null);
+                  Navigator.pop(context);
+                },
+              ),
+              ...bookmarkData.folders.map((f) => ListTile(
+                    title: Text(f.name),
+                    trailing: currentFolderId == f.id ? Icon(Icons.check, color: theme.primaryColor) : null,
+                    onTap: () {
+                      ref.read(bookmarkDataProvider.notifier).moveBookmark(refStr, f.id);
+                      Navigator.pop(context);
+                    },
+                  )),
+              const SizedBox(height: 16),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+enum _BookmarkViewType { all, unfiled, folder, byDate, byBook }
+
+class _BookmarksSegment extends ConsumerStatefulWidget {
   final ThemeData theme;
   const _BookmarksSegment({required this.theme});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final bookmarks = ref.watch(bookmarksProvider).toList();
+  ConsumerState<_BookmarksSegment> createState() => _BookmarksSegmentState();
+}
+
+class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
+  _BookmarkViewType _viewType = _BookmarkViewType.all;
+  String? _selectedFolderId;
+
+  @override
+  Widget build(BuildContext context) {
+    final bookmarkData = ref.watch(bookmarkDataProvider);
     final flatChapters = ref.watch(flatChaptersProvider);
+
+    // Filter bookmarks
+    List<BookmarkNode> filteredNodes = [];
+    if (_viewType == _BookmarkViewType.all) {
+      filteredNodes = bookmarkData.nodes.values.toList();
+    } else if (_viewType == _BookmarkViewType.unfiled) {
+      filteredNodes = bookmarkData.nodes.values.where((n) => n.folderId == null).toList();
+    } else if (_viewType == _BookmarkViewType.folder && _selectedFolderId != null) {
+      filteredNodes = bookmarkData.nodes.values.where((n) => n.folderId == _selectedFolderId).toList();
+    } else if (_viewType == _BookmarkViewType.byDate || _viewType == _BookmarkViewType.byBook) {
+      filteredNodes = bookmarkData.nodes.values.toList();
+    }
+    
+    // Sort descending by created date
+    filteredNodes.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+    // For grouping
+    Map<String, List<BookmarkNode>> groups = {};
+    if (_viewType == _BookmarkViewType.byDate) {
+      final now = DateTime.now();
+      for (final n in filteredNodes) {
+        final diff = now.difference(n.createdAt);
+        String group = 'Earlier';
+        if (diff.inDays <= 7) {
+          group = 'Last 7 Days';
+        } else if (diff.inDays <= 30) {
+          group = 'Last 30 Days';
+        }
+        
+        groups.putIfAbsent(group, () => []).add(n);
+      }
+    } else if (_viewType == _BookmarkViewType.byBook) {
+      for (final n in filteredNodes) {
+        final data = _parseVerseRef(n.reference, flatChapters);
+        final group = data?.bookName ?? 'Unknown Book';
+        groups.putIfAbsent(group, () => []).add(n);
+      }
+    }
+
+    Widget content;
+    if (_viewType == _BookmarkViewType.byDate || _viewType == _BookmarkViewType.byBook) {
+      final groupKeys = groups.keys.toList();
+      content = ListView.builder(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        itemCount: groupKeys.length,
+        itemBuilder: (context, index) {
+          final groupKey = groupKeys[index];
+          final nodes = groups[groupKey]!;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Text(
+                  groupKey,
+                  style: widget.theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: widget.theme.colorScheme.primary,
+                  ),
+                ),
+              ),
+              ...nodes.map((n) {
+                final data = _parseVerseRef(n.reference, flatChapters);
+                if (data == null) return const SizedBox.shrink();
+                return _buildRealVerseCard(context, ref, n.reference, data, widget.theme, isBookmarked: true);
+              }),
+            ],
+          );
+        },
+      );
+    } else {
+      content = filteredNodes.isEmpty
+          ? Center(
+              child: Text(
+                'No bookmarks here.',
+                style: widget.theme.textTheme.bodySmall?.copyWith(
+                  color: widget.theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                ),
+              ),
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              itemCount: filteredNodes.length,
+              itemBuilder: (context, index) {
+                final n = filteredNodes[index];
+                final data = _parseVerseRef(n.reference, flatChapters);
+                if (data == null) return const SizedBox.shrink();
+                return _buildRealVerseCard(context, ref, n.reference, data, widget.theme, isBookmarked: true);
+              },
+            );
+    }
+
+    BookmarkFolder? selectedFolder;
+    if (_viewType == _BookmarkViewType.folder && _selectedFolderId != null) {
+      selectedFolder = bookmarkData.folders.where((f) => f.id == _selectedFolderId).firstOrNull;
+    }
 
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-          child: Text(
-            "Verses you're going to reflect on and study more.",
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-              height: 1.4,
-            ),
+        // Chips Row
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.fromLTRB(16, 20, 16, 10),
+          child: Row(
+            children: [
+              ChoiceChip(
+                label: const Text('All'),
+                selected: _viewType == _BookmarkViewType.all,
+                onSelected: (val) {
+                  if (val) setState(() => _viewType = _BookmarkViewType.all);
+                },
+              ),
+              const SizedBox(width: 8),
+              ChoiceChip(
+                label: const Text('Unfiled'),
+                selected: _viewType == _BookmarkViewType.unfiled,
+                onSelected: (val) {
+                  if (val) setState(() => _viewType = _BookmarkViewType.unfiled);
+                },
+              ),
+              const SizedBox(width: 8),
+              Container(width: 1, height: 20, color: widget.theme.dividerColor.withValues(alpha: 0.2)),
+              const SizedBox(width: 8),
+              ...bookmarkData.folders.map((f) => Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: ChoiceChip(
+                      label: Text(f.name),
+                      selected: _viewType == _BookmarkViewType.folder && _selectedFolderId == f.id,
+                      onSelected: (val) {
+                        if (val) {
+                          setState(() {
+                            _viewType = _BookmarkViewType.folder;
+                            _selectedFolderId = f.id;
+                          });
+                        }
+                      },
+                    ),
+                  )),
+              ActionChip(
+                avatar: const Icon(Icons.add, size: 16),
+                label: const Text('New Folder'),
+                onPressed: () => _showAddFolderDialog(context, ref),
+              ),
+              const SizedBox(width: 8),
+              Container(width: 1, height: 20, color: widget.theme.dividerColor.withValues(alpha: 0.2)),
+              const SizedBox(width: 8),
+              ChoiceChip(
+                label: const Text('By Date'),
+                selected: _viewType == _BookmarkViewType.byDate,
+                onSelected: (val) {
+                  if (val) setState(() => _viewType = _BookmarkViewType.byDate);
+                },
+              ),
+              const SizedBox(width: 8),
+              ChoiceChip(
+                label: const Text('By Book'),
+                selected: _viewType == _BookmarkViewType.byBook,
+                onSelected: (val) {
+                  if (val) setState(() => _viewType = _BookmarkViewType.byBook);
+                },
+              ),
+            ],
           ),
         ),
-        Expanded(
-          child: bookmarks.isEmpty
-              ? const SizedBox.shrink()
-              : ListView.builder(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  itemCount: bookmarks.length,
-                  itemBuilder: (context, index) {
-                    final refStr = bookmarks[index];
-                    final data = _parseVerseRef(refStr, flatChapters);
-                    if (data == null) return const SizedBox.shrink();
-                    return _buildRealVerseCard(
-                        context, ref, refStr, data, theme,
-                        isBookmarked: true);
-                  },
+        
+        // Folder Header (Edit/Delete)
+        if (selectedFolder != null)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  selectedFolder.name,
+                  style: widget.theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
-        ),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.edit, size: 20),
+                      onPressed: () => _showRenameFolderDialog(context, ref, selectedFolder!.id, selectedFolder.name),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete, size: 20, color: Colors.red),
+                      onPressed: () {
+                        setState(() => _viewType = _BookmarkViewType.all);
+                        _showDeleteFolderDialog(context, ref, selectedFolder!.id, selectedFolder.name);
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          
+        Expanded(child: content),
       ],
     );
   }
@@ -637,12 +950,17 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                             ref.read(highlightsProvider.notifier).toggleHighlight(refStr, highlightColorIndex);
                           }
                           break;
+                        case 4:
+                          _showMoveToFolderSheet(context, ref, refStr, theme);
+                          break;
                       }
                     },
                     itemBuilder: (context) => [
                       const PopupMenuItem(value: 0, child: Text('Open in Read')),
                       const PopupMenuItem(value: 1, child: Text('Add Note')),
                       const PopupMenuItem(value: 2, child: Text('Share')),
+                      if (isBookmarked)
+                        const PopupMenuItem(value: 4, child: Text('Move to folder')),
                       PopupMenuItem(
                           value: 3,
                           child: Text(isBookmarked ? 'Remove Bookmark' : 'Remove Highlight',

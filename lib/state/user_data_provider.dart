@@ -122,6 +122,63 @@ class BookmarkDataNotifier extends Notifier<BookmarkData> {
     state = newData;
     ref.read(preferencesProvider).saveBookmarksV2(jsonEncode(newData.toJson()));
   }
+
+  void addFolder(String name) {
+    final id = 'folder_${DateTime.now().millisecondsSinceEpoch}';
+    final newFolder = BookmarkFolder(id: id, name: name);
+    final newFolders = List<BookmarkFolder>.from(state.folders)..add(newFolder);
+    final newData = BookmarkData(folders: newFolders, nodes: state.nodes);
+    state = newData;
+    ref.read(preferencesProvider).saveBookmarksV2(jsonEncode(newData.toJson()));
+  }
+
+  void renameFolder(String id, String newName) {
+    final newFolders = state.folders.map((f) {
+      if (f.id == id) {
+        return BookmarkFolder(id: f.id, name: newName);
+      }
+      return f;
+    }).toList();
+    final newData = BookmarkData(folders: newFolders, nodes: state.nodes);
+    state = newData;
+    ref.read(preferencesProvider).saveBookmarksV2(jsonEncode(newData.toJson()));
+  }
+
+  void deleteFolder(String id) {
+    // Remove the folder
+    final newFolders = state.folders.where((f) => f.id != id).toList();
+    
+    // Move all bookmarks in this folder to Unfiled (folderId = null)
+    final newNodes = Map<String, BookmarkNode>.from(state.nodes);
+    for (final entry in newNodes.entries) {
+      if (entry.value.folderId == id) {
+        newNodes[entry.key] = BookmarkNode(
+          reference: entry.value.reference,
+          createdAt: entry.value.createdAt,
+          folderId: null,
+        );
+      }
+    }
+    
+    final newData = BookmarkData(folders: newFolders, nodes: newNodes);
+    state = newData;
+    ref.read(preferencesProvider).saveBookmarksV2(jsonEncode(newData.toJson()));
+  }
+
+  void moveBookmark(String reference, String? newFolderId) {
+    final newNodes = Map<String, BookmarkNode>.from(state.nodes);
+    final existing = newNodes[reference];
+    if (existing != null) {
+      newNodes[reference] = BookmarkNode(
+        reference: existing.reference,
+        createdAt: existing.createdAt,
+        folderId: newFolderId,
+      );
+      final newData = BookmarkData(folders: state.folders, nodes: newNodes);
+      state = newData;
+      ref.read(preferencesProvider).saveBookmarksV2(jsonEncode(newData.toJson()));
+    }
+  }
 }
 
 final bookmarkDataProvider =
