@@ -258,6 +258,39 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
       SettingsPillCard(
         children: [
           Consumer(builder: (context, ref, _) {
+            final syncLang =
+                ref.watch(readSettingsProvider.select((s) => s.syncSavedItemsLanguage));
+            return SwitchListTile(
+              title: const Text('Show saved items in my language'),
+              subtitle: const Text(
+                  'Display Bookmarks, Highlights, and Commentary verses in your active primary translation'),
+              value: syncLang,
+              onChanged: (val) {
+                HapticFeedback.selectionClick();
+                ref.read(readSettingsProvider.notifier).setSyncSavedItemsLanguage(val);
+              },
+            );
+          }),
+          const Divider(height: 1, indent: 16),
+          Consumer(builder: (context, ref, _) {
+            final showChips =
+                ref.watch(readSettingsProvider.select((s) => s.showChipsOnSavedItems));
+            return SwitchListTile(
+              title: const Text('Show translation options on saved items'),
+              subtitle: const Text(
+                  'Adds a compact translation chip row to view saved verses in other translations'),
+              value: showChips,
+              onChanged: (val) {
+                HapticFeedback.selectionClick();
+                ref.read(readSettingsProvider.notifier).setShowChipsOnSavedItems(val);
+              },
+            );
+          }),
+        ],
+      ),
+      SettingsPillCard(
+        children: [
+          Consumer(builder: (context, ref, _) {
             final actionStyle =
                 ref.watch(readSettingsProvider.select((s) => s.verseActionStyle));
             return AnimatedSegmentedTile<VerseActionStyle>(

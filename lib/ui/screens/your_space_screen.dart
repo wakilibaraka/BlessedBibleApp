@@ -11,6 +11,8 @@ import '../widgets/animated_background.dart';
 import '../widgets/shared_app_bar.dart';
 import 'notes_list_screen.dart'; // for showAddNoteSheet
 import '../../services/share_service.dart';
+import '../../state/translation_provider.dart';
+import '../../state/read_settings_provider.dart';
 
 class YourSpaceScreen extends ConsumerStatefulWidget {
   final int initialTab; // 0=Highlights, 1=Bookmarks, 2=Notes
@@ -19,6 +21,25 @@ class YourSpaceScreen extends ConsumerStatefulWidget {
   @override
   ConsumerState<YourSpaceScreen> createState() => _YourSpaceScreenState();
 }
+
+class YourSpaceExpandedChipsNotifier extends Notifier<Map<String, String?>> {
+  @override
+  Map<String, String?> build() => {};
+
+  void setLanguage(String refStr, String translationId) {
+    state = {...state, refStr: translationId};
+  }
+
+  void clear(String refStr) {
+    final newState = Map<String, String?>.from(state);
+    newState.remove(refStr);
+    state = newState;
+  }
+}
+
+final yourSpaceExpandedChipsProvider =
+    NotifierProvider<YourSpaceExpandedChipsNotifier, Map<String, String?>>(
+        YourSpaceExpandedChipsNotifier.new);
 
 class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
   late int _selectedIndex;
@@ -475,16 +496,18 @@ class _NotesSegment extends ConsumerWidget {
 class _ParsedVerseData {
   final String bookAbbrev;
   final String bookName;
+  final int bookNumber;
   final int chapter;
   final int verseNum;
-  final String text;
+  final String fallbackText;
 
   _ParsedVerseData({
     required this.bookAbbrev,
     required this.bookName,
+    required this.bookNumber,
     required this.chapter,
     required this.verseNum,
-    required this.text,
+    required this.fallbackText,
   });
 }
 
@@ -520,11 +543,12 @@ _ParsedVerseData? _parseVerseRef(
   if (vIndex == -1) return null;
 
   return _ParsedVerseData(
-    bookAbbrev: fc.book.abbreviation, // canonical lowercase from JSON
+    bookAbbrev: fc.book.abbreviation, 
     bookName: fc.book.name,
+    bookNumber: fc.bookNumber,
     chapter: chapter,
     verseNum: verseNum,
-    text: fc.chapter.verses[vIndex].text,
+    fallbackText: fc.chapter.verses[vIndex].text,
   );
 }
 
@@ -613,7 +637,9 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                           showAddNoteSheet(context, ref, theme, initialReference: formattedRef);
                           break;
                         case 2:
-                          ShareService.shareText(body: '"${data.text}" — $formattedRef');
+                          // We use fallbackText for sharing from Your Space for simplicity, unless we await the translation.
+                          // To keep it sync, we'll just share the fallback text.
+                          ShareService.shareText(body: '"${data.fallbackText}" — $formattedRef');
                           break;
                         case 3:
                           if (isBookmarked) {
@@ -637,14 +663,201 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                 ],
               ),
               const SizedBox(height: 6),
-              Text(
-                data.text,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  height: 1.4,
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
-                  decoration: isBookmarked ? TextDecoration.underline : null,
-                  decorationColor: isBookmarked ? theme.primaryColor : null,
-                ),
+              Consumer(
+                builder: (context, ref, _) {
+                  final settings = ref.watch(readSettingsProvider);
+                  final activeTransId = ref.watch(activeTranslationProvider);
+                  final showChips = settings.showChipsOnSavedItems;
+                  
+                  final installedTranslations = ref.watch(availableTranslationsProvider).value ?? [];
+                  final targetLanguages = <String, String>{};
+                  for (final t in installedTranslations) {
+                    if (!targetLanguages.containsKey(t.languageName)) {
+                      targetLanguages[t.languageName] = t.languageName.length > 3 
+                          ? t.languageName.substring(0, 3).toUpperCase() 
+                          : t.languageName.toUpperCase();
+                    }
+                  }
+
+                  final availableChips = <String, String>{};
+                  String? activeLanguageLabel;
+                  for (final t in installedTranslations) {
+                    final label = targetLanguages[t.languageName]!;
+                    if (!availableChips.containsKey(label)) {
+                      availableChips[label] = t.translationId;
+                    }
+                    if (t.translationId == activeTransId) {
+                      activeLanguageLabel = label;
+                    }
+                  }
+
+                  final chipsToRender = targetLanguages.entries
+                      .where((e) => e.value != activeLanguageLabel)
+                      .toList();
+
+                  final expandedChipsMap = ref.watch(yourSpaceExpandedChipsProvider);
+                  final activeChipId = expandedChipsMap[refStr];
+
+                  Widget verseWidget;
+                  if (!settings.syncSavedItemsLanguage || activeTransId == 'kjv') {
+                    verseWidget = Text(
+                      data.fallbackText,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        height: 1.4,
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                        decoration: isBookmarked ? TextDecoration.underline : null,
+                        decorationColor: isBookmarked ? theme.primaryColor : null,
+                      ),
+                    );
+                  } else {
+                    final request = (
+                      translationId: activeTransId,
+                      bookNumber: data.bookNumber,
+                      chapter: data.chapter,
+                      verse: data.verseNum
+                    );
+                    final verseAsync = ref.watch(verseTranslationProvider(request));
+
+                    verseWidget = verseAsync.when(
+                      data: (verseData) {
+                        final displayText = verseData?.text ?? data.fallbackText;
+                        return Text(
+                          displayText,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            height: 1.4,
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                            decoration: isBookmarked ? TextDecoration.underline : null,
+                            decorationColor: isBookmarked ? theme.primaryColor : null,
+                          ),
+                        );
+                      },
+                      loading: () => Text(
+                        data.fallbackText,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          height: 1.4,
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                        ),
+                      ),
+                      error: (_, __) => Text(
+                        data.fallbackText,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          height: 1.4,
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                        ),
+                      ),
+                    );
+                  }
+
+                  Widget? expandedTranslationWidget;
+                  if (activeChipId != null) {
+                    final request = (
+                      translationId: activeChipId,
+                      bookNumber: data.bookNumber,
+                      chapter: data.chapter,
+                      verse: data.verseNum
+                    );
+                    final expandedAsync = ref.watch(verseTranslationProvider(request));
+                    expandedTranslationWidget = expandedAsync.when(
+                      data: (verseData) {
+                        if (verseData == null) return const SizedBox.shrink();
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(
+                            verseData.text,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              height: 1.4,
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        );
+                      },
+                      loading: () => const Padding(
+                        padding: EdgeInsets.only(top: 8.0),
+                        child: SizedBox(
+                          height: 12,
+                          width: 12,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+                      error: (_, __) => const SizedBox.shrink(),
+                    );
+                  }
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      verseWidget,
+                      if (expandedTranslationWidget != null) expandedTranslationWidget,
+                      if (showChips && chipsToRender.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            for (int i = 0; i < chipsToRender.length; i++)
+                              Expanded(
+                                child: Padding(
+                                  padding: EdgeInsets.only(
+                                      right: i == chipsToRender.length - 1 ? 0.0 : 6.0),
+                                  child: Builder(builder: (context) {
+                                    final langEntry = chipsToRender[i];
+                                    final isInstalled = availableChips.containsKey(langEntry.value);
+                                    final translationId = availableChips[langEntry.value];
+                                    final isSelected = activeChipId == translationId;
+
+                                    return Material(
+                                      color: isSelected
+                                          ? theme.primaryColor.withValues(alpha: 0.15)
+                                          : theme.colorScheme.surface,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        side: BorderSide(
+                                          color: isSelected
+                                              ? theme.primaryColor.withValues(alpha: 0.5)
+                                              : theme.colorScheme.onSurface.withValues(
+                                                  alpha: isInstalled ? 0.15 : 0.05),
+                                        ),
+                                      ),
+                                      clipBehavior: Clip.antiAlias,
+                                      child: InkWell(
+                                        onTap: () {
+                                          if (isInstalled && translationId != null) {
+                                            if (isSelected) {
+                                              ref.read(yourSpaceExpandedChipsProvider.notifier).clear(refStr);
+                                            } else {
+                                              ref.read(yourSpaceExpandedChipsProvider.notifier).setLanguage(refStr, translationId);
+                                            }
+                                          }
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 6.0),
+                                          child: Center(
+                                            child: Text(
+                                              langEntry.value,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                                                color: isSelected
+                                                    ? theme.primaryColor
+                                                    : (isInstalled
+                                                        ? theme.colorScheme.onSurface.withValues(alpha: 0.7)
+                                                        : theme.colorScheme.onSurface.withValues(alpha: 0.3)),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ],
+                    ],
+                  );
+                },
               ),
             ],
           ),

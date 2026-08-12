@@ -26,6 +26,8 @@ class ReadSettingsState {
   final ReadingLayout readingLayout;
   final bool fabLongPressToNav;
   final SelectorHeight selectorHeight;
+  final bool syncSavedItemsLanguage;
+  final bool showChipsOnSavedItems;
 
   const ReadSettingsState({
     this.readingViewMode = ReadingViewMode.pinned,
@@ -42,6 +44,8 @@ class ReadSettingsState {
     this.readingLayout = ReadingLayout.single,
     this.fabLongPressToNav = true,
     this.selectorHeight = SelectorHeight.half,
+    this.syncSavedItemsLanguage = true,
+    this.showChipsOnSavedItems = false,
   });
 
   ReadSettingsState copyWith({
@@ -59,6 +63,8 @@ class ReadSettingsState {
     ReadingLayout? readingLayout,
     bool? fabLongPressToNav,
     SelectorHeight? selectorHeight,
+    bool? syncSavedItemsLanguage,
+    bool? showChipsOnSavedItems,
   }) {
     return ReadSettingsState(
       readingViewMode: readingViewMode ?? this.readingViewMode,
@@ -76,6 +82,8 @@ class ReadSettingsState {
       readingLayout: readingLayout ?? this.readingLayout,
       fabLongPressToNav: fabLongPressToNav ?? this.fabLongPressToNav,
       selectorHeight: selectorHeight ?? this.selectorHeight,
+      syncSavedItemsLanguage: syncSavedItemsLanguage ?? this.syncSavedItemsLanguage,
+      showChipsOnSavedItems: showChipsOnSavedItems ?? this.showChipsOnSavedItems,
     );
   }
 }
@@ -114,6 +122,8 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     final layoutString = prefs.getString(_readingLayoutKey);
     final fabLongPressToNav = prefs.getBool('fab_long_press_to_nav') ?? true;
     final selectorHeightString = prefs.getString(_selectorHeightKey);
+    final syncSavedItemsLanguage = prefs.getBool('sync_saved_items_language') ?? true;
+    final showChipsOnSavedItems = prefs.getBool('show_chips_on_saved_items') ?? false;
 
     ReadingViewMode mode = ReadingViewMode.pinned;
     if (modeString != null) {
@@ -170,6 +180,8 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
       readingLayout: layout,
       fabLongPressToNav: fabLongPressToNav,
       selectorHeight: selectorHeight,
+      syncSavedItemsLanguage: syncSavedItemsLanguage,
+      showChipsOnSavedItems: showChipsOnSavedItems,
     );
   }
 
@@ -262,6 +274,18 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     state = state.copyWith(selectorHeight: height);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_selectorHeightKey, height.name);
+  }
+
+  Future<void> setSyncSavedItemsLanguage(bool value) async {
+    state = state.copyWith(syncSavedItemsLanguage: value);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('sync_saved_items_language', value);
+  }
+
+  Future<void> setShowChipsOnSavedItems(bool value) async {
+    state = state.copyWith(showChipsOnSavedItems: value);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('show_chips_on_saved_items', value);
   }
 }
 

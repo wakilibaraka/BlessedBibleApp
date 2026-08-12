@@ -6,9 +6,10 @@ import '../../state/commentary_provider.dart';
 import '../../state/bible_provider.dart';
 import '../../state/typography_provider.dart';
 import '../../state/user_data_provider.dart';
-import '../screens/read_screen.dart' show VerseActionLogic;
-
+import '../../state/translation_provider.dart';
+import '../../state/read_settings_provider.dart';
 import '../../state/theme_provider.dart';
+import '../screens/read_screen.dart' show VerseActionLogic;
 
 import '../../models/commentary_entry.dart';
 
@@ -109,7 +110,34 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
     final isBookmarked = displayVerse != null 
         ? ref.watch(bookmarksProvider).any((b) => b.endsWith('_$chapterNum:$displayVerse'))
         : ref.watch(bookmarksProvider).any((b) => b.endsWith('_$chapterNum:1'));
-    final fetchedVerseText = _lookupVerseText(ref, displayVerse);
+    final fallbackVerseText = _lookupVerseText(ref, displayVerse);
+    String? finalVerseText = fallbackVerseText;
+    
+    final settings = ref.watch(readSettingsProvider);
+    final activeTransId = ref.watch(activeTranslationProvider);
+    
+    if (settings.syncSavedItemsLanguage && activeTransId != 'kjv' && displayVerse != null) {
+      final bibleState = ref.watch(bibleProvider);
+      int? bookNum;
+      try {
+        final b = bibleState.books.firstWhere(
+          (b) => b.name.toLowerCase() == widget.book.toLowerCase() ||
+                 b.abbreviation.toLowerCase() == widget.book.toLowerCase(),
+        );
+        bookNum = bibleState.books.indexOf(b) + 1;
+      } catch (_) {}
+      
+      if (bookNum != null) {
+        final request = (
+          translationId: activeTransId,
+          bookNumber: bookNum,
+          chapter: chapterNum,
+          verse: displayVerse
+        );
+        final verseAsync = ref.watch(verseTranslationProvider(request));
+        finalVerseText = verseAsync.value?.text ?? fallbackVerseText;
+      }
+    }
 
     List<CommentaryEntry> verseEntries = [];
     List<CommentaryEntry> chapterEntries = [];
@@ -251,7 +279,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                 ),
 
                 // 3. FLOATING VERSE CARD
-                if (fetchedVerseText != null)
+                if (finalVerseText != null)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: GestureDetector(
@@ -284,7 +312,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              '\u201c$fetchedVerseText\u201d',
+                              '\u201c$finalVerseText\u201d',
                               textAlign: TextAlign.center,
                               style: theme.textTheme.headlineMedium?.copyWith(
                                 fontWeight: FontWeight.w600,
@@ -300,7 +328,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                               children: [
                                 Text(
                                   'Tap to read in context',
-                                  style: theme.textTheme.labelSmall?.copyWith(
+                                  style: theme.textTheme.bodyMedium?.copyWith(
                                     color: tokens.readingInkMuted.withValues(alpha: 0.6),
                                     letterSpacing: 0.5,
                                   ),

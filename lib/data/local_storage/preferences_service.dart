@@ -29,6 +29,10 @@ class PreferencesService {
   static const String _activeTranslationKey = 'active_translation';
   static const String _secondaryTranslationKey = 'secondary_translation';
 
+  // Saved items display
+  static const String _syncSavedItemsLanguageKey = 'sync_saved_items_language';
+  static const String _showChipsOnSavedItemsKey = 'show_chips_on_saved_items';
+
   // Reading tips
   static const String _showReadingTipsKey = 'show_reading_tips';
 
@@ -138,6 +142,22 @@ class PreferencesService {
 
   void saveDefaultStartTab(int index) {
     prefs.setInt(_defaultStartTabKey, index);
+  }
+
+  bool getSyncSavedItemsLanguage() {
+    return prefs.getBool(_syncSavedItemsLanguageKey) ?? true;
+  }
+
+  Future<void> setSyncSavedItemsLanguage(bool value) async {
+    await prefs.setBool(_syncSavedItemsLanguageKey, value);
+  }
+
+  bool getShowChipsOnSavedItems() {
+    return prefs.getBool(_showChipsOnSavedItemsKey) ?? false;
+  }
+
+  Future<void> setShowChipsOnSavedItems(bool value) async {
+    await prefs.setBool(_showChipsOnSavedItemsKey, value);
   }
 
   int getDefaultStartTab() {
