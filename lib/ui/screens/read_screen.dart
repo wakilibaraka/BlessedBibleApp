@@ -1752,29 +1752,26 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         fontSize: typography.fontSize * 0.95,
       );
 
-      final targetLanguages = {
-        'English': 'EN',
-        'Swahili': 'SW',
-        'French': 'FR',
-        'Italian': 'IT',
-        'Spanish': 'ES',
-        'Tagalog': 'TL',
-      };
-
       final installedTranslations =
           ref.watch(availableTranslationsProvider).value ?? [];
       final activeTransId = ref.watch(activeTranslationProvider);
+      
+      final targetLanguages = <String, String>{};
+      for (final t in installedTranslations) {
+        if (!targetLanguages.containsKey(t.languageName)) {
+           targetLanguages[t.languageName] = _getLanguageAbbr(t.languageName);
+        }
+      }
+
       final availableChips = <String, String>{};
       String? activeLanguageLabel;
       for (final t in installedTranslations) {
-        if (targetLanguages.containsKey(t.languageName)) {
-          final label = targetLanguages[t.languageName]!;
-          if (!availableChips.containsKey(label)) {
-            availableChips[label] = t.translationId;
-          }
-          if (t.translationId == activeTransId) {
-            activeLanguageLabel = label;
-          }
+        final label = targetLanguages[t.languageName]!;
+        if (!availableChips.containsKey(label)) {
+          availableChips[label] = t.translationId;
+        }
+        if (t.translationId == activeTransId) {
+          activeLanguageLabel = label;
         }
       }
 
@@ -1878,6 +1875,13 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                 builder: (context) =>
                                     const TranslationPickerSheet(),
                               );
+                            }
+                          },
+                          onLongPress: () {
+                            if (isInstalled && translationId != null) {
+                              final currentPrimary = ref.read(activeTranslationProvider);
+                              ref.read(activeTranslationProvider.notifier).setTranslation(translationId);
+                              ref.read(expandedChipsProvider.notifier).setLanguage(primaryVerse.number, currentPrimary);
                             }
                           },
                           child: Padding(
