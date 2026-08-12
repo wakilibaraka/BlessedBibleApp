@@ -10,6 +10,7 @@ import '../../state/theme_provider.dart';
 import '../widgets/animated_background.dart';
 import '../widgets/shared_app_bar.dart';
 import 'notes_list_screen.dart'; // for showAddNoteSheet
+import '../../services/share_service.dart';
 
 class YourSpaceScreen extends ConsumerStatefulWidget {
   final int initialTab; // 0=Highlights, 1=Bookmarks, 2=Notes
@@ -582,13 +583,9 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                       ),
                     ),
                   ),
-                  if (isBookmarked)
-                    Icon(Icons.bookmark_rounded,
-                        size: 16,
-                        color: theme.primaryColor.withValues(alpha: 0.7)),
                   if (highlightColor != null)
                     Padding(
-                      padding: const EdgeInsets.only(left: 6),
+                      padding: const EdgeInsets.only(left: 6, right: 6),
                       child: Container(
                         width: 12,
                         height: 12,
@@ -596,6 +593,47 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                             color: highlightColor, shape: BoxShape.circle),
                       ),
                     ),
+                  PopupMenuButton<int>(
+                    icon: Icon(Icons.more_vert_rounded,
+                        size: 20,
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
+                    onSelected: (value) {
+                      switch (value) {
+                        case 0:
+                          ref.read(readLocationProvider.notifier).updateLocation(
+                                bookAbbrev: data.bookAbbrev,
+                                bookName: data.bookName,
+                                chapter: data.chapter,
+                                verse: data.verseNum,
+                              );
+                          Navigator.of(context).pop();
+                          ref.read(navProvider.notifier).setIndex(1);
+                          break;
+                        case 1:
+                          showAddNoteSheet(context, ref, theme, initialReference: formattedRef);
+                          break;
+                        case 2:
+                          ShareService.shareText(body: '"${data.text}" — $formattedRef');
+                          break;
+                        case 3:
+                          if (isBookmarked) {
+                            ref.read(bookmarksProvider.notifier).toggle(refStr);
+                          } else if (highlightColorIndex != null) {
+                            ref.read(highlightsProvider.notifier).toggleHighlight(refStr, highlightColorIndex);
+                          }
+                          break;
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(value: 0, child: Text('Open in Read')),
+                      const PopupMenuItem(value: 1, child: Text('Add Note')),
+                      const PopupMenuItem(value: 2, child: Text('Share')),
+                      PopupMenuItem(
+                          value: 3,
+                          child: Text(isBookmarked ? 'Remove Bookmark' : 'Remove Highlight',
+                              style: const TextStyle(color: Colors.redAccent))),
+                    ],
+                  ),
                 ],
               ),
               const SizedBox(height: 6),

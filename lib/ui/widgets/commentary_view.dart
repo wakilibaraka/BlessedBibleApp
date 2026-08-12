@@ -5,6 +5,8 @@ import '../../theme/reading_tokens.dart';
 import '../../state/commentary_provider.dart';
 import '../../state/bible_provider.dart';
 import '../../state/typography_provider.dart';
+import '../../state/user_data_provider.dart';
+import '../screens/read_screen.dart' show VerseActionLogic;
 
 import '../../state/theme_provider.dart';
 
@@ -104,9 +106,9 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
         ? '$bookName $chapterNum:$displayVerse'
         : '$bookName $chapterNum';
 
-    final isBookmarked = ref
-        .read(commentaryBookmarksProvider.notifier)
-        .isBookmarked(bookName, chapterNum, displayVerse);
+    final isBookmarked = displayVerse != null 
+        ? ref.watch(bookmarksProvider).any((b) => b.endsWith('_$chapterNum:$displayVerse'))
+        : ref.watch(bookmarksProvider).any((b) => b.endsWith('_$chapterNum:1'));
     final fetchedVerseText = _lookupVerseText(ref, displayVerse);
 
     List<CommentaryEntry> verseEntries = [];
@@ -213,10 +215,8 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                                 ? 'Remove Bookmark'
                                 : 'Bookmark Commentary',
                             onPressed: () {
-                              ref
-                                  .read(commentaryBookmarksProvider.notifier)
-                                  .toggleBookmark(
-                                      bookName, chapterNum, displayVerse);
+                              VerseActionLogic.handleBookmark(
+                                  context, theme, ref, bookName, chapterNum, [displayVerse ?? 1]);
                             },
                           ),
                           if (widget.onExpand != null)

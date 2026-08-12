@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../state/chapter_titles_provider.dart';
+import '../../state/commentary_provider.dart';
 import '../../state/notes_provider.dart';
 import '../../data/models/home_data.dart';
 import '../widgets/textured_glass_container.dart';
@@ -134,6 +136,41 @@ Future<void> showAddNoteSheet(
     {String? initialReference}) async {
   final titleController = TextEditingController();
   final contentController = TextEditingController();
+
+  if (initialReference != null) {
+    // Attempt to extract book, chapter, verse to auto-fill title/commentary
+    final lastSpaceIdx = initialReference.lastIndexOf(' ');
+    if (lastSpaceIdx != -1) {
+      final bookName = initialReference.substring(0, lastSpaceIdx);
+      final refParts = initialReference.substring(lastSpaceIdx + 1).split(':');
+      if (refParts.isNotEmpty) {
+        final chapterNum = int.tryParse(refParts[0]);
+        if (chapterNum != null) {
+          // 1. Try to set Title from chapter titles
+          final chapterTitle = ref.read(chapterTitlesProvider)[bookName]?[chapterNum.toString()];
+          if (chapterTitle != null && chapterTitle.isNotEmpty) {
+            titleController.text = chapterTitle;
+          }
+
+          // 2. Try to set Content from first paragraph of commentary
+          final verseNum = refParts.length > 1 ? int.tryParse(refParts[1].split(',')[0]) : null;
+          final commentaryList = ref.read(commentaryProvider).value ?? [];
+          final matchingCommentaries = commentaryList.where((e) =>
+              e.scope.book?.toLowerCase() == bookName.toLowerCase() &&
+              e.scope.chapter == chapterNum &&
+              (e.scope.verse == verseNum || e.scope.verse == null));
+          
+          if (matchingCommentaries.isNotEmpty) {
+            final contentText = matchingCommentaries.first.text;
+            final firstParagraph = contentText.split('\n').firstWhere((line) => line.trim().isNotEmpty, orElse: () => '');
+            if (firstParagraph.isNotEmpty) {
+              contentController.text = firstParagraph;
+            }
+          }
+        }
+      }
+    }
+  }
 
   await showModalBottomSheet(
     context: context,
