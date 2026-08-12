@@ -9,6 +9,7 @@ class PreferencesService {
   PreferencesService(this.prefs);
 
   static const String _searchHistoryKey = 'search_history';
+  static const String _searchQueriesKey = 'recent_search_queries';
   static const String _bookmarksKey = 'bookmarks';
   static const String _bookmarksV2Key = 'bookmarks_v2';
   static const String _commentaryBookmarksKey = 'commentary_bookmarks';
@@ -90,6 +91,14 @@ class PreferencesService {
       }
     }
     return [];
+  }
+
+  List<String> getRecentSearchQueries() {
+    return prefs.getStringList(_searchQueriesKey) ?? [];
+  }
+
+  void saveRecentSearchQueries(List<String> queries) {
+    prefs.setStringList(_searchQueriesKey, queries);
   }
 
   void saveBookmarks(List<String> bookmarks) {

@@ -155,7 +155,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
               },
             );
           }),
-          const Divider(height: 1, indent: 16),
+        ],
+      ),
+
+      SettingsPillCard(
+        children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
+            child: Text('Search', style: TextStyle(fontSize: 16)),
+          ),
           Consumer(builder: (context, ref, _) {
             final autoOpen = ref.watch(
                 searchSettingsProvider.select((s) => s.autoOpenSingleSearchResult));
@@ -168,6 +176,85 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
                 HapticFeedback.selectionClick();
                 ref.read(searchSettingsProvider.notifier).toggleAutoOpen(value);
               },
+            );
+          }),
+          const Divider(height: 1, indent: 16),
+          Consumer(builder: (context, ref, _) {
+            final includeNotes = ref.watch(
+                searchSettingsProvider.select((s) => s.includeNotesInSearch));
+            return SwitchListTile(
+              title: const Text('Include personal notes in search'),
+              subtitle: const Text('Allow search to look through your personal notes'),
+              value: includeNotes,
+              onChanged: (value) {
+                HapticFeedback.selectionClick();
+                ref.read(searchSettingsProvider.notifier).toggleIncludeNotes(value);
+              },
+            );
+          }),
+          const Divider(height: 1, indent: 16),
+          Consumer(builder: (context, ref, _) {
+            final matchWholeWords = ref.watch(
+                searchSettingsProvider.select((s) => s.matchWholeWords));
+            return SwitchListTile(
+              title: const Text('Match whole words only'),
+              subtitle: const Text('Only find exact word matches (disables partial/prefix matching)'),
+              value: matchWholeWords,
+              onChanged: (value) {
+                HapticFeedback.selectionClick();
+                ref.read(searchSettingsProvider.notifier).toggleMatchWholeWords(value);
+              },
+            );
+          }),
+          const Divider(height: 1, indent: 16),
+          Consumer(builder: (context, ref, _) {
+            final defaultOt = ref.watch(
+                searchSettingsProvider.select((s) => s.defaultSearchOt));
+            final defaultNt = ref.watch(
+                searchSettingsProvider.select((s) => s.defaultSearchNt));
+            final defaultComm = ref.watch(
+                searchSettingsProvider.select((s) => s.defaultSearchCommentary));
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
+                  child: Text('Default Search Scopes', style: TextStyle(fontSize: 14)),
+                ),
+                CheckboxListTile(
+                  title: const Text('Old Testament'),
+                  value: defaultOt,
+                  onChanged: (value) {
+                    if (value != null) {
+                      ref.read(searchSettingsProvider.notifier).toggleDefaultOt(value);
+                    }
+                  },
+                  dense: true,
+                  visualDensity: VisualDensity.compact,
+                ),
+                CheckboxListTile(
+                  title: const Text('New Testament'),
+                  value: defaultNt,
+                  onChanged: (value) {
+                    if (value != null) {
+                      ref.read(searchSettingsProvider.notifier).toggleDefaultNt(value);
+                    }
+                  },
+                  dense: true,
+                  visualDensity: VisualDensity.compact,
+                ),
+                CheckboxListTile(
+                  title: const Text('Commentary'),
+                  value: defaultComm,
+                  onChanged: (value) {
+                    if (value != null) {
+                      ref.read(searchSettingsProvider.notifier).toggleDefaultCommentary(value);
+                    }
+                  },
+                  dense: true,
+                  visualDensity: VisualDensity.compact,
+                ),
+              ],
             );
           }),
         ],

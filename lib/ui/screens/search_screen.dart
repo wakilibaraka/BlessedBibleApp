@@ -10,6 +10,7 @@ import '../../state/bible_provider.dart';
 import '../../state/search_settings_provider.dart';
 import '../../state/most_read_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
+import '../../state/typography_provider.dart';
 import '../widgets/textured_glass_container.dart';
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -40,7 +41,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     );
     _focusNode = FocusNode();
     _focusNode.addListener(() {
-      if (mounted) setState(() {});
+      if (mounted) {
+        setState(() {});
+        if (!_focusNode.hasFocus && _showSwipeHint) {
+          _dismissSwipeHint();
+        }
+      }
     });
 
     _animationController = AnimationController(
@@ -80,6 +86,16 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     _animationController.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _dismissSwipeHint() {
+    if (!mounted) return;
+    setState(() => _showSwipeHint = false);
+    final prefs = ref.read(preferencesProvider);
+    final seen = prefs.getSeenHints();
+    if (!seen.contains('search_swipe_hint')) {
+      prefs.saveSeenHints([...seen, 'search_swipe_hint']);
+    }
   }
 
   void _onResultTap(SearchResult result) {
@@ -154,12 +170,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                         _focusNode.requestFocus();
                       }
                       if (_showSwipeHint) {
-                        setState(() => _showSwipeHint = false);
-                        final prefs = ref.read(preferencesProvider);
-                        final seen = prefs.getSeenHints();
-                        if (!seen.contains('search_swipe_hint')) {
-                          prefs.saveSeenHints([...seen, 'search_swipe_hint']);
-                        }
+                        _dismissSwipeHint();
                       }
                     }
                   },
@@ -326,16 +337,20 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                           theme: theme,
                                         ),
                                         const SizedBox(width: 8),
-                                        _buildFilterChip(
-                                          label: 'My Notes',
-                                          icon: Icons.sticky_note_2_outlined,
-                                          isActive: searchState.filterNotes,
-                                          onTap: () => ref
-                                              .read(
-                                                  searchStateProvider.notifier)
-                                              .toggleNotesFilter(),
-                                          theme: theme,
-                                        ),
+                                        Consumer(builder: (context, ref, _) {
+                                          final includeNotes = ref.watch(searchSettingsProvider
+                                              .select((s) => s.includeNotesInSearch));
+                                          if (!includeNotes) return const SizedBox.shrink();
+                                          return _buildFilterChip(
+                                            label: 'My Notes',
+                                            icon: Icons.sticky_note_2_outlined,
+                                            isActive: searchState.filterNotes,
+                                            onTap: () => ref
+                                                .read(searchStateProvider.notifier)
+                                                .toggleNotesFilter(),
+                                            theme: theme,
+                                          );
+                                        }),
                                       ],
                                     ),
                                   ),
@@ -475,7 +490,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     final mostRead = ref.watch(mostReadProvider);
     final showMostRead = mostRead.length >= 5;
 
-    if (state.recentPlaces.isEmpty && !showMostRead) {
+    if (state.recentPlaces.isEmpty && state.recentQueries.isEmpty && !showMostRead) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -503,9 +518,73 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
       controller: _scrollController,
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
       children: [
+        if (state.recentQueries.isNotEmpty) ...[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'RECENT SEARCHES',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              GestureDetector(
+                onTap: () => ref.read(searchStateProvider.notifier).clearRecentQueries(),
+                child: Text(
+                  'CLEAR',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.primaryColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: state.recentQueries.map((query) => GestureDetector(
+              onTap: () {
+                _controller.text = query;
+                ref.read(searchStateProvider.notifier).setQuery(query);
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surface,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.history_rounded,
+                      size: 14,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      query,
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )).toList(),
+          ),
+          const SizedBox(height: 24),
+        ],
         if (state.recentPlaces.isNotEmpty) ...[
           Text(
-            'RECENT',
+            'RECENT PLACES',
             style: theme.textTheme.labelSmall?.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
               fontWeight: FontWeight.bold,
@@ -681,14 +760,22 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
   }
 
   Widget _buildSnippet(String text, String query, ThemeData theme) {
-    final style = theme.textTheme.bodyMedium?.copyWith(
+    final typography = ref.watch(typographyProvider);
+    
+    // Scale down the reading font size proportionally for list view (e.g. 80%)
+    // But keep a reasonable minimum size so it's readable.
+    final resultFontSize = (typography.fontSize * 0.85).clamp(14.0, 24.0);
+    
+    final baseStyle = theme.textTheme.bodyMedium?.copyWith(
       color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
       height: 1.5,
+      fontSize: resultFontSize,
+      fontFamily: typography.fontFamily,
     );
 
     if (query.isEmpty) {
       return Text(text,
-          style: style, maxLines: 2, overflow: TextOverflow.ellipsis);
+          style: baseStyle, maxLines: 2, overflow: TextOverflow.ellipsis);
     }
 
     final queryLower = query.toLowerCase();
@@ -697,13 +784,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
 
     if (index == -1) {
       return Text(text,
-          style: style, maxLines: 2, overflow: TextOverflow.ellipsis);
+          style: baseStyle, maxLines: 2, overflow: TextOverflow.ellipsis);
     }
 
     final highlightColor = theme.brightness == Brightness.dark
         ? Colors.amberAccent
         : Colors.amber.shade800;
-    final highlightStyle = style?.copyWith(
+    final highlightStyle = baseStyle?.copyWith(
       color: highlightColor,
       fontWeight: FontWeight.bold,
       backgroundColor: highlightColor.withValues(alpha: 0.12),
@@ -713,13 +800,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
       text: TextSpan(
-        style: style,
+        style: baseStyle,
         children: [
-          TextSpan(text: text.substring(0, index)),
+          TextSpan(text: text.substring(0, index), style: baseStyle),
           TextSpan(
               text: text.substring(index, index + query.length),
               style: highlightStyle),
-          TextSpan(text: text.substring(index + query.length)),
+          TextSpan(text: text.substring(index + query.length), style: baseStyle),
         ],
       ),
     );

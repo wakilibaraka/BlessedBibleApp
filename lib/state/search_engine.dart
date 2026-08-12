@@ -364,7 +364,7 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
     }
 
     // Prefix matches (only if token is reasonably long, e.g., > 1 char to avoid exploding)
-    if (token.isNotEmpty) {
+    if (token.isNotEmpty && !args.exactMatch) {
       for (final key in index.keys) {
         if (key != token && key.startsWith(token)) {
           for (final id in index[key]!) {
