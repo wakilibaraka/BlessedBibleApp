@@ -81,6 +81,9 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
     final dayLabel =
         '${weekdays[now.weekday - 1]} · ${months[now.month - 1]} ${now.day}';
 
+    final streak = ref.watch(streakProvider);
+    final showNudge = !streak.readToday && streak.count > 0;
+
     final greetings = ['Good morning', 'Good afternoon', 'Good evening', 'Good night'];
     final hour = now.hour;
     final greeting = hour < 12
@@ -130,7 +133,40 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                                 minWidth: 44, minHeight: 44),
                             onPressed: () => Navigator.of(context).pop(),
                           ),
-                          trailing: const SizedBox.shrink(),
+                          trailing: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(showNudge
+                                      ? 'Read today to save your streak!'
+                                      : 'Notifications coming soon!'),
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12)),
+                                ),
+                              );
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 8.0, top: 8.0, bottom: 8.0, left: 8.0),
+                              child: Stack(
+                                alignment: Alignment.topRight,
+                                children: [
+                                  Icon(Icons.notifications_none_rounded,
+                                      size: 26, color: theme.colorScheme.onSurface),
+                                  if (showNudge)
+                                    Container(
+                                      margin: const EdgeInsets.only(top: 2, right: 2),
+                                      width: 8,
+                                      height: 8,
+                                      decoration: const BoxDecoration(
+                                          color: Colors.red,
+                                          shape: BoxShape.circle),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ),
                           centerContent: Text(
                             dayLabel,
                             textAlign: TextAlign.center,

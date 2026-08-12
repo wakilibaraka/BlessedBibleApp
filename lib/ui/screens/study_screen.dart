@@ -206,7 +206,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                           final glowColor = isLit
                               ? AppColors.goldAccent
                               : Colors.grey.withValues(alpha: 0.5);
-                          final showNudge = !isLit && streak.count > 0;
 
                           return Row(
                             children: [
@@ -265,36 +264,60 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                               GestureDetector(
                                 behavior: HitTestBehavior.opaque,
                                 onTap: () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(showNudge
-                                          ? 'Read today to save your streak!'
-                                          : 'Notifications coming soon!'),
-                                      behavior: SnackBarBehavior.floating,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12)),
-                                    ),
+                                  showModalBottomSheet(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return SafeArea(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            const Padding(
+                                              padding: EdgeInsets.all(16.0),
+                                              child: Text(
+                                                'Sign In',
+                                                style: TextStyle(
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.bold),
+                                              ),
+                                            ),
+                                            ListTile(
+                                              leading: const Icon(Icons.account_circle),
+                                              title: const Text('Sign in with Google'),
+                                              onTap: () {
+                                                Navigator.pop(context);
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  SnackBar(
+                                                    content: const Text('Account sync is coming soon!'),
+                                                    behavior: SnackBarBehavior.floating,
+                                                    shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(12)),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                            ListTile(
+                                              leading: const Icon(Icons.apple),
+                                              title: const Text('Sign in with Apple'),
+                                              onTap: () {
+                                                Navigator.pop(context);
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  SnackBar(
+                                                    content: const Text('Account sync is coming soon!'),
+                                                    behavior: SnackBarBehavior.floating,
+                                                    shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(12)),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
                                   );
                                 },
-                                child: Stack(
-                                  alignment: Alignment.topRight,
-                                  children: [
-                                    Icon(Icons.notifications_none_rounded,
-                                        size: 28,
-                                        color: theme.colorScheme.onSurface),
-                                    if (showNudge)
-                                      Container(
-                                        margin: const EdgeInsets.only(
-                                            top: 2, right: 2),
-                                        width: 8,
-                                        height: 8,
-                                        decoration: const BoxDecoration(
-                                            color: Colors.red,
-                                            shape: BoxShape.circle),
-                                      ),
-                                  ],
-                                ),
+                                child: Icon(Icons.person_outline_rounded,
+                                    size: 28, color: theme.colorScheme.onSurface),
                               ),
                             ],
                           );
