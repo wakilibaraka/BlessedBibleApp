@@ -133,11 +133,11 @@ class NotesListScreen extends ConsumerWidget {
 
 Future<void> showAddNoteSheet(
     BuildContext context, WidgetRef ref, ThemeData theme,
-    {String? initialReference}) async {
-  final titleController = TextEditingController();
-  final contentController = TextEditingController();
+    {String? initialReference, PersonalNote? editingNote, int? editingIndex}) async {
+  final titleController = TextEditingController(text: editingNote?.title ?? '');
+  final contentController = TextEditingController(text: editingNote?.content ?? '');
 
-  if (initialReference != null) {
+  if (editingNote == null && initialReference != null) {
     // Attempt to extract book, chapter, verse to auto-fill title/commentary
     final lastSpaceIdx = initialReference.lastIndexOf(' ');
     if (lastSpaceIdx != -1) {
@@ -189,9 +189,11 @@ Future<void> showAddNoteSheet(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            initialReference != null
-                ? 'New Note on $initialReference'
-                : 'New Note',
+            editingNote != null
+                ? 'Edit Note'
+                : (initialReference != null
+                    ? 'New Note on $initialReference'
+                    : 'New Note'),
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
               color: theme.primaryColor,
@@ -295,19 +297,41 @@ Future<void> showAddNoteSheet(
                 titleController.text.trim(),
                 contentController.text.trim(),
                 date,
-                reference: initialReference,
+                reference: editingNote?.reference ?? initialReference,
               );
 
-              ref.read(notesProvider.notifier).add(note);
+              if (editingIndex != null) {
+                ref.read(notesProvider.notifier).update(editingIndex, note);
+              } else {
+                ref.read(notesProvider.notifier).add(note);
+              }
               Navigator.pop(context);
 
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Note saved!')),
               );
             },
-            child: const Text('Save Note',
-                style: TextStyle(fontWeight: FontWeight.bold)),
+            child: Text(editingNote != null ? 'Save Changes' : 'Save Note',
+                style: const TextStyle(fontWeight: FontWeight.bold)),
           ),
+          if (editingIndex != null) ...[
+            const SizedBox(height: 12),
+            TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.red.shade400,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+              onPressed: () {
+                ref.read(notesProvider.notifier).remove(editingIndex);
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Note deleted')),
+                );
+              },
+              child: const Text('Delete Note',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ],
           const SizedBox(height: 24),
         ],
       ),

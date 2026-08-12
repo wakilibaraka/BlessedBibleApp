@@ -353,7 +353,6 @@ class _NotesSegment extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notes = ref.watch(notesProvider);
-    final flatChapters = ref.watch(flatChaptersProvider);
 
     return Column(
       children: [
@@ -408,23 +407,13 @@ class _NotesSegment extends ConsumerWidget {
                         child: InkWell(
                           borderRadius: BorderRadius.circular(16),
                           onTap: () {
-                            if (note.reference != null) {
-                              final data =
-                                  _parseVerseRef(note.reference!, flatChapters);
-                              if (data != null) {
-                                ref
-                                    .read(readLocationProvider.notifier)
-                                    .updateLocation(
-                                      bookAbbrev: data.bookAbbrev,
-                                      bookName: data.bookName,
-                                      chapter: data.chapter,
-                                      verse: data.verseNum,
-                                    );
-                                Navigator.of(context)
-                                    .pop(); // dismiss your space screen
-                                ref.read(navProvider.notifier).setIndex(1);
-                              }
-                            }
+                            showAddNoteSheet(
+                              context,
+                              ref,
+                              theme,
+                              editingNote: note,
+                              editingIndex: index,
+                            );
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(16.0),
