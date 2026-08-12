@@ -61,7 +61,6 @@ class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
     StudyCardConfig(id: 'your_space', size: CardSize.large),
     StudyCardConfig(id: 'reading_plan', size: CardSize.large),
     StudyCardConfig(id: 'commentary', size: CardSize.large),
-    StudyCardConfig(id: 'saved_verses', size: CardSize.medium),
   ];
 
   @override

@@ -21,6 +21,7 @@ import '../../state/read_location_provider.dart';
 import '../../state/bible_provider.dart';
 import '../../state/study_provider.dart';
 import '../../state/commentary_provider.dart';
+import 'votd_archive_screen.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TODAY SCREEN — static scaffold (Stage 1: design / no data wiring)
@@ -205,7 +206,14 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                         const SizedBox(height: 20),
 
                         // ═══════════════════════════════════════════════════════
-                        // 3. LATEST NOTE / HIGHLIGHT
+                        // 3. VOTD ARCHIVE
+                        // ═══════════════════════════════════════════════════════
+                        _VotdArchiveBanner(theme: theme),
+
+                        const SizedBox(height: 20),
+
+                        // ═══════════════════════════════════════════════════════
+                        // 4. LATEST NOTE / HIGHLIGHT
                         // ═══════════════════════════════════════════════════════
                         _SectionLabel(label: 'LATEST NOTE', theme: theme),
                         const SizedBox(height: 8),
@@ -214,30 +222,12 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                         const SizedBox(height: 20),
 
                         // ═══════════════════════════════════════════════════════
-                        // 4. QUICK ACTIONS
+                        // 5. QUICK ACTIONS
                         // ═══════════════════════════════════════════════════════
                         _SectionLabel(label: 'QUICK ACTIONS', theme: theme),
                         const SizedBox(height: 8),
                         _QuickActionsRow(theme: theme),
 
-                        const SizedBox(height: 40),
-                        Center(
-                          child: TextButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            style: TextButton.styleFrom(
-                              minimumSize: const Size(88, 44),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 24, vertical: 12),
-                            ),
-                            child: Text(
-                              'Done',
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                color: theme.colorScheme.onSurface,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
                         // Bottom padding: clears the floating bottom nav
                         SizedBox(height: mq.padding.bottom + 40),
                       ],
@@ -433,12 +423,15 @@ class _StreakProgressCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final streak = ref.watch(streakProvider);
     final streakDays = streak.count;
-    final totalCompleted = streak.distinctDaysThisYear;
     
     final now = DateTime.now();
     final year = now.year;
-    final nextYear = DateTime(year + 1, 1, 1);
-    final daysRemaining = nextYear.difference(now).inDays;
+    final isLeapYear = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+    final daysInYear = isLeapYear ? 366 : 365;
+    
+    final startOfYear = DateTime(year, 1, 1);
+    final dayOfYear = now.difference(startOfYear).inDays + 1;
+    final progress = dayOfYear / daysInYear;
 
     return Container(
       decoration: BoxDecoration(
@@ -488,7 +481,7 @@ class _StreakProgressCard extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '$totalCompleted / 365 days',
+                  'Day $dayOfYear of $daysInYear',
                   style: theme.textTheme.titleSmall?.copyWith(
                     color: theme.colorScheme.onSurface,
                     fontWeight: FontWeight.w700,
@@ -498,19 +491,12 @@ class _StreakProgressCard extends ConsumerWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(4),
                   child: LinearProgressIndicator(
-                    value: totalCompleted / 365.0,
+                    value: progress,
                     minHeight: 7,
                     backgroundColor:
                         theme.colorScheme.primary.withValues(alpha: 0.14),
                     valueColor: AlwaysStoppedAnimation<Color>(
                         theme.colorScheme.primary),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '$daysRemaining days to end of year.',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.50),
                   ),
                 ),
               ],
@@ -686,4 +672,80 @@ class _QuickActionButton extends StatelessWidget {
   }
 }
 
+class _VotdArchiveBanner extends StatelessWidget {
+  final ThemeData theme;
+  const _VotdArchiveBanner({required this.theme});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(24),
+          onTap: () {
+            Navigator.of(context).push(
+              CupertinoPageRoute(builder: (_) => const VotdArchiveScreen()),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.history_rounded, color: theme.primaryColor, size: 24),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Verse of the Day Archive',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            'Catch up on verses from days you missed.',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(Icons.keyboard_arrow_right_rounded, color: theme.primaryColor),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.auto_awesome,
+                          color: theme.primaryColor.withValues(alpha: 0.7), size: 16),
+                      const SizedBox(width: 8),
+                      Text('Explore your past daily verses',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.7))),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
 
