@@ -449,7 +449,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       useSafeArea: false,
       builder: (context) {
         final loc = ref.read(readLocationProvider);
-        return _BookChapterSelectorSheet(
+        return BookChapterSelectorSheet(
           books: allBooks,
           selectedBookAbbrev: loc.bookAbbrev,
           selectedChapter: loc.chapter,
@@ -2448,14 +2448,15 @@ final _sheetStateProvider =
     NotifierProvider.autoDispose<_SheetNotifier, _SheetState>(
         _SheetNotifier.new);
 
-class _BookChapterSelectorSheet extends ConsumerStatefulWidget {
+class BookChapterSelectorSheet extends ConsumerStatefulWidget {
   final List<BibleBook> books;
   final String selectedBookAbbrev;
   final int selectedChapter;
   final void Function(String abbrev, String name, int chapter, int? verse,
       {bool autoClose}) onSelectionChanged;
 
-  const _BookChapterSelectorSheet({
+  const BookChapterSelectorSheet({
+    super.key,
     required this.books,
     required this.selectedBookAbbrev,
     required this.selectedChapter,
@@ -2463,12 +2464,12 @@ class _BookChapterSelectorSheet extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<_BookChapterSelectorSheet> createState() =>
-      __BookChapterSelectorSheetState();
+  ConsumerState<BookChapterSelectorSheet> createState() =>
+      _BookChapterSelectorSheetState();
 }
 
-class __BookChapterSelectorSheetState
-    extends ConsumerState<_BookChapterSelectorSheet> {
+class _BookChapterSelectorSheetState
+    extends ConsumerState<BookChapterSelectorSheet> {
   @override
   void initState() {
     super.initState();
