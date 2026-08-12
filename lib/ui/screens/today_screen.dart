@@ -432,6 +432,7 @@ class _StreakProgressCard extends ConsumerWidget {
     final startOfYear = DateTime(year, 1, 1);
     final dayOfYear = now.difference(startOfYear).inDays + 1;
     final progress = dayOfYear / daysInYear;
+    final daysRemaining = daysInYear - dayOfYear;
 
     return Container(
       decoration: BoxDecoration(
@@ -497,6 +498,13 @@ class _StreakProgressCard extends ConsumerWidget {
                         theme.colorScheme.primary.withValues(alpha: 0.14),
                     valueColor: AlwaysStoppedAnimation<Color>(
                         theme.colorScheme.primary),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '$daysRemaining days of year remaining.',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.50),
                   ),
                 ),
               ],
