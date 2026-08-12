@@ -184,8 +184,9 @@ Future<void> showAddNoteSheet(
         right: 24,
         top: 24,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
@@ -230,35 +231,42 @@ Future<void> showAddNoteSheet(
             ),
           ),
           const SizedBox(height: 12),
-          TextField(
-            controller: contentController,
-            style: TextStyle(color: theme.colorScheme.onSurface),
-            decoration: InputDecoration(
-              hintText: 'Start typing...',
-              hintStyle: TextStyle(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
-              filled: true,
-              fillColor: theme.brightness == Brightness.dark
-                  ? Colors.black.withValues(alpha: 0.25)
-                  : Colors.white.withValues(alpha: 0.6),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide.none,
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(
-                    color: theme.primaryColor.withValues(alpha: 0.1)),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(
-                    color: theme.primaryColor.withValues(alpha: 0.4)),
-              ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.4,
             ),
-            maxLines: 5,
+            child: TextField(
+              controller: contentController,
+              style: TextStyle(color: theme.colorScheme.onSurface),
+              minLines: 6,
+              maxLines: null,
+              keyboardType: TextInputType.multiline,
+              decoration: InputDecoration(
+                hintText: 'Start typing...',
+                hintStyle: TextStyle(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
+                filled: true,
+                fillColor: theme.brightness == Brightness.dark
+                    ? Colors.black.withValues(alpha: 0.25)
+                    : Colors.white.withValues(alpha: 0.6),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(
+                      color: theme.primaryColor.withValues(alpha: 0.1)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(
+                      color: theme.primaryColor.withValues(alpha: 0.4)),
+                ),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              ),
+            ),
           ),
           const SizedBox(height: 16),
           FilledButton(
@@ -334,6 +342,7 @@ Future<void> showAddNoteSheet(
           ],
           const SizedBox(height: 24),
         ],
+      ),
       ),
     ),
   );
