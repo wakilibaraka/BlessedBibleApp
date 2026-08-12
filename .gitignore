@@ -64,3 +64,4 @@ task.md
 # Release artifacts
 *.apk
 release-artifacts/
+brace_counts.txt
