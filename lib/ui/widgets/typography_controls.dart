@@ -20,7 +20,9 @@ class TypographyControls extends ConsumerWidget {
       'Lora',
       'Literata',
       'Lexend',
-      'OpenDyslexic'
+      'OpenDyslexic',
+      'Bitter',
+      'Source Sans 3'
     ];
 
     final sectionLabelStyle = theme.textTheme.labelSmall?.copyWith(

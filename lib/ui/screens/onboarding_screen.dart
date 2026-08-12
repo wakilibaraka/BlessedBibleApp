@@ -988,6 +988,8 @@ class _TypographyPage extends ConsumerWidget {
       'EB Garamond',
       'Lexend',
       'OpenDyslexic',
+      'Bitter',
+      'Source Sans 3',
     ];
 
     return AnimatedContainer(
