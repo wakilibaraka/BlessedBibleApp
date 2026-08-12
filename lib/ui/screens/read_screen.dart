@@ -392,7 +392,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         final listener = _itemPositionsListeners[targetIndex];
 
         if (controller != null && controller.isAttached) {
-          final versesCount = flatChapters[targetIndex].chapter.verses.length;
 
           controller.scrollTo(
             index: verse - 1,
@@ -402,34 +401,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           );
 
           if (listener != null) {
-            bool adjusted = false;
-            void checkOverscroll() {
-              if (adjusted || !mounted) return;
-
-              final positions = listener.itemPositions.value;
-              // Footer is at index == versesCount
-              final footerPos =
-                  positions.where((p) => p.index == versesCount).firstOrNull;
-
-              if (footerPos != null && footerPos.itemTrailingEdge < 1.0) {
-                adjusted = true;
-                controller.scrollTo(
-                  index: versesCount,
-                  duration: const Duration(milliseconds: 400),
-                  curve: Curves.easeOutCubic,
-                  alignment: 1.0,
-                );
-              }
-            }
-
-            listener.itemPositions.addListener(checkOverscroll);
-
-            // Clean up the listener after the initial animation is done
-            Future.delayed(const Duration(milliseconds: 650), () {
-              if (mounted) {
-                listener.itemPositions.removeListener(checkOverscroll);
-              }
-            });
+            // Overscroll hack has been removed since we no longer have massive bottom padding.
           }
 
           // Highlight it faintly upon jumping
@@ -2050,34 +2022,28 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
             ),
           ),
         ...textSpans,
+        if (hasCommentary && !isSelectionMode)
+          WidgetSpan(
+            alignment: PlaceholderAlignment.middle,
+            child: GestureDetector(
+              onTap: onCommentaryTap,
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
+                child: Icon(
+                  Icons.lightbulb_rounded,
+                  color: starColor,
+                  size: typography.fontSize * 0.85,
+                ),
+              ),
+            ),
+          ),
       ],
     );
 
     final Widget textWidget = isSelectionMode
         ? Text.rich(textSpan, textAlign: textAlign)
         : RichText(textAlign: textAlign, text: textSpan);
-
-    if (hasCommentary && !isSelectionMode) {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Expanded(child: textWidget),
-          Padding(
-            // Generous padding increases the invisible tap target area
-            padding: const EdgeInsets.only(left: 4.0, bottom: 4.0, right: 4.0),
-            child: GestureDetector(
-              onTap: onCommentaryTap,
-              behavior: HitTestBehavior.opaque,
-              child: Icon(
-                Icons.lightbulb_rounded,
-                color: starColor,
-                size: typography.fontSize * 0.85,
-              ),
-            ),
-          ),
-        ],
-      );
-    }
 
     return textWidget;
   }
@@ -2091,7 +2057,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
     return Padding(
       padding:
-          const EdgeInsets.only(top: 80.0, bottom: 160.0), // Above nav pill
+          const EdgeInsets.only(top: 80.0, bottom: 32.0), // Above nav pill
       child: Column(
         children: [
           // Divider
