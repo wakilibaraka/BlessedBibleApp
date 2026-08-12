@@ -10,6 +10,7 @@ class PreferencesService {
 
   static const String _searchHistoryKey = 'search_history';
   static const String _bookmarksKey = 'bookmarks';
+  static const String _bookmarksV2Key = 'bookmarks_v2';
   static const String _commentaryBookmarksKey = 'commentary_bookmarks';
   static const String _favoritesKey = 'favorites';
   static const String _highlightsKey = 'highlights';
@@ -97,6 +98,18 @@ class PreferencesService {
 
   List<String> getBookmarks() {
     return prefs.getStringList(_bookmarksKey) ?? [];
+  }
+
+  void saveBookmarksV2(String json) {
+    prefs.setString(_bookmarksV2Key, json);
+  }
+
+  String? getBookmarksV2() {
+    return prefs.getString(_bookmarksV2Key);
+  }
+
+  void removeBookmarksV2() {
+    prefs.remove(_bookmarksV2Key);
   }
 
   void saveCommentaryBookmarks(List<String> bookmarks) {
