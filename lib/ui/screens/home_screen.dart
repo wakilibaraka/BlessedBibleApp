@@ -58,7 +58,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   late final AnimationController _verseController;
   late final Animation<double> _verseFade;
 
-  bool _hasFiredArmedHaptic = false;
+
 
   @override
   void initState() {
@@ -119,29 +119,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   },
                 ),
               },
-              child: NotificationListener<ScrollNotification>(
-                onNotification: (notification) {
-                  if (notification is ScrollUpdateNotification) {
-                    if (notification.metrics.pixels < -80 &&
-                        !_hasFiredArmedHaptic &&
-                        notification.dragDetails != null) {
-                      _hasFiredArmedHaptic = true;
-                      HapticFeedback.mediumImpact();
-                    } else if (notification.metrics.pixels >= -80 &&
-                        _hasFiredArmedHaptic) {
-                      _hasFiredArmedHaptic = false;
-                    }
-                  } else if (notification is ScrollEndNotification) {
-                    if (notification.metrics.pixels < -80) {
-                      ref.read(navProvider.notifier).setIndex(4);
-                    }
-                    _hasFiredArmedHaptic = false;
-                  }
-                  return false;
+              child: RefreshIndicator.adaptive(
+                color: Theme.of(context).primaryColor,
+                backgroundColor: Theme.of(context).colorScheme.surface,
+                onRefresh: () async {
+                  // CMS: fetch remote content here in future
+                  await Future.delayed(const Duration(milliseconds: 500));
+                  ref.invalidate(homeProvider);
                 },
                 child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(
-                      parent: AlwaysScrollableScrollPhysics()),
+                  physics: const AlwaysScrollableScrollPhysics(),
                   child: FadeTransition(
                     opacity: _verseFade,
                     child: _buildPage(context, homeState, appThemeMode),

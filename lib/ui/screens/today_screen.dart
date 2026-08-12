@@ -112,7 +112,16 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
           ),
           SafeArea(
             bottom: false,
-            child: CustomScrollView(
+            child: RefreshIndicator.adaptive(
+              color: theme.primaryColor,
+              backgroundColor: theme.colorScheme.surface,
+              onRefresh: () async {
+                // CMS: fetch remote content here in future
+                await Future.delayed(const Duration(milliseconds: 500));
+                ref.invalidate(streakProvider);
+                ref.invalidate(notesProvider);
+              },
+              child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
                 SliverToBoxAdapter(
@@ -236,6 +245,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                   ),
                 ),
               ],
+            ),
             ),
           ),
         ],

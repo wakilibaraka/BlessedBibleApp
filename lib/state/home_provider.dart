@@ -78,7 +78,9 @@ class HomeNotifier extends Notifier<HomeData> {
   HomeData _fetchData(List<PersonalNote> notes) {
     final pool = ref.watch(votdPoolProvider);
 
-    final dayIndex = DateTime.now().difference(DateTime(2026, 1, 1)).inDays % pool.length;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final dayIndex = today.difference(DateTime(2026, 1, 1)).inDays % pool.length;
     final votd = pool[dayIndex];
 
     // Show the 3 most recent notes
