@@ -1763,15 +1763,24 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
       final installedTranslations =
           ref.watch(availableTranslationsProvider).value ?? [];
+      final activeTransId = ref.watch(activeTranslationProvider);
       final availableChips = <String, String>{};
+      String? activeLanguageLabel;
       for (final t in installedTranslations) {
         if (targetLanguages.containsKey(t.languageName)) {
           final label = targetLanguages[t.languageName]!;
           if (!availableChips.containsKey(label)) {
             availableChips[label] = t.translationId;
           }
+          if (t.translationId == activeTransId) {
+            activeLanguageLabel = label;
+          }
         }
       }
+
+      final chipsToRender = targetLanguages.entries
+          .where((e) => e.value != activeLanguageLabel)
+          .toList();
 
       Widget? activeTranslationWidget;
       if (activeChipId != null) {
@@ -1816,20 +1825,21 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         children: [
           primary,
           const SizedBox(height: 8),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                for (final langEntry in targetLanguages.entries)
-                  Builder(builder: (context) {
-                    final isInstalled =
-                        availableChips.containsKey(langEntry.value);
-                    final translationId = availableChips[langEntry.value];
-                    final isSelected = activeChipId == translationId;
+          Row(
+            children: [
+              for (int i = 0; i < chipsToRender.length; i++)
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                        right: i == chipsToRender.length - 1 ? 0.0 : 6.0),
+                    child: Builder(builder: (context) {
+                      final langEntry = chipsToRender[i];
+                      final isInstalled =
+                          availableChips.containsKey(langEntry.value);
+                      final translationId = availableChips[langEntry.value];
+                      final isSelected = activeChipId == translationId;
 
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: Material(
+                      return Material(
                         color: isSelected
                             ? theme.primaryColor.withValues(alpha: 0.15)
                             : theme.colorScheme.surface,
@@ -1872,30 +1882,34 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                           },
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 12.0, vertical: 6.0),
+                                horizontal: 4.0, vertical: 6.0),
                             child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(
-                                  _getTranslationLabel(
-                                      isInstalled
-                                          ? (translationId ?? langEntry.value)
-                                          : langEntry.value,
-                                      installedTranslations,
-                                      defaultName: langEntry.key),
-                                  style: theme.textTheme.labelMedium?.copyWith(
-                                    color: isSelected
-                                        ? theme.primaryColor
-                                        : theme.colorScheme.onSurface
-                                            .withValues(
-                                                alpha: isInstalled ? 0.7 : 0.3),
-                                    fontWeight: FontWeight.w600,
+                                Flexible(
+                                  child: Text(
+                                    _getTranslationLabel(
+                                        isInstalled
+                                            ? (translationId ?? langEntry.value)
+                                            : langEntry.value,
+                                        installedTranslations,
+                                        defaultName: langEntry.key),
+                                    overflow: TextOverflow.ellipsis,
+                                    style: theme.textTheme.labelMedium?.copyWith(
+                                      color: isSelected
+                                          ? theme.primaryColor
+                                          : theme.colorScheme.onSurface
+                                              .withValues(
+                                                  alpha: isInstalled ? 0.7 : 0.3),
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                 ),
                                 if (!isInstalled) ...[
-                                  const SizedBox(width: 4),
+                                  const SizedBox(width: 2),
                                   Icon(Icons.download_rounded,
-                                      size: 12,
+                                      size: 10,
                                       color: theme.colorScheme.onSurface
                                           .withValues(alpha: 0.3)),
                                 ]
@@ -1903,11 +1917,11 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                             ),
                           ),
                         ),
-                      ),
-                    );
-                  }),
-              ],
-            ),
+                      );
+                    }),
+                  ),
+                ),
+            ],
           ),
           if (activeTranslationWidget != null) ...[
             const SizedBox(height: 12),
