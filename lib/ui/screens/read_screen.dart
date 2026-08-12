@@ -2570,6 +2570,13 @@ class __BookChapterSelectorSheetState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final settings = ref.watch(bibleNavSettingsProvider);
+    final selectorHeightSetting = ref.watch(readSettingsProvider.select((s) => s.selectorHeight));
+    
+    final heightFactor = switch (selectorHeightSetting) {
+      SelectorHeight.quarter => 0.25,
+      SelectorHeight.half => 0.50,
+      SelectorHeight.full => 0.95,
+    };
     final isInitialized =
         ref.watch(_sheetStateProvider.select((s) => s.book != null));
 
@@ -2580,7 +2587,7 @@ class __BookChapterSelectorSheetState
     return Material(
       color: Colors.transparent,
       child: FractionallySizedBox(
-        heightFactor: 0.75,
+        heightFactor: heightFactor,
         child: TexturedGlassContainer(
           borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
           padding: EdgeInsets.zero,

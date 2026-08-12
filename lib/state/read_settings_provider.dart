@@ -9,6 +9,8 @@ enum VerseActionStyle { classic, detached, horizontal, raindrop }
 
 enum ReadingLayout { single, interleaved, sideBySide, chips }
 
+enum SelectorHeight { quarter, half, full }
+
 class ReadSettingsState {
   final ReadingViewMode readingViewMode;
   final BackgroundGlowStyle backgroundGlowStyle;
@@ -23,6 +25,7 @@ class ReadSettingsState {
   final int defaultStartTab; // 0=Home, 1=Read, 2=Search, 3=Study
   final ReadingLayout readingLayout;
   final bool fabLongPressToNav;
+  final SelectorHeight selectorHeight;
 
   const ReadSettingsState({
     this.readingViewMode = ReadingViewMode.pinned,
@@ -38,6 +41,7 @@ class ReadSettingsState {
     this.defaultStartTab = 0,
     this.readingLayout = ReadingLayout.single,
     this.fabLongPressToNav = true,
+    this.selectorHeight = SelectorHeight.half,
   });
 
   ReadSettingsState copyWith({
@@ -54,6 +58,7 @@ class ReadSettingsState {
     int? defaultStartTab,
     ReadingLayout? readingLayout,
     bool? fabLongPressToNav,
+    SelectorHeight? selectorHeight,
   }) {
     return ReadSettingsState(
       readingViewMode: readingViewMode ?? this.readingViewMode,
@@ -70,6 +75,7 @@ class ReadSettingsState {
       defaultStartTab: defaultStartTab ?? this.defaultStartTab,
       readingLayout: readingLayout ?? this.readingLayout,
       fabLongPressToNav: fabLongPressToNav ?? this.fabLongPressToNav,
+      selectorHeight: selectorHeight ?? this.selectorHeight,
     );
   }
 }
@@ -84,6 +90,7 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
       'read_settings_active_highlight_color';
   static const _isManualNavHiddenKey = 'read_settings_is_manual_nav_hidden';
   static const _readingLayoutKey = 'read_settings_reading_layout';
+  static const _selectorHeightKey = 'read_settings_selector_height';
 
   @override
   ReadSettingsState build() {
@@ -106,6 +113,7 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     final defaultStartTab = prefs.getInt('default_start_tab') ?? 0;
     final layoutString = prefs.getString(_readingLayoutKey);
     final fabLongPressToNav = prefs.getBool('fab_long_press_to_nav') ?? true;
+    final selectorHeightString = prefs.getString(_selectorHeightKey);
 
     ReadingViewMode mode = ReadingViewMode.pinned;
     if (modeString != null) {
@@ -139,6 +147,14 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
       );
     }
 
+    SelectorHeight selectorHeight = SelectorHeight.half;
+    if (selectorHeightString != null) {
+      selectorHeight = SelectorHeight.values.firstWhere(
+        (e) => e.name == selectorHeightString,
+        orElse: () => SelectorHeight.half,
+      );
+    }
+
     state = state.copyWith(
       readingViewMode: mode,
       backgroundGlowStyle: glowStyle,
@@ -153,6 +169,7 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
       defaultStartTab: defaultStartTab,
       readingLayout: layout,
       fabLongPressToNav: fabLongPressToNav,
+      selectorHeight: selectorHeight,
     );
   }
 
@@ -239,6 +256,12 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     state = state.copyWith(defaultStartTab: index);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('default_start_tab', index);
+  }
+
+  Future<void> setSelectorHeight(SelectorHeight height) async {
+    state = state.copyWith(selectorHeight: height);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_selectorHeightKey, height.name);
   }
 }
 

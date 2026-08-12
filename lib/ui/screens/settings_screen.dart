@@ -138,6 +138,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
           }),
           const Divider(height: 1, indent: 16),
           Consumer(builder: (context, ref, _) {
+            final selectorHeight =
+                ref.watch(readSettingsProvider.select((s) => s.selectorHeight));
+            return AnimatedSegmentedTile<SelectorHeight>(
+              title: 'Book selector height',
+              subtitle: 'Control how far up the book/chapter sheet opens',
+              selectedValue: selectorHeight,
+              options: const [
+                MapEntry(SelectorHeight.quarter, 'Quarter'),
+                MapEntry(SelectorHeight.half, 'Half'),
+                MapEntry(SelectorHeight.full, 'Full'),
+              ],
+              onChanged: (val) {
+                HapticFeedback.selectionClick();
+                ref.read(readSettingsProvider.notifier).setSelectorHeight(val);
+              },
+            );
+          }),
+          const Divider(height: 1, indent: 16),
+          Consumer(builder: (context, ref, _) {
             final autoOpen = ref.watch(
                 searchSettingsProvider.select((s) => s.autoOpenSingleSearchResult));
             return SwitchListTile(
