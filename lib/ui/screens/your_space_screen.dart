@@ -725,7 +725,7 @@ class _NotesSegment extends ConsumerWidget {
                               ref,
                               theme,
                               editingNote: note,
-                              editingIndex: index,
+                              editingId: note.id,
                             );
                           },
                           child: Padding(

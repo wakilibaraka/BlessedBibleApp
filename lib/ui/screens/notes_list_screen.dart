@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/chapter_titles_provider.dart';
 import '../../state/commentary_provider.dart';
@@ -60,7 +61,7 @@ class NotesListScreen extends ConsumerWidget {
               itemBuilder: (context, index) {
                 final note = notes[index];
                 return Dismissible(
-                  key: ValueKey(note.title + note.date + index.toString()),
+                  key: ValueKey(note.id),
                   direction: DismissDirection.endToStart,
                   background: Container(
                     alignment: Alignment.centerRight,
@@ -69,7 +70,7 @@ class NotesListScreen extends ConsumerWidget {
                     child: const Icon(Icons.delete, color: Colors.white),
                   ),
                   onDismissed: (_) {
-                    ref.read(notesProvider.notifier).remove(index);
+                    ref.read(notesProvider.notifier).remove(note.id);
                   },
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: 12.0),
@@ -137,14 +138,14 @@ class NotesListScreen extends ConsumerWidget {
 
 Future<void> showAddNoteSheet(
     BuildContext context, WidgetRef ref, ThemeData theme,
-    {String? initialReference, PersonalNote? editingNote, int? editingIndex}) async {
+    {String? initialReference, PersonalNote? editingNote, String? editingId}) async {
   await showModalBottomSheet(
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
     builder: (context) => _NoteEditorForm(
       editingNote: editingNote,
-      editingIndex: editingIndex,
+      editingId: editingId,
       initialReference: initialReference,
       theme: theme,
     ),
@@ -153,13 +154,13 @@ Future<void> showAddNoteSheet(
 
 class _NoteEditorForm extends ConsumerStatefulWidget {
   final PersonalNote? editingNote;
-  final int? editingIndex;
+  final String? editingId;
   final String? initialReference;
   final ThemeData theme;
 
   const _NoteEditorForm({
     this.editingNote,
-    this.editingIndex,
+    this.editingId,
     this.initialReference,
     required this.theme,
   });
@@ -515,14 +516,15 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
                 final date =
                     '${months[now.month - 1]} ${now.day.toString().padLeft(2, '0')}, ${now.year}';
                 final note = PersonalNote(
+                  widget.editingNote?.id ?? const Uuid().v4(),
                   titleController.text.trim(),
                   contentController.text.trim(),
                   date,
                   reference: widget.editingNote?.reference ?? widget.initialReference,
                 );
 
-                if (widget.editingIndex != null) {
-                  ref.read(notesProvider.notifier).update(widget.editingIndex!, note);
+                if (widget.editingId != null) {
+                  ref.read(notesProvider.notifier).update(widget.editingId!, note);
                 } else {
                   ref.read(notesProvider.notifier).add(note);
                 }
@@ -535,7 +537,7 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
               child: Text(widget.editingNote != null ? 'Save Changes' : 'Save Note',
                   style: const TextStyle(fontWeight: FontWeight.bold)),
             ),
-            if (widget.editingIndex != null) ...[
+            if (widget.editingId != null) ...[
               const SizedBox(height: 12),
               TextButton(
                 style: TextButton.styleFrom(
@@ -543,7 +545,7 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 onPressed: () {
-                  ref.read(notesProvider.notifier).remove(widget.editingIndex!);
+                  ref.read(notesProvider.notifier).remove(widget.editingId!);
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Note deleted')),

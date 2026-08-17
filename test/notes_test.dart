@@ -21,7 +21,7 @@ void main() {
     expect(initialNotes, isEmpty);
 
     // Add a note
-    final newNote = PersonalNote('Test Note', 'This is a test content', 'Jan 01, 2026');
+    final newNote = PersonalNote('test-id-123', 'Test Note', 'This is a test content', 'Jan 01, 2026');
     container.read(notesProvider.notifier).add(newNote);
 
     // Verify state changed

@@ -59,7 +59,7 @@ void main() {
     ];
 
     final notes = [
-      PersonalNote('My Note', 'This is a test note about creation.', '2026-07-26'),
+      PersonalNote('test-id-123', 'My Note', 'This is a test note about creation.', '2026-07-26'),
     ];
 
     final baseIndexFuture = compute(

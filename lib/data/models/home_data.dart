@@ -1,3 +1,5 @@
+import 'package:uuid/uuid.dart';
+
 class HomeData {
   final VerseOfTheDay verseOfTheDay;
   final StudyProgress? activeStudy;
@@ -32,14 +34,16 @@ class StudyProgress {
 }
 
 class PersonalNote {
+  final String id;
   final String title;
   final String content;
   final String date;
   final String? reference;
 
-  PersonalNote(this.title, this.content, this.date, {this.reference});
+  PersonalNote(this.id, this.title, this.content, this.date, {this.reference});
 
   Map<String, dynamic> toJson() => {
+        'id': id,
         'title': title,
         'content': content,
         'date': date,
@@ -47,6 +51,7 @@ class PersonalNote {
       };
 
   factory PersonalNote.fromJson(Map<String, dynamic> json) => PersonalNote(
+        json['id'] as String? ?? const Uuid().v4(),
         json['title'] as String,
         json['content'] as String,
         json['date'] as String,
