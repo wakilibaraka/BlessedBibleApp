@@ -1,4 +1,4 @@
-package com.example.the_blessed_bible
+package com.baraka.bibleapp
 
 import io.flutter.embedding.android.FlutterActivity
 

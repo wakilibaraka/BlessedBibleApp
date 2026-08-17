@@ -84,3 +84,10 @@ Lexend.zip
 *.apk
 release-artifacts/
 brace_counts.txt
+
+# Firebase Config & Secrets
+google-services.json
+android/app/google-services.json
+*.jks
+*.keystore
+key.properties
