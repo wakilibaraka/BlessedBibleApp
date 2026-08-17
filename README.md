@@ -1,62 +1,65 @@
 # 📖 The Blessed Bible
 
-A premium, modern Bible & Historicist Commentary application for iOS and Android, crafted with Flutter. Built with a fluid **Liquid Glass** aesthetic inspired by modern iOS UI principles, featuring intelligent Spotlight-style search, custom typography controls, and verse-by-verse prophetic commentary.
+A premium, local-first Bible reading and Historicist Commentary application crafted for iOS and Android with Flutter and Riverpod. 
+
+Designed with an Apple-standard aesthetic, **The Blessed Bible** eliminates clutter and friction from daily devotionals—featuring fluid liquid glass containers, an in-memory isolate search engine, verse-by-verse historicist commentary, and modular study tools.
 
 ---
 
 ## ✨ Key Features
 
-### 💧 Liquid Glass UI & Design
-- **Frosted Glass Containers**: Dynamic translucency and backdrop blurring tailored for modern mobile interfaces.
-- **Theme-Adaptive Palettes**: Full support for **Light**, **Dark**, and **Sepia** reader modes with natural color mapping.
-- **Floating Glass Controls**: Floating search bar pill, breadcrumb navigation, and pill toggles for seamless ergonomics.
+### 💧 Liquid Glass & Adaptive Typography
+- **Frosted Depth & Textures**: Layered backdrop blurring and dynamic surface styling tailored for modern mobile screens.
+- **Curated Reading Typography**: 8+ pre-bundled typographic styles (EB Garamond, Bitter, Source Sans 3, Lora, Literata, Gentium Book Plus, Lexend, OpenDyslexic) with proportional font scaling and custom margin controls.
+- **Theme Engine**: Seamless transitions across Light, Dark, and high-contrast study palettes.
 
-### 🔍 Spotlight-Inspired Search Engine
-- **Fuzzy Search & Fast Indexing**: Instant queries across all 66 books of the Bible.
-- **Integrated Commentary Search**: Search through verse commentary, notes, and historical references simultaneously.
-- **Conjoined Filter Pills**: Easily isolate results between **Bible Verses** and **Historicist Commentary**.
-- **Recent Places**: Siri/Spotlight-inspired memory pills for quick access to your recent study locations.
+### 🔍 Isolate-Powered Search Engine
+- **Instant In-Memory Indexing**: Low-latency inverted index running on background Dart isolates.
+- **Granular Scopes & Precision**: Filter effortlessly between Old Testament, New Testament, and Commentary, with whole-word/exact-phrase precision toggles.
+- **Spotlight Memory**: Fast access to recent queries and tapped study locations.
 
-### 📚 Interactive Navigation & Reader
-- **Dynamic Breadcrumbs**: Smooth `[ Book ] [ Chapter ] [ Verse ]` breadcrumb header with auto-advancing 5-column selection grid.
-- **Testament Toggles**: Instant switching between Old Testament (39 books) and New Testament (27 books).
-- **Custom Reader Typography**: Adjustable font sizes, font families (Lora, Gentium Book Plus), line spacing, and margin padding.
+### 📜 Verse-by-Verse Historicist Commentary
+- **Contextual Insights**: In-depth historical and prophetic commentary (including Uriah Smith on Daniel & Revelation).
+- **Subtle Verse Indicators**: Unobtrusive margin indicators that expand into full commentary drawers on demand.
 
-### 📜 Verse Analysis & Historicist Commentary
-- **In-Depth Commentary Sheet**: Liquid glass modal bottom sheet displaying verse-by-verse historical and prophetic insights (e.g., Uriah Smith).
-- **Cross-References & Notes**: Quick actions to append personal study notes or share verses.
+### 📝 Study Hub, Notes & Bookmarks v2
+- **Slash-Command Note Editor**: Rapid inline writing with interactive `/` commands for quick-inserting verse references, timestamps, and headers.
+- **Structured Bookmark Folders**: Organize verses into custom or preset folders (*Sermon Prep, Memorize, Comfort, Study*).
+- **Streak & Habit Tracking**: Calendar-based day-of-year reading progress with native pull-to-refresh.
 
 ---
 
-## 🛠️ Tech Stack & Architecture
+## 🛠️ Architecture & Tech Stack
 
-- **Framework**: [Flutter](https://flutter.dev/) (Dart)
-- **State Management**: [Riverpod](https://riverpod.dev/) (`flutter_riverpod`)
-- **Typography & Styling**: `google_fonts` (Lora, Gentium Book Plus, Outfit), Custom Backdrop Filters
-- **Platform Support**: iOS & Android
+- **Framework**: [Flutter](https://flutter.dev/) (Dart 3)
+- **State Management**: [Riverpod 2.x](https://riverpod.dev/) (Notifier/AsyncNotifier architecture)
+- **Database**: Local SQLite (`bible.db`) supporting 11 bundled offline translations
+- **Search**: In-Memory Inverted Index running via `compute()` background isolates
+- **Storage**: Non-destructive, versioned JSON preference serialization
+- **Security & Privacy**: 100% local and offline. Zero tracking, zero third-party telemetry.
 
 ---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-- [Flutter SDK](https://docs.flutter.dev/get-started/install) (3.x or higher)
-- Xcode / CocoaPods (for iOS) or Android Studio (for Android)
+- Flutter SDK (3.x or higher)
+- Xcode (iOS) / Android Studio (Android SDK 34+)
 
-### Run Locally
+### Installation & Run
 
-1. **Clone the repository:**
+1. Clone the repository:
    ```bash
-   git clone https://github.com/Baraka254/the_blessed_bible.git
-   cd the_blessed_bible
+   git clone https://github.com/Baraka254/BlessedBibleApp.git
+   cd BlessedBibleApp
    ```
 
-2. **Install dependencies:**
+2. Install dependencies:
    ```bash
    flutter pub get
    ```
 
-3. **Launch Application:**
+3. Run on your connected device/simulator:
    ```bash
    flutter run
    ```
@@ -64,5 +67,4 @@ A premium, modern Bible & Historicist Commentary application for iOS and Android
 ---
 
 ## 🔒 License
-
 Private Repository. All rights reserved.
