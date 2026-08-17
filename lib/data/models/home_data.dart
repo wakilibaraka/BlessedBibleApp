@@ -59,22 +59,6 @@ class PersonalNote {
       );
 }
 
-class JournalEntry {
-  final String content;
-  final String date;
-
-  JournalEntry(this.content, this.date);
-
-  Map<String, dynamic> toJson() => {
-        'content': content,
-        'date': date,
-      };
-
-  factory JournalEntry.fromJson(Map<String, dynamic> json) => JournalEntry(
-        json['content'] as String,
-        json['date'] as String,
-      );
-}
 
 class MostReadVerse {
   final String reference;
