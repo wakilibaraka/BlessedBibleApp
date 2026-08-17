@@ -50,10 +50,29 @@ app.*.map.json
 /android/app/release
 
 # Agent scratch files
-*.py
+fix_nav.py
+fix_read_screen.py
+remove_bg.py
+replace_commentary.py
+replace_routes.py
+rewrite_main_nav.py
+rewrite_search_screen.py
+update_read_screen.py
+update_settings_screen.py
+fix_all.py
+rewrite_create.py
+rewrite_hub.py
+update_hub.py
+update_provider.py
+scratch/
 analyzer_output.txt
 diff_*.txt
 task.md
+app_log.txt
+crash_log.txt
+flutter_01.png
+Lexend.zip
+*.zip
 
 # SQLite WAL/SHM sidecar files (auto-generated, never commit)
 *.db-wal
