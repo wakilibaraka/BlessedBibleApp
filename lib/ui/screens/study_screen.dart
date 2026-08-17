@@ -21,7 +21,7 @@ import 'commentary_library_screen.dart';
 import '../../state/streak_provider.dart';
 import 'reading_plan_browser.dart';
 import '../../data/local_storage/preferences_service.dart';
-
+import '../../state/auth_provider.dart';
 class _ParsedRef {
   final String book;
   final int chapter;
@@ -267,51 +267,65 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                                   showModalBottomSheet(
                                     context: context,
                                     builder: (BuildContext context) {
-                                      return SafeArea(
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            const Padding(
-                                              padding: EdgeInsets.all(16.0),
-                                              child: Text(
-                                                'Sign In',
-                                                style: TextStyle(
-                                                    fontSize: 20,
-                                                    fontWeight: FontWeight.bold),
-                                              ),
-                                            ),
-                                            ListTile(
-                                              leading: const Icon(Icons.account_circle),
-                                              title: const Text('Sign in with Google'),
-                                              onTap: () {
-                                                Navigator.pop(context);
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  SnackBar(
-                                                    content: const Text('Account sync is coming soon!'),
-                                                    behavior: SnackBarBehavior.floating,
-                                                    shape: RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.circular(12)),
+                                      return Consumer(
+                                        builder: (context, ref, child) {
+                                          final authState = ref.watch(authStateProvider);
+                                          return SafeArea(
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Padding(
+                                                  padding: const EdgeInsets.all(16.0),
+                                                  child: Text(
+                                                    authState.value != null ? 'Account' : 'Sign In',
+                                                    style: const TextStyle(
+                                                        fontSize: 20,
+                                                        fontWeight: FontWeight.bold),
                                                   ),
-                                                );
-                                              },
-                                            ),
-                                            ListTile(
-                                              leading: const Icon(Icons.apple),
-                                              title: const Text('Sign in with Apple'),
-                                              onTap: () {
-                                                Navigator.pop(context);
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  SnackBar(
-                                                    content: const Text('Account sync is coming soon!'),
-                                                    behavior: SnackBarBehavior.floating,
-                                                    shape: RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.circular(12)),
+                                                ),
+                                                if (authState.value == null) ...[
+                                                  ListTile(
+                                                    leading: const Icon(Icons.account_circle),
+                                                    title: const Text('Sign in with Google'),
+                                                    onTap: () async {
+                                                      final result = await ref.read(authActionsProvider).signInWithGoogle();
+                                                      if (context.mounted && result == SignInResult.failed) {
+                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                          SnackBar(
+                                                            content: const Text('Sign in failed. Please try again.'),
+                                                            behavior: SnackBarBehavior.floating,
+                                                            shape: RoundedRectangleBorder(
+                                                                borderRadius: BorderRadius.circular(12)),
+                                                          ),
+                                                        );
+                                                      }
+                                                      if (context.mounted && result == SignInResult.success) {
+                                                         Navigator.pop(context);
+                                                      }
+                                                    },
                                                   ),
-                                                );
-                                              },
+                                                ] else ...[
+                                                  ListTile(
+                                                    leading: CircleAvatar(
+                                                      radius: 12,
+                                                      backgroundImage: authState.value?.photoURL != null ? NetworkImage(authState.value!.photoURL!) : null,
+                                                      child: authState.value?.photoURL == null ? const Icon(Icons.person, size: 16) : null,
+                                                    ),
+                                                    title: Text(authState.value?.displayName ?? 'Signed In'),
+                                                  ),
+                                                  ListTile(
+                                                    leading: const Icon(Icons.logout, color: Colors.red),
+                                                    title: const Text('Sign Out', style: TextStyle(color: Colors.red)),
+                                                    onTap: () async {
+                                                      await ref.read(authActionsProvider).signOut();
+                                                      if (context.mounted) Navigator.pop(context);
+                                                    },
+                                                  ),
+                                                ],
+                                              ],
                                             ),
-                                          ],
-                                        ),
+                                          );
+                                        }
                                       );
                                     },
                                   );

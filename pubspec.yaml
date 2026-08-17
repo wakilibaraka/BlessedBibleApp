@@ -27,6 +27,9 @@ dependencies:
   http: ^1.6.0
   collection: ^1.19.1
   uuid: ^4.6.0
+  firebase_core: ^4.13.0
+  firebase_auth: ^6.5.7
+  google_sign_in: ^6.2.1
 
 dev_dependencies:
   flutter_test:

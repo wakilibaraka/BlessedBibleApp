@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:io' as dart_io;
 
@@ -57,6 +59,7 @@ void main() async {
   if (kStartupTrace) {
   }
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   if (kStartupTrace) {
   }
   final prefs = await SharedPreferences.getInstance();
