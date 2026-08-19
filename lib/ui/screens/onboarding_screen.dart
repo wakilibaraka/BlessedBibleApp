@@ -450,93 +450,105 @@ class _WelcomePage extends ConsumerWidget {
       ),
       child: SafeArea(
         bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Spacer(flex: 2),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: IntrinsicHeight(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Spacer(flex: 2),
 
-              // Hero icon
-              Center(
-                child: Container(
-                  width: size.width * 0.38,
-                  height: size.width * 0.38,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(colors: [
-                      primary.withValues(alpha: 0.25),
-                      primary.withValues(alpha: 0.05),
-                    ]),
-                    border: Border.all(
-                        color: primary.withValues(alpha: 0.3), width: 2),
+                        // Hero icon
+                        Center(
+                          child: Container(
+                            width: size.width * 0.38,
+                            height: size.width * 0.38,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: RadialGradient(colors: [
+                                primary.withValues(alpha: 0.25),
+                                primary.withValues(alpha: 0.05),
+                              ]),
+                              border: Border.all(
+                                  color: primary.withValues(alpha: 0.3), width: 2),
+                            ),
+                            child: Icon(Icons.auto_stories_rounded,
+                                size: size.width * 0.2, color: primary),
+                          ),
+                        ),
+
+                        const Spacer(flex: 2),
+
+                        // Title
+                        Text(
+                          'The\nBlessed\nBible',
+                          style: theme.textTheme.displaySmall?.copyWith(
+                            fontWeight: FontWeight.w900,
+                            height: 1.05,
+                            letterSpacing: -1,
+                            color: theme.colorScheme.onSurface,
+                          ),
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        // Tagline
+                        Text(
+                          'Your daily Word. Beautifully crafted\nfor deep, distraction-free reading.',
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                            height: 1.55,
+                          ),
+                        ),
+
+                        const Spacer(flex: 3),
+
+                        // Features hint
+                        _FeatureHints(accentColor: primary),
+
+                        const Spacer(flex: 1),
+
+                        // CTA
+                        FilledButton(
+                          onPressed: () {
+                            HapticFeedback.mediumImpact();
+                            onNext();
+                          },
+                          style: FilledButton.styleFrom(
+                            backgroundColor: primary,
+                            foregroundColor: primary.computeLuminance() > 0.4
+                                ? Colors.black87
+                                : Colors.white,
+                            minimumSize: const Size(double.infinity, 56),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18)),
+                          ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text('Get Started',
+                                  style: TextStyle(
+                                      fontSize: 18, fontWeight: FontWeight.bold)),
+                              SizedBox(width: 8),
+                              Icon(Icons.arrow_forward_rounded, size: 20),
+                            ],
+                          ),
+                        ),
+
+                        SizedBox(height: bottom + 64),
+                      ],
+                    ),
                   ),
-                  child: Icon(Icons.auto_stories_rounded,
-                      size: size.width * 0.2, color: primary),
                 ),
               ),
-
-              const Spacer(flex: 2),
-
-              // Title
-              Text(
-                'The\nBlessed\nBible',
-                style: theme.textTheme.displaySmall?.copyWith(
-                  fontWeight: FontWeight.w900,
-                  height: 1.05,
-                  letterSpacing: -1,
-                  color: theme.colorScheme.onSurface,
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              // Tagline
-              Text(
-                'Your daily Word. Beautifully crafted\nfor deep, distraction-free reading.',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                  height: 1.55,
-                ),
-              ),
-
-              const Spacer(flex: 3),
-
-              // Features hint
-              _FeatureHints(accentColor: primary),
-
-              const Spacer(flex: 1),
-
-              // CTA
-              FilledButton(
-                onPressed: () {
-                  HapticFeedback.mediumImpact();
-                  onNext();
-                },
-                style: FilledButton.styleFrom(
-                  backgroundColor: primary,
-                  foregroundColor: primary.computeLuminance() > 0.4
-                      ? Colors.black87
-                      : Colors.white,
-                  minimumSize: const Size(double.infinity, 56),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18)),
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Get Started',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
-                    SizedBox(width: 8),
-                    Icon(Icons.arrow_forward_rounded, size: 20),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: bottom + 64),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
@@ -790,8 +802,12 @@ class _ThemePageState extends ConsumerState<_ThemePage> {
           // Theme grid
           Expanded(
             child: GridView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.only(left: 24, right: 24, top: 32, bottom: 8),
+              physics: const BouncingScrollPhysics(),
+              padding: EdgeInsets.only(
+                  left: 24,
+                  right: 24,
+                  top: 32,
+                  bottom: MediaQuery.of(context).padding.bottom + 140),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
                 childAspectRatio: 0.85,
@@ -1696,80 +1712,92 @@ class _GetStartedPageState extends ConsumerState<_GetStartedPage> {
       child: Stack(
         children: [
           SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Spacer(flex: 2),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    child: IntrinsicHeight(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Spacer(flex: 2),
 
-                  // Big check circle
-                  Center(
-                    child: Container(
-                      width: size.width * 0.3,
-                      height: size.width * 0.3,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: primary.withValues(alpha: 0.12),
-                        border: Border.all(
-                            color: primary.withValues(alpha: 0.3), width: 2.5),
+                            // Big check circle
+                            Center(
+                              child: Container(
+                                width: size.width * 0.3,
+                                height: size.width * 0.3,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: primary.withValues(alpha: 0.12),
+                                  border: Border.all(
+                                      color: primary.withValues(alpha: 0.3), width: 2.5),
+                                ),
+                                child: Icon(Icons.check_rounded,
+                                    size: size.width * 0.15, color: primary),
+                              ),
+                            ),
+
+                            const Spacer(flex: 2),
+
+                            Text(
+                              'You\'re all\nset! 🎉',
+                              style: theme.textTheme.displaySmall?.copyWith(
+                                fontWeight: FontWeight.w900,
+                                height: 1.05,
+                                letterSpacing: -1,
+                              ),
+                            ),
+
+                            const SizedBox(height: 20),
+
+                            // Summary
+                            _SetupSummaryCard(
+                              themeName: themeMeta.label,
+                              themeAccent: themeMeta.accent,
+                              translationId: activeId,
+                            ),
+
+                            const Spacer(flex: 3),
+
+                            _FloatingPill(
+                              color: primary.withValues(alpha: 0.85),
+                              borderRadius: BorderRadius.circular(16),
+                              child: FilledButton(
+                                onPressed: () {
+                                  HapticFeedback.selectionClick();
+                                  widget.onComplete();
+                                },
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
+                                  foregroundColor: primary.computeLuminance() > 0.4
+                                      ? Colors.black87
+                                      : Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16)),
+                                ),
+                                child: const Center(
+                                  child: Text('Start Reading',
+                                      style: TextStyle(
+                                          fontSize: 16, fontWeight: FontWeight.bold)),
+                                ),
+                              ),
+                            ),
+
+                            SizedBox(height: bottom + 68),
+                          ],
+                        ),
                       ),
-                      child: Icon(Icons.check_rounded,
-                          size: size.width * 0.15, color: primary),
                     ),
                   ),
-
-                  const Spacer(flex: 2),
-
-                  Text(
-                    'You\'re all\nset! 🎉',
-                    style: theme.textTheme.displaySmall?.copyWith(
-                      fontWeight: FontWeight.w900,
-                      height: 1.05,
-                      letterSpacing: -1,
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Summary
-                  _SetupSummaryCard(
-                    themeName: themeMeta.label,
-                    themeAccent: themeMeta.accent,
-                    translationId: activeId,
-                  ),
-
-                  const Spacer(flex: 3),
-
-                  _FloatingPill(
-                    color: primary.withValues(alpha: 0.85),
-                    borderRadius: BorderRadius.circular(16),
-                    child: FilledButton(
-                      onPressed: () {
-                        HapticFeedback.selectionClick();
-                        widget.onComplete();
-                      },
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        shadowColor: Colors.transparent,
-                        foregroundColor: primary.computeLuminance() > 0.4
-                            ? Colors.black87
-                            : Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16)),
-                      ),
-                      child: const Center(
-                        child: Text('Start Reading',
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold)),
-                      ),
-                    ),
-                  ),
-
-                  SizedBox(height: bottom + 68),
-                ],
-              ),
+                );
+              },
             ),
           ),
           Align(
