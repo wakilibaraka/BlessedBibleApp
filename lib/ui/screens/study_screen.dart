@@ -202,6 +202,8 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                         ),
                         Consumer(builder: (context, ref, child) {
                           final streak = ref.watch(streakProvider);
+                          final authState = ref.watch(authStateProvider);
+                          final user = authState.value;
                           final isLit = streak.readToday;
                           final glowColor = isLit
                               ? AppColors.goldAccent
@@ -330,8 +332,58 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                                     },
                                   );
                                 },
-                                child: Icon(Icons.person_outline_rounded,
-                                    size: 28, color: theme.colorScheme.onSurface),
+                                child: Builder(builder: (context) {
+                                  if (user == null) {
+                                    return Icon(Icons.person_outline_rounded,
+                                        size: 28, color: theme.colorScheme.onSurface);
+                                  }
+
+                                  Widget fallbackIcon;
+                                  final name = user.displayName?.trim() ?? '';
+                                  if (name.isNotEmpty) {
+                                    fallbackIcon = SizedBox(
+                                      width: 28,
+                                      height: 28,
+                                      child: CircleAvatar(
+                                        backgroundColor: theme.colorScheme.primaryContainer,
+                                        child: Text(
+                                          name[0].toUpperCase(),
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: theme.colorScheme.onPrimaryContainer,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    fallbackIcon = Icon(Icons.person_outline_rounded,
+                                        size: 28, color: theme.colorScheme.onSurface);
+                                  }
+
+                                  if (user.photoURL != null) {
+                                    return Container(
+                                      width: 28,
+                                      height: 28,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                                          width: 1,
+                                        ),
+                                      ),
+                                      child: ClipOval(
+                                        child: Image.network(
+                                          user.photoURL!,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) => fallbackIcon,
+                                        ),
+                                      ),
+                                    );
+                                  }
+
+                                  return fallbackIcon;
+                                }),
                               ),
                             ],
                           );
