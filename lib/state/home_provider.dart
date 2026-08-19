@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../services/content_sync_service.dart';
 import '../data/models/home_data.dart';
 import 'notes_provider.dart';
 import '../state/commentary_provider.dart';
@@ -68,6 +69,32 @@ final votdPoolProvider = Provider<List<VerseOfTheDay>>((ref) {
   return pool;
 });
 
+
+class VotdOverrideNotifier extends AsyncNotifier<Map<String, String>> {
+  late final ContentSyncService<String> _syncService;
+  
+  @override
+  Future<Map<String, String>> build() async {
+    _syncService = ContentSyncService<String>(
+      collectionName: 'VOTD',
+      cacheFileName: 'votd_overrides.json',
+      fromJson: (json) => json['reference'] as String,
+      toJson: (ref) => {'reference': ref},
+    );
+    
+    final localCache = await _syncService.loadLocalCache();
+    
+    // Fire and forget background sync
+    _syncService.syncDeltas((newCache) {
+       state = AsyncData(newCache);
+    });
+    
+    return localCache;
+  }
+}
+
+final votdOverrideProvider = AsyncNotifierProvider<VotdOverrideNotifier, Map<String, String>>(VotdOverrideNotifier.new);
+
 class HomeNotifier extends Notifier<HomeData> {
   @override
   HomeData build() {
@@ -77,11 +104,49 @@ class HomeNotifier extends Notifier<HomeData> {
 
   HomeData _fetchData(List<PersonalNote> notes) {
     final pool = ref.watch(votdPoolProvider);
+    final overridesAsync = ref.watch(votdOverrideProvider);
+    final overrides = overridesAsync.value ?? {};
+    final bibleState = ref.watch(bibleProvider);
 
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final dayIndex = today.difference(DateTime(2026, 1, 1)).inDays % pool.length;
-    final votd = pool[dayIndex];
+    VerseOfTheDay votd = pool[dayIndex];
+
+    final todayString = '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+
+    if (overrides.containsKey(todayString)) {
+      final overrideRef = overrides[todayString]!;
+      
+      final pooledOverride = pool.firstWhereOrNull((v) => v.reference.toLowerCase() == overrideRef.toLowerCase());
+      if (pooledOverride != null) {
+        votd = pooledOverride;
+      } else {
+        final books = bibleState.books;
+        if (books.isNotEmpty) {
+           final lastSpace = overrideRef.lastIndexOf(' ');
+           if (lastSpace != -1) {
+             final bookName = overrideRef.substring(0, lastSpace);
+             final parts = overrideRef.substring(lastSpace + 1).split(':');
+             if (parts.isNotEmpty) {
+               final chapterNum = int.tryParse(parts[0]) ?? 1;
+               final verseNum = int.tryParse(parts.length > 1 ? parts[1] : '1') ?? 1;
+               
+               final book = books.firstWhereOrNull((b) => b.name.toLowerCase() == bookName.toLowerCase());
+               if (book != null) {
+                 final chapter = book.chapters.firstWhereOrNull((c) => c.number == chapterNum);
+                 if (chapter != null) {
+                   final verse = chapter.verses.firstWhereOrNull((v) => v.number == verseNum);
+                   if (verse != null && verse.text.isNotEmpty) {
+                     votd = VerseOfTheDay(overrideRef, verse.text);
+                   }
+                 }
+               }
+             }
+           }
+        }
+      }
+    }
 
     // Show the 3 most recent notes
     final recentNotes = notes.reversed.take(3).toList();
