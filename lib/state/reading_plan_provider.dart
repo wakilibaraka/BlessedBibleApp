@@ -4,6 +4,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/notification_service.dart';
 import '../data/local_storage/preferences_service.dart';
+import '../models/reading_plan.dart';
+import '../services/pace_remap_service.dart';
+import '../services/word_count_service.dart';
+import '../utils/isolate_parsers.dart';
 
 /// App weekday: 1=Sunday, 2=Monday, ..., 7=Saturday
 int appWeekday(DateTime date) {
@@ -448,6 +452,57 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
   void markDayComplete(int day) => markReadingComplete(day);
   void markDayIncomplete(int day) => markReadingIncomplete(day);
   void markChapterComplete(PlanChapter c) {}
+
+  /// Adjust the day count of this custom plan and remap existing progress by
+  /// content position. Persists both the new plan definition and new progress.
+  ///
+  /// Returns null on success, or an error string if tracks are missing or
+  /// another failure occurs.
+  Future<String?> adjustPace(int newDayCount) async {
+    try {
+      final prefs = ref.read(preferencesProvider);
+      final planJson = prefs.getCustomPlan(_planId);
+      if (planJson == null) return 'Plan not found.';
+
+      final oldPlan = ReadingPlan.fromJson(planJson);
+      if (oldPlan.tracks == null || oldPlan.tracks!.isEmpty) {
+        return 'This plan was created before pace-adjustment was supported. '
+            'Recreate it to enable this feature.';
+      }
+
+      final wcs = ref.read(wordCountServiceProvider);
+      await wcs.init();
+      final pJson =
+          await rootBundle.loadString('assets/data/pericopes.json');
+      final allPericopes =
+          await compute(parsePericopesJson, pJson);
+
+      final remapSvc = PaceRemapService(
+        wordCountService: wcs,
+        allPericopes: allPericopes,
+      );
+
+      final result = remapSvc.remap(
+        oldPlan: oldPlan,
+        oldCompleted: state.completedReadings,
+        newDayCount: newDayCount,
+      );
+
+      // Persist updated plan definition
+      prefs.saveCustomPlan(_planId, result.newPlan.toJson());
+
+      // Persist updated progress
+      final next = state.copyWith(completedReadings: result.newCompletedReadings);
+      state = next;
+      _saveToPrefs(next);
+
+      // Reload planData from the new schedule
+      ref.invalidateSelf();
+      return null;
+    } catch (e) {
+      return 'Pace adjustment failed: $e';
+    }
+  }
 }
 
 final readingPlanProvider =

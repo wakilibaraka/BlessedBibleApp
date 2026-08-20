@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../../state/reading_plan_provider.dart';
 
-enum _CustomPlanAction { rename, makePrimary, togglePause, restart, delete }
+enum _CustomPlanAction { rename, makePrimary, togglePause, adjustPace, restart, delete }
 
 class CustomPlanActionSheet {
   static Future<void> show(BuildContext context, WidgetRef ref, String planId) async {
@@ -12,6 +12,13 @@ class CustomPlanActionSheet {
     final activeIds = ref.read(activePlanIdsProvider);
     final isActive = activeIds.contains(planId);
     final isPrimary = activeIds.isNotEmpty && activeIds.first == planId;
+
+    // Check if pace adjustment is available (plan has tracks)
+    final planJson = prefs.getCustomPlan(planId);
+    final hasTracks = planJson != null &&
+        planJson['tracks'] != null &&
+        (planJson['tracks'] as List).isNotEmpty;
+    final currentDayCount = planJson != null ? (planJson['days'] as int? ?? 30) : 30;
     
     final action = await showModalBottomSheet<_CustomPlanAction>(
       context: context,
@@ -37,6 +44,17 @@ class CustomPlanActionSheet {
                 leading: const Icon(Icons.edit),
                 title: const Text('Rename Plan'),
                 onTap: () => Navigator.pop(context, _CustomPlanAction.rename),
+              ),
+              ListTile(
+                leading: const Icon(Icons.speed),
+                title: const Text('Adjust Pace'),
+                subtitle: hasTracks
+                    ? const Text('Change your daily reading pace.')
+                    : const Text('Not available — recreate this plan to enable.'),
+                enabled: hasTracks,
+                onTap: hasTracks
+                    ? () => Navigator.pop(context, _CustomPlanAction.adjustPace)
+                    : null,
               ),
               ListTile(
                 leading: Icon(isActive ? Icons.pause : Icons.play_arrow),
@@ -108,7 +126,10 @@ class CustomPlanActionSheet {
           prefs.saveCustomPlan(planId, planData);
         }
       }
-    } 
+    }
+    else if (action == _CustomPlanAction.adjustPace) {
+      await _showAdjustPaceDialog(context, ref, planId, currentDayCount);
+    }
     else if (action == _CustomPlanAction.restart) {
       final confirm = await showDialog<bool>(
         context: context,
@@ -157,5 +178,118 @@ class CustomPlanActionSheet {
         ref.read(readingPlanProvider(planId).notifier).deletePlanProgress();
       }
     }
+  }
+
+  static Future<void> _showAdjustPaceDialog(
+      BuildContext context, WidgetRef ref, String planId, int currentDayCount) async {
+    int? chosenDays = await showDialog<int>(
+      context: context,
+      builder: (context) => _AdjustPaceDialog(currentDayCount: currentDayCount),
+    );
+
+    if (chosenDays == null || !context.mounted) return;
+    if (chosenDays == currentDayCount) return; // no-op
+
+    // Warn before applying
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Apply New Pace?'),
+        content: const Text(
+          'Your progress will be mapped to the new schedule as closely as possible.\n\n'
+          'Days that mix already-read and unread passages will show as unread.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Apply'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !context.mounted) return;
+
+    // Show loading snackbar
+    ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Adjusting pace…'), duration: Duration(seconds: 3)));
+
+    final error = await ref
+        .read(readingPlanProvider(planId).notifier)
+        .adjustPace(chosenDays);
+
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    if (error != null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error)));
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Pace updated to $chosenDays days!')));
+    }
+  }
+}
+
+/// Dialog with a day-count slider for pace adjustment.
+class _AdjustPaceDialog extends StatefulWidget {
+  final int currentDayCount;
+  const _AdjustPaceDialog({required this.currentDayCount});
+
+  @override
+  State<_AdjustPaceDialog> createState() => _AdjustPaceDialogState();
+}
+
+class _AdjustPaceDialogState extends State<_AdjustPaceDialog> {
+  late double _days;
+
+  @override
+  void initState() {
+    super.initState();
+    _days = widget.currentDayCount.toDouble();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final daysInt = _days.round();
+    return AlertDialog(
+      title: const Text('Adjust Pace'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('New day count: $daysInt days',
+              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 16),
+          Slider(
+            value: _days,
+            min: 7,
+            max: 365,
+            divisions: 358,
+            label: '$daysInt days',
+            onChanged: (v) => setState(() => _days = v),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Current: ${widget.currentDayCount} days',
+            style: theme.textTheme.bodySmall
+                ?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, null),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(context, daysInt),
+          child: const Text('Preview'),
+        ),
+      ],
+    );
   }
 }
