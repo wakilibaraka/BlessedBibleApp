@@ -7,7 +7,7 @@ import '../../theme/app_colors.dart';
 import '../widgets/animated_background.dart';
 import '../widgets/textured_glass_container.dart';
 import 'reading_plan_browser.dart';
-import 'create_custom_plan_screen.dart';
+import 'custom_plan_builder_screen.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../widgets/shared_app_bar.dart';
 
@@ -183,7 +183,7 @@ class ReadingPlansHubScreen extends ConsumerWidget {
                       TextButton.icon(
                         onPressed: () {
                           Navigator.of(context).push(CupertinoPageRoute(
-                              builder: (_) => const CreateCustomPlanScreen()));
+                              builder: (_) => const CustomPlanBuilderScreen()));
                         },
                         icon: const Icon(Icons.add, size: 18),
                         label: const Text('Create'),
