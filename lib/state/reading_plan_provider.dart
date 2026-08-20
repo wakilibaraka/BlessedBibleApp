@@ -264,9 +264,56 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
       if (planId != 'chronological_1yr') {
         final customPlan = ref.read(preferencesProvider).getCustomPlan(planId);
         if (customPlan != null) {
-          final rawReadings = customPlan['readings'] as List;
-          finalPlanData =
-              rawReadings.map((e) => PlanDayData.fromJson(e)).toList();
+          if (customPlan.containsKey('schedule')) {
+            final schedule = customPlan['schedule'] as List;
+            finalPlanData = [];
+            for (final dayMap in schedule) {
+              final dayNum = dayMap['dayNumber'] as int;
+              final portions = dayMap['portions'] as List;
+              
+              List<PlanPassage> passages = [];
+              for (final portionMap in portions) {
+                final book = portionMap['book'] as String;
+                final startCh = portionMap['startChapter'] as int;
+                final startV = portionMap['startVerse'] as int;
+                final endCh = portionMap['endChapter'] as int;
+                final endV = portionMap['endVerse'] as int;
+                
+                List<String> refs = [];
+                for (int ch = startCh; ch <= endCh; ch++) {
+                  if (startCh == endCh) {
+                     refs.add('$book $ch:$startV-$endV');
+                  } else if (ch == startCh) {
+                     refs.add('$book $ch:$startV');
+                  } else if (ch == endCh) {
+                     refs.add('$book $ch:1-$endV');
+                  } else {
+                     refs.add('$book $ch');
+                  }
+                }
+                
+                String label;
+                if (startCh == endCh) {
+                  label = '$book $startCh:$startV-$endV';
+                } else {
+                  label = '$book $startCh:$startV–$endCh:$endV';
+                }
+                
+                passages.add(PlanPassage(label: label, refs: refs));
+              }
+              
+              finalPlanData.add(PlanDayData(
+                day: dayNum,
+                week: ((dayNum - 1) ~/ 7) + 1,
+                title: 'Day $dayNum',
+                passages: passages,
+              ));
+            }
+          } else {
+            final rawReadings = customPlan['readings'] as List;
+            finalPlanData =
+                rawReadings.map((e) => PlanDayData.fromJson(e)).toList();
+          }
 
           // Restore paceMode and restDay saved inside the plan definition
           if (customPlan.containsKey('paceMode')) {
