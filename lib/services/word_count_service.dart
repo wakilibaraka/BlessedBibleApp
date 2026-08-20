@@ -16,8 +16,12 @@ class WordCountService {
   /// Loads and parses the word_counts.json asset off the main isolate.
   Future<void> init() async {
     if (_data != null) return;
-    
     final jsonString = await rootBundle.loadString('assets/data/word_counts.json');
+    await initFromJson(jsonString);
+  }
+
+  /// Initializes the service with a given JSON string (useful for testing).
+  Future<void> initFromJson(String jsonString) async {
     _data = await compute(_parseWordCountsJson, jsonString);
   }
 
@@ -79,13 +83,7 @@ class WordCountService {
       if (c == endCh) {
         lastVerseInChapter = endV;
       } else {
-        // Find the maximum verse number in this chapter
-        int maxV = 0;
-        for (final vKey in verses.keys) {
-          final vNum = int.tryParse(vKey) ?? 0;
-          if (vNum > maxV) maxV = vNum;
-        }
-        lastVerseInChapter = maxV;
+        lastVerseInChapter = maxVerseInChapter(book, c);
       }
 
       for (int v = firstVerseInChapter; v <= lastVerseInChapter; v++) {
@@ -95,6 +93,26 @@ class WordCountService {
     }
     
     return total;
+  }
+
+  /// Returns the highest verse number in the given chapter.
+  int maxVerseInChapter(String book, int chapter) {
+    _ensureInitialized();
+    try {
+      final bookData = _data![book];
+      if (bookData == null) return 0;
+      final chapterData = bookData[chapter.toString()];
+      if (chapterData == null) return 0;
+      final verses = chapterData['verses'] as Map<String, dynamic>;
+      int maxV = 0;
+      for (final vKey in verses.keys) {
+        final vNum = int.tryParse(vKey) ?? 0;
+        if (vNum > maxV) maxV = vNum;
+      }
+      return maxV;
+    } catch (e) {
+      return 0;
+    }
   }
 
   void _ensureInitialized() {
