@@ -10,7 +10,7 @@ import '../../data/models/bible_model.dart';
 import '../../data/models/home_data.dart';
 import '../widgets/textured_glass_container.dart';
 import '../widgets/shared_app_bar.dart';
-import 'read_screen.dart';
+import '../sheets/book_chapter_selector_sheet.dart';
 
 class NotesListScreen extends ConsumerWidget {
   const NotesListScreen({super.key});
