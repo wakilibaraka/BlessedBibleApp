@@ -67,10 +67,11 @@ class _PlanRowWidgetState extends ConsumerState<PlanRowWidget> {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
-          onLongPress: () {
+          onLongPress: () async {
             final prefs = ref.read(preferencesProvider);
             if (prefs.getCustomPlanIds().contains(planId)) {
-              CustomPlanActionSheet.show(context, ref, planId);
+              await CustomPlanActionSheet.show(context, ref, planId);
+              if (mounted) setState(() {});
             }
           },
           onTap: () {

@@ -48,7 +48,7 @@ class PlanGenerator {
     }
     
     if (totalPlanWords == 0) {
-      return ReadingPlan(id: id, title: title, days: 0, cadence: cadence, schedule: []);
+      return ReadingPlan(id: id, title: title, days: 0, cadence: cadence, schedule: [], tracks: tracks);
     }
 
     int effectiveReadingDays = (days * cadence / 7).round();
@@ -98,6 +98,7 @@ class PlanGenerator {
       wasClamped: wasClamped,
       clampReason: clampReason,
       schedule: finalizedSchedule,
+      tracks: tracks,
     );
   }
 

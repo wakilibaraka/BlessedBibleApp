@@ -359,7 +359,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
   }
 
   void deletePlanProgress() {
-    ref.read(preferencesProvider).deleteReadingPlanState(id);
+    ref.read(preferencesProvider).deleteReadingPlanState(_planId);
     ref.invalidateSelf();
   }
 
@@ -472,6 +472,15 @@ class ActivePlanIdsNotifier extends Notifier<List<String>> {
 
   void removePlan(String id) {
     final next = state.where((e) => e != id).toList();
+    state = next;
+    ref.read(preferencesProvider).saveActivePlanIds(next);
+  }
+
+  void makePrimary(String id) {
+    if (!state.contains(id)) return;
+    if (state.first == id) return;
+    final next = state.where((e) => e != id).toList();
+    next.insert(0, id);
     state = next;
     ref.read(preferencesProvider).saveActivePlanIds(next);
   }

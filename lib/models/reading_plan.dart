@@ -113,6 +113,7 @@ class ReadingPlan {
   final bool wasClamped;
   final String? clampReason;
   final List<PlanDay> schedule;
+  final List<List<PlanRange>>? tracks; // Nullable for backwards compatibility
 
   ReadingPlan({
     required this.id,
@@ -122,7 +123,30 @@ class ReadingPlan {
     required this.schedule,
     this.wasClamped = false,
     this.clampReason,
+    this.tracks,
   });
+
+  ReadingPlan copyWith({
+    String? id,
+    String? title,
+    int? days,
+    int? cadence,
+    bool? wasClamped,
+    String? clampReason,
+    List<PlanDay>? schedule,
+    List<List<PlanRange>>? tracks,
+  }) {
+    return ReadingPlan(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      days: days ?? this.days,
+      cadence: cadence ?? this.cadence,
+      wasClamped: wasClamped ?? this.wasClamped,
+      clampReason: clampReason ?? this.clampReason,
+      schedule: schedule ?? this.schedule,
+      tracks: tracks ?? this.tracks,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -132,6 +156,8 @@ class ReadingPlan {
         'wasClamped': wasClamped,
         'clampReason': clampReason,
         'schedule': schedule.map((d) => d.toJson()).toList(),
+        if (tracks != null) 
+          'tracks': tracks!.map((track) => track.map((r) => r.toJson()).toList()).toList(),
       };
 
   factory ReadingPlan.fromJson(Map<String, dynamic> json) => ReadingPlan(
@@ -144,5 +170,12 @@ class ReadingPlan {
         schedule: (json['schedule'] as List)
             .map((d) => PlanDay.fromJson(d as Map<String, dynamic>))
             .toList(),
+        tracks: json['tracks'] != null
+            ? (json['tracks'] as List)
+                .map((track) => (track as List)
+                    .map((r) => PlanRange.fromJson(r as Map<String, dynamic>))
+                    .toList())
+                .toList()
+            : null,
       );
 }
