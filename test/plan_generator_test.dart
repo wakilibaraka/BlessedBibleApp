@@ -156,4 +156,98 @@ void main() {
     
     debugPrint('Multi-track generated 30 days, 2 portions each successfully.');
   });
+
+  test('Edge case: days > total verses (John in 2000 days)', () {
+    final plan = generator.generatePlan(
+      id: 'john2000',
+      title: 'John in 2000 Days',
+      ranges: [
+        PlanRange(book: 'John', startChapter: 1, startVerse: 1, endChapter: 21, endVerse: 25)
+      ],
+      days: 2000,
+      cadence: 7,
+    );
+    
+    // John has 879 verses. The plan should be capped at 879 days.
+    // Some verses might be skipped if they are empty, but kjvbible.json doesn't have empty verses.
+    // The exact count might be 879.
+    debugPrint('John in 2000 days clamped to actual days: ${plan.days}');
+    expect(plan.days, lessThan(2000));
+    expect(plan.schedule.length, plan.days);
+    
+    // Confirm no empty days
+    for (final day in plan.schedule) {
+      expect(day.portions, isNotEmpty);
+      expect(day.totalWords, greaterThan(0));
+    }
+  });
+
+  test('Edge case: Extremely short plan (Whole Bible in 3 days)', () {
+    final allBooks = ['Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy', 'Joshua', 'Judges', 'Ruth', '1 Samuel', '2 Samuel', '1 Kings', '2 Kings', '1 Chronicles', '2 Chronicles', 'Ezra', 'Nehemiah', 'Esther', 'Job', 'Psalms', 'Proverbs', 'Ecclesiastes', 'Song of Solomon', 'Isaiah', 'Jeremiah', 'Lamentations', 'Ezekiel', 'Daniel', 'Hosea', 'Joel', 'Amos', 'Obadiah', 'Jonah', 'Micah', 'Nahum', 'Habakkuk', 'Zephaniah', 'Haggai', 'Zechariah', 'Malachi', 'Matthew', 'Mark', 'Luke', 'John', 'Acts', 'Romans', '1 Corinthians', '2 Corinthians', 'Galatians', 'Ephesians', 'Philippians', 'Colossians', '1 Thessalonians', '2 Thessalonians', '1 Timothy', '2 Timothy', 'Titus', 'Philemon', 'Hebrews', 'James', '1 Peter', '2 Peter', '1 John', '2 John', '3 John', 'Jude', 'Revelation'];
+    
+    List<PlanRange> ranges = [];
+    for (var book in allBooks) {
+      // Find max chapter and max verse
+      // We can just use large bounds and clamp, but we have maxVerseInChapter
+      // For simplicity in test, let's assume we can query pericopes or just pass 1 to 150.
+      // Wait, WordCountService has no simple "max chapter" method, but we can just use 1 to 150 and it'll fail if not clamped.
+      // Better: we can extract bounds from allPericopes!
+      final bookP = allPericopes.where((p) => p.book == book).toList();
+      if (bookP.isNotEmpty) {
+        int endCh = bookP.last.endChapter;
+        int endV = bookP.last.endVerse;
+        ranges.add(PlanRange(book: book, startChapter: 1, startVerse: 1, endChapter: endCh, endVerse: endV));
+      }
+    }
+
+    final plan = generator.generatePlan(
+      id: 'bible3',
+      title: 'Whole Bible in 3 Days',
+      ranges: ranges,
+      days: 3,
+      cadence: 7,
+    );
+    
+    expect(plan.days, 3);
+    int totalBibleWords = 0;
+    for (final day in plan.schedule) {
+      debugPrint('Day ${day.dayNumber} words: ${day.totalWords}');
+      totalBibleWords += day.totalWords;
+      expect(day.totalWords, greaterThan(200000)); // ~263k
+    }
+    debugPrint('Whole Bible total words in 3-day plan: $totalBibleWords');
+  });
+
+  test('Edge case: days = 1', () {
+    final plan = generator.generatePlan(
+      id: 'gen1',
+      title: 'Genesis in 1 Day',
+      ranges: [
+        PlanRange(book: 'Genesis', startChapter: 1, startVerse: 1, endChapter: 50, endVerse: 26)
+      ],
+      days: 1,
+      cadence: 7,
+    );
+    
+    expect(plan.days, 1);
+    expect(plan.schedule.length, 1);
+    
+    final day = plan.schedule.first;
+    expect(day.portions.length, 1);
+    expect(day.portions.first.startChapter, 1);
+    expect(day.portions.first.endChapter, 50);
+    debugPrint('Genesis in 1 Day created 1 day with ${day.totalWords} words.');
+  });
+
+  test('Edge case: days <= 0', () {
+    expect(() => generator.generatePlan(
+      id: 'invalid',
+      title: 'Invalid Plan',
+      ranges: [
+        PlanRange(book: 'Genesis', startChapter: 1, startVerse: 1, endChapter: 1, endVerse: 1)
+      ],
+      days: 0,
+      cadence: 7,
+    ), throwsArgumentError);
+  });
 }

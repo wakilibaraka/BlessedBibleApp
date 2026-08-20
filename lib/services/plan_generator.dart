@@ -32,6 +32,10 @@ class PlanGenerator {
     required int days,
     int cadence = 7,
   }) {
+    if (days <= 0) {
+      throw ArgumentError('Days must be greater than 0');
+    }
+
     int effectiveReadingDays = (days * cadence / 7).round();
     if (effectiveReadingDays < 1) effectiveReadingDays = 1;
 
@@ -44,10 +48,13 @@ class PlanGenerator {
       _distributeRange(range, effectiveReadingDays, schedule);
     }
 
+    // Remove any trailing empty days (happens if days > available break points)
+    schedule.removeWhere((day) => day.portions.isEmpty);
+
     return ReadingPlan(
       id: id,
       title: title,
-      days: days,
+      days: schedule.length, // Clamp the reported days to the actual produced days
       cadence: cadence,
       schedule: schedule,
     );
