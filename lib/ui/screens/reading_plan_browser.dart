@@ -211,7 +211,7 @@ DateTime _dateForReadingDay(DateTime startedOn, int readingDay, int? restDay) {
 }
 
 /// For scheduled mode: build a map from [year-month-day string] → readingDay number
-Map<String, int> _buildDateToReadingMap(ReadingPlanState s) {
+Map<String, int> buildDateToReadingMap(ReadingPlanState s) {
   final map = <String, int>{};
   if (s.planStartedOn == null || s.planData.isEmpty) return map;
   DateTime d = DateTime.utc(
@@ -321,7 +321,7 @@ int _totalLogicalDays(ReadingPlanState s) {
       1;
 }
 
-int? _readingDayForLogicalDay(int logicalDay, ReadingPlanState s) {
+int? readingDayForLogicalDay(int logicalDay, ReadingPlanState s) {
   if (s.paceMode != 'scheduled' || s.restDay == null || s.planStartedOn == null) {
     return logicalDay;
   }
@@ -791,7 +791,7 @@ class _TodayViewBody extends ConsumerWidget {
     final realNow = DateTime.now();
 
     final scheduledMap = planState.paceMode == 'scheduled'
-        ? _buildDateToReadingMap(planState)
+        ? buildDateToReadingMap(planState)
         : <String, int>{};
 
     final isScheduled = planState.paceMode == 'scheduled';
@@ -928,7 +928,7 @@ class _TodayViewBody extends ConsumerWidget {
               ),
             ],
             const SizedBox(height: 28),
-            _AdaptivePlanCalendar(
+            AdaptivePlanCalendar(
               planState: planState,
               displayMonth: displayMonth,
               isYearView: isYearView,
@@ -1347,7 +1347,7 @@ class _DayViewState extends ConsumerState<DayView>
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    final readingDay = _readingDayForLogicalDay(_currentLogicalDay, planState);
+    final readingDay = readingDayForLogicalDay(_currentLogicalDay, planState);
     final isRestDay = readingDay == null;
     final theme = Theme.of(context);
     final gold = AppColors.goldAccent;
@@ -1420,7 +1420,7 @@ class _DayViewState extends ConsumerState<DayView>
 
       String? weekTitle;
       final prevReadingDay =
-          _readingDayForLogicalDay(_currentLogicalDay - 1, planState);
+          readingDayForLogicalDay(_currentLogicalDay - 1, planState);
       if (prevReadingDay != null &&
           prevReadingDay >= 1 &&
           prevReadingDay <= planState.planData.length) {
@@ -1906,7 +1906,7 @@ class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
   }
 }
 
-class _AdaptivePlanCalendar extends StatelessWidget {
+class AdaptivePlanCalendar extends StatelessWidget {
   final ReadingPlanState planState;
   final DateTime displayMonth;
   final bool isYearView;
@@ -1921,7 +1921,8 @@ class _AdaptivePlanCalendar extends StatelessWidget {
   final ThemeData theme;
   final void Function(int dayNum) onDayTap;
 
-  const _AdaptivePlanCalendar({
+  const AdaptivePlanCalendar({
+    super.key,
     required this.planState,
     required this.displayMonth,
     required this.isYearView,
@@ -1942,7 +1943,7 @@ class _AdaptivePlanCalendar extends StatelessWidget {
     final totalDays = planState.planData.length;
 
     if (totalDays <= 14) {
-      return _PlanCompactCalendar(
+      return PlanCompactCalendar(
         planState: planState,
         gold: gold,
         theme: theme,
@@ -2066,13 +2067,14 @@ class _AdaptivePlanCalendar extends StatelessWidget {
   }
 }
 
-class _PlanCompactCalendar extends StatelessWidget {
+class PlanCompactCalendar extends StatelessWidget {
   final ReadingPlanState planState;
   final Color gold;
   final ThemeData theme;
   final void Function(int dayNum) onDayTap;
 
-  const _PlanCompactCalendar({
+  const PlanCompactCalendar({
+    super.key,
     required this.planState,
     required this.gold,
     required this.theme,

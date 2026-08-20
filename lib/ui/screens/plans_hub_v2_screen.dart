@@ -51,16 +51,16 @@ class _PlansHubV2ScreenState extends ConsumerState<PlansHubV2Screen> with Single
             labelColor: theme.primaryColor,
             unselectedLabelColor: theme.colorScheme.onSurface.withValues(alpha: 0.6),
             tabs: const [
+              Tab(text: 'Library'),
               Tab(text: 'My Plans'),
-              Tab(text: 'Discover'),
             ],
           ),
           Expanded(
             child: TabBarView(
               controller: _tabController,
               children: [
+                _LibraryTab(tabController: _tabController),
                 _MyPlansTab(),
-                _DiscoverTab(),
               ],
             ),
           ),
@@ -70,11 +70,39 @@ class _PlansHubV2ScreenState extends ConsumerState<PlansHubV2Screen> with Single
   }
 }
 
-class _MyPlansTab extends ConsumerWidget {
+class _MyPlansTab extends ConsumerStatefulWidget {
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_MyPlansTab> createState() => _MyPlansTabState();
+}
+
+class _MyPlansTabState extends ConsumerState<_MyPlansTab> {
+  int _viewIndex = 0; // 0: Week, 1: Month, 2: Year
+  late DateTime _displayMonth;
+
+  @override
+  void initState() {
+    super.initState();
+    final now = DateTime.now();
+    _displayMonth = DateTime(now.year, now.month, 1);
+  }
+
+  void _prevMonth() {
+    setState(() {
+      _displayMonth = DateTime(_displayMonth.year, _displayMonth.month - 1, 1);
+    });
+  }
+
+  void _nextMonth() {
+    setState(() {
+      _displayMonth = DateTime(_displayMonth.year, _displayMonth.month + 1, 1);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final activePlanIds = ref.watch(activePlanIdsProvider);
     final theme = Theme.of(context);
+    final gold = theme.primaryColor;
 
     if (activePlanIds.isEmpty) {
       return Center(
@@ -83,11 +111,11 @@ class _MyPlansTab extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.menu_book_rounded, size: 48, color: theme.primaryColor.withValues(alpha: 0.5)),
+              Icon(Icons.menu_book_rounded, size: 48, color: gold.withValues(alpha: 0.5)),
               const SizedBox(height: 16),
-              Text('No Active Plans', style: theme.textTheme.titleMedium?.copyWith(color: theme.primaryColor, fontWeight: FontWeight.bold)),
+              Text('No Active Plans', style: theme.textTheme.titleMedium?.copyWith(color: gold, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
-              Text('Go to the Discover tab to start a reading plan.', textAlign: TextAlign.center, style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.7))),
+              Text('Go to the Library tab to start a reading plan.', textAlign: TextAlign.center, style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.7))),
             ],
           ),
         ),
@@ -98,17 +126,98 @@ class _MyPlansTab extends ConsumerWidget {
     final secondaryPlanIds = activePlanIds.skip(1).toList();
     final primaryState = ref.watch(readingPlanProvider(primaryPlanId));
 
+    final realNow = DateTime.now();
+    final isScheduled = primaryState.paceMode == 'scheduled';
+    final scheduledMap = isScheduled ? buildDateToReadingMap(primaryState) : <String, int>{};
+
     return ListView(
       padding: const EdgeInsets.symmetric(vertical: 24),
       children: [
-        _buildWeekStrip(context, primaryState, theme),
+        // Big Progress Ring
+        Center(
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              SizedBox(
+                width: 140,
+                height: 140,
+                child: CircularProgressIndicator(
+                  value: primaryState.percentComplete,
+                  strokeWidth: 9,
+                  backgroundColor: gold.withValues(alpha: 0.12),
+                  valueColor: AlwaysStoppedAnimation<Color>(gold),
+                  strokeCap: StrokeCap.round,
+                ),
+              ),
+              Column(mainAxisSize: MainAxisSize.min, children: [
+                Text('${(primaryState.percentComplete * 100).toStringAsFixed(0)}%',
+                    style: TextStyle(
+                        fontFamily: 'EB Garamond',
+                        fontSize: 34,
+                        fontWeight: FontWeight.bold,
+                        color: gold)),
+                Text('Complete', style: theme.textTheme.labelSmall),
+              ]),
+            ],
+          ),
+        ),
         const SizedBox(height: 24),
+        
+        // Primary Plan Card
+        PlanRowWidget(planId: primaryPlanId),
+        const SizedBox(height: 24),
+
+        // View Switcher (Week / Month / Year)
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Text('Today\'s Reading', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+          child: Container(
+            height: 36,
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface.withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: theme.dividerColor.withValues(alpha: 0.2)),
+            ),
+            child: Row(
+              children: [
+                _buildViewTab('Week', 0, gold, theme),
+                _buildViewTab('Month', 1, gold, theme),
+                _buildViewTab('Year', 2, gold, theme),
+              ],
+            ),
+          ),
         ),
-        const SizedBox(height: 8),
-        PlanRowWidget(planId: primaryPlanId),
+        const SizedBox(height: 24),
+
+        // Current View
+        if (_viewIndex == 0)
+          _buildWeekStrip(context, primaryState, theme, isScheduled, scheduledMap)
+        else if (_viewIndex == 1)
+          AdaptivePlanCalendar(
+            planState: primaryState,
+            displayMonth: _displayMonth,
+            isYearView: false,
+            onPrevMonth: _prevMonth,
+            onNextMonth: _nextMonth,
+            onJumpToMonth: (d) => setState(() => _displayMonth = d),
+            onToggleYearView: () => setState(() => _viewIndex = 2),
+            scheduledMap: scheduledMap,
+            realToday: realNow,
+            isScheduled: isScheduled,
+            gold: gold,
+            theme: theme,
+            onDayTap: (dayNum) {
+              Navigator.push(context, CupertinoPageRoute(builder: (_) => DayView(planId: primaryPlanId, dayNum: dayNum)));
+            },
+          )
+        else if (_viewIndex == 2)
+          PlanCompactCalendar(
+            planState: primaryState,
+            gold: gold,
+            theme: theme,
+            onDayTap: (dayNum) {
+              Navigator.push(context, CupertinoPageRoute(builder: (_) => DayView(planId: primaryPlanId, dayNum: dayNum)));
+            },
+          ),
         
         if (secondaryPlanIds.isNotEmpty) ...[
           const SizedBox(height: 32),
@@ -123,9 +232,33 @@ class _MyPlansTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildWeekStrip(BuildContext context, ReadingPlanState state, ThemeData theme) {
+  Widget _buildViewTab(String title, int index, Color gold, ThemeData theme) {
+    final isSelected = _viewIndex == index;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => _viewIndex = index),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          decoration: BoxDecoration(
+            color: isSelected ? gold.withValues(alpha: 0.2) : Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            title,
+            style: theme.textTheme.labelMedium?.copyWith(
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              color: isSelected ? gold : theme.colorScheme.onSurface.withValues(alpha: 0.7),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWeekStrip(BuildContext context, ReadingPlanState state, ThemeData theme, bool isScheduled, Map<String, int> scheduledMap) {
     final now = DateTime.now();
-    final todayWeekday = now.weekday == 7 ? 0 : now.weekday; // 0 = Sunday, 6 = Saturday
+    final todayWeekday = now.weekday == 7 ? 0 : now.weekday; 
     final startOfWeek = now.subtract(Duration(days: todayWeekday));
     final days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
@@ -137,26 +270,17 @@ class _MyPlansTab extends ConsumerWidget {
           final date = startOfWeek.add(Duration(days: index));
           final isToday = date.year == now.year && date.month == now.month && date.day == now.day;
           
-          // simplified completion check based on today's reading day
-          // Since mapping actual dates is complex (depends on rest day logic),
-          // we use a simplified approximation: if it's before today, and we haven't missed days, it's checked.
-          // For absolute precision, we'd need _readingDayForLogicalDay, but since this is UI logic, 
-          // we'll just check if the reading day for this date is in completedReadings.
-          // Let's do a very basic lookup for demonstration:
           bool isCompleted = false;
-          int? rDay;
-          if (state.planStartedOn != null) {
-              final sDate = DateTime.utc(state.planStartedOn!.year, state.planStartedOn!.month, state.planStartedOn!.day);
-              final tDate = DateTime.utc(date.year, date.month, date.day);
-              final diff = tDate.difference(sDate).inDays;
-              if (diff >= 0) {
-                 final logicalDay = diff + 1;
-                 // Approximation: if diff >= 0, just assume readingDay ~ logicalDay for UI if scheduled
-                 rDay = logicalDay; 
-              }
-          }
-          if (rDay != null && state.completedReadings.contains(rDay)) {
-              isCompleted = true;
+          int? readingDayNum;
+          
+          if (isScheduled && state.planStartedOn != null) {
+            final logicalDay = date.difference(DateTime.utc(state.planStartedOn!.year, state.planStartedOn!.month, state.planStartedOn!.day)).inDays + 1;
+            if (logicalDay > 0) {
+                readingDayNum = readingDayForLogicalDay(logicalDay, state);
+                if (readingDayNum != null && state.completedReadings.contains(readingDayNum)) {
+                   isCompleted = true;
+                }
+            }
           }
 
           return Column(
@@ -169,29 +293,41 @@ class _MyPlansTab extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isToday 
-                      ? theme.primaryColor 
-                      : (isCompleted ? theme.primaryColor.withValues(alpha: 0.1) : Colors.transparent),
-                  border: isToday || isCompleted 
-                      ? null 
-                      : Border.all(color: theme.colorScheme.onSurface.withValues(alpha: 0.1)),
-                ),
-                child: Center(
-                  child: isCompleted && !isToday
-                      ? Icon(Icons.check, size: 16, color: theme.primaryColor)
-                      : Text(
-                          '${date.day}',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: isToday ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
+              GestureDetector(
+                onTap: () {
+                  if (readingDayNum != null) {
+                     Navigator.push(context, CupertinoPageRoute(builder: (_) => DayView(planId: state.planId, dayNum: readingDayNum!)));
+                  } else if (isToday) {
+                     final rDay = state.todayReadingDay;
+                     if (rDay != null) {
+                        Navigator.push(context, CupertinoPageRoute(builder: (_) => DayView(planId: state.planId, dayNum: rDay)));
+                     }
+                  }
+                },
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: isToday 
+                        ? theme.primaryColor 
+                        : (isCompleted ? theme.primaryColor.withValues(alpha: 0.1) : Colors.transparent),
+                    border: isToday || isCompleted 
+                        ? null 
+                        : Border.all(color: theme.colorScheme.onSurface.withValues(alpha: 0.1)),
+                  ),
+                  child: Center(
+                    child: isCompleted && !isToday
+                        ? Icon(Icons.check, size: 16, color: theme.primaryColor)
+                        : Text(
+                            '${date.day}',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: isToday ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
+                            ),
                           ),
-                        ),
+                  ),
                 ),
               ),
             ],
@@ -202,7 +338,36 @@ class _MyPlansTab extends ConsumerWidget {
   }
 }
 
-class _DiscoverTab extends ConsumerWidget {
+class _LibraryTab extends ConsumerWidget {
+  final TabController tabController;
+  const _LibraryTab({required this.tabController});
+
+  void _activatePlan(BuildContext context, WidgetRef ref, String id, {bool isCustom = false}) {
+    final added = ref.read(activePlanIdsProvider.notifier).addPlan(id);
+    if (!added) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('You have 3 active plans. Deactivate one to add another.')));
+      return;
+    }
+    
+    if (isCustom) {
+      final customPlan = ref.read(preferencesProvider).getCustomPlan(id);
+      ref.read(readingPlanProvider(id).notifier).startPlan(
+            planId: id,
+            paceMode: customPlan?['paceMode'] ?? 'scheduled',
+            restDay: customPlan?['restDay'] as int?,
+          );
+    } else {
+      ref.read(readingPlanProvider(id).notifier).startPlan(
+            planId: id,
+            paceMode: 'scheduled',
+          );
+    }
+    
+    ref.read(currentActivePlanIdProvider.notifier).setContext(id);
+    tabController.animateTo(1);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
@@ -342,9 +507,7 @@ class _DiscoverTab extends ConsumerWidget {
     final customPlan = ref.read(preferencesProvider).getCustomPlan(id);
     final title = customPlan?['title'] ?? 'Custom Plan';
     return GestureDetector(
-      onTap: () {
-         Navigator.of(context).push(CupertinoPageRoute(builder: (_) => ReadingPlanBrowser(planId: id)));
-      },
+      onTap: () => _activatePlan(context, ref, id, isCustom: true),
       child: Container(
         width: 140,
         margin: const EdgeInsets.only(right: 12),
@@ -369,9 +532,7 @@ class _DiscoverTab extends ConsumerWidget {
 
   Widget _buildCuratedPlanCard(BuildContext context, WidgetRef ref, ThemeData theme, PlanMetadata plan) {
     return GestureDetector(
-      onTap: () {
-         Navigator.of(context).push(CupertinoPageRoute(builder: (_) => ReadingPlanBrowser(planId: plan.id)));
-      },
+      onTap: () => _activatePlan(context, ref, plan.id),
       child: Container(
         width: 240,
         margin: const EdgeInsets.only(right: 12),

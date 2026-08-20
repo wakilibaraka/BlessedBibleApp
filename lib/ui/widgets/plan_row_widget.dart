@@ -73,13 +73,13 @@ class _PlanRowWidgetState extends ConsumerState<PlanRowWidget> {
                 builder: (_) => DayView(planId: planId, dayNum: 1),
               ));
             } else if (planState.isPlanComplete) {
+              final lastDay = planState.planData.isNotEmpty ? planState.planData.length : 1;
               Navigator.of(context).push(CupertinoPageRoute(
-                builder: (_) => ReadingPlanBrowser(planId: planId),
+                builder: (_) => DayView(planId: planId, dayNum: lastDay),
               ));
             } else {
               Navigator.of(context).push(CupertinoPageRoute(
-                builder: (_) =>
-                    DayView(planId: planId, dayNum: planState.currentDay),
+                builder: (_) => DayView(planId: planId, dayNum: planState.currentDay),
               ));
             }
           },
