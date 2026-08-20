@@ -73,10 +73,10 @@ class MainNavScreen extends ConsumerWidget {
             return;
           }
 
-          // If we are not on the Home tab (0), navigating back should just take us Home.
+          // If we are not on the Home tab (0), navigating back should just take us to the previous tab.
           final currentTab = ref.read(navProvider);
           if (currentTab != 0) {
-            ref.read(navProvider.notifier).setIndex(0);
+            ref.read(navProvider.notifier).goBack();
             return;
           }
 

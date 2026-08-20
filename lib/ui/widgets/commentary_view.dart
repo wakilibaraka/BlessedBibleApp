@@ -14,7 +14,7 @@ import '../screens/read_screen.dart' show VerseActionLogic;
 import '../../models/commentary_entry.dart';
 
 import '../screens/commentary_hub_screen.dart';
-import '../screens/standalone_reader_screen.dart';
+import '../../state/read_location_provider.dart';
 
 class CommentaryView extends ConsumerStatefulWidget {
   final String book;
@@ -284,13 +284,15 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: GestureDetector(
                       onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                          builder: (_) => StandaloneReaderScreen(
-                            bookName: bookName,
-                            chapterNum: chapterNum,
-                            verseNum: displayVerse,
-                          ),
-                        ));
+                        // Dismiss commentary hub back to root
+                        Navigator.of(context).popUntil((route) => route.isFirst);
+                        // Jump to verse in main reader
+                        openReaderAtVerse(
+                          ref,
+                          bookName: bookName,
+                          chapter: chapterNum,
+                          verse: displayVerse,
+                        );
                       },
                       child: Container(
                         padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
