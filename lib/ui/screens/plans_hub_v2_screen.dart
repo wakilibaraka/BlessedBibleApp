@@ -8,6 +8,7 @@ import '../widgets/shared_app_bar.dart';
 import '../widgets/account_button.dart';
 import '../widgets/plan_row_widget.dart';
 import '../sheets/custom_plan_action_sheet.dart';
+import '../sheets/curated_plan_action_sheet.dart';
 import 'custom_plan_builder_screen.dart';
 import 'reading_plan_browser.dart';
 import 'reading_plans_hub_screen.dart';
@@ -42,13 +43,13 @@ class _PlansHubV2ScreenState extends ConsumerState<PlansHubV2Screen> with Single
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: SharedAppBar(
         title: const Text('Plans'),
-        leading: const Padding(
-          padding: EdgeInsets.only(left: 16.0),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: AccountButton()
-          )
-        ),
+        leading: const BackButton(),
+        actions: const [
+          Padding(
+            padding: EdgeInsets.only(right: 8.0),
+            child: AccountButton(),
+          ),
+        ],
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -383,6 +384,9 @@ class _LibraryTab extends ConsumerWidget {
     final gold = theme.primaryColor;
     final prefs = ref.watch(preferencesProvider);
     final customPlanIds = prefs.getCustomPlanIds();
+    final hiddenIds = ref.watch(hiddenPlanIdsProvider);
+    final visiblePlans = availablePlans.where((p) => !hiddenIds.contains(p.id)).toList();
+    final hiddenPlans = availablePlans.where((p) => hiddenIds.contains(p.id)).toList();
 
     return ListView(
       padding: const EdgeInsets.symmetric(vertical: 24),
@@ -450,15 +454,27 @@ class _LibraryTab extends ConsumerWidget {
         // Curated Plans Section
         _buildSectionTitle(theme, 'Curated Plans'),
         const SizedBox(height: 12),
-        SizedBox(
-          height: 160,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            children: availablePlans.map((plan) => _buildCuratedPlanCard(context, ref, theme, plan)).toList(),
+        if (visiblePlans.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Text('All curated plans are hidden.', style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.5))),
+          )
+        else
+          SizedBox(
+            height: 160,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              children: visiblePlans.map((plan) => _buildCuratedPlanCard(context, ref, theme, plan)).toList(),
+            ),
           ),
-        ),
-        const SizedBox(height: 32),
+        const SizedBox(height: 24),
+
+        // Hidden Plans section (only shown when something is hidden)
+        if (hiddenPlans.isNotEmpty) ...[
+          _HiddenPlansSection(hiddenPlans: hiddenPlans, onActivate: (id) => _activatePlan(context, ref, id)),
+          const SizedBox(height: 24),
+        ],
 
         // Placeholder Devotionals Section
         _buildSectionTitle(theme, 'Devotionals (Coming Soon)'),
@@ -543,6 +559,7 @@ class _LibraryTab extends ConsumerWidget {
   Widget _buildCuratedPlanCard(BuildContext context, WidgetRef ref, ThemeData theme, PlanMetadata plan) {
     return GestureDetector(
       onTap: () => _activatePlan(context, ref, plan.id),
+      onLongPress: () => CuratedPlanActionSheet.show(context, ref, plan.id),
       child: Container(
         width: 240,
         margin: const EdgeInsets.only(right: 12),
@@ -586,3 +603,82 @@ class _LibraryTab extends ConsumerWidget {
     );
   }
 }
+
+// ─── Hidden Plans Section ────────────────────────────────────────────────────
+
+class _HiddenPlansSection extends ConsumerStatefulWidget {
+  final List<PlanMetadata> hiddenPlans;
+  final void Function(String id) onActivate;
+
+  const _HiddenPlansSection({required this.hiddenPlans, required this.onActivate});
+
+  @override
+  ConsumerState<_HiddenPlansSection> createState() => _HiddenPlansSectionState();
+}
+
+class _HiddenPlansSectionState extends ConsumerState<_HiddenPlansSection> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => setState(() => _expanded = !_expanded),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              children: [
+                Text('Hidden Plans (${widget.hiddenPlans.length})',
+                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                const Spacer(),
+                Icon(_expanded ? Icons.expand_less : Icons.expand_more,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+              ],
+            ),
+          ),
+        ),
+        if (_expanded) ...[
+          const SizedBox(height: 12),
+          for (final plan in widget.hiddenPlans)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4),
+              child: Material(
+                color: theme.colorScheme.surface,
+                borderRadius: BorderRadius.circular(12),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () => widget.onActivate(plan.id),
+                  onLongPress: () => CuratedPlanActionSheet.show(context, ref, plan.id),
+                  child: Padding(
+                    padding: const EdgeInsets.all(14.0),
+                    child: Row(
+                      children: [
+                        Icon(Icons.visibility_off_outlined,
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.4), size: 20),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(plan.title,
+                              style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold)),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            ref.read(hiddenPlanIdsProvider.notifier).removePlan(plan.id);
+                          },
+                          child: const Text('Unhide'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ],
+    );
+  }
+}
+

@@ -6,6 +6,7 @@ import '../../state/reading_plan_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../screens/reading_plan_browser.dart';
 import '../sheets/custom_plan_action_sheet.dart';
+import '../sheets/curated_plan_action_sheet.dart';
 
 class PlanRowWidget extends ConsumerStatefulWidget {
   final String planId;
@@ -72,6 +73,8 @@ class _PlanRowWidgetState extends ConsumerState<PlanRowWidget> {
             if (prefs.getCustomPlanIds().contains(planId)) {
               await CustomPlanActionSheet.show(context, ref, planId);
               if (mounted) setState(() {});
+            } else {
+              await CuratedPlanActionSheet.show(context, ref, planId);
             }
           },
           onTap: () {

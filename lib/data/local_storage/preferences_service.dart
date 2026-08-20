@@ -240,6 +240,14 @@ class PreferencesService {
     return prefs.getStringList(_activePlanIdsKey) ?? [];
   }
 
+  void saveHiddenPlanIds(List<String> planIds) {
+    prefs.setStringList('hidden_plan_ids', planIds);
+  }
+
+  List<String> getHiddenPlanIds() {
+    return prefs.getStringList('hidden_plan_ids') ?? [];
+  }
+
   void saveReadingPlanState(String planId, Map<String, dynamic> state) {
     prefs.setString('${_readingPlanStateKey}_$planId', jsonEncode(state));
   }

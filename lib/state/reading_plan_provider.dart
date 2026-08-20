@@ -490,6 +490,30 @@ final activePlanIdsProvider =
     NotifierProvider<ActivePlanIdsNotifier, List<String>>(
         ActivePlanIdsNotifier.new);
 
+class HiddenPlanIdsNotifier extends Notifier<List<String>> {
+  @override
+  List<String> build() {
+    return ref.read(preferencesProvider).getHiddenPlanIds();
+  }
+
+  void addPlan(String id) {
+    if (state.contains(id)) return;
+    final next = [...state, id];
+    state = next;
+    ref.read(preferencesProvider).saveHiddenPlanIds(next);
+  }
+
+  void removePlan(String id) {
+    final next = state.where((e) => e != id).toList();
+    state = next;
+    ref.read(preferencesProvider).saveHiddenPlanIds(next);
+  }
+}
+
+final hiddenPlanIdsProvider =
+    NotifierProvider<HiddenPlanIdsNotifier, List<String>>(
+        HiddenPlanIdsNotifier.new);
+
 class CurrentActivePlanIdNotifier extends Notifier<String?> {
   @override
   String? build() => null;
