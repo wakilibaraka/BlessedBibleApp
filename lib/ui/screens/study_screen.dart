@@ -22,6 +22,8 @@ import '../../state/streak_provider.dart';
 import 'reading_plan_browser.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../../state/auth_provider.dart';
+import 'admin/admin_constants.dart';
+import 'admin/admin_dashboard_screen.dart';
 class _ParsedRef {
   final String book;
   final int chapter;
@@ -323,6 +325,15 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                                                       if (context.mounted) Navigator.pop(context);
                                                     },
                                                   ),
+                                                  if (authState.value?.uid == kOwnerUid)
+                                                    ListTile(
+                                                      leading: const Icon(Icons.admin_panel_settings, color: Colors.blue),
+                                                      title: const Text('Admin Panel', style: TextStyle(color: Colors.blue)),
+                                                      onTap: () {
+                                                        Navigator.pop(context);
+                                                        Navigator.push(context, CupertinoPageRoute(builder: (_) => const AdminDashboardScreen()));
+                                                      },
+                                                    ),
                                                 ],
                                               ],
                                             ),
