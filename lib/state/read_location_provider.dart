@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/local_storage/preferences_service.dart';
+import 'nav_provider.dart';
 
 class ReadLocationState {
   final String bookAbbrev;
@@ -87,3 +88,15 @@ class ReadLocationNotifier extends Notifier<ReadLocationState> {
 final readLocationProvider =
     NotifierProvider<ReadLocationNotifier, ReadLocationState>(
         ReadLocationNotifier.new);
+
+/// Reusable trigger to jump to a specific verse in the reader.
+/// Opens the reader tab (index 1), loads the requested book/chapter,
+/// and sets the requestedVerse to trigger the scrolling/highlighting logic.
+void openReaderAtVerse(WidgetRef ref, {required String bookName, required int chapter, int? verse}) {
+  ref.read(readLocationProvider.notifier).updateLocation(
+    bookName: bookName,
+    chapter: chapter,
+    verse: verse,
+  );
+  ref.read(navProvider.notifier).setIndex(1);
+}

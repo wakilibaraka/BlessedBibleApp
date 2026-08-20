@@ -9,6 +9,7 @@ import '../../state/home_provider.dart';
 import '../../state/votd_tracker_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../state/nav_provider.dart';
+import '../../state/read_location_provider.dart';
 import '../widgets/shared_top_header.dart';
 import '../widgets/glass_container.dart';
 import '../widgets/bouncy_entrance.dart';
@@ -216,39 +217,58 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           const SizedBox(height: 56),
 
           // ── Verse of the Day ──────────────────────────────────────────
-          BouncyEntrance(
-            delay: const Duration(milliseconds: 100),
-            child: Text(
-              'VERSE OF THE DAY',
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.primaryColor,
-                letterSpacing: 2.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          BouncyEntrance(
-            delay: const Duration(milliseconds: 200),
-            child: Text(
-              '\u201c${data.verseOfTheDay.text}\u201d',
-              textAlign: TextAlign.center,
-              style: theme.textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                height: 1.42,
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          BouncyEntrance(
-            delay: const Duration(milliseconds: 300),
-            child: Text(
-              data.verseOfTheDay.reference,
-              style: theme.textTheme.titleSmall?.copyWith(
-                color: theme.primaryColor,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.5,
-              ),
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              final refParts = votdRef.split(':');
+              final verseNum = refParts.length > 1 ? int.tryParse(refParts.last) : 1;
+              openReaderAtVerse(
+                ref,
+                bookName: votdBook,
+                chapter: votdChapter,
+                verse: verseNum,
+              );
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                BouncyEntrance(
+                  delay: const Duration(milliseconds: 100),
+                  child: Text(
+                    'VERSE OF THE DAY',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.primaryColor,
+                      letterSpacing: 2.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                BouncyEntrance(
+                  delay: const Duration(milliseconds: 200),
+                  child: Text(
+                    '\u201c${data.verseOfTheDay.text}\u201d',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      height: 1.42,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                BouncyEntrance(
+                  delay: const Duration(milliseconds: 300),
+                  child: Text(
+                    data.verseOfTheDay.reference,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      color: theme.primaryColor,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
 
