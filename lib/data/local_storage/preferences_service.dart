@@ -309,12 +309,17 @@ class PreferencesService {
   }
 
   /// Returns the persisted rest-day preference (Sunday-first, 1=Sun … 7=Sat).
-  /// Default is 7 (Saturday / Sabbath).
-  int getReadingPlanRestDay() => prefs.getInt(_readingPlanRestDayKey) ?? 7;
+  /// Default is null (No Rest Day).
+  int? getReadingPlanRestDay() => prefs.getInt(_readingPlanRestDayKey);
 
-  /// Persists the rest-day preference. [value] must be 1–7 (Sunday-first).
-  void setReadingPlanRestDay(int value) =>
+  /// Persists the rest-day preference. [value] must be 1–7 (Sunday-first) or null.
+  void setReadingPlanRestDay(int? value) {
+    if (value == null) {
+      prefs.remove(_readingPlanRestDayKey);
+    } else {
       prefs.setInt(_readingPlanRestDayKey, value);
+    }
+  }
 
   void saveVotdViewedDays(List<String> days) {
     prefs.setStringList(_votdViewedDaysKey, days);

@@ -723,7 +723,6 @@ class ReadingPlansHubScreen extends ConsumerWidget {
                   ref.read(readingPlanProvider(plan.id).notifier).startPlan(
                         planId: plan.id,
                         paceMode: 'scheduled',
-                        restDay: 7,
                       );
                   ref
                       .read(currentActivePlanIdProvider.notifier)
