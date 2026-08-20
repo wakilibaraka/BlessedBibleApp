@@ -61,6 +61,10 @@ void main() {
     final avgWords = totalWords / 30;
     debugPrint('Genesis 30 Days - Words/Day: Min=$minWords, Max=$maxWords, Avg=${avgWords.toStringAsFixed(1)}');
     
+    for (int i = 0; i < 3; i++) {
+      debugPrint('Day ${i+1} estimated minutes: ${plan.schedule[i].estimatedTimeDisplay}');
+    }
+
     // Total Genesis words should be ~38,000
     debugPrint('Total Genesis words in plan: $totalWords');
     expect(totalWords, wordCountService.wordsInRange('Genesis', 1, 1, 50, 26));
@@ -168,11 +172,16 @@ void main() {
       cadence: 7,
     );
     
-    // John has 879 verses. The plan should be capped at 879 days.
-    // Some verses might be skipped if they are empty, but kjvbible.json doesn't have empty verses.
-    // The exact count might be 879.
+    int totalWords = wordCountService.wordsInRange('John', 1, 1, 21, 25);
+    int maxDays = (totalWords / 130).floor();
+    
+    debugPrint('John total words: $totalWords');
     debugPrint('John in 2000 days clamped to actual days: ${plan.days}');
-    expect(plan.days, lessThan(2000));
+    debugPrint('Computed maxDays constraint: $maxDays');
+    
+    expect(plan.wasClamped, isTrue);
+    expect(plan.clampReason, isNotNull);
+    expect(plan.days, maxDays);
     expect(plan.schedule.length, plan.days);
     
     // Confirm no empty days
@@ -180,6 +189,37 @@ void main() {
       expect(day.portions, isNotEmpty);
       expect(day.totalWords, greaterThan(0));
     }
+  });
+
+  test('Whole Bible in 365 days', () {
+    final allBooks = ['Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy', 'Joshua', 'Judges', 'Ruth', '1 Samuel', '2 Samuel', '1 Kings', '2 Kings', '1 Chronicles', '2 Chronicles', 'Ezra', 'Nehemiah', 'Esther', 'Job', 'Psalms', 'Proverbs', 'Ecclesiastes', 'Song of Solomon', 'Isaiah', 'Jeremiah', 'Lamentations', 'Ezekiel', 'Daniel', 'Hosea', 'Joel', 'Amos', 'Obadiah', 'Jonah', 'Micah', 'Nahum', 'Habakkuk', 'Zephaniah', 'Haggai', 'Zechariah', 'Malachi', 'Matthew', 'Mark', 'Luke', 'John', 'Acts', 'Romans', '1 Corinthians', '2 Corinthians', 'Galatians', 'Ephesians', 'Philippians', 'Colossians', '1 Thessalonians', '2 Thessalonians', '1 Timothy', '2 Timothy', 'Titus', 'Philemon', 'Hebrews', 'James', '1 Peter', '2 Peter', '1 John', '2 John', '3 John', 'Jude', 'Revelation'];
+    
+    List<PlanRange> ranges = [];
+    for (var book in allBooks) {
+      final bookP = allPericopes.where((p) => p.book == book).toList();
+      if (bookP.isNotEmpty) {
+        int endCh = bookP.last.endChapter;
+        int endV = bookP.last.endVerse;
+        ranges.add(PlanRange(book: book, startChapter: 1, startVerse: 1, endChapter: endCh, endVerse: endV));
+      }
+    }
+
+    final plan = generator.generatePlan(
+      id: 'bible365',
+      title: 'Whole Bible in 365 Days',
+      ranges: ranges,
+      days: 365,
+      cadence: 7,
+    );
+    
+    expect(plan.days, 365);
+    int totalWords = 0;
+    int totalMins = 0;
+    for (final day in plan.schedule) {
+      totalWords += day.totalWords;
+      totalMins += day.estimatedMinutes;
+    }
+    debugPrint('Whole Bible 365 Days - Avg words/day: ${(totalWords / 365).round()}, Avg mins/day: ${(totalMins / 365).round()}');
   });
 
   test('Edge case: Extremely short plan (Whole Bible in 3 days)', () {

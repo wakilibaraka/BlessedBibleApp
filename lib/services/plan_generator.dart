@@ -17,6 +17,10 @@ class _Chunk {
   _Chunk(this.book, this.startCh, this.startV, this.endCh, this.endV, this.words, {this.endsOnPericope = false, this.endsOnChapter = false});
 }
 
+const int kSlowReaderWpm = 130;
+const int kMinDailyReadingMinutes = 1;
+const int minWordsPerDay = kSlowReaderWpm * kMinDailyReadingMinutes;
+
 class PlanGenerator {
   final WordCountService wordCountService;
   final List<PericopeEntry> allPericopes;
@@ -36,13 +40,33 @@ class PlanGenerator {
       throw ArgumentError('Days must be greater than 0');
     }
 
+    int totalPlanWords = 0;
+    for (final range in ranges) {
+      totalPlanWords += wordCountService.wordsInRange(range.book, range.startChapter, range.startVerse, range.endChapter, range.endVerse);
+    }
+    
+    if (totalPlanWords == 0) {
+      return ReadingPlan(id: id, title: title, days: 0, cadence: cadence, schedule: []);
+    }
+
     int effectiveReadingDays = (days * cadence / 7).round();
     if (effectiveReadingDays < 1) effectiveReadingDays = 1;
+
+    int maxDays = (totalPlanWords / minWordsPerDay).floor();
+    if (maxDays < 1) maxDays = 1;
+
+    bool wasClamped = false;
+    String? clampReason;
+    if (effectiveReadingDays > maxDays) {
+      effectiveReadingDays = maxDays;
+      wasClamped = true;
+      clampReason = 'The gentlest pace for this selection is $maxDays days.';
+    }
 
     // Initialize empty days
     List<PlanDay> schedule = List.generate(
         effectiveReadingDays,
-        (i) => PlanDay(dayNumber: i + 1, portions: [], totalWords: 0));
+        (i) => PlanDay(dayNumber: i + 1, portions: [], totalWords: 0, estimatedMinutes: 0, estimatedTimeDisplay: ''));
 
     for (final range in ranges) {
       _distributeRange(range, effectiveReadingDays, schedule);
@@ -51,12 +75,27 @@ class PlanGenerator {
     // Remove any trailing empty days (happens if days > available break points)
     schedule.removeWhere((day) => day.portions.isEmpty);
 
+    // Compute estimated reading times for each finalized day
+    final finalizedSchedule = schedule.map((day) {
+      int minutes = (day.totalWords / kSlowReaderWpm).round();
+      String display = minutes < 1 ? '<1 min' : '$minutes min';
+      return PlanDay(
+        dayNumber: day.dayNumber,
+        portions: day.portions,
+        totalWords: day.totalWords,
+        estimatedMinutes: minutes,
+        estimatedTimeDisplay: display,
+      );
+    }).toList();
+
     return ReadingPlan(
       id: id,
       title: title,
-      days: schedule.length, // Clamp the reported days to the actual produced days
+      days: finalizedSchedule.length, // Clamp the reported days to the actual produced days
       cadence: cadence,
-      schedule: schedule,
+      wasClamped: wasClamped,
+      clampReason: clampReason,
+      schedule: finalizedSchedule,
     );
   }
 

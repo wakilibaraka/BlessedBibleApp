@@ -75,17 +75,23 @@ class PlanDay {
   final int dayNumber;
   final List<PlanPortion> portions;
   int totalWords;
+  final int estimatedMinutes;
+  final String estimatedTimeDisplay;
 
   PlanDay({
     required this.dayNumber,
     required this.portions,
     required this.totalWords,
+    required this.estimatedMinutes,
+    required this.estimatedTimeDisplay,
   });
 
   Map<String, dynamic> toJson() => {
         'dayNumber': dayNumber,
         'portions': portions.map((p) => p.toJson()).toList(),
         'totalWords': totalWords,
+        'estimatedMinutes': estimatedMinutes,
+        'estimatedTimeDisplay': estimatedTimeDisplay,
       };
 
   factory PlanDay.fromJson(Map<String, dynamic> json) => PlanDay(
@@ -94,6 +100,8 @@ class PlanDay {
             .map((p) => PlanPortion.fromJson(p as Map<String, dynamic>))
             .toList(),
         totalWords: json['totalWords'] as int,
+        estimatedMinutes: json['estimatedMinutes'] as int? ?? 0,
+        estimatedTimeDisplay: json['estimatedTimeDisplay'] as String? ?? '<1 min',
       );
 }
 
@@ -102,6 +110,8 @@ class ReadingPlan {
   final String title;
   final int days;
   final int cadence;
+  final bool wasClamped;
+  final String? clampReason;
   final List<PlanDay> schedule;
 
   ReadingPlan({
@@ -110,6 +120,8 @@ class ReadingPlan {
     required this.days,
     required this.cadence,
     required this.schedule,
+    this.wasClamped = false,
+    this.clampReason,
   });
 
   Map<String, dynamic> toJson() => {
@@ -117,6 +129,8 @@ class ReadingPlan {
         'title': title,
         'days': days,
         'cadence': cadence,
+        'wasClamped': wasClamped,
+        'clampReason': clampReason,
         'schedule': schedule.map((d) => d.toJson()).toList(),
       };
 
@@ -125,6 +139,8 @@ class ReadingPlan {
         title: json['title'] as String,
         days: json['days'] as int,
         cadence: json['cadence'] as int,
+        wasClamped: json['wasClamped'] as bool? ?? false,
+        clampReason: json['clampReason'] as String?,
         schedule: (json['schedule'] as List)
             .map((d) => PlanDay.fromJson(d as Map<String, dynamic>))
             .toList(),
