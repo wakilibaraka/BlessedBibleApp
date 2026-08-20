@@ -13,7 +13,7 @@ import '../../state/read_location_provider.dart';
 import '../widgets/shared_top_header.dart';
 import '../widgets/glass_container.dart';
 import '../widgets/bouncy_entrance.dart';
-import 'study_reader_screen.dart';
+import 'commentary_hub_screen.dart';
 import '../../state/commentary_provider.dart';
 import 'today_screen.dart';
 import '../../services/share_service.dart';
@@ -328,13 +328,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                   : null;
 
                               Navigator.of(context).push(CupertinoPageRoute(
-                                  builder: (_) => StudyReaderScreen(
-                                        payload: StudySessionPayload.deepDive(
-                                          deepDiveBook: bookName,
-                                          deepDiveChapter: chapterNum,
-                                          deepDiveVerse: verseNum,
-                                          deepDiveVerseText: data.verseOfTheDay.text,
-                                        ),
+                                  builder: (_) => CommentaryHubScreen(
+                                        book: bookName,
+                                        chapter: chapterNum,
+                                        verse: verseNum,
+                                        verseText: data.verseOfTheDay.text,
                                       )));
                             },
                           ),

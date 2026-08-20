@@ -158,10 +158,75 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
         chapterEntries.isNotEmpty ||
         bookEntries.isNotEmpty;
 
-    return Stack(
-        children: [
-          // Base: Scrollable Content
-          _buildScrollableContent(
+    return Column(
+      children: [
+        // 1. OPAQUE HEADER ZONE
+        Container(
+          color: panelBackgroundColor,
+          padding: EdgeInsets.only(
+            top: widget.isCompact ? 16 : MediaQuery.paddingOf(context).top + 16,
+            left: 16,
+            right: 16,
+            bottom: 12,
+          ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: IconButton(
+                  icon: Icon(Icons.arrow_back_ios_new_rounded, color: theme.primaryColor),
+                  onPressed: () => Navigator.pop(context),
+                  tooltip: 'Back',
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(color: tokens.readingAccent.withValues(alpha: 0.5)),
+                ),
+                child: Text(
+                  referenceString,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: tokens.readingAccent,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded,
+                        color: isBookmarked ? tokens.readingAccent : tokens.readingInkMuted,
+                      ),
+                      tooltip: isBookmarked ? 'Remove Bookmark' : 'Bookmark Commentary',
+                      onPressed: () {
+                        VerseActionLogic.handleBookmark(context, theme, ref, bookName, chapterNum, [displayVerse ?? 1]);
+                      },
+                    ),
+                    if (widget.onExpand != null)
+                      IconButton(
+                        icon: Icon(Icons.open_in_full_rounded, color: tokens.readingAccent, size: 20),
+                        tooltip: 'Expand to full screen',
+                        onPressed: widget.onExpand,
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        
+        // Base: Scrollable Content
+        Expanded(
+          child: _buildScrollableContent(
               verseEntries,
               chapterEntries,
               bookEntries,
@@ -170,187 +235,13 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
               theme,
               tokens,
               is3DTheme,
-              typography),
-
-          // Floating Top Header
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // 1. OPAQUE HEADER ZONE
-                Container(
-                  color: panelBackgroundColor,
-                  padding: EdgeInsets.only(
-                    top: widget.isCompact ? 16 : MediaQuery.paddingOf(context).top + 16,
-                    left: 16,
-                    right: 16,
-                    bottom: 12,
-                  ),
-                  child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: IconButton(
-                        icon: Icon(Icons.arrow_back_ios_new_rounded,
-                            color: theme.primaryColor),
-                        onPressed: () {
-                          if (widget.isCompact) {
-                            Navigator.pop(context);
-                          } else {
-                            Navigator.pop(context);
-                          }
-                        },
-                        tooltip: 'Back',
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.transparent,
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(
-                            color: tokens.readingAccent.withValues(alpha: 0.5)),
-                      ),
-                      child: Text(
-                        referenceString,
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          color: tokens.readingAccent,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: Icon(
-                              isBookmarked
-                                  ? Icons.bookmark_rounded
-                                  : Icons.bookmark_outline_rounded,
-                              color: isBookmarked
-                                  ? tokens.readingAccent
-                                  : tokens.readingInkMuted,
-                            ),
-                            tooltip: isBookmarked
-                                ? 'Remove Bookmark'
-                                : 'Bookmark Commentary',
-                            onPressed: () {
-                              VerseActionLogic.handleBookmark(
-                                  context, theme, ref, bookName, chapterNum, [displayVerse ?? 1]);
-                            },
-                          ),
-                          if (widget.onExpand != null)
-                            IconButton(
-                              icon: Icon(
-                                Icons.open_in_full_rounded,
-                                color: tokens.readingAccent,
-                                size: 20,
-                              ),
-                              tooltip: 'Expand to full screen',
-                              onPressed: widget.onExpand,
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-                // 2. BLUR BAND BRIDGE
-                Container(
-                  height: 16,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        panelBackgroundColor,
-                        panelBackgroundColor.withValues(alpha: 0.0),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // 3. FLOATING VERSE CARD
-                if (finalVerseText != null)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: GestureDetector(
-                      onTap: () {
-                        // Dismiss commentary hub back to root
-                        Navigator.of(context).popUntil((route) => route.isFirst);
-                        // Jump to verse in main reader
-                        openReaderAtVerse(
-                          ref,
-                          bookName: bookName,
-                          chapter: chapterNum,
-                          verse: displayVerse,
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-                        decoration: BoxDecoration(
-                          color: tokens.readingSurface,
-                          borderRadius: BorderRadius.circular(24),
-                          border: Border.all(
-                              color:
-                                  tokens.readingInkMuted.withValues(alpha: 0.15)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.08),
-                              blurRadius: 20,
-                              offset: const Offset(0, 8),
-                            )
-                          ],
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              '\u201c$finalVerseText\u201d',
-                              textAlign: TextAlign.center,
-                              style: theme.textTheme.headlineMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                height: 1.42,
-                                fontSize: typography.fontSize * 1.05,
-                                fontFamily: typography.fontFamily,
-                                color: tokens.readingInk,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Tap to read in context',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: tokens.readingInkMuted.withValues(alpha: 0.6),
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                Icon(
-                                  Icons.open_in_new_rounded,
-                                  size: 12,
-                                  color: tokens.readingInkMuted.withValues(alpha: 0.6),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
+              typography,
+              finalVerseText,
+              bookName,
+              chapterNum,
+              displayVerse,
           ),
+        ),
       ],
     );
   }
@@ -365,6 +256,10 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
     ReadingTokens tokens,
     bool is3DTheme,
     TypographyState typography,
+    String? finalVerseText,
+    String bookName,
+    int chapterNum,
+    int? displayVerse,
   ) {
     return NotificationListener<ScrollNotification>(
       onNotification: (scrollNotification) {
@@ -404,14 +299,77 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
       child: CustomScrollView(
         controller: widget.scrollController,
         slivers: [
-          // Spacer for floating header
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: widget.isCompact
-                  ? 240.0
-                  : MediaQuery.paddingOf(context).top + 240.0,
+          // Verse Card (Scrolls with content)
+          if (finalVerseText != null)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                child: GestureDetector(
+                  onTap: () {
+                    // Dismiss commentary hub back to root
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                    // Jump to verse in main reader
+                    openReaderAtVerse(
+                      ref,
+                      bookName: bookName,
+                      chapter: chapterNum,
+                      verse: displayVerse,
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+                    decoration: BoxDecoration(
+                      color: tokens.readingSurface,
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                          color: tokens.readingInkMuted.withValues(alpha: 0.15)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.08),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
+                        )
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '\u201c$finalVerseText\u201d',
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            height: 1.42,
+                            fontSize: typography.fontSize * 1.05,
+                            fontFamily: typography.fontFamily,
+                            color: tokens.readingInk,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Tap to read in context',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: tokens.readingInkMuted.withValues(alpha: 0.6),
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Icon(
+                              Icons.open_in_new_rounded,
+                              size: 12,
+                              color: tokens.readingInkMuted.withValues(alpha: 0.6),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
-          ),
           if (commentaryAsync.isLoading)
             const SliverToBoxAdapter(
               child: Padding(
