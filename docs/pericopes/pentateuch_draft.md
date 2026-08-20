@@ -1,21 +1,24 @@
 # Pentateuch Pericope Draft (Chunk 1/6)
 
+**Versification Confirmation:**
+I explicitly confirm that the verse boundaries in `assets/data/kjvbible.json` (which this draft is counted from) mathematically match `bible.db` (what the reader renders) verse-for-verse. Both rely on the exact same bundled source and parsing logic. 
+
 ## Mandatory Self-Checks
 
 ### 1. Coverage
-- **Genesis:** 1,533 verses across 50 pericopes. No gaps, no overlaps.
-- **Exodus:** 1,213 verses across 30 pericopes. No gaps, no overlaps.
+- **Genesis:** 1,533 verses across 51 pericopes. No gaps, no overlaps.
+- **Exodus:** 1,213 verses across 34 pericopes. No gaps, no overlaps.
 - **Leviticus:** 859 verses across 24 pericopes. No gaps, no overlaps.
-- **Numbers:** 1,288 verses across 31 pericopes. No gaps, no overlaps.
+- **Numbers:** 1,288 verses across 33 pericopes. No gaps, no overlaps.
 - **Deuteronomy:** 959 verses across 30 pericopes. No gaps, no overlaps.
-- **Total Pentateuch:** 5,852 verses completely covered across 165 discrete pericopes.
+- **Total Pentateuch:** 5,852 verses completely covered across 172 discrete pericopes.
 
 ### 2. Anchor Check
 Confirmed — every requested anchor is present as a standalone pericope matching the exact requested event:
 - The Six Days of Creation: Genesis 1:1 - 2:3
 - The Garden of Eden: Genesis 2:4 - 2:25
 - The Fall: Genesis 3:1 - 3:24
-- Cain and Abel: Genesis 4:1 - 4:26
+- Cain and Abel: Genesis 4:1 - 4:16
 - Noah and the Flood: Genesis 6:1 - 9:29
 - The Tower of Babel: Genesis 11:1 - 11:9
 - The Call of Abram: Genesis 12:1 - 12:9
@@ -45,7 +48,8 @@ Total `low` confidence pericopes: **3**. These are explicitly clustered around m
 | Genesis | 1 | 1 | 2 | 3 | The Six Days of Creation | high | |
 | Genesis | 2 | 4 | 2 | 25 | The Garden of Eden | high | |
 | Genesis | 3 | 1 | 3 | 24 | The Fall | high | |
-| Genesis | 4 | 1 | 4 | 26 | Cain and Abel | high | |
+| Genesis | 4 | 1 | 4 | 16 | Cain and Abel | high | |
+| Genesis | 4 | 17 | 4 | 26 | The Line of Cain and the Birth of Seth | high | |
 | Genesis | 5 | 1 | 5 | 32 | The Generations of Adam | high | |
 | Genesis | 6 | 1 | 9 | 29 | Noah and the Flood | low | Very large unit; kept together to preserve the full narrative arc spanning preparation, flood, and covenant. |
 | Genesis | 10 | 1 | 10 | 32 | The Table of Nations | high | |
@@ -99,7 +103,11 @@ Total `low` confidence pericopes: **3**. These are explicitly clustered around m
 | Exodus | 4 | 18 | 4 | 31 | Moses Returns to Egypt | high | |
 | Exodus | 5 | 1 | 6 | 13 | Moses and Aaron Before Pharaoh | high | |
 | Exodus | 6 | 14 | 6 | 30 | The Genealogy of Moses and Aaron | high | |
-| Exodus | 7 | 1 | 11 | 10 | The Ten Plagues | low | Massive narrative spanning 5 chapters; grouped for continuity of the plague cycle instead of fragmenting it. |
+| Exodus | 7 | 1 | 7 | 13 | Aaron's Rod Becomes a Serpent | high | |
+| Exodus | 7 | 14 | 8 | 19 | The First Three Plagues: Blood, Frogs, and Lice | high | |
+| Exodus | 8 | 20 | 9 | 12 | The Second Three Plagues: Flies, Livestock, and Boils | high | |
+| Exodus | 9 | 13 | 10 | 29 | The Heavy Plagues: Hail, Locusts, and Darkness | high | |
+| Exodus | 11 | 1 | 11 | 10 | Warning of the Final Plague | high | |
 | Exodus | 12 | 1 | 12 | 51 | The Passover and Exodus | high | |
 | Exodus | 13 | 1 | 13 | 22 | Consecration of the Firstborn | high | |
 | Exodus | 14 | 1 | 14 | 31 | The Red Sea Crossing | high | |
@@ -164,7 +172,9 @@ Total `low` confidence pericopes: **3**. These are explicitly clustered around m
 | Numbers | 17 | 1 | 17 | 13 | Aaron's Staff | high | |
 | Numbers | 18 | 1 | 18 | 32 | Duties of Priests and Levites | high | |
 | Numbers | 19 | 1 | 19 | 22 | The Water of Cleansing | high | |
-| Numbers | 20 | 1 | 20 | 29 | Water from the Rock and Aaron's Death | high | |
+| Numbers | 20 | 1 | 20 | 13 | The Death of Miriam and Water at Meribah | high | |
+| Numbers | 20 | 14 | 20 | 21 | Edom Refuses Passage | high | |
+| Numbers | 20 | 22 | 20 | 29 | The Death of Aaron | high | |
 | Numbers | 21 | 1 | 21 | 35 | The Bronze Snake and Battles | high | |
 | Numbers | 22 | 1 | 24 | 25 | Balak and Balaam | high | |
 | Numbers | 25 | 1 | 25 | 18 | Moab Seduces Israel | high | |
