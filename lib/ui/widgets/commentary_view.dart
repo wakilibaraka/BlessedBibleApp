@@ -96,7 +96,36 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
         appThemeMode == AppThemeMode.fresh;
 
     final chapterNum = widget.chapter;
-    final displayVerse = widget.verse ?? _currentVerseNum;
+
+    List<CommentaryEntry> verseEntries = [];
+    List<CommentaryEntry> chapterEntries = [];
+    List<CommentaryEntry> bookEntries = [];
+
+    if (widget.verse != null) {
+      verseEntries = commentaryNotifier.commentaryForVerse(
+          bookName, chapterNum, widget.verse!);
+    } else {
+      verseEntries =
+          commentaryNotifier.commentaryForChapterVerses(bookName, chapterNum);
+    }
+    chapterEntries =
+        commentaryNotifier.commentaryForChapter(bookName, chapterNum);
+    bookEntries = commentaryNotifier.commentaryForBook(bookName);
+
+    // Eagerly resolve the initial verse if missing, without mutating state during build
+    final displayVerse = widget.verse ??
+        _currentVerseNum ??
+        (verseEntries.isNotEmpty ? verseEntries.first.scope.verse : null);
+
+    if (_currentVerseNum == null && displayVerse != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _currentVerseNum == null) {
+          setState(() {
+            _currentVerseNum = displayVerse;
+          });
+        }
+      });
+    }
 
     final panelBackgroundColor = widget.isCompact
         ? (theme.bottomSheetTheme.backgroundColor ??
@@ -138,21 +167,6 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
         finalVerseText = verseAsync.value?.text ?? fallbackVerseText;
       }
     }
-
-    List<CommentaryEntry> verseEntries = [];
-    List<CommentaryEntry> chapterEntries = [];
-    List<CommentaryEntry> bookEntries = [];
-
-    if (widget.verse != null) {
-      verseEntries = commentaryNotifier.commentaryForVerse(
-          bookName, chapterNum, widget.verse!);
-    } else {
-      verseEntries =
-          commentaryNotifier.commentaryForChapterVerses(bookName, chapterNum);
-    }
-    chapterEntries =
-        commentaryNotifier.commentaryForChapter(bookName, chapterNum);
-    bookEntries = commentaryNotifier.commentaryForBook(bookName);
 
     final hasContent = verseEntries.isNotEmpty ||
         chapterEntries.isNotEmpty ||
