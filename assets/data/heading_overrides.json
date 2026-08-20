@@ -193,9 +193,9 @@
     "chapter": 26,
     "chapter_title": "Abrahamic Covenant Confirmed to Isaac",
     "pericope_title": "Isaac and Abimelech",
-    "decision": "MERGE",
-    "merged_text": "The Covenant Confirmed: Isaac and Abimelech",
-    "reason": "Both elements are critical"
+    "decision": "KEEP_PERICOPE",
+    "merged_text": "",
+    "reason": "User override"
   },
   {
     "book": "Genesis",
@@ -274,9 +274,9 @@
     "chapter": 35,
     "chapter_title": "Rachel Dies, Isaac Dies",
     "pericope_title": "Jacob Returns to Bethel",
-    "decision": "KEEP_CHAPTER_TITLE",
+    "decision": "KEEP_PERICOPE",
     "merged_text": "",
-    "reason": "Chapter title captures the major events better"
+    "reason": "User override"
   },
   {
     "book": "Genesis",
@@ -1633,9 +1633,9 @@
     "chapter": 6,
     "chapter_title": "Gideon and the Fleece",
     "pericope_title": "The Call of Gideon",
-    "decision": "MERGE",
-    "merged_text": "The Call of Gideon (Fleece)",
-    "reason": "Preserved distinct biblical term 'Fleece'"
+    "decision": "KEEP_PERICOPE",
+    "merged_text": "",
+    "reason": "User override"
   },
   {
     "book": "Judges",
@@ -3280,9 +3280,9 @@
     "chapter": 16,
     "chapter_title": "Death and Resurrection",
     "pericope_title": "Psalm 16",
-    "decision": "MERGE",
-    "merged_text": "Psalm 16 (Resurrection)",
-    "reason": "Preserved distinct biblical term 'Resurrection'"
+    "decision": "KEEP_PERICOPE",
+    "merged_text": "",
+    "reason": "User override"
   },
   {
     "book": "Psalms",
@@ -7069,9 +7069,9 @@
     "chapter": 20,
     "chapter_title": "Authority, Taxes & the Resurrection",
     "pericope_title": "Authority Questioned and Parable of Tenants",
-    "decision": "MERGE",
-    "merged_text": "Authority Questioned and Parable of Tenants (Resurrection)",
-    "reason": "Preserved distinct biblical term 'Resurrection'"
+    "decision": "KEEP_PERICOPE",
+    "merged_text": "",
+    "reason": "User override"
   },
   {
     "book": "Luke",
@@ -7204,9 +7204,9 @@
     "chapter": 11,
     "chapter_title": "Christ the Resurrection and the Life",
     "pericope_title": "The Raising of Lazarus",
-    "decision": "MERGE",
-    "merged_text": "The Raising of Lazarus (Resurrection)",
-    "reason": "Preserved distinct biblical term 'Resurrection'"
+    "decision": "KEEP_PERICOPE",
+    "merged_text": "",
+    "reason": "User override"
   },
   {
     "book": "John",

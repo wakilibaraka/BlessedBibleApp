@@ -21,6 +21,7 @@ import '../../state/user_data_provider.dart';
 import '../../state/reading_plan_provider.dart';
 import '../../state/streak_provider.dart';
 import '../../state/pericopes_provider.dart';
+import '../../state/heading_overrides_provider.dart';
 import '../../models/pericope_entry.dart';
 import '../../state/most_read_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
@@ -662,9 +663,11 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     final theme = Theme.of(context);
     final appThemeMode = ref.watch(themeProvider);
     final typography = ref.watch(typographyProvider);
-    final chapterTitles = ref.watch(chapterTitlesProvider);
-    final pericopesMap = ref.watch(pericopesProvider); // Trigger rebuild on load
+    ref.watch(chapterTitlesProvider);
+    ref.watch(pericopesProvider); // Trigger rebuild on load
     final pericopesNotifier = ref.read(pericopesProvider.notifier);
+    ref.watch(headingOverridesProvider); // Trigger rebuild on load
+    final overridesNotifier = ref.read(headingOverridesProvider.notifier);
     final readSettings = ref.watch(readSettingsProvider);
     final selectedVerses = ref.watch(readSelectionProvider);
 
@@ -1148,14 +1151,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                             selectedVerses
                                                                 .isNotEmpty;
 
-                                                        final bookData =
-                                                            chapterTitles[
-                                                                fc.book.name];
-                                                        final chapterTitle =
-                                                            bookData?[fc
-                                                                .chapter.number
-                                                                .toString()];
-
                                                         final chapterPericopes =
                                                             pericopesNotifier.getPericopesForChapter(
                                                                 fc.book.name,
@@ -1168,70 +1163,56 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                           }
                                                         }
 
+                                                        String? finalHeadingText;
+                                                        bool isChapterTitleStyle = false;
+
+                                                        if (index == 0) {
+                                                          final override = overridesNotifier.getOverrideForChapter(fc.book.name, fc.chapter.number);
+                                                          if (override != null) {
+                                                            switch (override.decision) {
+                                                              case 'KEEP_PERICOPE':
+                                                                finalHeadingText = pericopeHeading?.title;
+                                                                break;
+                                                              case 'KEEP_CHAPTER_TITLE':
+                                                                finalHeadingText = override.chapterTitle;
+                                                                isChapterTitleStyle = true;
+                                                                break;
+                                                              case 'MERGE':
+                                                                finalHeadingText = override.mergedText;
+                                                                break;
+                                                              default:
+                                                                finalHeadingText = pericopeHeading?.title;
+                                                            }
+                                                          } else {
+                                                            // Fallback if overrides missing/unmatched (FAIL-OPEN)
+                                                            finalHeadingText = pericopeHeading?.title;
+                                                          }
+                                                        } else {
+                                                          finalHeadingText = pericopeHeading?.title;
+                                                        }
+
                                                         return Column(
                                                           crossAxisAlignment:
                                                               CrossAxisAlignment
                                                                   .stretch,
                                                           children: [
-                                                            if (index == 0 &&
-                                                                chapterTitle !=
-                                                                    null) ...[
+                                                            if (finalHeadingText != null && finalHeadingText.isNotEmpty) ...[
                                                               Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .only(
-                                                                        top:
-                                                                            16.0,
-                                                                        bottom:
-                                                                            8.0,
-                                                                        left:
-                                                                            15.0,
-                                                                        right:
-                                                                            12.0),
-                                                                child: Text(
-                                                                  _toHeadingCase(
-                                                                      chapterTitle),
-                                                                  style: theme
-                                                                      .textTheme
-                                                                      .titleSmall
-                                                                      ?.copyWith(
-                                                                    color: theme
-                                                                        .primaryColor,
-                                                                    fontSize:
-                                                                        typography.fontSize *
-                                                                            1.25,
-                                                                    fontFamily:
-                                                                        typography
-                                                                            .fontFamily,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w700,
-                                                                    letterSpacing:
-                                                                        0.2,
-                                                                  ),
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .left,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                            if (pericopeHeading != null) ...[
-                                                              Padding(
-                                                                padding: EdgeInsets.only(
-                                                                  top: (index == 0 && chapterTitle != null) ? 4.0 : 16.0,
+                                                                padding: const EdgeInsets.only(
+                                                                  top: 16.0,
                                                                   bottom: 8.0,
                                                                   left: 15.0,
                                                                   right: 12.0,
                                                                 ),
                                                                 child: Text(
-                                                                  pericopeHeading.title,
+                                                                  isChapterTitleStyle ? _toHeadingCase(finalHeadingText) : finalHeadingText,
                                                                   style: theme.textTheme.titleSmall?.copyWith(
                                                                     color: theme.primaryColor,
-                                                                    fontSize: typography.fontSize * 1.05,
+                                                                    fontSize: typography.fontSize * (isChapterTitleStyle ? 1.25 : 1.05),
                                                                     fontFamily: typography.fontFamily,
-                                                                    fontWeight: FontWeight.w600,
-                                                                    fontStyle: FontStyle.italic,
-                                                                    letterSpacing: 0.1,
+                                                                    fontWeight: isChapterTitleStyle ? FontWeight.w700 : FontWeight.w600,
+                                                                    fontStyle: isChapterTitleStyle ? FontStyle.normal : FontStyle.italic,
+                                                                    letterSpacing: isChapterTitleStyle ? 0.2 : 0.1,
                                                                   ),
                                                                   textAlign: TextAlign.left,
                                                                 ),

@@ -4,6 +4,7 @@ import '../../data/models/bible_model.dart';
 import '../../state/bible_nav_settings_provider.dart';
 import '../widgets/textured_glass_container.dart';
 import '../../state/read_settings_provider.dart';
+import '../../state/chapter_titles_provider.dart';
 
 import '../../utils/bible_sections.dart';
 
@@ -505,11 +506,14 @@ class _BookChapterSelectorSheetState
     return Consumer(builder: (context, ref, _) {
       final selectedChapter =
           ref.watch(_sheetStateProvider.select((s) => s.chapter));
+      final allChapterTitles = ref.watch(chapterTitlesProvider);
+      final bookTitles = allChapterTitles[book.name] ?? {};
+
       return GridView.builder(
         padding:
             EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 24),
         gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 64,
+          maxCrossAxisExtent: 80, // Made wider to fit titles
           mainAxisExtent: 64,
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
@@ -518,8 +522,11 @@ class _BookChapterSelectorSheetState
         itemBuilder: (context, index) {
           final chapter = index + 1;
           final isSel = chapter == selectedChapter;
+          final subtitle = bookTitles[chapter.toString()];
+
           return _buildGridTile(
             text: '$chapter',
+            subtitle: subtitle,
             isSelected: isSel,
             onTap: () => _onChapterSelected(chapter, settings),
             theme: theme,
@@ -568,12 +575,13 @@ class _BookChapterSelectorSheetState
 
   Widget _buildGridTile(
       {required String text,
+      String? subtitle,
       required bool isSelected,
       required VoidCallback onTap,
       required ThemeData theme,
       Color? backgroundColor}) {
     // Determine if it's a book name (contains letters) to apply serif font consistency
-    final isBook = text.contains(RegExp(r'[a-zA-Z]'));
+    final isBook = text.contains(RegExp(r'[a-zA-Z]')) && subtitle == null;
 
     final textStyle = theme.textTheme.titleMedium?.copyWith(
       fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
@@ -585,16 +593,40 @@ class _BookChapterSelectorSheetState
           : theme.colorScheme.onSurface.withValues(alpha: 0.8),
     );
 
+    Widget content = Text(
+      text,
+      style: textStyle,
+      maxLines: 1,
+      textAlign: TextAlign.center,
+    );
+
+    if (subtitle != null && subtitle.isNotEmpty) {
+      content = Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          content,
+          const SizedBox(height: 2),
+          Text(
+            subtitle,
+            style: theme.textTheme.bodySmall?.copyWith(
+              fontSize: 9,
+              color: isSelected ? Colors.white.withValues(alpha: 0.9) : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              height: 1.1,
+            ),
+            maxLines: 2,
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      );
+    }
+
     final textWidget = Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: FittedBox(
+      padding: const EdgeInsets.symmetric(horizontal: 6.0),
+      child: subtitle != null ? content : FittedBox(
         fit: BoxFit.scaleDown,
-        child: Text(
-          text,
-          style: textStyle,
-          maxLines: 1,
-          textAlign: TextAlign.center,
-        ),
+        child: content,
       ),
     );
 
@@ -606,7 +638,7 @@ class _BookChapterSelectorSheetState
           decoration: BoxDecoration(
             color: backgroundColor ??
                 theme.colorScheme.surface.withValues(alpha: 0.8),
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
               width: 1,
@@ -627,7 +659,7 @@ class _BookChapterSelectorSheetState
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: theme.primaryColor,
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
                 color: theme.primaryColor.withValues(alpha: 0.4),
