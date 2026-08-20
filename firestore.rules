@@ -1,0 +1,22 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // CMS content: world-readable, owner-only writes
+    match /VOTD/{doc}          { allow read: if true; allow write: if isOwner(); }
+    match /devotionals/{doc}   { allow read: if true; allow write: if isOwner(); }
+    match /readingPlans/{doc}  { allow read: if true; allow write: if isOwner(); }
+    match /commentary/{doc}    { allow read: if true; allow write: if isOwner(); }
+    match /pericopes/{doc}     { allow read: if true; allow write: if isOwner(); }
+
+    // Future user sync data: each user owns their own doc tree
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    function isOwner() {
+      return request.auth != null
+        && request.auth.uid == 'dx78nhHTHMNnCLlryAWIwGqqAh23';
+    }
+  }
+}
