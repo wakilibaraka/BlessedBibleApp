@@ -1,6 +1,7 @@
 import 'dart:convert';
 import '../data/models/bible_model.dart';
 import '../models/commentary_entry.dart';
+import '../models/pericope_entry.dart';
 
 /// Top-level function to parse Bible JSON on a background isolate
 List<BibleBook> parseBibleJson(String jsonString) {
@@ -59,3 +60,22 @@ List<CommentaryEntry> parseCommentaryJson(String jsonString) {
       .map((e) => CommentaryEntry.fromJson(e as Map<String, dynamic>))
       .toList();
 }
+
+/// Top-level function to parse Pericopes JSON on a background isolate
+List<PericopeEntry> parsePericopesJson(String jsonString) {
+  final decoded = jsonDecode(jsonString);
+
+  List<dynamic> entriesList;
+  if (decoded is Map<String, dynamic> && decoded.containsKey('entries')) {
+    entriesList = decoded['entries'] as List<dynamic>;
+  } else if (decoded is List) {
+    entriesList = decoded;
+  } else {
+    return [];
+  }
+
+  return entriesList
+      .map((e) => PericopeEntry.fromJson(e as Map<String, dynamic>))
+      .toList();
+}
+
