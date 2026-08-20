@@ -19,22 +19,35 @@ import '../widgets/textured_glass_container.dart';
 import '../sheets/book_chapter_selector_sheet.dart';
 
 class _TrackDraft {
-  BibleBook? book;
+  BibleBook? startBook;
   int startChapter = 1;
   int startVerse = 1;
+
+  BibleBook? endBook;
   int endChapter = 1;
   int endVerse = 1;
 
-  bool get isValid => book != null;
+  bool get isValid => startBook != null && endBook != null;
   
-  PlanRange toRange() {
-    return PlanRange(
-      book: book!.name,
-      startChapter: startChapter,
-      startVerse: startVerse,
-      endChapter: endChapter,
-      endVerse: endVerse
-    );
+  List<PlanRange> toRanges(List<BibleBook> allBooks) {
+    if (!isValid) return [];
+    int startIndex = allBooks.indexWhere((b) => b.name == startBook!.name);
+    int endIndex = allBooks.indexWhere((b) => b.name == endBook!.name);
+    if (startIndex > endIndex) return [];
+    if (startIndex == endIndex) {
+      if (startChapter > endChapter || (startChapter == endChapter && startVerse > endVerse)) return [];
+    }
+    
+    List<PlanRange> result = [];
+    for (int i = startIndex; i <= endIndex; i++) {
+      final b = allBooks[i];
+      int sCh = (i == startIndex) ? startChapter : 1;
+      int sV = (i == startIndex) ? startVerse : 1;
+      int eCh = (i == endIndex) ? endChapter : b.chapters.last.number;
+      int eV = (i == endIndex) ? endVerse : b.chapters.last.verses.length;
+      result.add(PlanRange(book: b.name, startChapter: sCh, startVerse: sV, endChapter: eCh, endVerse: eV));
+    }
+    return result;
   }
 }
 
@@ -47,6 +60,7 @@ class CustomPlanBuilderScreen extends ConsumerStatefulWidget {
 
 class _CustomPlanBuilderScreenState extends ConsumerState<CustomPlanBuilderScreen> {
   final _titleController = TextEditingController();
+  bool _isTitleEditedByUser = false;
   final List<_TrackDraft> _drafts = [];
   double _days = 30; 
   
@@ -107,10 +121,17 @@ class _CustomPlanBuilderScreenState extends ConsumerState<CustomPlanBuilderScree
     }
 
     try {
+      final allBooks = ref.read(bibleProvider).books;
+      final tracks = validDrafts.map((d) => d.toRanges(allBooks)).where((t) => t.isNotEmpty).toList();
+      if (tracks.isEmpty) {
+        setState(() => _previewPlan = null);
+        return;
+      }
+
       final plan = _generator!.generatePlan(
         id: 'preview',
         title: _titleController.text.isEmpty ? 'Custom Plan' : _titleController.text,
-        ranges: validDrafts.map((d) => d.toRange()).toList(),
+        tracks: tracks,
         days: _days.toInt(),
         cadence: 7,
       );
@@ -120,12 +141,37 @@ class _CustomPlanBuilderScreenState extends ConsumerState<CustomPlanBuilderScree
     }
   }
 
+  void _autoNamePlan() {
+    if (_isTitleEditedByUser) return;
+    final validDrafts = _drafts.where((d) => d.isValid).toList();
+    if (validDrafts.isEmpty) return;
+
+    String baseName = '';
+    if (validDrafts.length == 1) {
+      final d = validDrafts.first;
+      if (d.startBook!.name == d.endBook!.name) {
+        baseName = d.startBook!.name;
+      } else {
+        baseName = '${d.startBook!.name} to ${d.endBook!.name}';
+      }
+    } else {
+      baseName = '${validDrafts.first.startBook!.name} & ${validDrafts[1].startBook!.name}';
+      if (validDrafts.length > 2) baseName += ' +${validDrafts.length - 2}';
+    }
+
+    final newName = '$baseName in ${_days.toInt()} Days';
+    if (_titleController.text != newName) {
+      _titleController.text = newName;
+      setState(() {});
+    }
+  }
+
   void _pickStart(int index) {
     final allBooks = ref.read(bibleProvider).books;
     if (allBooks.isEmpty) return;
     
     final draft = _drafts[index];
-    final initialAbbrev = draft.book?.abbreviation ?? allBooks.first.abbreviation;
+    final initialAbbrev = draft.startBook?.abbreviation ?? allBooks.first.abbreviation;
     
     showModalBottomSheet(
       context: context,
@@ -139,16 +185,19 @@ class _CustomPlanBuilderScreenState extends ConsumerState<CustomPlanBuilderScree
           onSelectionChanged: (abbrev, name, chapter, verse, {bool autoClose = true}) {
              final selectedBook = allBooks.firstWhere((b) => b.abbreviation == abbrev);
              setState(() {
-               draft.book = selectedBook;
+               draft.startBook = selectedBook;
                draft.startChapter = chapter;
                draft.startVerse = verse ?? 1;
                
-               if (draft.endChapter < chapter) {
+               // Auto-adjust end ref if it's currently invalid (e.g. before start)
+               if (draft.endBook == null || allBooks.indexOf(draft.endBook!) < allBooks.indexOf(selectedBook)) {
+                 draft.endBook = selectedBook;
                  draft.endChapter = selectedBook.chapters.last.number;
                  draft.endVerse = selectedBook.chapters.last.verses.length;
                }
              });
              _updatePreview();
+             _autoNamePlan();
              if (autoClose) Navigator.pop(context);
           },
         );
@@ -157,8 +206,15 @@ class _CustomPlanBuilderScreenState extends ConsumerState<CustomPlanBuilderScree
   }
 
   void _pickEnd(int index) {
+    final allBooks = ref.read(bibleProvider).books;
+    if (allBooks.isEmpty) return;
+    
     final draft = _drafts[index];
-    if (draft.book == null) return;
+    if (draft.startBook == null) return;
+    
+    // Only allow books from startBook onwards
+    final startIndex = allBooks.indexOf(draft.startBook!);
+    final validEndBooks = allBooks.sublist(startIndex);
     
     showModalBottomSheet(
       context: context,
@@ -166,15 +222,18 @@ class _CustomPlanBuilderScreenState extends ConsumerState<CustomPlanBuilderScree
       useRootNavigator: true,
       builder: (context) {
         return BookChapterSelectorSheet(
-          books: [draft.book!], 
-          selectedBookAbbrev: draft.book!.abbreviation,
+          books: validEndBooks, 
+          selectedBookAbbrev: draft.endBook?.abbreviation ?? draft.startBook!.abbreviation,
           selectedChapter: draft.endChapter,
           onSelectionChanged: (abbrev, name, chapter, verse, {bool autoClose = true}) {
+             final selectedBook = allBooks.firstWhere((b) => b.abbreviation == abbrev);
              setState(() {
+               draft.endBook = selectedBook;
                draft.endChapter = chapter;
                draft.endVerse = verse ?? 1;
              });
              _updatePreview();
+             _autoNamePlan();
              if (autoClose) Navigator.pop(context);
           },
         );
@@ -188,10 +247,11 @@ class _CustomPlanBuilderScreenState extends ConsumerState<CustomPlanBuilderScree
 
     setState(() => _isLoading = true);
 
+    final allBooks = ref.read(bibleProvider).books;
     final finalPlan = _generator!.generatePlan(
       id: const Uuid().v4(),
       title: _titleController.text.trim(),
-      ranges: _drafts.where((d) => d.isValid).map((d) => d.toRange()).toList(),
+      tracks: _drafts.where((d) => d.isValid).map((d) => d.toRanges(allBooks)).where((t) => t.isNotEmpty).toList(),
       days: _days.toInt(),
       cadence: 7,
     );
@@ -238,7 +298,10 @@ class _CustomPlanBuilderScreenState extends ConsumerState<CustomPlanBuilderScree
                           fillColor: theme.colorScheme.onSurface.withValues(alpha: 0.05),
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                         ),
-                        onChanged: (_) => _updatePreview(),
+                        onChanged: (_) {
+                          _isTitleEditedByUser = true;
+                          _updatePreview();
+                        },
                       ),
                       const SizedBox(height: 24),
                       Text('Reading Tracks', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
@@ -264,43 +327,64 @@ class _CustomPlanBuilderScreenState extends ConsumerState<CustomPlanBuilderScree
   Widget _buildTrackCard(int index, _TrackDraft draft, ThemeData theme) {
     return TexturedGlassContainer(
       margin: const EdgeInsets.only(bottom: 12),
-      child: Row(
+      child: Column(
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                GestureDetector(
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Track ${index + 1}', style: const TextStyle(fontWeight: FontWeight.bold)),
+              if (_drafts.length > 1)
+                IconButton(
+                  icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20),
+                  onPressed: () => _removeTrack(index),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                )
+            ]
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: InkWell(
                   onTap: () => _pickStart(index),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(8)
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    decoration: BoxDecoration(color: theme.colorScheme.onSurface.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(8)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Start Reference', style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
+                        const SizedBox(height: 4),
+                        Text(draft.startBook == null ? 'Select Start' : '${draft.startBook!.name} ${draft.startChapter}:${draft.startVerse}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                      ],
                     ),
-                    child: Text(draft.isValid ? 'Start: ${draft.book!.name} ${draft.startChapter}:${draft.startVerse}' : 'Select Start Reference')
-                  )
+                  ),
                 ),
-                const SizedBox(height: 8),
-                GestureDetector(
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8),
+                child: Icon(Icons.arrow_forward_rounded, size: 20, color: Colors.grey),
+              ),
+              Expanded(
+                child: InkWell(
                   onTap: () => _pickEnd(index),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(8)
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    decoration: BoxDecoration(color: theme.colorScheme.onSurface.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(8)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('End Reference', style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
+                        const SizedBox(height: 4),
+                        Text(draft.endBook == null ? 'Select End' : '${draft.endBook!.name} ${draft.endChapter}:${draft.endVerse}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                      ],
                     ),
-                    child: Text(draft.isValid ? 'End: ${draft.book!.name} ${draft.endChapter}:${draft.endVerse}' : 'Select End Reference')
-                  )
+                  ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          if (_drafts.length > 1)
-            IconButton(
-              icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-              onPressed: () => _removeTrack(index),
-            )
         ],
       )
     );
@@ -327,6 +411,7 @@ class _CustomPlanBuilderScreenState extends ConsumerState<CustomPlanBuilderScree
           onChanged: (val) {
             setState(() => _days = val);
             _updatePreview();
+            _autoNamePlan();
           },
         ),
         Wrap(
@@ -338,34 +423,74 @@ class _CustomPlanBuilderScreenState extends ConsumerState<CustomPlanBuilderScree
               if (sel) {
                 setState(() => _days = d.toDouble());
                 _updatePreview();
+                _autoNamePlan();
               }
             }
           )).toList(),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
         if (_previewPlan != null && _previewPlan!.schedule.isNotEmpty) ...[
-           Row(
-             children: [
-               Icon(Icons.timer_outlined, size: 16, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
-               const SizedBox(width: 4),
-               Text('Average pace: ~${_previewPlan!.schedule.first.estimatedTimeDisplay} / day', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.8))),
-             ],
-           ),
-           if (_previewPlan!.wasClamped)
-             Container(
-               margin: const EdgeInsets.only(top: 12),
-               padding: const EdgeInsets.all(12),
-               decoration: BoxDecoration(color: Colors.orange.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.orange.withValues(alpha: 0.3))),
-               child: Row(
-                 children: [
+           Text('Plan Overview', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+           const SizedBox(height: 12),
+           _buildPlanOverviewCard(theme),
+        ]
+      ]
+    );
+  }
+
+  Widget _buildPlanOverviewCard(ThemeData theme) {
+    final totalWords = _previewPlan!.schedule.fold(0, (s, day) => s + day.totalWords);
+    final totalMins = _previewPlan!.schedule.fold(0, (s, day) => s + day.estimatedMinutes);
+    
+    return TexturedGlassContainer(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildStatCol('Days', '${_previewPlan!.days}', theme),
+              _buildStatCol('Words', '${(totalWords / 1000).toStringAsFixed(1)}k', theme),
+              _buildStatCol('Total Time', '${(totalMins / 60).toStringAsFixed(1)}h', theme),
+              _buildStatCol('Pace', '~${_previewPlan!.schedule.first.estimatedTimeDisplay}/day', theme),
+            ],
+          ),
+          const Divider(height: 32),
+          Text('First few days preview:', style: theme.textTheme.titleSmall?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.7))),
+          const SizedBox(height: 8),
+          ..._previewPlan!.schedule.take(3).map((day) {
+            final refs = day.portions.map((p) => '${p.book} ${p.startChapter}:${p.startVerse} - ${p.endChapter}:${p.endVerse}').join(', ');
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Text('Day ${day.dayNumber}: $refs', style: const TextStyle(fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
+            );
+          }),
+          if (_previewPlan!.schedule.length > 3)
+            Text('... and ${_previewPlan!.schedule.length - 3} more days', style: const TextStyle(fontSize: 12, fontStyle: FontStyle.italic)),
+          if (_previewPlan!.wasClamped)
+            Container(
+              margin: const EdgeInsets.only(top: 16),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(color: Colors.orange.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.orange.withValues(alpha: 0.3))),
+              child: Row(
+                children: [
                    const Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 20),
                    const SizedBox(width: 8),
                    Expanded(child: Text(_previewPlan!.clampReason ?? '', style: const TextStyle(color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 13))),
-                 ],
-               ),
-             )
-        ]
-      ]
+                ],
+              ),
+            )
+        ],
+      )
+    );
+  }
+
+  Widget _buildStatCol(String label, String value, ThemeData theme) {
+    return Column(
+      children: [
+        Text(value, style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: theme.primaryColor)),
+        Text(label, style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
+      ],
     );
   }
 

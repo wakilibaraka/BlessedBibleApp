@@ -10,7 +10,6 @@ plugins {
 android {
     namespace = "com.baraka.bibleapp"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true

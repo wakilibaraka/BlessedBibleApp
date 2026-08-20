@@ -35,9 +35,9 @@ void main() {
     final plan = generator.generatePlan(
       id: 'gen30',
       title: 'Genesis in 30 Days',
-      ranges: [
+      tracks: [[
         PlanRange(book: 'Genesis', startChapter: 1, startVerse: 1, endChapter: 50, endVerse: 26) // 50:26 is the last verse
-      ],
+      ]],
       days: 30,
       cadence: 7,
     );
@@ -74,9 +74,9 @@ void main() {
     final plan = generator.generatePlan(
       id: 'heb30',
       title: 'Hebrews in 30 Days',
-      ranges: [
+      tracks: [[
         PlanRange(book: 'Hebrews', startChapter: 1, startVerse: 1, endChapter: 13, endVerse: 25)
-      ],
+      ]],
       days: 30,
       cadence: 7,
     );
@@ -97,9 +97,9 @@ void main() {
     final plan = generator.generatePlan(
       id: 'gen30',
       title: 'Genesis',
-      ranges: [
+      tracks: [[
         PlanRange(book: 'Genesis', startChapter: 1, startVerse: 1, endChapter: 50, endVerse: 26)
-      ],
+      ]],
       days: 30,
       cadence: 7,
     );
@@ -140,9 +140,9 @@ void main() {
     final plan = generator.generatePlan(
       id: 'genheb30',
       title: 'Gen + Heb',
-      ranges: [
-        PlanRange(book: 'Genesis', startChapter: 1, startVerse: 1, endChapter: 50, endVerse: 26),
-        PlanRange(book: 'Hebrews', startChapter: 1, startVerse: 1, endChapter: 13, endVerse: 25),
+      tracks: [
+        [PlanRange(book: 'Genesis', startChapter: 1, startVerse: 1, endChapter: 50, endVerse: 26)],
+        [PlanRange(book: 'Hebrews', startChapter: 1, startVerse: 1, endChapter: 13, endVerse: 25)],
       ],
       days: 30,
       cadence: 7,
@@ -165,9 +165,9 @@ void main() {
     final plan = generator.generatePlan(
       id: 'john2000',
       title: 'John in 2000 Days',
-      ranges: [
+      tracks: [[
         PlanRange(book: 'John', startChapter: 1, startVerse: 1, endChapter: 21, endVerse: 25)
-      ],
+      ]],
       days: 2000,
       cadence: 7,
     );
@@ -207,7 +207,7 @@ void main() {
     final plan = generator.generatePlan(
       id: 'bible365',
       title: 'Whole Bible in 365 Days',
-      ranges: ranges,
+      tracks: [ranges],
       days: 365,
       cadence: 7,
     );
@@ -243,7 +243,7 @@ void main() {
     final plan = generator.generatePlan(
       id: 'bible3',
       title: 'Whole Bible in 3 Days',
-      ranges: ranges,
+      tracks: [ranges],
       days: 3,
       cadence: 7,
     );
@@ -262,9 +262,9 @@ void main() {
     final plan = generator.generatePlan(
       id: 'gen1',
       title: 'Genesis in 1 Day',
-      ranges: [
+      tracks: [[
         PlanRange(book: 'Genesis', startChapter: 1, startVerse: 1, endChapter: 50, endVerse: 26)
-      ],
+      ]],
       days: 1,
       cadence: 7,
     );
@@ -283,9 +283,9 @@ void main() {
     expect(() => generator.generatePlan(
       id: 'invalid',
       title: 'Invalid Plan',
-      ranges: [
+      tracks: [[
         PlanRange(book: 'Genesis', startChapter: 1, startVerse: 1, endChapter: 1, endVerse: 1)
-      ],
+      ]],
       days: 0,
       cadence: 7,
     ), throwsArgumentError);
