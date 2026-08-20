@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'votd_editor_screen.dart';
 import 'commentary_import_screen.dart';
+import 'commentary_editor_screen.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({super.key});
@@ -21,6 +22,11 @@ class AdminDashboardScreen extends StatelessWidget {
             title: const Text('Commentary Importer'),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () => Navigator.push(context, CupertinoPageRoute(builder: (_) => const CommentaryImportScreen())),
+          ),
+          ListTile(
+            title: const Text('Commentary Editor'),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () => Navigator.push(context, CupertinoPageRoute(builder: (_) => const CommentaryEditorListScreen())),
           ),
         ],
       ),
