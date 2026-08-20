@@ -31,6 +31,45 @@ import '../widgets/commentary_view.dart';
 import '../../theme/app_colors.dart';
 import 'read_screen.dart' show VerseActionLogic;
 import '../sheets/verse_context_menu_sheet.dart';
+import '../../state/pericopes_provider.dart';
+import '../../state/heading_overrides_provider.dart';
+import '../../models/pericope_entry.dart';
+
+enum StudyMode { plan, deepDive }
+
+class StudySessionPayload {
+  final StudyMode mode;
+  // Plan fields
+  final String? planId;
+  final int? dayNum;
+  final int? initialPassageIndex;
+  
+  // Deep dive fields
+  final String? deepDiveBook;
+  final int? deepDiveChapter;
+  final int? deepDiveVerse;
+  final String? deepDiveVerseText;
+
+  const StudySessionPayload.plan({
+    required this.planId,
+    required this.dayNum,
+    this.initialPassageIndex = 0,
+  }) : mode = StudyMode.plan,
+       deepDiveBook = null,
+       deepDiveChapter = null,
+       deepDiveVerse = null,
+       deepDiveVerseText = null;
+       
+  const StudySessionPayload.deepDive({
+    required this.deepDiveBook,
+    required this.deepDiveChapter,
+    required this.deepDiveVerse,
+    required this.deepDiveVerseText,
+  }) : mode = StudyMode.deepDive,
+       planId = null,
+       dayNum = null,
+       initialPassageIndex = null;
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Data model for one resolved passage
@@ -94,23 +133,19 @@ _ParsedRef? _parseRef(String ref) {
 // Main Screen Widget
 // ─────────────────────────────────────────────────────────────────────────────
 
-class PlanReaderScreen extends ConsumerStatefulWidget {
-  final String planId;
-  final int dayNum;
-  final int initialPassageIndex;
+class StudyReaderScreen extends ConsumerStatefulWidget {
+  final StudySessionPayload payload;
 
-  const PlanReaderScreen({
+  const StudyReaderScreen({
     super.key,
-    required this.planId,
-    required this.dayNum,
-    required this.initialPassageIndex,
+    required this.payload,
   });
 
   @override
-  ConsumerState<PlanReaderScreen> createState() => _PlanReaderScreenState();
+  ConsumerState<StudyReaderScreen> createState() => _StudyReaderScreenState();
 }
 
-class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
+class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
   late int _passageIndex;
   bool _showFullChapter = false;
   final Set<int> _selectedVerses = {};
@@ -120,26 +155,56 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
   @override
   void initState() {
     super.initState();
-    _passageIndex = widget.initialPassageIndex;
+    _passageIndex = widget.payload.initialPassageIndex ?? 0;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _resolvePassages();
     });
   }
 
   void _resolvePassages() {
-    final planState = ref.read(readingPlanProvider(widget.planId));
-    if (planState.planData.isEmpty || widget.dayNum > planState.planData.length) {
-      return;
-    }
-    final dayData = planState.planData[widget.dayNum - 1];
     final flatChapters = ref.read(flatChaptersProvider);
     if (flatChapters.isEmpty) return;
 
     final resolved = <_PassageData>[];
-    for (final passage in dayData.passages) {
-      for (final refStr in passage.refs) {
-        final parsed = _parseRef(refStr);
-        if (parsed == null) continue;
+
+    if (widget.payload.mode == StudyMode.deepDive) {
+      final bName = widget.payload.deepDiveBook!;
+      final cNum = widget.payload.deepDiveChapter!;
+      
+      BibleBook? book;
+      try {
+        book = flatChapters.map((fc) => fc.book).firstWhere(
+            (b) => b.name.toLowerCase() == bName.toLowerCase());
+      } catch (_) {
+        try {
+          book = flatChapters.map((fc) => fc.book).firstWhere((b) =>
+              b.name.toLowerCase().startsWith(bName.toLowerCase()));
+        } catch (_) {
+          return;
+        }
+      }
+      
+      final chapIdx = cNum - 1;
+      if (chapIdx < 0 || chapIdx >= book.chapters.length) return;
+      final chapter = book.chapters[chapIdx];
+      
+      resolved.add(_PassageData(
+        label: '$bName $cNum',
+        book: book,
+        chapter: chapter,
+        chapterNum: cNum,
+      ));
+    } else {
+      final planState = ref.read(readingPlanProvider(widget.payload.planId!));
+      if (planState.planData.isEmpty || widget.payload.dayNum! > planState.planData.length) {
+        return;
+      }
+      final dayData = planState.planData[widget.payload.dayNum! - 1];
+
+      for (final passage in dayData.passages) {
+        for (final refStr in passage.refs) {
+          final parsed = _parseRef(refStr);
+          if (parsed == null) continue;
 
         BibleBook? book;
         try {
@@ -178,11 +243,12 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
         ));
       }
     }
+    } // End of else block for Plan mode
 
     if (mounted) {
       setState(() {
         _passages = resolved;
-        _passageIndex = widget.initialPassageIndex
+        _passageIndex = (widget.payload.initialPassageIndex ?? 0)
             .clamp(0, (resolved.length - 1).clamp(0, resolved.length));
         _loaded = true;
       });
@@ -211,10 +277,11 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
   }
 
   void _unmarkRead() {
+    if (widget.payload.mode != StudyMode.plan) return;
     HapticFeedback.lightImpact();
     ref
-        .read(readingPlanProvider(widget.planId).notifier)
-        .markReadingIncomplete(widget.dayNum);
+        .read(readingPlanProvider(widget.payload.planId!).notifier)
+        .markReadingIncomplete(widget.payload.dayNum!);
   }
 
   void _toggleVerseSelection(int verseNum) {
@@ -228,6 +295,14 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
   }
 
   void _clearSelection() => setState(() => _selectedVerses.clear());
+
+  String _toHeadingCase(String text) {
+    if (text.isEmpty) return text;
+    return text.split(' ').map((word) {
+      if (word.isEmpty) return word;
+      return word[0].toUpperCase() + word.substring(1).toLowerCase();
+    }).join(' ');
+  }
 
   void _showCommentary(
       int verseNum, String verseText, String bookName, int chapterNum) {
@@ -247,10 +322,16 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
     final typography = ref.watch(typographyProvider);
     final readSettings = ref.watch(readSettingsProvider);
     final appThemeMode = ref.watch(themeProvider);
-    final isDone = ref
-        .watch(readingPlanProvider(widget.planId))
-        .completedReadings
-        .contains(widget.dayNum);
+    ref.watch(pericopesProvider);
+    final pericopesNotifier = ref.read(pericopesProvider.notifier);
+    ref.watch(headingOverridesProvider);
+    final overridesNotifier = ref.read(headingOverridesProvider.notifier);
+    
+    final isDone = widget.payload.mode == StudyMode.plan
+        ? ref.watch(readingPlanProvider(widget.payload.planId!))
+            .completedReadings
+            .contains(widget.payload.dayNum)
+        : false;
 
     final resolvedMode = appThemeMode.resolve(context);
     final Color redLetterColor = resolvedMode == AppThemeMode.light
@@ -314,9 +395,17 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12)),
                     ),
-                    onPressed: isDone ? _unmarkRead : _markReadAndPop,
+                    onPressed: () {
+                      if (widget.payload.mode == StudyMode.plan && isDone) {
+                        _unmarkRead();
+                      } else {
+                        _markReadAndPop();
+                      }
+                    },
                     child: Text(
-                      isDone ? '✓ Completed' : 'Mark as Read',
+                      widget.payload.mode == StudyMode.plan
+                          ? (isDone ? '✓ Completed' : 'Mark as Read')
+                          : 'Done',
                       style: const TextStyle(
                           fontFamily: 'EB Garamond',
                           fontSize: 18,
@@ -534,7 +623,89 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
                                     theme.scaffoldBackgroundColor);
                           }
 
-                          return GestureDetector(
+                          final chapterPericopes = pericopesNotifier.getPericopesForChapter(
+                              passage.book.name, passage.chapterNum);
+                          PericopeEntry? pericopeHeading;
+                          for (final p in chapterPericopes) {
+                            if (p.startVerse == verse.number) {
+                              pericopeHeading = p;
+                              break;
+                            }
+                          }
+
+                          String? finalHeadingText;
+                          bool isChapterTitleStyle = false;
+
+                          if (verse.number == 1) {
+                            final override = overridesNotifier.getOverrideForChapter(passage.book.name, passage.chapterNum);
+                            if (override != null) {
+                              switch (override.decision) {
+                                case 'KEEP_PERICOPE':
+                                  finalHeadingText = pericopeHeading?.title;
+                                  break;
+                                case 'KEEP_CHAPTER_TITLE':
+                                  finalHeadingText = override.chapterTitle;
+                                  isChapterTitleStyle = true;
+                                  break;
+                                case 'MERGE':
+                                  finalHeadingText = override.mergedText;
+                                  break;
+                                default:
+                                  finalHeadingText = pericopeHeading?.title;
+                              }
+                            } else {
+                              finalHeadingText = pericopeHeading?.title;
+                            }
+                          } else {
+                            finalHeadingText = pericopeHeading?.title;
+                          }
+
+                          Widget? topCommentary;
+                          if (i == 0 && widget.payload.mode == StudyMode.deepDive) {
+                            topCommentary = Container(
+                              margin: const EdgeInsets.only(bottom: 24.0, top: 8.0),
+                              padding: const EdgeInsets.all(16.0),
+                              decoration: BoxDecoration(
+                                color: gold.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: gold.withValues(alpha: 0.3)),
+                              ),
+                              child: CommentaryView(
+                                book: widget.payload.deepDiveBook!,
+                                chapter: widget.payload.deepDiveChapter!,
+                                verse: widget.payload.deepDiveVerse,
+                                verseText: widget.payload.deepDiveVerseText ?? '',
+                              ),
+                            );
+                          }
+
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              if (topCommentary != null) topCommentary,
+                              if (finalHeadingText != null && finalHeadingText.isNotEmpty) ...[
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    top: 16.0,
+                                    bottom: 8.0,
+                                    left: 4.0, // Indent less than main reader since passage is padded
+                                    right: 4.0,
+                                  ),
+                                  child: Text(
+                                    isChapterTitleStyle ? _toHeadingCase(finalHeadingText) : finalHeadingText,
+                                    style: theme.textTheme.titleSmall?.copyWith(
+                                      color: theme.primaryColor,
+                                      fontSize: typography.fontSize * (isChapterTitleStyle ? 1.25 : 1.05),
+                                      fontFamily: typography.fontFamily,
+                                      fontWeight: isChapterTitleStyle ? FontWeight.w700 : FontWeight.w600,
+                                      fontStyle: isChapterTitleStyle ? FontStyle.normal : FontStyle.italic,
+                                      letterSpacing: isChapterTitleStyle ? 0.2 : 0.1,
+                                    ),
+                                    textAlign: TextAlign.left,
+                                  ),
+                                ),
+                              ],
+                              GestureDetector(
                             onTap: () => _toggleVerseSelection(verse.number),
                             onDoubleTap: () {
                               HapticFeedback.lightImpact();
@@ -646,6 +817,8 @@ class _PlanReaderScreenState extends ConsumerState<PlanReaderScreen> {
                                 );
                               }),
                             ),
+                          ),
+                          ],
                           );
                         },
                       ),

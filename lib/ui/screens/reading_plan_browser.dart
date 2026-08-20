@@ -6,7 +6,7 @@ import 'package:confetti/confetti.dart';
 import '../../state/reading_plan_provider.dart';
 import '../../theme/app_colors.dart';
 import '../widgets/shared_app_bar.dart';
-import 'plan_reader_screen.dart';
+import 'study_reader_screen.dart';
 import '../../state/streak_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
@@ -1594,10 +1594,12 @@ class _DayViewState extends ConsumerState<DayView>
                                     await Navigator.push<bool>(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => PlanReaderScreen(
-                                      planId: widget.planId,
-                                      dayNum: readingDay,
-                                      initialPassageIndex: entry.key,
+                                    builder: (_) => StudyReaderScreen(
+                                      payload: StudySessionPayload.plan(
+                                        planId: widget.planId,
+                                        dayNum: readingDay,
+                                        initialPassageIndex: entry.key,
+                                      ),
                                     ),
                                   ),
                                 );
