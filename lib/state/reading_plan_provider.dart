@@ -358,6 +358,12 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
     });
   }
 
+  void deletePlanProgress() {
+    ref.read(preferencesProvider).deleteReadingPlanState(id);
+    ref.invalidateSelf();
+  }
+
+
   void startPlan(
       {String? planId,
       String paceMode = 'scheduled',

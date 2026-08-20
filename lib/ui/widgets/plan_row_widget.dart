@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/reading_plan_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../screens/reading_plan_browser.dart';
+import '../sheets/custom_plan_action_sheet.dart';
 
 class PlanRowWidget extends ConsumerStatefulWidget {
   final String planId;
@@ -66,6 +67,12 @@ class _PlanRowWidgetState extends ConsumerState<PlanRowWidget> {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
+          onLongPress: () {
+            final prefs = ref.read(preferencesProvider);
+            if (prefs.getCustomPlanIds().contains(planId)) {
+              CustomPlanActionSheet.show(context, ref, planId);
+            }
+          },
           onTap: () {
             if (planState.currentDay == 0) {
               ref.read(readingPlanProvider(planId).notifier).startPlan();
@@ -136,7 +143,7 @@ class _PlanRowWidgetState extends ConsumerState<PlanRowWidget> {
                             ),
                             Center(
                               child: Text(
-                                '${(value * 100).toStringAsFixed(0)}%',
+                                '${(value * 100).toStringAsFixed(1)}%',
                                 style: TextStyle(
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,

@@ -10,6 +10,7 @@ import 'study_reader_screen.dart';
 import '../../state/streak_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
+import '../sheets/theme_picker_sheet.dart';
 import 'package:flutter/cupertino.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1436,6 +1437,23 @@ class _DayViewState extends ConsumerState<DayView>
         extendBodyBehindAppBar: true,
         appBar: SharedAppBar(
             title: const Text(''),
+            leadingWidth: 100,
+            leading: Padding(
+              padding: const EdgeInsets.only(left: 16.0),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.arrow_back_ios_new_rounded,
+                        color: Theme.of(context).primaryColor),
+                    onPressed: () => Navigator.of(context).maybePop(),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.tune_rounded, color: Theme.of(context).primaryColor),
+                    onPressed: () => ThemePickerSheet.show(context),
+                  ),
+                ],
+              ),
+            ),
             backgroundColor: Colors.transparent,
             elevation: 0),
         bottomNavigationBar: navBar,
@@ -1539,6 +1557,23 @@ class _DayViewState extends ConsumerState<DayView>
       extendBodyBehindAppBar: true,
       appBar: SharedAppBar(
           title: const Text(''),
+          leadingWidth: 100,
+          leading: Padding(
+            padding: const EdgeInsets.only(left: 16.0),
+            child: Row(
+              children: [
+                IconButton(
+                  icon: Icon(Icons.arrow_back_ios_new_rounded,
+                      color: Theme.of(context).primaryColor),
+                  onPressed: () => Navigator.of(context).maybePop(),
+                ),
+                IconButton(
+                  icon: Icon(Icons.tune_rounded, color: Theme.of(context).primaryColor),
+                  onPressed: () => ThemePickerSheet.show(context),
+                ),
+              ],
+            ),
+          ),
           backgroundColor: Colors.transparent,
           elevation: 0),
       bottomNavigationBar: navBar,

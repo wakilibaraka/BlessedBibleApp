@@ -269,6 +269,8 @@ class _CustomPlanBuilderScreenState extends ConsumerState<CustomPlanBuilderScree
       prefs.saveCustomPlan(finalPlan.id, finalPlan.toJson());
     }
     
+    ref.read(activePlanIdsProvider.notifier).addPlan(finalPlan.id);
+    
     if (mounted) Navigator.of(context).pop();
   }
 

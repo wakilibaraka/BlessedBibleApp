@@ -2,18 +2,22 @@ import 'package:flutter/material.dart';
 
 class SharedAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? title;
+  final Widget? leading;
   final List<Widget>? actions;
   final Color backgroundColor;
   final double elevation;
   final bool automaticallyImplyLeading;
+  final double? leadingWidth;
 
   const SharedAppBar({
     super.key,
     this.title,
+    this.leading,
     this.actions,
     this.backgroundColor = Colors.transparent,
     this.elevation = 0,
     this.automaticallyImplyLeading = true,
+    this.leadingWidth,
   });
 
   @override
@@ -21,14 +25,14 @@ class SharedAppBar extends StatelessWidget implements PreferredSizeWidget {
     final ModalRoute<dynamic>? parentRoute = ModalRoute.of(context);
     final bool canPop = parentRoute?.canPop ?? false;
 
-    Widget? leading;
-    double? leadingWidth;
+    Widget? _leading = leading;
+    double? _leadingWidth = leadingWidth;
 
-    if (automaticallyImplyLeading && canPop) {
+    if (_leading == null && automaticallyImplyLeading && canPop) {
       // 68pt width ensures 16pt left padding + 48pt standard touch target (total >= 44pt target)
       // This protects the button from iOS bezel/case lip conflicts while retaining full hit area.
-      leadingWidth = 68.0;
-      leading = Padding(
+      _leadingWidth = 68.0;
+      _leading = Padding(
         padding: const EdgeInsets.only(left: 16.0),
         child: IconButton(
           icon: Icon(Icons.arrow_back_ios_new_rounded,
@@ -43,8 +47,8 @@ class SharedAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: backgroundColor,
       elevation: elevation,
       actions: actions,
-      leading: leading,
-      leadingWidth: leadingWidth,
+      leading: _leading,
+      leadingWidth: _leadingWidth,
       centerTitle: true,
       automaticallyImplyLeading: automaticallyImplyLeading,
     );

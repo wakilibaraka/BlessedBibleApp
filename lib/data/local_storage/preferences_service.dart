@@ -244,6 +244,10 @@ class PreferencesService {
     prefs.setString('${_readingPlanStateKey}_$planId', jsonEncode(state));
   }
 
+  void deleteReadingPlanState(String planId) {
+    prefs.remove('${_readingPlanStateKey}_$planId');
+  }
+
   Map<String, dynamic>? getReadingPlanState(String planId) {
     final jsonString = prefs.getString('${_readingPlanStateKey}_$planId');
     if (jsonString != null) {

@@ -5,7 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/reading_plan_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../widgets/shared_app_bar.dart';
+import '../widgets/account_button.dart';
 import '../widgets/plan_row_widget.dart';
+import '../sheets/custom_plan_action_sheet.dart';
 import 'custom_plan_builder_screen.dart';
 import 'reading_plan_browser.dart';
 import 'reading_plans_hub_screen.dart';
@@ -40,6 +42,13 @@ class _PlansHubV2ScreenState extends ConsumerState<PlansHubV2Screen> with Single
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: SharedAppBar(
         title: const Text('Plans'),
+        leading: const Padding(
+          padding: EdgeInsets.only(left: 16.0),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: AccountButton()
+          )
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -150,7 +159,7 @@ class _MyPlansTabState extends ConsumerState<_MyPlansTab> {
                 ),
               ),
               Column(mainAxisSize: MainAxisSize.min, children: [
-                Text('${(primaryState.percentComplete * 100).toStringAsFixed(0)}%',
+                Text('${(primaryState.percentComplete * 100).toStringAsFixed(1)}%',
                     style: TextStyle(
                         fontFamily: 'EB Garamond',
                         fontSize: 34,
@@ -430,7 +439,7 @@ class _LibraryTab extends ConsumerWidget {
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             children: [
-              _buildCreateCustomPlanCard(context, theme, gold),
+              _buildCreateCustomPlanCard(context, theme, gold, customPlanIds.isEmpty),
               for (final id in customPlanIds)
                 _buildCustomPlanCard(context, ref, theme, id),
             ],
@@ -478,14 +487,14 @@ class _LibraryTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildCreateCustomPlanCard(BuildContext context, ThemeData theme, Color gold) {
+  Widget _buildCreateCustomPlanCard(BuildContext context, ThemeData theme, Color gold, bool isFullWidth) {
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(CupertinoPageRoute(builder: (_) => const CustomPlanBuilderScreen()));
       },
       child: Container(
-        width: 140,
-        margin: const EdgeInsets.only(right: 12),
+        width: isFullWidth ? MediaQuery.of(context).size.width - 32 : 140,
+        margin: EdgeInsets.only(right: isFullWidth ? 0 : 12),
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
@@ -508,6 +517,7 @@ class _LibraryTab extends ConsumerWidget {
     final title = customPlan?['title'] ?? 'Custom Plan';
     return GestureDetector(
       onTap: () => _activatePlan(context, ref, id, isCustom: true),
+      onLongPress: () => CustomPlanActionSheet.show(context, ref, id),
       child: Container(
         width: 140,
         margin: const EdgeInsets.only(right: 12),
