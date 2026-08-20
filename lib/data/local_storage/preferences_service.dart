@@ -18,6 +18,7 @@ class PreferencesService {
   static const String _lastTabKey = 'last_tab';
   static const String _lastReadLocKey = 'last_read_loc';
   static const String _studyLayoutKey = 'study_layout';
+  static const String _useNewPlansHubKey = 'use_new_plans_hub';
   static const String _readingPlanStateKey = 'reading_plan_state';
 
   /// Key for the user's chosen rest day in the reading plan.
@@ -97,8 +98,16 @@ class PreferencesService {
     return prefs.getStringList(_searchQueriesKey) ?? [];
   }
 
-  void saveRecentSearchQueries(List<String> queries) {
-    prefs.setStringList(_searchQueriesKey, queries);
+  Future<void> saveRecentSearchQueries(List<String> queries) async {
+    await prefs.setStringList(_searchQueriesKey, queries);
+  }
+
+  bool getUseNewPlansHub() {
+    return prefs.getBool(_useNewPlansHubKey) ?? false;
+  }
+
+  Future<void> setUseNewPlansHub(bool useNew) async {
+    await prefs.setBool(_useNewPlansHubKey, useNew);
   }
 
   void saveBookmarks(List<String> bookmarks) {
