@@ -20,6 +20,8 @@ import '../../state/read_settings_provider.dart';
 import '../../state/user_data_provider.dart';
 import '../../state/reading_plan_provider.dart';
 import '../../state/streak_provider.dart';
+import '../../state/pericopes_provider.dart';
+import '../../models/pericope_entry.dart';
 import '../../state/most_read_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../../data/models/translation_model.dart';
@@ -661,6 +663,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     final appThemeMode = ref.watch(themeProvider);
     final typography = ref.watch(typographyProvider);
     final chapterTitles = ref.watch(chapterTitlesProvider);
+    final pericopesMap = ref.watch(pericopesProvider); // Trigger rebuild on load
+    final pericopesNotifier = ref.read(pericopesProvider.notifier);
     final readSettings = ref.watch(readSettingsProvider);
     final selectedVerses = ref.watch(readSelectionProvider);
 
@@ -1152,6 +1156,18 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                 .chapter.number
                                                                 .toString()];
 
+                                                        final chapterPericopes =
+                                                            pericopesNotifier.getPericopesForChapter(
+                                                                fc.book.name,
+                                                                fc.chapter.number);
+                                                        PericopeEntry? pericopeHeading;
+                                                        for (final p in chapterPericopes) {
+                                                          if (p.startVerse == verse.number) {
+                                                            pericopeHeading = p;
+                                                            break;
+                                                          }
+                                                        }
+
                                                         return Column(
                                                           crossAxisAlignment:
                                                               CrossAxisAlignment
@@ -1196,6 +1212,28 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                   textAlign:
                                                                       TextAlign
                                                                           .left,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                            if (pericopeHeading != null) ...[
+                                                              Padding(
+                                                                padding: EdgeInsets.only(
+                                                                  top: (index == 0 && chapterTitle != null) ? 4.0 : 16.0,
+                                                                  bottom: 8.0,
+                                                                  left: 15.0,
+                                                                  right: 12.0,
+                                                                ),
+                                                                child: Text(
+                                                                  pericopeHeading.title,
+                                                                  style: theme.textTheme.titleSmall?.copyWith(
+                                                                    color: theme.primaryColor,
+                                                                    fontSize: typography.fontSize * 1.05,
+                                                                    fontFamily: typography.fontFamily,
+                                                                    fontWeight: FontWeight.w600,
+                                                                    fontStyle: FontStyle.italic,
+                                                                    letterSpacing: 0.1,
+                                                                  ),
+                                                                  textAlign: TextAlign.left,
                                                                 ),
                                                               ),
                                                             ],
