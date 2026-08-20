@@ -132,11 +132,11 @@ class _SingleCommentaryEditorScreenState extends State<SingleCommentaryEditorScr
         if (_verseCtrl.text.trim().isNotEmpty) 'verse': int.tryParse(_verseCtrl.text.trim()),
       };
 
-      await FirebaseFirestore.instance.collection('commentary').doc(widget.entry.id).update({
+      await FirebaseFirestore.instance.collection('commentary').doc(widget.entry.id).set({
         'text': _textCtrl.text.trim(),
         'scope': scopeMap,
         'updatedAt': FieldValue.serverTimestamp(),
-      });
+      }, SetOptions(merge: true));
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved entry in place!')));
