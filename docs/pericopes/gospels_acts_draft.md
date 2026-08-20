@@ -13,8 +13,8 @@ Matthew, Mark, Luke, and John were pericoped completely independently on their o
 - **Mark:** 678 verses across 53 pericopes. No gaps, no overlaps.
 - **Luke:** 1,151 verses across 77 pericopes. No gaps, no overlaps.
 - **John:** 879 verses across 42 pericopes. No gaps, no overlaps.
-- **Acts:** 1,007 verses across 46 pericopes. No gaps, no overlaps.
-- **Total Gospels & Acts:** 4,786 verses completely covered across 287 discrete pericopes.
+- **Acts:** 1,007 verses across 52 pericopes. No gaps, no overlaps.
+- **Total Gospels & Acts:** 4,786 verses completely covered across 293 discrete pericopes.
 
 ### 2. Anchor Check
 Every requested anchor story is present as a standalone pericope matching the exact requested event:
