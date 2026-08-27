@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
-import '../widgets/pinch_to_zoom_font_wrapper.dart';
+
 import '../widgets/typography_controls.dart';
 
 import 'package:flutter/rendering.dart';
@@ -821,8 +821,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
     return Scaffold(
       backgroundColor: getThemeBackgroundColor(),
-      body: PinchToZoomFontWrapper(
-        child: Stack(
+      body: Stack(
           children: [
             // ── Scripture Content Layer ──────────────────────────────────
             Positioned.fill(
@@ -1624,7 +1623,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
             ),
           ],
         ),
-      ),
     );
   }
 
