@@ -17,6 +17,7 @@ import '../../data/models/bible_model.dart';
 import '../../state/bible_provider.dart';
 
 import '../../state/read_settings_provider.dart';
+import '../../state/surface_style_provider.dart';
 import '../../state/user_data_provider.dart';
 import '../../state/reading_plan_provider.dart';
 import '../../state/streak_provider.dart';
@@ -487,33 +488,50 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       {required Widget child,
       required ReadingTokens tokens,
       required VoidCallback onTap}) {
+    final surfaceStyle = ref.watch(surfaceStyleProvider);
+    final isEarth = surfaceStyle == SurfaceStyle.flat;
+
     return GestureDetector(
       onTap: onTap,
       child: RepaintBoundary(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
-                  child: const SizedBox.shrink(),
-                ),
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                decoration: BoxDecoration(
-                  color: tokens.readingPaper.withValues(alpha: 0.85),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: tokens.readingBorder.withValues(alpha: 0.3),
-                    width: 1,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: isEarth
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.12),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                : null,
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
+                    child: const SizedBox.shrink(),
                   ),
                 ),
-                child: child,
-              ),
-            ],
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: tokens.readingPaper.withValues(alpha: 0.85),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: tokens.readingBorder.withValues(alpha: 0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: child,
+                ),
+              ],
+            ),
           ),
         ),
       ),
