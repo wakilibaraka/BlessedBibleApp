@@ -813,9 +813,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
                             .setReadingViewMode(ReadingViewMode.full);
                         await ref
                             .read(readSettingsProvider.notifier)
-                            .setBackgroundGlowStyle(BackgroundGlowStyle.top);
-                        await ref
-                            .read(readSettingsProvider.notifier)
                             .setVerseActionStyle(VerseActionStyle.classic);
                         await ref
                             .read(readSettingsProvider.notifier)
@@ -870,7 +867,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
             trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
             onTap: () async {
               final uri = Uri.parse(
-                  'mailto:placeholder@example.com?subject=The Blessed Bible Feedback');
+                  'mailto:wakilibar@gmail.com?subject=The Blessed Bible Feedback');
               if (await canLaunchUrl(uri)) {
                 await launchUrl(uri);
               }

@@ -12,6 +12,7 @@ import '../../utils/isolate_parsers.dart';
 import '../../data/models/bible_model.dart';
 import '../../state/bible_provider.dart';
 import '../../state/auth_provider.dart';
+import '../../state/reading_plan_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../widgets/shared_app_bar.dart';
 import '../widgets/primary_button.dart';

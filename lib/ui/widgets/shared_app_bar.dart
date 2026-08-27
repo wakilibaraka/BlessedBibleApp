@@ -25,14 +25,14 @@ class SharedAppBar extends StatelessWidget implements PreferredSizeWidget {
     final ModalRoute<dynamic>? parentRoute = ModalRoute.of(context);
     final bool canPop = parentRoute?.canPop ?? false;
 
-    Widget? _leading = leading;
-    double? _leadingWidth = leadingWidth;
+    Widget? finalLeading = leading;
+    double? finalLeadingWidth = leadingWidth;
 
-    if (_leading == null && automaticallyImplyLeading && canPop) {
+    if (finalLeading == null && automaticallyImplyLeading && canPop) {
       // 68pt width ensures 16pt left padding + 48pt standard touch target (total >= 44pt target)
       // This protects the button from iOS bezel/case lip conflicts while retaining full hit area.
-      _leadingWidth = 68.0;
-      _leading = Padding(
+      finalLeadingWidth = 68.0;
+      finalLeading = Padding(
         padding: const EdgeInsets.only(left: 16.0),
         child: IconButton(
           icon: Icon(Icons.arrow_back_ios_new_rounded,
@@ -47,8 +47,8 @@ class SharedAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: backgroundColor,
       elevation: elevation,
       actions: actions,
-      leading: _leading,
-      leadingWidth: _leadingWidth,
+      leading: finalLeading,
+      leadingWidth: finalLeadingWidth,
       centerTitle: true,
       automaticallyImplyLeading: automaticallyImplyLeading,
     );

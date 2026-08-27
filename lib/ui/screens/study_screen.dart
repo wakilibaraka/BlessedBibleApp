@@ -20,9 +20,6 @@ import 'reading_plans_hub_screen.dart';
 import 'commentary_hub_screen.dart';
 import 'commentary_library_screen.dart';
 import '../../state/streak_provider.dart';
-import '../../state/auth_provider.dart';
-import 'admin/admin_constants.dart';
-import 'admin/admin_dashboard_screen.dart';
 import '../widgets/plan_row_widget.dart';
 import '../../state/plans_hub_style_provider.dart';
 import 'plans_hub_v2_screen.dart';
@@ -206,8 +203,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                         ),
                         Consumer(builder: (context, ref, child) {
                           final streak = ref.watch(streakProvider);
-                          final authState = ref.watch(authStateProvider);
-                          final user = authState.value;
                           final isLit = streak.readToday;
                           final glowColor = isLit
                               ? AppColors.goldAccent

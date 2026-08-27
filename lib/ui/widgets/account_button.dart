@@ -3,8 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../state/auth_provider.dart';
-import '../../services/auth_service.dart';
-import '../screens/admin_dashboard_screen.dart';
+import '../screens/admin/admin_dashboard_screen.dart';
+import '../screens/admin/admin_constants.dart';
 
 class AccountButton extends ConsumerWidget {
   const AccountButton({super.key});
@@ -60,6 +60,29 @@ class AccountButton extends ConsumerWidget {
                             }
                           },
                         ),
+                        ListTile(
+                          leading: const Icon(Icons.apple),
+                          title: const Text('Sign in with Apple'),
+                          onTap: () async {
+                            final result = await ref
+                                .read(authActionsProvider)
+                                .signInWithApple();
+                            if (context.mounted && result == SignInResult.failed) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: const Text(
+                                      'Sign in failed. Please try again.'),
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12)),
+                                ),
+                              );
+                            }
+                            if (context.mounted && result == SignInResult.success) {
+                              Navigator.pop(context);
+                            }
+                          },
+                        ),
                       ] else ...[
                         ListTile(
                           leading: CircleAvatar(
@@ -74,12 +97,61 @@ class AccountButton extends ConsumerWidget {
                           title: Text(currentAuthState.value?.displayName ?? 'Signed In'),
                         ),
                         ListTile(
-                          leading: const Icon(Icons.logout, color: Colors.red),
+                          leading: const Icon(Icons.logout, color: Colors.orange),
                           title: const Text('Sign Out',
-                              style: TextStyle(color: Colors.red)),
+                              style: TextStyle(color: Colors.orange)),
                           onTap: () async {
                             await ref.read(authActionsProvider).signOut();
                             if (context.mounted) Navigator.pop(context);
+                          },
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.delete_forever, color: Colors.red),
+                          title: const Text('Delete Account',
+                              style: TextStyle(color: Colors.red)),
+                          onTap: () async {
+                            // Close the bottom sheet first
+                            Navigator.pop(context);
+                            // Show confirmation dialog
+                            final confirm = await showDialog<bool>(
+                              context: context,
+                              builder: (ctx) => AlertDialog(
+                                title: const Text('Delete Account?'),
+                                content: const Text(
+                                    'This will permanently delete your account and all associated data from our servers. This action cannot be undone.'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(ctx, false),
+                                    child: const Text('Cancel'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(ctx, true),
+                                    child: const Text('Delete',
+                                        style: TextStyle(color: Colors.red)),
+                                  ),
+                                ],
+                              ),
+                            );
+
+                            if (confirm == true && context.mounted) {
+                              try {
+                                await ref.read(authActionsProvider).deleteAccount();
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Account deleted successfully.')),
+                                  );
+                                }
+                              } catch (e) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Failed to delete account. Please sign out, sign back in, and try again.'),
+                                      duration: Duration(seconds: 4),
+                                    ),
+                                  );
+                                }
+                              }
+                            }
                           },
                         ),
                         if (currentAuthState.value?.uid == kOwnerUid)

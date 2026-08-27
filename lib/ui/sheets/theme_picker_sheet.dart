@@ -30,38 +30,15 @@ class ThemePickerSheet extends ConsumerStatefulWidget {
 }
 
 class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
-  bool _showAdvanced = false;
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final currentMode = ref.watch(themeProvider);
 
-    final engineMode = ref.watch(engineModeProvider);
-
     final readSettings = ref.watch(readSettingsProvider);
 
-    return PopScope(
-      canPop: !_showAdvanced,
-      onPopInvokedWithResult: (didPop, result) {
-        if (!didPop) {
-          setState(() {
-            _showAdvanced = false;
-          });
-        }
-      },
-      child: GestureDetector(
+    return GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onHorizontalDragEnd: (details) {
-          final velocity = details.primaryVelocity ?? 0;
-          if (velocity < -300 && !_showAdvanced) {
-            HapticFeedback.selectionClick();
-            setState(() => _showAdvanced = true);
-          } else if (velocity > 300 && _showAdvanced) {
-            HapticFeedback.selectionClick();
-            setState(() => _showAdvanced = false);
-          }
-        },
         onVerticalDragEnd: (details) {
           // Swipe down quickly → dismiss the sheet
           if ((details.primaryVelocity ?? 0) > 400) {
@@ -102,58 +79,21 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        if (_showAdvanced) ...[
-                          IconButton(
-                            icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                                size: 18),
-                            onPressed: () =>
-                                setState(() => _showAdvanced = false),
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                          ),
-                          const SizedBox(width: 12),
-                        ],
-                        Text(
-                          _showAdvanced ? 'Advanced Appearance' : 'Appearance',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (!_showAdvanced)
-                      IconButton(
-                        icon: Icon(Icons.tune_rounded,
-                            size: 20, color: theme.colorScheme.onSurface),
-                        onPressed: () {
-                          HapticFeedback.selectionClick();
-                          setState(() {
-                            _showAdvanced = true;
-                          });
-                        },
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                      ),
-                  ],
+                Text(
+                  'Appearance',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 const SizedBox(height: 16),
                 ConstrainedBox(
                   constraints: const BoxConstraints(minHeight: 520.0),
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 250),
-                    child: _showAdvanced
-                        ? _buildAdvancedContent(theme, readSettings, engineMode)
-                        : Container(
-                            key: const ValueKey('appearance_main'),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
+                  child: Container(
+                    key: const ValueKey('appearance_main'),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                                 Consumer(builder: (context, ref, _) {
                                   final surfaceStyle =
                                       ref.watch(earthHeavenStyleProvider);
@@ -432,151 +372,31 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                                   ],
                                 ),
                                 const SizedBox(height: 16),
+                                const SizedBox(height: 24),
+                                const Divider(height: 16),
+                                SwitchListTile(
+                                  contentPadding: EdgeInsets.zero,
+                                  title: const Text('Enable Background Glow', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                                  subtitle: const Text('Renders a subtle animated light behind the reader in 3D surface style', style: TextStyle(fontSize: 12)),
+                                  value: readSettings.isGlowEnabled,
+                                  onChanged: (value) {
+                                    HapticFeedback.selectionClick();
+                                    ref.read(readSettingsProvider.notifier).setGlowEnabled(value);
+                                  },
+                                ),
                               ],
                             ),
                           ),
-                  ),
                 ),
               ],
             ),
           ),
         ),
       ),
-      ),
     );
   }
 
-  Widget _buildAdvancedContent(ThemeData theme, ReadSettingsState readSettings,
-      ThemeEngineMode engineMode) {
-    return Container(
-      key: const ValueKey('advanced_main'),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'THEME MODE',
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.primaryColor,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
-            ),
-          ),
-          const SizedBox(height: 12),
-          GestureDetector(
-            onTap: () {
-              HapticFeedback.selectionClick();
-              final newMode = engineMode == ThemeEngineMode.locked
-                  ? ThemeEngineMode.timeBased
-                  : ThemeEngineMode.locked;
-              ref.read(themeProvider.notifier).setEngineMode(newMode);
-            },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.1)),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                      engineMode == ThemeEngineMode.locked
-                          ? Icons.lock_rounded
-                          : Icons.schedule_rounded,
-                      size: 16,
-                      color: theme.colorScheme.onSurface),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      engineMode == ThemeEngineMode.locked
-                          ? 'Locked Theme'
-                          : 'Time-Based',
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 13),
-                    ),
-                  ),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Text(
-                      engineMode == ThemeEngineMode.locked ? 'Locked' : 'Auto',
-                      style: const TextStyle(
-                          fontSize: 11, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'FINE-TUNING',
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.primaryColor,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
-            ),
-          ),
-          const SizedBox(height: 12),
 
-          const Divider(height: 16, indent: 16),
-          SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            title: const Text('Enable Background Glow',
-                style: TextStyle(fontSize: 14)),
-            subtitle: const Text(
-                'Renders a subtle animated light behind the reader in 3D surface style',
-                style: TextStyle(fontSize: 12)),
-            value: readSettings.isGlowEnabled,
-            onChanged: (value) {
-              HapticFeedback.selectionClick();
-              ref.read(readSettingsProvider.notifier).setGlowEnabled(value);
-            },
-          ),
-          if (readSettings.isGlowEnabled) ...[
-            const SizedBox(height: 16),
-            AnimatedSegmentedTile<BackgroundGlowStyle>(
-              title: 'Glow Position',
-              subtitle: 'Where the glow originates on the screen',
-              selectedValue: readSettings.backgroundGlowStyle,
-              options: const [
-                MapEntry(BackgroundGlowStyle.top, 'Top'),
-                MapEntry(BackgroundGlowStyle.full, 'Full'),
-              ],
-              onChanged: (val) {
-                HapticFeedback.selectionClick();
-                ref
-                    .read(readSettingsProvider.notifier)
-                    .setBackgroundGlowStyle(val);
-              },
-            ),
-            const SizedBox(height: 16),
-            AnimatedSegmentedTile<double>(
-              title: 'Glow Intensity',
-              subtitle: 'Brightness of the animated light',
-              selectedValue: readSettings.glowIntensity,
-              options: const [
-                MapEntry(0.5, 'Subtle'),
-                MapEntry(0.75, 'Normal'),
-                MapEntry(1.0, 'Bright'),
-              ],
-              onChanged: (val) {
-                HapticFeedback.selectionClick();
-                ref.read(readSettingsProvider.notifier).setGlowIntensity(val);
-              },
-            ),
-          ],
-          const SizedBox(height: 16),
-        ],
-      ),
-    );
-  }
 }
 
 class _ThemePill extends ConsumerStatefulWidget {

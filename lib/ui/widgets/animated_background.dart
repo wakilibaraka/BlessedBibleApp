@@ -71,8 +71,28 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground>
       child: AnimatedBuilder(
         animation: _bgAnimation,
         builder: (_, __) {
-          final glowStyle = ref.read(readSettingsProvider).backgroundGlowStyle;
-          final isTopGlow = glowStyle == BackgroundGlowStyle.top;
+          final hour = DateTime.now().hour;
+          
+          bool isTopGlow = true;
+          double intensity = 0.5;
+
+          if (hour >= 6 && hour < 10) {
+            // Morning
+            isTopGlow = true;
+            intensity = 0.6;
+          } else if (hour >= 10 && hour < 16) {
+            // Midday
+            isTopGlow = false;
+            intensity = 1.0;
+          } else if (hour >= 16 && hour < 20) {
+            // Evening
+            isTopGlow = true;
+            intensity = 0.8;
+          } else {
+            // Night (20-6)
+            isTopGlow = true;
+            intensity = 0.3;
+          }
 
           final t = _bgAnimation.value;
 
@@ -175,7 +195,6 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground>
               break;
           }
 
-          final intensity = ref.read(readSettingsProvider).glowIntensity;
           final finalColors = colors
               .map((c) => Color.lerp(
                   Theme.of(context).scaffoldBackgroundColor, c, intensity)!)
