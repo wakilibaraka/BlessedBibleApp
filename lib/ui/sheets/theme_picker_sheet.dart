@@ -86,66 +86,66 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                const SizedBox(height: 16),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(minHeight: 520.0),
-                  child: Container(
-                    key: const ValueKey('appearance_main'),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                                Consumer(builder: (context, ref, _) {
-                                  final surfaceStyle =
-                                      ref.watch(earthHeavenStyleProvider);
-                                  return Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      AnimatedSegmentedTile<EarthHeavenStyle>(
-                                        title: 'Surface Style',
-                                        subtitle:
-                                            'Visual depth and material styling',
-                                        selectedValue: surfaceStyle,
-                                        options: const [
-                                          MapEntry(EarthHeavenStyle.heaven,
-                                              'Heaven'),
-                                          MapEntry(
-                                              EarthHeavenStyle.earth, 'Earth'),
-                                          MapEntry(
-                                              EarthHeavenStyle.paperlike, 'Paperlike'),
-                                        ],
-                                        onChanged: (val) {
-                                          HapticFeedback.selectionClick();
-                                          ref
-                                              .read(earthHeavenStyleProvider
-                                                  .notifier)
-                                              .setStyle(val);
-                                        },
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                            top: 4.0, left: 2.0),
-                                        child: Text(
-                                          surfaceStyle ==
-                                                  EarthHeavenStyle.heaven
-                                              ? 'Layered depth'
-                                              : surfaceStyle == EarthHeavenStyle.paperlike
-                                                  ? 'Warm e-reader paper'
-                                                  : 'Flat surfaces',
-                                          style: theme.textTheme.labelSmall
-                                              ?.copyWith(
-                                            color: theme.colorScheme.onSurface
-                                                .withValues(alpha: 0.5),
-                                            fontSize: 10,
-                                          ),
+                Container(
+                  key: const ValueKey('appearance_main'),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                              Consumer(builder: (context, ref, _) {
+                                final surfaceStyle = ref.watch(earthHeavenStyleProvider);
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 16.0),
+                                      child: Text(
+                                        'SURFACES',
+                                        style: theme.textTheme.labelSmall?.copyWith(
+                                          color: theme.primaryColor,
+                                          letterSpacing: 1.2,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 10,
                                         ),
                                       ),
-                                    ],
-                                  );
-                                }),
-                                const SizedBox(height: 12),
-                                const SizedBox(height: 12),
+                                    ),
+                                    AnimatedSegmentedTile<EarthHeavenStyle>(
+                                      subtitle: surfaceStyle == EarthHeavenStyle.heaven
+                                          ? 'Layered depth and lighting'
+                                          : surfaceStyle == EarthHeavenStyle.paperlike
+                                              ? 'Warm e-reader paper'
+                                              : 'Flat, uniform surfaces',
+                                      selectedValue: surfaceStyle,
+                                      options: const [
+                                        MapEntry(EarthHeavenStyle.heaven, 'Heaven'),
+                                        MapEntry(EarthHeavenStyle.earth, 'Earth'),
+                                        MapEntry(EarthHeavenStyle.paperlike, 'Paperlike'),
+                                      ],
+                                      onChanged: (val) {
+                                        HapticFeedback.selectionClick();
+                                        ref.read(earthHeavenStyleProvider.notifier).setStyle(val);
+                                      },
+                                    ),
+                                    AnimatedSize(
+                                      duration: const Duration(milliseconds: 300),
+                                      curve: Curves.easeInOut,
+                                      child: surfaceStyle == EarthHeavenStyle.heaven
+                                          ? SwitchListTile(
+                                              contentPadding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+                                              title: const Text('Enable Background Glow', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                                              subtitle: const Text('Renders a subtle animated light behind the reader', style: TextStyle(fontSize: 12)),
+                                              value: readSettings.isGlowEnabled,
+                                              onChanged: (value) {
+                                                HapticFeedback.selectionClick();
+                                                ref.read(readSettingsProvider.notifier).setGlowEnabled(value);
+                                              },
+                                            )
+                                          : const SizedBox.shrink(),
+                                    ),
+                                  ],
+                                );
+                              }),
+                              const SizedBox(height: 24),
                                 Text(
                                   'FOUNDATIONS',
                                   style: theme.textTheme.labelSmall?.copyWith(
@@ -371,23 +371,9 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 16),
-                                const SizedBox(height: 24),
-                                const Divider(height: 16),
-                                SwitchListTile(
-                                  contentPadding: EdgeInsets.zero,
-                                  title: const Text('Enable Background Glow', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                                  subtitle: const Text('Renders a subtle animated light behind the reader in 3D surface style', style: TextStyle(fontSize: 12)),
-                                  value: readSettings.isGlowEnabled,
-                                  onChanged: (value) {
-                                    HapticFeedback.selectionClick();
-                                    ref.read(readSettingsProvider.notifier).setGlowEnabled(value);
-                                  },
-                                ),
                               ],
                             ),
                           ),
-                ),
               ],
             ),
           ),
