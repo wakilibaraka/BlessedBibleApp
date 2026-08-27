@@ -504,3 +504,51 @@ class AppTheme {
   static ThemeData scarletRedTheme(double baseFontSize) =>
       customAccentTheme(baseFontSize, const Color(0xFFE53935));
 }
+
+extension PaperlikeTransform on ThemeData {
+  ThemeData applyPaperlike() {
+    final isDark = brightness == Brightness.dark;
+    final tokens = extension<ReadingTokens>();
+    if (tokens == null) return this;
+
+    // Preserve light/dark character:
+    // Light themes get a warm cream tint, dark themes get a warm charcoal/brown tint.
+    final warmTint = isDark ? const Color(0xFF2D2520) : const Color(0xFFF9F5EC);
+
+    Color transformBackground(Color original) {
+      // Blend aggressively to ensure a matte, distinct paper feel
+      return Color.alphaBlend(warmTint.withValues(alpha: 0.7), original);
+    }
+
+    final newPaper = transformBackground(tokens.readingPaper);
+    final newSurface = transformBackground(tokens.readingSurface);
+
+    // Boost reading contrast: push ink further towards pure black/white for focused reading
+    Color boostInk(Color original) {
+      return isDark
+          ? Color.lerp(original, Colors.white, 0.45)!
+          : Color.lerp(original, Colors.black, 0.45)!;
+    }
+
+    final newInk = boostInk(tokens.readingInk);
+    final newInkMuted = boostInk(tokens.readingInkMuted);
+
+    final newTokens = tokens.copyWith(
+      readingPaper: newPaper,
+      readingSurface: newSurface,
+      readingInk: newInk,
+      readingInkMuted: newInkMuted,
+      readingBorder: transformBackground(tokens.readingBorder),
+    );
+
+    return copyWith(
+      scaffoldBackgroundColor: newPaper,
+      canvasColor: newSurface,
+      colorScheme: colorScheme.copyWith(
+        surface: newSurface,
+        onSurface: newInk,
+      ),
+      extensions: [newTokens],
+    );
+  }
+}

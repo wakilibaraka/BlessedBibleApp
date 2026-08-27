@@ -6,13 +6,9 @@ enum EarthHeavenStyle { earth, heaven, paperlike }
 
 enum SurfaceStyle { flat, frosted, threeDimensional, paperlike }
 
-const Map<AppThemeMode, SurfaceStyle> _kEarthSurfaceMap = {
-  AppThemeMode.dawn: SurfaceStyle.flat,
-  AppThemeMode.fresh: SurfaceStyle.flat,
-};
-
-SurfaceStyle resolveEarthSurface(AppThemeMode theme) =>
-    _kEarthSurfaceMap[theme] ?? SurfaceStyle.frosted;
+// Earth is now uniformly flat for ALL 14 themes.
+// SurfaceStyle.frosted is currently unrouted, kept in codebase per request.
+SurfaceStyle resolveEarthSurface(AppThemeMode theme) => SurfaceStyle.flat;
 
 class EarthHeavenStyleNotifier extends Notifier<EarthHeavenStyle> {
   static const _surfaceStyleKey = 'app_surface_style';

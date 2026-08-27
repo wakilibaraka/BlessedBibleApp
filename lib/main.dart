@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:io' as dart_io;
 
 import 'state/theme_provider.dart';
+import 'state/surface_style_provider.dart';
 import 'theme/app_theme.dart';
 import 'ui/screens/main_nav_screen.dart';
 
@@ -96,6 +97,7 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
   @override
   Widget build(BuildContext context) {
     final themeMode = ref.watch(themeProvider);
+    final surfaceStyle = ref.watch(surfaceStyleProvider);
     final isBibleLoading = ref.watch(bibleProvider.select((s) => s.isLoading));
 
     ThemeData lightBase = themeMode == AppThemeMode.lilies
@@ -122,6 +124,11 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
                 ? AppTheme.freshTheme(14.0)
                 : AppTheme.darkTheme(14.0,
                     isAmoled: themeMode == AppThemeMode.oled);
+
+    if (surfaceStyle == SurfaceStyle.paperlike) {
+      lightBase = lightBase.applyPaperlike();
+      darkBase = darkBase.applyPaperlike();
+    }
 
     final prefsService = ref.watch(preferencesProvider);
     final hasCompletedOnboarding = prefsService.hasCompletedOnboarding();
