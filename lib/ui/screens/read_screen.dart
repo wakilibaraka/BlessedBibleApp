@@ -703,6 +703,15 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
   @override
   Widget build(BuildContext context) {
+    final mq = MediaQuery.of(context);
+    final double defaultSlop = mq.gestureSettings.touchSlop ?? kTouchSlop;
+    final mqHighSlop = mq.copyWith(
+      gestureSettings: DeviceGestureSettings(touchSlop: defaultSlop * 3.0),
+    );
+    final mqNormalSlop = mq.copyWith(
+      gestureSettings: DeviceGestureSettings(touchSlop: defaultSlop),
+    );
+    
     final theme = Theme.of(context);
     final appThemeMode = ref.watch(themeProvider);
     final typography = ref.watch(typographyProvider);
@@ -865,7 +874,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                 child: Text('Passage not found.',
                                     style: theme.textTheme.bodyLarge),
                               )
-                            : NotificationListener<ScrollNotification>(
+                            : MediaQuery(
+                                data: mqHighSlop,
+                                child: NotificationListener<ScrollNotification>(
                                 onNotification: (notification) {
                                   // Axis-lock: freeze the vertical list while PageView is swiping horizontally
                                   if (notification.metrics.axis == Axis.horizontal) {
@@ -1050,8 +1061,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                           }
                                         }
 
-                                        return RepaintBoundary(
-                                          child: GestureDetector(
+                                        return MediaQuery(
+                                          data: mqNormalSlop,
+                                          child: RepaintBoundary(
+                                            child: GestureDetector(
                                             onTap: _isPageSelectionMode
                                                 ? null
                                                 : () {
@@ -1453,7 +1466,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
                                                       final ScrollPhysics
                                                           basePhysics =
-                                                          const BouncingScrollPhysics();
+                                                          const AlwaysScrollableScrollPhysics();
 
                                                       Widget listWidget;
                                                       if (_isPageSelectionMode) {
@@ -1540,12 +1553,14 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                               ), // end Directionality
                                             ), // end NotificationListener
                                           ), // end GestureDetector
-                                        ); // end RepaintBoundary
+                                        ), // end RepaintBoundary
+                                        ); // end MediaQuery
                                       }, // end Consumer's builder
                                     );
                                   },
                                 ),
                               ),
+                            ),
 
                   ),
                   // Top Navigation Bar Layer (Floating pills allowing text to flow behind)
