@@ -2,9 +2,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'theme_provider.dart';
 
-enum EarthHeavenStyle { earth, heaven }
+enum EarthHeavenStyle { earth, heaven, paperlike }
 
-enum SurfaceStyle { flat, frosted, threeDimensional }
+enum SurfaceStyle { flat, frosted, threeDimensional, paperlike }
 
 const Map<AppThemeMode, SurfaceStyle> _kEarthSurfaceMap = {
   AppThemeMode.dawn: SurfaceStyle.flat,
@@ -21,7 +21,7 @@ class EarthHeavenStyleNotifier extends Notifier<EarthHeavenStyle> {
   @override
   EarthHeavenStyle build() {
     _loadState();
-    return EarthHeavenStyle.heaven;
+    return EarthHeavenStyle.earth;
   }
 
   Future<void> _loadState() async {
@@ -61,6 +61,9 @@ final surfaceStyleProvider = Provider<SurfaceStyle>((ref) {
   final eh = ref.watch(earthHeavenStyleProvider);
   if (eh == EarthHeavenStyle.heaven) {
     return SurfaceStyle.threeDimensional;
+  }
+  if (eh == EarthHeavenStyle.paperlike) {
+    return SurfaceStyle.paperlike;
   }
   final theme = ref.watch(themeProvider);
   return resolveEarthSurface(theme);

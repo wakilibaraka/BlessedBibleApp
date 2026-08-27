@@ -46,6 +46,7 @@ class TexturedGlassContainer extends ConsumerWidget {
 
     final useBlur = surfaceStyle == SurfaceStyle.frosted && !isScrollable;
     final is3D = surfaceStyle == SurfaceStyle.threeDimensional;
+    final isPaperlike = surfaceStyle == SurfaceStyle.paperlike;
 
     final tokens = Theme.of(context).extension<ReadingTokens>()!;
 
@@ -128,6 +129,13 @@ class TexturedGlassContainer extends ConsumerWidget {
           offset: const Offset(0, 3),
         ),
       ];
+    } else if (isPaperlike) {
+      shadows = [
+        BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 2,
+            offset: const Offset(0, 1)),
+      ];
     } else {
       shadows = [
         BoxShadow(
@@ -148,8 +156,8 @@ class TexturedGlassContainer extends ConsumerWidget {
         border: useBlur
             ? null
             : Border.all(
-                width: is3D ? 0.0 : 0.5,
-                color: is3D ? Colors.transparent : tokens.readingBorder,
+                width: is3D ? 0.0 : (isPaperlike ? 0.8 : 0.5),
+                color: is3D ? Colors.transparent : (isPaperlike ? tokens.readingBorder.withValues(alpha: 0.4) : tokens.readingBorder),
               ),
       ),
       child: child,

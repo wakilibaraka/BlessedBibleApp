@@ -172,6 +172,8 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                                               'Heaven'),
                                           MapEntry(
                                               EarthHeavenStyle.earth, 'Earth'),
+                                          MapEntry(
+                                              EarthHeavenStyle.paperlike, 'Paperlike'),
                                         ],
                                         onChanged: (val) {
                                           HapticFeedback.selectionClick();
@@ -188,7 +190,9 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                                           surfaceStyle ==
                                                   EarthHeavenStyle.heaven
                                               ? 'Layered depth'
-                                              : 'Flat surfaces',
+                                              : surfaceStyle == EarthHeavenStyle.paperlike
+                                                  ? 'Warm e-reader paper'
+                                                  : 'Flat surfaces',
                                           style: theme.textTheme.labelSmall
                                               ?.copyWith(
                                             color: theme.colorScheme.onSurface
