@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../state/typography_provider.dart';
 
-class PinchToNavWrapper extends StatefulWidget {
+class PinchToZoomFontWrapper extends ConsumerStatefulWidget {
   final Widget child;
-  final VoidCallback onPinchNav;
 
-  const PinchToNavWrapper({
-    super.key,
-    required this.child,
-    required this.onPinchNav,
-  });
+  const PinchToZoomFontWrapper({super.key, required this.child});
 
   @override
-  State<PinchToNavWrapper> createState() => _PinchToNavWrapperState();
+  ConsumerState<PinchToZoomFontWrapper> createState() =>
+      _PinchToZoomFontWrapperState();
 }
 
-class _PinchToNavWrapperState extends State<PinchToNavWrapper> {
+class _PinchToZoomFontWrapperState
+    extends ConsumerState<PinchToZoomFontWrapper> {
   final Map<int, Offset> _activePointers = {};
   double _initialDistance = 0.0;
-  bool _hasTriggeredPinch = false;
+  double _initialFontSize = 18.0;
+  double _lastHapticFontSize = 18.0;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,8 @@ class _PinchToNavWrapperState extends State<PinchToNavWrapper> {
         if (_activePointers.length == 2) {
           final pts = _activePointers.values.toList();
           _initialDistance = (pts[0] - pts[1]).distance;
-          _hasTriggeredPinch = false;
+          _initialFontSize = ref.read(typographyProvider).fontSize;
+          _lastHapticFontSize = _initialFontSize;
         }
       },
       onPointerMove: (event) {
@@ -36,19 +37,22 @@ class _PinchToNavWrapperState extends State<PinchToNavWrapper> {
           _activePointers[event.pointer] = event.position;
         }
 
-        if (_activePointers.length == 2 && _initialDistance > 0 && !_hasTriggeredPinch) {
+        if (_activePointers.length == 2 && _initialDistance > 0) {
           final pts = _activePointers.values.toList();
           final currentDistance = (pts[0] - pts[1]).distance;
           final scale = currentDistance / _initialDistance;
 
-          // Guard against accidental triggers:
-          // 1. MUST have exactly 2 active pointers (handled by length == 2 check above).
-          // 2. MUST have a significant scale change. A typical tap/scroll won't have 2 fingers,
-          //    and accidental multi-touch during scrolling won't create a large scale difference.
-          if (scale < 0.7 || scale > 1.3) {
-            _hasTriggeredPinch = true;
-            HapticFeedback.mediumImpact();
-            widget.onPinchNav();
+          // Map scale to font size: e.g. scale 1.1 -> +10% font size
+          final newFontSize = (_initialFontSize * scale).clamp(12.0, 32.0);
+
+          final currentFontSize = ref.read(typographyProvider).fontSize;
+          if ((newFontSize - currentFontSize).abs() > 0.5) {
+            // Update live but debounced by distance threshold
+            ref.read(typographyProvider.notifier).setFontSize(newFontSize);
+            if ((newFontSize - _lastHapticFontSize).abs() >= 1.0) {
+              HapticFeedback.selectionClick();
+              _lastHapticFontSize = newFontSize.roundToDouble();
+            }
           }
         }
       },
@@ -56,14 +60,12 @@ class _PinchToNavWrapperState extends State<PinchToNavWrapper> {
         _activePointers.remove(event.pointer);
         if (_activePointers.length < 2) {
           _initialDistance = 0.0;
-          _hasTriggeredPinch = false;
         }
       },
       onPointerCancel: (event) {
         _activePointers.remove(event.pointer);
         if (_activePointers.length < 2) {
           _initialDistance = 0.0;
-          _hasTriggeredPinch = false;
         }
       },
       behavior: HitTestBehavior.translucent,
