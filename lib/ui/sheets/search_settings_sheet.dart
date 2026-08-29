@@ -92,16 +92,18 @@ class SearchSettingsSheet extends ConsumerWidget {
                   ),
                   SwitchListTile(
                     title: const Text('Old Testament'),
+                    subtitle: searchState.filterBook != null ? const Text('Disabled (Book Filter Active)') : null,
                     value: searchState.filterOt,
-                    onChanged: (val) {
+                    onChanged: searchState.filterBook != null ? null : (val) {
                       ref.read(searchStateProvider.notifier).toggleOtFilter();
                     },
                     secondary: const Icon(Icons.history_edu_rounded),
                   ),
                   SwitchListTile(
                     title: const Text('New Testament'),
+                    subtitle: searchState.filterBook != null ? const Text('Disabled (Book Filter Active)') : null,
                     value: searchState.filterNt,
-                    onChanged: (val) {
+                    onChanged: searchState.filterBook != null ? null : (val) {
                       ref.read(searchStateProvider.notifier).toggleNtFilter();
                     },
                     secondary: const Icon(Icons.menu_book_rounded),

@@ -11,7 +11,7 @@ class SearchSettingsState {
   final bool matchWholeWords;
 
   const SearchSettingsState({
-    this.autoOpenSingleSearchResult = true,
+    this.autoOpenSingleSearchResult = false,
     this.defaultSearchOt = true,
     this.defaultSearchNt = true,
     this.defaultSearchCommentary = true,
@@ -39,7 +39,7 @@ class SearchSettingsNotifier extends Notifier<SearchSettingsState> {
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
     state = SearchSettingsState(
-      autoOpenSingleSearchResult: prefs.getBool(_autoOpenKey) ?? true,
+      autoOpenSingleSearchResult: prefs.getBool(_autoOpenKey) ?? false,
       defaultSearchOt: prefs.getBool(_defaultOtKey) ?? true,
       defaultSearchNt: prefs.getBool(_defaultNtKey) ?? true,
       defaultSearchCommentary: prefs.getBool(_defaultCommKey) ?? true,

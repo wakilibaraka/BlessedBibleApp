@@ -69,8 +69,10 @@ class SearchItem {
 class IndexData {
   final List<SearchItem> corpus;
   final Map<String, List<int>> invertedIndex;
+  final List<String> sortedKeys;
 
-  IndexData(this.corpus, this.invertedIndex);
+  IndexData(this.corpus, this.invertedIndex, [List<String>? sortedKeys])
+      : sortedKeys = sortedKeys ?? invertedIndex.keys.toList()..sort();
 }
 
 class IndexBuildArgs {
@@ -95,6 +97,7 @@ class SearchQueryArgs {
   final bool includeCommentary;
   final bool includeNotes;
   final bool exactMatch;
+  final String? filterBook;
 
   SearchQueryArgs(
     this.query,
@@ -107,6 +110,7 @@ class SearchQueryArgs {
     this.includeCommentary,
     this.includeNotes,
     this.exactMatch,
+    this.filterBook,
   );
 }
 
@@ -376,40 +380,92 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
   // Store matching metadata for ranking later
   final matchQuality = <int, int>{}; // id -> score (higher is better)
 
-  for (final token in queryTokens) {
+  const syns = {
+    'saviour': ['saviour', 'savior'],
+    'savior': ['saviour', 'savior'],
+    'colour': ['colour', 'color'],
+    'color': ['colour', 'color'],
+    'favour': ['favour', 'favor'],
+    'favor': ['favour', 'favor'],
+    'honour': ['honour', 'honor'],
+    'honor': ['honour', 'honor'],
+    'labour': ['labour', 'labor'],
+    'labor': ['labour', 'labor'],
+    'neighbour': ['neighbour', 'neighbor'],
+    'neighbor': ['neighbour', 'neighbor'],
+    'isaac': ['isaac', 'issac'],
+    'issac': ['isaac', 'issac'],
+    'immanuel': ['immanuel', 'emmanuel'],
+    'emmanuel': ['immanuel', 'emmanuel'],
+    'judas': ['judas', 'jude'],
+    'jude': ['judas', 'jude'],
+    'elijah': ['elijah', 'elias'],
+    'elias': ['elijah', 'elias'],
+    'elisha': ['elisha', 'eliseus'],
+    'eliseus': ['elisha', 'eliseus'],
+    'messiah': ['messiah', 'messias'],
+    'messias': ['messiah', 'messias'],
+  };
+
+  final sortedKeys = args.indexData.sortedKeys;
+
+  for (final rawToken in queryTokens) {
     final currentTokenMatches = <int>{};
+    final synTokens = syns[rawToken] ?? [rawToken];
 
-    // Exact matches
-    if (index.containsKey(token)) {
-      for (final id in index[token]!) {
-        currentTokenMatches.add(id);
-        matchQuality[id] =
-            (matchQuality[id] ?? 0) + 10; // Exact word match = 10 pts
-      }
-    }
-    if (noteIndex.containsKey(token)) {
-      for (final id in noteIndex[token]!) {
-        currentTokenMatches.add(id);
-        matchQuality[id] = (matchQuality[id] ?? 0) + 10;
-      }
-    }
-
-    // Prefix matches (only if token is reasonably long, e.g., > 1 char to avoid exploding)
-    if (token.isNotEmpty && !args.exactMatch) {
-      for (final key in index.keys) {
-        if (key != token && key.startsWith(token)) {
-          for (final id in index[key]!) {
-            currentTokenMatches.add(id);
-            matchQuality[id] =
-                (matchQuality[id] ?? 0) + 1; // Prefix match = 1 pt
-          }
+    for (final token in synTokens) {
+      // Exact matches
+      if (index.containsKey(token)) {
+        for (final id in index[token]!) {
+          currentTokenMatches.add(id);
+          matchQuality[id] = (matchQuality[id] ?? 0) + 10;
         }
       }
-      for (final key in noteIndex.keys) {
-        if (key != token && key.startsWith(token)) {
-          for (final id in noteIndex[key]!) {
-            currentTokenMatches.add(id);
-            matchQuality[id] = (matchQuality[id] ?? 0) + 1;
+      if (noteIndex.containsKey(token)) {
+        for (final id in noteIndex[token]!) {
+          currentTokenMatches.add(id);
+          matchQuality[id] = (matchQuality[id] ?? 0) + 10;
+        }
+      }
+
+      // Prefix matches
+      if (token.isNotEmpty && !args.exactMatch) {
+        // Binary search for prefix in main index
+        int low = 0;
+        int high = sortedKeys.length - 1;
+        int startIndex = sortedKeys.length;
+        
+        while (low <= high) {
+          int mid = (low + high) >> 1;
+          if (sortedKeys[mid].compareTo(token) >= 0) {
+            startIndex = mid;
+            high = mid - 1;
+          } else {
+            low = mid + 1;
+          }
+        }
+        
+        for (int i = startIndex; i < sortedKeys.length; i++) {
+          final key = sortedKeys[i];
+          if (key.startsWith(token)) {
+            if (key != token) {
+              for (final id in index[key]!) {
+                currentTokenMatches.add(id);
+                matchQuality[id] = (matchQuality[id] ?? 0) + 1;
+              }
+            }
+          } else {
+            break; // Stop since list is sorted
+          }
+        }
+
+        // Linear scan for noteIndex (it's small)
+        for (final key in noteIndex.keys) {
+          if (key != token && key.startsWith(token)) {
+            for (final id in noteIndex[key]!) {
+              currentTokenMatches.add(id);
+              matchQuality[id] = (matchQuality[id] ?? 0) + 1;
+            }
           }
         }
       }
@@ -421,7 +477,6 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
       matchingIds = matchingIds.intersection(currentTokenMatches);
     }
 
-    // If at any point the intersection is empty, we can abort early
     if (matchingIds.isEmpty) break;
   }
 
@@ -443,6 +498,10 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
         if (!args.includeCommentary) continue;
       } else if (item.type == SearchResultType.note) {
         if (!args.includeNotes) continue;
+      }
+      if (args.filterBook != null) {
+        final bName = item.metadata['bookName'] ?? item.metadata['book'];
+        if (bName != args.filterBook) continue;
       }
       matchedItems.add(item);
     }
@@ -496,6 +555,7 @@ class SearchEngine {
     bool includeCommentary = true,
     bool includeNotes = true,
     bool exactMatch = false,
+    String? filterBook,
   }) async {
     final indexData = await baseIndexFuture;
 
@@ -512,6 +572,7 @@ class SearchEngine {
         includeCommentary,
         includeNotes,
         exactMatch,
+        filterBook,
       ),
     );
   }

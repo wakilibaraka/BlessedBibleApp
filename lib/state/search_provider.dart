@@ -11,6 +11,7 @@ class SearchState {
   final bool filterCommentary;
   final bool filterNotes;
   final bool exactMatch;
+  final String? filterBook;
   final List<SearchResult> results;
   final bool isSearching;
   final List<SearchResult> recentPlaces;
@@ -24,6 +25,7 @@ class SearchState {
     this.filterCommentary = true,
     this.filterNotes = false,
     this.exactMatch = false,
+    this.filterBook,
     this.results = const [],
     this.isSearching = false,
     this.recentPlaces = const [],
@@ -38,6 +40,8 @@ class SearchState {
     bool? filterCommentary,
     bool? filterNotes,
     bool? exactMatch,
+    String? filterBook,
+    bool clearFilterBook = false,
     List<SearchResult>? results,
     bool? isSearching,
     List<SearchResult>? recentPlaces,
@@ -51,6 +55,7 @@ class SearchState {
       filterCommentary: filterCommentary ?? this.filterCommentary,
       filterNotes: filterNotes ?? this.filterNotes,
       exactMatch: exactMatch ?? this.exactMatch,
+      filterBook: clearFilterBook ? null : (filterBook ?? this.filterBook),
       results: results ?? this.results,
       isSearching: isSearching ?? this.isSearching,
       recentPlaces: recentPlaces ?? this.recentPlaces,
@@ -121,6 +126,11 @@ class SearchNotifier extends Notifier<SearchState> {
     _performSearch();
   }
 
+  void setFilterBook(String? bookName) {
+    state = state.copyWith(filterBook: bookName, clearFilterBook: bookName == null);
+    _performSearch();
+  }
+
   void toggleExactMatch() {
     state = state.copyWith(exactMatch: !state.exactMatch);
     _performSearch();
@@ -172,6 +182,7 @@ class SearchNotifier extends Notifier<SearchState> {
       includeCommentary: state.filterCommentary,
       includeNotes: state.filterNotes && settings.includeNotesInSearch,
       exactMatch: state.exactMatch,
+      filterBook: state.filterBook,
     );
 
     // If query changed while searching, don't update results

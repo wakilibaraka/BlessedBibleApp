@@ -9,7 +9,7 @@ import '../../state/surface_style_provider.dart';
 import '../../state/bible_provider.dart';
 import '../../state/search_settings_provider.dart';
 import '../../state/most_read_provider.dart';
-import '../../data/local_storage/preferences_service.dart';
+import 'package:flutter/services.dart';
 import '../../state/typography_provider.dart';
 import '../widgets/textured_glass_container.dart';
 import '../sheets/search_settings_sheet.dart';
@@ -30,9 +30,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
-  bool _showSwipeHint = false;
-  double _dragStartY = 0;
-  bool _isDragging = false;
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -45,9 +42,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     _focusNode.addListener(() {
       if (mounted) {
         setState(() {});
-        if (!_focusNode.hasFocus && _showSwipeHint) {
-          _dismissSwipeHint();
-        }
       }
     });
 
@@ -66,12 +60,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
 
-      final prefs = ref.read(preferencesProvider);
-      final seenHints = prefs.getSeenHints();
-      if (!seenHints.contains('search_swipe_hint')) {
-        setState(() => _showSwipeHint = true);
-      }
-
       _animationController.forward();
       _focusTimer = Timer(const Duration(milliseconds: 150), () {
         if (mounted) _focusNode.requestFocus();
@@ -88,16 +76,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     _animationController.dispose();
     _scrollController.dispose();
     super.dispose();
-  }
-
-  void _dismissSwipeHint() {
-    if (!mounted) return;
-    setState(() => _showSwipeHint = false);
-    final prefs = ref.read(preferencesProvider);
-    final seen = prefs.getSeenHints();
-    if (!seen.contains('search_swipe_hint')) {
-      prefs.saveSeenHints([...seen, 'search_swipe_hint']);
-    }
   }
 
   void _onResultTap(SearchResult result) {
@@ -186,40 +164,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
             child: Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 800),
-                child: Listener(
-                  onPointerDown: (e) {
-                    _dragStartY = e.position.dy;
-                    _isDragging = true;
-                  },
-                  onPointerMove: (e) {
-                    if (!_isDragging) return;
-
-                    bool isAtTop = true;
-                    if (_scrollController.hasClients) {
-                      isAtTop = _scrollController.offset <= 16.0;
-                    }
-
-                    if (!isAtTop) return;
-
-                    final dy = e.position.dy - _dragStartY;
-                    if (dy < -10) {
-                      _isDragging = false;
-                      return;
-                    }
-
-                    if (dy > 40) {
-                      _isDragging = false;
-                      if (!_focusNode.hasFocus) {
-                        _focusNode.requestFocus();
-                      }
-                      if (_showSwipeHint) {
-                        _dismissSwipeHint();
-                      }
-                    }
-                  },
-                  onPointerUp: (e) => _isDragging = false,
-                  onPointerCancel: (e) => _isDragging = false,
-                  child: Column(
+                child: Column(
                     children: [
                       const SizedBox(height: 24),
 
@@ -347,26 +292,61 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         _buildFilterChip(
-                                          label: 'OT',
-                                          icon: Icons.history_edu_rounded,
-                                          isActive: searchState.filterOt,
-                                          onTap: () => ref
-                                              .read(
-                                                  searchStateProvider.notifier)
-                                              .toggleOtFilter(),
-                                          theme: theme,
-                                        ),
-                                        const SizedBox(width: 8),
-                                        _buildFilterChip(
-                                          label: 'NT',
+                                          label: searchState.filterBook ?? 'All Books',
                                           icon: Icons.menu_book_rounded,
-                                          isActive: searchState.filterNt,
-                                          onTap: () => ref
-                                              .read(
-                                                  searchStateProvider.notifier)
-                                              .toggleNtFilter(),
+                                          isActive: searchState.filterBook != null,
+                                          onTap: () async {
+                                            // Show book picker modal
+                                            if (searchState.filterBook != null) {
+                                              ref.read(searchStateProvider.notifier).setFilterBook(null);
+                                              return;
+                                            }
+                                            // Need a way to pick a book. 
+                                            // For simplicity, we could open a bottom sheet with a list of books.
+                                            // Actually, the SettingsSheet might be a better place. But since N2 asks for it, let's keep it simple.
+                                            // For now, let's just make it a chip that opens a modal.
+                                            final books = ref.read(bibleProvider).books;
+                                            showModalBottomSheet(
+                                              context: context,
+                                              backgroundColor: theme.scaffoldBackgroundColor,
+                                              builder: (ctx) => ListView.builder(
+                                                itemCount: books.length,
+                                                itemBuilder: (c, i) => ListTile(
+                                                  title: Text(books[i].name),
+                                                  onTap: () {
+                                                    ref.read(searchStateProvider.notifier).setFilterBook(books[i].name);
+                                                    Navigator.pop(ctx);
+                                                  },
+                                                ),
+                                              ),
+                                            );
+                                          },
                                           theme: theme,
                                         ),
+                                        if (searchState.filterBook == null) ...[
+                                          const SizedBox(width: 8),
+                                          _buildFilterChip(
+                                            label: 'OT',
+                                            icon: Icons.history_edu_rounded,
+                                            isActive: searchState.filterOt,
+                                            onTap: () => ref
+                                                .read(searchStateProvider.notifier)
+                                                .toggleOtFilter(),
+                                            theme: theme,
+                                          ),
+                                        ],
+                                        if (searchState.filterBook == null) ...[
+                                          const SizedBox(width: 8),
+                                          _buildFilterChip(
+                                            label: 'NT',
+                                            icon: Icons.menu_book_rounded,
+                                            isActive: searchState.filterNt,
+                                            onTap: () => ref
+                                                .read(searchStateProvider.notifier)
+                                                .toggleNtFilter(),
+                                            theme: theme,
+                                          ),
+                                        ],
                                         const SizedBox(width: 8),
                                         _buildFilterChip(
                                           label: 'Commentary',
@@ -431,65 +411,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                               searchState.query.isEmpty
                                   ? _buildRecentPlaces(searchState, theme)
                                   : _buildSearchResults(searchState, theme),
-                            Positioned(
-                              top: 16,
-                              left: 0,
-                              right: 0,
-                              child: IgnorePointer(
-                                child: AnimatedOpacity(
-                                  duration: const Duration(milliseconds: 300),
-                                  opacity: _showSwipeHint ? 1.0 : 0.0,
-                                  child: Center(
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 16, vertical: 8),
-                                      decoration: BoxDecoration(
-                                        color: theme.colorScheme.surface
-                                            .withValues(
-                                                alpha: isGlassy ? 0.7 : 1.0),
-                                        borderRadius: BorderRadius.circular(20),
-                                        border: Border.all(
-                                          color: theme.colorScheme.onSurface
-                                              .withValues(alpha: 0.1),
-                                        ),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black
-                                                .withValues(alpha: 0.05),
-                                            blurRadius: 10,
-                                          )
-                                        ],
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(
-                                              Icons.keyboard_arrow_down_rounded,
-                                              size: 16,
-                                              color: theme.colorScheme.onSurface
-                                                  .withValues(alpha: 0.6)),
-                                          const SizedBox(width: 8),
-                                          Text(
-                                            'Swipe down for keyboard',
-                                            style: theme.textTheme.labelMedium
-                                                ?.copyWith(
-                                              color: theme.colorScheme.onSurface
-                                                  .withValues(alpha: 0.6),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
+
                           ],
                         ),
                       ),
                     ),
                   ],
-                  ),
                 ),
               ),
             ),
@@ -741,30 +668,30 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
           ),
         ),
         if (pericopeResults.isNotEmpty) ...[
-          _buildSectionHeader('STORIES', theme),
+          _buildSectionHeader('STORIES (${pericopeResults.length})', theme),
           ...pericopeResults
               .map((r) => _buildResultItem(r, theme, state.query)),
           const SizedBox(height: 12),
         ],
         if (referenceResults.isNotEmpty) ...[
-          _buildSectionHeader('JUMP TO', theme),
+          _buildSectionHeader('JUMP TO (${referenceResults.length})', theme),
           ...referenceResults
               .map((r) => _buildResultItem(r, theme, state.query)),
           const SizedBox(height: 12),
         ],
         if (bibleResults.isNotEmpty) ...[
-          _buildSectionHeader('VERSES', theme),
+          _buildSectionHeader('VERSES (${bibleResults.length})', theme),
           ...bibleResults.map((r) => _buildResultItem(r, theme, state.query)),
           const SizedBox(height: 12),
         ],
         if (commentaryResults.isNotEmpty) ...[
-          _buildSectionHeader('COMMENTARY', theme),
+          _buildSectionHeader('COMMENTARY (${commentaryResults.length})', theme),
           ...commentaryResults
               .map((r) => _buildResultItem(r, theme, state.query)),
           const SizedBox(height: 12),
         ],
         if (noteResults.isNotEmpty) ...[
-          _buildSectionHeader('MY NOTES', theme),
+          _buildSectionHeader('MY NOTES (${noteResults.length})', theme),
           ...noteResults.map((r) => _buildResultItem(r, theme, state.query)),
           const SizedBox(height: 12),
         ],
@@ -807,6 +734,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
       padding: const EdgeInsets.only(bottom: 12.0),
       child: GestureDetector(
         onTap: () => _onResultTap(result),
+        onLongPress: () {
+          Clipboard.setData(ClipboardData(text: '${result.title}\n${result.snippet.replaceAll('...', '')}'));
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Copied to clipboard')),
+          );
+        },
         child: TexturedGlassContainer(
           borderRadius: BorderRadius.circular(20),
           padding: const EdgeInsets.all(16.0),
@@ -866,9 +799,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
 
     final queryLower = query.toLowerCase();
     final textLower = text.toLowerCase();
-    final index = textLower.indexOf(queryLower);
-
-    if (index == -1) {
+    
+    if (!textLower.contains(queryLower)) {
       return Text(text,
           style: baseStyle, maxLines: 2, overflow: TextOverflow.ellipsis);
     }
@@ -882,18 +814,29 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
       backgroundColor: highlightColor.withValues(alpha: 0.12),
     );
 
+    List<InlineSpan> spans = [];
+    int start = 0;
+    int idx;
+    
+    while ((idx = textLower.indexOf(queryLower, start)) != -1) {
+      if (idx > start) {
+        spans.add(TextSpan(text: text.substring(start, idx), style: baseStyle));
+      }
+      spans.add(TextSpan(
+          text: text.substring(idx, idx + query.length),
+          style: highlightStyle));
+      start = idx + query.length;
+    }
+    if (start < text.length) {
+      spans.add(TextSpan(text: text.substring(start), style: baseStyle));
+    }
+
     return RichText(
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
       text: TextSpan(
         style: baseStyle,
-        children: [
-          TextSpan(text: text.substring(0, index), style: baseStyle),
-          TextSpan(
-              text: text.substring(index, index + query.length),
-              style: highlightStyle),
-          TextSpan(text: text.substring(index + query.length), style: baseStyle),
-        ],
+        children: spans,
       ),
     );
   }

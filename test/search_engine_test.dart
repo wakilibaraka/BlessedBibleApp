@@ -64,7 +64,7 @@ void main() {
 
     final baseIndexFuture = compute(
       buildIndexIsolate,
-      IndexBuildArgs(books, null, commentary, []),
+      IndexBuildArgs(books, null, commentary, [], []),
     );
     final engine = SearchEngine(bibleBooks: books, baseIndexFuture: baseIndexFuture, notes: notes);
 
