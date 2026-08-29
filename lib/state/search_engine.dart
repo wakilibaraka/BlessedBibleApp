@@ -2,14 +2,16 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/models/bible_model.dart';
 import '../models/commentary_entry.dart';
+import '../models/pericope_entry.dart';
 import '../data/models/home_data.dart';
 import 'bible_provider.dart';
 import 'notes_provider.dart';
 import 'commentary_provider.dart';
 import 'translation_provider.dart';
+import 'pericopes_provider.dart';
 import '../services/bible_database_service.dart';
 
-enum SearchResultType { reference, bible, commentary, history, note }
+enum SearchResultType { reference, bible, commentary, history, note, pericope }
 
 class SearchResult {
   final String title;
@@ -75,10 +77,11 @@ class IndexBuildArgs {
   final List<BibleBook>? bibleBooks;
   final List<Map<String, dynamic>>? dbVerses;
   final List<CommentaryEntry>? commentaryData;
+  final List<PericopeEntry>? pericopes;
   final List<PersonalNote> notes;
 
   IndexBuildArgs(
-      this.bibleBooks, this.dbVerses, this.commentaryData, this.notes);
+      this.bibleBooks, this.dbVerses, this.commentaryData, this.pericopes, this.notes);
 }
 
 class SearchQueryArgs {
@@ -221,6 +224,26 @@ IndexData buildIndexIsolate(IndexBuildArgs args) {
 
   // Notes are now indexed separately during search to avoid full re-index
 
+  // 3. Pericopes
+  if (args.pericopes != null) {
+    for (final pericope in args.pericopes!) {
+      final item = SearchItem(
+        id: nextId++,
+        type: SearchResultType.pericope,
+        title: pericope.title,
+        subtitle: '${pericope.book} ${pericope.startChapter}:${pericope.startVerse}',
+        text: pericope.title,
+        metadata: {
+          'bookName': pericope.book,
+          'chapter': pericope.startChapter,
+          'verse': pericope.startVerse,
+        },
+      );
+      corpus.add(item);
+      addTokens(item.id, item.title);
+    }
+  }
+
   return IndexData(corpus, index);
 }
 
@@ -254,7 +277,10 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
         title: note.title,
         subtitle: 'Note • ${note.date}',
         text: note.content,
-        metadata: {'title': note.title},
+        metadata: {
+          'title': note.title,
+          if (note.reference != null) 'reference': note.reference,
+        },
       );
       noteCorpus.add(item);
       addNoteTokens(item.id, '${item.title} ${item.text}');
@@ -281,7 +307,7 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
   // 0. Exact Reference Match (highest priority)
   if ((args.includeOt || args.includeNt) && args.bibleBooks != null) {
     final regex =
-        RegExp(r'^((?:\d\s*)?[a-z]+(?:\s+[a-z]+)*)\s*(?:(\d+)[\s:.]*(\d+)?)?$');
+        RegExp(r'^((?:\d\s*)?[a-z]+(?:\s+[a-z]+)*)\s*(?:(\d+)[\s:.]*(\d+)?(?:-\d+)?)?$');
     final match = regex.firstMatch(queryLower);
 
     if (match != null) {
@@ -300,7 +326,12 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
           if (chapterStr != null) {
             chapter = int.tryParse(chapterStr);
             if (chapter != null) {
-              chapter = chapter.clamp(1, book.chapters.length);
+              if (verseStr == null && book.chapters.length == 1) {
+                verse = chapter.clamp(1, book.chapters[0].verses.length);
+                chapter = 1;
+              } else {
+                chapter = chapter.clamp(1, book.chapters.length);
+              }
             }
           }
 
@@ -502,10 +533,14 @@ final baseSearchIndexProvider = FutureProvider<IndexData>((ref) async {
   // Commentary is optional — use whatever is already available without blocking
   final commentaryAsync = ref.watch(commentaryProvider);
 
+  final pericopesMap = ref.watch(pericopesProvider);
+  final pericopes = pericopesMap.values.expand((e) => e).toList();
+
   final args = IndexBuildArgs(
     bibleState.books,
     dbVerses,
     commentaryAsync.asData?.value,
+    pericopes,
     [], // Notes handled dynamically
   );
   return await compute(buildIndexIsolate, args);

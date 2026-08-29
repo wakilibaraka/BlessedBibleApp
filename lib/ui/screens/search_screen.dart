@@ -12,6 +12,8 @@ import '../../state/most_read_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../../state/typography_provider.dart';
 import '../widgets/textured_glass_container.dart';
+import '../sheets/search_settings_sheet.dart';
+
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
 
@@ -102,7 +104,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     ref.read(searchStateProvider.notifier).addRecentPlace(result);
 
     if (result.type == SearchResultType.bible ||
-        result.type == SearchResultType.reference) {
+        result.type == SearchResultType.reference ||
+        result.type == SearchResultType.pericope) {
       ref.read(navProvider.notifier).setIndex(1);
       ref.read(readLocationProvider.notifier).updateLocation(
             bookAbbrev: result.metadata['bookAbbrev'],
@@ -113,7 +116,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     } else if (result.type == SearchResultType.commentary) {
       ref.read(navProvider.notifier).setIndex(1);
       final books = ref.read(bibleProvider).books;
-      final bookName = result.metadata['book'] as String;
+      final bookName = (result.metadata['bookName'] ?? result.metadata['book']) as String;
       final book = books.firstWhere((b) => b.name == bookName,
           orElse: () => books.first);
       ref.read(readLocationProvider.notifier).updateLocation(
@@ -123,6 +126,46 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
             verse: result.metadata['verse'],
             openCommentary: true,
           );
+    } else if (result.type == SearchResultType.note) {
+      final refStr = result.metadata['reference'] as String?;
+      if (refStr != null && refStr.isNotEmpty) {
+        // Try to parse reference to navigate to verse
+        final regex = RegExp(r'^((?:\d\s*)?[a-z]+(?:\s+[a-z]+)*)\s*(?:(\d+)[\s:.]*(\d+)?(?:-\d+)?)?$');
+        final match = regex.firstMatch(refStr.toLowerCase());
+        if (match != null) {
+          final bookStr = match.group(1)?.trim() ?? '';
+          final chapterStr = match.group(2);
+          final verseStr = match.group(3);
+          
+          final books = ref.read(bibleProvider).books;
+          for (final book in books) {
+            if (book.name.toLowerCase().startsWith(bookStr) || book.abbreviation.toLowerCase().startsWith(bookStr)) {
+              int chapter = 1;
+              if (chapterStr != null) {
+                chapter = int.tryParse(chapterStr) ?? 1;
+                if (verseStr == null && book.chapters.length == 1) {
+                  chapter = 1;
+                }
+              }
+              int? verse = verseStr != null ? int.tryParse(verseStr) : null;
+              if (chapterStr != null && verseStr == null && book.chapters.length == 1) {
+                verse = int.tryParse(chapterStr);
+              }
+              
+              ref.read(navProvider.notifier).setIndex(1);
+              ref.read(readLocationProvider.notifier).updateLocation(
+                bookAbbrev: book.abbreviation,
+                bookName: book.name,
+                chapter: chapter,
+                verse: verse,
+              );
+              return;
+            }
+          }
+        }
+      }
+      // If no valid reference or parsing failed, just go to Notes tab (Study)
+      ref.read(navProvider.notifier).setIndex(3);
     }
   }
 
@@ -351,6 +394,21 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                             theme: theme,
                                           );
                                         }),
+                                        const SizedBox(width: 8),
+                                        IconButton(
+                                          icon: Icon(Icons.settings_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                                          iconSize: 20,
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                          constraints: const BoxConstraints(),
+                                          onPressed: () {
+                                            showModalBottomSheet(
+                                              context: context,
+                                              backgroundColor: Colors.transparent,
+                                              isScrollControlled: true,
+                                              builder: (context) => const SearchSettingsSheet(),
+                                            );
+                                          },
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -365,11 +423,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
 
                       // ── Results ────────────────────────────────────────────
                       Expanded(
-                        child: Stack(
-                          children: [
-                            searchState.query.isEmpty
-                                ? _buildRecentPlaces(searchState, theme)
-                                : _buildSearchResults(searchState, theme),
+                        child: GestureDetector(
+                          onTap: () => FocusScope.of(context).unfocus(),
+                          behavior: HitTestBehavior.opaque,
+                          child: Stack(
+                            children: [
+                              searchState.query.isEmpty
+                                  ? _buildRecentPlaces(searchState, theme)
+                                  : _buildSearchResults(searchState, theme),
                             Positioned(
                               top: 16,
                               left: 0,
@@ -426,7 +487,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                           ],
                         ),
                       ),
-                    ],
+                    ),
+                  ],
                   ),
                 ),
               ),
@@ -516,6 +578,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
 
     return ListView(
       controller: _scrollController,
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
       children: [
         if (state.recentQueries.isNotEmpty) ...[
@@ -658,10 +721,31 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     final noteResults =
         state.results.where((r) => r.type == SearchResultType.note).toList();
 
+    final pericopeResults = state.results
+        .where((r) => r.type == SearchResultType.pericope)
+        .toList();
+
     return ListView(
       controller: _scrollController,
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
       children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 16.0, left: 4.0),
+          child: Text(
+            state.results.length >= 100 ? 'Showing top 100 results' : '${state.results.length} results found',
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ),
+        if (pericopeResults.isNotEmpty) ...[
+          _buildSectionHeader('STORIES', theme),
+          ...pericopeResults
+              .map((r) => _buildResultItem(r, theme, state.query)),
+          const SizedBox(height: 12),
+        ],
         if (referenceResults.isNotEmpty) ...[
           _buildSectionHeader('JUMP TO', theme),
           ...referenceResults
@@ -713,6 +797,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
       icon = Icons.menu_book_rounded;
     } else if (result.type == SearchResultType.note) {
       icon = Icons.sticky_note_2_outlined;
+    } else if (result.type == SearchResultType.pericope) {
+      icon = Icons.auto_stories_rounded;
     } else {
       icon = Icons.library_books_rounded;
     }
