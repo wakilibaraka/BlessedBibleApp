@@ -1,7 +1,15 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../models/pericope_entry.dart';
 import '../../services/bible_database_service.dart';
+
+class ParsedBibleData {
+  final List<Map<String, dynamic>> verses;
+  final List<PericopeEntry> pericopes;
+  ParsedBibleData(this.verses, this.pericopes);
+}
 
 class WebBbeImporter {
   static Future<void> importData() async {
@@ -27,10 +35,18 @@ class WebBbeImporter {
     if (needsWebRepair) {
       try {
         final webJsonStr = await rootBundle.loadString('assets/data/web_bible.json');
-        final webList = _parseJson(webJsonStr);
-        if (webList.isNotEmpty) {
-          await _updateVerses(db, 'web', webList);
+        final webData = _parseJson(webJsonStr, 'web');
+        if (webData.verses.isNotEmpty) {
+          await _updateVerses(db, 'web', webData.verses);
           print('WEB repaired successfully.');
+        }
+        if (webData.pericopes.isNotEmpty) {
+          final prefs = await SharedPreferences.getInstance();
+          final jsonList = webData.pericopes.map((p) => p.toJson()).toList();
+          await prefs.setString('pericopes_web', jsonEncode(jsonList));
+          print('WEB headings captured: ${webData.pericopes.length}');
+        } else {
+          print('WEB headings captured: 0 (No type: title found)');
         }
       } catch (e) {
         print('Error repairing WEB: $e');
@@ -40,8 +56,9 @@ class WebBbeImporter {
     if (!isBbePresent) {
       try {
         final bbeJsonStr = await rootBundle.loadString('assets/data/bbe_bible.json');
-        final bbeList = _parseJson(bbeJsonStr);
-        if (bbeList.isNotEmpty) {
+        final bbeData = _parseJson(bbeJsonStr, 'bbe');
+        print('BBE inspection: found ${bbeData.pericopes.length} headings/titles.');
+        if (bbeData.verses.isNotEmpty) {
           await db.insert('translations', {
             'translation_id': 'bbe',
             'language_code': 'en',
@@ -51,7 +68,7 @@ class WebBbeImporter {
             'license': 'Public Domain',
             'is_complete': 1,
           });
-          await _insertVerses(db, 'bbe', bbeList);
+          await _insertVerses(db, 'bbe', bbeData.verses);
           print('BBE imported successfully.');
         }
       } catch (e) {
@@ -60,9 +77,10 @@ class WebBbeImporter {
     }
   }
 
-  static List<Map<String, dynamic>> _parseJson(String jsonStr) {
+  static ParsedBibleData _parseJson(String jsonStr, String translationId) {
     final dynamic data = json.decode(jsonStr);
     List<Map<String, dynamic>> verses = [];
+    List<PericopeEntry> pericopes = [];
 
     // Scrollmapper JSON structure: {"resultset": {"row": [ {"field": [id, b, c, v, text]} ]}}
     if (data is Map && data.containsKey('resultset')) {
@@ -80,11 +98,24 @@ class WebBbeImporter {
         }
       }
     }
-    // Our kjvbible.json structure: [{"book": 1, "chapter": 1, "verse": 1, "text": "..."}]
+    // Our flat JSON structure: [{"book": 1, "chapter": 1, "verse": 1, "text": "..."}]
+    // And possibly: [{"type": "title", "value": "Heading", "book": 1, "chapter": 1, "verse": 1}]
     else if (data is List) {
       for (final item in data) {
         if (item is Map) {
-          if (item.containsKey('book') && item.containsKey('chapter') && item.containsKey('verse') && item.containsKey('text')) {
+          if (item['type'] == 'title' && item.containsKey('value') && item.containsKey('book') && item.containsKey('chapter') && item.containsKey('verse')) {
+            pericopes.add(PericopeEntry(
+              id: '${translationId}_${item['book']}_${item['chapter']}_${item['verse']}',
+              book: item['book'].toString(), // We don't have the string name here easily, so use number
+              startChapter: item['chapter'] as int,
+              startVerse: item['verse'] as int,
+              endChapter: item['chapter'] as int,
+              endVerse: 999, // Unknown
+              title: item['value'].toString().trim(),
+              confidence: 'high',
+              translationId: translationId,
+            ));
+          } else if (item.containsKey('book') && item.containsKey('chapter') && item.containsKey('verse') && item.containsKey('text')) {
             verses.add({
               'book_number': item['book'] as int,
               'chapter': item['chapter'] as int,
@@ -118,7 +149,7 @@ class WebBbeImporter {
         bookNum++;
       }
     }
-    return verses;
+    return ParsedBibleData(verses, pericopes);
   }
 
   static Future<void> _updateVerses(Database db, String translationId, List<Map<String, dynamic>> verses) async {

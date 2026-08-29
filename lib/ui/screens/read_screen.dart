@@ -1221,10 +1221,12 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                             selectedVerses
                                                                 .isNotEmpty;
 
+                                                        final activeTransId = ref.watch(activeTranslationProvider);
                                                         final chapterPericopes =
                                                             pericopesNotifier.getPericopesForChapter(
                                                                 fc.book.name,
-                                                                fc.chapter.number);
+                                                                fc.chapter.number,
+                                                                translationId: activeTransId);
                                                         PericopeEntry? pericopeHeading;
                                                         for (final p in chapterPericopes) {
                                                           if (p.startVerse == verse.number) {

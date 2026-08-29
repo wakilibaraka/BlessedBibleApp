@@ -7,6 +7,7 @@ class PericopeEntry {
   final int endVerse;
   final String title;
   final String confidence;
+  final String? translationId; // Null means it's a shared/curated pericope for all translations
 
   PericopeEntry({
     required this.id,
@@ -17,6 +18,7 @@ class PericopeEntry {
     required this.endVerse,
     required this.title,
     required this.confidence,
+    this.translationId,
   });
 
   /// Slugification rule: remove all spaces from the book name.
@@ -44,6 +46,7 @@ class PericopeEntry {
       endVerse: json['endVerse'] as int,
       title: json['title'] as String,
       confidence: json['confidence'] as String? ?? 'low',
+      translationId: json['translationId'] as String?,
     );
   }
 
@@ -57,6 +60,7 @@ class PericopeEntry {
       'endVerse': endVerse,
       'title': title,
       'confidence': confidence,
+      if (translationId != null) 'translationId': translationId,
     };
   }
 }

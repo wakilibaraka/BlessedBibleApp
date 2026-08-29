@@ -593,9 +593,10 @@ final baseSearchIndexProvider = FutureProvider<IndexData>((ref) async {
 
   // Commentary is optional — use whatever is already available without blocking
   final commentaryAsync = ref.watch(commentaryProvider);
-
   final pericopesMap = ref.watch(pericopesProvider);
-  final pericopes = pericopesMap.values.expand((e) => e).toList();
+  final pericopes = pericopesMap.values.expand((e) => e)
+      .where((p) => p.translationId == null || p.translationId == activeTranslation)
+      .toList();
 
   final args = IndexBuildArgs(
     bibleState.books,

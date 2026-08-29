@@ -22,6 +22,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/bible_model.dart';
 import '../../state/bible_provider.dart';
 import '../../state/reading_plan_provider.dart';
+import '../../state/translation_provider.dart';
 import '../../state/read_settings_provider.dart';
 import '../widgets/textured_glass_container.dart';
 import '../../state/typography_provider.dart';
@@ -623,8 +624,9 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                                     theme.scaffoldBackgroundColor);
                           }
 
+                          final activeTransId = ref.watch(activeTranslationProvider);
                           final chapterPericopes = pericopesNotifier.getPericopesForChapter(
-                              passage.book.name, passage.chapterNum);
+                              passage.book.name, passage.chapterNum, translationId: activeTransId);
                           PericopeEntry? pericopeHeading;
                           for (final p in chapterPericopes) {
                             if (p.startVerse == verse.number) {
