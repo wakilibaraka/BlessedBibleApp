@@ -1006,6 +1006,9 @@ class _TypographyPage extends ConsumerWidget {
       'OpenDyslexic',
       'Bitter',
       'Source Sans 3',
+      'Pinyon Script',
+      'Alex Brush',
+      'Tangerine',
     ];
 
     return AnimatedContainer(

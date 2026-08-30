@@ -22,7 +22,10 @@ class TypographyControls extends ConsumerWidget {
       'Lexend',
       'OpenDyslexic',
       'Bitter',
-      'Source Sans 3'
+      'Source Sans 3',
+      'Pinyon Script',
+      'Alex Brush',
+      'Tangerine',
     ];
 
     final sectionLabelStyle = theme.textTheme.labelSmall?.copyWith(

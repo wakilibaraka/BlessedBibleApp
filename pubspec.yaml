@@ -142,3 +142,17 @@ flutter:
         - asset: assets/fonts/SourceSans3-BoldItalic.ttf
           weight: 700
           style: italic
+    - family: Pinyon Script
+      fonts:
+        - asset: assets/fonts/PinyonScript-Regular.ttf
+          weight: 400
+    - family: Alex Brush
+      fonts:
+        - asset: assets/fonts/AlexBrush-Regular.ttf
+          weight: 400
+    - family: Tangerine
+      fonts:
+        - asset: assets/fonts/Tangerine-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Tangerine-Bold.ttf
+          weight: 700
