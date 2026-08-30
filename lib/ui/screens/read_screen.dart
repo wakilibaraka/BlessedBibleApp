@@ -53,28 +53,6 @@ import '../sheets/book_chapter_selector_sheet.dart';
 
 
 
-class StrictVerticalScrollPhysics extends ScrollPhysics {
-  final ValueNotifier<bool> isPageSwiping;
-
-  const StrictVerticalScrollPhysics({
-    super.parent,
-    required this.isPageSwiping,
-  });
-
-  @override
-  StrictVerticalScrollPhysics applyTo(ScrollPhysics? ancestor) {
-    return StrictVerticalScrollPhysics(
-      parent: buildParent(ancestor),
-      isPageSwiping: isPageSwiping,
-    );
-  }
-
-  @override
-  bool shouldAcceptUserOffset(ScrollMetrics position) {
-    if (isPageSwiping.value) return false;
-    return super.shouldAcceptUserOffset(position);
-  }
-}
 
 class ExpandedChipsNotifier extends Notifier<Map<int, String?>> {
   @override
@@ -204,8 +182,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
 
   final ValueNotifier<bool> _isScrolling = ValueNotifier(false);
-  // True while PageView is mid-swipe; used to freeze vertical child list.
-  final ValueNotifier<bool> _isPageSwiping = ValueNotifier(false);
 
   // ── Hints ────────────────────────────────────────────────────────
   String? _currentHintId;
@@ -846,22 +822,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                               )
                             : MediaQuery(
                                 data: mqHighSlop,
-                                child: NotificationListener<ScrollNotification>(
-                                onNotification: (notification) {
-                                  // Axis-lock: freeze the vertical list while PageView is swiping horizontally
-                                  if (notification.metrics.axis == Axis.horizontal) {
-                                    if (notification is ScrollStartNotification) {
-                                      _isPageSwiping.value = true;
-                                    } else if (notification is ScrollEndNotification) {
-                                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                                        if (mounted) {
-                                          _isPageSwiping.value = false;
-                                        }
-                                      });
-                                    }
-                                  }
-                                  return false;
-                                },
                                 child: PageView.builder(
                                   allowImplicitScrolling: true,
                                   dragStartBehavior: DragStartBehavior.start,
@@ -1461,7 +1421,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                           dragStartBehavior:
                                                               DragStartBehavior
                                                                   .down,
-                                                          physics: StrictVerticalScrollPhysics(isPageSwiping: _isPageSwiping).applyTo(basePhysics),
+                                                          physics: basePhysics,
                                                           child: SelectionArea(
                                                             child: Column(
                                                               crossAxisAlignment:
@@ -1514,7 +1474,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                               verses.length + 1,
                                                           itemBuilder:
                                                               buildVerseItem,
-                                                          physics: StrictVerticalScrollPhysics(isPageSwiping: _isPageSwiping).applyTo(basePhysics),
+                                                          physics: basePhysics,
                                                         );
                                                       }
                                                       return listWidget;
@@ -1530,7 +1490,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                     );
                                   },
                                 ),
-                              ),
                             ),
 
                   ),
