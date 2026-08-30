@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/bible_model.dart';
+import '../../state/pericopes_provider.dart';
+import '../../state/translation_provider.dart';
+
 import '../../state/bible_nav_settings_provider.dart';
 import '../widgets/textured_glass_container.dart';
 import '../../state/read_settings_provider.dart';
@@ -549,26 +552,110 @@ class _BookChapterSelectorSheetState
     return Consumer(builder: (context, ref, _) {
       final selectedVerse =
           ref.watch(_sheetStateProvider.select((s) => s.verse));
-      return GridView.builder(
-        padding:
-            EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 24),
-        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 64,
-          mainAxisExtent: 64,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-        ),
-        itemCount: verses,
-        itemBuilder: (context, index) {
-          final verse = index + 1;
-          final isSel = verse == selectedVerse;
-          return _buildGridTile(
-            text: '$verse',
-            isSelected: isSel,
-            onTap: () => _onVerseSelected(verse, settings),
-            theme: theme,
-          );
-        },
+          
+      final activeTrans = ref.watch(activeTranslationProvider);
+      final chapterPericopes = ref.watch(pericopesProvider).values.expand((e) => e)
+          .where((p) => p.book == book.name && p.startChapter == selectedChapter && (p.translationId == activeTrans || p.translationId == null))
+          .toList();
+
+      return CustomScrollView(
+        slivers: [
+          if (chapterPericopes.isNotEmpty) ...[
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 12.0, left: 4.0),
+                child: Text(
+                  'Stories & Sections',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.only(bottom: 24.0),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final p = chapterPericopes[index];
+                    final isSel = p.startVerse == selectedVerse;
+                    return InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () => _onVerseSelected(p.startVerse, settings),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        margin: const EdgeInsets.only(bottom: 8),
+                        decoration: BoxDecoration(
+                          color: isSel ? theme.primaryColor : theme.colorScheme.onSurface.withValues(alpha: 0.05),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                p.title,
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  color: isSel ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              'v. ${p.startVerse}',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: isSel ? theme.colorScheme.onPrimary.withValues(alpha: 0.7) : theme.colorScheme.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                  childCount: chapterPericopes.length,
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 12.0, left: 4.0),
+                child: Text(
+                  'All Verses',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ],
+          SliverPadding(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 24),
+            sliver: SliverGrid(
+              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 64,
+                mainAxisExtent: 64,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+              ),
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final verse = index + 1;
+                  final isSel = verse == selectedVerse;
+                  return _buildGridTile(
+                    text: '$verse',
+                    isSelected: isSel,
+                    onTap: () => _onVerseSelected(verse, settings),
+                    theme: theme,
+                  );
+                },
+                childCount: verses,
+              ),
+            ),
+          ),
+        ],
       );
     });
   }

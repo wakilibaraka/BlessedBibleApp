@@ -182,36 +182,6 @@ String _getTranslationLabel(
 }
 
 
-String _toHeadingCase(String text) {
-  if (text.isEmpty) return text;
-  final minorWords = {
-    'a',
-    'an',
-    'the',
-    'and',
-    'but',
-    'or',
-    'for',
-    'nor',
-    'on',
-    'at',
-    'to',
-    'from',
-    'by',
-    'in',
-    'of',
-    'with'
-  };
-  final words = text.toLowerCase().split(' ');
-  for (int i = 0; i < words.length; i++) {
-    if (words[i].isEmpty) continue;
-    if (i == 0 || i == words.length - 1 || !minorWords.contains(words[i])) {
-      words[i] = words[i][0].toUpperCase() + words[i].substring(1);
-    }
-  }
-  return words.join(' ');
-}
-
 class ReadScreen extends ConsumerStatefulWidget {
   const ReadScreen({super.key});
 
@@ -1236,27 +1206,26 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                         }
 
                                                         String? finalHeadingText;
-                                                        bool isChapterTitleStyle = false;
 
                                                         if (index == 0) {
                                                           final override = overridesNotifier.getOverrideForChapter(fc.book.name, fc.chapter.number);
                                                           if (override != null) {
-                                                            switch (override.decision) {
-                                                              case 'KEEP_PERICOPE':
-                                                                finalHeadingText = pericopeHeading?.title;
-                                                                break;
-                                                              case 'KEEP_CHAPTER_TITLE':
-                                                                finalHeadingText = override.chapterTitle;
-                                                                isChapterTitleStyle = true;
-                                                                break;
-                                                              case 'MERGE':
-                                                                finalHeadingText = override.mergedText;
-                                                                break;
-                                                              default:
-                                                                finalHeadingText = pericopeHeading?.title;
+                                                            if (pericopeHeading == null) {
+                                                              finalHeadingText = override.chapterTitle;
+                                                            } else {
+                                                              switch (override.decision) {
+                                                                case 'KEEP_CHAPTER_TITLE':
+                                                                  finalHeadingText = override.chapterTitle;
+                                                                  break;
+                                                                case 'MERGE':
+                                                                  finalHeadingText = override.mergedText;
+                                                                  break;
+                                                                case 'KEEP_PERICOPE':
+                                                                default:
+                                                                  finalHeadingText = pericopeHeading.title;
+                                                              }
                                                             }
                                                           } else {
-                                                            // Fallback if overrides missing/unmatched (FAIL-OPEN)
                                                             finalHeadingText = pericopeHeading?.title;
                                                           }
                                                         } else {
@@ -1277,14 +1246,14 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                   right: 12.0,
                                                                 ),
                                                                 child: Text(
-                                                                  isChapterTitleStyle ? _toHeadingCase(finalHeadingText) : finalHeadingText,
+                                                                  finalHeadingText,
                                                                   style: theme.textTheme.titleSmall?.copyWith(
                                                                     color: theme.primaryColor,
-                                                                    fontSize: typography.fontSize * (isChapterTitleStyle ? 1.25 : 1.05),
+                                                                    fontSize: typography.fontSize * 1.05,
                                                                     fontFamily: typography.fontFamily,
-                                                                    fontWeight: isChapterTitleStyle ? FontWeight.w700 : FontWeight.w600,
-                                                                    fontStyle: isChapterTitleStyle ? FontStyle.normal : FontStyle.italic,
-                                                                    letterSpacing: isChapterTitleStyle ? 0.2 : 0.1,
+                                                                    fontWeight: FontWeight.w600,
+                                                                    fontStyle: FontStyle.italic,
+                                                                    letterSpacing: 0.1,
                                                                   ),
                                                                   textAlign: TextAlign.left,
                                                                 ),
