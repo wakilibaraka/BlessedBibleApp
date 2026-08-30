@@ -163,7 +163,7 @@ class PlanGenerator {
     int startRef = _ref(range.startChapter, range.startVerse);
     int endRef = _ref(range.endChapter, range.endVerse);
 
-    final bookPericopes = allPericopes.where((p) => p.book == range.book).toList();
+    final bookPericopes = allPericopes.where((p) => p.book == range.book && p.isPlanBreak).toList();
     if (bookPericopes.isEmpty) {
       return [
         _Chunk(range.book, range.startChapter, range.startVerse,
@@ -259,7 +259,7 @@ class PlanGenerator {
       int endRef = _ref(endCh, endV);
 
       final titles = allPericopes.where((p) {
-        if (p.book != book) return false;
+        if (p.book != book || !p.isPlanBreak) return false;
         int pStart = _ref(p.startChapter, p.startVerse);
         int pEnd = _ref(p.endChapter, p.endVerse);
         return startRef <= pEnd && endRef >= pStart;
