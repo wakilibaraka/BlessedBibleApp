@@ -7,7 +7,6 @@ import '../../state/translation_provider.dart';
 import '../../state/bible_nav_settings_provider.dart';
 import '../widgets/textured_glass_container.dart';
 import '../../state/read_settings_provider.dart';
-import '../../state/chapter_titles_provider.dart';
 
 import '../../utils/bible_sections.dart';
 
@@ -504,28 +503,28 @@ class _BookChapterSelectorSheetState
       ThemeData theme, BibleNavSettingsState settings) {
     final book = ref.read(_sheetStateProvider).book;
     if (book == null) return const SizedBox.shrink();
-    final chapters = book.chapters.length;
 
     return Consumer(builder: (context, ref, _) {
       final selectedChapter =
           ref.watch(_sheetStateProvider.select((s) => s.chapter));
-      final allChapterTitles = ref.watch(chapterTitlesProvider);
-      final bookTitles = allChapterTitles[book.name] ?? {};
+      final pericopesNotifier = ref.watch(pericopesProvider.notifier);
 
       return GridView.builder(
         padding:
             EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 24),
         gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 80, // Made wider to fit titles
-          mainAxisExtent: 64,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
+          maxCrossAxisExtent: 80,
+          childAspectRatio: 1.0,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
         ),
-        itemCount: chapters,
+        itemCount: book.chapters.length,
         itemBuilder: (context, index) {
           final chapter = index + 1;
           final isSel = chapter == selectedChapter;
-          final subtitle = bookTitles[chapter.toString()];
+          final chapterPericopes = pericopesNotifier.getPericopesForChapter(book.name, chapter);
+          final v1Pericope = chapterPericopes.where((p) => p.startVerse == 1).firstOrNull;
+          final subtitle = v1Pericope?.title;
 
           return _buildGridTile(
             text: '$chapter',

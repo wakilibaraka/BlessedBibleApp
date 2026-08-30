@@ -36,7 +36,6 @@ import '../sheets/translation_picker_sheet.dart';
 import '../widgets/day_complete_celebration.dart';
 import '../../state/theme_provider.dart';
 import '../../state/typography_provider.dart';
-import '../../state/chapter_titles_provider.dart';
 import '../../state/immersive_mode_provider.dart';
 import '../../state/read_selection_provider.dart';
 import '../../state/commentary_provider.dart';
@@ -661,7 +660,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     final theme = Theme.of(context);
     final appThemeMode = ref.watch(themeProvider);
     final typography = ref.watch(typographyProvider);
-    ref.watch(chapterTitlesProvider);
     ref.watch(pericopesProvider); // Trigger rebuild on load
     final pericopesNotifier = ref.read(pericopesProvider.notifier);
     final readSettings = ref.watch(readSettingsProvider);

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../state/chapter_titles_provider.dart';
+import '../../state/pericopes_provider.dart';
 import '../../state/commentary_provider.dart';
 import '../../state/notes_provider.dart';
 import '../../state/bible_provider.dart';
@@ -190,7 +190,7 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
         if (refParts.isNotEmpty) {
           final chapterNum = int.tryParse(refParts[0]);
           if (chapterNum != null) {
-            final chapterTitle = ref.read(chapterTitlesProvider)[bookName]?[chapterNum.toString()];
+            final chapterTitle = ref.read(pericopesProvider.notifier).getPericopesForChapter(bookName, chapterNum).where((p) => p.startVerse == 1).firstOrNull?.title;
             if (chapterTitle != null && chapterTitle.isNotEmpty) {
               titleController.text = chapterTitle;
             }
@@ -355,7 +355,7 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
         if (refParts.isNotEmpty) {
           final chapterNum = int.tryParse(refParts[0]);
           if (chapterNum != null) {
-            final chapterTitle = ref.read(chapterTitlesProvider)[bookName]?[chapterNum.toString()];
+            final chapterTitle = ref.read(pericopesProvider.notifier).getPericopesForChapter(bookName, chapterNum).where((p) => p.startVerse == 1).firstOrNull?.title;
             if (chapterTitle != null && chapterTitle.isNotEmpty) {
               _insertText('$chapterTitle ');
               return;
