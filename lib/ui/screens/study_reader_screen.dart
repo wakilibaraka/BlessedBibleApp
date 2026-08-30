@@ -33,7 +33,7 @@ import '../../theme/app_colors.dart';
 import 'read_screen.dart' show VerseActionLogic;
 import '../sheets/verse_context_menu_sheet.dart';
 import '../../state/pericopes_provider.dart';
-import '../../state/heading_overrides_provider.dart';
+
 import '../../models/pericope_entry.dart';
 
 enum StudyMode { plan, deepDive }
@@ -297,13 +297,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
 
   void _clearSelection() => setState(() => _selectedVerses.clear());
 
-  String _toHeadingCase(String text) {
-    if (text.isEmpty) return text;
-    return text.split(' ').map((word) {
-      if (word.isEmpty) return word;
-      return word[0].toUpperCase() + word.substring(1).toLowerCase();
-    }).join(' ');
-  }
+
 
   void _showCommentary(
       int verseNum, String verseText, String bookName, int chapterNum) {
@@ -325,8 +319,6 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
     final appThemeMode = ref.watch(themeProvider);
     ref.watch(pericopesProvider);
     final pericopesNotifier = ref.read(pericopesProvider.notifier);
-    ref.watch(headingOverridesProvider);
-    final overridesNotifier = ref.read(headingOverridesProvider.notifier);
     
     final isDone = widget.payload.mode == StudyMode.plan
         ? ref.watch(readingPlanProvider(widget.payload.planId!))
@@ -635,32 +627,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                             }
                           }
 
-                          String? finalHeadingText;
-                          bool isChapterTitleStyle = false;
-
-                          if (verse.number == 1) {
-                            final override = overridesNotifier.getOverrideForChapter(passage.book.name, passage.chapterNum);
-                            if (override != null) {
-                              switch (override.decision) {
-                                case 'KEEP_PERICOPE':
-                                  finalHeadingText = pericopeHeading?.title;
-                                  break;
-                                case 'KEEP_CHAPTER_TITLE':
-                                  finalHeadingText = override.chapterTitle;
-                                  isChapterTitleStyle = true;
-                                  break;
-                                case 'MERGE':
-                                  finalHeadingText = override.mergedText;
-                                  break;
-                                default:
-                                  finalHeadingText = pericopeHeading?.title;
-                              }
-                            } else {
-                              finalHeadingText = pericopeHeading?.title;
-                            }
-                          } else {
-                            finalHeadingText = pericopeHeading?.title;
-                          }
+                          final finalHeadingText = pericopeHeading?.title;
 
                           Widget? topCommentary;
                           if (i == 0 && widget.payload.mode == StudyMode.deepDive) {
@@ -694,14 +661,14 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                                     right: 4.0,
                                   ),
                                   child: Text(
-                                    isChapterTitleStyle ? _toHeadingCase(finalHeadingText) : finalHeadingText,
+                                    finalHeadingText,
                                     style: theme.textTheme.titleSmall?.copyWith(
                                       color: theme.primaryColor,
-                                      fontSize: typography.fontSize * (isChapterTitleStyle ? 1.25 : 1.05),
+                                      fontSize: typography.fontSize * 1.05,
                                       fontFamily: typography.fontFamily,
-                                      fontWeight: isChapterTitleStyle ? FontWeight.w700 : FontWeight.w600,
-                                      fontStyle: isChapterTitleStyle ? FontStyle.normal : FontStyle.italic,
-                                      letterSpacing: isChapterTitleStyle ? 0.2 : 0.1,
+                                      fontWeight: FontWeight.w600,
+                                      fontStyle: FontStyle.italic,
+                                      letterSpacing: 0.1,
                                     ),
                                     textAlign: TextAlign.left,
                                   ),
