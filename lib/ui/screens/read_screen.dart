@@ -22,7 +22,7 @@ import '../../state/user_data_provider.dart';
 import '../../state/reading_plan_provider.dart';
 import '../../state/streak_provider.dart';
 import '../../state/pericopes_provider.dart';
-import '../../state/heading_overrides_provider.dart';
+
 import '../../models/pericope_entry.dart';
 import '../../state/most_read_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
@@ -664,8 +664,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     ref.watch(chapterTitlesProvider);
     ref.watch(pericopesProvider); // Trigger rebuild on load
     final pericopesNotifier = ref.read(pericopesProvider.notifier);
-    ref.watch(headingOverridesProvider); // Trigger rebuild on load
-    final overridesNotifier = ref.read(headingOverridesProvider.notifier);
     final readSettings = ref.watch(readSettingsProvider);
     final selectedVerses = ref.watch(readSelectionProvider);
 
@@ -1165,32 +1163,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                           }
                                                         }
 
-                                                        String? finalHeadingText;
-
-                                                        if (index == 0) {
-                                                          final override = overridesNotifier.getOverrideForChapter(fc.book.name, fc.chapter.number);
-                                                          if (override != null) {
-                                                            if (pericopeHeading == null) {
-                                                              finalHeadingText = override.chapterTitle;
-                                                            } else {
-                                                              switch (override.decision) {
-                                                                case 'KEEP_CHAPTER_TITLE':
-                                                                  finalHeadingText = override.chapterTitle;
-                                                                  break;
-                                                                case 'MERGE':
-                                                                  finalHeadingText = override.mergedText;
-                                                                  break;
-                                                                case 'KEEP_PERICOPE':
-                                                                default:
-                                                                  finalHeadingText = pericopeHeading.title;
-                                                              }
-                                                            }
-                                                          } else {
-                                                            finalHeadingText = pericopeHeading?.title;
-                                                          }
-                                                        } else {
-                                                          finalHeadingText = pericopeHeading?.title;
-                                                        }
+                                                        final finalHeadingText = pericopeHeading?.title;
 
                                                         return Column(
                                                           crossAxisAlignment:
