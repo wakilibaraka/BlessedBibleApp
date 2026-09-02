@@ -219,11 +219,15 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
   Future<void> _loadData(String targetPlanId) async {
     try {
       List<PlanDayData> planData = [];
-      final jsonString = await rootBundle.loadString('assets/reading_plans/$targetPlanId.json');
-      final Map<String, dynamic> decoded = await compute<String, Map<String, dynamic>>(
-        (s) => jsonDecode(s) as Map<String, dynamic>, jsonString);
-      final rawReadings = decoded['readings'] as List;
-      planData = rawReadings.map((e) => PlanDayData.fromJson(e)).toList();
+      bool isCustom = targetPlanId != 'chronological_1yr';
+      
+      if (!isCustom) {
+        final jsonString = await rootBundle.loadString('assets/reading_plans/$targetPlanId.json');
+        final Map<String, dynamic> decoded = await compute<String, Map<String, dynamic>>(
+          (s) => jsonDecode(s) as Map<String, dynamic>, jsonString);
+        final rawReadings = decoded['readings'] as List;
+        planData = rawReadings.map((e) => PlanDayData.fromJson(e)).toList();
+      }
 
       final prefsState =
           ref.read(preferencesProvider).getReadingPlanState(targetPlanId);
