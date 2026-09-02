@@ -118,16 +118,50 @@ class _ParsedRef {
       this.endVerse});
 }
 
-_ParsedRef? _parseRef(String ref) {
-  final re = RegExp(r'^(.+?)\s+(\d+)(?::(\d+)(?:-(\d+))?)?$');
+List<_ParsedRef> _parseRef(String ref) {
+  // Matches: Book C, Book C:V, Book C:V-V, Book C:V-C:V, Book C-C
+  final re = RegExp(r'^([\d\sA-Za-z]+)\s+(\d+)(?::(\d+))?(?:\s*-\s*(\d+)?(?::(\d+))?)?$');
   final m = re.firstMatch(ref.trim());
-  if (m == null) return null;
-  return _ParsedRef(
-    bookName: m.group(1)!.trim(),
-    chapter: int.parse(m.group(2)!),
-    startVerse: m.group(3) != null ? int.tryParse(m.group(3)!) : null,
-    endVerse: m.group(4) != null ? int.tryParse(m.group(4)!) : null,
-  );
+  if (m == null) return [];
+
+  final bookName = m.group(1)!.trim();
+  final startC = int.parse(m.group(2)!);
+  final startV = m.group(3) != null ? int.parse(m.group(3)!) : null;
+  final endC1 = m.group(4) != null ? int.parse(m.group(4)!) : null;
+  final endC2 = m.group(5) != null ? int.parse(m.group(5)!) : null;
+
+  int endC = startC;
+  int? endV;
+
+  if (endC1 != null && endC2 != null) {
+    endC = endC1;
+    endV = endC2;
+  } else if (endC1 != null && endC2 == null && startV != null && ref.contains(':')) {
+    endC = startC;
+    endV = endC1;
+  } else if (endC1 != null && endC2 == null) {
+    endC = endC1;
+    endV = null;
+  } else {
+    endC = startC;
+    endV = startV;
+    if (!ref.contains(':') && endC1 == null) {
+      endV = null;
+    }
+  }
+
+  final results = <_ParsedRef>[];
+  for (int c = startC; c <= endC; c++) {
+    int? sV = (c == startC) ? startV : null;
+    int? eV = (c == endC) ? endV : null;
+    results.add(_ParsedRef(
+      bookName: bookName,
+      chapter: c,
+      startVerse: sV,
+      endVerse: eV,
+    ));
+  }
+  return results;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -204,10 +238,9 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
 
       for (final passage in dayData.passages) {
         for (final refStr in passage.refs) {
-          final parsed = _parseRef(refStr);
-          if (parsed == null) continue;
-
-        BibleBook? book;
+          final parsedList = _parseRef(refStr);
+          for (final parsed in parsedList) {
+            BibleBook? book;
         try {
           book = flatChapters.map((fc) => fc.book).firstWhere(
               (b) => b.name.toLowerCase() == parsed.bookName.toLowerCase());
@@ -242,8 +275,9 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
           startVerse: parsed.startVerse,
           endVerse: parsed.endVerse,
         ));
+          }
+        }
       }
-    }
     } // End of else block for Plan mode
 
     if (mounted) {
