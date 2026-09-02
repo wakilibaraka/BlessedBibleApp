@@ -78,21 +78,9 @@ class _PlanRowWidgetState extends ConsumerState<PlanRowWidget> {
             }
           },
           onTap: () {
-            if (planState.currentDay == 0) {
-              ref.read(readingPlanProvider(planId).notifier).startPlan();
-              Navigator.of(context).push(CupertinoPageRoute(
-                builder: (_) => DayView(planId: planId, dayNum: 1),
-              ));
-            } else if (planState.isPlanComplete) {
-              final lastDay = planState.planData.isNotEmpty ? planState.planData.length : 1;
-              Navigator.of(context).push(CupertinoPageRoute(
-                builder: (_) => DayView(planId: planId, dayNum: lastDay),
-              ));
-            } else {
-              Navigator.of(context).push(CupertinoPageRoute(
-                builder: (_) => DayView(planId: planId, dayNum: planState.currentDay),
-              ));
-            }
+            Navigator.of(context).push(CupertinoPageRoute(
+              builder: (_) => ReadingPlanBrowser(planId: planId),
+            ));
           },
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

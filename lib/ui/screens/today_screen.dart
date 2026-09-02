@@ -14,9 +14,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
 import 'your_space_screen.dart';
 import 'notes_list_screen.dart';
-import 'reading_plans_hub_screen.dart';
+
 import 'plans_hub_v2_screen.dart';
-import '../../state/plans_hub_style_provider.dart';
+
 import 'commentary_hub_screen.dart';
 import 'main_nav_screen.dart';
 import '../../state/read_location_provider.dart';
@@ -595,7 +595,7 @@ class _QuickActionsRow extends ConsumerWidget {
         onTap: () {
           Navigator.of(context).push(
             CupertinoPageRoute(
-                builder: (_) => ref.read(plansHubStyleProvider) ? const PlansHubV2Screen() : const ReadingPlansHubScreen()),
+                builder: (_) => const PlansHubV2Screen()),
           );
         },
       ),

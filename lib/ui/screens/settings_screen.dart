@@ -19,7 +19,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'privacy_policy_screen.dart';
 import 'onboarding_screen.dart';
 import '../../data/local_storage/preferences_service.dart';
-import '../../state/plans_hub_style_provider.dart';
+
 
 final packageInfoProvider = FutureProvider<PackageInfo>((ref) async {
   return await PackageInfo.fromPlatform();
@@ -160,23 +160,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               },
             );
           }),
-          const Divider(height: 1, indent: 16),
-          Consumer(builder: (context, ref, _) {
-            final useNewHub = ref.watch(plansHubStyleProvider);
-            return AnimatedSegmentedTile<bool>(
-              title: 'Plans hub style',
-              subtitle: 'Switch between the new and legacy Plans tab layout',
-              selectedValue: useNewHub,
-              options: const [
-                MapEntry(false, 'Legacy'),
-                MapEntry(true, 'New'),
-              ],
-              onChanged: (val) {
-                HapticFeedback.selectionClick();
-                ref.read(plansHubStyleProvider.notifier).setUseNewHub(val);
-              },
-            );
-          }),
+
         ],
       ),
       SettingsPillCard(

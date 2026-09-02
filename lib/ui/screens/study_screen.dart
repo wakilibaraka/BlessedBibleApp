@@ -16,12 +16,12 @@ import '../../state/study_layout_provider.dart';
 import '../widgets/account_button.dart';
 import '../widgets/jiggle_animator.dart';
 import '../../state/reading_plan_provider.dart';
-import 'reading_plans_hub_screen.dart';
+
 import 'commentary_hub_screen.dart';
 import 'commentary_library_screen.dart';
 import '../../state/streak_provider.dart';
 import '../widgets/plan_row_widget.dart';
-import '../../state/plans_hub_style_provider.dart';
+
 import 'plans_hub_v2_screen.dart';
 class _ParsedRef {
   final String book;
@@ -582,9 +582,8 @@ class _ReadingPlanBannerState extends ConsumerState<ReadingPlanBanner>
                     borderRadius:
                         const BorderRadius.vertical(top: Radius.circular(24)),
                     onTap: () {
-                      final useNewHub = ref.read(plansHubStyleProvider);
                       Navigator.of(context).push(CupertinoPageRoute(
-                          builder: (_) => useNewHub ? const PlansHubV2Screen() : const ReadingPlansHubScreen()));
+                          builder: (_) => const PlansHubV2Screen()));
                     },
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
@@ -613,9 +612,8 @@ class _ReadingPlanBannerState extends ConsumerState<ReadingPlanBanner>
                       child: InkWell(
                         borderRadius: BorderRadius.circular(20),
                         onTap: () {
-                          final useNewHub = ref.read(plansHubStyleProvider);
                           Navigator.of(context).push(CupertinoPageRoute(
-                              builder: (_) => useNewHub ? const PlansHubV2Screen() : const ReadingPlansHubScreen()));
+                              builder: (_) => const PlansHubV2Screen()));
                         },
                         child: Container(
                           padding: const EdgeInsets.all(24),
