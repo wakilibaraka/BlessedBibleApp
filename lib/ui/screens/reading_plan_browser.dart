@@ -1584,20 +1584,19 @@ class _DayViewState extends ConsumerState<DayView>
           leadingWidth: 100,
           leading: Padding(
             padding: const EdgeInsets.only(left: 16.0),
-            child: Row(
-              children: [
-                IconButton(
-                  icon: Icon(Icons.arrow_back_ios_new_rounded,
-                      color: Theme.of(context).primaryColor),
-                  onPressed: () => Navigator.of(context).maybePop(),
-                ),
-                IconButton(
-                  icon: Icon(Icons.tune_rounded, color: Theme.of(context).primaryColor),
-                  onPressed: () => ThemePickerSheet.show(context),
-                ),
-              ],
+            child: IconButton(
+              icon: Icon(Icons.arrow_back_ios_new_rounded,
+                  color: Theme.of(context).primaryColor),
+              onPressed: () => Navigator.of(context).maybePop(),
             ),
           ),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.tune_rounded, color: Theme.of(context).primaryColor),
+              onPressed: () => ThemePickerSheet.show(context),
+            ),
+            const SizedBox(width: 8),
+          ],
           backgroundColor: Colors.transparent,
           elevation: 0),
       bottomNavigationBar: navBar,
