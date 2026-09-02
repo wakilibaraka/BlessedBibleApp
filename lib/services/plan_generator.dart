@@ -35,6 +35,7 @@ class PlanGenerator {
     required List<List<PlanRange>> tracks,
     required int days,
     int cadence = 7,
+    bool atomicRanges = false,
   }) {
     if (days <= 0) {
       throw ArgumentError('Days must be greater than 0');
@@ -71,7 +72,7 @@ class PlanGenerator {
         (i) => PlanDay(dayNumber: i + 1, portions: [], totalWords: 0, estimatedMinutes: 0, estimatedTimeDisplay: ''));
 
     for (final track in tracks) {
-      _distributeTrack(track, effectiveReadingDays, schedule);
+      _distributeTrack(track, effectiveReadingDays, schedule, atomicRanges: atomicRanges);
     }
 
     // Remove any trailing empty days (happens if days > available break points)
@@ -103,7 +104,7 @@ class PlanGenerator {
   }
 
   void _distributeTrack(
-      List<PlanRange> track, int effectiveReadingDays, List<PlanDay> schedule) {
+      List<PlanRange> track, int effectiveReadingDays, List<PlanDay> schedule, {bool atomicRanges = false}) {
     int totalWords = 0;
     for (final range in track) {
       totalWords += wordCountService.wordsInRange(
@@ -116,10 +117,18 @@ class PlanGenerator {
     double maxWordsPerChunk = targetPerDay * 1.15;
 
     List<_Chunk> splitChunks = [];
-    for (final range in track) {
-      List<_Chunk> chunks = _getPericopeChunks(range);
-      for (final c in chunks) {
-        splitChunks.addAll(_splitChunk(c, maxWordsPerChunk));
+    if (atomicRanges) {
+      for (final range in track) {
+        final w = wordCountService.wordsInRange(
+          range.book, range.startChapter, range.startVerse, range.endChapter, range.endVerse);
+        splitChunks.add(_Chunk(range.book, range.startChapter, range.startVerse, range.endChapter, range.endVerse, w));
+      }
+    } else {
+      for (final range in track) {
+        List<_Chunk> chunks = _getPericopeChunks(range);
+        for (final c in chunks) {
+          splitChunks.addAll(_splitChunk(c, maxWordsPerChunk));
+        }
       }
     }
 

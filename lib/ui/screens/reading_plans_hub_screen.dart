@@ -30,7 +30,7 @@ class PlanMetadata {
 const List<PlanMetadata> availablePlans = [
   PlanMetadata(
     id: 'chronological_1yr',
-    title: 'Chronological Bible in a Year',
+    title: 'Chronological — Bible in a Year',
     description: 'Read the Bible in the order events occurred.',
     isAvailable: true,
   ),

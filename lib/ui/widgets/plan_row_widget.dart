@@ -21,7 +21,7 @@ class _PlanRowWidgetState extends ConsumerState<PlanRowWidget> {
   bool _isInit = false;
 
   String _getPlanTitle(String planId, WidgetRef ref) {
-    if (planId == 'chronological_1yr') return 'Chronological Bible in a Year';
+    if (planId == 'chronological_1yr') return 'Chronological — Bible in a Year';
     if (planId == 'great_controversy') return 'The Great Controversy';
     if (planId == 'prophetic_timeline') return 'Prophetic Timeline';
     final customPlan = ref.read(preferencesProvider).getCustomPlan(planId);
