@@ -15,9 +15,12 @@ class WebBbeImporter {
   static Future<void> importData() async {
     final db = await bibleDbService.database;
 
+    final prefs = await SharedPreferences.getInstance();
+    final bbePatched = prefs.getBool('bbe_patched_web') ?? false;
+
     // Check if BBE exists
     final bbeExists = await db.query('translations', where: 'translation_id = ?', whereArgs: ['bbe']);
-    final isBbePresent = bbeExists.isNotEmpty;
+    bool isBbePresent = bbeExists.isNotEmpty;
 
     // Check if WEB is repaired (we can use a flag in SharedPreferences or just count verses with length < 10)
     // Actually, checking if WEB needs repair:
@@ -25,6 +28,13 @@ class WebBbeImporter {
       "SELECT COUNT(*) FROM verses WHERE translation_id = 'web' AND length(text) < 10"
     )) ?? 0;
     final needsWebRepair = badWebVerses > 1000; // If there are >1000 short verses, it needs repair
+
+    if (isBbePresent && !bbePatched) {
+      await db.delete('verses', where: "translation_id = 'bbe'");
+      await db.delete('translations', where: "translation_id = 'bbe'");
+      isBbePresent = false;
+      await prefs.setBool('bbe_patched_web', true);
+    }
 
     if (isBbePresent && !needsWebRepair) {
       return; // Already done
