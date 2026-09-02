@@ -8,6 +8,7 @@ import '../../state/bible_nav_settings_provider.dart';
 import '../../state/typography_provider.dart';
 import '../../state/search_settings_provider.dart';
 import '../../state/read_settings_provider.dart';
+import '../../state/bbe_substitutions_provider.dart';
 import '../../services/backup_service.dart';
 import '../../state/reminders_provider.dart';
 import '../widgets/shared_app_bar.dart';
@@ -19,6 +20,7 @@ import 'privacy_policy_screen.dart';
 import 'onboarding_screen.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../../state/plans_hub_style_provider.dart';
+
 final packageInfoProvider = FutureProvider<PackageInfo>((ref) async {
   return await PackageInfo.fromPlatform();
 });
@@ -30,7 +32,8 @@ class SettingsScreen extends ConsumerStatefulWidget {
   ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTickerProviderStateMixin {
+class _SettingsScreenState extends ConsumerState<SettingsScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -48,7 +51,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onHorizontalDragEnd: (details) {
@@ -75,7 +78,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
                 tabAlignment: TabAlignment.fill,
                 indicatorColor: theme.primaryColor,
                 labelColor: theme.primaryColor,
-                unselectedLabelColor: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                unselectedLabelColor:
+                    theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 tabs: const [
                   Tab(text: 'General'),
                   Tab(text: 'Navigation'),
@@ -119,8 +123,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
       SettingsPillCard(
         children: [
           Consumer(builder: (context, ref, _) {
-            final defaultStartTab =
-                ref.watch(readSettingsProvider.select((s) => s.defaultStartTab));
+            final defaultStartTab = ref
+                .watch(readSettingsProvider.select((s) => s.defaultStartTab));
             return AnimatedSegmentedTile<int>(
               title: 'Default start page',
               subtitle: 'Choose which page the app opens to on launch',
@@ -175,7 +179,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
           }),
         ],
       ),
-
       SettingsPillCard(
         children: [
           const Padding(
@@ -183,8 +186,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
             child: Text('Search', style: TextStyle(fontSize: 16)),
           ),
           Consumer(builder: (context, ref, _) {
-            final autoOpen = ref.watch(
-                searchSettingsProvider.select((s) => s.autoOpenSingleSearchResult));
+            final autoOpen = ref.watch(searchSettingsProvider
+                .select((s) => s.autoOpenSingleSearchResult));
             return SwitchListTile(
               title: const Text('Auto-open single search result'),
               subtitle: const Text(
@@ -202,49 +205,58 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
                 searchSettingsProvider.select((s) => s.includeNotesInSearch));
             return SwitchListTile(
               title: const Text('Include personal notes in search'),
-              subtitle: const Text('Allow search to look through your personal notes'),
+              subtitle: const Text(
+                  'Allow search to look through your personal notes'),
               value: includeNotes,
               onChanged: (value) {
                 HapticFeedback.selectionClick();
-                ref.read(searchSettingsProvider.notifier).toggleIncludeNotes(value);
+                ref
+                    .read(searchSettingsProvider.notifier)
+                    .toggleIncludeNotes(value);
               },
             );
           }),
           const Divider(height: 1, indent: 16),
           Consumer(builder: (context, ref, _) {
-            final matchWholeWords = ref.watch(
-                searchSettingsProvider.select((s) => s.matchWholeWords));
+            final matchWholeWords = ref
+                .watch(searchSettingsProvider.select((s) => s.matchWholeWords));
             return SwitchListTile(
               title: const Text('Match whole words only'),
-              subtitle: const Text('Only find exact word matches (disables partial/prefix matching)'),
+              subtitle: const Text(
+                  'Only find exact word matches (disables partial/prefix matching)'),
               value: matchWholeWords,
               onChanged: (value) {
                 HapticFeedback.selectionClick();
-                ref.read(searchSettingsProvider.notifier).toggleMatchWholeWords(value);
+                ref
+                    .read(searchSettingsProvider.notifier)
+                    .toggleMatchWholeWords(value);
               },
             );
           }),
           const Divider(height: 1, indent: 16),
           Consumer(builder: (context, ref, _) {
-            final defaultOt = ref.watch(
-                searchSettingsProvider.select((s) => s.defaultSearchOt));
-            final defaultNt = ref.watch(
-                searchSettingsProvider.select((s) => s.defaultSearchNt));
-            final defaultComm = ref.watch(
-                searchSettingsProvider.select((s) => s.defaultSearchCommentary));
+            final defaultOt = ref
+                .watch(searchSettingsProvider.select((s) => s.defaultSearchOt));
+            final defaultNt = ref
+                .watch(searchSettingsProvider.select((s) => s.defaultSearchNt));
+            final defaultComm = ref.watch(searchSettingsProvider
+                .select((s) => s.defaultSearchCommentary));
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Padding(
                   padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
-                  child: Text('Default Search Scopes', style: TextStyle(fontSize: 14)),
+                  child: Text('Default Search Scopes',
+                      style: TextStyle(fontSize: 14)),
                 ),
                 CheckboxListTile(
                   title: const Text('Old Testament'),
                   value: defaultOt,
                   onChanged: (value) {
                     if (value != null) {
-                      ref.read(searchSettingsProvider.notifier).toggleDefaultOt(value);
+                      ref
+                          .read(searchSettingsProvider.notifier)
+                          .toggleDefaultOt(value);
                     }
                   },
                   dense: true,
@@ -255,7 +267,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
                   value: defaultNt,
                   onChanged: (value) {
                     if (value != null) {
-                      ref.read(searchSettingsProvider.notifier).toggleDefaultNt(value);
+                      ref
+                          .read(searchSettingsProvider.notifier)
+                          .toggleDefaultNt(value);
                     }
                   },
                   dense: true,
@@ -266,7 +280,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
                   value: defaultComm,
                   onChanged: (value) {
                     if (value != null) {
-                      ref.read(searchSettingsProvider.notifier).toggleDefaultCommentary(value);
+                      ref
+                          .read(searchSettingsProvider.notifier)
+                          .toggleDefaultCommentary(value);
                     }
                   },
                   dense: true,
@@ -277,18 +293,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
           }),
         ],
       ),
-
       SettingsPillCard(
         children: [
           Consumer(builder: (context, ref, _) {
-            final viewMode =
-                ref.watch(readSettingsProvider.select((s) => s.readingViewMode));
+            final viewMode = ref
+                .watch(readSettingsProvider.select((s) => s.readingViewMode));
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Padding(
                   padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
-                  child: Text('Immersive Reading', style: TextStyle(fontSize: 16)),
+                  child:
+                      Text('Immersive Reading', style: TextStyle(fontSize: 16)),
                 ),
                 _buildImmersiveTile(
                   context,
@@ -298,7 +314,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
                   groupValue: viewMode,
                   onTap: (val) {
                     HapticFeedback.selectionClick();
-                    ref.read(readSettingsProvider.notifier).setReadingViewMode(val);
+                    ref
+                        .read(readSettingsProvider.notifier)
+                        .setReadingViewMode(val);
                   },
                 ),
                 _buildImmersiveTile(
@@ -310,7 +328,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
                   groupValue: viewMode,
                   onTap: (val) {
                     HapticFeedback.selectionClick();
-                    ref.read(readSettingsProvider.notifier).setReadingViewMode(val);
+                    ref
+                        .read(readSettingsProvider.notifier)
+                        .setReadingViewMode(val);
                   },
                 ),
                 _buildImmersiveTile(
@@ -321,7 +341,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
                   groupValue: viewMode,
                   onTap: (val) {
                     HapticFeedback.selectionClick();
-                    ref.read(readSettingsProvider.notifier).setReadingViewMode(val);
+                    ref
+                        .read(readSettingsProvider.notifier)
+                        .setReadingViewMode(val);
                   },
                 ),
               ],
@@ -332,29 +354,33 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
       SettingsPillCard(
         children: [
           Consumer(builder: (context, ref, _) {
-            final isRedLetter =
-                ref.watch(readSettingsProvider.select((s) => s.isRedLetterEnabled));
+            final isRedLetter = ref.watch(
+                readSettingsProvider.select((s) => s.isRedLetterEnabled));
             return SwitchListTile(
               title: const Text('Words of Jesus in Red'),
               subtitle: const Text('Render words spoken by Jesus in red'),
               value: isRedLetter,
               onChanged: (val) {
                 HapticFeedback.selectionClick();
-                ref.read(readSettingsProvider.notifier).setRedLetterEnabled(val);
+                ref
+                    .read(readSettingsProvider.notifier)
+                    .setRedLetterEnabled(val);
               },
             );
           }),
           const Divider(height: 1, indent: 16),
           Consumer(builder: (context, ref, _) {
-            final showNumbers =
-                ref.watch(readSettingsProvider.select((s) => s.showVerseNumbers));
+            final showNumbers = ref
+                .watch(readSettingsProvider.select((s) => s.showVerseNumbers));
             return SwitchListTile(
               title: const Text('Show Verse Numbers'),
               subtitle: const Text('Display verse numbers in the text'),
               value: showNumbers,
               onChanged: (val) {
                 HapticFeedback.selectionClick();
-                ref.read(readSettingsProvider.notifier).setShowVerseNumbers(val);
+                ref
+                    .read(readSettingsProvider.notifier)
+                    .setShowVerseNumbers(val);
               },
             );
           }),
@@ -363,8 +389,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
       SettingsPillCard(
         children: [
           Consumer(builder: (context, ref, _) {
-            final syncLang =
-                ref.watch(readSettingsProvider.select((s) => s.syncSavedItemsLanguage));
+            final syncLang = ref.watch(
+                readSettingsProvider.select((s) => s.syncSavedItemsLanguage));
             return SwitchListTile(
               title: const Text('Show saved items in my language'),
               subtitle: const Text(
@@ -372,14 +398,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
               value: syncLang,
               onChanged: (val) {
                 HapticFeedback.selectionClick();
-                ref.read(readSettingsProvider.notifier).setSyncSavedItemsLanguage(val);
+                ref
+                    .read(readSettingsProvider.notifier)
+                    .setSyncSavedItemsLanguage(val);
               },
             );
           }),
           const Divider(height: 1, indent: 16),
           Consumer(builder: (context, ref, _) {
-            final showChips =
-                ref.watch(readSettingsProvider.select((s) => s.showChipsOnSavedItems));
+            final showChips = ref.watch(
+                readSettingsProvider.select((s) => s.showChipsOnSavedItems));
             return SwitchListTile(
               title: const Text('Show translation options on saved items'),
               subtitle: const Text(
@@ -387,7 +415,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
               value: showChips,
               onChanged: (val) {
                 HapticFeedback.selectionClick();
-                ref.read(readSettingsProvider.notifier).setShowChipsOnSavedItems(val);
+                ref
+                    .read(readSettingsProvider.notifier)
+                    .setShowChipsOnSavedItems(val);
               },
             );
           }),
@@ -396,8 +426,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
       SettingsPillCard(
         children: [
           Consumer(builder: (context, ref, _) {
-            final actionStyle =
-                ref.watch(readSettingsProvider.select((s) => s.verseActionStyle));
+            final actionStyle = ref
+                .watch(readSettingsProvider.select((s) => s.verseActionStyle));
             return AnimatedSegmentedTile<VerseActionStyle>(
               title: 'Verse Action Style',
               subtitle:
@@ -410,7 +440,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
               ],
               onChanged: (val) {
                 HapticFeedback.selectionClick();
-                ref.read(readSettingsProvider.notifier).setVerseActionStyle(val);
+                ref
+                    .read(readSettingsProvider.notifier)
+                    .setVerseActionStyle(val);
               },
             );
           }),
@@ -419,11 +451,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
       SettingsPillCard(
         children: [
           Consumer(builder: (context, ref, _) {
-            final keepAwake =
-                ref.watch(readSettingsProvider.select((s) => s.keepScreenAwake));
+            final keepAwake = ref
+                .watch(readSettingsProvider.select((s) => s.keepScreenAwake));
             return SwitchListTile(
               title: const Text('Keep Screen Awake'),
-              subtitle: const Text('Prevent device from sleeping while reading'),
+              subtitle:
+                  const Text('Prevent device from sleeping while reading'),
               value: keepAwake,
               onChanged: (val) {
                 HapticFeedback.selectionClick();
@@ -460,7 +493,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
             return ListTile(
               title: const Text('Restart onboarding'),
               subtitle: const Text('Replay the first-time setup'),
-              trailing: Icon(Icons.restart_alt_rounded, color: theme.primaryColor),
+              trailing:
+                  Icon(Icons.restart_alt_rounded, color: theme.primaryColor),
               onTap: () {
                 HapticFeedback.selectionClick();
                 showDialog(
@@ -477,13 +511,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
                       TextButton(
                         onPressed: () {
                           Navigator.of(ctx).pop();
-                          ref.read(preferencesProvider).setOnboardingComplete(false);
+                          ref
+                              .read(preferencesProvider)
+                              .setOnboardingComplete(false);
                           Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+                            MaterialPageRoute(
+                                builder: (_) => const OnboardingScreen()),
                             (route) => false,
                           );
                         },
-                        child: Text('Restart', style: TextStyle(color: theme.primaryColor, fontWeight: FontWeight.bold)),
+                        child: Text('Restart',
+                            style: TextStyle(
+                                color: theme.primaryColor,
+                                fontWeight: FontWeight.bold)),
                       ),
                     ],
                   ),
@@ -530,8 +570,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
                   const Divider(height: 1, indent: 16),
                   ListTile(
                     title: const Text('Location'),
-                    subtitle: Text(
-                        remindersState.sabbathLocationName ?? 'Not set (Tap to set)'),
+                    subtitle: Text(remindersState.sabbathLocationName ??
+                        'Not set (Tap to set)'),
                     trailing: const Icon(Icons.edit_location_alt_rounded),
                     onTap: () => _showLocationPicker(context, notifier),
                   ),
@@ -668,8 +708,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
           }),
           const Divider(height: 1, indent: 16),
           Consumer(builder: (context, ref, _) {
-            final fabLongPress =
-                ref.watch(readSettingsProvider.select((s) => s.fabLongPressToNav));
+            final fabLongPress = ref
+                .watch(readSettingsProvider.select((s) => s.fabLongPressToNav));
             return SwitchListTile(
               title: Text(
                 'Long-press button to open navigation',
@@ -686,18 +726,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
               activeTrackColor: Theme.of(context).primaryColor,
               onChanged: (val) {
                 HapticFeedback.selectionClick();
-                ref.read(readSettingsProvider.notifier).setFabLongPressToNav(val);
+                ref
+                    .read(readSettingsProvider.notifier)
+                    .setFabLongPressToNav(val);
               },
             );
           }),
           const Divider(height: 1, indent: 16),
           Consumer(builder: (context, ref, _) {
-            final autoClose = ref.watch(
-                bibleNavSettingsProvider.select((s) => s.autoCloseOnFinalSelection));
+            final autoClose = ref.watch(bibleNavSettingsProvider
+                .select((s) => s.autoCloseOnFinalSelection));
             return SwitchListTile(
               title: const Text('Auto-close sheet on final selection'),
-              subtitle:
-                  const Text('Automatically dismiss the picker after the last step'),
+              subtitle: const Text(
+                  'Automatically dismiss the picker after the last step'),
               value: autoClose,
               onChanged: (value) {
                 HapticFeedback.selectionClick();
@@ -713,6 +755,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
   // --- Page 4: Info ---
   Widget _buildInfoPage(BuildContext context, WidgetRef ref) {
     return _buildPageContainer(context, [
+      SettingsPillCard(
+        children: [
+          Consumer(
+            builder: (context, ref, _) {
+              final subsCount =
+                  ref.watch(bbeSubstitutionsProvider).value?.length ?? 94;
+              return ListTile(
+                leading: const Icon(Icons.info_outline_rounded),
+                title: const Text('BBE Translation Note'),
+                subtitle: Text(
+                    'The Bible in Basic English originally left some verses untranslated or heavily truncated. For those ($subsCount verses), the World English Bible (WEB) text is shown instead and marked with a WEB badge.'),
+                isThreeLine: true,
+              );
+            },
+          ),
+        ],
+      ),
+      const SizedBox(height: 16),
       SettingsPillCard(
         children: [
           ListTile(
@@ -780,7 +840,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
                 color: Theme.of(context).colorScheme.error),
             title: Text('Reset to Default',
                 style: TextStyle(color: Theme.of(context).colorScheme.error)),
-            subtitle: const Text('Restore original app settings (content is kept)'),
+            subtitle:
+                const Text('Restore original app settings (content is kept)'),
             onTap: () {
               showDialog(
                 context: context,
@@ -827,8 +888,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
                         ref.read(hintsProvider.notifier).resetHints();
 
                         if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                              content: Text('Settings reset to default.')));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Settings reset to default.')));
                         }
                       },
                       child: const Text('Reset'),
@@ -901,8 +963,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
 
   // --- Helper methods ---
 
-
-
   String _weekdayName(int day) {
     const names = [
       'Monday',
@@ -960,12 +1020,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
                 height: 200,
                 child: ListView(
                   children: [
-                    _cityTile(ctx, notifier, 'New York, USA', 40.7128, -74.0060),
+                    _cityTile(
+                        ctx, notifier, 'New York, USA', 40.7128, -74.0060),
                     _cityTile(ctx, notifier, 'London, UK', 51.5074, -0.1278),
                     _cityTile(
                         ctx, notifier, 'Sydney, Australia', -33.8688, 151.2093),
                     _cityTile(ctx, notifier, 'Tokyo, Japan', 35.6762, 139.6503),
-                    _cityTile(ctx, notifier, 'Johannesburg, SA', -26.2041, 28.0473),
+                    _cityTile(
+                        ctx, notifier, 'Johannesburg, SA', -26.2041, 28.0473),
                     _cityTile(
                         ctx, notifier, 'São Paulo, Brazil', -23.5505, -46.6333),
                   ],
@@ -979,8 +1041,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
     );
   }
 
-  Widget _cityTile(BuildContext context, RemindersNotifier notifier, String name,
-      double lat, double lng) {
+  Widget _cityTile(BuildContext context, RemindersNotifier notifier,
+      String name, double lat, double lng) {
     return ListTile(
       title: Text(name),
       onTap: () {

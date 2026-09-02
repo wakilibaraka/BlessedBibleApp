@@ -219,65 +219,11 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
   Future<void> _loadData(String targetPlanId) async {
     try {
       List<PlanDayData> planData = [];
-      if (targetPlanId == 'chronological_1yr') {
-        final wcs = ref.read(wordCountServiceProvider);
-        await wcs.init();
-        final pJson = await rootBundle.loadString('assets/data/pericopes.json');
-        final allPericopes = await compute(parsePericopesJson, pJson);
-        final generator = PlanGenerator(wordCountService: wcs, allPericopes: allPericopes);
-        
-        final chronoStr = await rootBundle.loadString('assets/data/chronological_plan.json');
-        final List<dynamic> chronoDecoded = await compute((s) => jsonDecode(s) as List, chronoStr);
-        final track = chronoDecoded.map((e) => PlanRange(
-          book: e['book'], startChapter: e['startChapter'], startVerse: e['startVerse'],
-          endChapter: e['endChapter'], endVerse: e['endVerse']
-        )).toList();
-        
-        final readingPlan = generator.generatePlan(
-          id: targetPlanId,
-          title: 'Chronological — Bible in a Year',
-          tracks: [track],
-          days: 365,
-          cadence: 7,
-          atomicRanges: true,
-        );
-        
-        for (final dayMap in readingPlan.schedule) {
-          final portions = dayMap.portions;
-          List<PlanPassage> passages = [];
-          for (final portion in portions) {
-            final book = portion.book;
-            final startCh = portion.startChapter;
-            final startV = portion.startVerse;
-            final endCh = portion.endChapter;
-            final endV = portion.endVerse;
-            
-            List<String> refs = [];
-            for (int ch = startCh; ch <= endCh; ch++) {
-              if (startCh == endCh) {
-                 refs.add('$book $ch:$startV-$endV');
-              } else if (ch == startCh) {
-                 refs.add('$book $ch:$startV');
-              } else if (ch == endCh) {
-                 refs.add('$book $ch:1-$endV');
-              } else {
-                 refs.add('$book $ch');
-              }
-            }
-            final label = '${portion.book} ${portion.startChapter}:${portion.startVerse}' + 
-              ((portion.startChapter == portion.endChapter && portion.startVerse == portion.endVerse) 
-                ? '' : '-${portion.endChapter != portion.startChapter ? portion.endChapter.toString() + ":" : ""}${portion.endVerse}');
-            passages.add(PlanPassage(label: label, refs: refs));
-          }
-          planData.add(PlanDayData(day: dayMap.dayNumber, week: ((dayMap.dayNumber - 1) ~/ 7) + 1, title: 'Day ${dayMap.dayNumber}', passages: passages));
-        }
-      } else {
-        final jsonString = await rootBundle.loadString('assets/reading_plans/$targetPlanId.json');
-        final Map<String, dynamic> decoded = await compute<String, Map<String, dynamic>>(
-          (s) => jsonDecode(s) as Map<String, dynamic>, jsonString);
-        final rawReadings = decoded['readings'] as List;
-        planData = rawReadings.map((e) => PlanDayData.fromJson(e)).toList();
-      }
+      final jsonString = await rootBundle.loadString('assets/reading_plans/$targetPlanId.json');
+      final Map<String, dynamic> decoded = await compute<String, Map<String, dynamic>>(
+        (s) => jsonDecode(s) as Map<String, dynamic>, jsonString);
+      final rawReadings = decoded['readings'] as List;
+      planData = rawReadings.map((e) => PlanDayData.fromJson(e)).toList();
 
       final prefsState =
           ref.read(preferencesProvider).getReadingPlanState(targetPlanId);
@@ -420,14 +366,15 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
   }
 
 
-  void startPlan(
-      {String? planId,
+  void startPlan({
+      String? planId,
       String paceMode = 'scheduled',
       int? restDay,
+      DateTime? startDate,
       List<PlanDayData>? customPlanData}) {
     final next = state.copyWith(
       planId: planId ?? _planId,
-      planStartedOn: DateTime.now(),
+      planStartedOn: startDate ?? DateTime.now(),
       paceMode: paceMode,
       restDay: restDay,
       completedReadings: {},
@@ -471,6 +418,13 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
         next.reminderTimeHour,
         next.reminderTimeMinute,
         next.restDay);
+  }
+
+
+  void setStartDate(DateTime startDate) {
+    final next = state.copyWith(planStartedOn: startDate);
+    state = next;
+    _saveToPrefs(next);
   }
 
   void restartPlan() {

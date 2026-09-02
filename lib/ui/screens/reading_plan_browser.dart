@@ -349,7 +349,7 @@ class PlanSetupSheet extends StatefulWidget {
   final ReadingPlanState initialState;
   final bool isEditing;
   final void Function(String pace, int? restDay, bool reminderEnabled,
-      int reminderHour, int reminderMinute) onConfirm;
+      int reminderHour, int reminderMinute, DateTime startDate) onConfirm;
 
   const PlanSetupSheet({
     super.key,
@@ -368,10 +368,12 @@ class _PlanSetupSheetState extends State<PlanSetupSheet> {
   late int? _customDay;
   late bool _reminderEnabled;
   late TimeOfDay _reminderTime;
+  late DateTime _startDate;
 
   @override
   void initState() {
     super.initState();
+    _startDate = widget.initialState.planStartedOn ?? DateTime.now();
     _paceMode = widget.initialState.paceMode;
     final rd = widget.initialState.restDay;
     if (rd == null || rd == -1) {
@@ -393,6 +395,34 @@ class _PlanSetupSheetState extends State<PlanSetupSheet> {
     if (_restDayChoice == null) return -1;
     if (_restDayChoice == 7) return 7;
     return _customDay;
+  }
+
+  
+  Future<void> _pickStartDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _startDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.dark(
+              primary: AppColors.goldAccent,
+              onPrimary: Colors.white,
+              surface: Theme.of(context).scaffoldBackgroundColor,
+              onSurface: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null) {
+      setState(() {
+        _startDate = picked;
+      });
+    }
   }
 
   Future<void> _pickTime() async {
@@ -476,6 +506,35 @@ class _PlanSetupSheetState extends State<PlanSetupSheet> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
+              
+              const SizedBox(height: 24),
+              Text('Start Date',
+                  style: theme.textTheme.titleMedium
+                      ?.copyWith(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 10),
+              InkWell(
+                onTap: _pickStartDate,
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: gold),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.date_range_rounded, size: 18, color: gold),
+                      const SizedBox(width: 10),
+                      Text(
+                        "${_startDate.year}-${_startDate.month.toString().padLeft(2, '0')}-${_startDate.day.toString().padLeft(2, '0')}",
+                        style: TextStyle(color: gold, fontWeight: FontWeight.w600),
+                      ),
+                      const Spacer(),
+                      Icon(Icons.edit_calendar_rounded, color: gold),
+                    ],
+                  ),
+                ),
+              ),
               Text('Pace Mode',
                   style: theme.textTheme.titleMedium
                       ?.copyWith(fontWeight: FontWeight.bold)),
@@ -584,7 +643,8 @@ class _PlanSetupSheetState extends State<PlanSetupSheet> {
                       _effectiveRestDay,
                       _reminderEnabled,
                       _reminderTime.hour,
-                      _reminderTime.minute);
+                      _reminderTime.minute,
+                      _startDate);
                   Navigator.pop(context);
                 },
                 child: Text(
@@ -768,13 +828,16 @@ class _TodayViewBody extends ConsumerWidget {
       builder: (_) => PlanSetupSheet(
         initialState: planState,
         isEditing: true,
-        onConfirm: (pace, rest, remEnabled, remH, remM) {
+        onConfirm: (pace, rest, remEnabled, remH, remM, startDate) {
           ref
               .read(readingPlanProvider(planState.planId).notifier)
               .setPaceMode(pace);
           ref
               .read(readingPlanProvider(planState.planId).notifier)
               .setRestDay(rest);
+          ref
+              .read(readingPlanProvider(planState.planId).notifier)
+              .setStartDate(startDate);
           ref
               .read(readingPlanProvider(planState.planId).notifier)
               .setReminder(remEnabled, remH, remM);
@@ -1440,20 +1503,19 @@ class _DayViewState extends ConsumerState<DayView>
             leadingWidth: 100,
             leading: Padding(
               padding: const EdgeInsets.only(left: 16.0),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.arrow_back_ios_new_rounded,
-                        color: Theme.of(context).primaryColor),
-                    onPressed: () => Navigator.of(context).maybePop(),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.tune_rounded, color: Theme.of(context).primaryColor),
-                    onPressed: () => ThemePickerSheet.show(context),
-                  ),
-                ],
+              child: IconButton(
+                icon: Icon(Icons.arrow_back_ios_new_rounded,
+                    color: Theme.of(context).primaryColor),
+                onPressed: () => Navigator.of(context).maybePop(),
               ),
             ),
+            actions: [
+              IconButton(
+                icon: Icon(Icons.tune_rounded, color: Theme.of(context).primaryColor),
+                onPressed: () => ThemePickerSheet.show(context),
+              ),
+              const SizedBox(width: 8),
+            ],
             backgroundColor: Colors.transparent,
             elevation: 0),
         bottomNavigationBar: navBar,
@@ -1895,7 +1957,7 @@ class _ReadingPlanBrowserState extends ConsumerState<ReadingPlanBrowser> {
                       builder: (_) => PlanSetupSheet(
                         initialState: planState,
                         isEditing: false,
-                        onConfirm: (pace, rest, remEnabled, remH, remM) {
+                        onConfirm: (pace, rest, remEnabled, remH, remM, startDate) {
                           ref
                               .read(readingPlanProvider(widget.planId).notifier)
                               .startPlan(
