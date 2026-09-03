@@ -137,23 +137,20 @@ class AuthActions {
   }
 
   /// Deletes the current user's account and signs out.
-  /// Automatically attempts re-authentication if required.
+  /// Re-authenticates the user upfront before performing any deletion.
   Future<void> deleteAccount() async {
     final user = _auth.currentUser;
     if (user == null) return;
 
+    final reauthed = await _reauthenticate(user);
+    if (!reauthed) {
+      throw Exception('Re-authentication required to delete your account.');
+    }
+
     try {
       await _performDeletionSteps(user);
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'requires-recent-login') {
-        final reauthed = await _reauthenticate(user);
-        if (!reauthed) {
-          throw Exception('Failed to re-authenticate. Account deletion cancelled.');
-        }
-        await _performDeletionSteps(user);
-      } else {
-        rethrow;
-      }
+    } catch (e) {
+      rethrow;
     }
   }
 }
