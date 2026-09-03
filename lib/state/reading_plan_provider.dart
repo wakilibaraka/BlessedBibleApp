@@ -7,7 +7,6 @@ import '../data/local_storage/preferences_service.dart';
 import '../models/reading_plan.dart';
 import '../services/pace_remap_service.dart';
 import '../services/word_count_service.dart';
-import '../services/plan_generator.dart';
 import '../utils/isolate_parsers.dart';
 
 /// App weekday: 1=Sunday, 2=Monday, ..., 7=Saturday
