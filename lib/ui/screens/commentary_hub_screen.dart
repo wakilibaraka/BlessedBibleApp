@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../theme/reading_tokens.dart';
 import '../../theme/app_colors.dart';
 import '../../state/theme_provider.dart';
+import '../../state/surface_style_provider.dart';
 import '../widgets/commentary_view.dart';
 
 class CommentaryHubScreen extends ConsumerWidget {
@@ -22,9 +23,14 @@ class CommentaryHubScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appThemeMode = ref.watch(themeProvider);
+    final surfaceStyle = ref.watch(surfaceStyleProvider);
+    final theme = Theme.of(context);
     final tokens = Theme.of(context).extension<ReadingTokens>()!;
 
     Color getThemeBackgroundColor() {
+      if (surfaceStyle == SurfaceStyle.paperlike) {
+        return theme.scaffoldBackgroundColor;
+      }
       switch (appThemeMode) {
         case AppThemeMode.dawn:
           return AppColors.dawnBackground;

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/home_provider.dart';
 import '../../state/votd_tracker_provider.dart';
 import '../../state/theme_provider.dart';
+import '../../state/surface_style_provider.dart';
 import 'commentary_hub_screen.dart';
 import '../../state/commentary_provider.dart';
 import '../../theme/reading_tokens.dart';
@@ -30,6 +31,7 @@ class VotdArchiveScreen extends ConsumerWidget {
     final epoch = DateTime(2026, 1, 1);
 
     final appThemeMode = ref.watch(themeProvider);
+    final surfaceStyle = ref.watch(surfaceStyleProvider);
     final is3DTheme = appThemeMode == AppThemeMode.dawn ||
         appThemeMode == AppThemeMode.lilies ||
         appThemeMode == AppThemeMode.roses ||
@@ -38,6 +40,9 @@ class VotdArchiveScreen extends ConsumerWidget {
         appThemeMode == AppThemeMode.fresh;
 
     Color getThemeBackgroundColor() {
+      if (surfaceStyle == SurfaceStyle.paperlike) {
+        return theme.scaffoldBackgroundColor;
+      }
       switch (appThemeMode) {
         case AppThemeMode.dawn:
           return AppColors.dawnBackground;

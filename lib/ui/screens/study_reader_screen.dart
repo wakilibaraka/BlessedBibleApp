@@ -28,6 +28,7 @@ import '../widgets/textured_glass_container.dart';
 import '../../state/typography_provider.dart';
 import '../../state/user_data_provider.dart';
 import '../../state/theme_provider.dart';
+import '../../state/surface_style_provider.dart';
 import '../widgets/commentary_view.dart';
 import '../../theme/app_colors.dart';
 import 'read_screen.dart' show VerseActionLogic;
@@ -351,6 +352,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
     final typography = ref.watch(typographyProvider);
     final readSettings = ref.watch(readSettingsProvider);
     final appThemeMode = ref.watch(themeProvider);
+    final surfaceStyle = ref.watch(surfaceStyleProvider);
     ref.watch(pericopesProvider);
     final pericopesNotifier = ref.read(pericopesProvider.notifier);
     
@@ -467,6 +469,9 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
     );
 
     Color getThemeBackgroundColor() {
+      if (surfaceStyle == SurfaceStyle.paperlike) {
+        return theme.scaffoldBackgroundColor;
+      }
       switch (appThemeMode) {
         case AppThemeMode.dawn:
           return AppColors.dawnBackground;
