@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import '../data/local_storage/preferences_service.dart';
 
 /// Streams the current Firebase auth state (null = signed out).
 final authStateProvider = StreamProvider<User?>((ref) {
@@ -9,13 +11,16 @@ final authStateProvider = StreamProvider<User?>((ref) {
 });
 
 /// Provides sign-in/out actions (no state, just methods).
-final authActionsProvider = Provider<AuthActions>((ref) => AuthActions());
+final authActionsProvider = Provider<AuthActions>((ref) => AuthActions(ref));
 
 enum SignInResult { success, cancelled, failed }
 
 class AuthActions {
+  final Ref ref;
   final _auth = FirebaseAuth.instance;
   final _googleSignIn = GoogleSignIn();
+
+  AuthActions(this.ref);
 
   /// Runs the Google sign-in flow and signs into Firebase.
   /// Returns [SignInResult.cancelled] if the user dismisses the picker,
@@ -72,16 +77,83 @@ class AuthActions {
     ]);
   }
 
+  /// Re-authenticates the current user (required before sensitive ops).
+  Future<bool> _reauthenticate(User user) async {
+    try {
+      final isApple = user.providerData.any((p) => p.providerId == 'apple.com');
+      if (isApple) {
+        final appleCredential = await SignInWithApple.getAppleIDCredential(
+          scopes: [AppleIDAuthorizationScopes.email, AppleIDAuthorizationScopes.fullName],
+        );
+        final oauthCredential = OAuthProvider('apple.com').credential(
+          idToken: appleCredential.identityToken,
+          accessToken: appleCredential.authorizationCode,
+        );
+        await user.reauthenticateWithCredential(oauthCredential);
+        return true;
+      } else {
+        final googleUser = await _googleSignIn.signIn();
+        if (googleUser == null) return false;
+        final googleAuth = await googleUser.authentication;
+        final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
+        await user.reauthenticateWithCredential(credential);
+        return true;
+      }
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<void> _performDeletionSteps(User user) async {
+    final uid = user.uid;
+    final firestore = FirebaseFirestore.instance;
+
+    // 1. Query users/{uid}/plans and batch-delete every plan document
+    final plansRef = firestore.collection('users').doc(uid).collection('plans');
+    final plansSnap = await plansRef.get();
+    
+    if (plansSnap.docs.isNotEmpty) {
+      final batch = firestore.batch();
+      for (final doc in plansSnap.docs) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
+    }
+
+    // 2. Delete the users/{uid} document itself
+    await firestore.collection('users').doc(uid).delete();
+
+    // 3. Delete the auth account
+    await user.delete();
+
+    // 4. Clear local user data
+    await ref.read(preferencesProvider).clearAllUserData();
+
+    // 5. Clear Google state
+    await _googleSignIn.signOut();
+  }
+
   /// Deletes the current user's account and signs out.
-  /// Throws an exception if the deletion fails (e.g., requires recent sign-in).
+  /// Automatically attempts re-authentication if required.
   Future<void> deleteAccount() async {
     final user = _auth.currentUser;
-    if (user != null) {
-      // Note: If the user hasn't signed in recently, this will throw a
-      // FirebaseAuthException (requires-recent-login). The UI must handle this.
-      await user.delete();
-      // user.delete() also signs them out of Firebase, but we should clear Google state too.
-      await _googleSignIn.signOut();
+    if (user == null) return;
+
+    try {
+      await _performDeletionSteps(user);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'requires-recent-login') {
+        final reauthed = await _reauthenticate(user);
+        if (!reauthed) {
+          throw Exception('Failed to re-authenticate. Account deletion cancelled.');
+        }
+        await _performDeletionSteps(user);
+      } else {
+        rethrow;
+      }
     }
   }
 }

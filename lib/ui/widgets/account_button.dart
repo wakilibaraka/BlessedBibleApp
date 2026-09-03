@@ -118,7 +118,11 @@ class AccountButton extends ConsumerWidget {
                               builder: (ctx) => AlertDialog(
                                 title: const Text('Delete Account?'),
                                 content: const Text(
-                                    'This will permanently delete your account and all associated data from our servers. This action cannot be undone.'),
+                                    'This is permanent and irreversible.\n\n'
+                                    'The following will be completely removed:\n'
+                                    '• Your sign-in account\n'
+                                    '• Your cloud-synced custom plans\n'
+                                    '• All on-device study data (bookmarks, highlights, history)'),
                                 actions: [
                                   TextButton(
                                     onPressed: () => Navigator.pop(ctx, false),
@@ -144,8 +148,9 @@ class AccountButton extends ConsumerWidget {
                               } catch (e) {
                                 if (context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Failed to delete account. Please sign out, sign back in, and try again.'),
+                                    SnackBar(
+                                      content: Text('Failed to delete account: ${e.toString().replaceAll("Exception: ", "")}'),
+
                                       duration: Duration(seconds: 4),
                                     ),
                                   );

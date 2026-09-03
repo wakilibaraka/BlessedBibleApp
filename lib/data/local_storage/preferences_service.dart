@@ -519,6 +519,29 @@ class PreferencesService {
   void setOnboardingComplete(bool value) {
     prefs.setBool(_onboardingCompleteKey, value);
   }
+
+  /// Clears all study and progress data associated with a user account.
+  Future<void> clearAllUserData() async {
+    final keys = [
+      _bookmarksKey,
+      _bookmarksV2Key,
+      _commentaryBookmarksKey,
+      _favoritesKey,
+      _highlightsKey,
+      _readingPlanStateKey,
+      _readingPlanRestDayKey,
+      'custom_plans', // explicitly referenced in codebase
+      _streakCountKey,
+      _lastReadDateKey,
+      _votdViewedDaysKey,
+      _searchHistoryKey,
+      _searchQueriesKey,
+      _lastReadLocKey,
+    ];
+    for (final key in keys) {
+      await prefs.remove(key);
+    }
+  }
 }
 
 final preferencesProvider = Provider<PreferencesService>((ref) {
