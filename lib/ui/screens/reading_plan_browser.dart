@@ -1639,77 +1639,118 @@ class _DayViewState extends ConsumerState<DayView>
                     padding: const EdgeInsets.fromLTRB(20, 24, 20, 40),
                     children: [
                       ...dayData.passages.asMap().entries.map((entry) {
-                        final idx = entry.key + 1;
                         final passage = entry.value;
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 14),
-                          child: Material(
-                            color: theme.cardColor,
-                            borderRadius: BorderRadius.circular(12),
-                            child: InkWell(
-                              onTap: () async {
-                                final markedComplete =
-                                    await Navigator.push<bool>(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => StudyReaderScreen(
-                                      payload: StudySessionPayload.plan(
-                                        planId: widget.planId,
-                                        dayNum: readingDay,
-                                        initialPassageIndex: entry.key,
+                        return Column(
+                          children: [
+                            Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () async {
+                                  final markedComplete = await Navigator.push<bool>(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => StudyReaderScreen(
+                                        payload: StudySessionPayload.plan(
+                                          planId: widget.planId,
+                                          dayNum: readingDay,
+                                          initialPassageIndex: entry.key,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                );
-                                if (markedComplete == true && mounted) {
-                                  final isDoneNow = ref
-                                      .read(readingPlanProvider(widget.planId))
-                                      .completedReadings
-                                      .contains(readingDay);
-                                  if (!isDoneNow) {
-                                    _toggleDone(false, readingDay);
+                                  );
+                                  if (markedComplete == true && mounted) {
+                                    final isDoneNow = ref
+                                        .read(readingPlanProvider(widget.planId))
+                                        .completedReadings
+                                        .contains(readingDay);
+                                    if (!isDoneNow) {
+                                      _toggleDone(false, readingDay);
+                                    }
                                   }
-                                }
-                              },
-                              borderRadius: BorderRadius.circular(12),
-                              child: Container(
-                                height: 64,
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 18),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: theme.dividerColor),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: 28,
-                                      height: 28,
-                                      decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: gold.withValues(alpha: 0.12)),
-                                      child: Center(
-                                          child: Text('$idx',
+                                },
+                                borderRadius: BorderRadius.circular(12),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 20, horizontal: 12),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        width: 24,
+                                        height: 24,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(6),
+                                          border: Border.all(
+                                            color: isDone
+                                                ? gold
+                                                : theme.colorScheme.onSurface
+                                                    .withValues(alpha: 0.25),
+                                            width: 1.5,
+                                          ),
+                                          color: isDone
+                                              ? gold
+                                              : Colors.transparent,
+                                        ),
+                                        child: isDone
+                                            ? const Icon(Icons.check_rounded,
+                                                size: 16, color: Colors.white)
+                                            : null,
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              _expandLabel(passage),
                                               style: TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: gold))),
-                                    ),
-                                    const SizedBox(width: 14),
-                                    Expanded(
-                                        child: Text(_expandLabel(passage),
-                                            style: const TextStyle(
                                                 fontFamily: 'EB Garamond',
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.w600))),
-                                    Icon(Icons.menu_book_rounded,
-                                        size: 18,
-                                        color: gold.withValues(alpha: 0.6)),
-                                  ],
+                                                fontSize: 22,
+                                                fontWeight: FontWeight.w600,
+                                                color: isDone
+                                                    ? theme.colorScheme.onSurface
+                                                        .withValues(alpha: 0.5)
+                                                    : theme.colorScheme.onSurface,
+                                                decoration: isDone
+                                                    ? TextDecoration.lineThrough
+                                                    : null,
+                                                decorationColor: theme
+                                                    .colorScheme.onSurface
+                                                    .withValues(alpha: 0.4),
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              'Tap to read passage',
+                                              style: TextStyle(
+                                                fontFamily: 'Inter',
+                                                fontSize: 13,
+                                                color: theme.colorScheme.onSurface
+                                                    .withValues(alpha: 0.4),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Icon(Icons.chevron_right_rounded,
+                                          size: 20,
+                                          color: theme.colorScheme.onSurface
+                                              .withValues(alpha: 0.2)),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
+                            if (entry.key < dayData.passages.length - 1)
+                              Divider(
+                                height: 1,
+                                thickness: 0.5,
+                                indent: 52,
+                                endIndent: 12,
+                                color: theme.dividerColor.withValues(alpha: 0.5),
+                              ),
+                          ],
                         );
                       }),
                       const SizedBox(height: 28),
