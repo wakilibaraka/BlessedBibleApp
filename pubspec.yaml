@@ -142,17 +142,26 @@ flutter:
         - asset: assets/fonts/SourceSans3-BoldItalic.ttf
           weight: 700
           style: italic
-    - family: Pinyon Script
+    - family: Cardo
       fonts:
-        - asset: assets/fonts/PinyonScript-Regular.ttf
+        - asset: assets/fonts/Cardo-Regular.ttf
           weight: 400
-    - family: Alex Brush
-      fonts:
-        - asset: assets/fonts/AlexBrush-Regular.ttf
-          weight: 400
-    - family: Tangerine
-      fonts:
-        - asset: assets/fonts/Tangerine-Regular.ttf
-          weight: 400
-        - asset: assets/fonts/Tangerine-Bold.ttf
+        - asset: assets/fonts/Cardo-Bold.ttf
           weight: 700
+        - asset: assets/fonts/Cardo-Italic.ttf
+          weight: 400
+          style: italic
+    - family: Noto Serif
+      fonts:
+        - asset: assets/fonts/NotoSerif-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/NotoSerif-Italic.ttf
+          weight: 400
+          style: italic
+    - family: Alegreya
+      fonts:
+        - asset: assets/fonts/Alegreya-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Alegreya-Italic.ttf
+          weight: 400
+          style: italic

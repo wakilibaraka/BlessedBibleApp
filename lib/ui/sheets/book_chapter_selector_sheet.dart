@@ -181,9 +181,9 @@ class _BookChapterSelectorSheetState
     final selectorHeightSetting = ref.watch(readSettingsProvider.select((s) => s.selectorHeight));
     
     final heightFactor = switch (selectorHeightSetting) {
-      SelectorHeight.quarter => 0.25,
-      SelectorHeight.half => 0.50,
-      SelectorHeight.full => 0.95,
+      SelectorHeight.quarter => 0.50,
+      SelectorHeight.half => 0.75,
+      SelectorHeight.full => 1.0,
     };
     final isInitialized =
         ref.watch(_sheetStateProvider.select((s) => s.book != null));
@@ -194,36 +194,43 @@ class _BookChapterSelectorSheetState
 
     return Material(
       color: Colors.transparent,
-      child: FractionallySizedBox(
-        heightFactor: heightFactor,
-        child: TexturedGlassContainer(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-          padding: EdgeInsets.zero,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(2),
+      child: DraggableScrollableSheet(
+        initialChildSize: heightFactor,
+        minChildSize: 0.5,
+        maxChildSize: 1.0,
+        snap: true,
+        snapSizes: const [0.5, 0.75, 1.0],
+        expand: false,
+        builder: (context, scrollController) {
+          return TexturedGlassContainer(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+            padding: EdgeInsets.zero,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                _buildBreadcrumbs(theme, settings),
-                const SizedBox(height: 16),
-                Expanded(
-                  child: _buildSelectionView(theme, settings),
-                ),
-              ],
+                  const SizedBox(height: 20),
+                  _buildBreadcrumbs(theme, settings),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: _buildSelectionView(theme, settings),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }

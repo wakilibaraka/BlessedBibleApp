@@ -13,6 +13,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
+import 'main_nav_screen.dart' show kBottomDockHeight, kBottomDockInset;
+
 import '../../data/models/bible_model.dart';
 import '../../state/bible_provider.dart';
 
@@ -42,7 +44,6 @@ import '../../state/read_selection_provider.dart';
 import '../../state/commentary_provider.dart';
 import '../../state/read_location_provider.dart';
 import '../widgets/textured_glass_container.dart';
-import '../widgets/bouncy_entrance.dart';
 
 import '../../state/translation_provider.dart';
 import '../../theme/reading_tokens.dart';
@@ -400,9 +401,14 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   void _showTypographyBottomSheet() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       isScrollControlled: true,
       useRootNavigator: true,
+      useSafeArea: true,
+      showDragHandle: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
       builder: (context) => const _TypographyBottomSheet(),
     );
   }
@@ -523,16 +529,15 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         mainAxisSize: MainAxisSize.min,
         children: [
           Flexible(
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 160),
-                child: Text(
-                  '$currentBookName $currentChapter',
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: tokens.readingInk,
-                  ),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 160),
+              child: Text(
+                '$currentBookName $currentChapter',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: tokens.readingInk,
                 ),
               ),
             ),
@@ -578,6 +583,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                 tokens,
                 Text(
                   activeTransLabel,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w700,
                     color: tokens.readingInk,
@@ -619,11 +626,15 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
             ),
             _showTypographyBottomSheet);
 
-    return SizedBox(
-      height: 48,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(
+        textScaler: MediaQuery.textScalerOf(context).clamp(minScaleFactor: 1.0, maxScaleFactor: 1.3),
+      ),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 48),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
           Align(
             alignment: Alignment.centerLeft,
             child: leadingButton,
@@ -637,6 +648,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
             child: trailingButton,
           ),
         ],
+      ),
       ),
     );
   }
@@ -1127,29 +1139,19 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                             maxWidth: 800),
                                                     child: Builder(
                                                         builder: (context) {
+                                                      final double chromeScale = MediaQuery.textScalerOf(context).clamp(minScaleFactor: 1.0, maxScaleFactor: 1.3).scale(1.0);
+                                                      final double dynamicTopBarHeight = 48.0 * chromeScale;
+                                                      final double dynamicBottomDockHeight = kBottomDockHeight * chromeScale;
+                                                      
                                                       final listPadding = EdgeInsets.only(
-                                                          top:
-                                                              MediaQuery.of(context).padding.top +
-                                                                  80.0,
+                                                          top: MediaQuery.viewPaddingOf(context).top + dynamicTopBarHeight + 32.0,
                                                           left: math.max(
-                                                              MediaQuery.of(context)
-                                                                  .padding
-                                                                  .left,
-                                                              MediaQuery.of(context)
-                                                                      .size
-                                                                      .width *
-                                                                  (typography.marginPercent /
-                                                                      100.0)),
+                                                              MediaQuery.viewPaddingOf(context).left,
+                                                              MediaQuery.sizeOf(context).width * (typography.marginPercent / 100.0)),
                                                           right: math.max(
-                                                              MediaQuery.of(context)
-                                                                  .padding
-                                                                  .right,
-                                                              MediaQuery.of(context)
-                                                                      .size
-                                                                      .width *
-                                                                  (typography.marginPercent /
-                                                                      100.0)),
-                                                          bottom: MediaQuery.of(context).padding.bottom + 80.0);
+                                                              MediaQuery.viewPaddingOf(context).right,
+                                                              MediaQuery.sizeOf(context).width * (typography.marginPercent / 100.0)),
+                                                          bottom: MediaQuery.viewPaddingOf(context).bottom + dynamicBottomDockHeight + kBottomDockInset + 24.0);
 
                                                       Widget buildVerseItem(
                                                           BuildContext context,
@@ -2004,6 +2006,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     final tokens = theme.extension<ReadingTokens>();
     final fontStyle = theme.textTheme.bodyMedium?.copyWith(
           fontFamily: typography.fontFamily,
+          fontStyle: typography.fontStyle,
           fontSize: typography.fontSize,
           height: typography.lineHeight,
           letterSpacing: 0.15,
@@ -2491,46 +2494,27 @@ class _TypographyBottomSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final handlebarColor = theme.colorScheme.onSurface.withValues(alpha: 0.2);
 
-    return BouncyEntrance(
-      delay: const Duration(milliseconds: 50),
-      child: FractionallySizedBox(
-        heightFactor: 0.75,
-        child: TexturedGlassContainer(
-          sigmaX: 45.0,
-          sigmaY: 45.0,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-          padding: EdgeInsets.zero,
-          child: SafeArea(
-            top: false,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(20.0, 16.0, 20.0, 16.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 36,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: handlebarColor,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  Text(
-                    'Typography',
-                    style: theme.textTheme.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
-                  const TypographyControls(),
-                ],
+    return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.8,
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20.0, 16.0, 20.0, 0.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Typography',
+                style: theme.textTheme.titleMedium
+                    ?.copyWith(fontWeight: FontWeight.bold),
               ),
-            ),
+              const SizedBox(height: 12),
+              const Expanded(child: TypographyControls()),
+            ],
           ),
         ),
       ),

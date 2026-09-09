@@ -790,6 +790,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
       height: 1.5,
       fontSize: resultFontSize,
       fontFamily: typography.fontFamily,
+      fontStyle: typography.fontStyle,
     );
 
     if (query.isEmpty) {

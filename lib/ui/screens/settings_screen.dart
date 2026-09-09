@@ -150,8 +150,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               subtitle: 'Control how far up the book/chapter sheet opens',
               selectedValue: selectorHeight,
               options: const [
-                MapEntry(SelectorHeight.quarter, 'Quarter'),
-                MapEntry(SelectorHeight.half, 'Half'),
+                MapEntry(SelectorHeight.quarter, 'Half'),
+                MapEntry(SelectorHeight.half, '3/4'),
                 MapEntry(SelectorHeight.full, 'Full'),
               ],
               onChanged: (val) {

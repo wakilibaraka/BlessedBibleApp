@@ -149,15 +149,17 @@ class MainNavScreen extends ConsumerWidget {
                 final double availableWidth = rawWidth > 0 ? rawWidth : 360.0;
                 final double maxDockWidth = 450.0;
                 final double dockMaxWidth = math.max(250.0,
-                    math.min(maxDockWidth, availableWidth - 40 - 72 - 16));
-                final double totalExpandedWidth = dockMaxWidth + 12.0 + 72.0;
+                    math.min(maxDockWidth, availableWidth - 40 - kBottomDockHeight - 16));
+                final double totalExpandedWidth = dockMaxWidth + 12.0 + kBottomDockHeight;
                 final double rightOffset =
                     math.max(20.0, (availableWidth - totalExpandedWidth) / 2);
+                final double clampedScale = MediaQuery.textScalerOf(context).clamp(minScaleFactor: 1.0, maxScaleFactor: 1.3).scale(1.0);
+                final double dynamicDockHeight = kBottomDockHeight * clampedScale;
                 final double height = (currentIndex == 1 &&
                         selectedVerses.isNotEmpty &&
                         style != VerseActionStyle.horizontal)
                     ? 420.0
-                    : 72.0;
+                    : dynamicDockHeight;
 
                 return SizedBox(
                   height: height + (kBottomDockInset * 2),
@@ -722,10 +724,12 @@ class MainNavScreen extends ConsumerWidget {
         },
         onLongPress: isAction ? onActionLongPress : null,
         behavior: HitTestBehavior.opaque,
-        child: SizedBox(
-          height: double.infinity,
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
+        child: MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: MediaQuery.textScalerOf(context).clamp(minScaleFactor: 1.0, maxScaleFactor: 1.3),
+          ),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 4),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
@@ -752,6 +756,9 @@ class MainNavScreen extends ConsumerWidget {
                   child: Text(
                     currentLabel,
                     key: ValueKey(currentLabel),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.labelSmall?.copyWith(
                       fontFamily: 'Inter',
                       color: currentColor,
@@ -979,16 +986,19 @@ class MainNavScreen extends ConsumerWidget {
     final bookName = readLoc.bookName;
     final actionIconColor = theme.colorScheme.onSurface.withValues(alpha: 0.4);
 
-    return SafeArea(
-      bottom: true,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 24.0),
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          child: Row(
-            key: const ValueKey('unified_tabs'),
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double hPad = constraints.maxWidth < 280 ? 8.0 : 24.0;
+        return SafeArea(
+          bottom: true,
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: hPad),
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              child: Row(
+                key: const ValueKey('unified_tabs'),
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
               _buildMorphingSlot(
                 context,
                 ref,
@@ -1082,6 +1092,8 @@ class MainNavScreen extends ConsumerWidget {
         ),
       ),
     );
+      },
+    );
   }
 
   Widget _buildGlassWrapper(
@@ -1111,7 +1123,7 @@ class MainNavScreen extends ConsumerWidget {
         );
       },
       child: Container(
-        height: kBottomDockHeight,
+        constraints: const BoxConstraints(minHeight: kBottomDockHeight),
         width: dockMaxWidth,
         alignment: Alignment.centerRight,
         child: SizedBox(
@@ -1179,8 +1191,8 @@ class MainNavScreen extends ConsumerWidget {
 
   Widget _buildRaindropColorRow(
       BuildContext context, WidgetRef ref, ThemeData theme) {
-    return SizedBox(
-      height: kBottomDockHeight,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: kBottomDockHeight),
       child: Center(
         child: _buildColorDotRow(context, ref),
       ),

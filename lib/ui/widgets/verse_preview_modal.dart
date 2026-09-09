@@ -83,6 +83,7 @@ class VersePreviewModal extends ConsumerWidget {
                         color: theme.primaryColor,
                         fontWeight: FontWeight.bold,
                         fontFamily: typography.fontFamily,
+                        fontStyle: typography.fontStyle,
                       ),
                     ),
                   ),
@@ -109,6 +110,7 @@ class VersePreviewModal extends ConsumerWidget {
                   verseText,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontFamily: typography.fontFamily,
+                    fontStyle: typography.fontStyle,
                     fontSize: typography.fontSize,
                     height: 1.6,
                     color: theme.textTheme.bodyLarge?.color,

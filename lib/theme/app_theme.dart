@@ -551,4 +551,34 @@ extension PaperlikeTransform on ThemeData {
       extensions: [newTokens],
     );
   }
+
+  ThemeData applyFreshPaperlike() {
+    final tokens = extension<ReadingTokens>();
+    if (tokens == null) return this;
+
+    const warmPaper = AppColors.warmGoldBackground;
+    const warmSurface = AppColors.warmGoldSurface;
+    const deepInk = AppColors.warmGoldTextPrimary;
+    const goldAccent = AppColors.warmGoldAccent;
+    const mutedInk = AppColors.sepiaTextPrimary;
+
+    final newTokens = tokens.copyWith(
+      readingPaper: warmPaper,
+      readingSurface: warmSurface,
+      readingInk: deepInk,
+      readingInkMuted: mutedInk,
+      readingBorder: AppColors.warmGoldAccent.withValues(alpha: 0.2),
+    );
+
+    return copyWith(
+      scaffoldBackgroundColor: warmPaper,
+      canvasColor: warmSurface,
+      colorScheme: colorScheme.copyWith(
+        surface: warmSurface,
+        onSurface: deepInk,
+        primary: goldAccent,
+      ),
+      extensions: [newTokens],
+    );
+  }
 }

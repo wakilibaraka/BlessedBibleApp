@@ -757,7 +757,8 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                               ),
                               child: Builder(builder: (ctx) {
                                 final fontStyle = TextStyle(
-                                  fontFamily: 'EB Garamond',
+                                  fontFamily: typography.fontFamily,
+                                  fontStyle: typography.fontStyle,
                                   fontSize: typography.fontSize,
                                   height: typography.lineHeight,
                                   letterSpacing: 0.15,

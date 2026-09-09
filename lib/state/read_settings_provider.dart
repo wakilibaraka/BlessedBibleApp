@@ -38,6 +38,8 @@ class ReadSettingsState {
     this.defaultStartTab = 0,
     this.readingLayout = ReadingLayout.single,
     this.fabLongPressToNav = true,
+    // Note: SelectorHeight.half currently maps to initialChildSize 0.75 (labeled "3/4" in UI)
+    // Quarter maps to 0.5 ("Half") and Full maps to 1.0. 
     this.selectorHeight = SelectorHeight.half,
     this.syncSavedItemsLanguage = true,
     this.showChipsOnSavedItems = false,
@@ -137,6 +139,7 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
       );
     }
 
+    // Default to 'half', which maps to 0.75 (3/4) height in the UI
     SelectorHeight selectorHeight = SelectorHeight.half;
     if (selectorHeightString != null) {
       selectorHeight = SelectorHeight.values.firstWhere(

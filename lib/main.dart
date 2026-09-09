@@ -114,7 +114,9 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
                             ? AppTheme.scarletRedTheme(14.0)
                             : themeMode == AppThemeMode.sepia
                                 ? AppTheme.sepiaTheme(14.0)
-                                : AppTheme.lightTheme(14.0);
+                                : themeMode == AppThemeMode.automatic
+                                    ? AppTheme.freshTheme(14.0)
+                                    : AppTheme.lightTheme(14.0);
 
     ThemeData darkBase = themeMode == AppThemeMode.dawn
         ? AppTheme.dawnTheme(14.0)
@@ -122,15 +124,27 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
             ? AppTheme.duskTheme(14.0)
             : themeMode == AppThemeMode.fresh
                 ? AppTheme.freshTheme(14.0)
-                : AppTheme.darkTheme(14.0,
-                    isAmoled: themeMode == AppThemeMode.oled);
-
-    if (surfaceStyle == SurfaceStyle.paperlike) {
-      lightBase = lightBase.applyPaperlike();
-      darkBase = darkBase.applyPaperlike();
-    }
+                : themeMode == AppThemeMode.automatic
+                    ? AppTheme.duskTheme(14.0)
+                    : AppTheme.darkTheme(14.0,
+                        isAmoled: themeMode == AppThemeMode.oled);
 
     final prefsService = ref.watch(preferencesProvider);
+    final hasExplicitSurface = prefsService.prefs.containsKey('app_surface_style');
+    final applyPaperlikeToLight = surfaceStyle == SurfaceStyle.paperlike;
+    final applyPaperlikeToDark = surfaceStyle == SurfaceStyle.paperlike || 
+                                (themeMode == AppThemeMode.automatic && !hasExplicitSurface);
+
+    if (applyPaperlikeToLight) {
+      lightBase = lightBase.applyPaperlike();
+    }
+    
+    if (applyPaperlikeToDark) {
+      darkBase = themeMode == AppThemeMode.fresh
+          ? darkBase.applyFreshPaperlike()
+          : darkBase.applyPaperlike();
+    }
+
     final hasCompletedOnboarding = prefsService.hasCompletedOnboarding();
 
     return MaterialApp(
