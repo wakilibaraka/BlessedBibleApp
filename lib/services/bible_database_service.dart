@@ -24,7 +24,7 @@ class BibleDatabaseService {
 
     final prefs = await SharedPreferences.getInstance();
     final currentDbVersion = prefs.getInt('db_version') ?? 1;
-    const requiredDbVersion = 5;
+    const requiredDbVersion = 6;
 
     final dbFile = File(dbPath);
     final backupFile = File(backupPath);

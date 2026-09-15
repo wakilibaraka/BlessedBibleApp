@@ -5,7 +5,6 @@ import '../data/models/bible_model.dart';
 import '../utils/isolate_parsers.dart';
 import '../utils/startup_stopwatch.dart'; // For startupStopwatch
 import '../services/bible_database_service.dart';
-import '../data/importers/web_bbe_importer.dart';
 
 class BibleState {
   final bool isLoading;
@@ -54,8 +53,6 @@ class BibleNotifier extends Notifier<BibleState> {
       if (kStartupTrace) {
       }
       
-      // One-time run to repair WEB and add BBE
-      await WebBbeImporter.importData();
 
       state = state.copyWith(isLoading: false, books: booksList);
     } catch (e) {
