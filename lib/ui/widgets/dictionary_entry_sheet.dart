@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/dictionary_provider.dart';
+import '../../state/typography_provider.dart';
 
 class DictionaryEntrySheet extends ConsumerWidget {
   final String normalizedWord;
@@ -12,6 +13,7 @@ class DictionaryEntrySheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final definitionsAsync = ref.watch(dictionaryDefinitionProvider(normalizedWord));
+    final typography = ref.watch(typographyProvider);
 
     return Container(
       constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.85),
@@ -77,7 +79,7 @@ class DictionaryEntrySheet extends ConsumerWidget {
                     ),
                     itemBuilder: (context, index) {
                       final def = defs[index];
-                      return _buildDefinitionBlock(context, ref, def, theme);
+                      return _buildDefinitionBlock(context, ref, def, theme, typography);
                     },
                   );
                 },
@@ -94,7 +96,7 @@ class DictionaryEntrySheet extends ConsumerWidget {
     );
   }
 
-  Widget _buildDefinitionBlock(BuildContext context, WidgetRef ref, DictionaryDefinition def, ThemeData theme) {
+  Widget _buildDefinitionBlock(BuildContext context, WidgetRef ref, DictionaryDefinition def, ThemeData theme, TypographyState typography) {
     // Break into paragraphs
     final paragraphs = def.definition.split(RegExp(r'\\n+'));
     
@@ -125,7 +127,8 @@ class DictionaryEntrySheet extends ConsumerWidget {
               text: TextSpan(
                 style: theme.textTheme.bodyMedium?.copyWith(
                   height: 1.6,
-                  fontSize: 16,
+                  fontSize: typography.fontSize,
+                  fontFamily: typography.fontFamily,
                   color: theme.colorScheme.onSurface,
                 ),
                 children: _parseRichText(p, theme),
