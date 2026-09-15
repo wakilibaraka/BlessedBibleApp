@@ -17,6 +17,7 @@ import 'main_nav_screen.dart' show kBottomDockHeight, kBottomDockInset;
 
 import '../../data/models/bible_model.dart';
 import '../../state/bible_provider.dart';
+import '../../state/dictionary_provider.dart';
 
 import '../../state/read_settings_provider.dart';
 import '../../state/surface_style_provider.dart';
@@ -169,6 +170,94 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   int _currentPageIndex = 0;
   final Map<int, ItemScrollController> _itemScrollControllers = {};
   final Map<int, ItemPositionsListener> _itemPositionsListeners = {};
+  final Map<String, List<TapGestureRecognizer>> _dictRecognizers = {};
+
+  void _showDictionaryPopover(String normalizedWord) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) {
+        return Consumer(builder: (context, ref, _) {
+          final defsAsync = ref.watch(dictionaryDefinitionProvider(normalizedWord));
+          
+          return Container(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.sizeOf(context).height * 0.5,
+            ),
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            padding: const EdgeInsets.all(20),
+            child: defsAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, st) => const Center(child: Text('Error loading definition.')),
+              data: (defs) {
+                if (defs.isEmpty) {
+                  return const Center(child: Text('Definition not found.'));
+                }
+                
+                final displayWord = defs.first.displayHeadword;
+                
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        margin: const EdgeInsets.only(bottom: 20),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withValues(alpha: 0.3),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    Text(
+                      displayWord,
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 16),
+                    Expanded(
+                      child: ListView.separated(
+                        itemCount: defs.length,
+                        separatorBuilder: (_, __) => const Divider(height: 32),
+                        itemBuilder: (context, index) {
+                          final def = defs[index];
+                          final sourceName = def.source == 'easton' ? "Easton's" : "Smith's";
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                sourceName,
+                                style: TextStyle(
+                                  color: Theme.of(context).primaryColor,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12,
+                                  letterSpacing: 1.0,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                def.definition,
+                                style: const TextStyle(fontSize: 16, height: 1.5),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          );
+        });
+      },
+    );
+  }
+
   int? _navigatedVerseIndex;
   Timer? _scrollDebounceTimer;
   Timer? _visitTimer;
@@ -326,6 +415,13 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     _pageDebounceTimer?.cancel();
 
     _isScrolling.dispose();
+
+    for (final list in _dictRecognizers.values) {
+      for (final r in list) {
+        r.dispose();
+      }
+    }
+    _dictRecognizers.clear();
     _pageController.dispose();
     WidgetsBinding.instance.removeObserver(this);
     WakelockPlus.disable(); // Release wakelock
@@ -705,7 +801,14 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         _hasInitialJumped = true;
         _currentPageIndex = safeTarget;
         if (!_pageController.hasClients) {
-          _pageController.dispose();
+      
+    for (final list in _dictRecognizers.values) {
+      for (final r in list) {
+        r.dispose();
+      }
+    }
+    _dictRecognizers.clear();
+    _pageController.dispose();
           _pageController = PageController(initialPage: safeTarget);
         } else {
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -1087,52 +1190,28 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                 }
                                                 return false;
                                               },
-                                              child: Directionality(
-                                                textDirection: () {
-                                                  final availableTrans = ref
-                                                          .watch(
-                                                              availableTranslationsProvider)
-                                                          .value ??
-                                                      [];
-                                                  final activeTransId = ref.watch(
-                                                      activeTranslationProvider);
-                                                  final transInfo =
-                                                      availableTrans.firstWhere(
-                                                          (t) =>
-                                                              t.translationId ==
-                                                              activeTransId,
-                                                          orElse: () => availableTrans
-                                                                  .isNotEmpty
-                                                              ? availableTrans
-                                                                  .first
-                                                              : TranslationInfo(
-                                                                  translationId:
-                                                                      'kjv',
-                                                                  languageCode:
-                                                                      'en',
-                                                                  languageName:
-                                                                      'English',
-                                                                  translationName:
-                                                                      'King James Version',
-                                                                  abbreviation:
-                                                                      'KJV',
-                                                                  license:
-                                                                      'Public Domain',
-                                                                  isComplete:
-                                                                      true,
-                                                                ));
-                                                  final isRtl = [
-                                                    'ar',
-                                                    'he',
-                                                    'fa',
-                                                    'ur'
-                                                  ].contains(
-                                                      transInfo.languageCode);
-                                                  return isRtl
-                                                      ? TextDirection.rtl
-                                                      : TextDirection.ltr;
-                                                }(),
-                                                child: Center(
+                                              child: Builder(
+                                                builder: (context) {
+                                                  final availableTrans = ref.watch(availableTranslationsProvider).value ?? [];
+                                                  final activeTransId = ref.watch(activeTranslationProvider);
+                                                  final transInfo = availableTrans.firstWhere(
+                                                    (t) => t.translationId == activeTransId,
+                                                    orElse: () => availableTrans.isNotEmpty
+                                                        ? availableTrans.first
+                                                        : TranslationInfo(
+                                                            translationId: 'kjv',
+                                                            languageCode: 'en',
+                                                            languageName: 'English',
+                                                            translationName: 'King James Version',
+                                                            abbreviation: 'KJV',
+                                                            license: 'Public Domain',
+                                                            isComplete: true,
+                                                          ));
+                                                  final isRtl = ['ar', 'he', 'fa', 'ur'].contains(transInfo.languageCode);
+                                                  
+                                                  return Directionality(
+                                                    textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
+                                                    child: Center(
                                                   child: ConstrainedBox(
                                                     constraints:
                                                         const BoxConstraints(
@@ -1156,6 +1235,17 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                       Widget buildVerseItem(
                                                           BuildContext context,
                                                           int index) {
+                                                        final isEnglish = transInfo.languageCode == 'en';
+                                                        final chapterDictMap = ref.watch(
+                                                          chapterUnderlineMapProvider(
+                                                            ChapterUnderlineArgs(
+                                                              bookNumber: allBooks.indexOf(fc.book) + 1,
+                                                              chapterNumber: fc.chapter.number,
+                                                              verses: verses,
+                                                              isEnglish: isEnglish,
+                                                            )
+                                                          )
+                                                        );
                                                         if (index ==
                                                             verses.length) {
                                                           bool
@@ -1348,6 +1438,14 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                           .isRedLetterEnabled,
                                                                   isSelectionMode:
                                                                       _isPageSelectionMode,
+                                                                  dictTokens:
+                                                                      chapterDictMap[
+                                                                          verse
+                                                                              .number],
+                                                                  onDictTap:
+                                                                      _isPageSelectionMode
+                                                                          ? null
+                                                                          : _showDictionaryPopover,
                                                                 );
 
                                                                 return GestureDetector(
@@ -1516,7 +1614,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                     }), // end Builder
                                                   ), // end ConstrainedBox
                                                 ), // end Center
-                                              ), // end Directionality
+                                              ); // end Directionality
+                                              }), // end outer Builder
                                             ), // end NotificationListener
                                           ), // end GestureDetector
                                         ), // end RepaintBoundary
@@ -1673,7 +1772,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       VoidCallback? onCommentaryTap,
       bool isBookmarked = false,
       bool isRedLetterEnabled = true,
-      bool isSelectionMode = false}) {
+      bool isSelectionMode = false,
+      Set<int>? dictTokens,
+      void Function(String word)? onDictTap}) {
     final activeTrans = ref.read(activeTranslationProvider);
     final secondaryTrans = ref.read(secondaryTranslationProvider);
 
@@ -1689,7 +1790,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       isSelectionMode: isSelectionMode,
       translationId: activeTrans,
       bookNumber: bookNumber,
-      chapterNumber: chapterNumber
+      chapterNumber: chapterNumber,
+      dictTokens: dictTokens,
+      onDictTap: onDictTap,
     );
 
     if (secondaryVerse == null || layout == ReadingLayout.single) {
@@ -2002,7 +2105,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       bool isSelectionMode = false,
       String? translationId,
       int? bookNumber,
-      int? chapterNumber}) {
+      int? chapterNumber,
+      Set<int>? dictTokens,
+      void Function(String word)? onDictTap}) {
     final tokens = theme.extension<ReadingTokens>();
     final fontStyle = theme.textTheme.bodyMedium?.copyWith(
           fontFamily: typography.fontFamily,
@@ -2050,33 +2155,89 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     List<TextSpan> textSpans = [];
     String text = verse.text;
     int currentIndex = 0;
+    int globalTokenIndex = 0;
+    
+    final String verseKey = '${bookNumber}_${chapterNumber}_${verse.number}';
+    final List<TapGestureRecognizer> localRecognizers = [];
+
+    void processChunk(String chunk, TextStyle style) {
+      if (dictTokens == null || dictTokens.isEmpty) {
+        textSpans.add(TextSpan(text: chunk, style: style));
+        final matches = RegExp(r'[a-zA-Z]+').allMatches(chunk);
+        globalTokenIndex += matches.length;
+        return;
+      }
+
+      final matches = RegExp(r'[a-zA-Z]+').allMatches(chunk);
+      int lastMatchEnd = 0;
+      
+      for (final match in matches) {
+        if (match.start > lastMatchEnd) {
+          textSpans.add(TextSpan(text: chunk.substring(lastMatchEnd, match.start), style: style));
+        }
+        
+        final word = match.group(0)!;
+        final isUnderlined = dictTokens.contains(globalTokenIndex);
+        
+        if (isUnderlined) {
+          final tapGesture = TapGestureRecognizer()..onTap = () {
+            onDictTap?.call(word.toLowerCase());
+          };
+          localRecognizers.add(tapGesture);
+          
+          textSpans.add(TextSpan(
+            text: word,
+            style: style.copyWith(
+              decoration: TextDecoration.underline,
+              decorationStyle: TextDecorationStyle.dotted,
+              decorationColor: theme.primaryColor,
+            ),
+            recognizer: tapGesture,
+          ));
+        } else {
+          textSpans.add(TextSpan(text: word, style: style));
+        }
+        
+        globalTokenIndex++;
+        lastMatchEnd = match.end;
+      }
+      
+      if (lastMatchEnd < chunk.length) {
+        textSpans.add(TextSpan(text: chunk.substring(lastMatchEnd), style: style));
+      }
+    }
 
     while (currentIndex < text.length) {
       int startIndex = text.indexOf('‹', currentIndex);
       if (startIndex == -1) {
-        textSpans.add(
-            TextSpan(text: text.substring(currentIndex), style: fontStyle));
+        processChunk(text.substring(currentIndex), fontStyle);
         break;
       }
 
       if (startIndex > currentIndex) {
-        textSpans.add(TextSpan(
-            text: text.substring(currentIndex, startIndex), style: fontStyle));
+        processChunk(text.substring(currentIndex, startIndex), fontStyle);
       }
 
       int endIndex = text.indexOf('›', startIndex + 1);
       if (endIndex == -1) {
-        textSpans.add(TextSpan(
-            text: text.substring(startIndex + 1),
-            style: isRedLetterEnabled ? redLetterStyle : fontStyle));
+        processChunk(text.substring(startIndex + 1), isRedLetterEnabled ? redLetterStyle : fontStyle);
         break;
       }
 
-      textSpans.add(TextSpan(
-          text: text.substring(startIndex + 1, endIndex),
-          style: isRedLetterEnabled ? redLetterStyle : fontStyle));
-
+      processChunk(text.substring(startIndex + 1, endIndex), isRedLetterEnabled ? redLetterStyle : fontStyle);
       currentIndex = endIndex + 1;
+    }
+
+    if (localRecognizers.isNotEmpty) {
+      final oldRecognizers = _dictRecognizers[verseKey];
+      if (oldRecognizers != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          for (final r in oldRecognizers) {
+            r.dispose();
+          }
+        });
+      }
+      _dictRecognizers[verseKey] = localRecognizers;
     }
 
     final textAlign = () {

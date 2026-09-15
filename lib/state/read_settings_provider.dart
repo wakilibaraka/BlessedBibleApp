@@ -10,6 +10,8 @@ enum ReadingLayout { single, interleaved, sideBySide, chips }
 
 enum SelectorHeight { quarter, half, full }
 
+enum DictionaryScope { term, termAndTricky, everything }
+
 class ReadSettingsState {
   final ReadingViewMode readingViewMode;
   final bool isGlowEnabled;
@@ -25,6 +27,8 @@ class ReadSettingsState {
   final SelectorHeight selectorHeight;
   final bool syncSavedItemsLanguage;
   final bool showChipsOnSavedItems;
+  final bool dictionaryUnderlinesEnabled;
+  final DictionaryScope dictionaryScope;
 
   const ReadSettingsState({
     this.readingViewMode = ReadingViewMode.pinned,
@@ -43,6 +47,8 @@ class ReadSettingsState {
     this.selectorHeight = SelectorHeight.half,
     this.syncSavedItemsLanguage = true,
     this.showChipsOnSavedItems = false,
+    this.dictionaryUnderlinesEnabled = true,
+    this.dictionaryScope = DictionaryScope.termAndTricky,
   });
 
   ReadSettingsState copyWith({
@@ -60,6 +66,8 @@ class ReadSettingsState {
     SelectorHeight? selectorHeight,
     bool? syncSavedItemsLanguage,
     bool? showChipsOnSavedItems,
+    bool? dictionaryUnderlinesEnabled,
+    DictionaryScope? dictionaryScope,
   }) {
     return ReadSettingsState(
       readingViewMode: readingViewMode ?? this.readingViewMode,
@@ -77,6 +85,8 @@ class ReadSettingsState {
       selectorHeight: selectorHeight ?? this.selectorHeight,
       syncSavedItemsLanguage: syncSavedItemsLanguage ?? this.syncSavedItemsLanguage,
       showChipsOnSavedItems: showChipsOnSavedItems ?? this.showChipsOnSavedItems,
+      dictionaryUnderlinesEnabled: dictionaryUnderlinesEnabled ?? this.dictionaryUnderlinesEnabled,
+      dictionaryScope: dictionaryScope ?? this.dictionaryScope,
     );
   }
 }
@@ -113,6 +123,15 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     final selectorHeightString = prefs.getString(_selectorHeightKey);
     final syncSavedItemsLanguage = prefs.getBool('sync_saved_items_language') ?? true;
     final showChipsOnSavedItems = prefs.getBool('show_chips_on_saved_items') ?? false;
+    final dictionaryUnderlinesEnabled = prefs.getBool('dictionaryUnderlinesEnabled') ?? true;
+    final dictScopeString = prefs.getString('dictionaryScope');
+    DictionaryScope dictScope = DictionaryScope.termAndTricky;
+    if (dictScopeString != null) {
+      dictScope = DictionaryScope.values.firstWhere(
+        (e) => e.name == dictScopeString,
+        orElse: () => DictionaryScope.termAndTricky,
+      );
+    }
 
     ReadingViewMode mode = ReadingViewMode.pinned;
     if (modeString != null) {
@@ -163,6 +182,8 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
       selectorHeight: selectorHeight,
       syncSavedItemsLanguage: syncSavedItemsLanguage,
       showChipsOnSavedItems: showChipsOnSavedItems,
+      dictionaryUnderlinesEnabled: dictionaryUnderlinesEnabled,
+      dictionaryScope: dictScope,
     );
   }
 
@@ -251,6 +272,19 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     state = state.copyWith(syncSavedItemsLanguage: value);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('sync_saved_items_language', value);
+  }
+
+
+  Future<void> setDictionaryUnderlinesEnabled(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('dictionaryUnderlinesEnabled', value);
+    state = state.copyWith(dictionaryUnderlinesEnabled: value);
+  }
+
+  Future<void> setDictionaryScope(DictionaryScope scope) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('dictionaryScope', scope.name);
+    state = state.copyWith(dictionaryScope: scope);
   }
 
   Future<void> setShowChipsOnSavedItems(bool value) async {

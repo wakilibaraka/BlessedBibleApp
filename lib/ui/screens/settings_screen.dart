@@ -370,6 +370,78 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           }),
         ],
       ),
+
+      SettingsPillCard(
+        children: [
+          Consumer(builder: (context, ref, _) {
+            final isEnabled = ref.watch(
+                readSettingsProvider.select((s) => s.dictionaryUnderlinesEnabled));
+            return SwitchListTile(
+              title: const Text('Dictionary Underlines'),
+              subtitle: const Text('Dotted underlines on biblical terms and archaic words'),
+              value: isEnabled,
+              onChanged: (val) {
+                HapticFeedback.selectionClick();
+                ref
+                    .read(readSettingsProvider.notifier)
+                    .setDictionaryUnderlinesEnabled(val);
+              },
+            );
+          }),
+          const Divider(height: 1, indent: 16),
+          Consumer(builder: (context, ref, _) {
+            final scope = ref.watch(
+                readSettingsProvider.select((s) => s.dictionaryScope));
+            final isEnabled = ref.watch(
+                readSettingsProvider.select((s) => s.dictionaryUnderlinesEnabled));
+            
+            if (!isEnabled) return const SizedBox.shrink();
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
+                  child: Text('Underline Scope', style: TextStyle(fontSize: 16)),
+                ),
+                _buildDictScopeTile(
+                  context,
+                  title: 'Names & terms only',
+                  subtitle: 'Proper nouns and specific biblical concepts',
+                  value: DictionaryScope.term,
+                  groupValue: scope,
+                  onTap: (val) {
+                    HapticFeedback.selectionClick();
+                    ref.read(readSettingsProvider.notifier).setDictionaryScope(val);
+                  },
+                ),
+                _buildDictScopeTile(
+                  context,
+                  title: 'Names + tricky words (Recommended)',
+                  subtitle: 'Includes archaic words with changed meanings (e.g., let, prevent)',
+                  value: DictionaryScope.termAndTricky,
+                  groupValue: scope,
+                  onTap: (val) {
+                    HapticFeedback.selectionClick();
+                    ref.read(readSettingsProvider.notifier).setDictionaryScope(val);
+                  },
+                ),
+                _buildDictScopeTile(
+                  context,
+                  title: 'Everything',
+                  subtitle: 'Highlights all archaic grammar (e.g., thee, thou, hath, unto)',
+                  value: DictionaryScope.everything,
+                  groupValue: scope,
+                  onTap: (val) {
+                    HapticFeedback.selectionClick();
+                    ref.read(readSettingsProvider.notifier).setDictionaryScope(val);
+                  },
+                ),
+              ],
+            );
+          }),
+        ],
+      ),
       SettingsPillCard(
         children: [
           Consumer(builder: (context, ref, _) {
@@ -1033,6 +1105,50 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
         notifier.setSabbathLocation(name, lat, lng);
         Navigator.pop(context);
       },
+    );
+  }
+
+
+  Widget _buildDictScopeTile(
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required DictionaryScope value,
+    required DictionaryScope groupValue,
+    required ValueChanged<DictionaryScope> onTap,
+  }) {
+    final theme = Theme.of(context);
+    final isSelected = value == groupValue;
+    return InkWell(
+      onTap: () => onTap(value),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        color: isSelected
+            ? theme.primaryColor.withValues(alpha: 0.05)
+            : Colors.transparent,
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title,
+                      style: theme.textTheme.titleSmall
+                          ?.copyWith(fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 4),
+                  Text(subtitle,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.7))),
+                ],
+              ),
+            ),
+            if (isSelected)
+              Icon(Icons.check_circle_rounded,
+                  color: theme.primaryColor, size: 20),
+          ],
+        ),
+      ),
     );
   }
 

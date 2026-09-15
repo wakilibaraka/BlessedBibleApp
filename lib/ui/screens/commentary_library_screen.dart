@@ -25,9 +25,20 @@ class CommentaryLibraryScreen extends ConsumerWidget {
       covered.putIfAbsent(book, () => {}).add(chapter);
     }
 
-    // Canonical display order
-    const bookOrder = ['Daniel', 'Hebrews', 'Revelation'];
-    final books = bookOrder.where(covered.containsKey).toList();
+    const canonicalOrder = [
+      'Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy', 'Joshua', 'Judges', 'Ruth', '1 Samuel', '2 Samuel',
+      '1 Kings', '2 Kings', '1 Chronicles', '2 Chronicles', 'Ezra', 'Nehemiah', 'Esther', 'Job', 'Psalms', 'Proverbs',
+      'Ecclesiastes', 'Song of Solomon', 'Isaiah', 'Jeremiah', 'Lamentations', 'Ezekiel', 'Daniel', 'Hosea', 'Joel',
+      'Amos', 'Obadiah', 'Jonah', 'Micah', 'Nahum', 'Habakkuk', 'Zephaniah', 'Haggai', 'Zechariah', 'Malachi',
+      'Matthew', 'Mark', 'Luke', 'John', 'Acts', 'Romans', '1 Corinthians', '2 Corinthians', 'Galatians',
+      'Ephesians', 'Philippians', 'Colossians', '1 Thessalonians', '2 Thessalonians', '1 Timothy', '2 Timothy',
+      'Titus', 'Philemon', 'Hebrews', 'James', '1 Peter', '2 Peter', '1 John', '2 John', '3 John', 'Jude', 'Revelation',
+    ];
+
+    final availableBooks = canonicalOrder.where(covered.containsKey).toList();
+    
+    final otBooks = availableBooks.where((b) => canonicalOrder.indexOf(b) < 39).toList();
+    final ntBooks = availableBooks.where((b) => canonicalOrder.indexOf(b) >= 39).toList();
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -56,7 +67,7 @@ class CommentaryLibraryScreen extends ConsumerWidget {
           ),
         ),
       ),
-      body: books.isEmpty
+      body: availableBooks.isEmpty
           ? Center(
               child: Padding(
                 padding: const EdgeInsets.all(32),
@@ -69,29 +80,65 @@ class CommentaryLibraryScreen extends ConsumerWidget {
                 ),
               ),
             )
-          : ListView.separated(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              separatorBuilder: (_, __) => Divider(
-                indent: 20,
-                endIndent: 20,
-                color: theme.dividerColor.withValues(alpha: 0.25),
-              ),
-              itemCount: books.length,
-              itemBuilder: (context, bookIndex) {
-                final book = books[bookIndex];
-                final chapters = (covered[book]!.toList()..sort());
-                return _BookSection(
-                  book: book,
-                  chapters: chapters,
-                  theme: theme,
-                );
-              },
+          : CustomScrollView(
+              slivers: [
+                if (otBooks.isNotEmpty)
+                  _buildSectionHeader(context, 'Old Testament'),
+                if (otBooks.isNotEmpty)
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final book = otBooks[index];
+                        return _BookSection(
+                          book: book,
+                          chapters: covered[book]!.toList()..sort(),
+                          theme: theme,
+                        );
+                      },
+                      childCount: otBooks.length,
+                    ),
+                  ),
+                if (ntBooks.isNotEmpty)
+                  _buildSectionHeader(context, 'New Testament'),
+                if (ntBooks.isNotEmpty)
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final book = ntBooks[index];
+                        return _BookSection(
+                          book: book,
+                          chapters: covered[book]!.toList()..sort(),
+                          theme: theme,
+                        );
+                      },
+                      childCount: ntBooks.length,
+                    ),
+                  ),
+                const SliverToBoxAdapter(child: SizedBox(height: 32)),
+              ],
             ),
+    );
+  }
+
+  Widget _buildSectionHeader(BuildContext context, String title) {
+    final theme = Theme.of(context);
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
+        child: Text(
+          title.toUpperCase(),
+          style: theme.textTheme.labelMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.5,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+          ),
+        ),
+      ),
     );
   }
 }
 
-class _BookSection extends StatelessWidget {
+class _BookSection extends StatefulWidget {
   final String book;
   final List<int> chapters;
   final ThemeData theme;
@@ -103,54 +150,94 @@ class _BookSection extends StatelessWidget {
   });
 
   @override
+  State<_BookSection> createState() => _BookSectionState();
+}
+
+class _BookSectionState extends State<_BookSection> {
+  bool _isExpanded = false;
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: Row(
-            children: [
-              Icon(Icons.library_books_rounded,
-                  size: 16, color: theme.primaryColor),
-              const SizedBox(width: 8),
-              Text(
-                book,
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: theme.primaryColor,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.8,
+        InkWell(
+          onTap: () => setState(() => _isExpanded = !_isExpanded),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.library_books_rounded,
+                  size: 18,
+                  color: widget.theme.primaryColor,
                 ),
-              ),
-            ],
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    widget.book,
+                    style: widget.theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: widget.theme.primaryColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '${widget.chapters.length} ch',
+                    style: widget.theme.textTheme.labelSmall?.copyWith(
+                      color: widget.theme.primaryColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Icon(
+                  _isExpanded
+                      ? Icons.keyboard_arrow_up_rounded
+                      : Icons.keyboard_arrow_down_rounded,
+                  color: widget.theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                ),
+              ],
+            ),
           ),
         ),
-        ...chapters.map(
-          (chapter) => ListTile(
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 32, vertical: 2),
-            dense: true,
-            title: Text(
-              '$book $chapter',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            trailing: Icon(
-              Icons.chevron_right_rounded,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
-            ),
-            onTap: () {
-              Navigator.of(context).push(CupertinoPageRoute(
-                builder: (_) => CommentaryHubScreen(
-                  book: book,
-                  chapter: chapter,
-                  verse: null,
+        if (_isExpanded)
+          ...widget.chapters.map(
+            (chapter) => ListTile(
+              contentPadding: const EdgeInsets.only(left: 52, right: 20),
+              dense: true,
+              title: Text(
+                'Chapter $chapter',
+                style: widget.theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w500,
                 ),
-              ));
-            },
+              ),
+              trailing: Icon(
+                Icons.chevron_right_rounded,
+                size: 16,
+                color: widget.theme.colorScheme.onSurface.withValues(alpha: 0.3),
+              ),
+              onTap: () {
+                Navigator.of(context).push(CupertinoPageRoute(
+                  builder: (_) => CommentaryHubScreen(
+                    book: widget.book,
+                    chapter: chapter,
+                    verse: null,
+                  ),
+                ));
+              },
+            ),
           ),
+        Divider(
+          indent: 20,
+          endIndent: 20,
+          height: 1,
+          color: widget.theme.dividerColor.withValues(alpha: 0.1),
         ),
       ],
     );

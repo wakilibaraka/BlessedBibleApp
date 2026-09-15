@@ -42,7 +42,9 @@ class CommentaryView extends ConsumerStatefulWidget {
 
 class _CommentaryViewState extends ConsumerState<CommentaryView> {
   bool _showChapter = false;
+  bool _userToggledChapter = false;
   bool _showBook = false;
+  bool _userToggledBook = false;
   int? _currentVerseNum;
   final Map<int, GlobalKey> _entryKeys = {};
 
@@ -422,10 +424,14 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                   theme: theme,
                   tokens: tokens,
                   title: 'On this chapter',
-                  isExpanded: _showChapter,
+                  isExpanded: _userToggledChapter ? _showChapter : (verseEntries.isEmpty || _showChapter),
                   entries: chapterEntries,
                   typography: typography,
-                  onToggle: () => setState(() => _showChapter = !_showChapter),
+                  onToggle: () => setState(() {
+                    final currentlyExpanded = _userToggledChapter ? _showChapter : (verseEntries.isEmpty || _showChapter);
+                    _userToggledChapter = true;
+                    _showChapter = !currentlyExpanded;
+                  }),
                 ),
               ),
             if (bookEntries.isNotEmpty)
@@ -434,10 +440,14 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                   theme: theme,
                   tokens: tokens,
                   title: 'On this book',
-                  isExpanded: _showBook,
+                  isExpanded: _userToggledBook ? _showBook : (verseEntries.isEmpty && chapterEntries.isEmpty || _showBook),
                   entries: bookEntries,
                   typography: typography,
-                  onToggle: () => setState(() => _showBook = !_showBook),
+                  onToggle: () => setState(() {
+                    final currentlyExpanded = _userToggledBook ? _showBook : (verseEntries.isEmpty && chapterEntries.isEmpty || _showBook);
+                    _userToggledBook = true;
+                    _showBook = !currentlyExpanded;
+                  }),
                 ),
               ),
           ],
@@ -550,9 +560,41 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
     );
   }
 
+  List<TextSpan> _parseMarkdown(String text, TextStyle? baseStyle) {
+    final spans = <TextSpan>[];
+    final RegExp exp = RegExp(r'\*\*(.*?)\*\*');
+    int start = 0;
+    
+    for (final match in exp.allMatches(text)) {
+      if (match.start > start) {
+        spans.add(TextSpan(text: text.substring(start, match.start)));
+      }
+      spans.add(TextSpan(
+        text: match.group(1),
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ));
+      start = match.end;
+    }
+    
+    if (start < text.length) {
+      spans.add(TextSpan(text: text.substring(start)));
+    }
+    
+    return spans;
+  }
+
   Widget _buildEntryContent(ThemeData theme, ReadingTokens tokens,
       CommentaryEntry entry, TypographyState typography) {
     final paragraphs = entry.text.split('\n\n');
+    final isBreakdown = entry.source == 'Chapter Breakdown';
+
+    final baseStyle = theme.textTheme.bodyLarge?.copyWith(
+      fontSize: typography.fontSize,
+      height: typography.lineHeight,
+      fontFamily: typography.fontFamily,
+      fontStyle: typography.fontStyle,
+      color: tokens.readingInk,
+    );
 
     return SelectionArea(
       child: Column(
@@ -560,27 +602,31 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
         children: [
           ...paragraphs.map((p) => Padding(
                 padding: const EdgeInsets.only(bottom: 16.0),
-                child: Text(
-                  p.trim(),
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    fontSize: typography.fontSize,
-                    height: typography.lineHeight,
-                    fontFamily: typography.fontFamily,
-                    fontStyle: typography.fontStyle,
-                    color: tokens.readingInk,
+                child: RichText(
+                  text: TextSpan(
+                    style: baseStyle,
+                    children: _parseMarkdown(p.trim(), baseStyle),
                   ),
                 ),
               )),
-          const Divider(height: 24),
-          Text(
-            entry.author,
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: tokens.readingAccent,
-            ),
+          Divider(height: 24, color: tokens.readingBorder),
+          Row(
+            children: [
+              if (isBreakdown) ...[
+                Icon(Icons.lightbulb_outline_rounded, size: 16, color: tokens.readingAccent),
+                const SizedBox(width: 6),
+              ],
+              Text(
+                entry.author,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: tokens.readingAccent,
+                ),
+              ),
+            ],
           ),
           if (entry.source.isNotEmpty) ...[
-            const SizedBox(height: 2),
+            const SizedBox(height: 4),
             Text(
               entry.source,
               style: theme.textTheme.labelMedium?.copyWith(
