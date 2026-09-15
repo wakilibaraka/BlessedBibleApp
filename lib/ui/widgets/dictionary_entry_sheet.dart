@@ -95,8 +95,9 @@ class DictionaryEntrySheet extends ConsumerWidget {
   }
 
   Widget _buildDefinitionBlock(BuildContext context, WidgetRef ref, DictionaryDefinition def, ThemeData theme) {
-    // Parse references if present
-    // Assuming refs look like "Gen 1:1, John 3:16" but let's just make it simple
+    // Break into paragraphs
+    final paragraphs = def.definition.split(RegExp(r'\\n+'));
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -116,14 +117,50 @@ class DictionaryEntrySheet extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 16),
-        Text(
-          def.definition,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            height: 1.6,
-            fontSize: 16,
-          ),
-        ),
+        ...paragraphs.map((p) {
+          if (p.trim().isEmpty) return const SizedBox.shrink();
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12.0),
+            child: RichText(
+              text: TextSpan(
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  height: 1.6,
+                  fontSize: 16,
+                  color: theme.colorScheme.onSurface,
+                ),
+                children: _parseRichText(p, theme),
+              ),
+            ),
+          );
+        }),
       ],
     );
+  }
+
+  List<TextSpan> _parseRichText(String text, ThemeData theme) {
+    final spans = <TextSpan>[];
+    // Simple regex to find text in parentheses, e.g. (Dan. 11:1) or (1.)
+    final regex = RegExp(r'\([^)]+\)');
+    final matches = regex.allMatches(text);
+    
+    int lastEnd = 0;
+    for (final match in matches) {
+      if (match.start > lastEnd) {
+        spans.add(TextSpan(text: text.substring(lastEnd, match.start)));
+      }
+      spans.add(TextSpan(
+        text: match.group(0),
+        style: TextStyle(
+          color: theme.primaryColor,
+          fontWeight: FontWeight.w500,
+        ),
+      ));
+      lastEnd = match.end;
+    }
+    
+    if (lastEnd < text.length) {
+      spans.add(TextSpan(text: text.substring(lastEnd)));
+    }
+    return spans;
   }
 }

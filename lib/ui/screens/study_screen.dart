@@ -306,6 +306,9 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                     case 'reading_plan':
                       cardWidget = ReadingPlanBanner(size: config.size);
                       break;
+                    case 'dictionary':
+                      cardWidget = DictionaryBanner(size: config.size);
+                      break;
                     case 'commentary':
                       cardWidget = CommentaryBanner(size: config.size);
                       break;

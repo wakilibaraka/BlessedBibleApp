@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
+import '../widgets/dictionary_entry_sheet.dart';
+
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
@@ -175,86 +177,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   void _showDictionaryPopover(String normalizedWord) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (context) {
-        return Consumer(builder: (context, ref, _) {
-          final defsAsync = ref.watch(dictionaryDefinitionProvider(normalizedWord));
-          
-          return Container(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.sizeOf(context).height * 0.5,
-            ),
-            decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-            ),
-            padding: const EdgeInsets.all(20),
-            child: defsAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, st) => const Center(child: Text('Error loading definition.')),
-              data: (defs) {
-                if (defs.isEmpty) {
-                  return const Center(child: Text('Definition not found.'));
-                }
-                
-                final displayWord = defs.first.displayHeadword;
-                
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
-                      child: Container(
-                        width: 40,
-                        height: 4,
-                        margin: const EdgeInsets.only(bottom: 20),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.withValues(alpha: 0.3),
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                    ),
-                    Text(
-                      displayWord,
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 16),
-                    Expanded(
-                      child: ListView.separated(
-                        itemCount: defs.length,
-                        separatorBuilder: (_, __) => const Divider(height: 32),
-                        itemBuilder: (context, index) {
-                          final def = defs[index];
-                          final sourceName = def.source == 'easton' ? "Easton's" : "Smith's";
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                sourceName,
-                                style: TextStyle(
-                                  color: Theme.of(context).primaryColor,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 12,
-                                  letterSpacing: 1.0,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                def.definition,
-                                style: const TextStyle(fontSize: 16, height: 1.5),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-          );
-        });
-      },
+      backgroundColor: Colors.transparent,
+      builder: (context) => DictionaryEntrySheet(normalizedWord: normalizedWord),
     );
   }
 
