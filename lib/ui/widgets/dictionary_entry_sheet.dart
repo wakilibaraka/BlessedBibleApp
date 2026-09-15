@@ -16,7 +16,10 @@ class DictionaryEntrySheet extends ConsumerWidget {
     final typography = ref.watch(typographyProvider);
 
     return Container(
-      constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.85),
+      constraints: BoxConstraints(
+        minHeight: MediaQuery.sizeOf(context).height * 0.5,
+        maxHeight: MediaQuery.sizeOf(context).height * 0.75,
+      ),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
