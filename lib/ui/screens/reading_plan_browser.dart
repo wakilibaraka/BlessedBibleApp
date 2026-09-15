@@ -10,7 +10,7 @@ import 'study_reader_screen.dart';
 import '../../state/streak_provider.dart';
 
 import '../../data/local_storage/preferences_service.dart';
-import '../sheets/theme_picker_sheet.dart';
+import '../sheets/appearance_settings_sheet.dart';
 import 'package:flutter/cupertino.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1474,7 +1474,7 @@ class _DayViewState extends ConsumerState<DayView>
             actions: [
               IconButton(
                 icon: Icon(Icons.tune_rounded, color: Theme.of(context).primaryColor),
-                onPressed: () => ThemePickerSheet.show(context),
+                onPressed: () => AppearanceSettingsSheet.show(context, initialTab: AppearanceTab.theme),
               ),
               const SizedBox(width: 8),
             ],
@@ -1593,7 +1593,7 @@ class _DayViewState extends ConsumerState<DayView>
           actions: [
             IconButton(
               icon: Icon(Icons.tune_rounded, color: Theme.of(context).primaryColor),
-              onPressed: () => ThemePickerSheet.show(context),
+              onPressed: () => AppearanceSettingsSheet.show(context, initialTab: AppearanceTab.theme),
             ),
             const SizedBox(width: 8),
           ],

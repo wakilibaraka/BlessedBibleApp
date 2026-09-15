@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'dart:ui';
 import '../widgets/dictionary_entry_sheet.dart';
+import '../sheets/appearance_settings_sheet.dart';
 
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
 
-import '../widgets/typography_controls.dart';
 
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -420,18 +420,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   }
 
   void _showTypographyBottomSheet() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      isScrollControlled: true,
-      useRootNavigator: true,
-      useSafeArea: true,
-      showDragHandle: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      builder: (context) => const _TypographyBottomSheet(),
-    );
+    AppearanceSettingsSheet.show(context, initialTab: AppearanceTab.typography);
   }
 
   void _showSelectorBottomSheet(List<BibleBook> allBooks) {
@@ -2037,6 +2026,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     final fontStyle = theme.textTheme.bodyMedium?.copyWith(
           fontFamily: typography.fontFamily,
           fontStyle: typography.fontStyle,
+          fontWeight: typography.fontWeight,
           fontSize: typography.fontSize,
           height: typography.lineHeight,
           letterSpacing: 0.15,
@@ -2574,39 +2564,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   }
 }
 
-class _TypographyBottomSheet extends ConsumerWidget {
-  const _TypographyBottomSheet();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-
-    return Container(
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.8,
-      ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20.0, 16.0, 20.0, 0.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Typography',
-                style: theme.textTheme.titleMedium
-                    ?.copyWith(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
-              const Expanded(child: TypographyControls()),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 class VerseActionLogic {
   static void _showFeedback(
