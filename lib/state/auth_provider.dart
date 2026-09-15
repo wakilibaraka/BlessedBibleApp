@@ -18,7 +18,6 @@ enum SignInResult { success, cancelled, failed }
 class AuthActions {
   final Ref ref;
   final _auth = FirebaseAuth.instance;
-  final _googleSignIn = GoogleSignIn();
 
   AuthActions(this.ref);
 
@@ -27,16 +26,20 @@ class AuthActions {
   /// [SignInResult.failed] on any error, [SignInResult.success] on success.
   Future<SignInResult> signInWithGoogle() async {
     try {
-      final googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) return SignInResult.cancelled;
-
-      final googleAuth = await googleUser.authentication;
+      final googleUser = await GoogleSignIn.instance.authenticate();
+      final googleAuth = googleUser.authentication;
       final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
+        accessToken: null, // v7: idToken-only flow for Firebase
         idToken: googleAuth.idToken,
       );
       await _auth.signInWithCredential(credential);
       return SignInResult.success;
+    } on GoogleSignInException catch (e) {
+      if (e.code == GoogleSignInExceptionCode.canceled ||
+          e.code == GoogleSignInExceptionCode.interrupted) {
+        return SignInResult.cancelled;
+      }
+      return SignInResult.failed;
     } catch (_) {
       return SignInResult.failed;
     }
@@ -71,10 +74,8 @@ class AuthActions {
 
   /// Signs out of both Firebase and Google.
   Future<void> signOut() async {
-    await Future.wait([
-      _auth.signOut(),
-      _googleSignIn.signOut(),
-    ]);
+    await _auth.signOut();
+    await GoogleSignIn.instance.signOut();
   }
 
   /// Re-authenticates the current user (required before sensitive ops).
@@ -92,11 +93,10 @@ class AuthActions {
         await user.reauthenticateWithCredential(oauthCredential);
         return true;
       } else {
-        final googleUser = await _googleSignIn.signIn();
-        if (googleUser == null) return false;
-        final googleAuth = await googleUser.authentication;
+        final googleUser = await GoogleSignIn.instance.authenticate();
+        final googleAuth = googleUser.authentication;
         final credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken,
+          accessToken: null,
           idToken: googleAuth.idToken,
         );
         await user.reauthenticateWithCredential(credential);
@@ -133,7 +133,7 @@ class AuthActions {
     await ref.read(preferencesProvider).clearAllUserData();
 
     // 5. Clear Google state
-    await _googleSignIn.signOut();
+    await GoogleSignIn.instance.signOut();
   }
 
   /// Deletes the current user's account and signs out.
