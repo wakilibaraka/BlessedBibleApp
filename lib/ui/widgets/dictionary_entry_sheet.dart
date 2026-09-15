@@ -17,11 +17,11 @@ class DictionaryEntrySheet extends ConsumerWidget {
 
     return Container(
       constraints: BoxConstraints(
-        minHeight: MediaQuery.sizeOf(context).height * 0.5,
-        maxHeight: MediaQuery.sizeOf(context).height * 0.75,
+        minHeight: MediaQuery.sizeOf(context).height * 0.7,
+        maxHeight: MediaQuery.sizeOf(context).height * 0.9,
       ),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
+        color: theme.scaffoldBackgroundColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
       ),
       child: SafeArea(
@@ -29,65 +29,153 @@ class DictionaryEntrySheet extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Center(
-              child: Container(
-                margin: const EdgeInsets.only(top: 12, bottom: 8),
-                width: 32,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
+            // ── Top Navigation Bar ──────────────────────────────
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+              padding: const EdgeInsets.only(left: 8, right: 16, top: 12, bottom: 8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                    child: definitionsAsync.when(
-                      data: (defs) => Text(
-                        defs.isNotEmpty ? defs.first.displayHeadword : normalizedWord.toUpperCase(),
-                        style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-                      ),
-                      loading: () => const Text('Loading...'),
-                      error: (_, __) => const Text('Error'),
+                  TextButton.icon(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: theme.primaryColor),
+                    label: Text('Back', style: TextStyle(fontSize: 16, color: theme.primaryColor)),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.close_rounded),
-                    onPressed: () => Navigator.of(context).pop(),
+                  Row(
+                    children: [
+                      Icon(Icons.star_rounded, color: Colors.amber.shade500, size: 26),
+                      const SizedBox(width: 16),
+                      Icon(Icons.ios_share_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.4), size: 24),
+                      const SizedBox(width: 16),
+                      Icon(Icons.more_horiz_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.4), size: 24),
+                    ],
                   ),
                 ],
               ),
             ),
-            const Divider(height: 1),
+            
+            // ── Content ──────────────────────────────────────────
             Flexible(
               child: definitionsAsync.when(
                 data: (defs) {
                   if (defs.isEmpty) {
                     return const Padding(
-                      padding: EdgeInsets.all(24.0),
+                      padding: EdgeInsets.all(32.0),
                       child: Text('No definition found.'),
                     );
                   }
 
-                  return ListView.separated(
-                    padding: const EdgeInsets.all(24),
-                    itemCount: defs.length,
-                    separatorBuilder: (context, index) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 24),
-                      child: Divider(color: theme.dividerColor.withValues(alpha: 0.5)),
-                    ),
-                    itemBuilder: (context, index) {
-                      final def = defs[index];
-                      return _buildDefinitionBlock(context, ref, def, theme, typography);
-                    },
+                  final displayWord = defs.first.displayHeadword;
+                  final sourceName = defs.first.source.toLowerCase().contains('easton') 
+                      ? "Easton's Bible Dictionary" 
+                      : (defs.first.source.toLowerCase().contains('kjv') ? "KJV Archaic Word" : defs.first.source);
+
+                  return ListView(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                    children: [
+                      // Hero Word
+                      Text(
+                        displayWord,
+                        style: TextStyle(
+                          fontFamily: typography.fontFamily,
+                          fontSize: 48,
+                          fontWeight: FontWeight.w800,
+                          height: 1.1,
+                          letterSpacing: -1.0,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      // Phonetic / Source Subtitle
+                      Row(
+                        children: [
+                          Text(
+                            '/ $sourceName /',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontStyle: FontStyle.italic,
+                              color: theme.primaryColor.withValues(alpha: 0.8),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Icon(CupertinoIcons.speaker_2_fill, size: 16, color: theme.primaryColor.withValues(alpha: 0.8)),
+                        ],
+                      ),
+                      
+                      const SizedBox(height: 32),
+                      
+                      // DEFINITIONS Header
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'DEFINITIONS',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                              letterSpacing: 1.5,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Divider(color: theme.dividerColor.withValues(alpha: 0.3), height: 1),
+                          const SizedBox(height: 24),
+                        ],
+                      ),
+                      
+                      // Definition Blocks
+                      ...defs.expand((def) {
+                        final paragraphs = def.definition.split(RegExp(r'\\n+'))
+                            .map((p) => p.trim())
+                            .where((p) => p.isNotEmpty)
+                            .toList();
+                            
+                        return List.generate(paragraphs.length, (index) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 24.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Number Column
+                                SizedBox(
+                                  width: 28,
+                                  child: Text(
+                                    '${index + 1}',
+                                    style: TextStyle(
+                                      fontSize: typography.fontSize,
+                                      fontWeight: FontWeight.w500,
+                                      color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                                    ),
+                                  ),
+                                ),
+                                // Text Column
+                                Expanded(
+                                  child: RichText(
+                                    text: TextSpan(
+                                      style: theme.textTheme.bodyMedium?.copyWith(
+                                        height: typography.lineHeight,
+                                        fontSize: typography.fontSize,
+                                        fontFamily: typography.fontFamily,
+                                        fontWeight: typography.fontWeight,
+                                        color: theme.colorScheme.onSurface.withValues(alpha: 0.85),
+                                      ),
+                                      children: _parseRichText(paragraphs[index], theme),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        });
+                      }),
+                      
+                      const SizedBox(height: 40),
+                    ],
                   );
                 },
                 loading: () => const Center(child: Padding(
-                  padding: EdgeInsets.all(32.0),
+                  padding: EdgeInsets.all(40.0),
                   child: CupertinoActivityIndicator(),
                 )),
                 error: (e, __) => Center(child: Text('Failed to load: $e')),
@@ -99,53 +187,9 @@ class DictionaryEntrySheet extends ConsumerWidget {
     );
   }
 
-  Widget _buildDefinitionBlock(BuildContext context, WidgetRef ref, DictionaryDefinition def, ThemeData theme, TypographyState typography) {
-    // Break into paragraphs
-    final paragraphs = def.definition.split(RegExp(r'\\n+'));
-    
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            def.source.toUpperCase(),
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.colorScheme.onPrimaryContainer,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.0,
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        ...paragraphs.map((p) {
-          if (p.trim().isEmpty) return const SizedBox.shrink();
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 12.0),
-            child: RichText(
-              text: TextSpan(
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  height: 1.6,
-                  fontSize: typography.fontSize,
-                  fontFamily: typography.fontFamily,
-                  color: theme.colorScheme.onSurface,
-                ),
-                children: _parseRichText(p, theme),
-              ),
-            ),
-          );
-        }),
-      ],
-    );
-  }
-
   List<TextSpan> _parseRichText(String text, ThemeData theme) {
     final spans = <TextSpan>[];
-    // Simple regex to find text in parentheses, e.g. (Dan. 11:1) or (1.)
+    // Find text in parentheses, e.g. (Dan. 11:1)
     final regex = RegExp(r'\([^)]+\)');
     final matches = regex.allMatches(text);
     
@@ -158,7 +202,7 @@ class DictionaryEntrySheet extends ConsumerWidget {
         text: match.group(0),
         style: TextStyle(
           color: theme.primaryColor,
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.w600, // Make scripture refs bold like the blue 'life' example
         ),
       ));
       lastEnd = match.end;
