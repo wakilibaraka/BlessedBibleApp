@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../state/wotd_provider.dart';
+import '../widgets/dictionary_entry_sheet.dart';
 
 import '../../data/models/home_data.dart';
 import '../../state/home_provider.dart';
@@ -360,41 +362,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
           const SizedBox(height: 16),
 
-          // ── Pill Watch & Listen Liquid Glass Buttons ──────────────
-          BouncyEntrance(
-            delay: const Duration(milliseconds: 500),
-            child: Row(
-              children: [
-                Expanded(
-                  child: _PillGlassButton(
-                    icon: Icons.play_arrow_rounded,
-                    label: 'Watch',
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text(
-                                'Media features coming in a future update')),
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _PillGlassButton(
-                    icon: Icons.headphones_rounded,
-                    label: 'Listen',
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text(
-                                'Media features coming in a future update')),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
+          // ── Word of the Day Section ──────────────
+          const WordOfTheDaySection(),
 
           // Clearance above the floating nav bar
           const SizedBox(height: 140),
@@ -471,51 +440,83 @@ class _PillButton extends StatelessWidget {
   }
 }
 
-// ── Pill Liquid Glass Button for Watch / Listen ─────────────────────
-class _PillGlassButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
 
-  const _PillGlassButton({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
+
+class WordOfTheDaySection extends ConsumerWidget {
+  const WordOfTheDaySection({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final gold = theme.primaryColor;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: SizedBox(
-        height: 48,
-        child: GlassContainer(
-          isScrollable: true,
-          borderRadius: BorderRadius.circular(50),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+    final wotdAsync = ref.watch(wordOfTheDayProvider);
+    
+    return wotdAsync.when(
+      data: (wotd) {
+        if (wotd == null) return const SizedBox.shrink();
+        
+        return BouncyEntrance(
+          delay: const Duration(milliseconds: 500),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                icon,
-                size: 20,
-                color: gold,
-              ),
-              const SizedBox(width: 8),
               Text(
-                label,
-                style: theme.textTheme.labelMedium?.copyWith(
+                'WORD OF THE DAY',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.primaryColor,
+                  letterSpacing: 2.0,
                   fontWeight: FontWeight.bold,
-                  color: gold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                wotd.word,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  height: 1.42,
+                ),
+              ),
+              const SizedBox(height: 16),
+              GlassContainer(
+                isScrollable: false,
+                borderRadius: BorderRadius.circular(24),
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      wotd.snippet,
+                      maxLines: 4,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        height: 1.60,
+                        color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.82),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    _PillButton(
+                      label: 'Read Full Definition',
+                      filled: true,
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (context) => DictionaryEntrySheet(normalizedWord: wotd.word.toLowerCase()),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-        ),
-      ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
     );
   }
 }
