@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'search_engine.dart';
 import '../data/local_storage/preferences_service.dart';
 import 'search_settings_provider.dart';
+import '../services/bible_database_service.dart';
 
 class SearchState {
   final String query;
@@ -10,6 +11,7 @@ class SearchState {
   final bool filterNt;
   final bool filterCommentary;
   final bool filterNotes;
+  final bool filterDictionary;
   final bool exactMatch;
   final String? filterBook;
   final List<SearchResult> results;
@@ -24,6 +26,7 @@ class SearchState {
     this.filterNt = true,
     this.filterCommentary = true,
     this.filterNotes = false,
+    this.filterDictionary = true,
     this.exactMatch = false,
     this.filterBook,
     this.results = const [],
@@ -39,6 +42,7 @@ class SearchState {
     bool? filterNt,
     bool? filterCommentary,
     bool? filterNotes,
+    bool? filterDictionary,
     bool? exactMatch,
     String? filterBook,
     bool clearFilterBook = false,
@@ -54,6 +58,7 @@ class SearchState {
       filterNt: filterNt ?? this.filterNt,
       filterCommentary: filterCommentary ?? this.filterCommentary,
       filterNotes: filterNotes ?? this.filterNotes,
+      filterDictionary: filterDictionary ?? this.filterDictionary,
       exactMatch: exactMatch ?? this.exactMatch,
       filterBook: clearFilterBook ? null : (filterBook ?? this.filterBook),
       results: results ?? this.results,
@@ -89,6 +94,7 @@ class SearchNotifier extends Notifier<SearchState> {
       filterNt: settings.defaultSearchNt,
       filterCommentary: settings.defaultSearchCommentary,
       filterNotes: settings.defaultSearchNotes,
+      filterDictionary: settings.defaultSearchDictionary,
       exactMatch: settings.matchWholeWords,
     );
   }
@@ -119,6 +125,14 @@ class SearchNotifier extends Notifier<SearchState> {
   void toggleCommentaryFilter() {
     state = state.copyWith(filterCommentary: !state.filterCommentary);
     _performSearch();
+  }
+
+  
+  void toggleDictionaryFilter() {
+    state = state.copyWith(filterDictionary: !state.filterDictionary);
+    if (state.query.trim().isNotEmpty) {
+      _performSearch();
+    }
   }
 
   void toggleNotesFilter() {
@@ -168,15 +182,16 @@ class SearchNotifier extends Notifier<SearchState> {
       return;
     }
 
-    // Force isSearching to true again in case it was toggled by a filter change
     if (!state.isSearching) {
       state = state.copyWith(isSearching: true);
     }
 
+    final query = state.query;
     final engine = ref.read(searchEngineProvider);
     final settings = ref.read(searchSettingsProvider);
-    final results = await engine.search(
-      state.query,
+    
+    final engineFuture = engine.search(
+      query,
       includeOt: state.filterOt,
       includeNt: state.filterNt,
       includeCommentary: state.filterCommentary,
@@ -185,11 +200,79 @@ class SearchNotifier extends Notifier<SearchState> {
       filterBook: state.filterBook,
     );
 
-    // If query changed while searching, don't update results
-    final currentQuery = ref.read(searchStateProvider).query;
-    if (currentQuery != state.query) return;
+    Future<List<SearchResult>> dictFuture = Future.value([]);
+    if (state.filterDictionary) {
+      dictFuture = _searchDictionary(query);
+    }
 
-    state = state.copyWith(results: results, isSearching: false);
+    final resultsPair = await Future.wait([engineFuture, dictFuture]);
+    final engineResults = resultsPair[0];
+    final dictResults = resultsPair[1];
+
+    final currentQuery = ref.read(searchStateProvider).query;
+    if (currentQuery != query) return;
+
+    final combinedResults = [...dictResults, ...engineResults];
+    state = state.copyWith(results: combinedResults, isSearching: false);
+  }
+
+  Future<List<SearchResult>> _searchDictionary(String query) async {
+    try {
+      final db = await bibleDbService.database;
+      final q = query.trim();
+      final likeTerm = '%${q}%';
+      
+      final rows = await db.query(
+        'dictionary',
+        columns: ['display_headword', 'source', 'definition', 'normalized_word'],
+        where: 'normalized_word LIKE ? OR display_headword LIKE ?',
+        whereArgs: [likeTerm, likeTerm],
+        orderBy: 'display_headword ASC',
+        limit: 8,
+      );
+
+      // Group by headword to combine sources
+      final Map<String, Map<String, dynamic>> grouped = {};
+      
+      for (final row in rows) {
+        final headword = row['display_headword'] as String;
+        if (!grouped.containsKey(headword)) {
+          grouped[headword] = {
+            'headword': headword,
+            'normalized_word': row['normalized_word'] as String,
+            'sources': <String>[],
+            'definition': row['definition'] as String, // preview first
+          };
+        }
+        (grouped[headword]!['sources'] as List<String>).add(row['source'] as String);
+      }
+
+      return grouped.values.map((g) {
+        final headword = g['headword'] as String;
+        final preview = g['definition'] as String;
+        final normWord = g['normalized_word'] as String;
+        final sourceList = (g['sources'] as List<String>).join(', ');
+        
+        // Strip out any HTML-like tags or line breaks for snippet
+        var cleanSnippet = preview.replaceAll(RegExp(r'<[^>]*>'), '');
+        cleanSnippet = cleanSnippet.replaceAll('\n', ' ');
+        if (cleanSnippet.length > 80) {
+          cleanSnippet = '${cleanSnippet.substring(0, 80)}...';
+        }
+        
+        return SearchResult(
+          title: headword,
+          subtitle: 'Dictionary ($sourceList)',
+          snippet: cleanSnippet,
+          type: SearchResultType.dictionary,
+          metadata: {
+            'normalized_word': normWord,
+          },
+        );
+      }).toList();
+    } catch (e) {
+      return [];
+    }
   }
 }
 

@@ -11,7 +11,7 @@ import 'translation_provider.dart';
 import 'pericopes_provider.dart';
 import '../services/bible_database_service.dart';
 
-enum SearchResultType { reference, bible, commentary, history, note, pericope }
+enum SearchResultType { reference, bible, commentary, history, note, pericope, dictionary }
 
 class SearchResult {
   final String title;

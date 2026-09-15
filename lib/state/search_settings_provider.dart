@@ -7,6 +7,7 @@ class SearchSettingsState {
   final bool defaultSearchNt;
   final bool defaultSearchCommentary;
   final bool defaultSearchNotes;
+  final bool defaultSearchDictionary;
   final bool includeNotesInSearch;
   final bool matchWholeWords;
 
@@ -16,6 +17,7 @@ class SearchSettingsState {
     this.defaultSearchNt = true,
     this.defaultSearchCommentary = true,
     this.defaultSearchNotes = false,
+    this.defaultSearchDictionary = true,
     this.includeNotesInSearch = false,
     this.matchWholeWords = false,
   });
@@ -27,6 +29,7 @@ class SearchSettingsNotifier extends Notifier<SearchSettingsState> {
   static const _defaultNtKey = 'search_default_nt';
   static const _defaultCommKey = 'search_default_comm';
   static const _defaultNotesKey = 'search_default_notes';
+  static const _defaultDictKey = 'search_default_dict';
   static const _includeNotesKey = 'search_include_notes';
   static const _matchWholeWordsKey = 'search_match_whole_words';
 
@@ -44,6 +47,7 @@ class SearchSettingsNotifier extends Notifier<SearchSettingsState> {
       defaultSearchNt: prefs.getBool(_defaultNtKey) ?? true,
       defaultSearchCommentary: prefs.getBool(_defaultCommKey) ?? true,
       defaultSearchNotes: prefs.getBool(_defaultNotesKey) ?? false,
+      defaultSearchDictionary: prefs.getBool(_defaultDictKey) ?? true,
       includeNotesInSearch: prefs.getBool(_includeNotesKey) ?? false,
       matchWholeWords: prefs.getBool(_matchWholeWordsKey) ?? false,
     );
@@ -56,6 +60,7 @@ class SearchSettingsNotifier extends Notifier<SearchSettingsState> {
       defaultSearchNt: state.defaultSearchNt,
       defaultSearchCommentary: state.defaultSearchCommentary,
       defaultSearchNotes: state.defaultSearchNotes,
+      defaultSearchDictionary: state.defaultSearchDictionary,
       includeNotesInSearch: state.includeNotesInSearch,
       matchWholeWords: state.matchWholeWords,
     );
@@ -70,6 +75,7 @@ class SearchSettingsNotifier extends Notifier<SearchSettingsState> {
       defaultSearchNt: state.defaultSearchNt,
       defaultSearchCommentary: state.defaultSearchCommentary,
       defaultSearchNotes: state.defaultSearchNotes,
+      defaultSearchDictionary: state.defaultSearchDictionary,
       includeNotesInSearch: state.includeNotesInSearch,
       matchWholeWords: state.matchWholeWords,
     );
@@ -84,6 +90,7 @@ class SearchSettingsNotifier extends Notifier<SearchSettingsState> {
       defaultSearchNt: value,
       defaultSearchCommentary: state.defaultSearchCommentary,
       defaultSearchNotes: state.defaultSearchNotes,
+      defaultSearchDictionary: state.defaultSearchDictionary,
       includeNotesInSearch: state.includeNotesInSearch,
       matchWholeWords: state.matchWholeWords,
     );
@@ -98,6 +105,7 @@ class SearchSettingsNotifier extends Notifier<SearchSettingsState> {
       defaultSearchNt: state.defaultSearchNt,
       defaultSearchCommentary: value,
       defaultSearchNotes: state.defaultSearchNotes,
+      defaultSearchDictionary: state.defaultSearchDictionary,
       includeNotesInSearch: state.includeNotesInSearch,
       matchWholeWords: state.matchWholeWords,
     );
@@ -112,6 +120,7 @@ class SearchSettingsNotifier extends Notifier<SearchSettingsState> {
       defaultSearchNt: state.defaultSearchNt,
       defaultSearchCommentary: state.defaultSearchCommentary,
       defaultSearchNotes: value,
+      defaultSearchDictionary: state.defaultSearchDictionary,
       includeNotesInSearch: state.includeNotesInSearch,
       matchWholeWords: state.matchWholeWords,
     );
@@ -126,6 +135,7 @@ class SearchSettingsNotifier extends Notifier<SearchSettingsState> {
       defaultSearchNt: state.defaultSearchNt,
       defaultSearchCommentary: state.defaultSearchCommentary,
       defaultSearchNotes: state.defaultSearchNotes,
+      defaultSearchDictionary: state.defaultSearchDictionary,
       includeNotesInSearch: value,
       matchWholeWords: state.matchWholeWords,
     );
@@ -140,11 +150,27 @@ class SearchSettingsNotifier extends Notifier<SearchSettingsState> {
       defaultSearchNt: state.defaultSearchNt,
       defaultSearchCommentary: state.defaultSearchCommentary,
       defaultSearchNotes: state.defaultSearchNotes,
+      defaultSearchDictionary: state.defaultSearchDictionary,
       includeNotesInSearch: state.includeNotesInSearch,
       matchWholeWords: value,
     );
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_matchWholeWordsKey, value);
+  }
+
+  Future<void> toggleDefaultDictionary(bool value) async {
+    state = SearchSettingsState(
+      autoOpenSingleSearchResult: state.autoOpenSingleSearchResult,
+      defaultSearchOt: state.defaultSearchOt,
+      defaultSearchNt: state.defaultSearchNt,
+      defaultSearchCommentary: state.defaultSearchCommentary,
+      defaultSearchNotes: state.defaultSearchNotes,
+      defaultSearchDictionary: value,
+      includeNotesInSearch: state.includeNotesInSearch,
+      matchWholeWords: state.matchWholeWords,
+    );
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_defaultDictKey, value);
   }
 }
 

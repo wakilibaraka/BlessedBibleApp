@@ -23,6 +23,7 @@ import '../../state/streak_provider.dart';
 import '../widgets/plan_row_widget.dart';
 
 import 'plans_hub_v2_screen.dart';
+import 'dictionary_screen.dart';
 class _ParsedRef {
   final String book;
   final int chapter;
@@ -839,3 +840,116 @@ class CommentaryBanner extends ConsumerWidget {
   }
 }
 
+
+class DictionaryBanner extends ConsumerWidget {
+  final CardSize size;
+  const DictionaryBanner({super.key, required this.size});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeInOut,
+      child: RepaintBoundary(
+        child: TexturedGlassContainer(
+          isScrollable: true,
+          borderRadius: BorderRadius.circular(28),
+          padding: EdgeInsets.zero,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(28),
+              gradient: LinearGradient(
+                colors: [
+                  theme.primaryColor.withValues(alpha: 0.1),
+                  Colors.transparent,
+                  theme.primaryColor.withValues(alpha: 0.05),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(28),
+                onTap: () {
+                  Navigator.of(context).push(CupertinoPageRoute(
+                    builder: (_) => const DictionaryScreen(),
+                  ));
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.import_contacts_rounded,
+                              size: 20, color: theme.primaryColor),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Dictionary',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.primaryColor,
+                              letterSpacing: 1.5,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Bible Dictionary',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Browse or search 8,500+ definitions and scripture references from Easton and Smith.',
+                        maxLines: size == CardSize.small ? 2 : 4,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          height: 1.5,
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                        ),
+                      ),
+                      if (size == CardSize.large) ...[
+                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                                color: theme.primaryColor.withValues(alpha: 0.3)),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Open Dictionary',
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  color: theme.primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Icon(Icons.arrow_forward_rounded,
+                                  size: 16, color: theme.primaryColor),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

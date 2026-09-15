@@ -8,6 +8,7 @@ import '../../state/read_location_provider.dart';
 import '../../state/surface_style_provider.dart';
 import '../../state/bible_provider.dart';
 import '../../state/search_settings_provider.dart';
+import '../widgets/dictionary_entry_sheet.dart';
 import '../../state/most_read_provider.dart';
 import 'package:flutter/services.dart';
 import '../../state/typography_provider.dart';
@@ -91,6 +92,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
             chapter: result.metadata['chapter'],
             verse: result.metadata['verse'],
           );
+    } else if (result.type == SearchResultType.dictionary) {
+      final normWord = result.metadata['normalized_word'] as String;
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => DictionaryEntrySheet(normalizedWord: normWord),
+      );
     } else if (result.type == SearchResultType.commentary) {
       ref.read(navProvider.notifier).setIndex(1);
       final books = ref.read(bibleProvider).books;
@@ -645,6 +654,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     final commentaryResults = state.results
         .where((r) => r.type == SearchResultType.commentary)
         .toList();
+    final dictionaryResults = state.results
+        .where((r) => r.type == SearchResultType.dictionary)
+        .toList();
     final noteResults =
         state.results.where((r) => r.type == SearchResultType.note).toList();
 
@@ -667,6 +679,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
             ),
           ),
         ),
+        if (dictionaryResults.isNotEmpty) ...[
+          _buildSectionHeader('DICTIONARY (${dictionaryResults.length})', theme),
+          ...dictionaryResults
+              .map((r) => _buildResultItem(r, theme, state.query)),
+          const SizedBox(height: 12),
+        ],
+
         if (pericopeResults.isNotEmpty) ...[
           _buildSectionHeader('STORIES (${pericopeResults.length})', theme),
           ...pericopeResults
@@ -726,6 +745,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
       icon = Icons.sticky_note_2_outlined;
     } else if (result.type == SearchResultType.pericope) {
       icon = Icons.auto_stories_rounded;
+    } else if (result.type == SearchResultType.dictionary) {
+      icon = Icons.import_contacts_rounded;
     } else {
       icon = Icons.library_books_rounded;
     }
