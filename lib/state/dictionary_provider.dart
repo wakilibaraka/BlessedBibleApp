@@ -1,3 +1,5 @@
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -130,3 +132,32 @@ final dictionaryDefinitionProvider = FutureProvider.family<List<DictionaryDefini
     definition: r['definition'] as String,
   )).toList();
 });
+
+
+class BookmarkedWordsNotifier extends AsyncNotifier<Set<String>> {
+  static const _key = 'bookmarked_dictionary_words';
+
+  @override
+  Future<Set<String>> build() async {
+    final prefs = await SharedPreferences.getInstance();
+    final list = prefs.getStringList(_key) ?? [];
+    return list.toSet();
+  }
+
+  Future<void> toggleBookmark(String word) async {
+    final currentSet = state.asData?.value ?? {};
+    final newSet = Set<String>.from(currentSet);
+    
+    if (newSet.contains(word)) {
+      newSet.remove(word);
+    } else {
+      newSet.add(word);
+    }
+    
+    state = AsyncData(newSet);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(_key, newSet.toList());
+  }
+}
+
+final bookmarkedWordsProvider = AsyncNotifierProvider<BookmarkedWordsNotifier, Set<String>>(BookmarkedWordsNotifier.new);

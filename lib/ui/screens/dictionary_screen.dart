@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../state/dictionary_search_provider.dart';
 import '../widgets/dictionary_entry_sheet.dart';
+import '../../state/dictionary_provider.dart';
 
 class DictionaryScreen extends ConsumerStatefulWidget {
   const DictionaryScreen({super.key});
@@ -16,14 +18,14 @@ class DictionaryScreen extends ConsumerStatefulWidget {
 
 class _DictionaryScreenState extends ConsumerState<DictionaryScreen> {
   final TextEditingController _searchController = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
+  final ItemScrollController _itemScrollController = ItemScrollController();
   String _searchQuery = '';
   Timer? _debounce;
+  String? _currentDragLetter;
 
   @override
   void dispose() {
     _searchController.dispose();
-    _scrollController.dispose();
     _debounce?.cancel();
     super.dispose();
   }
@@ -37,10 +39,22 @@ class _DictionaryScreenState extends ConsumerState<DictionaryScreen> {
     });
   }
 
+  void _jumpToLetter(String letter, Map<String, int> letterIndices) {
+    if (letterIndices.containsKey(letter)) {
+      final index = letterIndices[letter]!;
+      _itemScrollController.jumpTo(index: index);
+      if (_currentDragLetter != letter) {
+        HapticFeedback.selectionClick();
+        setState(() => _currentDragLetter = letter);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final resultsAsync = ref.watch(dictionarySearchProvider(_searchQuery));
+    final bookmarkedWords = ref.watch(bookmarkedWordsProvider).asData?.value ?? {};
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -106,30 +120,97 @@ class _DictionaryScreenState extends ConsumerState<DictionaryScreen> {
                     ),
                   );
                 }
+
+                // Compute letter indices for the slider
+                final Map<String, int> letterIndices = {};
+                for (int i = 0; i < results.length; i++) {
+                  final firstChar = results[i].displayHeadword[0].toUpperCase();
+                  if (RegExp(r'[A-Z]').hasMatch(firstChar) && !letterIndices.containsKey(firstChar)) {
+                    letterIndices[firstChar] = i;
+                  }
+                }
+                final availableLetters = letterIndices.keys.toList()..sort();
+                final showSlider = _searchQuery.isEmpty && availableLetters.length > 5;
                 
-                return ListView.separated(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-                  itemCount: results.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 12),
-                  itemBuilder: (context, index) {
-                    final item = results[index];
-                    return _DictionaryCard(
-                      word: item.displayHeadword,
-                      snippet: item.snippet,
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (context) => DictionaryEntrySheet(
-                            normalizedWord: item.normalizedWord,
-                          ),
+                return Stack(
+                  children: [
+                    ScrollablePositionedList.separated(
+                      itemScrollController: _itemScrollController,
+                      padding: EdgeInsets.fromLTRB(16, 16, showSlider ? 36 : 16, 100),
+                      itemCount: results.length,
+                      separatorBuilder: (context, index) => const SizedBox(height: 12),
+                      itemBuilder: (context, index) {
+                        final item = results[index];
+                        final isBookmarked = bookmarkedWords.contains(item.normalizedWord);
+                        
+                        return _DictionaryCard(
+                          word: item.displayHeadword,
+                          snippet: item.snippet,
+                          isBookmarked: isBookmarked,
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (context) => DictionaryEntrySheet(
+                                normalizedWord: item.normalizedWord,
+                              ),
+                            );
+                          },
                         );
                       },
-                    );
-                  },
+                    ),
+
+                    // A-Z Slider
+                    if (showSlider)
+                      Positioned(
+                        right: 4,
+                        top: 16,
+                        bottom: 32,
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            final double letterHeight = constraints.maxHeight / availableLetters.length;
+                            return GestureDetector(
+                              onVerticalDragStart: (details) {
+                                final index = (details.localPosition.dy / letterHeight).floor().clamp(0, availableLetters.length - 1);
+                                _jumpToLetter(availableLetters[index], letterIndices);
+                              },
+                              onVerticalDragUpdate: (details) {
+                                final index = (details.localPosition.dy / letterHeight).floor().clamp(0, availableLetters.length - 1);
+                                _jumpToLetter(availableLetters[index], letterIndices);
+                              },
+                              onVerticalDragEnd: (_) => setState(() => _currentDragLetter = null),
+                              onTapUp: (_) => setState(() => _currentDragLetter = null),
+                              child: Container(
+                                width: 28,
+                                color: Colors.transparent, // catch touches
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: availableLetters.map((letter) {
+                                    final isActive = letter == _currentDragLetter;
+                                    return Expanded(
+                                      child: Center(
+                                        child: Text(
+                                          letter,
+                                          style: TextStyle(
+                                            fontSize: isActive ? 14 : 11,
+                                            fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
+                                            color: isActive 
+                                                ? theme.primaryColor 
+                                                : theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                            );
+                          }
+                        ),
+                      ),
+                  ],
                 );
               },
               loading: () => const Center(child: CupertinoActivityIndicator()),
@@ -145,11 +226,13 @@ class _DictionaryScreenState extends ConsumerState<DictionaryScreen> {
 class _DictionaryCard extends StatelessWidget {
   final String word;
   final String snippet;
+  final bool isBookmarked;
   final VoidCallback onTap;
 
   const _DictionaryCard({
     required this.word,
     required this.snippet,
+    required this.isBookmarked,
     required this.onTap,
   });
 
@@ -180,15 +263,6 @@ class _DictionaryCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 2.0),
-              child: Icon(
-                Icons.wb_sunny_outlined, // Sun icon matching the screenshot
-                size: 20,
-                color: theme.primaryColor.withValues(alpha: 0.7),
-              ),
-            ),
-            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -216,11 +290,18 @@ class _DictionaryCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            Icon(
-              Icons.bookmark_border_rounded,
-              size: 24,
-              color: theme.primaryColor.withValues(alpha: 0.8),
-            ),
+            if (isBookmarked)
+              Icon(
+                Icons.bookmark_rounded,
+                size: 20,
+                color: theme.primaryColor.withValues(alpha: 0.8),
+              )
+            else
+              Icon(
+                Icons.bookmark_border_rounded,
+                size: 20,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+              ),
           ],
         ),
       ),

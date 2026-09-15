@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../state/dictionary_provider.dart';
 import '../../state/typography_provider.dart';
 
@@ -20,6 +21,8 @@ class DictionaryEntrySheet extends ConsumerWidget {
     final theme = Theme.of(context);
     final definitionsAsync = ref.watch(dictionaryDefinitionProvider(normalizedWord));
     final typography = ref.watch(typographyProvider);
+    final bookmarkedWords = ref.watch(bookmarkedWordsProvider).asData?.value ?? {};
+    final isBookmarked = bookmarkedWords.contains(normalizedWord);
 
     return Container(
       constraints: BoxConstraints(
@@ -51,11 +54,30 @@ class DictionaryEntrySheet extends ConsumerWidget {
                   ),
                   Row(
                     children: [
-                      Icon(Icons.star_rounded, color: Colors.amber.shade500, size: 26),
-                      const SizedBox(width: 16),
-                      Icon(Icons.ios_share_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.4), size: 24),
-                      const SizedBox(width: 16),
-                      Icon(Icons.more_horiz_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.4), size: 24),
+                      IconButton(
+                        onPressed: () {
+                          ref.read(bookmarkedWordsProvider.notifier).toggleBookmark(normalizedWord);
+                        },
+                        icon: Icon(
+                          isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+                          color: isBookmarked ? theme.primaryColor : theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                          size: 26,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      IconButton(
+                        onPressed: () {
+                          final defs = definitionsAsync.asData?.value;
+                          if (defs != null && defs.isNotEmpty) {
+                            final displayWord = defs.first.displayHeadword;
+                            final textToShare = "$displayWord\n\n" + defs.map((d) {
+                              return "${_formatSourceName(d.source).toUpperCase()}:\n${d.definition.trim()}";
+                            }).join('\n\n');
+                            Share.share(textToShare);
+                          }
+                        },
+                        icon: Icon(Icons.ios_share_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.4), size: 24),
+                      ),
                     ],
                   ),
                 ],
@@ -90,60 +112,27 @@ class DictionaryEntrySheet extends ConsumerWidget {
                           color: theme.colorScheme.onSurface,
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      // Phonetic / Source Subtitle
-                      if (defs.length == 1)
-                        Row(
-                          children: [
-                            Text(
-                              '/ ${_formatSourceName(defs.first.source)} /',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontStyle: FontStyle.italic,
-                                color: theme.primaryColor.withValues(alpha: 0.8),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Icon(CupertinoIcons.speaker_2_fill, size: 16, color: theme.primaryColor.withValues(alpha: 0.8)),
-                          ],
-                        ),
-                      
                       const SizedBox(height: 32),
                       
                       // Definition Blocks
                       ...defs.expand((def) {
-                        // FIX: Use actual newline char '\n+' instead of literal backslash 'n' '\\n+'
                         final paragraphs = def.definition.split(RegExp(r'\n+'))
                             .map((p) => p.trim())
                             .where((p) => p.isNotEmpty)
                             .toList();
                             
                         return [
-                          if (defs.length > 1) ...[
-                            Text(
-                              _formatSourceName(def.source).toUpperCase(),
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
-                                letterSpacing: 1.5,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          Text(
+                            _formatSourceName(def.source).toUpperCase(),
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                              letterSpacing: 1.5,
+                              fontWeight: FontWeight.w600,
                             ),
-                            const SizedBox(height: 8),
-                            Divider(color: theme.dividerColor.withValues(alpha: 0.3), height: 1),
-                            const SizedBox(height: 16),
-                          ] else if (def == defs.first) ...[
-                            Text(
-                              'DEFINITIONS',
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
-                                letterSpacing: 1.5,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Divider(color: theme.dividerColor.withValues(alpha: 0.3), height: 1),
-                            const SizedBox(height: 16),
-                          ],
+                          ),
+                          const SizedBox(height: 8),
+                          Divider(color: theme.dividerColor.withValues(alpha: 0.3), height: 1),
+                          const SizedBox(height: 16),
                           ...paragraphs.map((p) => Padding(
                             padding: const EdgeInsets.only(bottom: 20.0),
                             child: SelectableText.rich(
@@ -159,8 +148,7 @@ class DictionaryEntrySheet extends ConsumerWidget {
                               ),
                             ),
                           )),
-                          if (defs.length > 1)
-                            const SizedBox(height: 16),
+                          if (def != defs.last) const SizedBox(height: 16),
                         ];
                       }),
                       
@@ -183,7 +171,6 @@ class DictionaryEntrySheet extends ConsumerWidget {
 
   List<TextSpan> _parseRichText(String text, ThemeData theme) {
     final spans = <TextSpan>[];
-    // Find text in parentheses, e.g. (Dan. 11:1) or (1.)
     final regex = RegExp(r'\([^)]+\)');
     final matches = regex.allMatches(text);
     
