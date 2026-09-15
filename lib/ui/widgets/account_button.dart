@@ -145,13 +145,14 @@ class AccountButton extends ConsumerWidget {
                                     const SnackBar(content: Text('Account deleted successfully.')),
                                   );
                                 }
+                              } on ReauthCancelledException catch (_) {
+                                // Ignore cancellation silently
                               } catch (e) {
                                 if (context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text('Failed to delete account: ${e.toString().replaceAll("Exception: ", "")}'),
-
-                                      duration: Duration(seconds: 4),
+                                      duration: const Duration(seconds: 4),
                                     ),
                                   );
                                 }

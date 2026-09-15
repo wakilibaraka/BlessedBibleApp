@@ -13,6 +13,13 @@ final authStateProvider = StreamProvider<User?>((ref) {
 /// Provides sign-in/out actions (no state, just methods).
 final authActionsProvider = Provider<AuthActions>((ref) => AuthActions(ref));
 
+class ReauthCancelledException implements Exception {
+  final String message;
+  ReauthCancelledException([this.message = 'Re-authentication was cancelled.']);
+  @override
+  String toString() => message;
+}
+
 enum SignInResult { success, cancelled, failed }
 
 class AuthActions {
@@ -102,6 +109,16 @@ class AuthActions {
         await user.reauthenticateWithCredential(credential);
         return true;
       }
+    } on GoogleSignInException catch (e) {
+      if (e.code == GoogleSignInExceptionCode.canceled || e.code == GoogleSignInExceptionCode.interrupted) {
+        throw ReauthCancelledException();
+      }
+      return false;
+    } on SignInWithAppleAuthorizationException catch (e) {
+      if (e.code == AuthorizationErrorCode.canceled) {
+        throw ReauthCancelledException();
+      }
+      return false;
     } catch (e) {
       return false;
     }
