@@ -50,7 +50,7 @@ flutter_launcher_icons:
 flutter:
   uses-material-design: true
   assets:
-    - assets/bible/
+    - assets/bible/bible.db
     - assets/images/
     - assets/data/
     - assets/icon/

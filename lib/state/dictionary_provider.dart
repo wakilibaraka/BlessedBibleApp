@@ -22,12 +22,14 @@ class ChapterUnderlineArgs {
   final int chapterNumber;
   final List<BibleVerse> verses;
   final bool isEnglish;
+  final String translationId;
 
   ChapterUnderlineArgs({
     required this.bookNumber, 
     required this.chapterNumber, 
     required this.verses,
     required this.isEnglish,
+    required this.translationId,
   });
 
   @override
@@ -37,10 +39,11 @@ class ChapterUnderlineArgs {
           runtimeType == other.runtimeType &&
           bookNumber == other.bookNumber &&
           chapterNumber == other.chapterNumber &&
-          isEnglish == other.isEnglish;
+          isEnglish == other.isEnglish &&
+          translationId == other.translationId;
 
   @override
-  int get hashCode => bookNumber.hashCode ^ chapterNumber.hashCode ^ isEnglish.hashCode;
+  int get hashCode => bookNumber.hashCode ^ chapterNumber.hashCode ^ isEnglish.hashCode ^ translationId.hashCode;
 }
 
 // Map of verseNumber -> Set of token indices
@@ -63,16 +66,8 @@ final chapterUnderlineMapProvider = Provider.family<Map<int, Set<int>>, ChapterU
 
   for (final v in args.verses) {
     final int verseNum = v.number;
-    final String text = v.text;
-    
-    // We match over plain text (no tags) so indices align with splitMapJoin later
-    // Actually, if we use wordRegex.allMatches on the original text with tags stripped,
-    // how does that align with `splitMapJoin` during rendering?
-    // If we split by `[a-zA-Z]+` on the RAW text (with `‹` and `›`), the token index will still match!
-    // Why? Because punctuation doesn't change the number of words. 
-    // Wait! `splitMapJoin` on the raw text WILL include `‹` and `›` as non-matches.
-    // Yes, the number of matches of `[a-zA-Z]+` is identical whether punctuation is there or not!
-    // So we can just use `wordRegex.allMatches(text)` on the raw text.
+    // Strip Strong's tags before matching so index aligns with read_screen.dart
+    final String text = v.text.replaceAll(RegExp(r'\[[HG]\d+\]'), '');
     
     final matches = wordRegex.allMatches(text);
     int matchIndex = 0;

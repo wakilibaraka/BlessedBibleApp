@@ -1,17 +1,21 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../state/dictionary_provider.dart';
 import '../../state/typography_provider.dart';
+import '../dialogs/verse_preview_dialog.dart';
 
 class DictionaryEntrySheet extends ConsumerWidget {
   final String normalizedWord;
+  final bool isFloating;
 
-  const DictionaryEntrySheet({super.key, required this.normalizedWord});
+  const DictionaryEntrySheet({super.key, required this.normalizedWord, this.isFloating = false});
 
   String _formatSourceName(String source) {
     if (source.toLowerCase().contains('easton')) return "Easton's Bible Dictionary";
+    if (source.toLowerCase().contains('smith')) return "Smith's Bible Dictionary";
     if (source.toLowerCase().contains('kjv')) return "KJV Archaic Word";
     return source;
   }
@@ -24,14 +28,25 @@ class DictionaryEntrySheet extends ConsumerWidget {
     final bookmarkedWords = ref.watch(bookmarkedWordsProvider).asData?.value ?? {};
     final isBookmarked = bookmarkedWords.contains(normalizedWord);
 
-    return Container(
+    Widget content = Container(
+      width: isFloating ? MediaQuery.sizeOf(context).width * 0.9 : double.infinity,
       constraints: BoxConstraints(
-        minHeight: MediaQuery.sizeOf(context).height * 0.5,
+        minHeight: MediaQuery.sizeOf(context).height * 0.3,
         maxHeight: MediaQuery.sizeOf(context).height * 0.75,
+        maxWidth: isFloating ? 500 : double.infinity,
       ),
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        borderRadius: isFloating 
+            ? BorderRadius.circular(24) 
+            : const BorderRadius.vertical(top: Radius.circular(32)),
+        boxShadow: isFloating ? [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 24,
+            spreadRadius: 8,
+          )
+        ] : null,
       ),
       child: SafeArea(
         child: Column(
@@ -116,7 +131,11 @@ class DictionaryEntrySheet extends ConsumerWidget {
                       
                       // Definition Blocks
                       ...defs.expand((def) {
-                        final paragraphs = def.definition.split(RegExp(r'\n+'))
+                        String formattedDef = def.definition.replaceAllMapped(
+                          RegExp(r'\s(\(\d+\.?\)|\d+\.|[IVX]+\.)\s'),
+                          (match) => '\n\n${match.group(1)} '
+                        );
+                        final paragraphs = formattedDef.split(RegExp(r'\n+'))
                             .map((p) => p.trim())
                             .where((p) => p.isNotEmpty)
                             .toList();
@@ -144,7 +163,7 @@ class DictionaryEntrySheet extends ConsumerWidget {
                                   fontWeight: typography.fontWeight,
                                   color: theme.colorScheme.onSurface.withValues(alpha: 0.85),
                                 ),
-                                children: _parseRichText(p, theme),
+                                children: _parseRichText(context, p, theme),
                               ),
                             ),
                           )),
@@ -167,11 +186,21 @@ class DictionaryEntrySheet extends ConsumerWidget {
         ),
       ),
     );
+
+    if (isFloating) {
+      return Dialog(
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        child: content,
+      );
+    }
+    return content;
   }
 
-  List<TextSpan> _parseRichText(String text, ThemeData theme) {
+  List<TextSpan> _parseRichText(BuildContext context, String text, ThemeData theme) {
     final spans = <TextSpan>[];
-    final regex = RegExp(r'\([^)]+\)');
+    final regex = RegExp(r'\[\[(\d+)\]([^\]]+)\]|([1-3]?\s?[A-Z][a-z]+\.?\s+\d+:\d+(?:-\d+)?)');
     final matches = regex.allMatches(text);
     
     int lastEnd = 0;
@@ -179,13 +208,68 @@ class DictionaryEntrySheet extends ConsumerWidget {
       if (match.start > lastEnd) {
         spans.add(TextSpan(text: text.substring(lastEnd, match.start)));
       }
-      spans.add(TextSpan(
-        text: match.group(0),
-        style: TextStyle(
-          color: theme.primaryColor,
-          fontWeight: FontWeight.w600,
-        ),
-      ));
+      
+      if (match.group(1) != null) {
+        // It's a Strong's reference: [[1072]Slave]
+        
+        final word = match.group(2)!;
+        
+        spans.add(TextSpan(
+          text: word,
+          style: TextStyle(
+            color: theme.primaryColor,
+            fontWeight: FontWeight.w600,
+            decoration: TextDecoration.underline,
+          ),
+          recognizer: TapGestureRecognizer()..onTap = () {
+             // Depending on whether it's Greek or Hebrew, the ID might need prefixing,
+             // but Easton/Smith uses Strongs. Wait, the Strongs DB uses H1072 or G1072.
+             // If we don't have H or G, we might need to guess based on context, but let's just use it directly
+             // Actually, if we just pass 'H$strongsId' or 'G$strongsId' it might be better, or we can look it up.
+             // Since we can't tell, let's just pass 'G$strongsId' as most Smith dictionary references are NT.
+             // Actually, maybe it's fine to just show the DictionaryEntrySheet for the word instead of Strongs!
+             // Let's launch DictionaryEntrySheet for 'word'
+             showDialog(
+                context: context,
+                builder: (ctx) => DictionaryEntrySheet(normalizedWord: word.toLowerCase(), isFloating: true),
+             );
+          },
+        ));
+      } else if (match.group(3) != null) {
+        // It's a Verse reference: 1 Cor. 4:4
+        final verseRef = match.group(3)!;
+        
+        spans.add(TextSpan(
+          text: verseRef,
+          style: TextStyle(
+            color: theme.primaryColor,
+            fontWeight: FontWeight.w600,
+          ),
+          recognizer: TapGestureRecognizer()..onTap = () {
+             final parts = verseRef.split(RegExp(r'\s+'));
+             final cv = parts.last.split(':');
+             if (cv.length >= 2) {
+                final ch = int.tryParse(cv[0]);
+                final vPart = cv[1].split('-').first;
+                final v = int.tryParse(vPart);
+                final bookAbbrev = parts.sublist(0, parts.length - 1).join(' ');
+                
+                if (ch != null && v != null) {
+                   showDialog(
+                     context: context,
+                     builder: (ctx) => VersePreviewDialog(
+                       reference: verseRef,
+                       bookAbbrev: bookAbbrev,
+                       chapter: ch,
+                       verseNum: v,
+                     ),
+                   );
+                }
+             }
+          },
+        ));
+      }
+      
       lastEnd = match.end;
     }
     

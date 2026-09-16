@@ -12,6 +12,10 @@ enum SelectorHeight { quarter, half, full }
 
 enum DictionaryScope { term, termAndTricky, everything }
 
+enum StrongsIndicatorStyle { asterisk, chain, number }
+
+enum PopupStyle { bottomSheet, floating }
+
 class ReadSettingsState {
   final ReadingViewMode readingViewMode;
   final bool isGlowEnabled;
@@ -29,6 +33,10 @@ class ReadSettingsState {
   final bool showChipsOnSavedItems;
   final bool dictionaryUnderlinesEnabled;
   final DictionaryScope dictionaryScope;
+  final bool showCrossReferences;
+  final bool showStrongsNumbers;
+  final StrongsIndicatorStyle strongsIndicatorStyle;
+  final PopupStyle popupStyle;
 
   const ReadSettingsState({
     this.readingViewMode = ReadingViewMode.pinned,
@@ -49,6 +57,10 @@ class ReadSettingsState {
     this.showChipsOnSavedItems = false,
     this.dictionaryUnderlinesEnabled = true,
     this.dictionaryScope = DictionaryScope.termAndTricky,
+    this.showCrossReferences = false,
+    this.showStrongsNumbers = false,
+    this.strongsIndicatorStyle = StrongsIndicatorStyle.asterisk,
+    this.popupStyle = PopupStyle.floating,
   });
 
   ReadSettingsState copyWith({
@@ -68,6 +80,10 @@ class ReadSettingsState {
     bool? showChipsOnSavedItems,
     bool? dictionaryUnderlinesEnabled,
     DictionaryScope? dictionaryScope,
+    bool? showCrossReferences,
+    bool? showStrongsNumbers,
+    StrongsIndicatorStyle? strongsIndicatorStyle,
+    PopupStyle? popupStyle,
   }) {
     return ReadSettingsState(
       readingViewMode: readingViewMode ?? this.readingViewMode,
@@ -87,6 +103,10 @@ class ReadSettingsState {
       showChipsOnSavedItems: showChipsOnSavedItems ?? this.showChipsOnSavedItems,
       dictionaryUnderlinesEnabled: dictionaryUnderlinesEnabled ?? this.dictionaryUnderlinesEnabled,
       dictionaryScope: dictionaryScope ?? this.dictionaryScope,
+      showCrossReferences: showCrossReferences ?? this.showCrossReferences,
+      showStrongsNumbers: showStrongsNumbers ?? this.showStrongsNumbers,
+      strongsIndicatorStyle: strongsIndicatorStyle ?? this.strongsIndicatorStyle,
+      popupStyle: popupStyle ?? this.popupStyle,
     );
   }
 }
@@ -125,6 +145,8 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     final showChipsOnSavedItems = prefs.getBool('show_chips_on_saved_items') ?? false;
     final dictionaryUnderlinesEnabled = prefs.getBool('dictionaryUnderlinesEnabled') ?? true;
     final dictScopeString = prefs.getString('dictionaryScope');
+    final showCrossReferences = prefs.getBool('show_cross_references') ?? false;
+    final showStrongsNumbers = prefs.getBool('show_strongs_numbers') ?? false;
     DictionaryScope dictScope = DictionaryScope.termAndTricky;
     if (dictScopeString != null) {
       dictScope = DictionaryScope.values.firstWhere(
@@ -167,6 +189,24 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
       );
     }
 
+    final strongsStyleString = prefs.getString('strongs_indicator_style');
+    StrongsIndicatorStyle strongsStyle = StrongsIndicatorStyle.asterisk;
+    if (strongsStyleString != null) {
+      strongsStyle = StrongsIndicatorStyle.values.firstWhere(
+        (e) => e.name == strongsStyleString,
+        orElse: () => StrongsIndicatorStyle.asterisk,
+      );
+    }
+
+    final popupStyleString = prefs.getString('popup_style');
+    PopupStyle popupStyle = PopupStyle.floating;
+    if (popupStyleString != null) {
+      popupStyle = PopupStyle.values.firstWhere(
+        (e) => e.name == popupStyleString,
+        orElse: () => PopupStyle.floating,
+      );
+    }
+
     state = state.copyWith(
       readingViewMode: mode,
       isGlowEnabled: isGlowEnabled,
@@ -184,7 +224,17 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
       showChipsOnSavedItems: showChipsOnSavedItems,
       dictionaryUnderlinesEnabled: dictionaryUnderlinesEnabled,
       dictionaryScope: dictScope,
+      showCrossReferences: showCrossReferences,
+      showStrongsNumbers: showStrongsNumbers,
+      strongsIndicatorStyle: strongsStyle,
+      popupStyle: popupStyle,
     );
+  }
+
+  Future<void> setPopupStyle(PopupStyle style) async {
+    state = state.copyWith(popupStyle: style);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('popup_style', style.name);
   }
 
   Future<void> setFabLongPressToNav(bool value) async {
@@ -291,6 +341,24 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     state = state.copyWith(showChipsOnSavedItems: value);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('show_chips_on_saved_items', value);
+  }
+
+  Future<void> setShowCrossReferences(bool value) async {
+    state = state.copyWith(showCrossReferences: value);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('show_cross_references', value);
+  }
+
+  Future<void> setStrongsIndicatorStyle(StrongsIndicatorStyle style) async {
+    state = state.copyWith(strongsIndicatorStyle: style);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('strongs_indicator_style', style.name);
+  }
+
+  Future<void> setShowStrongsNumbers(bool value) async {
+    state = state.copyWith(showStrongsNumbers: value);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('show_strongs_numbers', value);
   }
 }
 

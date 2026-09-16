@@ -735,6 +735,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                                   verseNumber: verse.number,
                                   bookName: passage.book.name,
                                   chapterNum: passage.chapterNum,
+                                  bookNumber: ref.read(bibleProvider).books.indexOf(passage.book) + 1,
                                   onCustomSelection: () {},
                                 ),
                               );

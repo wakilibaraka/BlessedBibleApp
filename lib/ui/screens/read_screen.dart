@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
+import '../widgets/strongs_entry_sheet.dart';
+
 import '../widgets/dictionary_entry_sheet.dart';
 import '../sheets/appearance_settings_sheet.dart';
 
@@ -175,12 +177,28 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   final Map<String, List<TapGestureRecognizer>> _dictRecognizers = {};
 
   void _showDictionaryPopover(String normalizedWord) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => DictionaryEntrySheet(normalizedWord: normalizedWord),
-    );
+    final style = ref.read(readSettingsProvider).popupStyle;
+    final isFloating = style == PopupStyle.floating;
+    
+    if (isFloating) {
+      showDialog(
+        context: context,
+        builder: (context) => DictionaryEntrySheet(
+          normalizedWord: normalizedWord,
+          isFloating: true,
+        ),
+      );
+    } else {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => DictionaryEntrySheet(
+          normalizedWord: normalizedWord,
+          isFloating: false,
+        ),
+      );
+    }
   }
 
   int? _navigatedVerseIndex;
@@ -1157,6 +1175,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                               chapterNumber: fc.chapter.number,
                                                               verses: verses,
                                                               isEnglish: isEnglish,
+                                                              translationId: transInfo.translationId,
                                                             )
                                                           )
                                                         );
@@ -1398,6 +1417,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                                   verseNumber: verse.number,
                                                                                   bookName: fc.book.name,
                                                                                   chapterNum: fc.chapter.number,
+                                                                                  bookNumber: allBooks.indexOf(fc.book) + 1,
                                                                                   onCustomSelection: _enterPageSelection,
                                                                                 ),
                                                                               );
@@ -1691,8 +1711,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       void Function(String word)? onDictTap}) {
     final activeTrans = ref.read(activeTranslationProvider);
     final secondaryTrans = ref.read(secondaryTranslationProvider);
+    final showStrongs = ref.watch(readSettingsProvider.select((s) => s.showStrongsNumbers));
+    final strongsStyle = ref.watch(readSettingsProvider.select((s) => s.strongsIndicatorStyle));
 
-    final primary = _buildNormalVerse(
+    final primary = _buildNormalVerse(context, 
       primaryVerse,
       theme,
       typography,
@@ -1705,6 +1727,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       translationId: activeTrans,
       bookNumber: bookNumber,
       chapterNumber: chapterNumber,
+      showStrongsNumbers: showStrongs, strongsIndicatorStyle: strongsStyle,
       dictTokens: dictTokens,
       onDictTap: onDictTap,
     );
@@ -1722,7 +1745,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         fontSize: typography.fontSize * 0.95,
       );
 
-      final secondary = _buildNormalVerse(
+      final secondary = _buildNormalVerse(context, 
         secondaryVerse,
         theme,
         secondaryTypography,
@@ -1735,7 +1758,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         isSelectionMode: isSelectionMode,
         translationId: secondaryTrans,
         bookNumber: bookNumber,
-        chapterNumber: chapterNumber
+        chapterNumber: chapterNumber,
+        showStrongsNumbers: showStrongs, strongsIndicatorStyle: strongsStyle,
       );
 
       return Column(
@@ -1765,7 +1789,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         fontSize: typography.fontSize * 0.95,
       );
 
-      final secondary = _buildNormalVerse(
+      final secondary = _buildNormalVerse(context, 
         secondaryVerse,
         theme,
         secondaryTypography,
@@ -1778,7 +1802,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         isSelectionMode: isSelectionMode,
         translationId: secondaryTrans,
         bookNumber: bookNumber,
-        chapterNumber: chapterNumber
+        chapterNumber: chapterNumber,
+        showStrongsNumbers: showStrongs, strongsIndicatorStyle: strongsStyle,
       );
 
       return Row(
@@ -1849,7 +1874,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         activeTranslationWidget = verseAsync.when(
           data: (verse) {
             if (verse == null) return const SizedBox.shrink();
-            return _buildNormalVerse(
+            return _buildNormalVerse(context, 
               verse,
               theme,
               secondaryTypography,
@@ -1863,6 +1888,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
               translationId: activeChipId,
               bookNumber: bookNumber,
               chapterNumber: chapterNumber,
+              showStrongsNumbers: showStrongs, strongsIndicatorStyle: strongsStyle,
             );
           },
           loading: () => Padding(
@@ -2008,7 +2034,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     return primary;
   }
 
-  Widget _buildNormalVerse(BibleVerse verse, ThemeData theme,
+  Widget _buildNormalVerse(BuildContext context, BibleVerse verse, ThemeData theme,
       TypographyState typography, AppThemeMode appThemeMode,
       {bool hasCommentary = false,
       VoidCallback? onCommentaryTap,
@@ -2020,6 +2046,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       String? translationId,
       int? bookNumber,
       int? chapterNumber,
+      bool showStrongsNumbers = false, StrongsIndicatorStyle strongsIndicatorStyle = StrongsIndicatorStyle.asterisk,
       Set<int>? dictTokens,
       void Function(String word)? onDictTap}) {
     final tokens = theme.extension<ReadingTokens>();
@@ -2067,8 +2094,15 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     }
 
     final redLetterStyle = fontStyle.copyWith(color: redLetterColor);
-    List<TextSpan> textSpans = [];
+    List<InlineSpan> textSpans = [];
+    
     String text = verse.text;
+    
+    // If not showing strongs, simply strip the tags
+    if (!showStrongsNumbers) {
+      text = text.replaceAll(RegExp(r'\[[HG]\d+\]'), '');
+    }
+    
     int currentIndex = 0;
     int globalTokenIndex = 0;
     
@@ -2076,14 +2110,17 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     final List<TapGestureRecognizer> localRecognizers = [];
 
     void processChunk(String chunk, TextStyle style) {
-      if (dictTokens == null || dictTokens.isEmpty) {
+      if (!showStrongsNumbers && (dictTokens == null || dictTokens.isEmpty)) {
         textSpans.add(TextSpan(text: chunk, style: style));
         final matches = RegExp(r'[a-zA-Z]+').allMatches(chunk);
         globalTokenIndex += matches.length;
         return;
       }
 
-      final matches = RegExp(r'[a-zA-Z]+').allMatches(chunk);
+      final regex = showStrongsNumbers 
+          ? RegExp(r'\[[HG]\d+\]|[a-zA-Z]+')
+          : RegExp(r'[a-zA-Z]+');
+      final matches = regex.allMatches(chunk);
       int lastMatchEnd = 0;
       
       for (final match in matches) {
@@ -2092,28 +2129,75 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         }
         
         final word = match.group(0)!;
-        final isUnderlined = dictTokens.contains(globalTokenIndex);
         
-        if (isUnderlined) {
+        if (word.startsWith('[') && word.endsWith(']')) {
+          final strongsId = word.substring(1, word.length - 1);
           final tapGesture = TapGestureRecognizer()..onTap = () {
-            onDictTap?.call(word.toLowerCase());
+            showStrongsEntrySheet(context, strongsId);
           };
           localRecognizers.add(tapGesture);
-          
-          textSpans.add(TextSpan(
-            text: word,
-            style: style.copyWith(
-              decoration: TextDecoration.underline,
-              decorationStyle: TextDecorationStyle.dotted,
-              decorationColor: theme.primaryColor,
-            ),
-            recognizer: tapGesture,
-          ));
+
+          InlineSpan strongsSpan;
+          if (strongsIndicatorStyle == StrongsIndicatorStyle.asterisk) {
+            strongsSpan = TextSpan(
+              text: '*',
+              style: style.copyWith(
+                color: theme.colorScheme.primary.withOpacity(0.8),
+                fontWeight: FontWeight.bold,
+              ),
+              recognizer: tapGesture,
+            );
+          } else if (strongsIndicatorStyle == StrongsIndicatorStyle.number) {
+            strongsSpan = TextSpan(
+              text: strongsId,
+              style: style.copyWith(
+                fontSize: (style.fontSize ?? 16) * 0.7,
+                color: theme.colorScheme.primary.withOpacity(0.9),
+                fontWeight: FontWeight.bold,
+              ),
+              recognizer: tapGesture,
+            );
+          } else {
+            strongsSpan = WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
+              child: GestureDetector(
+                onTap: () => showStrongsEntrySheet(context, strongsId),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 1.0),
+                  child: Icon(
+                    Icons.link,
+                    size: (style.fontSize ?? 16) * 0.85,
+                    color: theme.colorScheme.primary.withOpacity(0.7),
+                  ),
+                ),
+              ),
+            );
+          }
+          textSpans.add(strongsSpan);
         } else {
-          textSpans.add(TextSpan(text: word, style: style));
+          final isUnderlined = dictTokens?.contains(globalTokenIndex) ?? false;
+          
+          if (isUnderlined) {
+            final tapGesture = TapGestureRecognizer()..onTap = () {
+              onDictTap?.call(word.toLowerCase());
+            };
+            localRecognizers.add(tapGesture);
+            
+            textSpans.add(TextSpan(
+              text: word,
+              style: style.copyWith(
+                decoration: TextDecoration.underline,
+                decorationStyle: TextDecorationStyle.dotted,
+                decorationColor: theme.primaryColor,
+              ),
+              recognizer: tapGesture,
+            ));
+          } else {
+            textSpans.add(TextSpan(text: word, style: style));
+          }
+          globalTokenIndex++;
         }
         
-        globalTokenIndex++;
         lastMatchEnd = match.end;
       }
       

@@ -368,6 +368,77 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               },
             );
           }),
+          const Divider(height: 1, indent: 16),
+          Consumer(builder: (context, ref, _) {
+            final showCrossRefs = ref.watch(
+                readSettingsProvider.select((s) => s.showCrossReferences));
+            return SwitchListTile(
+              title: const Text('Show Cross-References'),
+              subtitle: const Text(
+                  'Adds a "Related" button when you long-press any verse, showing thematically linked verses'),
+              value: showCrossRefs,
+              onChanged: (val) {
+                HapticFeedback.selectionClick();
+                ref
+                    .read(readSettingsProvider.notifier)
+                    .setShowCrossReferences(val);
+              },
+            );
+          }),
+          const Divider(height: 1, indent: 16),
+          Consumer(builder: (context, ref, _) {
+            final showStrongs = ref.watch(
+                readSettingsProvider.select((s) => s.showStrongsNumbers));
+            final strongsStyle = ref.watch(
+                readSettingsProvider.select((s) => s.strongsIndicatorStyle));
+            
+            return Column(
+              children: [
+                SwitchListTile(
+                  title: const Text("Show Strong's Numbers"),
+                  subtitle: const Text(
+                      'Displays original Hebrew/Greek identifiers alongside KJV text for deep word study'),
+                  value: showStrongs,
+                  onChanged: (val) {
+                    HapticFeedback.selectionClick();
+                    ref
+                        .read(readSettingsProvider.notifier)
+                        .setShowStrongsNumbers(val);
+                  },
+                ),
+                if (showStrongs)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    child: SegmentedButton<StrongsIndicatorStyle>(
+                      segments: const [
+                        ButtonSegment(
+                          value: StrongsIndicatorStyle.asterisk,
+                          label: Text('Asterisk (*)'),
+                        ),
+                        ButtonSegment(
+                          value: StrongsIndicatorStyle.chain,
+                          label: Text('Chain (🔗)'),
+                        ),
+                        ButtonSegment(
+                          value: StrongsIndicatorStyle.number,
+                          label: Text('Number (H1234)'),
+                        ),
+                      ],
+                      selected: {strongsStyle},
+                      onSelectionChanged: (set) {
+                        HapticFeedback.selectionClick();
+                        ref
+                            .read(readSettingsProvider.notifier)
+                            .setStrongsIndicatorStyle(set.first);
+                      },
+                      style: ButtonStyle(
+                        visualDensity: VisualDensity.compact,
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          }),
         ],
       ),
 
@@ -438,6 +509,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                   },
                 ),
               ],
+            );
+          }),
+          const Divider(height: 1, indent: 16),
+          Consumer(builder: (context, ref, _) {
+            final popupStyle = ref.watch(
+                readSettingsProvider.select((s) => s.popupStyle));
+            return AnimatedSegmentedTile<PopupStyle>(
+              title: 'Popup Style',
+              subtitle: 'How dictionary definitions and Strong\'s numbers are displayed',
+              selectedValue: popupStyle,
+              options: const [
+                MapEntry(PopupStyle.floating, 'Floating'),
+                MapEntry(PopupStyle.bottomSheet, 'Sheet'),
+              ],
+              onChanged: (val) {
+                HapticFeedback.selectionClick();
+                ref.read(readSettingsProvider.notifier).setPopupStyle(val);
+              },
             );
           }),
         ],
