@@ -212,7 +212,7 @@ class _StrongsEntrySheet extends ConsumerWidget {
                 },
                 loading: () => const Center(child: Padding(
                   padding: EdgeInsets.all(40.0),
-                  child: CupertinoActivityIndicator(),
+                  child: CircularProgressIndicator(),
                 )),
                 error: (e, __) => Center(child: Text('Failed to load: $e')),
               ),

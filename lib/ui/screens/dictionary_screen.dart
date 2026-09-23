@@ -94,9 +94,9 @@ class _DictionaryScreenState extends ConsumerState<DictionaryScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                 prefixIcon: Padding(
                   padding: const EdgeInsets.only(left: 8.0, top: 2),
-                  child: Icon(CupertinoIcons.search, color: theme.colorScheme.onSurface.withValues(alpha: 0.4), size: 20),
+                  child: Icon(Icons.search, color: theme.colorScheme.onSurface.withValues(alpha: 0.4), size: 20),
                 ),
-                suffixIcon: const Icon(CupertinoIcons.clear_thick_circled, size: 18),
+                suffixIcon: const Icon(Icons.cancel, size: 18),
                 style: theme.textTheme.bodyMedium,
                 decoration: BoxDecoration(
                   color: Colors.transparent,
@@ -213,7 +213,7 @@ class _DictionaryScreenState extends ConsumerState<DictionaryScreen> {
                   ],
                 );
               },
-              loading: () => const Center(child: CupertinoActivityIndicator()),
+              loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, __) => Center(child: Text('Error: $e')),
             ),
           ),
