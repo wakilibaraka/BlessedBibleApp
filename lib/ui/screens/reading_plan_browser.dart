@@ -2162,7 +2162,7 @@ class _AdaptivePlanCalendar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final surfaceStyle = ref.watch(surfaceStyleProvider);
-    final is3D = surfaceStyle == SurfaceStyle.threeDimensional || surfaceStyle == SurfaceStyle.depth3D;
+    final is3D = surfaceStyle == SurfaceStyle.threeDimensional || surfaceStyle == SurfaceStyle.depth3D || surfaceStyle == SurfaceStyle.skeuomorphic;
 
     final totalDays = planState.planData.length;
 

@@ -254,7 +254,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                   ],
                 ),
                 itemCount: layoutConfig.length,
-                onReorderItem: (int oldIndex, int newIndex) {
+                onReorder: (int oldIndex, int newIndex) {
                   ref
                       .read(studyLayoutProvider.notifier)
                       .reorder(oldIndex, newIndex);

@@ -91,9 +91,10 @@ class _TexturedGlassContainerState extends ConsumerState<TexturedGlassContainer>
     final appThemeResolved = appTheme.resolve(context);
     final surfaceStyle = ref.watch(surfaceStyleProvider);
     final isDepth3D = surfaceStyle == SurfaceStyle.depth3D;
+    final isSkeuomorphic = surfaceStyle == SurfaceStyle.skeuomorphic;
 
     BorderRadius radius;
-    if (isDepth3D) {
+    if (isDepth3D || isSkeuomorphic) {
       if (widget.borderRadius != null && widget.borderRadius!.topLeft.x < 28) {
         radius = BorderRadius.circular(28);
       } else {
@@ -111,7 +112,18 @@ class _TexturedGlassContainerState extends ConsumerState<TexturedGlassContainer>
     Color fillColor;
     bool isDarkPanel = false;
 
-    if (useBlur) {
+    if (isSkeuomorphic) {
+      final baseColor = tokens.readingSurface;
+      final isDark = baseColor.computeLuminance() < 0.4;
+      isDarkPanel = isDark;
+      if (widget.isActive) {
+        fillColor = isDark
+            ? baseColor.withValues(alpha: 0.8)
+            : baseColor.withValues(alpha: 0.9);
+      } else {
+        fillColor = baseColor;
+      }
+    } else if (useBlur) {
       switch (appThemeResolved) {
         case AppThemeMode.sepia:
           fillColor =
@@ -343,7 +355,14 @@ class _TexturedGlassContainerState extends ConsumerState<TexturedGlassContainer>
         borderRadius: radius,
         border: useBlur
             ? null
-            : isDepth3D
+            : isSkeuomorphic
+                ? Border.all(
+                    width: 1.0,
+                    color: isDarkBg
+                            ? Colors.white.withValues(alpha: 0.08)
+                            : Colors.black.withValues(alpha: 0.15),
+                  )
+                : isDepth3D
                 ? Border.all(
                     width: 1.0,
                     color: appThemeResolved == AppThemeMode.priestlyPurple ? const Color(0xFFFFD700).withValues(alpha: 0.15)
@@ -361,7 +380,16 @@ class _TexturedGlassContainerState extends ConsumerState<TexturedGlassContainer>
       child: finalChild,
     );
 
-    if (useBlur) {
+    if (isSkeuomorphic) {
+      content = CustomPaint(
+        foregroundPainter: _SkeuomorphicPainter(
+          borderRadius: radius,
+          isDark: isDarkPanel,
+          baseColor: fillColor,
+        ),
+        child: content,
+      );
+    } else if (useBlur) {
       content = CustomPaint(
         foregroundPainter: _RimAndNoisePainter(
           borderRadius: radius,
@@ -385,13 +413,15 @@ class _TexturedGlassContainerState extends ConsumerState<TexturedGlassContainer>
         borderRadius: radius,
         clipBehavior: Clip.antiAlias,
         child: RepaintBoundary(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(
-              sigmaX: useBlur ? widget.sigmaX : 0.001,
-              sigmaY: useBlur ? widget.sigmaY : 0.001,
-            ),
-            child: content,
-          ),
+          child: (useBlur || is3D || isDepth3D)
+              ? BackdropFilter(
+                  filter: ImageFilter.blur(
+                    sigmaX: useBlur ? widget.sigmaX : 0.001,
+                    sigmaY: useBlur ? widget.sigmaY : 0.001,
+                  ),
+                  child: content,
+                )
+              : content,
         ),
       ),
     );
@@ -502,4 +532,75 @@ class _RimAndNoisePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _RimAndNoisePainter old) =>
       old.rimAlpha != rimAlpha || old.isDark != isDark;
+}
+
+class _SkeuomorphicPainter extends CustomPainter {
+  final BorderRadius borderRadius;
+  final bool isDark;
+  final Color baseColor;
+
+  _SkeuomorphicPainter({
+    required this.borderRadius,
+    required this.isDark,
+    required this.baseColor,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rrect = borderRadius.toRRect(Offset.zero & size);
+    canvas.save();
+    canvas.clipRRect(rrect);
+
+    final random = math.Random(12345);
+    final count = (size.width * size.height * 0.08).toInt().clamp(0, 15000);
+
+    // Draw fine noise for leather/paper grain texture
+    final darkPoints = <Offset>[];
+    final lightPoints = <Offset>[];
+    for (int i = 0; i < count; i++) {
+      final x = random.nextDouble() * size.width;
+      final y = random.nextDouble() * size.height;
+      if (random.nextBool()) {
+        darkPoints.add(Offset(x, y));
+      } else {
+        lightPoints.add(Offset(x, y));
+      }
+    }
+
+    final noiseAlphaDark = isDark ? 0.08 : 0.04;
+    final noiseAlphaLight = isDark ? 0.04 : 0.15;
+
+    canvas.drawPoints(
+        PointMode.points,
+        darkPoints,
+        Paint()
+          ..color = Colors.black.withValues(alpha: noiseAlphaDark)
+          ..strokeWidth = 1.2);
+    canvas.drawPoints(
+        PointMode.points,
+        lightPoints,
+        Paint()
+          ..color = Colors.white.withValues(alpha: noiseAlphaLight)
+          ..strokeWidth = 1.2);
+
+    // Subtle ambient lighting gradient over the surface
+    final gradientPaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          Colors.white.withValues(alpha: isDark ? 0.10 : 0.35),
+          Colors.transparent,
+          Colors.black.withValues(alpha: isDark ? 0.40 : 0.05),
+        ],
+        stops: const [0.0, 0.4, 1.0],
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
+    canvas.drawRRect(rrect, gradientPaint);
+
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _SkeuomorphicPainter old) =>
+      old.isDark != isDark || old.baseColor != baseColor;
 }
