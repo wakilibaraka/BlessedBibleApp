@@ -2,9 +2,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'theme_provider.dart';
 
-enum EarthHeavenStyle { earth, heaven, threeD }
+enum EarthHeavenStyle { earth, heaven, threeD, skeuomorphic }
 
-enum SurfaceStyle { flat, frosted, threeDimensional, depth3D }
+enum SurfaceStyle { flat, frosted, threeDimensional, depth3D, skeuomorphic }
 
 const Map<AppThemeMode, SurfaceStyle> _kEarthSurfaceMap = {
   AppThemeMode.dawn: SurfaceStyle.flat,
@@ -64,6 +64,9 @@ final surfaceStyleProvider = Provider<SurfaceStyle>((ref) {
   }
   if (eh == EarthHeavenStyle.threeD) {
     return SurfaceStyle.depth3D;
+  }
+  if (eh == EarthHeavenStyle.skeuomorphic) {
+    return SurfaceStyle.skeuomorphic;
   }
   final theme = ref.watch(themeProvider);
   return resolveEarthSurface(theme);

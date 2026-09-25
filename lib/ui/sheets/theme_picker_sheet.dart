@@ -166,6 +166,8 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                                               'Heaven'),
                                           MapEntry(EarthHeavenStyle.threeD,
                                               '3D'),
+                                          MapEntry(EarthHeavenStyle.skeuomorphic,
+                                              'Physical'),
                                         ],
                                         onChanged: (val) {
                                           HapticFeedback.selectionClick();
@@ -180,6 +182,9 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                                             top: 4.0, left: 2.0),
                                         child: Text(
                                           surfaceStyle ==
+                                                  EarthHeavenStyle.skeuomorphic
+                                              ? 'Realistic physical materials'
+                                              : surfaceStyle ==
                                                   EarthHeavenStyle.threeD
                                               ? 'Modern 3D depth'
                                               : surfaceStyle ==

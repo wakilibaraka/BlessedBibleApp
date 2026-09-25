@@ -56,7 +56,8 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground>
     final isFull =
         readSettings.readingViewMode == ReadingViewMode.full;
     final disableGlow = (surfaceStyle != SurfaceStyle.threeDimensional &&
-            surfaceStyle != SurfaceStyle.depth3D) ||
+            surfaceStyle != SurfaceStyle.depth3D &&
+            surfaceStyle != SurfaceStyle.skeuomorphic) ||
         (isReadTab && isFull) ||
         !readSettings.isGlowEnabled;
 
