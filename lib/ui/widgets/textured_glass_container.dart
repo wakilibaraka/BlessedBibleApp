@@ -25,6 +25,7 @@ class TexturedGlassContainer extends ConsumerWidget {
   final double sigmaY;
   final double borderOpacity;
   final bool isScrollable;
+  final bool isActive;
 
   const TexturedGlassContainer({
     super.key,
@@ -36,24 +37,64 @@ class TexturedGlassContainer extends ConsumerWidget {
     this.sigmaY = _kBlurSigma,
     this.borderOpacity = 0.5,
     this.isScrollable = false,
+    this.isActive = false,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appTheme = ref.watch(themeProvider);
     final surfaceStyle = ref.watch(surfaceStyleProvider);
-    final radius = borderRadius ?? BorderRadius.circular(24);
-
-    final useBlur = surfaceStyle == SurfaceStyle.frosted && !isScrollable;
+    
     final is3D = surfaceStyle == SurfaceStyle.threeDimensional;
     final isPaperlike = surfaceStyle == SurfaceStyle.paperlike;
+    final isNeumorphic = surfaceStyle == SurfaceStyle.neumorphic;
+    final isClaymorphic = surfaceStyle == SurfaceStyle.claymorphic;
+    final isFrutigerAero = surfaceStyle == SurfaceStyle.frutigerAero;
+    final isSkeuomorphic = surfaceStyle == SurfaceStyle.skeuomorphic;
+    final isFrosted = surfaceStyle == SurfaceStyle.frosted;
+    final useBlur = isFrosted && !isScrollable;
+
+    BorderRadius radius;
+    if (isClaymorphic) {
+      final minR = borderRadius != null && borderRadius!.topLeft.x > 24
+          ? borderRadius!.topLeft.x
+          : 28.0;
+      radius = BorderRadius.circular(minR);
+    } else if (isSkeuomorphic) {
+      if (borderRadius != null && borderRadius!.topLeft.x < 28) {
+        radius = BorderRadius.circular(28);
+      } else {
+        radius = borderRadius ?? BorderRadius.circular(28);
+      }
+    } else {
+      radius = borderRadius ?? BorderRadius.circular(24);
+    }
 
     final tokens = Theme.of(context).extension<ReadingTokens>()!;
 
     Color fillColor;
     bool isDarkPanel = false;
 
-    if (useBlur) {
+    if (isSkeuomorphic) {
+      final baseColor = tokens.readingSurface;
+      final isDark = baseColor.computeLuminance() < 0.4;
+      isDarkPanel = isDark;
+      fillColor = isActive
+          ? baseColor.withValues(alpha: isDark ? 0.8 : 0.9)
+          : baseColor;
+    } else if (isNeumorphic) {
+      fillColor = tokens.readingSurface;
+      isDarkPanel = tokens.readingSurface.computeLuminance() < 0.4;
+    } else if (isClaymorphic) {
+      fillColor = tokens.readingSurface;
+      isDarkPanel = tokens.readingSurface.computeLuminance() < 0.4;
+    } else if (isFrutigerAero) {
+      final baseColor = tokens.readingSurface;
+      isDarkPanel = baseColor.computeLuminance() < 0.4;
+      fillColor = isDarkPanel
+          ? baseColor.withValues(alpha: 0.82)
+          : baseColor.withValues(alpha: 0.78);
+    } else if (useBlur) {
       switch (appTheme.resolve(context)) {
         case AppThemeMode.sepia:
           fillColor =
@@ -80,7 +121,7 @@ class TexturedGlassContainer extends ConsumerWidget {
           isDarkPanel = true;
           break;
       }
-    } else if (surfaceStyle == SurfaceStyle.frosted && isScrollable) {
+    } else if (isFrosted && isScrollable) {
       fillColor = tokens.readingSurface.withValues(alpha: 0.92);
       isDarkPanel = tokens.readingSurface.computeLuminance() < 0.4;
     } else {
@@ -92,7 +133,79 @@ class TexturedGlassContainer extends ConsumerWidget {
     final isDarkBg = bgLuminance < 0.4;
 
     final List<BoxShadow> shadows;
-    if (is3D) {
+    if (isNeumorphic) {
+      final highlightColor = isDarkBg
+          ? Colors.white.withValues(alpha: 0.12)
+          : Colors.white.withValues(alpha: 0.85);
+      final shadowColor = isDarkBg
+          ? Colors.black.withValues(alpha: 0.55)
+          : const Color(0xFFA3B1C6).withValues(alpha: 0.60);
+
+      if (isActive) {
+        shadows = [
+          BoxShadow(
+            color: shadowColor,
+            offset: const Offset(-4, -4),
+            blurRadius: 10,
+          ),
+          BoxShadow(
+            color: highlightColor,
+            offset: const Offset(4, 4),
+            blurRadius: 10,
+          ),
+        ];
+      } else {
+        shadows = [
+          BoxShadow(
+            color: highlightColor,
+            offset: const Offset(-6, -6),
+            blurRadius: 12,
+          ),
+          BoxShadow(
+            color: shadowColor,
+            offset: const Offset(6, 6),
+            blurRadius: 12,
+          ),
+        ];
+      }
+    } else if (isClaymorphic) {
+      final primary = Theme.of(context).primaryColor;
+      final dropColor = isDarkBg
+          ? Colors.black.withValues(alpha: 0.45)
+          : primary.withValues(alpha: 0.22);
+      final floorColor = isDarkBg
+          ? Colors.black.withValues(alpha: 0.25)
+          : Colors.black.withValues(alpha: 0.10);
+      shadows = [
+        BoxShadow(
+          color: dropColor,
+          offset: const Offset(0, 10),
+          blurRadius: 20,
+          spreadRadius: -2,
+        ),
+        BoxShadow(
+          color: floorColor,
+          offset: const Offset(0, 3),
+          blurRadius: 6,
+        ),
+      ];
+    } else if (isFrutigerAero) {
+      final glassBlue = Colors.lightBlue.withValues(alpha: isDarkBg ? 0.30 : 0.20);
+      shadows = [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: isDarkBg ? 0.45 : 0.18),
+          blurRadius: 28,
+          spreadRadius: -2,
+          offset: const Offset(0, 12),
+        ),
+        BoxShadow(
+          color: glassBlue,
+          blurRadius: 16,
+          spreadRadius: 0,
+          offset: const Offset(0, 4),
+        ),
+      ];
+    } else if (is3D) {
       shadows = isDarkBg
           ? [
               BoxShadow(
@@ -114,7 +227,7 @@ class TexturedGlassContainer extends ConsumerWidget {
                   offset: const Offset(4.0, 4.0),
                   blurRadius: 6),
             ];
-    } else if (surfaceStyle == SurfaceStyle.frosted) {
+    } else if (isFrosted) {
       shadows = [
         BoxShadow(
           color: Colors.black.withValues(alpha: isDarkBg ? 0.45 : 0.18),
@@ -147,23 +260,75 @@ class TexturedGlassContainer extends ConsumerWidget {
 
     final rimAlpha = isDarkPanel ? _kRimDarkAlpha : _kRimLightAlpha;
 
+    Border? containerBorder;
+    if (useBlur || isClaymorphic || isNeumorphic) {
+      containerBorder = null;
+    } else if (isSkeuomorphic) {
+      containerBorder = Border.all(
+        width: 1.0,
+        color: isDarkBg
+            ? Colors.white.withValues(alpha: 0.08)
+            : Colors.black.withValues(alpha: 0.15),
+      );
+    } else if (isFrutigerAero) {
+      containerBorder = Border.all(
+        width: 1.5,
+        color: Colors.lightBlue.withValues(alpha: isDarkBg ? 0.25 : 0.40),
+      );
+    } else {
+      containerBorder = Border.all(
+        width: is3D ? 0.0 : (isPaperlike ? 0.8 : 0.5),
+        color: is3D ? Colors.transparent : (isPaperlike ? tokens.readingBorder.withValues(alpha: 0.4) : tokens.readingBorder),
+      );
+    }
+
     Widget content = AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       padding: padding,
       decoration: BoxDecoration(
         color: fillColor,
         borderRadius: radius,
-        border: useBlur
-            ? null
-            : Border.all(
-                width: is3D ? 0.0 : (isPaperlike ? 0.8 : 0.5),
-                color: is3D ? Colors.transparent : (isPaperlike ? tokens.readingBorder.withValues(alpha: 0.4) : tokens.readingBorder),
-              ),
+        border: containerBorder,
       ),
       child: child,
     );
 
-    if (useBlur) {
+    if (isSkeuomorphic) {
+      content = CustomPaint(
+        foregroundPainter: _SkeuomorphicPainter(
+          borderRadius: radius,
+          isDark: isDarkPanel,
+          baseColor: fillColor,
+        ),
+        child: content,
+      );
+    } else if (isNeumorphic) {
+      content = CustomPaint(
+        foregroundPainter: _NeumorphicPainter(
+          borderRadius: radius,
+          isDark: isDarkPanel,
+          isActive: isActive,
+        ),
+        child: content,
+      );
+    } else if (isClaymorphic) {
+      content = CustomPaint(
+        foregroundPainter: _ClaymorphicPainter(
+          borderRadius: radius,
+          isDark: isDarkPanel,
+          fillColor: fillColor,
+        ),
+        child: content,
+      );
+    } else if (isFrutigerAero) {
+      content = CustomPaint(
+        foregroundPainter: _FrutigerAeroPainter(
+          borderRadius: radius,
+          isDark: isDarkPanel,
+        ),
+        child: content,
+      );
+    } else if (useBlur) {
       content = CustomPaint(
         foregroundPainter: _RimAndNoisePainter(
           borderRadius: radius,
@@ -187,25 +352,29 @@ class TexturedGlassContainer extends ConsumerWidget {
         borderRadius: radius,
         clipBehavior: Clip.antiAlias,
         child: RepaintBoundary(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(
-              sigmaX: useBlur ? sigmaX : 0.001,
-              sigmaY: useBlur ? sigmaY : 0.001,
-            ),
-            child: content,
-          ),
+          child: (useBlur || isFrutigerAero)
+              ? BackdropFilter(
+                  filter: ImageFilter.blur(
+                    sigmaX: isFrutigerAero ? (isScrollable ? 0.001 : 16.0) : (useBlur ? sigmaX : 0.001),
+                    sigmaY: isFrutigerAero ? (isScrollable ? 0.001 : 16.0) : (useBlur ? sigmaY : 0.001),
+                  ),
+                  child: content,
+                )
+              : content,
         ),
       ),
     );
   }
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+//  PAINTERS
+// ══════════════════════════════════════════════════════════════════════════════
+
 class _RimAndNoisePainter extends CustomPainter {
   final BorderRadius borderRadius;
   final double rimAlpha;
   final bool isDark;
-
-  static final Map<Size, (List<Offset>, List<Offset>)> _noiseCache = {};
 
   _RimAndNoisePainter({
     required this.borderRadius,
@@ -216,30 +385,20 @@ class _RimAndNoisePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final rrect = borderRadius.toRRect(Offset.zero & size);
-
     canvas.save();
     canvas.clipRRect(rrect);
 
-    if (!_noiseCache.containsKey(size)) {
-      final random = math.Random(42);
-      final count =
-          (size.width * size.height * _kNoiseDensity).toInt().clamp(0, 800);
-      final darkPoints = <Offset>[];
-      final lightPoints = <Offset>[];
-      for (int i = 0; i < count; i++) {
-        darkPoints.add(Offset(
-            random.nextDouble() * size.width, random.nextDouble() * size.height));
-        lightPoints.add(Offset(
-            random.nextDouble() * size.width, random.nextDouble() * size.height));
-      }
-      // Simple bounded cache to prevent memory leaks if size animates
-      if (_noiseCache.length > 20) _noiseCache.clear();
-      _noiseCache[size] = (darkPoints, lightPoints);
+    final random = math.Random(42);
+    final count =
+        (size.width * size.height * _kNoiseDensity).toInt().clamp(0, 800);
+    final darkPoints = <Offset>[];
+    final lightPoints = <Offset>[];
+    for (int i = 0; i < count; i++) {
+      darkPoints.add(Offset(
+          random.nextDouble() * size.width, random.nextDouble() * size.height));
+      lightPoints.add(Offset(
+          random.nextDouble() * size.width, random.nextDouble() * size.height));
     }
-
-    final cached = _noiseCache[size]!;
-    final darkPoints = cached.$1;
-    final lightPoints = cached.$2;
     canvas.drawPoints(
         PointMode.points,
         darkPoints,
@@ -290,4 +449,310 @@ class _RimAndNoisePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _RimAndNoisePainter old) =>
       old.rimAlpha != rimAlpha || old.isDark != isDark;
+}
+
+class _NeumorphicPainter extends CustomPainter {
+  final BorderRadius borderRadius;
+  final bool isDark;
+  final bool isActive;
+
+  _NeumorphicPainter({
+    required this.borderRadius,
+    required this.isDark,
+    required this.isActive,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rrect = borderRadius.toRRect(Offset.zero & size);
+    canvas.save();
+    canvas.clipRRect(rrect);
+
+    final rimAlpha = isActive ? 0.0 : (isDark ? 0.08 : 0.45);
+    if (rimAlpha > 0) {
+      canvas.drawRRect(
+        borderRadius
+            .toRRect(Rect.fromLTWH(0.5, 0.5, size.width - 1, size.height - 1)),
+        Paint()
+          ..color = (isDark
+              ? Colors.white.withValues(alpha: rimAlpha)
+              : Colors.white.withValues(alpha: rimAlpha))
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.0,
+      );
+    }
+
+    if (isActive) {
+      final concavePaint = Paint()
+        ..shader = RadialGradient(
+          center: Alignment.center,
+          radius: 0.9,
+          colors: [
+            Colors.black.withValues(alpha: isDark ? 0.20 : 0.06),
+            Colors.transparent,
+          ],
+        ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
+      canvas.drawRRect(rrect, concavePaint);
+    }
+
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _NeumorphicPainter old) =>
+      old.isDark != isDark || old.isActive != isActive;
+}
+
+class _ClaymorphicPainter extends CustomPainter {
+  final BorderRadius borderRadius;
+  final bool isDark;
+  final Color fillColor;
+
+  _ClaymorphicPainter({
+    required this.borderRadius,
+    required this.isDark,
+    required this.fillColor,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rrect = borderRadius.toRRect(Offset.zero & size);
+    canvas.save();
+    canvas.clipRRect(rrect);
+
+    final topHighlightPaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          Colors.white.withValues(alpha: isDark ? 0.28 : 0.55),
+          Colors.white.withValues(alpha: 0.0),
+        ],
+        stops: const [0.0, 1.0],
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height * 0.50));
+    canvas.drawRRect(
+      borderRadius.toRRect(
+          Rect.fromLTWH(1.5, 1.5, size.width - 3, size.height - 3)),
+      topHighlightPaint,
+    );
+
+    final bottomShadowPaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.bottomCenter,
+        end: Alignment.topCenter,
+        colors: [
+          Colors.black.withValues(alpha: isDark ? 0.32 : 0.16),
+          Colors.transparent,
+        ],
+        stops: const [0.0, 1.0],
+      ).createShader(
+          Rect.fromLTWH(0, size.height * 0.55, size.width, size.height * 0.45));
+    canvas.drawRRect(rrect, bottomShadowPaint);
+
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _ClaymorphicPainter old) =>
+      old.isDark != isDark || old.fillColor != fillColor;
+}
+
+class _FrutigerAeroPainter extends CustomPainter {
+  final BorderRadius borderRadius;
+  final bool isDark;
+
+  _FrutigerAeroPainter({
+    required this.borderRadius,
+    required this.isDark,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rrect = borderRadius.toRRect(Offset.zero & size);
+    canvas.save();
+    canvas.clipRRect(rrect);
+
+    final glareRect = Rect.fromLTWH(
+      size.width * 0.08,
+      size.height * -0.1,
+      size.width * 0.84,
+      size.height * 0.52,
+    );
+    final glarePath = Path()..addOval(glareRect);
+    canvas.drawPath(
+      glarePath,
+      Paint()
+        ..shader = RadialGradient(
+          center: const Alignment(0.0, -0.4),
+          radius: 0.65,
+          colors: [
+            Colors.white.withValues(alpha: isDark ? 0.45 : 0.55),
+            Colors.white.withValues(alpha: isDark ? 0.08 : 0.12),
+            Colors.transparent,
+          ],
+          stops: const [0.0, 0.55, 1.0],
+        ).createShader(glareRect),
+    );
+
+    canvas.drawRRect(
+      rrect,
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white.withValues(alpha: isDark ? 0.12 : 0.22),
+            Colors.transparent,
+            Colors.lightBlue.withValues(alpha: isDark ? 0.06 : 0.10),
+          ],
+          stops: const [0.0, 0.45, 1.0],
+        ).createShader(Rect.fromLTWH(0, 0, size.width, size.height)),
+    );
+
+    canvas.drawRRect(
+      borderRadius.toRRect(
+          Rect.fromLTWH(0.75, 0.75, size.width - 1.5, size.height - 1.5)),
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Colors.white.withValues(alpha: isDark ? 0.55 : 0.70),
+            Colors.lightBlue.withValues(alpha: isDark ? 0.20 : 0.35),
+            Colors.cyan.withValues(alpha: 0.0),
+          ],
+          stops: const [0.0, 0.40, 1.0],
+        ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.5,
+    );
+
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _FrutigerAeroPainter old) =>
+      old.isDark != isDark;
+}
+
+class _SkeuomorphicPainter extends CustomPainter {
+  final BorderRadius borderRadius;
+  final bool isDark;
+  final Color baseColor;
+
+  _SkeuomorphicPainter({
+    required this.borderRadius,
+    required this.isDark,
+    required this.baseColor,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rrect = borderRadius.toRRect(Offset.zero & size);
+    canvas.save();
+    canvas.clipRRect(rrect);
+
+    final random = math.Random(12345);
+    final count = (size.width * size.height * 0.08).toInt().clamp(0, 15000);
+    final darkPoints = <Offset>[];
+    final lightPoints = <Offset>[];
+    for (int i = 0; i < count; i++) {
+      final x = random.nextDouble() * size.width;
+      final y = random.nextDouble() * size.height;
+      if (random.nextBool()) {
+        darkPoints.add(Offset(x, y));
+      } else {
+        lightPoints.add(Offset(x, y));
+      }
+    }
+    final noiseAlphaDark = isDark ? 0.08 : 0.04;
+    final noiseAlphaLight = isDark ? 0.04 : 0.15;
+    canvas.drawPoints(
+        PointMode.points,
+        darkPoints,
+        Paint()
+          ..color = Colors.black.withValues(alpha: noiseAlphaDark)
+          ..strokeWidth = 1.2);
+    canvas.drawPoints(
+        PointMode.points,
+        lightPoints,
+        Paint()
+          ..color = Colors.white.withValues(alpha: noiseAlphaLight)
+          ..strokeWidth = 1.2);
+
+    canvas.drawRRect(
+      rrect,
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white.withValues(alpha: isDark ? 0.10 : 0.35),
+            Colors.transparent,
+            Colors.black.withValues(alpha: isDark ? 0.40 : 0.05),
+          ],
+          stops: const [0.0, 0.4, 1.0],
+        ).createShader(Rect.fromLTWH(0, 0, size.width, size.height)),
+    );
+
+    canvas.drawRRect(
+      borderRadius.toRRect(
+          Rect.fromLTWH(1.5, 1.5, size.width - 3.0, size.height * 0.18)),
+      Paint()
+        ..color = Colors.white.withValues(alpha: isDark ? 0.12 : 0.40)
+        ..style = PaintingStyle.fill,
+    );
+
+    final stitchColor = isDark
+        ? const Color(0xFFD4C4A0).withValues(alpha: 0.30)
+        : const Color(0xFF8B6914).withValues(alpha: 0.25);
+    const stitchInset = 4.0;
+    const dashLen = 4.0;
+    const gapLen = 3.5;
+
+    final stitchRect = Rect.fromLTWH(
+        stitchInset, stitchInset,
+        size.width - stitchInset * 2,
+        size.height - stitchInset * 2);
+    final stitchRadius = borderRadius.resolve(TextDirection.ltr);
+    final minR = math.min(
+        stitchInset + 2, stitchRadius.topLeft.x * 0.7);
+    final stitchRRect = RRect.fromRectAndRadius(
+        stitchRect, Radius.circular(minR));
+
+    _drawDashedRRect(canvas, stitchRRect, stitchColor, dashLen, gapLen);
+
+    canvas.restore();
+  }
+
+  void _drawDashedRRect(Canvas canvas, RRect rRect, Color color,
+      double dashLength, double gapLength) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0
+      ..strokeCap = StrokeCap.round;
+
+    final path = Path()..addRRect(rRect);
+    final metrics = path.computeMetrics();
+    for (final metric in metrics) {
+      double pos = 0.0;
+      bool drawing = true;
+      while (pos < metric.length) {
+        final segLen = drawing ? dashLength : gapLength;
+        if (drawing) {
+          canvas.drawPath(
+            metric.extractPath(pos, math.min(pos + segLen, metric.length)),
+            paint,
+          );
+        }
+        pos += segLen;
+        drawing = !drawing;
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _SkeuomorphicPainter old) =>
+      old.isDark != isDark || old.baseColor != baseColor;
 }

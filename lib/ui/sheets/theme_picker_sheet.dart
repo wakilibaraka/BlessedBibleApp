@@ -97,50 +97,23 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 16.0),
-                                      child: Text(
-                                        'SURFACES',
-                                        style: theme.textTheme.labelSmall?.copyWith(
-                                          color: theme.primaryColor,
-                                          letterSpacing: 1.2,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 10,
-                                        ),
-                                      ),
-                                    ),
-                                    AnimatedSegmentedTile<EarthHeavenStyle>(
-                                      subtitle: surfaceStyle == EarthHeavenStyle.heaven
-                                          ? 'Layered depth and lighting'
-                                          : surfaceStyle == EarthHeavenStyle.paperlike
-                                              ? 'Warm e-reader paper'
-                                              : 'Flat, uniform surfaces',
-                                      selectedValue: surfaceStyle,
-                                      options: const [
-                                        MapEntry(EarthHeavenStyle.heaven, 'Heaven'),
-                                        MapEntry(EarthHeavenStyle.earth, 'Earth'),
-                                        MapEntry(EarthHeavenStyle.paperlike, 'Paperlike'),
-                                      ],
+                                    _SurfaceStyleGrid(
+                                      selectedStyle: surfaceStyle,
                                       onChanged: (val) {
                                         HapticFeedback.selectionClick();
                                         ref.read(earthHeavenStyleProvider.notifier).setStyle(val);
                                       },
                                     ),
-                                    AnimatedSize(
-                                      duration: const Duration(milliseconds: 300),
-                                      curve: Curves.easeInOut,
-                                      child: surfaceStyle == EarthHeavenStyle.heaven
-                                          ? SwitchListTile(
-                                              contentPadding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
-                                              title: const Text('Enable Background Glow', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                                              subtitle: const Text('Renders a subtle animated light behind the reader', style: TextStyle(fontSize: 12)),
-                                              value: readSettings.isGlowEnabled,
-                                              onChanged: (value) {
-                                                HapticFeedback.selectionClick();
-                                                ref.read(readSettingsProvider.notifier).setGlowEnabled(value);
-                                              },
-                                            )
-                                          : const SizedBox.shrink(),
+                                    const SizedBox(height: 8),
+                                    SwitchListTile(
+                                      contentPadding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+                                      title: const Text('Enable Background Glow', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                                      subtitle: const Text('Renders a subtle animated light behind the reader', style: TextStyle(fontSize: 12)),
+                                      value: readSettings.isGlowEnabled,
+                                      onChanged: (value) {
+                                        HapticFeedback.selectionClick();
+                                        ref.read(readSettingsProvider.notifier).setGlowEnabled(value);
+                                      },
                                     ),
                                   ],
                                 );
@@ -944,4 +917,206 @@ class _SparkleSpec {
   final double dirY;
 
   const _SparkleSpec(this.relX, this.relY, this.dirX, this.dirY);
+}
+
+// ── Surface Style Grid ──────────────────────────────────────────────────────
+
+/// 7-item tactile grid selector for surface rendering styles.
+class _SurfaceStyleGrid extends StatelessWidget {
+  final EarthHeavenStyle selectedStyle;
+  final ValueChanged<EarthHeavenStyle> onChanged;
+
+  const _SurfaceStyleGrid({
+    required this.selectedStyle,
+    required this.onChanged,
+  });
+
+  static const _kTiles = [
+    _StyleMeta(
+      style: EarthHeavenStyle.earth,
+      label: 'Earth',
+      subtitle: 'Flat surface',
+      icon: Icons.layers_outlined,
+    ),
+    _StyleMeta(
+      style: EarthHeavenStyle.heaven,
+      label: 'Heaven',
+      subtitle: 'Frosted depth',
+      icon: Icons.blur_on_rounded,
+    ),
+    _StyleMeta(
+      style: EarthHeavenStyle.paperlike,
+      label: 'Paper',
+      subtitle: 'Warm e-reader',
+      icon: Icons.menu_book_rounded,
+    ),
+    _StyleMeta(
+      style: EarthHeavenStyle.neumorphic,
+      label: 'Soft',
+      subtitle: 'Moulded matte',
+      icon: Icons.circle_outlined,
+    ),
+    _StyleMeta(
+      style: EarthHeavenStyle.claymorphic,
+      label: 'Clay',
+      subtitle: 'Pillowy 3-D',
+      icon: Icons.interests_rounded,
+    ),
+    _StyleMeta(
+      style: EarthHeavenStyle.frutigerAero,
+      label: 'Aero',
+      subtitle: 'Glossy aqua',
+      icon: Icons.water_drop_rounded,
+    ),
+    _StyleMeta(
+      style: EarthHeavenStyle.skeuomorphic,
+      label: 'Physical',
+      subtitle: 'Real material',
+      icon: Icons.auto_awesome_rounded,
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Surface Style',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.primaryColor,
+              letterSpacing: 1.2,
+              fontWeight: FontWeight.bold,
+              fontSize: 10,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Visual depth and material rendering',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
+              fontSize: 11,
+            ),
+          ),
+          const SizedBox(height: 12),
+          // We use Wrap to support 7 items smoothly without rigid grid gaps
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: _kTiles.map((meta) {
+              return SizedBox(
+                width: (MediaQuery.of(context).size.width - 32 - 16) / 3.01,
+                child: _SurfaceStyleTile(
+                  meta: meta,
+                  isSelected: selectedStyle == meta.style,
+                  onTap: () => onChanged(meta.style),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+@immutable
+class _StyleMeta {
+  final EarthHeavenStyle style;
+  final String label;
+  final String subtitle;
+  final IconData icon;
+
+  const _StyleMeta({
+    required this.style,
+    required this.label,
+    required this.subtitle,
+    required this.icon,
+  });
+}
+
+class _SurfaceStyleTile extends StatelessWidget {
+  final _StyleMeta meta;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _SurfaceStyleTile({
+    required this.meta,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final primary = theme.primaryColor;
+    final onSurface = theme.colorScheme.onSurface;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? primary.withValues(alpha: 0.10)
+              : onSurface.withValues(alpha: 0.04),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected
+                ? primary.withValues(alpha: 0.75)
+                : onSurface.withValues(alpha: 0.10),
+            width: isSelected ? 1.5 : 0.8,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: primary.withValues(alpha: 0.18),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : [],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              meta.icon,
+              size: 22,
+              color: isSelected ? primary : onSurface.withValues(alpha: 0.55),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              meta.label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                color: isSelected ? primary : onSurface.withValues(alpha: 0.80),
+                height: 1.1,
+              ),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              meta.subtitle,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 9,
+                fontWeight: FontWeight.w400,
+                color: onSurface.withValues(alpha: 0.45),
+                height: 1.2,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

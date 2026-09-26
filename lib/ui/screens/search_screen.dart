@@ -160,7 +160,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
   Widget build(BuildContext context) {
     final searchState = ref.watch(searchStateProvider);
     final theme = Theme.of(context);
-    final isGlassy = ref.watch(surfaceStyleProvider) == SurfaceStyle.frosted;
+    final surfaceStyleVal = ref.watch(surfaceStyleProvider);
+    final isGlassy = surfaceStyleVal == SurfaceStyle.frosted || 
+                     surfaceStyleVal == SurfaceStyle.frutigerAero;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
