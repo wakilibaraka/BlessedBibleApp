@@ -384,32 +384,20 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 16.0),
-                child: Text('SURFACES', style: theme.textTheme.labelSmall?.copyWith(color: theme.primaryColor, letterSpacing: 1.2, fontWeight: FontWeight.bold, fontSize: 10)),
+              _SurfaceStyleGrid(
+                selectedStyle: surfaceStyle,
+                onChanged: (val) {
+                  HapticFeedback.selectionClick();
+                  ref.read(earthHeavenStyleProvider.notifier).setStyle(val);
+                },
               ),
-              AnimatedSegmentedTile<EarthHeavenStyle>(
-                subtitle: surfaceStyle == EarthHeavenStyle.heaven ? 'Layered depth and lighting' : surfaceStyle == EarthHeavenStyle.paperlike ? 'Warm e-reader paper' : 'Flat, uniform surfaces',
-                selectedValue: surfaceStyle,
-                options: const [
-                  MapEntry(EarthHeavenStyle.heaven, 'Heaven'),
-                  MapEntry(EarthHeavenStyle.earth, 'Earth'),
-                  MapEntry(EarthHeavenStyle.paperlike, 'Paperlike'),
-                ],
-                onChanged: (val) { HapticFeedback.selectionClick(); ref.read(earthHeavenStyleProvider.notifier).setStyle(val); },
-              ),
-              AnimatedSize(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-                child: surfaceStyle == EarthHeavenStyle.heaven
-                    ? SwitchListTile(
-                        contentPadding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
-                        title: const Text('Enable Background Glow', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                        subtitle: const Text('Renders a subtle animated light behind the reader', style: TextStyle(fontSize: 12)),
-                        value: readSettings.isGlowEnabled,
-                        onChanged: (value) { HapticFeedback.selectionClick(); ref.read(readSettingsProvider.notifier).setGlowEnabled(value); },
-                      )
-                    : const SizedBox.shrink(),
+              const SizedBox(height: 8),
+              SwitchListTile(
+                contentPadding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+                title: const Text('Enable Background Glow', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                subtitle: const Text('Renders a subtle animated light behind the reader', style: TextStyle(fontSize: 12)),
+                value: readSettings.isGlowEnabled,
+                onChanged: (value) { HapticFeedback.selectionClick(); ref.read(readSettingsProvider.notifier).setGlowEnabled(value); },
               ),
             ],
           );
