@@ -939,12 +939,6 @@ class _SurfaceStyleGrid extends StatelessWidget {
       icon: Icons.menu_book_rounded,
     ),
     _StyleMeta(
-      style: EarthHeavenStyle.neumorphic,
-      label: 'Soft',
-      subtitle: 'Moulded matte',
-      icon: Icons.circle_outlined,
-    ),
-    _StyleMeta(
       style: EarthHeavenStyle.claymorphic,
       label: 'Clay',
       subtitle: 'Pillowy 3-D',
@@ -990,13 +984,14 @@ class _SurfaceStyleGrid extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          // We use Wrap to support 7 items smoothly without rigid grid gaps
+          // We use Wrap to support items smoothly without rigid grid gaps
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: _kTiles.map((meta) {
               return SizedBox(
-                width: (MediaQuery.of(context).size.width - 32 - 16) / 3.01,
+                // Account for 40px sheet padding + 16px horizontal gaps
+                width: (MediaQuery.of(context).size.width - 40 - 16.5) / 3.0,
                 child: _SurfaceStyleTile(
                   meta: meta,
                   isSelected: selectedStyle == meta.style,

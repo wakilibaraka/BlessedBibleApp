@@ -2,7 +2,7 @@ name: the_blessed_bible
 description: "A new Flutter project for The Blessed Bible."
 publish_to: 'none'
 
-version: 1.0.1+3
+version: 1.0.1+4
 
 environment:
   sdk: '>=3.2.0 <4.0.0'

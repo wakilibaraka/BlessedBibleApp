@@ -47,7 +47,6 @@ class TexturedGlassContainer extends ConsumerWidget {
     
     final is3D = surfaceStyle == SurfaceStyle.threeDimensional;
     final isPaperlike = surfaceStyle == SurfaceStyle.paperlike;
-    final isNeumorphic = surfaceStyle == SurfaceStyle.neumorphic;
     final isClaymorphic = surfaceStyle == SurfaceStyle.claymorphic;
     final isFrutigerAero = surfaceStyle == SurfaceStyle.frutigerAero;
     final isSkeuomorphic = surfaceStyle == SurfaceStyle.skeuomorphic;
@@ -82,9 +81,6 @@ class TexturedGlassContainer extends ConsumerWidget {
       fillColor = isActive
           ? baseColor.withValues(alpha: isDark ? 0.8 : 0.9)
           : baseColor;
-    } else if (isNeumorphic) {
-      fillColor = tokens.readingSurface;
-      isDarkPanel = tokens.readingSurface.computeLuminance() < 0.4;
     } else if (isClaymorphic) {
       fillColor = tokens.readingSurface;
       isDarkPanel = tokens.readingSurface.computeLuminance() < 0.4;
@@ -133,42 +129,7 @@ class TexturedGlassContainer extends ConsumerWidget {
     final isDarkBg = bgLuminance < 0.4;
 
     final List<BoxShadow> shadows;
-    if (isNeumorphic) {
-      final highlightColor = isDarkBg
-          ? Colors.white.withValues(alpha: 0.12)
-          : Colors.white.withValues(alpha: 0.85);
-      final shadowColor = isDarkBg
-          ? Colors.black.withValues(alpha: 0.55)
-          : const Color(0xFFA3B1C6).withValues(alpha: 0.60);
-
-      if (isActive) {
-        shadows = [
-          BoxShadow(
-            color: shadowColor,
-            offset: const Offset(-4, -4),
-            blurRadius: 10,
-          ),
-          BoxShadow(
-            color: highlightColor,
-            offset: const Offset(4, 4),
-            blurRadius: 10,
-          ),
-        ];
-      } else {
-        shadows = [
-          BoxShadow(
-            color: highlightColor,
-            offset: const Offset(-6, -6),
-            blurRadius: 12,
-          ),
-          BoxShadow(
-            color: shadowColor,
-            offset: const Offset(6, 6),
-            blurRadius: 12,
-          ),
-        ];
-      }
-    } else if (isClaymorphic) {
+    if (isClaymorphic) {
       final primary = Theme.of(context).primaryColor;
       final dropColor = isDarkBg
           ? Colors.black.withValues(alpha: 0.45)
@@ -261,7 +222,7 @@ class TexturedGlassContainer extends ConsumerWidget {
     final rimAlpha = isDarkPanel ? _kRimDarkAlpha : _kRimLightAlpha;
 
     Border? containerBorder;
-    if (useBlur || isClaymorphic || isNeumorphic) {
+    if (useBlur || isClaymorphic) {
       containerBorder = null;
     } else if (isSkeuomorphic) {
       containerBorder = Border.all(
@@ -299,15 +260,6 @@ class TexturedGlassContainer extends ConsumerWidget {
           borderRadius: radius,
           isDark: isDarkPanel,
           baseColor: fillColor,
-        ),
-        child: content,
-      );
-    } else if (isNeumorphic) {
-      content = CustomPaint(
-        foregroundPainter: _NeumorphicPainter(
-          borderRadius: radius,
-          isDark: isDarkPanel,
-          isActive: isActive,
         ),
         child: content,
       );
@@ -451,57 +403,6 @@ class _RimAndNoisePainter extends CustomPainter {
       old.rimAlpha != rimAlpha || old.isDark != isDark;
 }
 
-class _NeumorphicPainter extends CustomPainter {
-  final BorderRadius borderRadius;
-  final bool isDark;
-  final bool isActive;
-
-  _NeumorphicPainter({
-    required this.borderRadius,
-    required this.isDark,
-    required this.isActive,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final rrect = borderRadius.toRRect(Offset.zero & size);
-    canvas.save();
-    canvas.clipRRect(rrect);
-
-    final rimAlpha = isActive ? 0.0 : (isDark ? 0.08 : 0.45);
-    if (rimAlpha > 0) {
-      canvas.drawRRect(
-        borderRadius
-            .toRRect(Rect.fromLTWH(0.5, 0.5, size.width - 1, size.height - 1)),
-        Paint()
-          ..color = (isDark
-              ? Colors.white.withValues(alpha: rimAlpha)
-              : Colors.white.withValues(alpha: rimAlpha))
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.0,
-      );
-    }
-
-    if (isActive) {
-      final concavePaint = Paint()
-        ..shader = RadialGradient(
-          center: Alignment.center,
-          radius: 0.9,
-          colors: [
-            Colors.black.withValues(alpha: isDark ? 0.20 : 0.06),
-            Colors.transparent,
-          ],
-        ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
-      canvas.drawRRect(rrect, concavePaint);
-    }
-
-    canvas.restore();
-  }
-
-  @override
-  bool shouldRepaint(covariant _NeumorphicPainter old) =>
-      old.isDark != isDark || old.isActive != isActive;
-}
 
 class _ClaymorphicPainter extends CustomPainter {
   final BorderRadius borderRadius;
@@ -703,53 +604,7 @@ class _SkeuomorphicPainter extends CustomPainter {
         ..style = PaintingStyle.fill,
     );
 
-    final stitchColor = isDark
-        ? const Color(0xFFD4C4A0).withValues(alpha: 0.30)
-        : const Color(0xFF8B6914).withValues(alpha: 0.25);
-    const stitchInset = 4.0;
-    const dashLen = 4.0;
-    const gapLen = 3.5;
-
-    final stitchRect = Rect.fromLTWH(
-        stitchInset, stitchInset,
-        size.width - stitchInset * 2,
-        size.height - stitchInset * 2);
-    final stitchRadius = borderRadius.resolve(TextDirection.ltr);
-    final minR = math.min(
-        stitchInset + 2, stitchRadius.topLeft.x * 0.7);
-    final stitchRRect = RRect.fromRectAndRadius(
-        stitchRect, Radius.circular(minR));
-
-    _drawDashedRRect(canvas, stitchRRect, stitchColor, dashLen, gapLen);
-
     canvas.restore();
-  }
-
-  void _drawDashedRRect(Canvas canvas, RRect rRect, Color color,
-      double dashLength, double gapLength) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.0
-      ..strokeCap = StrokeCap.round;
-
-    final path = Path()..addRRect(rRect);
-    final metrics = path.computeMetrics();
-    for (final metric in metrics) {
-      double pos = 0.0;
-      bool drawing = true;
-      while (pos < metric.length) {
-        final segLen = drawing ? dashLength : gapLength;
-        if (drawing) {
-          canvas.drawPath(
-            metric.extractPath(pos, math.min(pos + segLen, metric.length)),
-            paint,
-          );
-        }
-        pos += segLen;
-        drawing = !drawing;
-      }
-    }
   }
 
   @override

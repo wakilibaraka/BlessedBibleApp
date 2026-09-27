@@ -6,7 +6,6 @@ enum EarthHeavenStyle {
   earth, 
   heaven, 
   paperlike, 
-  neumorphic, 
   claymorphic, 
   frutigerAero, 
   skeuomorphic 
@@ -17,7 +16,6 @@ enum SurfaceStyle {
   frosted, 
   threeDimensional, 
   paperlike, 
-  neumorphic, 
   claymorphic, 
   frutigerAero, 
   skeuomorphic 
@@ -59,6 +57,8 @@ class EarthHeavenStyleNotifier extends Notifier<EarthHeavenStyle> {
       await prefs.setBool('surface_migrated_v1', true);
     } else {
       final savedIndex = prefs.getInt(_surfaceStyleKey);
+      // Fallback check: if saved index was for a style that no longer exists (e.g. 7 or old neumorphic which was index 3)
+      // we gracefully fallback to Earth.
       if (savedIndex != null &&
           savedIndex >= 0 &&
           savedIndex < EarthHeavenStyle.values.length) {
@@ -85,9 +85,6 @@ final surfaceStyleProvider = Provider<SurfaceStyle>((ref) {
   }
   if (eh == EarthHeavenStyle.paperlike) {
     return SurfaceStyle.paperlike;
-  }
-  if (eh == EarthHeavenStyle.neumorphic) {
-    return SurfaceStyle.neumorphic;
   }
   if (eh == EarthHeavenStyle.claymorphic) {
     return SurfaceStyle.claymorphic;
