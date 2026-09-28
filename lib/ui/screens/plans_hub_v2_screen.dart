@@ -734,7 +734,7 @@ class _LibraryTabState extends ConsumerState<_LibraryTab> {
   }
 
   Widget _buildCustomPlanCard(BuildContext context, WidgetRef ref,
-      ThemeData theme, String id, Set<String> activeIds) {
+      ThemeData theme, String id, List<String> activeIds) {
     final customPlan = ref.read(preferencesProvider).getCustomPlan(id);
     final title = customPlan?['title'] ?? 'Custom Plan';
     final isActive = activeIds.contains(id);
@@ -806,7 +806,7 @@ class _LibraryTabState extends ConsumerState<_LibraryTab> {
       ThemeData theme,
       Color gold,
       PlanMetadata plan,
-      Set<String> activeIds) {
+      List<String> activeIds) {
     final isActive = activeIds.contains(plan.id);
 
     return Container(
