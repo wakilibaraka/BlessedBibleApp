@@ -15,7 +15,9 @@ import 'package:flutter/cupertino.dart';
 import 'your_space_screen.dart';
 import 'notes_list_screen.dart';
 
-import 'plans_hub_v2_screen.dart';
+import 'reading_plans_screen.dart';
+import '../widgets/continue_reading_card.dart';
+import '../widgets/reminder_settings_card.dart';
 
 import 'commentary_hub_screen.dart';
 import 'main_nav_screen.dart';
@@ -199,6 +201,15 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                         const SizedBox(height: 20),
 
                         // ═══════════════════════════════════════════════════════
+                        // 1B. CONTINUE READING
+                        // ═══════════════════════════════════════════════════════
+                        _SectionLabel(label: 'RESUME', theme: theme),
+                        const SizedBox(height: 8),
+                        ContinueReadingCard(theme: theme),
+
+                        const SizedBox(height: 20),
+
+                        // ═══════════════════════════════════════════════════════
                         // 2. READING STREAK
                         // ═══════════════════════════════════════════════════════
                         _SectionLabel(label: 'READING STREAK', theme: theme),
@@ -229,6 +240,15 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                         _SectionLabel(label: 'QUICK ACTIONS', theme: theme),
                         const SizedBox(height: 8),
                         _QuickActionsRow(theme: theme),
+
+                        const SizedBox(height: 20),
+
+                        // ═══════════════════════════════════════════════════════
+                        // 6. DAILY REMINDERS
+                        // ═══════════════════════════════════════════════════════
+                        _SectionLabel(label: 'DAILY REMINDERS', theme: theme),
+                        const SizedBox(height: 8),
+                        ReminderSettingsCard(theme: theme),
 
                         // Bottom padding: clears the floating bottom nav
                         SizedBox(height: mq.padding.bottom + 40),
@@ -595,7 +615,7 @@ class _QuickActionsRow extends ConsumerWidget {
         onTap: () {
           Navigator.of(context).push(
             CupertinoPageRoute(
-                builder: (_) => const PlansHubV2Screen()),
+                builder: (_) => const ReadingPlansScreen()),
           );
         },
       ),

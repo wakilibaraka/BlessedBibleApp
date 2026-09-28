@@ -95,6 +95,36 @@ class NotificationService {
     );
   }
 
+  Future<void> schedulePrayerReminder(int hour, int minute) async {
+    await requestPermissions();
+
+    final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
+    tz.TZDateTime scheduledDate =
+        tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
+
+    if (scheduledDate.isBefore(now)) {
+      scheduledDate = scheduledDate.add(const Duration(days: 1));
+    }
+
+    await _flutterLocalNotificationsPlugin.zonedSchedule(
+      id: 2,
+      title: "Time for Prayer",
+      body: "Pause for a moment of reflection and prayer.",
+      scheduledDate: scheduledDate,
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
+          "prayer_reminder_channel",
+          "Prayer Reminders",
+          channelDescription: "Daily prayer reminders",
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      matchDateTimeComponents: DateTimeComponents.time,
+    );
+  }
+
   Future<void> scheduleWeeklyReminder(int weekday, int hour, int minute) async {
     await requestPermissions();
 
@@ -182,6 +212,11 @@ class NotificationService {
   Future<void> cancelDailyReminder() async {
     await _flutterLocalNotificationsPlugin.cancel(id: 0);
   }
+
+  Future<void> cancelPrayerReminder() async {
+    await _flutterLocalNotificationsPlugin.cancel(id: 2);
+  }
+
 
   Future<void> cancelWeeklyReminder() async {
     await _flutterLocalNotificationsPlugin.cancel(id: 1);

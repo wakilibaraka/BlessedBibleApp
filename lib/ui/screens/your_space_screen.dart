@@ -14,6 +14,7 @@ import '../../services/share_service.dart';
 import '../../state/translation_provider.dart';
 import '../../state/read_settings_provider.dart';
 import '../../data/models/bookmark_model.dart';
+import '../widgets/journal_segment.dart';
 
 class YourSpaceScreen extends ConsumerStatefulWidget {
   final int initialTab; // 0=Highlights, 1=Bookmarks, 2=Notes
@@ -130,6 +131,14 @@ class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
                           theme: theme,
                         ),
                       ),
+                      Expanded(
+                        child: _SegmentTab(
+                          label: 'Journal',
+                          isSelected: _selectedIndex == 3,
+                          onTap: () => _onTabTapped(3),
+                          theme: theme,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -151,6 +160,7 @@ class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
                       _HighlightsSegment(theme: theme),
                       _BookmarksSegment(theme: theme),
                       _NotesSegment(theme: theme),
+                      JournalSegment(theme: theme),
                     ],
                   ),
                 ),
@@ -1173,3 +1183,4 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
     ),
   );
 }
+

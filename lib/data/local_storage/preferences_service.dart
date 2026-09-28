@@ -408,6 +408,25 @@ class PreferencesService {
   void setSabbathLocationName(String val) =>
       prefs.setString(_sabbathLocationNameKey, val);
 
+
+  // Prayer
+  static const _prayerReminderEnabledKey = "prayer_reminder_enabled";
+  static const _prayerReminderHourKey = "prayer_reminder_hour";
+  static const _prayerReminderMinuteKey = "prayer_reminder_minute";
+
+  bool getPrayerReminderEnabled() =>
+      prefs.getBool(_prayerReminderEnabledKey) ?? false;
+  void setPrayerReminderEnabled(bool val) =>
+      prefs.setBool(_prayerReminderEnabledKey, val);
+
+  int getPrayerReminderHour() => prefs.getInt(_prayerReminderHourKey) ?? 7;
+  void setPrayerReminderHour(int val) =>
+      prefs.setInt(_prayerReminderHourKey, val);
+
+  int getPrayerReminderMinute() => prefs.getInt(_prayerReminderMinuteKey) ?? 40;
+  void setPrayerReminderMinute(int val) =>
+      prefs.setInt(_prayerReminderMinuteKey, val);
+
   bool getDailyReminderEnabled() =>
       prefs.getBool(_dailyReminderEnabledKey) ?? false;
   void setDailyReminderEnabled(bool val) =>
