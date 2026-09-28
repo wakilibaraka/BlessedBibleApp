@@ -204,6 +204,19 @@ class ReadingPlanState {
   String getFormattedDateForDay(int day) => '';
 }
 
+const Set<String> kBundledPlanIds = {
+  'chronological_1yr',
+  'mccheyne_1yr',
+  'horner_10_chapters',
+  'esv_through_the_bible',
+  'esv_everyday_in_word',
+  'esv_gospels_and_epistles',
+  'esv_psalms_and_wisdom',
+  'esv_pentateuch_and_history',
+  'esv_chronicles_and_prophets',
+  'heartlight_ot_nt',
+};
+
 class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
   /// The planId this notifier instance is keyed for (injected via factory).
   final String _planId;
@@ -218,9 +231,9 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
   Future<void> _loadData(String targetPlanId) async {
     try {
       List<PlanDayData> planData = [];
-      bool isCustom = targetPlanId != 'chronological_1yr';
+      final bool isBundled = kBundledPlanIds.contains(targetPlanId);
       
-      if (!isCustom) {
+      if (isBundled) {
         final jsonString = await rootBundle.loadString('assets/reading_plans/$targetPlanId.json');
         final Map<String, dynamic> decoded = await compute<String, Map<String, dynamic>>(
           (s) => jsonDecode(s) as Map<String, dynamic>, jsonString);
@@ -266,7 +279,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
       }
 
       List<PlanDayData> finalPlanData = planData;
-      if (planId != 'chronological_1yr') {
+      if (!isBundled) {
         final customPlan = ref.read(preferencesProvider).getCustomPlan(planId);
         if (customPlan != null) {
           if (customPlan.containsKey('schedule')) {

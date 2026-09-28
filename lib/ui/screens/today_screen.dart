@@ -15,7 +15,7 @@ import 'package:flutter/cupertino.dart';
 import 'your_space_screen.dart';
 import 'notes_list_screen.dart';
 
-import 'reading_plans_screen.dart';
+import 'plans_hub_v2_screen.dart';
 import '../widgets/continue_reading_card.dart';
 import '../widgets/reminder_settings_card.dart';
 
@@ -615,7 +615,7 @@ class _QuickActionsRow extends ConsumerWidget {
         onTap: () {
           Navigator.of(context).push(
             CupertinoPageRoute(
-                builder: (_) => const ReadingPlansScreen()),
+                builder: (_) => const PlansHubV2Screen()),
           );
         },
       ),
