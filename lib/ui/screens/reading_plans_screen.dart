@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/dynamic_reading_plan_provider.dart';
 import '../../state/read_location_provider.dart';
-import '../../state/theme_provider.dart';
 import '../../theme/app_colors.dart';
 import '../widgets/shared_app_bar.dart';
 

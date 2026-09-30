@@ -4,7 +4,6 @@ import '../../state/theme_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/read_settings_provider.dart';
 import '../../state/nav_provider.dart';
-import '../../state/surface_style_provider.dart';
 
 class AnimatedBackground extends ConsumerStatefulWidget {
   final AppThemeMode appThemeMode;
@@ -51,7 +50,6 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground>
     }
 
     final readSettings = ref.watch(readSettingsProvider);
-    final surfaceStyle = ref.watch(surfaceStyleProvider);
     final isReadTab = widget.tabIndex == 1;
     final isFull =
         readSettings.readingViewMode == ReadingViewMode.full;

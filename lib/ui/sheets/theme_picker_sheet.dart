@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import '../../state/theme_provider.dart';
 import '../../state/surface_style_provider.dart';
 import '../../theme/app_colors.dart';
-import '../widgets/animated_segmented_tile.dart';
 
 import '../widgets/textured_glass_container.dart';
 import '../../state/read_settings_provider.dart';
@@ -944,18 +943,6 @@ class _SurfaceStyleGrid extends StatelessWidget {
       subtitle: 'Pillowy 3-D',
       icon: Icons.interests_rounded,
     ),
-    _StyleMeta(
-      style: EarthHeavenStyle.frutigerAero,
-      label: 'Aero',
-      subtitle: 'Glossy aqua',
-      icon: Icons.water_drop_rounded,
-    ),
-    _StyleMeta(
-      style: EarthHeavenStyle.skeuomorphic,
-      label: 'Physical',
-      subtitle: 'Real material',
-      icon: Icons.auto_awesome_rounded,
-    ),
   ];
 
   @override
@@ -984,21 +971,19 @@ class _SurfaceStyleGrid extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          // We use Wrap to support items smoothly without rigid grid gaps
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: _kTiles.map((meta) {
-              return SizedBox(
-                // Account for 40px sheet padding + 16px horizontal gaps
-                width: (MediaQuery.of(context).size.width - 40 - 16.5) / 3.0,
-                child: _SurfaceStyleTile(
-                  meta: meta,
-                  isSelected: selectedStyle == meta.style,
-                  onTap: () => onChanged(meta.style),
+          Row(
+            children: [
+              for (int i = 0; i < _kTiles.length; i++) ...[
+                if (i > 0) const SizedBox(width: 8),
+                Expanded(
+                  child: _SurfaceStyleTile(
+                    meta: _kTiles[i],
+                    isSelected: selectedStyle == _kTiles[i].style,
+                    onTap: () => onChanged(_kTiles[i].style),
+                  ),
                 ),
-              );
-            }).toList(),
+              ],
+            ],
           ),
         ],
       ),
@@ -1043,7 +1028,7 @@ class _SurfaceStyleTile extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeOutCubic,
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
         decoration: BoxDecoration(
           color: isSelected
               ? primary.withValues(alpha: 0.10)
@@ -1070,31 +1055,31 @@ class _SurfaceStyleTile extends StatelessWidget {
           children: [
             Icon(
               meta.icon,
-              size: 22,
+              size: 20,
               color: isSelected ? primary : onSurface.withValues(alpha: 0.55),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 5),
             Text(
               meta.label,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 11,
+                fontSize: 10.5,
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                 color: isSelected ? primary : onSurface.withValues(alpha: 0.80),
                 height: 1.1,
               ),
             ),
-            const SizedBox(height: 3),
+            const SizedBox(height: 2),
             Text(
               meta.subtitle,
               textAlign: TextAlign.center,
-              maxLines: 2,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 9,
+                fontSize: 8.5,
                 fontWeight: FontWeight.w400,
                 color: onSurface.withValues(alpha: 0.45),
-                height: 1.2,
+                height: 1.1,
               ),
             ),
           ],

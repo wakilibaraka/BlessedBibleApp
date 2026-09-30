@@ -1,3 +1,4 @@
+import '../theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,7 +21,7 @@ enum AppThemeMode {
 }
 
 extension AppThemeModeExtension on AppThemeMode {
-  AppThemeMode resolve(BuildContext context) {
+  AppThemeMode resolve([BuildContext? context]) {
     if (this == AppThemeMode.automatic) {
       final days = DateTime.now().millisecondsSinceEpoch ~/ 86400000;
       const cycle = [
@@ -33,6 +34,89 @@ extension AppThemeModeExtension on AppThemeMode {
     }
     return this;
   }
+
+  bool get isFirmamentTheme {
+    return this == AppThemeMode.dawn ||
+        this == AppThemeMode.fresh ||
+        this == AppThemeMode.dusk;
+  }
+
+  bool get isSanctuaryTheme {
+    return this == AppThemeMode.priestlyPurple ||
+        this == AppThemeMode.galileeBlue ||
+        this == AppThemeMode.scarletRed;
+  }
+
+  String get subGreeting {
+    switch (this) {
+      case AppThemeMode.dark:
+      case AppThemeMode.oled:
+      case AppThemeMode.dusk:
+      case AppThemeMode.automatic:
+        return "Rest in the peace of His promises.";
+      case AppThemeMode.sepia:
+        return "Reflect on the ancient wisdom.";
+      default:
+        return "Embrace the light of His word.";
+    }
+  }
+
+  bool get is3DTheme {
+    return this == AppThemeMode.dawn ||
+        this == AppThemeMode.lilies ||
+        this == AppThemeMode.roses ||
+        this == AppThemeMode.olives ||
+        this == AppThemeMode.dusk ||
+        this == AppThemeMode.fresh;
+  }
+
+  Color get backgroundColor {
+    switch (this) {
+      case AppThemeMode.dawn:
+        return AppColors.dawnBackground;
+      case AppThemeMode.lilies:
+        return AppColors.liliesBackground;
+      case AppThemeMode.roses:
+        return AppColors.rosesBackground;
+      case AppThemeMode.olives:
+        return AppColors.olivesBackground;
+      case AppThemeMode.dusk:
+        return const Color(0xFF312C51);
+      case AppThemeMode.fresh:
+        return const Color(0xFF132C33);
+      default:
+        return Colors.transparent; // callers will coalesce with theme.scaffoldBackgroundColor
+    }
+  }
+
+  Color get redLetterColor {
+    switch (this) {
+      case AppThemeMode.dark:
+      case AppThemeMode.oled:
+      case AppThemeMode.dusk:
+      case AppThemeMode.automatic:
+        return const Color(0xFFD46A6A);
+      case AppThemeMode.sepia:
+        return const Color(0xFFA63C3C);
+      default:
+        return const Color(0xFFB33A3A);
+    }
+  }
+
+  Color get starColor {
+    switch (this) {
+      case AppThemeMode.dark:
+      case AppThemeMode.oled:
+      case AppThemeMode.dusk:
+      case AppThemeMode.automatic:
+        return Colors.amber.shade400;
+      case AppThemeMode.sepia:
+        return Colors.orange.shade700;
+      default:
+        return Colors.deepOrange.shade400;
+    }
+  }
+
 }
 
 class ThemeNotifier extends Notifier<AppThemeMode> {

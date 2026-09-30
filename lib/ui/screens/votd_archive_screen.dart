@@ -5,11 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/home_provider.dart';
 import '../../state/votd_tracker_provider.dart';
 import '../../state/theme_provider.dart';
-import '../../state/surface_style_provider.dart';
 import 'commentary_hub_screen.dart';
 import '../../state/commentary_provider.dart';
 import '../../theme/reading_tokens.dart';
-import '../../theme/app_colors.dart';
 
 class VotdArchiveScreen extends ConsumerWidget {
   const VotdArchiveScreen({super.key});
@@ -31,35 +29,9 @@ class VotdArchiveScreen extends ConsumerWidget {
     final epoch = DateTime(2026, 1, 1);
 
     final appThemeMode = ref.watch(themeProvider);
-    final surfaceStyle = ref.watch(surfaceStyleProvider);
-    final is3DTheme = appThemeMode == AppThemeMode.dawn ||
-        appThemeMode == AppThemeMode.lilies ||
-        appThemeMode == AppThemeMode.roses ||
-        appThemeMode == AppThemeMode.olives ||
-        appThemeMode == AppThemeMode.dusk ||
-        appThemeMode == AppThemeMode.fresh;
+    final is3DTheme = appThemeMode.is3DTheme;
 
-    Color getThemeBackgroundColor() {
-      if (surfaceStyle == SurfaceStyle.paperlike) {
-        return theme.scaffoldBackgroundColor;
-      }
-      switch (appThemeMode) {
-        case AppThemeMode.dawn:
-          return AppColors.dawnBackground;
-        case AppThemeMode.lilies:
-          return AppColors.liliesBackground;
-        case AppThemeMode.roses:
-          return AppColors.rosesBackground;
-        case AppThemeMode.olives:
-          return AppColors.olivesBackground;
-        case AppThemeMode.dusk:
-          return const Color(0xFF312C51);
-        case AppThemeMode.fresh:
-          return const Color(0xFF132C33);
-        default:
-          return theme.scaffoldBackgroundColor;
-      }
-    }
+    Color getThemeBackgroundColor() { return appThemeMode.is3DTheme ? appThemeMode.backgroundColor : theme.scaffoldBackgroundColor; }
 
     return Scaffold(
       backgroundColor: getThemeBackgroundColor(),
@@ -172,12 +144,7 @@ class VotdArchiveScreen extends ConsumerWidget {
                                 ? Colors.white.withValues(alpha: 0.15)
                                 : tokens.readingBorder,
                           ),
-                          boxShadow: (appThemeMode == AppThemeMode.dawn ||
-                                  appThemeMode == AppThemeMode.lilies ||
-                                  appThemeMode == AppThemeMode.roses ||
-                                  appThemeMode == AppThemeMode.olives ||
-                                  appThemeMode == AppThemeMode.dusk ||
-                                  appThemeMode == AppThemeMode.fresh)
+                          boxShadow: appThemeMode.is3DTheme
                               ? [
                                   BoxShadow(
                                     color: Colors.black.withValues(alpha: 0.08),

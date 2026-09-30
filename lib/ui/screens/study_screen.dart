@@ -24,6 +24,7 @@ import '../widgets/plan_row_widget.dart';
 
 import 'plans_hub_v2_screen.dart';
 import 'dictionary_screen.dart';
+import '../widgets/bible_stories_banner.dart';
 class _ParsedRef {
   final String book;
   final int chapter;
@@ -83,29 +84,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
     final appThemeMode = ref.watch(themeProvider);
     final layoutConfig = ref.watch(studyLayoutProvider);
 
-    String subGreeting;
-    switch (appThemeMode.resolve(context)) {
-      case AppThemeMode.light:
-      case AppThemeMode.priestlyPurple:
-      case AppThemeMode.galileeBlue:
-      case AppThemeMode.scarletRed:
-      case AppThemeMode.dawn:
-      case AppThemeMode.lilies:
-      case AppThemeMode.roses:
-      case AppThemeMode.olives:
-      case AppThemeMode.fresh:
-        subGreeting = "Embrace the light of His word.";
-        break;
-      case AppThemeMode.dark:
-      case AppThemeMode.oled:
-      case AppThemeMode.dusk:
-      case AppThemeMode.automatic:
-        subGreeting = "Rest in the peace of His promises.";
-        break;
-      case AppThemeMode.sepia:
-        subGreeting = "Reflect on the ancient wisdom.";
-        break;
-    }
+    String subGreeting = appThemeMode.resolve(context).subGreeting;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -305,6 +284,9 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                       break;
                     case 'reading_plan':
                       cardWidget = ReadingPlanBanner(size: config.size);
+                      break;
+                    case 'bible_stories':
+                      cardWidget = BibleStoriesBanner(size: config.size);
                       break;
                     case 'dictionary':
                       cardWidget = DictionaryBanner(size: config.size);

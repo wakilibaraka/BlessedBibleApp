@@ -3,8 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../state/auth_provider.dart';
-import '../screens/admin/admin_dashboard_screen.dart';
-import '../screens/admin/admin_constants.dart';
+
+
 
 class AccountButton extends ConsumerWidget {
   const AccountButton({super.key});
@@ -160,20 +160,7 @@ class AccountButton extends ConsumerWidget {
                             }
                           },
                         ),
-                        if (currentAuthState.value?.uid == kOwnerUid)
-                          ListTile(
-                            leading: const Icon(Icons.admin_panel_settings,
-                                color: Colors.blue),
-                            title: const Text('Admin Panel',
-                                style: TextStyle(color: Colors.blue)),
-                            onTap: () {
-                              Navigator.pop(context);
-                              Navigator.push(
-                                  context,
-                                  CupertinoPageRoute(
-                                      builder: (_) => const AdminDashboardScreen()));
-                            },
-                          ),
+                        
                       ],
                     ],
                   ),

@@ -363,11 +363,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
         : false;
 
     final resolvedMode = appThemeMode.resolve(context);
-    final Color redLetterColor = resolvedMode == AppThemeMode.light
-        ? const Color(0xFFB33A3A)
-        : resolvedMode == AppThemeMode.sepia
-            ? const Color(0xFFA63C3C)
-            : const Color(0xFFD46A6A);
+    final Color redLetterColor = resolvedMode.redLetterColor;
 
     if (!_loaded) {
       return Scaffold(

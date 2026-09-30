@@ -820,24 +820,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     }
 
     final tokens = theme.extension<ReadingTokens>()!;
-    Color getThemeBackgroundColor() {
-      switch (appThemeMode) {
-        case AppThemeMode.dawn:
-          return AppColors.dawnBackground;
-        case AppThemeMode.lilies:
-          return AppColors.liliesBackground;
-        case AppThemeMode.roses:
-          return AppColors.rosesBackground;
-        case AppThemeMode.olives:
-          return AppColors.olivesBackground;
-        case AppThemeMode.dusk:
-          return const Color(0xFF312C51);
-        case AppThemeMode.fresh:
-          return const Color(0xFF132C33);
-        default:
-          return tokens.readingPaper;
-      }
-    }
+    Color getThemeBackgroundColor() { return appThemeMode.is3DTheme ? appThemeMode.backgroundColor : tokens.readingPaper; }
 
     return Scaffold(
       backgroundColor: getThemeBackgroundColor(),

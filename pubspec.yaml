@@ -2,7 +2,7 @@ name: the_blessed_bible
 description: "A new Flutter project for The Blessed Bible."
 publish_to: 'none'
 
-version: 1.0.1+6
+version: 1.0.1+8
 
 environment:
   sdk: '>=3.2.0 <4.0.0'
@@ -58,6 +58,8 @@ flutter:
     - assets/reading_plans/
     - assets/reading_plans/source/
     - assets/commentary/
+    - assets/devotional/stories/
+    - assets/devotional/art/
   fonts:
     - family: Inter
       fonts:
@@ -166,3 +168,36 @@ flutter:
         - asset: assets/fonts/Alegreya-Italic.ttf
           weight: 400
           style: italic
+    #region Devotional (The Bible Stories) fonts - OFL licensed
+    - family: Playfair Display
+      fonts:
+        - asset: assets/fonts/devotional/PlayfairDisplay-400.ttf
+          weight: 400
+        - asset: assets/fonts/devotional/PlayfairDisplay-500.ttf
+          weight: 500
+        - asset: assets/fonts/devotional/PlayfairDisplay-600.ttf
+          weight: 600
+        - asset: assets/fonts/devotional/PlayfairDisplay-700.ttf
+          weight: 700
+        - asset: assets/fonts/devotional/PlayfairDisplay-400italic.ttf
+          weight: 400
+          style: italic
+    - family: Cormorant Garamond
+      fonts:
+        - asset: assets/fonts/devotional/CormorantGaramond-400.ttf
+          weight: 400
+        - asset: assets/fonts/devotional/CormorantGaramond-500.ttf
+          weight: 500
+        - asset: assets/fonts/devotional/CormorantGaramond-600.ttf
+          weight: 600
+        - asset: assets/fonts/devotional/CormorantGaramond-400italic.ttf
+          weight: 400
+          style: italic
+    - family: IM Fell English
+      fonts:
+        - asset: assets/fonts/devotional/IMFellEnglish-400.ttf
+          weight: 400
+        - asset: assets/fonts/devotional/IMFellEnglish-400italic.ttf
+          weight: 400
+          style: italic
+    #endregion

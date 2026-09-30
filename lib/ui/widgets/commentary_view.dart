@@ -554,8 +554,27 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
 
   Widget _buildEntryCard(ThemeData theme, ReadingTokens tokens,
       CommentaryEntry entry, TypographyState typography) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+    final isDevotional = entry.source.toLowerCase().contains('devotional');
+    final isStudyNote = entry.source.toLowerCase().contains('study note');
+    
+    final bgColor = isDevotional 
+        ? tokens.readingAccent.withValues(alpha: 0.05) 
+        : isStudyNote 
+            ? tokens.readingInkMuted.withValues(alpha: 0.05)
+            : Colors.transparent;
+            
+    final border = isDevotional 
+        ? Border.all(color: tokens.readingAccent.withValues(alpha: 0.2)) 
+        : null;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      padding: const EdgeInsets.all(20.0),
+      decoration: BoxDecoration(
+        color: bgColor,
+        border: border,
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: _buildEntryContent(theme, tokens, entry, typography),
     );
   }
@@ -587,6 +606,8 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
       CommentaryEntry entry, TypographyState typography) {
     final paragraphs = entry.text.split('\n\n');
     final isBreakdown = entry.source == 'Chapter Breakdown';
+    final isDevotional = entry.source.toLowerCase().contains('devotional');
+    final isStudyNote = entry.source.toLowerCase().contains('study note');
 
     final baseStyle = theme.textTheme.bodyLarge?.copyWith(
       fontSize: typography.fontSize,
@@ -596,10 +617,39 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
       color: tokens.readingInk,
     );
 
+    IconData sourceIcon = Icons.library_books_rounded;
+    if (isBreakdown) sourceIcon = Icons.auto_awesome_rounded;
+    if (isDevotional) sourceIcon = Icons.favorite_rounded;
+    if (isStudyNote) sourceIcon = Icons.edit_note_rounded;
+
     return SelectionArea(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            children: [
+              Icon(sourceIcon, size: 16, color: tokens.readingAccent),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  entry.source.isNotEmpty ? entry.source : 'Commentary',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.1,
+                    color: tokens.readingAccent,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Text(
+                entry.author,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: tokens.readingInkMuted,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
           ...paragraphs.map((p) => Padding(
                 padding: const EdgeInsets.only(bottom: 16.0),
                 child: RichText(
@@ -609,31 +659,6 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                   ),
                 ),
               )),
-          Divider(height: 24, color: tokens.readingBorder),
-          Row(
-            children: [
-              if (isBreakdown) ...[
-                Icon(Icons.lightbulb_outline_rounded, size: 16, color: tokens.readingAccent),
-                const SizedBox(width: 6),
-              ],
-              Text(
-                entry.author,
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: tokens.readingAccent,
-                ),
-              ),
-            ],
-          ),
-          if (entry.source.isNotEmpty) ...[
-            const SizedBox(height: 4),
-            Text(
-              entry.source,
-              style: theme.textTheme.labelMedium?.copyWith(
-                color: tokens.readingInkMuted,
-              ),
-            ),
-          ],
         ],
       ),
     );

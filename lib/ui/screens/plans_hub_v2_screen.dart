@@ -155,11 +155,6 @@ class _PlansHubV2ScreenState extends ConsumerState<PlansHubV2Screen>
   }
 
   @override
-  void disposeBack() {
-    _tabController.dispose();
-  }
-
-  @override
   void dispose() {
     _tabController.dispose();
     super.dispose();

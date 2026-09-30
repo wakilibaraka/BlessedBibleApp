@@ -7,8 +7,6 @@ enum EarthHeavenStyle {
   heaven, 
   paperlike, 
   claymorphic, 
-  frutigerAero, 
-  skeuomorphic 
 }
 
 enum SurfaceStyle { 
@@ -27,7 +25,7 @@ SurfaceStyle resolveEarthSurface(AppThemeMode theme) => SurfaceStyle.flat;
 
 class EarthHeavenStyleNotifier extends Notifier<EarthHeavenStyle> {
   static const _surfaceStyleKey = 'app_surface_style';
-  static const _migrationKey = 'surface_migrated_v2';
+  static const _migrationKey = 'surface_migrated_v3';
 
   @override
   EarthHeavenStyle build() {
@@ -41,28 +39,23 @@ class EarthHeavenStyleNotifier extends Notifier<EarthHeavenStyle> {
     final migrated = prefs.getBool(_migrationKey) ?? false;
     if (!migrated) {
       final savedIndex = prefs.getInt(_surfaceStyleKey);
-      if (savedIndex == 2) {
-        state = EarthHeavenStyle.paperlike;
-      } else if (savedIndex == 1) {
-        state = EarthHeavenStyle.heaven;
-      } else if (savedIndex == 0) {
-        state = EarthHeavenStyle.earth;
-      }
-      // Migrate v1 logic if it hasn't run either.
-      final migratedV1 = prefs.getBool('surface_migrated_v1') ?? false;
-      if (!migratedV1 && savedIndex == 2 && state != EarthHeavenStyle.paperlike) {
-         state = EarthHeavenStyle.heaven;
-      }
-      await prefs.setBool(_migrationKey, true);
-      await prefs.setBool('surface_migrated_v1', true);
-    } else {
-      final savedIndex = prefs.getInt(_surfaceStyleKey);
-      // Fallback check: if saved index was for a style that no longer exists (e.g. 7 or old neumorphic which was index 3)
-      // we gracefully fallback to Earth.
       if (savedIndex != null &&
           savedIndex >= 0 &&
           savedIndex < EarthHeavenStyle.values.length) {
         state = EarthHeavenStyle.values[savedIndex];
+      } else {
+        // Fallback for previous Aero (4) or Physical (5) to Earth
+        state = EarthHeavenStyle.earth;
+      }
+      await prefs.setBool(_migrationKey, true);
+    } else {
+      final savedIndex = prefs.getInt(_surfaceStyleKey);
+      if (savedIndex != null &&
+          savedIndex >= 0 &&
+          savedIndex < EarthHeavenStyle.values.length) {
+        state = EarthHeavenStyle.values[savedIndex];
+      } else {
+        state = EarthHeavenStyle.earth;
       }
     }
   }
@@ -84,16 +77,18 @@ final surfaceStyleProvider = Provider<SurfaceStyle>((ref) {
     return SurfaceStyle.threeDimensional;
   }
   if (eh == EarthHeavenStyle.paperlike) {
+    final theme = ref.watch(themeProvider);
+    final resolved = theme.resolve();
+    if (resolved.isFirmamentTheme) {
+      return SurfaceStyle.skeuomorphic;
+    }
+    if (resolved.isSanctuaryTheme) {
+      return SurfaceStyle.frutigerAero;
+    }
     return SurfaceStyle.paperlike;
   }
   if (eh == EarthHeavenStyle.claymorphic) {
     return SurfaceStyle.claymorphic;
-  }
-  if (eh == EarthHeavenStyle.frutigerAero) {
-    return SurfaceStyle.frutigerAero;
-  }
-  if (eh == EarthHeavenStyle.skeuomorphic) {
-    return SurfaceStyle.skeuomorphic;
   }
   final theme = ref.watch(themeProvider);
   return resolveEarthSurface(theme);
