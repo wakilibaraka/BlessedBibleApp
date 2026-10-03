@@ -19,6 +19,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'privacy_policy_screen.dart';
 import 'onboarding_screen.dart';
 import '../../data/local_storage/preferences_service.dart';
+import '../sheets/widget_settings_sheet.dart';
 
 
 final packageInfoProvider = FutureProvider<PackageInfo>((ref) async {
@@ -120,6 +121,23 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
   // --- Page 1: General ---
   Widget _buildGeneralPage(BuildContext context, WidgetRef ref) {
     return _buildPageContainer(context, [
+      SettingsPillCard(
+        children: [
+          ListTile(
+            leading: Icon(
+              Icons.widgets_rounded,
+              color: Theme.of(context).primaryColor,
+            ),
+            title: const Text('Home Screen Widgets'),
+            subtitle: const Text('Customize gradients, transparency, and live preview'),
+            trailing: const Icon(Icons.chevron_right_rounded),
+            onTap: () {
+              HapticFeedback.selectionClick();
+              WidgetSettingsSheet.show(context);
+            },
+          ),
+        ],
+      ),
       SettingsPillCard(
         children: [
           Consumer(builder: (context, ref, _) {

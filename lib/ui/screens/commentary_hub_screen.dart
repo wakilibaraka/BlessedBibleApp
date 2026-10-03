@@ -6,6 +6,7 @@ import '../../state/theme_provider.dart';
 import '../../state/surface_style_provider.dart';
 import '../../state/commentary_provider.dart';
 import '../../models/commentary_entry.dart';
+import '../../models/study_content_category.dart';
 import '../../state/typography_provider.dart';
 import 'dart:ui';
 
@@ -29,7 +30,7 @@ class CommentaryHubScreen extends ConsumerStatefulWidget {
 }
 
 class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
-  String _selectedSource = 'All Sources';
+  String _selectedSource = 'All';
   String _selectedScope = 'All Contexts';
 
   @override
@@ -110,18 +111,16 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
                   return false;
                 if (e.scope.chapter != widget.chapter) return false;
 
-                // Filter by Source
-                if (_selectedSource != 'All Sources') {
+                // Filter by Source / Category
+                if (_selectedSource != 'All') {
                   if (_selectedSource == 'Devotionals' &&
-                      !e.source.toLowerCase().contains('devotional'))
+                      e.category != StudyContentCategory.devotional) {
                     return false;
-                  if (_selectedSource == 'Study Notes' &&
-                      !e.source.toLowerCase().contains('study note'))
-                    return false;
+                  }
                   if (_selectedSource == 'Commentary' &&
-                      e.source.toLowerCase().contains('devotional') &&
-                      e.source.toLowerCase().contains('study note'))
+                      e.category != StudyContentCategory.commentary) {
                     return false;
+                  }
                 }
 
                 // Filter by Scope
@@ -172,10 +171,9 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
         physics: const BouncingScrollPhysics(),
         children: [
           _buildDropdownChip(theme, tokens, _selectedSource, [
-            'All Sources',
+            'All',
             'Commentary',
-            'Devotionals',
-            'Study Notes'
+            'Devotionals'
           ], (val) {
             setState(() => _selectedSource = val);
           }),
@@ -232,8 +230,8 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
 
   Widget _buildEntryCard(ThemeData theme, ReadingTokens tokens,
       CommentaryEntry entry, TypographyState typography) {
-    final isDevotional = entry.source.toLowerCase().contains('devotional');
-    final isStudyNote = entry.source.toLowerCase().contains('study note');
+    final isDevotional = entry.category == StudyContentCategory.devotional;
+    final isStudyNote = entry.category == StudyContentCategory.studyNote;
 
     final bgColor = isDevotional
         ? tokens.readingAccent.withValues(alpha: 0.05)
@@ -283,9 +281,8 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
   Widget _buildEntryContent(ThemeData theme, ReadingTokens tokens,
       CommentaryEntry entry, TypographyState typography) {
     final paragraphs = entry.text.split('\n\n');
-    final isBreakdown = entry.source == 'Chapter Breakdown';
-    final isDevotional = entry.source.toLowerCase().contains('devotional');
-    final isStudyNote = entry.source.toLowerCase().contains('study note');
+    final isDevotional = entry.category == StudyContentCategory.devotional;
+    final isStudyNote = entry.category == StudyContentCategory.studyNote;
 
     final baseStyle = theme.textTheme.bodyLarge?.copyWith(
       fontSize: typography.fontSize,
@@ -296,7 +293,6 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
     );
 
     IconData sourceIcon = Icons.library_books_rounded;
-    if (isBreakdown) sourceIcon = Icons.auto_awesome_rounded;
     if (isDevotional) sourceIcon = Icons.favorite_rounded;
     if (isStudyNote) sourceIcon = Icons.edit_note_rounded;
 

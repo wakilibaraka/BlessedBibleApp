@@ -23,7 +23,18 @@ class VerseOfTheDay {
   final String reference;
   final String text;
   final String? commentarySnippet;
-  VerseOfTheDay(this.reference, this.text, {this.commentarySnippet});
+  final String? author;
+  final String? sourceTitle;
+  final bool isDevotional;
+
+  VerseOfTheDay(
+    this.reference,
+    this.text, {
+    this.commentarySnippet,
+    this.author,
+    this.sourceTitle,
+    this.isDevotional = false,
+  });
 }
 
 class StudyProgress {

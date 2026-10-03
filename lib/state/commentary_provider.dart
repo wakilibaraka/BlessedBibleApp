@@ -2,13 +2,16 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/commentary_entry.dart';
+import '../models/study_content_category.dart';
 import '../data/local_storage/preferences_service.dart';
 import 'package:flutter/foundation.dart';
 import '../utils/isolate_parsers.dart';
 
 class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
   List<String> _cachedFormattedVerses = [];
-  Set<String> _cachedVerses = {};
+  Set<String> _cachedVersesWithCommentary = {};
+  Set<String> _cachedVersesWithDevotionals = {};
+  Set<String> _cachedVersesWithNotes = {};
   Set<String> _cachedChapters = {};
 
   @override
@@ -24,7 +27,9 @@ class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
       final entries = await compute(parseCommentaryJson, jsonString);
 
       final verses = <String>{};
-      final vSet = <String>{};
+      final vCommSet = <String>{};
+      final vDevoSet = <String>{};
+      final vNoteSet = <String>{};
       final cSet = <String>{};
       
       for (final e in entries) {
@@ -37,14 +42,23 @@ class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
             cSet.add('$b|$c');
           }
           if (e.scope.type == 'verse' && v != null) {
-            vSet.add('$b|$c|$v');
+            final key = '$b|$c|$v';
+            if (e.category == StudyContentCategory.devotional) {
+              vDevoSet.add(key);
+            } else if (e.category == StudyContentCategory.studyNote) {
+              vNoteSet.add(key);
+            } else {
+              vCommSet.add(key);
+            }
             verses.add('$b $c:$v');
           }
         }
       }
       
       _cachedChapters = cSet;
-      _cachedVerses = vSet;
+      _cachedVersesWithCommentary = vCommSet;
+      _cachedVersesWithDevotionals = vDevoSet;
+      _cachedVersesWithNotes = vNoteSet;
       _cachedFormattedVerses = verses.toList()..sort();
       
       return entries;
@@ -54,7 +68,9 @@ class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
     }
   }
 
-  Set<String> get versesWithCommentarySet => _cachedVerses;
+  Set<String> get versesWithCommentarySet => _cachedVersesWithCommentary;
+  Set<String> get versesWithDevotionalsSet => _cachedVersesWithDevotionals;
+  Set<String> get versesWithNotesSet => _cachedVersesWithNotes;
   Set<String> get chaptersWithCommentarySet => _cachedChapters;
 
   List<CommentaryEntry> commentaryForVerse(

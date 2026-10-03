@@ -4,6 +4,7 @@ import '../data/models/home_data.dart';
 import 'notes_provider.dart';
 import '../state/commentary_provider.dart';
 import '../state/bible_provider.dart';
+import '../models/study_content_category.dart';
 import 'package:collection/collection.dart'; // for firstOrNull
 
 String _extractSnippet(String text) {
@@ -37,6 +38,10 @@ final votdPoolProvider = Provider<List<VerseOfTheDay>>((ref) {
   final List<VerseOfTheDay> pool = [];
   
   for (final entry in commentaries) {
+    final isDevotional = entry.category == StudyContentCategory.devotional;
+    final isCommentary = entry.category == StudyContentCategory.commentary;
+    if (!isDevotional && !isCommentary) continue;
+
     if (entry.scope.type == 'verse' && entry.scope.book != null && entry.scope.chapter != null && entry.scope.verse != null) {
       final bookName = entry.scope.book!;
       final chapterNum = entry.scope.chapter!;
@@ -51,11 +56,17 @@ final votdPoolProvider = Provider<List<VerseOfTheDay>>((ref) {
         if (chapter != null) {
           final verse = chapter.verses.firstWhereOrNull((v) => v.number == verseNum);
           if (verse != null && verse.text.isNotEmpty) {
-             pool.add(VerseOfTheDay(
-               refStr, 
-               verse.text,
-               commentarySnippet: _extractSnippet(entry.text),
-             ));
+             final snippet = _extractSnippet(entry.text);
+             if (snippet.trim().isNotEmpty) {
+               pool.add(VerseOfTheDay(
+                 refStr, 
+                 verse.text,
+                 commentarySnippet: snippet,
+                 author: entry.author,
+                 sourceTitle: entry.source,
+                 isDevotional: isDevotional,
+               ));
+             }
           }
         }
       }

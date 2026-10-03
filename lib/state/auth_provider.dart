@@ -139,6 +139,17 @@ class AuthActions {
       }
       await batch.commit();
     }
+    
+    // 1b. Delete sync_data
+    final syncRef = firestore.collection('users').doc(uid).collection('sync_data');
+    final syncSnap = await syncRef.get();
+    if (syncSnap.docs.isNotEmpty) {
+      final batch = firestore.batch();
+      for (final doc in syncSnap.docs) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
+    }
 
     // 2. Delete the users/{uid} document itself
     await firestore.collection('users').doc(uid).delete();

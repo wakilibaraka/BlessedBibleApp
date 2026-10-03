@@ -4,6 +4,7 @@ import '../../theme/app_colors.dart';
 import 'textured_glass_container.dart';
 import '../screens/your_space_screen.dart';
 import '../../state/study_layout_provider.dart';
+import 'mesh_gradient_bg.dart';
 
 class YourSpaceHero extends StatelessWidget {
   final CardSize size;
@@ -13,12 +14,14 @@ class YourSpaceHero extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return TexturedGlassContainer(
-      borderRadius: BorderRadius.circular(24),
-      padding: EdgeInsets.zero,
-      child: InkWell(
+    return AnimatedMeshGradient(
+      borderRadius: 24,
+      child: TexturedGlassContainer(
         borderRadius: BorderRadius.circular(24),
-        onTap: () {
+        padding: EdgeInsets.zero,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(24),
+          onTap: () {
           Navigator.of(context).push(
             CupertinoPageRoute(builder: (_) => const YourSpaceScreen()),
           );
@@ -54,6 +57,7 @@ class YourSpaceHero extends StatelessWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }

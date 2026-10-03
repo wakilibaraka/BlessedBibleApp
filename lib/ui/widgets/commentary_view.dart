@@ -12,6 +12,7 @@ import '../../state/theme_provider.dart';
 import '../screens/read_screen.dart' show VerseActionLogic;
 
 import '../../models/commentary_entry.dart';
+import '../../models/study_content_category.dart';
 
 import '../screens/commentary_hub_screen.dart';
 import '../../state/read_location_provider.dart';
@@ -554,8 +555,8 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
 
   Widget _buildEntryCard(ThemeData theme, ReadingTokens tokens,
       CommentaryEntry entry, TypographyState typography) {
-    final isDevotional = entry.source.toLowerCase().contains('devotional');
-    final isStudyNote = entry.source.toLowerCase().contains('study note');
+    final isDevotional = entry.category == StudyContentCategory.devotional;
+    final isStudyNote = entry.category == StudyContentCategory.studyNote;
     
     final bgColor = isDevotional 
         ? tokens.readingAccent.withValues(alpha: 0.05) 
@@ -605,9 +606,8 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
   Widget _buildEntryContent(ThemeData theme, ReadingTokens tokens,
       CommentaryEntry entry, TypographyState typography) {
     final paragraphs = entry.text.split('\n\n');
-    final isBreakdown = entry.source == 'Chapter Breakdown';
-    final isDevotional = entry.source.toLowerCase().contains('devotional');
-    final isStudyNote = entry.source.toLowerCase().contains('study note');
+    final isDevotional = entry.category == StudyContentCategory.devotional;
+    final isStudyNote = entry.category == StudyContentCategory.studyNote;
 
     final baseStyle = theme.textTheme.bodyLarge?.copyWith(
       fontSize: typography.fontSize,
@@ -618,7 +618,6 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
     );
 
     IconData sourceIcon = Icons.library_books_rounded;
-    if (isBreakdown) sourceIcon = Icons.auto_awesome_rounded;
     if (isDevotional) sourceIcon = Icons.favorite_rounded;
     if (isStudyNote) sourceIcon = Icons.edit_note_rounded;
 

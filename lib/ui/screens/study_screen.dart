@@ -25,6 +25,7 @@ import '../widgets/plan_row_widget.dart';
 import 'plans_hub_v2_screen.dart';
 import 'dictionary_screen.dart';
 import '../widgets/bible_stories_banner.dart';
+import '../widgets/account_sync_card.dart';
 class _ParsedRef {
   final String book;
   final int chapter;
@@ -52,16 +53,23 @@ class StudyScreen extends ConsumerStatefulWidget {
   ConsumerState<StudyScreen> createState() => _StudyScreenState();
 }
 
-class _StudyScreenState extends ConsumerState<StudyScreen> {
+class _StudyScreenState extends ConsumerState<StudyScreen> with SingleTickerProviderStateMixin {
   int _currentAuthorIndex = 0;
   final List<String> _commentaryAuthors = ['Uriah Smith'];
   Timer? _timer;
   bool _isEditing = false;
   bool _hasFiredArmedHaptic = false;
+  
+  late AnimationController _pulseController;
 
   @override
   void initState() {
     super.initState();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
+    
     _timer = Timer.periodic(const Duration(seconds: 4), (timer) {
       if (mounted) {
         setState(() {
@@ -75,6 +83,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
   @override
   void dispose() {
     _timer?.cancel();
+    _pulseController.dispose();
     super.dispose();
   }
 
@@ -208,26 +217,32 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                                 child: Row(
                                   children: [
                                     if (streak.count > 0 || isLit) ...[
-                                      Icon(
-                                          isLit
-                                              ? Icons
-                                                  .local_fire_department_rounded
-                                              : Icons
-                                                  .local_fire_department_outlined,
-                                          color: glowColor,
-                                          shadows: isLit
-                                              ? [
-                                                  Shadow(
-                                                    color: glowColor.withValues(
-                                                        alpha: 0.6),
-                                                    blurRadius: 10 +
-                                                        (streak.count
-                                                            .clamp(0, 10)
-                                                            .toDouble()),
-                                                  )
-                                                ]
-                                              : null,
-                                          size: 24),
+                                      AnimatedBuilder(
+                                        animation: _pulseController,
+                                        builder: (context, child) {
+                                          return Icon(
+                                              isLit
+                                                  ? Icons
+                                                      .local_fire_department_rounded
+                                                  : Icons
+                                                      .local_fire_department_outlined,
+                                              color: glowColor,
+                                              shadows: isLit
+                                                  ? [
+                                                      Shadow(
+                                                        color: glowColor.withValues(
+                                                            alpha: 0.6 + (_pulseController.value * 0.4)),
+                                                        blurRadius: 10 +
+                                                            (streak.count
+                                                                .clamp(0, 10)
+                                                                .toDouble()) + 
+                                                            (_pulseController.value * 12),
+                                                      )
+                                                    ]
+                                                  : null,
+                                              size: 24);
+                                        },
+                                      ),
                                       const SizedBox(width: 4),
                                       Text('${streak.count}',
                                           style: TextStyle(
@@ -240,9 +255,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                                   ],
                                 ),
                               ),
-                              if (streak.count > 0 || isLit)
-                                const SizedBox(width: 16),
-                              const AccountButton(),
                             ],
                           );
                         }),
@@ -287,6 +299,9 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                       break;
                     case 'bible_stories':
                       cardWidget = BibleStoriesBanner(size: config.size);
+                      break;
+                    case 'cloud_sync':
+                      cardWidget = AccountSyncCard(size: config.size);
                       break;
                     case 'dictionary':
                       cardWidget = DictionaryBanner(size: config.size);

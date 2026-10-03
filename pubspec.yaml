@@ -33,6 +33,7 @@ dependencies:
   cloud_firestore: ^6.8.0
   sign_in_with_apple: ^8.1.0
   flutter_timezone: ^5.1.0
+  home_widget: ^0.10.0
 
 dev_dependencies:
   flutter_test:

@@ -15,6 +15,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'bible_story_reader_screen.dart';
+import '../../state/devotional_provider.dart';
+
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import 'main_nav_screen.dart' show kBottomDockHeight, kBottomDockInset;
@@ -41,6 +44,7 @@ import 'notes_list_screen.dart';
 import '../sheets/translation_picker_sheet.dart';
 
 import '../widgets/day_complete_celebration.dart';
+import '../widgets/dynamic_toast.dart';
 import '../../state/theme_provider.dart';
 import '../../state/bbe_substitutions_provider.dart';
 import '../../state/typography_provider.dart';
@@ -704,6 +708,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     final commentaryNotifier = ref.read(commentaryProvider.notifier);
     final Set<String> versesWithCommentary =
         commentaryNotifier.versesWithCommentarySet;
+    final Set<String> versesWithDevotionals =
+        commentaryNotifier.versesWithDevotionalsSet;
+    final Set<String> versesWithNotes =
+        commentaryNotifier.versesWithNotesSet;
     final Set<String> chaptersWithCommentary =
         commentaryNotifier.chaptersWithCommentarySet;
 
@@ -1277,11 +1285,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                       (context,
                                                                           itemRef,
                                                                           _) {
-                                                                bool
-                                                                    hasCommentary =
-                                                                    versesWithCommentary
-                                                                        .contains(
-                                                                            '${fc.book.name}|${fc.chapter.number}|${verse.number}');
+                                                                final verseKey = '${fc.book.name}|${fc.chapter.number}|${verse.number}';
+                                                                bool hasCommentary = versesWithCommentary.contains(verseKey);
+                                                                bool hasDevotional = versesWithDevotionals.contains(verseKey);
+                                                                bool hasStudyNote = versesWithNotes.contains(verseKey);
 
                                                                 final highlights =
                                                                     itemRef.watch(
@@ -1341,7 +1348,29 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                   appThemeMode,
                                                                   hasCommentary:
                                                                       hasCommentary,
+                                                                  hasDevotional: hasDevotional,
+                                                                  hasStudyNote: hasStudyNote,
                                                                   onCommentaryTap: () =>
+                                                                      _showCommentaryBottomSheet(
+                                                                          verse
+                                                                              .number,
+                                                                          verse
+                                                                              .text),
+                                                                  onDevotionalTap: () async {
+                                                                    HapticFeedback.selectionClick();
+                                                                    final refStr = '${fc.book.name} ${fc.chapter.number}:${verse.number}';
+                                                                    final service = ref.read(devotionalServiceProvider);
+                                                                    await service.loadAllStoryRefs();
+                                                                    final story = service.storyByKeyVerse[refStr];
+                                                                    if (story != null && context.mounted) {
+                                                                      Navigator.of(context).push(MaterialPageRoute(
+                                                                        builder: (_) => BibleStoryReaderScreen(initialStory: story),
+                                                                      ));
+                                                                    } else {
+                                                                      _showCommentaryBottomSheet(verse.number, verse.text);
+                                                                    }
+                                                                  },
+                                                                  onStudyNoteTap: () =>
                                                                       _showCommentaryBottomSheet(
                                                                           verse
                                                                               .number,
@@ -1686,7 +1715,11 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       TypographyState typography,
       AppThemeMode appThemeMode,
       {bool hasCommentary = false,
+      bool hasDevotional = false,
+      bool hasStudyNote = false,
       VoidCallback? onCommentaryTap,
+      VoidCallback? onDevotionalTap,
+      VoidCallback? onStudyNoteTap,
       bool isBookmarked = false,
       bool isRedLetterEnabled = true,
       bool isSelectionMode = false,
@@ -1703,7 +1736,11 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       typography,
       appThemeMode,
       hasCommentary: hasCommentary,
+      hasDevotional: hasDevotional,
+      hasStudyNote: hasStudyNote,
       onCommentaryTap: onCommentaryTap,
+      onDevotionalTap: onDevotionalTap,
+      onStudyNoteTap: onStudyNoteTap,
       isBookmarked: isBookmarked,
       isRedLetterEnabled: isRedLetterEnabled,
       isSelectionMode: isSelectionMode,
@@ -2020,7 +2057,11 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   Widget _buildNormalVerse(BuildContext context, BibleVerse verse, ThemeData theme,
       TypographyState typography, AppThemeMode appThemeMode,
       {bool hasCommentary = false,
+      bool hasDevotional = false,
+      bool hasStudyNote = false,
       VoidCallback? onCommentaryTap,
+      VoidCallback? onDevotionalTap,
+      VoidCallback? onStudyNoteTap,
       bool isBookmarked = false,
       bool isRedLetterEnabled = true,
       Color? overrideColor,
@@ -2259,6 +2300,40 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
             ),
           ),
         ...textSpans,
+        if (hasDevotional && !isSelectionMode)
+          WidgetSpan(
+            alignment: PlaceholderAlignment.middle,
+            child: GestureDetector(
+              onTap: onDevotionalTap,
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
+                child: Icon(
+                  Icons.favorite_rounded,
+                  color: tokens?.readingAccent ?? theme.primaryColor,
+                  size: typography.fontSize * 0.85,
+                ),
+              ),
+            ),
+          ),
+        if (hasStudyNote && !isSelectionMode)
+          WidgetSpan(
+            alignment: PlaceholderAlignment.middle,
+            child: GestureDetector(
+              onTap: onStudyNoteTap,
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
+                child: Icon(
+                  Icons.edit_note_rounded,
+                  color: starColor,
+                  size: typography.fontSize * 0.85,
+                ),
+              ),
+            ),
+          ),
         if (hasCommentary && !isSelectionMode)
           WidgetSpan(
             alignment: PlaceholderAlignment.middle,
@@ -2267,9 +2342,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
               behavior: HitTestBehavior.opaque,
               child: Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
+                    const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
                 child: Icon(
-                  Icons.lightbulb_rounded,
+                  Icons.library_books_rounded,
                   color: starColor,
                   size: typography.fontSize * 0.85,
                 ),
@@ -2634,21 +2709,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
 class VerseActionLogic {
   static void _showFeedback(
-      BuildContext context, ThemeData theme, String message) {
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message,
-            style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onInverseSurface,
-                fontWeight: FontWeight.bold)),
-        backgroundColor: theme.colorScheme.inverseSurface,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.only(left: 24, right: 24, bottom: 120),
-        duration: const Duration(seconds: 2),
-      ),
-    );
+      BuildContext context, ThemeData theme, String message, {IconData? icon}) {
+    DynamicToast.show(context, message, icon: icon);
   }
 
   static void showHighlightPaletteModal(
@@ -2680,6 +2742,7 @@ class VerseActionLogic {
                   // Clear highlight button
                   GestureDetector(
                     onTap: () {
+                      HapticFeedback.lightImpact();
                       for (var v in targetVerses) {
                         final refStr =
                             generateVerseKey(bookAbbrev, chapterNum, v);
@@ -2730,6 +2793,7 @@ class VerseActionLogic {
                         theme.scaffoldBackgroundColor);
                     return GestureDetector(
                       onTap: () {
+                        HapticFeedback.lightImpact();
                         ref
                             .read(readSettingsProvider.notifier)
                             .setActiveHighlightColorIndex(i);
@@ -2818,7 +2882,8 @@ class VerseActionLogic {
         theme,
         isRemoving
             ? '$count Highlight(s) removed'
-            : '$count verse(s) highlighted');
+            : '$count verse(s) highlighted',
+        icon: isRemoving ? Icons.format_paint_outlined : Icons.format_paint_rounded);
   }
 
   static void handleBookmark(
@@ -2844,7 +2909,8 @@ class VerseActionLogic {
         theme,
         isAllBookmarked
             ? '${targetVerses.length} verse(s) removed from bookmarks'
-            : '${targetVerses.length} verse(s) bookmarked!');
+            : '${targetVerses.length} verse(s) bookmarked!',
+        icon: isAllBookmarked ? Icons.bookmark_outline_rounded : Icons.bookmark_rounded);
   }
 
   static Future<void> handleNote(

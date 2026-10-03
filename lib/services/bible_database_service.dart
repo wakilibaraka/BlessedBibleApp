@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
@@ -164,6 +165,26 @@ class BibleDatabaseService {
           await db.execute(
               'ALTER TABLE translations ADD COLUMN is_downloaded INTEGER NOT NULL DEFAULT 0;');
         }
+        
+        await db.execute('''
+          CREATE TABLE IF NOT EXISTS reading_plans (
+            id TEXT PRIMARY KEY,
+            title TEXT NOT NULL,
+            description TEXT,
+            days_count INTEGER NOT NULL,
+            category TEXT,
+            plan_json TEXT NOT NULL
+          );
+        ''');
+        
+        await db.execute('''
+          CREATE TABLE IF NOT EXISTS user_plan_progress (
+            plan_id TEXT,
+            day_number INTEGER,
+            completed_at INTEGER,
+            PRIMARY KEY (plan_id, day_number)
+          );
+        ''');
       },
     );
   }
@@ -254,6 +275,41 @@ class BibleDatabaseService {
     });
     // Vacuum to reclaim space, but do it outside the transaction as it rewrites the DB
     await db.execute('VACUUM;');
+  }
+
+  Future<void> migrateReadingPlansFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final migrated = prefs.getBool('plans_migrated_to_sqlite') ?? false;
+    if (migrated) return;
+
+    final db = await database;
+    await db.transaction((txn) async {
+      final activeIds = prefs.getStringList('active_plan_ids') ?? [];
+      
+      for (final id in activeIds) {
+        final jsonString = prefs.getString('reading_plan_state_$id');
+        if (jsonString != null) {
+          try {
+            final state = jsonDecode(jsonString) as Map<String, dynamic>;
+            final completedDaysList = state['completedDays'];
+            if (completedDaysList != null && completedDaysList is List) {
+              for (final dayObj in completedDaysList) {
+                final dayNumber = int.tryParse(dayObj.toString());
+                if (dayNumber != null) {
+                  await txn.insert('user_plan_progress', {
+                    'plan_id': id,
+                    'day_number': dayNumber,
+                    'completed_at': DateTime.now().millisecondsSinceEpoch,
+                  }, conflictAlgorithm: ConflictAlgorithm.ignore);
+                }
+              }
+            }
+          } catch (_) {}
+        }
+      }
+    });
+    
+    await prefs.setBool('plans_migrated_to_sqlite', true);
   }
 }
 

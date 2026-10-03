@@ -18,12 +18,16 @@ class DevotionalService {
   final Map<String, List<DevotionalStory>> _booksByPrefix = {};
   final Map<String, String> _artByPrefix = {};
   final Map<String, String> _artCaptionBySlug = {};
+  final Map<String, DevotionalStory> _storyByKeyVerse = {};
   bool _artLoaded = false;
 
   List<DevotionalBookInfo>? _index;
 
   /// The loaded index, or null before the first [loadIndex] call.
   List<DevotionalBookInfo>? get indexOrNull => _index;
+
+  /// All stories mapped by key verse ("Genesis 1:3").
+  Map<String, DevotionalStory> get storyByKeyVerse => _storyByKeyVerse;
 
   /// All books in canonical chronological order.
   Future<List<DevotionalBookInfo>> loadIndex() async {
@@ -83,11 +87,15 @@ class DevotionalService {
         grouping: grouping,
         order: order,
       );
-      stories.add(s.copyWithEnriched(
+      final enriched = s.copyWithEnriched(
         indexInBook: i,
         plateSlug: plateSlug,
         plateCaption: plateCaption,
-      ));
+      );
+      stories.add(enriched);
+      if (enriched.keyVerseRef.isNotEmpty) {
+        _storyByKeyVerse[enriched.keyVerseRef] = enriched;
+      }
     }
     _booksByPrefix[prefix] = stories;
     return stories;

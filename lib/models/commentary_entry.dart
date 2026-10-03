@@ -1,3 +1,5 @@
+import 'study_content_category.dart';
+
 class CommentaryScope {
   final String type;
   final String? book;
@@ -53,6 +55,7 @@ class CommentaryEntry {
   final CommentaryScope scope;
   final String text;
   final String? dateAdded;
+  final StudyContentCategory category;
 
   CommentaryEntry({
     required this.id,
@@ -61,6 +64,7 @@ class CommentaryEntry {
     required this.scope,
     required this.text,
     this.dateAdded,
+    required this.category,
   });
 
   factory CommentaryEntry.fromJson(Map<String, dynamic> json) {
@@ -86,6 +90,7 @@ class CommentaryEntry {
       scope: scope,
       text: text,
       dateAdded: json['dateAdded'] as String?,
+      category: StudyContentCategory.fromSource(source),
     );
   }
 

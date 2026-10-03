@@ -289,8 +289,40 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Commentary text excerpt (fallback to omitted if none exists)
+                  // Commentary / Devotional text excerpt (fallback to omitted if none exists)
                   if (excerpt != null) ...[
+                    Row(
+                      children: [
+                        Icon(
+                          data.verseOfTheDay.isDevotional
+                              ? Icons.favorite_rounded
+                              : Icons.library_books_rounded,
+                          size: 13,
+                          color: theme.primaryColor,
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            (data.verseOfTheDay.isDevotional
+                                    ? 'DEVOTIONAL'
+                                    : 'COMMENTARY') +
+                                (data.verseOfTheDay.author != null
+                                    ? ' · ${data.verseOfTheDay.author}'
+                                    : (data.verseOfTheDay.sourceTitle != null
+                                        ? ' · ${data.verseOfTheDay.sourceTitle}'
+                                        : '')),
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.8,
+                              color: theme.primaryColor,
+                              fontSize: 11,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
                     Text(
                       excerpt,
                       maxLines: 8,

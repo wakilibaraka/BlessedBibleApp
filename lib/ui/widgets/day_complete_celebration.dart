@@ -1,5 +1,6 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:confetti/confetti.dart';
 
 class DayCompleteCelebration extends StatefulWidget {
   final int day;
@@ -17,12 +18,19 @@ class _DayCompleteCelebrationState extends State<DayCompleteCelebration>
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
+  late ConfettiController _confettiController;
 
   @override
   void initState() {
     super.initState();
+    HapticFeedback.heavyImpact();
+
+    _confettiController = ConfettiController(duration: const Duration(seconds: 1));
+    _confettiController.play();
+
     _controller = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 2500));
+
     _scaleAnimation = TweenSequence([
       TweenSequenceItem(
           tween: Tween<double>(begin: 0.5, end: 1.1)
@@ -52,13 +60,14 @@ class _DayCompleteCelebrationState extends State<DayCompleteCelebration>
     ]).animate(_controller);
 
     _controller.forward().then((_) {
-      widget.onComplete();
+      if (mounted) widget.onComplete();
     });
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _confettiController.dispose();
     super.dispose();
   }
 
@@ -66,90 +75,83 @@ class _DayCompleteCelebrationState extends State<DayCompleteCelebration>
   Widget build(BuildContext context) {
     return Material(
       color: Colors.black45,
-      child: Center(
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            return FadeTransition(
-              opacity: _fadeAnimation,
-              child: ScaleTransition(
-                scale: _scaleAnimation,
-                child: CustomPaint(
-                  painter: _SparklePainter(_controller.value),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 40, vertical: 32),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surface,
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Theme.of(context)
-                              .primaryColor
-                              .withValues(alpha: 0.3),
-                          blurRadius: 32,
-                          spreadRadius: 8,
-                        )
-                      ],
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.stars_rounded,
-                            color: Theme.of(context).primaryColor, size: 64),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Reading Plan\nDay ${widget.day} Complete!',
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineSmall
-                              ?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                        ),
-                      ],
+      child: GestureDetector(
+        onTap: () {
+          _controller.stop();
+          widget.onComplete();
+        },
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            AnimatedBuilder(
+              animation: _controller,
+              builder: (context, child) {
+                return FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: ScaleTransition(
+                    scale: _scaleAnimation,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 40, vertical: 32),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Theme.of(context)
+                                .primaryColor
+                                .withValues(alpha: 0.3),
+                            blurRadius: 32,
+                            spreadRadius: 8,
+                          )
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.stars_rounded,
+                              color: Theme.of(context).primaryColor, size: 64),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Reading Plan\nDay ${widget.day} Complete!',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineSmall
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context).colorScheme.onSurface,
+                                ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
+                );
+              },
+            ),
+            Align(
+              alignment: Alignment.topCenter,
+              child: ConfettiWidget(
+                confettiController: _confettiController,
+                blastDirection: 3.14159 / 2, // straight down
+                maxBlastForce: 5,
+                minBlastForce: 2,
+                emissionFrequency: 0.05,
+                numberOfParticles: 50,
+                gravity: 0.2,
+                colors: const [
+                  Colors.green,
+                  Colors.blue,
+                  Colors.pink,
+                  Colors.orange,
+                  Colors.purple
+                ],
               ),
-            );
-          },
+            ),
+          ],
         ),
       ),
     );
   }
-}
-
-class _SparklePainter extends CustomPainter {
-  final double progress;
-  _SparklePainter(this.progress);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (progress == 0 || progress == 1.0) return;
-
-    final paint = Paint()
-      ..color =
-          const Color(0xFFFFD700).withValues(alpha: 1.0 - progress) // Gold
-      ..style = PaintingStyle.fill;
-
-    final center = Offset(size.width / 2, size.height / 2);
-    final maxRadius = size.width;
-    final radius = maxRadius * Curves.easeOutQuad.transform(progress);
-
-    for (int i = 0; i < 12; i++) {
-      final angle = (i * pi * 2) / 12;
-      final distance = radius * (i % 2 == 0 ? 1.0 : 0.6);
-      final offset = Offset(
-        center.dx + cos(angle) * distance,
-        center.dy + sin(angle) * distance,
-      );
-      canvas.drawCircle(offset, 4 * (1.0 - progress), paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }

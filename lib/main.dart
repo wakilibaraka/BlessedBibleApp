@@ -20,6 +20,7 @@ import 'package:flutter/foundation.dart';
 import 'ui/widgets/app_error_fallback.dart';
 
 import 'utils/startup_stopwatch.dart';
+import 'services/widget_update_service.dart';
 
 void main() async {
   // Global Flutter framework error handling
@@ -98,6 +99,8 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(widgetUpdateServiceProvider); // Initialize widget background sync
+    
     final themeMode = ref.watch(themeProvider);
     final surfaceStyle = ref.watch(surfaceStyleProvider);
     final isBibleLoading = ref.watch(bibleProvider.select((s) => s.isLoading));
@@ -152,8 +155,8 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
     return MaterialApp(
       title: 'The Blessed Bible',
       debugShowCheckedModeBanner: false,
-      themeAnimationDuration: const Duration(milliseconds: 300),
-      themeAnimationCurve: Curves.easeOut,
+      themeAnimationDuration: const Duration(milliseconds: 600),
+      themeAnimationCurve: Curves.easeInOut,
       themeMode: switch (themeMode) {
         AppThemeMode.automatic => ThemeMode.system,
         AppThemeMode.light => ThemeMode.light,

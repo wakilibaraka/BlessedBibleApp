@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/widget_bg_gradient_dusk"
+    android:padding="16dp">
+
+    <!-- Header -->
+    <TextView
+        android:id="@+id/votd_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="VERSE OF THE DAY"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.08"
+        android:textColor="#FDE047"
+        android:shadowColor="#80000000"
+        android:shadowDx="0"
+        android:shadowDy="1"
+        android:shadowRadius="2"
+        android:layout_marginBottom="6dp" />
+
+    <!-- Subtle divider -->
+    <View
+        android:id="@+id/votd_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="10dp"
+        android:background="#26FFFFFF" />
+
+    <!-- Verse Text -->
+    <TextView
+        android:id="@+id/votd_text"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="Loading verse..."
+        android:textSize="14sp"
+        android:textColor="#FFFFFF"
+        android:maxLines="5"
+        android:ellipsize="end"
+        android:lineSpacingExtra="2dp"
+        android:shadowColor="#80000000"
+        android:shadowDx="0"
+        android:shadowDy="1"
+        android:shadowRadius="2"
+        android:layout_marginBottom="6dp" />
+
+    <!-- Reference -->
+    <TextView
+        android:id="@+id/votd_reference"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="..."
+        android:textSize="13sp"
+        android:textStyle="italic|bold"
+        android:textColor="#D4D4D8"
+        android:shadowColor="#80000000"
+        android:shadowDx="0"
+        android:shadowDy="1"
+        android:shadowRadius="2" />
+
+</LinearLayout>
