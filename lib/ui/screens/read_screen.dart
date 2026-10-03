@@ -180,6 +180,14 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   final Map<int, ItemPositionsListener> _itemPositionsListeners = {};
   final Map<String, List<TapGestureRecognizer>> _dictRecognizers = {};
 
+  // Pull-down-to-search gesture state
+  static const double _kOverscrollDistanceThreshold = 80.0;
+  double _dragStartY = 0.0;
+  bool _isDragging = false;
+  double _overscrollAccum = 0.0;
+  bool _hasFiredArmedHaptic = false;
+  bool _navTriggeredThisDrag = false;
+
   void _showDictionaryPopover(String normalizedWord) {
     final style = ref.read(readSettingsProvider).popupStyle;
     final isFloating = style == PopupStyle.floating;

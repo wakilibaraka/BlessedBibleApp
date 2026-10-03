@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Study Tools — Dictionary · Notes · Bookmarks</title>
+<link href="https://fonts.googleapis.com/css2?family=Gentium+Book+Plus:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700;800&family=EB+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html[data-theme="light"]{--bg:#F5F5F7;--surface:#fff;--s2:#F1F1F4;--ink:#1D1D1F;--mut:#6E6E73;--bd:#E5E5EA;--ac:#B8860B;--as:rgba(184,134,11,.12);--ab:rgba(184,134,11,.3)}
+html[data-theme="sepia"]{--bg:#F0E5D1;--surface:#F8EFE0;--s2:#EADFC6;--ink:#4A3B32;--mut:#7A6B62;--bd:#D6C8B3;--ac:#9E6B00;--as:rgba(158,107,0,.13);--ab:rgba(158,107,0,.32)}
+html[data-theme="dark"]{--bg:#121212;--surface:#1E1E1E;--s2:#282828;--ink:#EAE6E1;--mut:#AFAAA3;--bd:#3F3C39;--ac:#C9A227;--as:rgba(201,162,39,.14);--ab:rgba(201,162,39,.34)}
+html[data-theme="oled"]{--bg:#000;--surface:#101010;--s2:#1a1a1a;--ink:#EAE6E1;--mut:#AFAAA3;--bd:#2A2826;--ac:#C9A227;--as:rgba(201,162,39,.14);--ab:rgba(201,162,39,.34)}
+html[data-theme="dawn"]{--bg:#2E2A3A;--surface:#3A3547;--s2:#463F58;--ink:#EDE9F0;--mut:#A9A2B5;--bd:#453F52;--ac:#E8A87C;--as:rgba(232,168,124,.14);--ab:rgba(232,168,124,.38)}
+html[data-theme="lilies"]{--bg:#FCE4EC;--surface:#FDF6F8;--s2:#F7DCE7;--ink:#4A4045;--mut:#8E7C85;--bd:#E8CEDB;--ac:#3E7FA3;--as:rgba(140,185,209,.22);--ab:rgba(62,127,163,.4)}
+html[data-theme="roses"]{--bg:#FBE4D8;--surface:#FFF2EB;--s2:#F8DFCE;--ink:#523326;--mut:#996B58;--bd:#EACBB8;--ac:#C65A41;--as:rgba(222,116,86,.14);--ab:rgba(222,116,86,.38)}
+html[data-theme="olives"]{--bg:#E3E8DB;--surface:#F0F2EB;--s2:#D9E0CC;--ink:#2F3E2F;--mut:#5F755F;--bd:#CBD4C1;--ac:#4A5E28;--as:rgba(85,107,47,.14);--ab:rgba(85,107,47,.38)}
+html[data-theme="dusk"]{--bg:#312C51;--surface:#48426D;--s2:#575080;--ink:#fff;--mut:#B4A8D6;--bd:#5A5288;--ac:#F1AA9D;--as:rgba(241,170,157,.15);--ab:rgba(241,170,157,.42)}
+html[data-theme="fresh"]{--bg:#132C33;--surface:#1C404A;--s2:#27505C;--ink:#fff;--mut:#90B3B9;--bd:#265460;--ac:#D8B4E2;--as:rgba(216,180,226,.15);--ab:rgba(216,180,226,.42)}
+html[data-theme="priestly"]{--bg:#F5F5F7;--surface:#fff;--s2:#EFEBFA;--ink:#1D1D1F;--mut:#6E6E73;--bd:#E5E5EA;--ac:#673AB7;--as:rgba(103,58,183,.1);--ab:rgba(103,58,183,.32)}
+html[data-theme="galilee"]{--bg:#F5F5F7;--surface:#fff;--s2:#E8F2FD;--ink:#1D1D1F;--mut:#6E6E73;--bd:#E5E5EA;--ac:#1976C9;--as:rgba(33,150,243,.1);--ab:rgba(33,150,243,.32)}
+html[data-theme="scarlet"]{--bg:#F5F5F7;--surface:#fff;--s2:#FDECEC;--ink:#1D1D1F;--mut:#6E6E73;--bd:#E5E5EA;--ac:#C62828;--as:rgba(229,57,53,.1);--ab:rgba(229,57,53,.32)}
+body{background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif}
+.bar{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--bd)}
+.bar-in{max-width:640px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px}
+.back{color:var(--ac);text-decoration:none;font-size:13px;font-weight:700}.bar-in b{font-family:"EB Garamond",serif;font-size:17px}
+.th{display:flex;gap:5px;margin-left:auto;overflow-x:auto;scrollbar-width:none}.th button{flex:0 0 auto;border:1px solid var(--bd);background:var(--surface);color:var(--ink);font-size:10.5px;font-weight:700;padding:6px 9px;border-radius:999px;cursor:pointer}.th button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.wrap{max-width:640px;margin:0 auto;padding:20px 16px 110px}
+h1{font-family:"Gentium Book Plus",serif;font-size:29px}.sub{color:var(--mut);font-size:13px;margin-top:4px;line-height:1.6}
+.tabs{display:flex;background:var(--s2);border-radius:999px;padding:4px;margin-top:14px}.tabs button{flex:1;border:0;background:transparent;color:var(--mut);font-weight:800;font-size:12.5px;padding:10px;border-radius:999px;cursor:pointer}.tabs button.on{background:var(--surface);color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.search{width:100%;background:var(--surface);border:1px solid var(--bd);border-radius:14px;padding:12px 14px;color:var(--ink);font-size:13.5px;margin-top:12px;outline:none}
+.frow{display:flex;gap:7px;margin-top:10px}.frow button{border:1px solid var(--bd);background:var(--surface);color:var(--mut);font-size:12px;font-weight:700;padding:8px 13px;border-radius:999px;cursor:pointer}.frow button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card{background:var(--surface);border:1px solid var(--bd);border-radius:18px;padding:15px;margin-top:10px;cursor:pointer}
+.card h4{font-family:"Gentium Book Plus",serif;font-size:17px}.card p{font-size:12.8px;color:var(--mut);line-height:1.6;margin-top:4px}
+.lh{font-size:11px;font-weight:800;letter-spacing:.12em;color:var(--mut);margin:16px 0 2px}
+.hl{border-left:4px solid;padding:11px 13px;border-radius:0 13px 13px 0;background:var(--surface);border-top:1px solid var(--bd);border-right:1px solid var(--bd);border-bottom:1px solid var(--bd);margin-top:9px;font-family:"Gentium Book Plus",serif;font-size:15px}
+.folder{display:flex;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--bd);border-radius:16px;padding:13px;margin-top:9px}
+.chipv{font-size:10.5px;font-weight:800;background:var(--as);border:1px solid var(--ab);color:var(--ac);padding:4px 9px;border-radius:999px}
+.toast{position:fixed;left:50%;transform:translateX(-50%) translateY(20px);bottom:76px;background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 16px;border-radius:14px;opacity:0;transition:.25s;z-index:70}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.rail{position:fixed;right:8px;top:50%;transform:translateY(-50%);background:var(--surface);border:1px solid var(--bd);border-radius:999px;padding:8px 6px;font-size:10px;font-weight:800;color:var(--mut);display:flex;flex-direction:column;gap:2px;z-index:20}.rail b{color:var(--ac)}
+</style>
+</head>
+<body>
+<div class="bar"><div class="bar-in"><a class="back" href="index.html">← All pages</a><b>Study tools</b><div class="th" id="th"></div></div></div>
+<div class="wrap">
+<h1>Words, marks &amp; memory<span style="color:var(--ac)">.</span></h1>
+<p class="sub">Dictionary, cross-references, bookmarks, highlights and notes — one quiet system with history, filters and real empty states.</p>
+<div class="tabs"><button class="on" onclick="tab(this,'d')">Dictionary</button><button onclick="tab(this,'b')">Bookmarks</button><button onclick="tab(this,'h')">Highlights &amp; Notes</button></div>
+<div id="pane-d">
+<input class="search" id="q" placeholder="Search — try “grace”, “atonement”, “wilderness”…" oninput="dq(this.value)">
+<div class="frow"><button class="on">All sources</button><button>Easton</button><button>Smith</button><button style="margin-left:auto" onclick="toast('Showing bookmarked words only')">★ Saved</button><button onclick="toast('Recent: grace · atonement · wilderness')">🕘 Recents</button></div>
+<div class="lh">A · 2 OF 3,412</div>
+<div class="card" onclick="toast('Entry sheet: Atonement — full Easton article + verse links')"><h4>Atonement <span class="chipv">Easton</span> <span style="float:right;color:var(--ac)">★</span></h4><p>Reconciliation; the covering of sin by sacrifice. “And he shall make an atonement…” — Lev 16:30. Tap for full article, verse links, original-language notes.</p></div>
+<div class="card" onclick="toast('Entry sheet: Amen — Smith + Easton compared')"><h4>Amen <span class="chipv">Smith + Easton</span> <span style="float:right;color:var(--mut)">☆</span></h4><p>Firm, faithful, true. Liturgical affirmation closing prayer and doxology — “so be it.”</p></div>
+<div class="card" onclick="toast('Cross-reference chain opened')"><h4 style="font-family:Inter;font-size:13px">🔗 Cross-reference chain · John 8:12</h4><p>“I am the light of the world” → Isa 60:1 · 1 Jn 1:7 · Ps 119:105 · Mal 4:2 (+4 more). Chains stay open beside the reader.</p></div>
+<p class="sub" style="margin-top:10px">Fixes: source filter + recents + saved-only · A–Z rail with letter headers (numbers/symbols grouped under #) · empty headwords can't crash · iOS search field replaced with themed Material field · empty state suggests related words.</p>
+</div>
+<div id="pane-b" style="display:none">
+<div class="frow"><button class="on">All folders</button><button>Promises</button><button>Prayer</button><button>Hope</button><button style="margin-left:auto" onclick="toast('New folder created')">+ Folder</button></div>
+<div class="folder"><div style="font-size:20px">💜</div><div style="flex:1"><b style="font-size:13.5px">Promises</b><div class="sub">12 verses · Rom 8:28, Jer 29:11…</div></div><span>›</span></div>
+<div class="folder"><div style="font-size:20px">🙏</div><div style="flex:1"><b style="font-size:13.5px">Prayer</b><div class="sub">8 verses · smart group: this month</div></div><span>›</span></div>
+<div class="folder"><div style="font-size:20px">🕘</div><div style="flex:1"><b style="font-size:13.5px">Recent · this week</b><div class="sub">Auto-group · 5 verses</div></div><span>›</span></div>
+</div>
+<div id="pane-h" style="display:none">
+<div class="hl" style="border-color:#EAB308">“And we know that all things work together for good…” — Rom 8:28 <div class="sub">💛 Yellow · Jun 10 · <span class="chipv">Rom 8:28</span></div></div>
+<div class="hl" style="border-color:#22C55E">“Thy word is a lamp unto my feet…” — Ps 119:105 <div class="sub">💚 Green · Jun 8 · attached note: “pray this before night reading”</div></div>
+<div class="card" onclick="toast('Note editor — verse chips insert at cursor, translation follows reader')"><h4>Note · Rev 12:6 <span class="chipv">Jun 2</span></h4><p>“Prepared of God” — protection ≠ comfort. Link to Gen 45:7 + Ex 14 notes…</p></div>
+<p class="sub" style="margin-top:10px">Highlights render with <b style="color:var(--ink)">getRenderedHighlightColor()</b> (amber-700 on sepia, 0.35α dark / 0.55α light) so they stay legible on every theme.</p>
+</div>
+</div>
+<div class="rail">A<b>A</b>B C D E F G</div>
+<div class="toast" id="toast"></div>
+<script>
+const themes=[["light","Light"],["sepia","Sepia"],["dark","Dark"],["oled","OLED"],["dawn","Dawn"],["lilies","Lilies"],["roses","Roses"],["olives","Olives"],["dusk","Dusk"],["fresh","Fresh"],["priestly","Priestly"],["galilee","Galilee"],["scarlet","Scarlet"]];
+const box=document.getElementById('th');themes.forEach(([v,l])=>{const b=document.createElement('button');b.textContent=l;b.setAttribute('aria-pressed',v===document.documentElement.dataset.theme);b.onclick=()=>{document.documentElement.dataset.theme=v;localStorage.setItem('bb-theme',v);[...box.children].forEach(x=>x.setAttribute('aria-pressed',x.textContent===l))};box.appendChild(b)});
+const sv=localStorage.getItem('bb-theme');if(sv){document.documentElement.dataset.theme=sv;[...box.children].forEach(x=>x.setAttribute('aria-pressed',x.textContent.toLowerCase()===sv))}
+function tab(btn,w){document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));btn.classList.add('on');['d','b','h'].forEach(k=>document.getElementById('pane-'+k).style.display=k===w?'':'none')}
+function dq(v){if(v.trim()==='')toast('Browse A–Z · 3,412 headwords offline');else toast('3 results for “'+v+'” — debounced 300ms')}
+function toast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.add('show');clearTimeout(el._h);el._h=setTimeout(()=>el.classList.remove('show'),2400)}
+document.querySelectorAll('.frow button').forEach(b=>{if(!b.onclick)b.onclick=()=>{[...b.parentElement.children].forEach(x=>x.classList.remove('on'));b.classList.add('on')}});
+</script>
+</body></html>
