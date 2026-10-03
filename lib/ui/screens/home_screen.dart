@@ -61,7 +61,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   late final AnimationController _verseController;
   late final Animation<double> _verseFade;
 
-
+  // Pull-down-to-settings gesture state
+  static const double _kOverscrollThreshold = 80.0;
+  final ScrollController _scrollController = ScrollController();
+  double _dragStartY = 0.0;
+  bool _isDragging = false;
+  double _overscrollAccum = 0.0;
+  bool _hasFiredArmedHaptic = false;
 
   @override
   void initState() {
@@ -86,6 +92,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   @override
   void dispose() {
     _verseController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -101,40 +108,85 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           // ── Layer 2: Content ───────────────────────────────────────────
           SafeArea(
             bottom: false,
-            child: RawGestureDetector(
-              behavior: HitTestBehavior.opaque,
-              gestures: {
-                StrictHorizontalDragGestureRecognizer:
-                    GestureRecognizerFactoryWithHandlers<
-                        StrictHorizontalDragGestureRecognizer>(
-                  () => StrictHorizontalDragGestureRecognizer(),
-                  (StrictHorizontalDragGestureRecognizer instance) {
-                    instance
-                      ..onUpdate = (details) {}
-                      ..onEnd = (details) {
-                        if (details.primaryVelocity == null) return;
-                        // Swipe Left → go to Read tab
-                        if (details.primaryVelocity! < -300) {
-                          HapticFeedback.selectionClick();
-                          ref.read(navProvider.notifier).setIndex(1);
-                        }
-                      };
-                  },
-                ),
+            child: Listener(
+              onPointerDown: (e) {
+                _dragStartY = e.position.dy;
+                _isDragging = true;
               },
-              child: RefreshIndicator.adaptive(
-                color: Theme.of(context).primaryColor,
-                backgroundColor: Theme.of(context).colorScheme.surface,
-                onRefresh: () async {
-                  // CMS: fetch remote content here in future
-                  await Future.delayed(const Duration(milliseconds: 500));
-                  ref.invalidate(homeProvider);
+              onPointerMove: (e) {
+                if (!_isDragging) return;
+                bool isAtTop = true;
+                if (_scrollController.hasClients) {
+                  isAtTop = _scrollController.offset <= 16.0;
+                }
+                if (!isAtTop) return;
+                final dy = e.position.dy - _dragStartY;
+                if (dy < -10) {
+                  _isDragging = false;
+                  _overscrollAccum = 0.0;
+                  if (mounted) setState(() {});
+                  return;
+                }
+                if (dy > 0) {
+                  _overscrollAccum = dy;
+                  if (_overscrollAccum >= _kOverscrollThreshold && !_hasFiredArmedHaptic) {
+                    _hasFiredArmedHaptic = true;
+                    HapticFeedback.mediumImpact();
+                  }
+                  if (mounted) setState(() {});
+                }
+              },
+              onPointerUp: (e) {
+                _isDragging = false;
+                if (_overscrollAccum >= _kOverscrollThreshold) {
+                  ref.read(navProvider.notifier).setIndex(4); // 4 = Settings
+                }
+                _overscrollAccum = 0.0;
+                _hasFiredArmedHaptic = false;
+                if (mounted) setState(() {});
+              },
+              onPointerCancel: (e) {
+                _isDragging = false;
+                _overscrollAccum = 0.0;
+                _hasFiredArmedHaptic = false;
+                if (mounted) setState(() {});
+              },
+              child: RawGestureDetector(
+                behavior: HitTestBehavior.opaque,
+                gestures: {
+                  StrictHorizontalDragGestureRecognizer:
+                      GestureRecognizerFactoryWithHandlers<
+                          StrictHorizontalDragGestureRecognizer>(
+                    () => StrictHorizontalDragGestureRecognizer(),
+                    (StrictHorizontalDragGestureRecognizer instance) {
+                      instance
+                        ..onUpdate = (details) {}
+                        ..onEnd = (details) {
+                          if (details.primaryVelocity == null) return;
+                          // Swipe Left → go to Read tab
+                          if (details.primaryVelocity! < -300) {
+                            HapticFeedback.selectionClick();
+                            ref.read(navProvider.notifier).setIndex(1);
+                          }
+                        };
+                    },
+                  ),
                 },
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: FadeTransition(
-                    opacity: _verseFade,
-                    child: _buildPage(context, homeState, appThemeMode),
+                child: RefreshIndicator.adaptive(
+                  color: Theme.of(context).primaryColor,
+                  backgroundColor: Theme.of(context).colorScheme.surface,
+                  onRefresh: () async {
+                    // CMS: fetch remote content here in future
+                    await Future.delayed(const Duration(milliseconds: 500));
+                    ref.invalidate(homeProvider);
+                  },
+                  child: SingleChildScrollView(
+                    controller: _scrollController,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: FadeTransition(
+                      opacity: _verseFade,
+                      child: _buildPage(context, homeState, appThemeMode),
+                    ),
                   ),
                 ),
               ),
