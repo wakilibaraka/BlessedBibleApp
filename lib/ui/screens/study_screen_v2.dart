@@ -7,6 +7,7 @@ import '../../state/journal_provider.dart';
 import '../../state/notes_provider.dart';
 import '../../state/reading_plan_provider.dart';
 import '../../state/streak_provider.dart';
+import '../../state/plans_design_provider.dart';
 import '../../state/study_layout_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../state/user_data_provider.dart'
@@ -18,6 +19,7 @@ import 'bible_stories_screen.dart';
 import 'commentary_library_v2_screen.dart';
 import 'dictionary_v2_screen.dart';
 import 'plans_hub_v3_screen.dart';
+import 'plans_library_screen.dart';
 import 'reading_plan_detail_v2_screen.dart';
 import 'your_space_screen.dart';
 import 'plans_hub_v2_screen.dart' show availablePlans;
@@ -491,6 +493,7 @@ class _CardBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final useNewLibrary = ref.watch(plansDesignProvider);
     switch (id) {
       case 'your_space':
         return _YourSpaceCard(span: span, onOpen: onOpen);
@@ -518,8 +521,9 @@ class _CardBody extends ConsumerWidget {
           snippet:
               'Curated, paced and custom plans with catch-up.',
           cta: 'Browse plans',
-          onTap: () =>
-              onOpen(const PlansHubV3Screen()),
+          onTap: () => onOpen(useNewLibrary
+              ? const PlansLibraryScreen()
+              : const PlansHubV3Screen()),
         );
       case 'dictionary':
         return _ToolCard(
@@ -709,10 +713,13 @@ class _PlanSnapshotCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final activeIds = ref.watch(activePlanIdsProvider);
+    final useNewLibrary = ref.watch(plansDesignProvider);
 
     if (activeIds.isEmpty) {
       return V2Card(
-        onTap: () => onOpen(const PlansHubV3Screen()),
+        onTap: () => onOpen(useNewLibrary
+            ? const PlansLibraryScreen()
+            : const PlansHubV3Screen()),
         child: Row(
           children: [
             Icon(Icons.menu_book_rounded,

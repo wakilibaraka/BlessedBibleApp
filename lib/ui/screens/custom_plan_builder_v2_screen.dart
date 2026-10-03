@@ -83,8 +83,22 @@ class CustomPlanBuilderV2Screen extends ConsumerStatefulWidget {
   /// (used by the paced-generator shortcut).
   final bool wholeBible;
 
-  const CustomPlanBuilderV2Screen(
-      {super.key, this.initialDays, this.wholeBible = false});
+  /// Optional preset: pre-fill one track spanning a book range, e.g.
+  /// Genesis → Genesis (matched by book name). Used by Bookshelf presets.
+  final String? initialStartBook;
+  final String? initialEndBook;
+
+  /// Optional preset: pre-fill the plan title (e.g. "Genesis in 30 days").
+  final String? initialTitle;
+
+  const CustomPlanBuilderV2Screen({
+    super.key,
+    this.initialDays,
+    this.wholeBible = false,
+    this.initialStartBook,
+    this.initialEndBook,
+    this.initialTitle,
+  });
 
   @override
   ConsumerState<CustomPlanBuilderV2Screen> createState() =>
@@ -117,6 +131,10 @@ class _CustomPlanBuilderV2ScreenState
     if (widget.initialDays != null) {
       _days = widget.initialDays!.clamp(1, 730).toDouble();
       _daysController.text = _days.toInt().toString();
+    }
+    if (widget.initialTitle != null && widget.initialTitle!.isNotEmpty) {
+      _titleController.text = widget.initialTitle!;
+      _titleTouched = true;
     }
     _initGenerator();
   }
@@ -152,6 +170,30 @@ class _CustomPlanBuilderV2ScreenState
             ..endBook = last
             ..endChapter = last.chapters.last.number
             ..endVerse = last.chapters.last.verses.length);
+        } else if (widget.initialStartBook != null && allBooks.isNotEmpty) {
+          // Bookshelf preset: one track across a book range.
+          BibleBook? find(String name) {
+            for (final b in allBooks) {
+              if (b.name.toLowerCase() == name.toLowerCase()) return b;
+            }
+            return null;
+          }
+
+          final start = find(widget.initialStartBook!);
+          final end = widget.initialEndBook == null
+              ? start
+              : find(widget.initialEndBook!);
+          if (start != null && end != null) {
+            _drafts.add(_TrackDraftV2()
+              ..startBook = start
+              ..startChapter = 1
+              ..startVerse = 1
+              ..endBook = end
+              ..endChapter = end.chapters.last.number
+              ..endVerse = end.chapters.last.verses.length);
+          } else {
+            _drafts.add(_TrackDraftV2());
+          }
         } else {
           _drafts.add(_TrackDraftV2());
         }

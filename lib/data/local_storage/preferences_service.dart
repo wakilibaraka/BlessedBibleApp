@@ -132,6 +132,20 @@ class PreferencesService {
     await prefs.setBool(_studyRedesignKey, enabled);
   }
 
+  static const String _plansRedesignKey = 'plans_library_redesign_enabled';
+
+  /// Plans Library redesign flag: when true, plan entry points open the new
+  /// Reading/Books/My Plans library. Default ON — the previous hub remains
+  /// as the fallback (turn the Settings switch off to use it). An explicit
+  /// stored choice always wins over the default.
+  bool getPlansRedesign() {
+    return prefs.getBool(_plansRedesignKey) ?? true;
+  }
+
+  Future<void> setPlansRedesign(bool enabled) async {
+    await prefs.setBool(_plansRedesignKey, enabled);
+  }
+
   void saveBookmarks(List<String> bookmarks) {
     prefs.setStringList(_bookmarksKey, bookmarks);
   }
