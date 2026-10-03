@@ -596,6 +596,19 @@ class BibleDatabaseService {
     await _packStore.restoreBundledPack(translationId);
   }
 
+  /// Installs a prebuilt pack database downloaded over the network
+  /// (Firebase Storage flow), hash-verified when [expectedSha256] is given.
+  Future<void> installPrebuiltPack(
+      String translationId, List<int> bytes,
+      {String? expectedSha256}) async {
+    if (TranslationPackStore.isCoreId(translationId)) {
+      throw StateError(
+          "'$translationId' is part of the app backbone.");
+    }
+    await _packStore.installPackFromBytes(translationId, bytes,
+        expectedSha256: expectedSha256);
+  }
+
   Future<void> migrateReadingPlansFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     final migrated = prefs.getBool('plans_migrated_to_sqlite') ?? false;

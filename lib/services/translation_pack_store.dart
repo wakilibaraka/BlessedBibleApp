@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:crypto/crypto.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -378,7 +379,17 @@ class TranslationPackStore {
   }
 
   /// Installs a prebuilt pack database (Firebase Storage flow).
-  Future<void> installPackFromBytes(String id, List<int> bytes) async {
+  /// When [expectedSha256] is given, the bytes are hash-verified first so a
+  /// corrupt or tampered download can never become installed content.
+  Future<void> installPackFromBytes(String id, List<int> bytes,
+      {String? expectedSha256}) async {
+    if (expectedSha256 != null) {
+      final actual = sha256.convert(bytes).toString();
+      if (actual != expectedSha256.toLowerCase()) {
+        throw StateError(
+            'Download of $id failed integrity check (sha256 mismatch).');
+      }
+    }
     final file = await _packFile(id);
     final tmp = File('${file.path}.tmp');
     await tmp.writeAsBytes(bytes, flush: true);

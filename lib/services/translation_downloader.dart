@@ -70,12 +70,170 @@ class TranslationDownloader {
       'license': 'CC BY-SA 4.0',
       'sizeMB': 8.0
     },
+    // Bundled packs the user deleted: restored from the APK (instant,
+    // offline) instead of downloaded. Sizes measured from built packs.
+    {
+      'id': 'swh_ulb',
+      'lang': 'sw',
+      'langName': 'Swahili',
+      'name': 'Swahili Unlocked Literal Bible',
+      'abbr': 'ULB',
+      'license': 'CC BY-SA 4.0',
+      'sizeMB': 5.0,
+      'source': 'bundled',
+    },
+    {
+      'id': 'tgl_ulb',
+      'lang': 'tl',
+      'langName': 'Tagalog',
+      'name': 'Tagalog Unlocked Literal Bible',
+      'abbr': 'ULB',
+      'license': 'CC BY-SA 4.0',
+      'sizeMB': 6.0,
+      'source': 'bundled',
+    },
+    {
+      'id': 'ron_btf',
+      'lang': 'ro',
+      'langName': 'Romanian',
+      'name': 'Romanian BTF Bible',
+      'abbr': 'BTF',
+      'license': 'Public Domain',
+      'sizeMB': 5.4,
+      'source': 'bundled',
+    },
+    {
+      'id': 'ita_dio',
+      'lang': 'it',
+      'langName': 'Italian',
+      'name': 'Diodati 1885',
+      'abbr': 'DIO',
+      'license': 'Public Domain',
+      'sizeMB': 4.9,
+      'source': 'bundled',
+    },
+    {
+      'id': 'fra_lsg',
+      'lang': 'fr',
+      'langName': 'French',
+      'name': 'Louis Segond 1910',
+      'abbr': 'LSG',
+      'license': 'Public Domain',
+      'sizeMB': 4.1,
+      'source': 'bundled',
+    },
+    // Prebuilt packs hosted in Firebase Storage (see content_packs/ +
+    // content_packs/manifest.json for sha256). Upload once with:
+    // gsutil cp content_packs/<id>.db gs://blessedbibleapp.firebasestorage.app/packs/
+    ..._storagePack(
+      id: 'bbe',
+      lang: 'en',
+      langName: 'English',
+      name: 'Bible in Basic English',
+      abbr: 'BBE',
+      license: 'Public Domain',
+      sizeMB: 5.1,
+      sha256:
+          'b022b832d381127df1ff52bc81de386d36b0f8fa23aea2b69a0ad6053d4cc541',
+    ),
+    ..._storagePack(
+      id: 'web',
+      lang: 'en',
+      langName: 'English',
+      name: 'World English Bible',
+      abbr: 'WEB',
+      license: 'Public Domain',
+      sizeMB: 5.0,
+      sha256:
+          'e9e3907aedc0515ffb76a85cf0c18d0bd4f7d208894f09e0539ba70fbcc05415',
+    ),
+    ..._storagePack(
+      id: 'deu_l12',
+      lang: 'de',
+      langName: 'German',
+      name: 'Luther Bible 1912',
+      abbr: 'L1912',
+      license: 'Public Domain',
+      sizeMB: 4.9,
+      sha256:
+          'f3cc52a2e35060dfea078807fd67b8b2c43b353bc6034edb2f1962ad4d2af250',
+    ),
+    ..._storagePack(
+      id: 'nld_',
+      lang: 'nl',
+      langName: 'Dutch',
+      name: 'Dutch Bible 1917',
+      abbr: 'NLD',
+      license: 'Public Domain',
+      sizeMB: 5.3,
+      sha256:
+          '3a6d4631581887d7b7cb17d1f094c65cef703ce450c82bc1b79347c9f834ed96',
+    ),
+    ..._storagePack(
+      id: 'por_blj',
+      lang: 'pt',
+      langName: 'Portuguese',
+      name: 'Bíblia Livre',
+      abbr: 'BLIVRE',
+      license: 'CC BY 4.0',
+      sizeMB: 5.0,
+      sha256:
+          '0a6145db735f7fa95317979cc7d1a963616ec2a6429a6f5adccae065fee03477',
+    ),
+    ..._storagePack(
+      id: 'spa_r09',
+      lang: 'es',
+      langName: 'Spanish',
+      name: 'Reina Valera 1909',
+      abbr: 'RV1909',
+      license: 'Public Domain',
+      sizeMB: 5.0,
+      sha256:
+          'c1783150ae84f10c76379aa4dc8e8c856b35e3d211134c97628c9e04161dc453',
+    ),
   ];
+
+  static const String _storageBucket = 'blessedbibleapp.firebasestorage.app';
+
+  /// Registry entry for one Firebase-Storage-hosted prebuilt pack.
+  static List<Map<String, dynamic>> _storagePack({
+    required String id,
+    required String lang,
+    required String langName,
+    required String name,
+    required String abbr,
+    required String license,
+    required double sizeMB,
+    required String sha256,
+  }) {
+    return [
+      {
+        'id': id,
+        'lang': lang,
+        'langName': langName,
+        'name': name,
+        'abbr': abbr,
+        'license': license,
+        'sizeMB': sizeMB,
+        'source': 'storage',
+        'storageUrl': 'https://firebasestorage.googleapis.com/v0/b/'
+            '$_storageBucket/o/packs%2F$id.db?alt=media',
+        'sha256': sha256,
+      }
+    ];
+  }
 
   static Future<void> downloadAndInstall(
       String translationId, void Function(double) onProgress) async {
     final meta = downloadableTranslations
         .firstWhere((t) => (t['db_id'] ?? t['id']) == translationId);
+
+    // Prebuilt pack flow (Firebase Storage): exact bytes, hash-verified.
+    final storageUrl = meta['storageUrl'] as String?;
+    if (storageUrl != null) {
+      await _downloadPrebuiltPack(meta, storageUrl, onProgress);
+      return;
+    }
 
     // Primary endpoint (actual helloao structure)
     final primaryUrl =
@@ -128,6 +286,55 @@ class TranslationDownloader {
     // Install to DB
     await bibleDbService.insertTranslationPack(
         parsedData.info, parsedData.verses);
+  }
+
+  /// Downloads a prebuilt pack database (Firebase Storage) with retries,
+  /// verifies its sha256, and installs it as a standalone pack file.
+  static Future<void> _downloadPrebuiltPack(
+    Map<String, dynamic> meta,
+    String url,
+    void Function(double) onProgress,
+  ) async {
+    final tid = (meta['db_id'] ?? meta['id']) as String;
+    List<int>? bytes;
+    Exception? lastError;
+
+    for (int i = 0; i < _maxRetries; i++) {
+      try {
+        final request = http.Request('GET', Uri.parse(url));
+        final response = await request.send();
+        if (response.statusCode == 200) {
+          int totalBytes = response.contentLength ??
+              ((meta['sizeMB'] as num) * 1024 * 1024).toInt();
+          int receivedBytes = 0;
+          final chunks = <int>[];
+          await for (final chunk in response.stream) {
+            chunks.addAll(chunk);
+            receivedBytes += chunk.length;
+            onProgress(receivedBytes / totalBytes);
+          }
+          bytes = chunks;
+          break;
+        } else {
+          throw Exception('HTTP ${response.statusCode}');
+        }
+      } catch (e) {
+        lastError = e as Exception;
+        if (i < _maxRetries - 1) {
+          await Future.delayed(_retryDelay * (i + 1));
+        }
+      }
+    }
+
+    if (bytes == null) {
+      throw lastError ?? Exception('Download failed');
+    }
+    onProgress(1.0); // Verifying + installing
+    await bibleDbService.installPrebuiltPack(
+      tid,
+      bytes,
+      expectedSha256: meta['sha256'] as String?,
+    );
   }
 
   // Runs in an isolate

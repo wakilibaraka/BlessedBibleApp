@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/translation_provider.dart';
 import '../../state/read_settings_provider.dart';
 import '../../data/models/translation_model.dart';
+import '../../services/bible_database_service.dart';
 import '../../services/translation_downloader.dart';
 import '../widgets/animated_segmented_tile.dart';
 import '../widgets/textured_glass_container.dart';
@@ -206,6 +207,71 @@ class _TranslationPickerSheetState
     );
   }
 
+  /// Deletes an installed translation. KJV is the undeletable backbone.
+  /// Falls back to KJV first so Read never points at a missing translation.
+  Future<void> _deleteTranslation(
+    BuildContext context,
+    WidgetRef ref,
+    TranslationInfo item,
+  ) async {
+    final id = item.translationId;
+    if (id == 'kjv') return;
+    if (ref.read(activeTranslationProvider) == id) {
+      await ref.read(activeTranslationProvider.notifier).setTranslation('kjv');
+    }
+    if (ref.read(secondaryTranslationProvider) == id) {
+      await ref
+          .read(secondaryTranslationProvider.notifier)
+          .setTranslation(null);
+    }
+    try {
+      await bibleDbService.deleteTranslationPack(id);
+      ref.invalidate(availableTranslationsProvider);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${item.translationName} deleted.'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Could not delete: $e'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
+  Widget _languageHeader(ThemeData theme, String lang) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0, top: 12.0),
+      child: Text(
+        lang,
+        style: theme.textTheme.labelLarge?.copyWith(
+          color: theme.primaryColor,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 1.2,
+        ),
+      ),
+    );
+  }
+
+  List<String> _sortedLangs(Iterable<String> langs) {
+    final sortedKeys = langs.toList()
+      ..sort((a, b) {
+        int pA = _getLanguagePriority(a);
+        int pB = _getLanguagePriority(b);
+        if (pA != pB) return pA.compareTo(pB);
+        return a.compareTo(b); // Alphabetical fallback
+      });
+    return sortedKeys;
+  }
+
   Widget _buildTranslationList(
     BuildContext context,
     WidgetRef ref,
@@ -214,51 +280,162 @@ class _TranslationPickerSheetState
     String? otherTranslationId,
     List<TranslationInfo> installed,
   ) {
-    // Combine installed and downloadable
-    final allTranslations = <String,
-        List<dynamic>>{}; // map of langName -> list of (TranslationInfo OR Map)
+    final installedIds = installed.map((t) => t.translationId).toSet();
 
-    // 1. Beta Feature Flag: Set to true to re-enable downloadable translations
-    bool kEnableDownloads = false;
+    // Not installed: bundled packs the user removed (restore offline) plus
+    // network-downloadable translations.
+    final pending = TranslationDownloader.downloadableTranslations.where((t) {
+      final tid = (t['db_id'] ?? t['id']) as String;
+      return !installedIds.contains(tid);
+    }).toList();
 
-    // First add installed (they are guaranteed local because they are in the DB)
+    final installedByLang = <String, List<TranslationInfo>>{};
     for (final t in installed) {
-      final lang = t.languageName;
-      allTranslations[lang] = allTranslations[lang] ?? [];
-      allTranslations[lang]!.add(t);
+      installedByLang[t.languageName] =
+          installedByLang[t.languageName] ?? [];
+      installedByLang[t.languageName]!.add(t);
     }
-
-    // Then add downloadable (if not installed)
-    // ignore: dead_code
-    if (kEnableDownloads) {
-      final installedIds = installed.map((t) => t.translationId).toSet();
-      for (final t in TranslationDownloader.downloadableTranslations) {
-        final tid = t['db_id'] ?? t['id'];
-        if (!installedIds.contains(tid)) {
-          final lang = t['langName'] as String;
-          allTranslations[lang] = allTranslations[lang] ?? [];
-          allTranslations[lang]!.add(t);
-        }
-      }
+    final pendingByLang = <String, List<Map<String, dynamic>>>{};
+    for (final t in pending) {
+      final lang = t['langName'] as String;
+      pendingByLang[lang] = pendingByLang[lang] ?? [];
+      pendingByLang[lang]!.add(t);
     }
-
-    final sortedKeys = allTranslations.keys.toList()
-      ..sort((a, b) {
-        int pA = _getLanguagePriority(a);
-        int pB = _getLanguagePriority(b);
-        if (pA != pB) return pA.compareTo(pB);
-        return a.compareTo(b); // Alphabetical fallback
-      });
 
     final children = <Widget>[];
 
-    for (final lang in sortedKeys) {
-      final list = allTranslations[lang]!;
+    for (final lang in _sortedLangs(installedByLang.keys)) {
+      children.add(_languageHeader(theme, lang));
+      for (final item in installedByLang[lang]!) {
+        // Installed
+        final isSelected = item.translationId == activeTranslationId;
+        final isOtherSelected = ref.read(readSettingsProvider).readingLayout != ReadingLayout.single && item.translationId == otherTranslationId;
+        // Only KJV is locked: everything else can be deleted to slim the app.
+        final isLocked = item.translationId == 'kjv';
+        children.add(
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Opacity(
+              opacity: isOtherSelected ? 0.4 : 1.0,
+              child: Material(
+                color: isSelected
+                    ? theme.primaryColor.withValues(alpha: 0.1)
+                    : theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(16),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onTap: isOtherSelected ? null : () {
+                  if (_isSelectingSecondary) {
+                    ref
+                        .read(secondaryTranslationProvider.notifier)
+                        .setTranslation(item.translationId);
+                  } else {
+                    ref
+                        .read(activeTranslationProvider.notifier)
+                        .setTranslation(item.translationId);
+                  }
+                  Navigator.of(context).pop();
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 16),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: isSelected
+                          ? theme.primaryColor.withValues(alpha: 0.5)
+                          : theme.colorScheme.onSurface
+                              .withValues(alpha: 0.1),
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item.translationName,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: isSelected
+                                    ? theme.primaryColor
+                                    : theme.colorScheme.onSurface,
+                              ),
+                            ),
+                            Builder(builder: (_) {
+                              final subtitle = isLocked
+                                  ? 'Always available · app backbone'
+                                  : item.license;
+                              if (subtitle.isEmpty) {
+                                return const SizedBox.shrink();
+                              }
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 4),
+                                child: Text(
+                                  subtitle,
+                                  style: theme.textTheme.bodySmall
+                                      ?.copyWith(
+                                    color: theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.6),
+                                  ),
+                                ),
+                              );
+                            }),
+                          ],
+                        ),
+                      ),
+                      if (!isLocked)
+                        IconButton(
+                          tooltip: 'Delete ${item.translationName}',
+                          icon: const Icon(
+                              Icons.delete_outline_rounded,
+                              size: 20),
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.4),
+                          onPressed: () => _deleteTranslation(
+                              context, ref, item),
+                        ),
+                      if (isSelected)
+                        Icon(
+                          Icons.check_circle_rounded,
+                          color: theme.primaryColor,
+                        )
+                      else if (isLocked)
+                        Tooltip(
+                          message: 'Cannot delete — app backbone',
+                          child: Icon(
+                            Icons.lock_outline_rounded,
+                            size: 20,
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.3),
+                          ),
+                        )
+                      else
+                        Icon(
+                          Icons.cloud_done_outlined,
+                          size: 20,
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.3),
+                        ),
+                    ],
+                  ),
+                ),
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+    }
+
+    if (pendingByLang.isNotEmpty) {
       children.add(
         Padding(
-          padding: const EdgeInsets.only(bottom: 12.0, top: 12.0),
+          padding: const EdgeInsets.only(bottom: 4.0, top: 16.0),
           child: Text(
-            lang,
+            'AVAILABLE TO ADD',
             style: theme.textTheme.labelLarge?.copyWith(
               color: theme.primaryColor,
               fontWeight: FontWeight.w700,
@@ -267,101 +444,11 @@ class _TranslationPickerSheetState
           ),
         ),
       );
-
-      for (final item in list) {
-        if (item is TranslationInfo) {
-          // Installed
-          final isSelected = item.translationId == activeTranslationId;
-          final isOtherSelected = ref.read(readSettingsProvider).readingLayout != ReadingLayout.single && item.translationId == otherTranslationId;
-          children.add(
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: Opacity(
-                opacity: isOtherSelected ? 0.4 : 1.0,
-                child: Material(
-                  color: isSelected
-                      ? theme.primaryColor.withValues(alpha: 0.1)
-                      : theme.colorScheme.surface,
-                borderRadius: BorderRadius.circular(16),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(16),
-                  onTap: isOtherSelected ? null : () {
-                    if (_isSelectingSecondary) {
-                      ref
-                          .read(secondaryTranslationProvider.notifier)
-                          .setTranslation(item.translationId);
-                    } else {
-                      ref
-                          .read(activeTranslationProvider.notifier)
-                          .setTranslation(item.translationId);
-                    }
-                    Navigator.of(context).pop();
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 16),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: isSelected
-                            ? theme.primaryColor.withValues(alpha: 0.5)
-                            : theme.colorScheme.onSurface
-                                .withValues(alpha: 0.1),
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                item.translationName,
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: isSelected
-                                      ? theme.primaryColor
-                                      : theme.colorScheme.onSurface,
-                                ),
-                              ),
-                              if (item.license.isNotEmpty) ...[
-                                const SizedBox(height: 4),
-                                Text(
-                                  item.license,
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: theme.colorScheme.onSurface
-                                        .withValues(alpha: 0.6),
-                                  ),
-                                ),
-                              ]
-                            ],
-                          ),
-                        ),
-                        if (isSelected)
-                          Icon(
-                            Icons.check_circle_rounded,
-                            color: theme.primaryColor,
-                          )
-                        else
-                          Icon(
-                            Icons.cloud_done_outlined,
-                            size: 20,
-                            color: theme.colorScheme.onSurface
-                                .withValues(alpha: 0.3),
-                          ),
-                      ],
-                    ),
-                  ),
-                  ),
-                ),
-              ),
-            ),
-          );
-        } else {
-          // Downloadable
+      for (final lang in _sortedLangs(pendingByLang.keys)) {
+        children.add(_languageHeader(theme, lang));
+        for (final item in pendingByLang[lang]!) {
           children.add(_DownloadableTile(
-              item: item as Map<String, dynamic>,
-              isSecondary: _isSelectingSecondary));
+              item: item, isSecondary: _isSelectingSecondary));
         }
       }
     }
@@ -387,6 +474,8 @@ class _DownloadableTileState extends ConsumerState<_DownloadableTile> {
   double _progress = 0.0;
   String? _error;
 
+  bool get _isRestore => widget.item['source'] == 'bundled';
+
   Future<void> _startDownload() async {
     setState(() {
       _isDownloading = true;
@@ -396,13 +485,19 @@ class _DownloadableTileState extends ConsumerState<_DownloadableTile> {
 
     final tid = widget.item['db_id'] ?? widget.item['id'];
     try {
-      await TranslationDownloader.downloadAndInstall(tid, (p) {
-        if (mounted) {
-          setState(() {
-            _progress = p;
-          });
-        }
-      });
+      if (_isRestore) {
+        // Bundled pack the user removed: re-copy from the APK (instant,
+        // offline) instead of downloading.
+        await bibleDbService.restoreBundledPack(tid);
+      } else {
+        await TranslationDownloader.downloadAndInstall(tid, (p) {
+          if (mounted) {
+            setState(() {
+              _progress = p;
+            });
+          }
+        });
+      }
       if (mounted) {
         // Refresh the list of available translations
         ref.invalidate(availableTranslationsProvider);
@@ -420,10 +515,10 @@ class _DownloadableTileState extends ConsumerState<_DownloadableTile> {
       if (mounted) {
         setState(() {
           _isDownloading = false;
-          _error = 'Download failed';
+          _error = _isRestore ? 'Restore failed' : 'Download failed';
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to download: $e')),
+          SnackBar(content: Text('Failed to add: $e')),
         );
       }
     }
@@ -467,13 +562,20 @@ class _DownloadableTileState extends ConsumerState<_DownloadableTile> {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        "${widget.item['license']} · ${sizeMB.toStringAsFixed(1)} MB",
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurface
-                              .withValues(alpha: 0.6),
-                        ),
-                      ),
+                      Builder(builder: (_) {
+                        final isRestore =
+                            widget.item['source'] == 'bundled';
+                        final label = isRestore
+                            ? "${widget.item['license']} · ${sizeMB.toStringAsFixed(1)} MB · restore offline"
+                            : "${widget.item['license']} · ${sizeMB.toStringAsFixed(1)} MB";
+                        return Text(
+                          label,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.6),
+                          ),
+                        );
+                      }),
                       if (_error != null)
                         Text(
                           _error!,
@@ -494,7 +596,9 @@ class _DownloadableTileState extends ConsumerState<_DownloadableTile> {
                 ),
                 if (!_isDownloading)
                   Icon(
-                    Icons.cloud_download_outlined,
+                    widget.item['source'] == 'bundled'
+                        ? Icons.settings_backup_restore_rounded
+                        : Icons.cloud_download_outlined,
                     color: theme.primaryColor,
                   ),
               ],

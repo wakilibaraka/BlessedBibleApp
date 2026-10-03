@@ -25,6 +25,7 @@ dependencies:
   sqflite: ^2.3.3+1
   path: ^1.9.0
   http: ^1.6.0
+  crypto: ^3.0.3
   collection: ^1.19.1
   uuid: ^4.6.0
   firebase_core: ^4.13.0
