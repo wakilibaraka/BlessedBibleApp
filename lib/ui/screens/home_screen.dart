@@ -536,7 +536,11 @@ class WordOfTheDaySection extends ConsumerWidget {
     
     return wotdAsync.when(
       data: (wotd) {
-        if (wotd == null) return const SizedBox.shrink();
+        if (wotd == null) {
+          return const _WotdFallback(
+            'No word picked for today yet — try again later.',
+          );
+        }
         
         return BouncyEntrance(
           delay: const Duration(milliseconds: 500),
@@ -588,7 +592,7 @@ class WordOfTheDaySection extends ConsumerWidget {
                           context: context,
                           isScrollControlled: true,
                           backgroundColor: Colors.transparent,
-                          builder: (context) => DictionaryEntrySheet(normalizedWord: wotd.word.toLowerCase()),
+                          builder: (context) => DictionaryEntrySheet(normalizedWord: wotd.normalized),
                         );
                       },
                     ),
@@ -600,7 +604,49 @@ class WordOfTheDaySection extends ConsumerWidget {
         );
       },
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (e, st) {
+        debugPrint('wordOfTheDayProvider error: $e\n$st');
+        return _WotdFallback('Word of the day unavailable ($e).');
+      },
+    );
+  }
+}
+
+/// Quiet, visible fallback so a Word of the Day failure is never silent.
+class _WotdFallback extends StatelessWidget {
+  final String message;
+  const _WotdFallback(this.message);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'WORD OF THE DAY',
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: theme.primaryColor,
+            letterSpacing: 2.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 12),
+        GlassContainer(
+          isScrollable: false,
+          borderRadius: BorderRadius.circular(24),
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
+          child: Text(
+            message,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodySmall?.copyWith(
+              height: 1.60,
+              color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.82),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

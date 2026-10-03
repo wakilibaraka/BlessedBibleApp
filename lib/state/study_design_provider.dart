@@ -3,9 +3,9 @@ import '../data/local_storage/preferences_service.dart';
 
 /// Dual-design rollout flag for the Study redesign.
 ///
-/// When true, the Study tab and all study flows render the redesigned V2
-/// screens. When false (default), the original V1 screens are used as
-/// fallback. Both designs share the same underlying providers/prefs, so
+/// When true (default), the Study tab and all study flows render the
+/// redesigned V2 screens. When false, the original V1 screens are used as
+/// the fallback. Both designs share the same underlying providers/prefs, so
 /// toggling never loses progress — it only switches presentation.
 class StudyDesignNotifier extends Notifier<bool> {
   @override

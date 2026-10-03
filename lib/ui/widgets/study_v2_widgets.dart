@@ -105,7 +105,7 @@ class V2SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(4, 22, 4, 0),
+      padding: const EdgeInsets.fromLTRB(0, 22, 0, 0),
       child: Text(
         text.toUpperCase(),
         style: theme.textTheme.labelSmall?.copyWith(

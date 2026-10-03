@@ -26,7 +26,7 @@ import 'plans_hub_v2_screen.dart' show availablePlans;
 ///
 /// - Order + span (quarter/half/full) persist via [studyLayoutProvider].
 /// - Long-press a card to enter edit mode (jiggle + drag + resize);
-///   ••• on each card offers the same resize for accessibility.
+///   the ••• resize handle shows on each card only while editing.
 /// - No persistent Edit button. No Continue Reading card (resume lives in
 ///   the plan snapshot + Read tab).
 /// - Top banner is Your Space: live bookmark/highlight/note/journal counts.
@@ -81,7 +81,17 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
 
   void _push(Widget page) {
     HapticFeedback.selectionClick();
-    Navigator.of(context).push(CupertinoPageRoute(builder: (_) => page));
+    try {
+      Navigator.of(context).push(CupertinoPageRoute(builder: (_) => page));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Could not open that screen. $e'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 
   void _showResize(String id, CardSpan current) {
@@ -105,6 +115,19 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // iOS-style grabber for the bottom sheet.
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 5,
+                  margin: const EdgeInsets.only(top: 6, bottom: 2),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.onSurface
+                        .withValues(alpha: 0.25),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                ),
+              ),
               const Padding(
                 padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
                 child: V2Eyebrow('Card size'),
@@ -330,51 +353,38 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                                       onResize: () => _showResize(
                                           card.id, card.span),
                                     );
-                                    final framed =
-                                        Stack(
+                                    // passthrough: the card gets the
+                                    // slot's tight width so every card
+                                    // fills its span (no shrink-wrap).
+                                    final framed = Stack(
+                                      fit: StackFit.passthrough,
                                       children: [
                                         inner,
-                                        Positioned(
-                                          top: 6,
-                                          right: 6,
-                                          child:
-                                              GestureDetector(
-                                            onTap: () =>
-                                                _showResize(
-                                                    card.id,
-                                                    card.span),
-                                            child: Container(
-                                              padding:
-                                                  const EdgeInsets
-                                                      .all(6),
-                                              decoration:
-                                                  BoxDecoration(
-                                                color: theme
-                                                    .colorScheme
-                                                    .surface
-                                                    .withValues(
-                                                        alpha:
-                                                            0.9),
-                                                shape:
-                                                    BoxShape.circle,
-                                                border: Border.all(
-                                                    color: theme
-                                                        .dividerColor),
-                                              ),
-                                              child: Icon(
-                                                Icons
-                                                    .more_horiz_rounded,
-                                                size: 16,
-                                                color: theme
-                                                    .colorScheme
-                                                    .onSurface
-                                                    .withValues(
-                                                        alpha:
-                                                            0.6),
+                                        if (_editing)
+                                          Positioned(
+                                            top: 0,
+                                            right: 0,
+                                            child:
+                                                GestureDetector(
+                                              behavior:
+                                                  HitTestBehavior
+                                                      .opaque,
+                                              onTap: () =>
+                                                  _showResize(
+                                                      card.id,
+                                                      card.span),
+                                              // 10px hit padding + 6px
+                                              // visual padding + 16px
+                                              // icon = 48pt target.
+                                              child:
+                                                  const Padding(
+                                                padding:
+                                                    EdgeInsets
+                                                        .all(10),
+                                                child: _ResizeDots(),
                                               ),
                                             ),
                                           ),
-                                        ),
                                       ],
                                     );
                                     return JiggleAnimator(
@@ -877,6 +887,29 @@ class _TodayRow extends ConsumerWidget {
                 : 'Read'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Circular ••• resize affordance on hub cards (edit mode only).
+class _ResizeDots extends StatelessWidget {
+  const _ResizeDots();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(6),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface.withValues(alpha: 0.9),
+        shape: BoxShape.circle,
+        border: Border.all(color: theme.dividerColor),
+      ),
+      child: Icon(
+        Icons.more_horiz_rounded,
+        size: 16,
+        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
       ),
     );
   }

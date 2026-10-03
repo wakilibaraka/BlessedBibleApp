@@ -121,9 +121,11 @@ class PreferencesService {
   }
 
   /// Dual-design rollout flag: when true, Study tab + study flows use the
-  /// redesigned V2 screens. V1 stays as fallback. Default off (testing only).
+  /// redesigned V2 screens. Default ON — V1 remains as the fallback
+  /// (turn the Settings switch off to use the classic layout). An
+  /// explicit stored choice always wins over the default.
   bool getStudyRedesign() {
-    return prefs.getBool(_studyRedesignKey) ?? false;
+    return prefs.getBool(_studyRedesignKey) ?? true;
   }
 
   Future<void> setStudyRedesign(bool enabled) async {

@@ -703,9 +703,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             final useRedesign = ref.watch(studyDesignProvider);
             final theme = Theme.of(context);
             return SwitchListTile(
-              title: const Text('New Study design (beta)'),
+              title: const Text('New Study design'),
               subtitle: const Text(
-                  'Try the redesigned Study hub, plans, commentary and tools. Off = current design. Your plans, notes and progress are shared — nothing is lost either way.'),
+                  'On by default — the redesigned Study hub, plans, commentary and tools. Turn off to use the classic design (fallback). Your plans, notes and progress are shared — nothing is lost either way.'),
               secondary: Icon(Icons.science_outlined,
                   color: theme.primaryColor),
               value: useRedesign,
@@ -717,8 +717,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(val
-                        ? 'New Study design on — open the Study tab to try it.'
-                        : 'Back to the current Study design.'),
+                        ? 'New Study design on — open the Study tab to see it.'
+                        : 'Classic Study design on (fallback).'),
                     behavior: SnackBarBehavior.floating,
                   ),
                 );
