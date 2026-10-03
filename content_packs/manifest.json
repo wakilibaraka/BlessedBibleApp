@@ -1,0 +1,214 @@
+{
+  "core": {
+    "file": "bible.db",
+    "bytes": 52973568,
+    "sizeMB": 50.52,
+    "sha256": "7f6ee6870a1c56d7da8e120899f90ae143cb80f5b12ba6bfab5e1e0a45687acb",
+    "translations": [
+      "kjv",
+      "kjv_strongs"
+    ]
+  },
+  "packs": {
+    "swh_ulb": {
+      "file": "swh_ulb.db",
+      "bytes": 5287936,
+      "sizeMB": 5.04,
+      "sha256": "20a88181769ff0de88cb4229fd455576d4835fc534e734186bdb416e52d3c267",
+      "id": "swh_ulb",
+      "verses": 31101,
+      "meta": {
+        "translation_id": "swh_ulb",
+        "language_code": "sw",
+        "language_name": "Swahili",
+        "translation_name": "Swahili Unlocked Literal Bible",
+        "abbreviation": "ULB",
+        "license": "CC BY-SA 4.0",
+        "is_complete": 1,
+        "is_downloaded": 0
+      }
+    },
+    "ita_dio": {
+      "file": "ita_dio.db",
+      "bytes": 5099520,
+      "sizeMB": 4.86,
+      "sha256": "4031654d0427c377b219a11c4e17dd65e5cc3a29f311592f0e3da6f8639f950a",
+      "id": "ita_dio",
+      "verses": 31095,
+      "meta": {
+        "translation_id": "ita_dio",
+        "language_code": "it",
+        "language_name": "Italian",
+        "translation_name": "Diodati 1885",
+        "abbreviation": "DIO",
+        "license": "Public Domain",
+        "is_complete": 1,
+        "is_downloaded": 0
+      }
+    },
+    "fra_lsg": {
+      "file": "fra_lsg.db",
+      "bytes": 4263936,
+      "sizeMB": 4.07,
+      "sha256": "641a11b501215661d77215e1bcb9afa7f909b86bb0866a97e953a122ff5640e1",
+      "id": "fra_lsg",
+      "verses": 31170,
+      "meta": {
+        "translation_id": "fra_lsg",
+        "language_code": "fr",
+        "language_name": "French",
+        "translation_name": "Louis Segond 1910",
+        "abbreviation": "LSG",
+        "license": "Public Domain",
+        "is_complete": 1,
+        "is_downloaded": 0
+      }
+    },
+    "ron_btf": {
+      "file": "ron_btf.db",
+      "bytes": 5619712,
+      "sizeMB": 5.36,
+      "sha256": "c6a58081226e7918fee38440e664395f76f49e9e7f0dbe9d573cdcbbd6496052",
+      "id": "ron_btf",
+      "verses": 31102,
+      "meta": {
+        "translation_id": "ron_btf",
+        "language_code": "ro",
+        "language_name": "Romanian",
+        "translation_name": "Romanian BTF Bible",
+        "abbreviation": "BTF",
+        "license": "Public Domain",
+        "is_complete": 1,
+        "is_downloaded": 0
+      }
+    },
+    "tgl_ulb": {
+      "file": "tgl_ulb.db",
+      "bytes": 6299648,
+      "sizeMB": 6.01,
+      "sha256": "5c16084c8c128b008f3c81583300d8f308b1e31d32d5249f772042901ebd3188",
+      "id": "tgl_ulb",
+      "verses": 31103,
+      "meta": {
+        "translation_id": "tgl_ulb",
+        "language_code": "tl",
+        "language_name": "Tagalog",
+        "translation_name": "Tagalog Unlocked Literal Bible",
+        "abbreviation": "ULB",
+        "license": "CC BY-SA 4.0",
+        "is_complete": 1,
+        "is_downloaded": 0
+      }
+    }
+  },
+  "upload_packs": {
+    "bbe": {
+      "file": "bbe.db",
+      "bytes": 5382144,
+      "sizeMB": 5.13,
+      "sha256": "b022b832d381127df1ff52bc81de386d36b0f8fa23aea2b69a0ad6053d4cc541",
+      "id": "bbe",
+      "verses": 31102,
+      "meta": {
+        "translation_id": "bbe",
+        "language_code": "en",
+        "language_name": "English",
+        "translation_name": "Bible in Basic English",
+        "abbreviation": "BBE",
+        "license": "Public Domain",
+        "is_complete": 1,
+        "is_downloaded": 1
+      }
+    },
+    "web": {
+      "file": "web.db",
+      "bytes": 5218304,
+      "sizeMB": 4.98,
+      "sha256": "e9e3907aedc0515ffb76a85cf0c18d0bd4f7d208894f09e0539ba70fbcc05415",
+      "id": "web",
+      "verses": 31103,
+      "meta": {
+        "translation_id": "web",
+        "language_code": "en",
+        "language_name": "English",
+        "translation_name": "World English Bible",
+        "abbreviation": "WEB",
+        "license": "Public Domain",
+        "is_complete": 1,
+        "is_downloaded": 1
+      }
+    },
+    "deu_l12": {
+      "file": "deu_l12.db",
+      "bytes": 5189632,
+      "sizeMB": 4.95,
+      "sha256": "f3cc52a2e35060dfea078807fd67b8b2c43b353bc6034edb2f1962ad4d2af250",
+      "id": "deu_l12",
+      "verses": 31102,
+      "meta": {
+        "translation_id": "deu_l12",
+        "language_code": "de",
+        "language_name": "German",
+        "translation_name": "Luther Bible 1912",
+        "abbreviation": "L1912",
+        "license": "Public Domain",
+        "is_complete": 1,
+        "is_downloaded": 1
+      }
+    },
+    "nld_": {
+      "file": "nld_.db",
+      "bytes": 5574656,
+      "sizeMB": 5.32,
+      "sha256": "3a6d4631581887d7b7cb17d1f094c65cef703ce450c82bc1b79347c9f834ed96",
+      "id": "nld_",
+      "verses": 31102,
+      "meta": {
+        "translation_id": "nld_",
+        "language_code": "nl",
+        "language_name": "Dutch",
+        "translation_name": "Dutch Bible 1917",
+        "abbreviation": "NLD",
+        "license": "Public Domain",
+        "is_complete": 1,
+        "is_downloaded": 1
+      }
+    },
+    "por_blj": {
+      "file": "por_blj.db",
+      "bytes": 5201920,
+      "sizeMB": 4.96,
+      "sha256": "0a6145db735f7fa95317979cc7d1a963616ec2a6429a6f5adccae065fee03477",
+      "id": "por_blj",
+      "verses": 31102,
+      "meta": {
+        "translation_id": "por_blj",
+        "language_code": "pt",
+        "language_name": "Portuguese",
+        "translation_name": "Bíblia Livre",
+        "abbreviation": "BLIVRE",
+        "license": "CC BY 4.0",
+        "is_complete": 1,
+        "is_downloaded": 1
+      }
+    },
+    "spa_r09": {
+      "file": "spa_r09.db",
+      "bytes": 5255168,
+      "sizeMB": 5.01,
+      "sha256": "c1783150ae84f10c76379aa4dc8e8c856b35e3d211134c97628c9e04161dc453",
+      "id": "spa_r09",
+      "verses": 31102,
+      "meta": {
+        "translation_id": "spa_r09",
+        "language_code": "es",
+        "language_name": "Spanish",
+        "translation_name": "Reina Valera 1909",
+        "abbreviation": "RV1909",
+        "license": "Public Domain",
+        "is_complete": 1,
+        "is_downloaded": 1
+      }
+    }
+  }
+}

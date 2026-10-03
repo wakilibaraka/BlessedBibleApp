@@ -1,1 +1,3 @@
 assets/bible/bible.db filter=lfs diff=lfs merge=lfs -text
+assets/packs/*.db filter=lfs diff=lfs merge=lfs -text
+content_packs/*.db filter=lfs diff=lfs merge=lfs -text

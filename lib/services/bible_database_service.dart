@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import '../data/models/bible_model.dart';
 import '../data/models/translation_model.dart';
+import 'translation_pack_store.dart';
 
 /// Offline-first content store for the bundled Bible database.
 ///
@@ -24,10 +25,12 @@ import '../data/models/translation_model.dart';
 class BibleDatabaseService {
   static const String _dbName = 'bible.db';
 
-  /// Content generation id. Bump when the bundled `assets/bible/bible.db`
-  /// asset or the on-disk layout changes. Any mismatch (upgrade, downgrade,
-  /// test APK, corruption repair) converges by re-materializing from asset.
-  static const int contentVersion = 1;
+  /// Content generation id. Bump when the bundled content assets or the
+  /// on-disk layout change. Any mismatch (upgrade, downgrade, test APK,
+  /// corruption repair) converges by re-materializing from asset.
+  ///
+  /// History: 1 = single-file layout (P0); 2 = core + translation packs.
+  static const int contentVersion = 2;
   static const String _contentVersionKey = 'content_version';
   static const String _repairAttemptsKey = 'content_repair_attempts';
   static const int _maxRepairAttempts = 2;
@@ -47,6 +50,8 @@ class BibleDatabaseService {
 
   Database? _db;
   Future<Database>? _installing;
+
+  final TranslationPackStore _packStore = TranslationPackStore();
 
   final StreamController<double> _installProgressController =
       StreamController<double>.broadcast();
@@ -75,10 +80,9 @@ class BibleDatabaseService {
   int _storedContentVersion(SharedPreferences prefs) {
     final v = prefs.getInt(_contentVersionKey);
     if (v != null) return v;
-    // Legacy migration: a db_version at/above the last shipped legacy
-    // version means the installed content is current.
+    // Legacy migration: db_version 12 == the P0 single-file layout.
     final legacy = prefs.getInt('db_version') ?? 1;
-    return legacy >= _legacyRequiredDbVersion ? contentVersion : 0;
+    return legacy >= _legacyRequiredDbVersion ? 1 : 0;
   }
 
   Future<int> _repairAttempts(SharedPreferences prefs) async {
@@ -102,14 +106,58 @@ class BibleDatabaseService {
 
     final dbFile = File(dbPath);
     if (!await dbFile.exists() || stored < contentVersion) {
-      await _installFromAsset(
-        dbPath,
-        prefs,
-        preservePacks: await dbFile.exists(),
-      );
+      if (stored == 1 && await dbFile.exists()) {
+        // P2 layout migration: extract translations into pack files
+        // in place (preserves bundled + downloaded translations).
+        try {
+          await _migrateToPacks(dbPath, prefs);
+        } catch (e) {
+          stderr.writeln('DB pack migration failed, reinstalling: $e');
+          await _installFromAsset(dbPath, prefs, preservePacks: true);
+        }
+      } else {
+        await _installFromAsset(
+          dbPath,
+          prefs,
+          preservePacks: await dbFile.exists(),
+        );
+      }
     }
 
+    // Bundled packs must be present (fresh installs, repairs, or packs
+    // lost outside the app). Cheap no-op when everything is in place;
+    // never resurrects packs the user deleted.
+    await _packStore.ensureBundledPacks(
+      skipIds: await _packStore.deletedPackIds(),
+    );
+
     var db = await _openGuarded(dbPath);
+    // Converge interrupted migrations: legacy translation rows must not
+    // linger in the core database.
+    if (await _hasLegacyTranslationRows(db)) {
+      if (await _repairAttempts(prefs) >= _maxRepairAttempts) {
+        throw StateError(
+          'Bible database has an unsupported layout. '
+          'Please check storage space, then retry or reinstall the app.',
+        );
+      }
+      try {
+        await db.close();
+      } catch (_) {}
+      _db = null;
+      try {
+        await _migrateToPacks(dbPath, prefs);
+      } catch (e) {
+        stderr.writeln('DB pack migration failed, reinstalling: $e');
+        await _recordRepairAttempt(prefs);
+        await _installFromAsset(dbPath, prefs, preservePacks: true);
+      }
+      await _packStore.ensureBundledPacks(
+        skipIds: await _packStore.deletedPackIds(),
+      );
+      db = await _openGuarded(dbPath);
+    }
+
     var problems = await _probeCore(db);
     if (problems.isEmpty) {
       await _clearRepairAttempts(prefs);
@@ -176,6 +224,12 @@ class BibleDatabaseService {
       if (backupForPreserve != null) {
         await _preserveDownloadedPacks(dbPath, backupForPreserve);
       }
+      // Bundled packs must be present on every fresh install / repair.
+      // Skips packs the user deleted; no-op when everything is in place.
+      await _packStore.ensureBundledPacks(
+        skipIds: await _packStore.deletedPackIds(),
+        onProgress: (p) => _emitProgress(0.8 + 0.15 * p),
+      );
     } catch (e) {
       stderr.writeln('DB install error: $e');
       if (!copyOk) {
@@ -216,8 +270,8 @@ class BibleDatabaseService {
         final end =
             (off + chunk > bytes.length) ? bytes.length : off + chunk;
         out.add(bytes.sublist(off, end));
-        // Copy phase reports 0..0.9; verification takes it to 1.0.
-        _emitProgress(0.9 * end / bytes.length);
+        // Copy phase reports 0..0.75; packs take it to ~0.95.
+        _emitProgress(0.75 * end / bytes.length);
       }
       await out.flush();
       await out.close();
@@ -246,7 +300,7 @@ class BibleDatabaseService {
         throw StateError(
             'Copied database failed verification: ${problems.join('; ')}');
       }
-      _emitProgress(0.95);
+      _emitProgress(0.8);
     } finally {
       try {
         await tmp?.close();
@@ -287,137 +341,102 @@ class BibleDatabaseService {
     return problems;
   }
 
-  /// Best-effort carry-over of user-downloaded translation packs from the
-  /// previous database file. Never throws: a bad backup must not break the
-  /// install (the fresh asset copy is already verified at this point).
+  /// Best-effort carry-over of translations from the previous database
+  /// file into standalone pack files (P2 layout). Bundled-era rows
+  /// (bbe/web) travel along so the user keeps what they had; the pack
+  /// store marks bundled ids accordingly. Never throws: a bad backup must
+  /// not break the install (the fresh core copy is already verified).
   Future<void> _preserveDownloadedPacks(
       String dbPath, String backupPath) async {
-    Database? mainDb;
+    Database? backupDb;
     try {
-      mainDb = await openDatabase(
-        dbPath,
-        onConfigure: (db) async {
-          try {
-            await db.rawQuery('PRAGMA journal_mode=WAL;');
-          } catch (_) {}
-        },
+      // Never resurrect packs the user deleted.
+      final deleted = await _packStore.deletedPackIds();
+      backupDb = await openDatabase(backupPath, readOnly: true);
+      await _packStore.extractFromDatabase(
+        backupDb,
+        shouldExtract: (id) =>
+            !TranslationPackStore.isCoreId(id) && !deleted.contains(id),
       );
-
-      try {
-        final tableRows = await mainDb.rawQuery(
-            "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'translations'");
-        if (tableRows.isNotEmpty) {
-          final mainCols =
-              await mainDb.rawQuery('PRAGMA table_info(translations);');
-          if (!mainCols.any((c) => c['name'] == 'is_downloaded')) {
-            await mainDb.execute(
-                'ALTER TABLE translations ADD COLUMN is_downloaded INTEGER NOT NULL DEFAULT 0;');
-          }
-        }
-      } catch (e) {
-        stderr.writeln('DB preserve is_downloaded guard: $e');
-      }
-
-      final escapedBackupPath = backupPath.replaceAll("'", "''");
-      try {
-        await mainDb
-            .execute("ATTACH DATABASE '$escapedBackupPath' AS backup;");
-      } catch (e) {
-        stderr.writeln('DB preserve: attach backup failed: $e');
-        return;
-      }
-
-      List<Map<String, Object?>> backupCols = [];
-      try {
-        backupCols =
-            await mainDb.rawQuery('PRAGMA backup.table_info(translations);');
-      } catch (_) {}
-      if (backupCols.isEmpty) {
-        stderr.writeln('DB preserve: backup has no translations table');
-        return;
-      }
-      final hasIsDownloadedInBackup =
-          backupCols.any((c) => c['name'] == 'is_downloaded');
-
-      try {
-        await mainDb.transaction((txn) async {
-          if (!hasIsDownloadedInBackup) {
-            // One-time deduction backfill (v1/v2 -> v3)
-            final unbundledRows = await txn.rawQuery('''
-              SELECT translation_id, language_code, language_name, translation_name, abbreviation, license, is_complete
-              FROM backup.translations
-              WHERE translation_id NOT IN (SELECT translation_id FROM main.translations)
-            ''');
-
-            for (final row in unbundledRows) {
-              final tid = row['translation_id'] as String;
-              await txn.rawInsert('''
-                INSERT OR REPLACE INTO main.translations 
-                (translation_id, language_code, language_name, translation_name, abbreviation, license, is_complete, is_downloaded)
-                VALUES (?, ?, ?, ?, ?, ?, ?, 1)
-              ''', [
-                row['translation_id'],
-                row['language_code'],
-                row['language_name'],
-                row['translation_name'],
-                row['abbreviation'],
-                row['license'],
-                row['is_complete'],
-              ]);
-
-              await txn.rawInsert('''
-                INSERT INTO main.verses (translation_id, language_code, book_number, chapter, verse, text)
-                SELECT translation_id, language_code, book_number, chapter, verse, text
-                FROM backup.verses
-                WHERE translation_id = ?
-              ''', [tid]);
-            }
-          } else {
-            // Future migrations (v3+): read is_downloaded flag directly
-            final downloadedRows = await txn.rawQuery('''
-              SELECT translation_id, language_code, language_name, translation_name, abbreviation, license, is_complete
-              FROM backup.translations
-              WHERE is_downloaded = 1
-            ''');
-
-            for (final row in downloadedRows) {
-              final tid = row['translation_id'] as String;
-              await txn.rawInsert('''
-                INSERT OR REPLACE INTO main.translations 
-                (translation_id, language_code, language_name, translation_name, abbreviation, license, is_complete, is_downloaded)
-                VALUES (?, ?, ?, ?, ?, ?, ?, 1)
-              ''', [
-                row['translation_id'],
-                row['language_code'],
-                row['language_name'],
-                row['translation_name'],
-                row['abbreviation'],
-                row['license'],
-                row['is_complete'],
-              ]);
-
-              await txn.rawInsert('''
-                INSERT INTO main.verses (translation_id, language_code, book_number, chapter, verse, text)
-                SELECT translation_id, language_code, book_number, chapter, verse, text
-                FROM backup.verses
-                WHERE translation_id = ?
-              ''', [tid]);
-            }
-          }
-        });
-      } finally {
-        try {
-          await mainDb.execute('DETACH DATABASE backup;');
-        } catch (_) {}
-      }
     } catch (e) {
       stderr.writeln('DB preserve downloaded packs failed: $e');
     } finally {
       try {
-        await mainDb?.close();
+        await backupDb?.close();
       } catch (_) {}
     }
   }
+
+  /// P2 layout migration: extracts every non-backbone translation out of a
+  /// legacy single-file database into standalone pack files, then slims the
+  /// core database down to the KJV backbone + reference tables. Stamps
+  /// content version 2 on success. Throws on failure (caller reinstalls).
+  Future<void> _migrateToPacks(
+      String dbPath, SharedPreferences prefs) async {
+    Database? db;
+    try {
+      db = await _openGuarded(dbPath);
+      final problems = await _probeCore(db);
+      if (problems.isNotEmpty) {
+        throw StateError(
+            'Cannot migrate unreadable database: ${problems.join('; ')}');
+      }
+      final deleted = await _packStore.deletedPackIds();
+      final extracted = await _packStore.extractFromDatabase(
+        db,
+        shouldExtract: (id) =>
+            !TranslationPackStore.isCoreId(id) && !deleted.contains(id),
+      );
+      if (extracted.isNotEmpty) {
+        const keep = "'kjv','kjv_strongs'";
+        await db.execute(
+            'DELETE FROM verses WHERE translation_id NOT IN ($keep)');
+        await db.execute(
+            'DELETE FROM translations WHERE translation_id NOT IN ($keep)');
+        // One-time compaction (~50 MB rewrite). Cannot report progress.
+        await db.execute('VACUUM');
+      }
+    } finally {
+      try {
+        await db?.close();
+      } catch (_) {}
+    }
+    // Re-verify the slimmed core before publishing the version stamp.
+    final check = await _openGuarded(dbPath);
+    try {
+      final problems = await _probeCore(check);
+      if (problems.isNotEmpty) {
+        throw StateError(
+            'Migrated database failed verification: ${problems.join('; ')}');
+      }
+    } finally {
+      try {
+        await check.close();
+      } catch (_) {}
+    }
+    await prefs.setInt(_contentVersionKey, contentVersion);
+    await prefs.setInt('db_version', _legacyRequiredDbVersion);
+    _emitProgress(1.0);
+  }
+
+  /// True when the core database still holds legacy (non-backbone)
+  /// translation rows — i.e. a pack-layout migration is pending.
+  Future<bool> _hasLegacyTranslationRows(Database db) async {
+    try {
+      final rows =
+          await db.query('translations', columns: ['translation_id']);
+      for (final r in rows) {
+        final tid = r['translation_id'] as String?;
+        if (tid != null &&
+            tid.isNotEmpty &&
+            !TranslationPackStore.isCoreId(tid)) {
+          return true;
+        }
+      }
+    } catch (_) {}
+    return false;
+  }
+
 
   /// Opens the installed database. Hooks are fully guarded so a partial or
   /// corrupt file can never throw here — [_initDB] verifies and repairs via
@@ -479,18 +498,36 @@ class BibleDatabaseService {
     );
   }
 
+  /// Routes a translation id to its database: backbone ids (kjv,
+  /// kjv_strongs) live in the core database, everything else in its
+  /// standalone pack file (opened lazily, read-only). Throws [StateError]
+  /// when the translation is not installed — callers render restore /
+  /// download UI instead of blank content.
+  Future<Database> _dbForTranslation(String translationId) async {
+    if (TranslationPackStore.isCoreId(translationId)) return database;
+    return _packStore.openPack(translationId);
+  }
+
   Future<List<TranslationInfo>> getTranslations() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       'translations',
       orderBy: 'language_name ASC, translation_name ASC',
     );
-    return maps.map((map) => TranslationInfo.fromMap(map)).toList();
+    final infos = maps.map((map) => TranslationInfo.fromMap(map)).toList();
+    for (final meta in await _packStore.installedPacks()) {
+      infos.add(meta.toInfo());
+    }
+    infos.sort((a, b) {
+      final l = a.languageName.compareTo(b.languageName);
+      return l != 0 ? l : a.translationName.compareTo(b.translationName);
+    });
+    return infos;
   }
 
   Future<List<BibleVerse>> getChapter(
       String translationId, int bookNumber, int chapterNumber) async {
-    final db = await database;
+    final db = await _dbForTranslation(translationId);
     final List<Map<String, dynamic>> maps = await db.query(
       'verses',
       columns: ['verse', 'text'],
@@ -509,7 +546,7 @@ class BibleDatabaseService {
 
   Future<BibleVerse?> getVerse(String translationId, int bookNumber,
       int chapterNumber, int verseNumber) async {
-    final db = await database;
+    final db = await _dbForTranslation(translationId);
     final List<Map<String, dynamic>> maps = await db.query(
       'verses',
       columns: ['verse', 'text'],
@@ -526,7 +563,7 @@ class BibleDatabaseService {
   }
 
   Future<List<Map<String, dynamic>>> getAllVerses(String translationId) async {
-    final db = await database;
+    final db = await _dbForTranslation(translationId);
     return await db.query(
       'verses',
       columns: ['book_number', 'chapter', 'verse', 'text'],
@@ -537,36 +574,26 @@ class BibleDatabaseService {
     );
   }
 
+  /// Installs a downloaded translation as a standalone pack file
+  /// (verified before publishing). Backbone ids are rejected.
   Future<void> insertTranslationPack(
       TranslationInfo info, List<Map<String, dynamic>> verses) async {
-    final db = await database;
-    await db.transaction((txn) async {
-      final map = info.toMap();
-      map['is_downloaded'] = 1;
-      await txn.insert(
-        'translations',
-        map,
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-
-      final batch = txn.batch();
-      for (final verse in verses) {
-        batch.insert('verses', verse);
-      }
-      await batch.commit(noResult: true);
-    });
+    if (TranslationPackStore.isCoreId(info.translationId)) {
+      throw StateError(
+          "'${info.translationId}' is part of the app backbone.");
+    }
+    await _packStore.installPackFromRows(info, verses);
   }
 
+  /// Deletes a non-backbone translation pack. Frees storage immediately
+  /// (file removal, no VACUUM needed). Throws for backbone ids.
   Future<void> deleteTranslationPack(String translationId) async {
-    final db = await database;
-    await db.transaction((txn) async {
-      await txn.delete('verses',
-          where: 'translation_id = ?', whereArgs: [translationId]);
-      await txn.delete('translations',
-          where: 'translation_id = ?', whereArgs: [translationId]);
-    });
-    // Vacuum to reclaim space, but do it outside the transaction as it rewrites the DB
-    await db.execute('VACUUM;');
+    await _packStore.deletePack(translationId);
+  }
+
+  /// Restores a user-deleted bundled pack from the APK (instant, offline).
+  Future<void> restoreBundledPack(String translationId) async {
+    await _packStore.restoreBundledPack(translationId);
   }
 
   Future<void> migrateReadingPlansFromPrefs() async {

@@ -53,6 +53,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/bible/bible.db
+    - assets/packs/
     - assets/images/
     - assets/data/
     - assets/icon/
