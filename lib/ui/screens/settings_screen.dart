@@ -7,6 +7,7 @@ import '../../state/hints_provider.dart';
 import '../../state/bible_nav_settings_provider.dart';
 import '../../state/typography_provider.dart';
 import '../../state/search_settings_provider.dart';
+import '../../state/study_design_provider.dart';
 import '../../state/read_settings_provider.dart';
 import '../../state/bbe_substitutions_provider.dart';
 import '../../services/backup_service.dart';
@@ -689,6 +690,36 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                                 fontWeight: FontWeight.bold)),
                       ),
                     ],
+                  ),
+                );
+              },
+            );
+          }),
+        ],
+      ),
+      SettingsPillCard(
+        children: [
+          Consumer(builder: (context, ref, _) {
+            final useRedesign = ref.watch(studyDesignProvider);
+            final theme = Theme.of(context);
+            return SwitchListTile(
+              title: const Text('New Study design (beta)'),
+              subtitle: const Text(
+                  'Try the redesigned Study hub, plans, commentary and tools. Off = current design. Your plans, notes and progress are shared — nothing is lost either way.'),
+              secondary: Icon(Icons.science_outlined,
+                  color: theme.primaryColor),
+              value: useRedesign,
+              onChanged: (val) {
+                HapticFeedback.selectionClick();
+                ref
+                    .read(studyDesignProvider.notifier)
+                    .setEnabled(val);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(val
+                        ? 'New Study design on — open the Study tab to try it.'
+                        : 'Back to the current Study design.'),
+                    behavior: SnackBarBehavior.floating,
                   ),
                 );
               },

@@ -19,6 +19,7 @@ class PreferencesService {
   static const String _lastReadLocKey = 'last_read_loc';
   static const String _studyLayoutKey = 'study_layout';
   static const String _useNewPlansHubKey = 'use_new_plans_hub';
+  static const String _studyRedesignKey = 'study_redesign_enabled';
   static const String _readingPlanStateKey = 'reading_plan_state';
   static const String _bentoPresetKey = 'bento_preset';
 
@@ -117,6 +118,16 @@ class PreferencesService {
 
   Future<void> setUseNewPlansHub(bool useNew) async {
     await prefs.setBool(_useNewPlansHubKey, useNew);
+  }
+
+  /// Dual-design rollout flag: when true, Study tab + study flows use the
+  /// redesigned V2 screens. V1 stays as fallback. Default off (testing only).
+  bool getStudyRedesign() {
+    return prefs.getBool(_studyRedesignKey) ?? false;
+  }
+
+  Future<void> setStudyRedesign(bool enabled) async {
+    await prefs.setBool(_studyRedesignKey, enabled);
   }
 
   void saveBookmarks(List<String> bookmarks) {
