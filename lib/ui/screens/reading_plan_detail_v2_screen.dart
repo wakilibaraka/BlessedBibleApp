@@ -34,8 +34,24 @@ class ReadingPlanDetailV2Screen extends ConsumerStatefulWidget {
 class _ReadingPlanDetailV2ScreenState
     extends ConsumerState<ReadingPlanDetailV2Screen> {
   int? _selectedDay;
-  DateTime _visibleMonth = DateTime(DateTime.now().year, DateTime.now().month);
   DateTime? _pendingStartDate;
+
+  /// Anchor keys for scroll-to-day jumps (row tap, "jump to today").
+  final GlobalKey _todayRowKey = GlobalKey();
+  final GlobalKey _dayDetailKey = GlobalKey();
+
+  void _reveal(GlobalKey key) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final ctx = key.currentContext;
+      if (ctx != null) {
+        Scrollable.ensureVisible(
+          ctx,
+          duration: const Duration(milliseconds: 350),
+          alignment: 0.05,
+        );
+      }
+    });
+  }
 
   String _title() {
     for (final p in availablePlans) {
@@ -463,6 +479,31 @@ class _ReadingPlanDetailV2ScreenState
                                 },
                                 child: const Text('Mark oldest done'),
                               ),
+                              FilledButton.tonal(
+                                onPressed: () {
+                                  final newly = List.generate(
+                                          current - 1, (i) => i + 1)
+                                      .where((d) => !plan.completedReadings
+                                          .contains(d))
+                                      .length;
+                                  notifier
+                                      .markAllPreviousRead(current);
+                                  HapticFeedback.mediumImpact();
+                                  if (!mounted) return;
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(
+                                    SnackBar(
+                                      content: Text(newly == 0
+                                          ? 'Everything before today is already done.'
+                                          : '$newly previous day${newly == 1 ? '' : 's'} marked as read.'),
+                                      behavior:
+                                          SnackBarBehavior.floating,
+                                    ),
+                                  );
+                                },
+                                child:
+                                    const Text('Mark all previous done'),
+                              ),
                               OutlinedButton(
                                 onPressed: () => _rebase(behind),
                                 child: Text('Rebase +$behind days'),
@@ -474,37 +515,37 @@ class _ReadingPlanDetailV2ScreenState
                     ),
                   ),
 
-                // ── Calendar ──────────────────────────────────
+                // ── Readings list ─────────────────────────────
+                // Day-by-day rows (done / today / missed / upcoming)
+                // replace the old month calendar: same states, scannable
+                // at a glance. Tapping a row selects the day below.
                 Padding(
                   padding: const EdgeInsets.only(top: 12),
                   child: V2Card(
                     child: Column(
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
                             Expanded(
                               child: Text(
-                                _monthLabel(_visibleMonth, total),
-                                style: theme.textTheme.titleSmall
+                                'READINGS · $total DAYS',
+                                style: theme.textTheme.labelSmall
                                     ?.copyWith(
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 1.5,
+                                  color: theme
+                                      .colorScheme.onSurface
+                                      .withValues(alpha: 0.65),
                                 ),
                               ),
                             ),
                             IconButton(
-                              visualDensity: VisualDensity.compact,
+                              visualDensity:
+                                  VisualDensity.compact,
                               icon: const Icon(
-                                  Icons.chevron_left_rounded),
-                              onPressed: () => setState(() {
-                                _visibleMonth = DateTime(
-                                    _visibleMonth.year,
-                                    _visibleMonth.month - 1);
-                              }),
-                            ),
-                            IconButton(
-                              visualDensity: VisualDensity.compact,
-                              icon:
-                                  const Icon(Icons.map_rounded),
+                                  Icons.map_rounded),
                               tooltip: 'Journey map view',
                               onPressed: () {
                                 Navigator.of(context).push(
@@ -518,74 +559,80 @@ class _ReadingPlanDetailV2ScreenState
                               },
                             ),
                             IconButton(
-                              visualDensity: VisualDensity.compact,
+                              visualDensity:
+                                  VisualDensity.compact,
                               icon: const Icon(
                                   Icons.today_rounded),
                               tooltip: 'Jump to today',
-                              onPressed: () => setState(() {
-                                final now = DateTime.now();
-                                _visibleMonth =
-                                    DateTime(now.year, now.month);
-                                _selectedDay = current;
-                              }),
-                            ),
-                            IconButton(
-                              visualDensity: VisualDensity.compact,
-                              icon: const Icon(
-                                  Icons.chevron_right_rounded),
-                              onPressed: () => setState(() {
-                                _visibleMonth = DateTime(
-                                    _visibleMonth.year,
-                                    _visibleMonth.month + 1);
-                              }),
+                              onPressed: () {
+                                setState(() =>
+                                    _selectedDay = current);
+                                _reveal(_todayRowKey);
+                                _reveal(_dayDetailKey);
+                              },
                             ),
                           ],
                         ),
-                        const SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment.spaceAround,
-                          children: const [
-                            _Dow('SUN'),
-                            _Dow('MON'),
-                            _Dow('TUE'),
-                            _Dow('WED'),
-                            _Dow('THU'),
-                            _Dow('FRI'),
-                            _Dow('SAT'),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        GridView.builder(
-                          shrinkWrap: true,
-                          physics:
-                              const NeverScrollableScrollPhysics(),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 7,
-                            mainAxisSpacing: 6,
-                            crossAxisSpacing: 6,
+                        const SizedBox(height: 4),
+                        // Flexible plans accrue no missed days, so the
+                        // catch-up card never appears for them — offer
+                        // the same one-tap catch-up here instead.
+                        if (plan.paceMode == 'flexible' &&
+                            plan.oldestUnread > 1)
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(bottom: 8),
+                            child: FilledButton.tonal(
+                              onPressed: () {
+                                notifier.markAllPreviousRead(
+                                    plan.oldestUnread);
+                                HapticFeedback.mediumImpact();
+                              },
+                              child: const Text(
+                                  'Mark all previous done'),
+                            ),
                           ),
-                          itemCount: _cellsForMonth(
-                                  _visibleMonth, dateMap, plan.restDay)
-                              .length,
-                          itemBuilder: (context, i) {
-                            final cell = _cellsForMonth(_visibleMonth,
-                                dateMap, plan.restDay)[i];
-                            return _DayCell(
-                              cell: cell,
-                              isToday: cell.readingDay != null &&
-                                  cell.readingDay == current,
-                              isSelected:
-                                  cell.readingDay == selected,
-                              onTap: cell.readingDay == null
-                                  ? null
-                                  : () => setState(() =>
-                                      _selectedDay =
-                                          cell.readingDay),
+                        for (var day = 1; day <= total; day++)
+                          Builder(builder: (_) {
+                            final done = plan.completedReadings
+                                .contains(day);
+                            final missed = plan.missedDays
+                                .contains(day);
+                            final isToday = day == current;
+                            final date = dateMap[day];
+                            final dateLabel = date == null
+                                ? 'Day $day'
+                                : 'Day $day · ${_weekdayName(appWeekday(date))} ${date.month}/${date.day}';
+                            final summary = plan
+                                .planData[day - 1].passages
+                                .map((p) => p.label)
+                                .join(', ');
+                            return _DayRow(
+                              key: isToday ? _todayRowKey : null,
+                              day: day,
+                              dateLabel: dateLabel,
+                              summary: summary,
+                              done: done,
+                              isToday: isToday,
+                              isMissed: missed && !done,
+                              isSelected: day == selected,
+                              onTap: () {
+                                setState(
+                                    () => _selectedDay = day);
+                                _reveal(_dayDetailKey);
+                              },
+                              onToggle: () {
+                                HapticFeedback.mediumImpact();
+                                if (done) {
+                                  notifier.markReadingIncomplete(
+                                      day);
+                                } else {
+                                  notifier.markReadingComplete(
+                                      day);
+                                }
+                              },
                             );
-                          },
-                        ),
+                          }),
                         const SizedBox(height: 8),
                         Wrap(
                           spacing: 12,
@@ -595,10 +642,9 @@ class _ReadingPlanDetailV2ScreenState
                                 theme.primaryColor, 'Done'),
                             _Legend(null, 'Today = ring',
                                 ring: true),
-                            _Legend(null, 'Missed = dashed',
-                                dashed: true),
-                            _Legend(null, 'Rest = hatched',
-                                hatched: true),
+                            _Legend(
+                                theme.colorScheme.error,
+                                'Missed'),
                           ],
                         ),
                       ],
@@ -608,6 +654,7 @@ class _ReadingPlanDetailV2ScreenState
 
                 // ── Day detail ────────────────────────────────
                 Padding(
+                  key: _dayDetailKey,
                   padding: const EdgeInsets.only(top: 12),
                   child: _DayDetailCard(
                     key: ValueKey(
@@ -691,53 +738,6 @@ class _ReadingPlanDetailV2ScreenState
       ),
     );
   }
-
-  String _monthLabel(DateTime m, int total) {
-    const names = [
-      'January', 'February', 'March', 'April', 'May', 'June', 'July',
-      'August', 'September', 'October', 'November', 'December'
-    ];
-    return '${names[m.month - 1]} ${m.year}';
-  }
-
-  /// Sunday-first cells. readingDay == null → padding or rest date.
-  List<_CalCell> _cellsForMonth(
-      DateTime month, Map<int, DateTime> dateMap, int? restDay) {
-    final first = DateTime(month.year, month.month, 1);
-    // Sunday-first offset: DateTime.weekday Mon=1..Sun=7.
-    final leading = first.weekday % 7;
-    final daysInMonth =
-        DateTime(month.year, month.month + 1, 0).day;
-    final byDate = <String, int>{};
-    for (final e in dateMap.entries) {
-      byDate[_key(e.value)] = e.key;
-    }
-    final plan = ref.read(readingPlanProvider(widget.planId));
-    final cells = <_CalCell>[];
-    for (var i = 0; i < leading; i++) {
-      cells.add(const _CalCell.blank());
-    }
-    for (var d = 1; d <= daysInMonth; d++) {
-      final date = DateTime(month.year, month.month, d);
-      final readingDay = byDate[_key(date)];
-      final isRestDay =
-          restDay != null && appWeekday(date) == restDay;
-      final done = readingDay != null &&
-          plan.completedReadings.contains(readingDay);
-      final missed = readingDay != null &&
-          plan.missedDays.contains(readingDay);
-      cells.add(_CalCell(
-        dayOfMonth: d,
-        readingDay: readingDay,
-        isRest: isRestDay && readingDay == null,
-        isDone: done,
-        isMissed: missed,
-      ));
-    }
-    return cells;
-  }
-
-  String _key(DateTime d) => '${d.year}-${d.month}-${d.day}';
 
   String _weekdayName(int appDay) {
     const names = ['', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -840,106 +840,131 @@ class _ReadingPlanDetailV2ScreenState
   }
 }
 
-class _Dow extends StatelessWidget {
-  final String text;
-  const _Dow(this.text);
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 32,
-      child: Text(
-        text,
-        textAlign: TextAlign.center,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              fontWeight: FontWeight.w800,
-              fontSize: 10,
-              color: Theme.of(context)
-                  .colorScheme
-                  .onSurface
-                  .withValues(alpha: 0.65),
-            ),
-      ),
-    );
-  }
-}
-
-class _CalCell {
-  final int? dayOfMonth;
-  final int? readingDay;
-  final bool isRest;
-  final bool isDone;
-  final bool isMissed;
-  const _CalCell({
-    this.dayOfMonth,
-    this.readingDay,
-    this.isRest = false,
-    this.isDone = false,
-    this.isMissed = false,
-  });
-  const _CalCell.blank()
-      : dayOfMonth = null,
-        readingDay = null,
-        isRest = false,
-        isDone = false,
-        isMissed = false;
-}
-
-class _DayCell extends StatelessWidget {
-  final _CalCell cell;
+/// One readings-list row: status ring (check when done, day number
+/// otherwise), date + passage summary, and a read/unread toggle.
+/// Tap selects the day detail below; the toggle flips completion.
+class _DayRow extends StatelessWidget {
+  final int day;
+  final String dateLabel;
+  final String summary;
+  final bool done;
   final bool isToday;
+  final bool isMissed;
   final bool isSelected;
-  final VoidCallback? onTap;
-  const _DayCell({
-    required this.cell,
+  final VoidCallback onTap;
+  final VoidCallback onToggle;
+  const _DayRow({
+    super.key,
+    required this.day,
+    required this.dateLabel,
+    required this.summary,
+    required this.done,
     required this.isToday,
+    required this.isMissed,
     required this.isSelected,
     required this.onTap,
+    required this.onToggle,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    if (cell.dayOfMonth == null) {
-      return const SizedBox.shrink();
-    }
-    Color? bg;
-    Border? border;
-    if (isSelected) {
-      bg = theme.colorScheme.onSurface;
-    } else if (cell.isDone) {
-      bg = theme.primaryColor.withValues(alpha: 0.14);
-      border = Border.all(
-          color: theme.primaryColor.withValues(alpha: 0.35));
-    } else if (isToday) {
-      border = Border.all(color: theme.primaryColor, width: 2);
-    } else if (cell.isMissed) {
-      border = Border.all(
-        color: theme.primaryColor.withValues(alpha: 0.5),
-      );
-    } else {
-      border = Border.all(color: theme.dividerColor);
-    }
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: cell.isRest && bg == null
-              ? theme.colorScheme.onSurface.withValues(alpha: 0.05)
-              : bg,
-          borderRadius: BorderRadius.circular(12),
-          border: border,
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          '${cell.dayOfMonth}',
-          style: theme.textTheme.labelLarge?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: isSelected
-                ? theme.colorScheme.surface
-                : cell.isRest
-                    ? theme.colorScheme.onSurface
-                        .withValues(alpha: 0.6)
-                    : null,
+    final statusColor = done
+        ? theme.primaryColor
+        : isMissed
+            ? theme.colorScheme.error
+            : isToday
+                ? theme.primaryColor
+                : theme.colorScheme.onSurface.withValues(alpha: 0.35);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Material(
+        color: isSelected
+            ? theme.primaryColor.withValues(alpha: 0.08)
+            : Colors.transparent,
+        borderRadius: BorderRadius.circular(14),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(14),
+          onTap: onTap,
+          child: Padding(
+            padding:
+                const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+            child: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color:
+                        done ? theme.primaryColor : Colors.transparent,
+                    border: Border.all(
+                      color: statusColor,
+                      width: (isToday || done) ? 2 : 1.5,
+                    ),
+                  ),
+                  alignment: Alignment.center,
+                  child: done
+                      ? Icon(
+                          Icons.check_rounded,
+                          size: 20,
+                          color: theme.colorScheme.surface,
+                        )
+                      : Text(
+                          '$day',
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            fontWeight: FontWeight.w800,
+                            color: (isToday || isMissed)
+                                ? statusColor
+                                : theme.colorScheme.onSurface
+                                    .withValues(alpha: 0.65),
+                          ),
+                        ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        dateLabel,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.8,
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.6),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        summary,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style:
+                            theme.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  visualDensity: VisualDensity.compact,
+                  tooltip: done ? 'Mark unread' : 'Mark read',
+                  icon: Icon(
+                    done
+                        ? Icons.check_circle_rounded
+                        : Icons.circle_outlined,
+                    color: done
+                        ? theme.primaryColor
+                        : theme.colorScheme.onSurface
+                            .withValues(alpha: 0.35),
+                  ),
+                  onPressed: onToggle,
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -947,14 +972,12 @@ class _DayCell extends StatelessWidget {
   }
 }
 
+
 class _Legend extends StatelessWidget {
   final Color? color;
   final String text;
   final bool ring;
-  final bool dashed;
-  final bool hatched;
-  const _Legend(this.color, this.text,
-      {this.ring = false, this.dashed = false, this.hatched = false});
+  const _Legend(this.color, this.text, {this.ring = false});
 
   @override
   Widget build(BuildContext context) {

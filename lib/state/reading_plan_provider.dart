@@ -235,7 +235,13 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
 
   @override
   ReadingPlanState build() {
-    _loadData(_planId);
+    // Deferred: for custom ids _loadData has no await before the state
+    // assignment, so running it inline would write state while the
+    // provider is still uninitialized (stuck on isLoading forever).
+    // A microtask runs after build() has returned, when state is legal.
+    // _loadData is fully try/caught, so the deferred future cannot
+    // produce unhandled async errors.
+    Future.microtask(() => _loadData(_planId));
     return ReadingPlanState(isLoading: true, planId: _planId);
   }
 
@@ -433,6 +439,18 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
 
   void markReadingIncomplete(int day) {
     final newCompleted = Set<int>.from(state.completedReadings)..remove(day);
+    final next = state.copyWith(completedReadings: newCompleted);
+    state = next;
+    _saveToPrefs(next);
+  }
+
+  /// Marks every reading day strictly before [upToDay] complete
+  /// (catch-up: "mark all previous as read"). Clamps to the plan range;
+  /// [upToDay] itself is never touched.
+  void markAllPreviousRead(int upToDay) {
+    final last = upToDay.clamp(1, state.planData.length + 1);
+    final newCompleted = Set<int>.from(state.completedReadings)
+      ..addAll(List.generate(last - 1, (i) => i + 1));
     final next = state.copyWith(completedReadings: newCompleted);
     state = next;
     _saveToPrefs(next);
