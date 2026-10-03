@@ -1,23 +1,31 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../state/study_provider.dart';
+import '../../state/nav_provider.dart';
 import '../../state/commentary_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../theme/app_colors.dart';
 import '../widgets/textured_glass_container.dart';
 import '../widgets/your_space_hero.dart';
+
 import '../../state/study_layout_provider.dart';
+import '../widgets/account_button.dart';
 import '../widgets/jiggle_animator.dart';
 import '../../state/reading_plan_provider.dart';
-import 'reading_plans_hub_screen.dart';
-import 'commentary_hub_screen.dart';
-import '../../state/streak_provider.dart';
-import 'reading_plan_browser.dart';
-import '../../data/local_storage/preferences_service.dart';
 
+import 'commentary_hub_screen.dart';
+import 'commentary_library_screen.dart';
+import '../../state/streak_provider.dart';
+import '../widgets/plan_row_widget.dart';
+
+import 'plans_hub_v2_screen.dart';
+import 'dictionary_screen.dart';
+import '../widgets/bible_stories_banner.dart';
+import '../widgets/account_sync_card.dart';
 class _ParsedRef {
   final String book;
   final int chapter;
@@ -45,17 +53,23 @@ class StudyScreen extends ConsumerStatefulWidget {
   ConsumerState<StudyScreen> createState() => _StudyScreenState();
 }
 
-class _StudyScreenState extends ConsumerState<StudyScreen> {
+class _StudyScreenState extends ConsumerState<StudyScreen> with SingleTickerProviderStateMixin {
   int _currentAuthorIndex = 0;
   final List<String> _commentaryAuthors = ['Uriah Smith'];
   Timer? _timer;
   bool _isEditing = false;
-
-  final ScrollController _scrollController = ScrollController();
+  bool _hasFiredArmedHaptic = false;
+  
+  late AnimationController _pulseController;
 
   @override
   void initState() {
     super.initState();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
+    
     _timer = Timer.periodic(const Duration(seconds: 4), (timer) {
       if (mounted) {
         setState(() {
@@ -69,7 +83,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
   @override
   void dispose() {
     _timer?.cancel();
-    _scrollController.dispose();
+    _pulseController.dispose();
     super.dispose();
   }
 
@@ -79,29 +93,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
     final appThemeMode = ref.watch(themeProvider);
     final layoutConfig = ref.watch(studyLayoutProvider);
 
-    String subGreeting;
-    switch (appThemeMode.resolve(context)) {
-      case AppThemeMode.light:
-      case AppThemeMode.priestlyPurple:
-      case AppThemeMode.galileeBlue:
-      case AppThemeMode.scarletRed:
-      case AppThemeMode.dawn:
-      case AppThemeMode.lilies:
-      case AppThemeMode.roses:
-      case AppThemeMode.olives:
-      case AppThemeMode.fresh:
-        subGreeting = "Embrace the light of His word.";
-        break;
-      case AppThemeMode.dark:
-      case AppThemeMode.oled:
-      case AppThemeMode.dusk:
-      case AppThemeMode.automatic:
-        subGreeting = "Rest in the peace of His promises.";
-        break;
-      case AppThemeMode.sepia:
-        subGreeting = "Reflect on the ancient wisdom.";
-        break;
-    }
+    String subGreeting = appThemeMode.resolve(context).subGreeting;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -115,12 +107,31 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 800),
-              child: ReorderableListView.builder(
-                  scrollController: _scrollController,
+              child: NotificationListener<ScrollNotification>(
+                onNotification: (notification) {
+                  if (notification is ScrollUpdateNotification) {
+                    if (notification.metrics.pixels < -80 &&
+                        !_hasFiredArmedHaptic &&
+                        notification.dragDetails != null) {
+                      _hasFiredArmedHaptic = true;
+                      HapticFeedback.mediumImpact();
+                    } else if (notification.metrics.pixels >= -80 &&
+                        _hasFiredArmedHaptic) {
+                      _hasFiredArmedHaptic = false;
+                    }
+                  } else if (notification is ScrollEndNotification) {
+                    if (notification.metrics.pixels < -80) {
+                      ref.read(navProvider.notifier).setIndex(4);
+                    }
+                    _hasFiredArmedHaptic = false;
+                  }
+                  return false;
+                },
+                child: ReorderableListView.builder(
                   physics: const BouncingScrollPhysics(
                       parent: AlwaysScrollableScrollPhysics()),
                   padding: const EdgeInsets.only(
-                      left: 24.0, right: 24.0, top: 16.0, bottom: 180.0),
+                      left: 20.0, right: 20.0, top: 32.0, bottom: 180.0),
                 buildDefaultDragHandles: false,
                 proxyDecorator: (child, index, animation) {
                   return AnimatedBuilder(
@@ -143,12 +154,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                               )
                             ],
                           ),
-                          child: SizedBox(
-                            width: (MediaQuery.of(context).size.width > 800 
-                                ? 800.0 
-                                : MediaQuery.of(context).size.width) - 48,
-                            child: child,
-                          ),
+                          child: child,
                         ),
                       );
                     },
@@ -190,7 +196,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                           final glowColor = isLit
                               ? AppColors.goldAccent
                               : Colors.grey.withValues(alpha: 0.5);
-                          final showNudge = !isLit && streak.count > 0;
 
                           return Row(
                             children: [
@@ -199,9 +204,9 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                                 onTap: () {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text(showNudge
-                                          ? 'Read today to save your streak!'
-                                          : 'Notifications coming soon!'),
+                                      content: Text(streak.count > 0
+                                          ? '${streak.count} Day Streak! Keep it up!'
+                                          : 'Read today to start your streak!'),
                                       behavior: SnackBarBehavior.floating,
                                       shape: RoundedRectangleBorder(
                                           borderRadius:
@@ -209,22 +214,44 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                                     ),
                                   );
                                 },
-                                child: Stack(
-                                  alignment: Alignment.topRight,
+                                child: Row(
                                   children: [
-                                    Icon(Icons.notifications_none_rounded,
-                                        size: 28,
-                                        color: theme.colorScheme.onSurface),
-                                    if (showNudge)
-                                      Container(
-                                        margin: const EdgeInsets.only(
-                                            top: 2, right: 2),
-                                        width: 8,
-                                        height: 8,
-                                        decoration: const BoxDecoration(
-                                            color: Colors.red,
-                                            shape: BoxShape.circle),
+                                    if (streak.count > 0 || isLit) ...[
+                                      AnimatedBuilder(
+                                        animation: _pulseController,
+                                        builder: (context, child) {
+                                          return Icon(
+                                              isLit
+                                                  ? Icons
+                                                      .local_fire_department_rounded
+                                                  : Icons
+                                                      .local_fire_department_outlined,
+                                              color: glowColor,
+                                              shadows: isLit
+                                                  ? [
+                                                      Shadow(
+                                                        color: glowColor.withValues(
+                                                            alpha: 0.6 + (_pulseController.value * 0.4)),
+                                                        blurRadius: 10 +
+                                                            (streak.count
+                                                                .clamp(0, 10)
+                                                                .toDouble()) + 
+                                                            (_pulseController.value * 12),
+                                                      )
+                                                    ]
+                                                  : null,
+                                              size: 24);
+                                        },
                                       ),
+                                      const SizedBox(width: 4),
+                                      Text('${streak.count}',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: isLit
+                                                  ? theme.colorScheme.onSurface
+                                                  : theme.colorScheme.onSurface
+                                                      .withValues(alpha: 0.6))),
+                                    ],
                                   ],
                                 ),
                               ),
@@ -233,7 +260,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                         }),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 32),
                     if (_isEditing)
                       Padding(
                         padding: const EdgeInsets.only(bottom: 16.0),
@@ -270,6 +297,15 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                     case 'reading_plan':
                       cardWidget = ReadingPlanBanner(size: config.size);
                       break;
+                    case 'bible_stories':
+                      cardWidget = BibleStoriesBanner(size: config.size);
+                      break;
+                    case 'cloud_sync':
+                      cardWidget = AccountSyncCard(size: config.size);
+                      break;
+                    case 'dictionary':
+                      cardWidget = DictionaryBanner(size: config.size);
+                      break;
                     case 'commentary':
                       cardWidget = CommentaryBanner(size: config.size);
                       break;
@@ -281,7 +317,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                     key: ValueKey(config.id),
                     child: _KeepAliveWrapper(
                       child: Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0),
+                        padding: const EdgeInsets.only(bottom: 32.0),
                         child: GestureDetector(
                           behavior: HitTestBehavior.opaque,
                           onLongPress: () {
@@ -416,6 +452,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                   return card;
                 },
               ),
+              ),
             ),
           ),
         ),
@@ -518,241 +555,104 @@ class _ReadingPlanBannerState extends ConsumerState<ReadingPlanBanner>
     return AnimatedSize(
       duration: const Duration(milliseconds: 250),
       curve: Curves.easeInOut,
-      child: RepaintBoundary(
-        child: TexturedGlassContainer(
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: theme.brightness == Brightness.dark
+                  ? Colors.black.withValues(alpha: 0.3)
+                  : AppColors.goldAccent.withValues(alpha: 0.1),
+              blurRadius: 16,
+              spreadRadius: 2,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: RepaintBoundary(
+          child: TexturedGlassContainer(
             isScrollable: true,
             borderRadius: BorderRadius.circular(24),
             padding: EdgeInsets.zero,
-            child: Builder(
-              builder: (context) {
-                final theme = Theme.of(context);
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Material(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius:
+                        const BorderRadius.vertical(top: Radius.circular(24)),
+                    onTap: () {
+                      Navigator.of(context).push(CupertinoPageRoute(
+                          builder: (_) => const PlansHubV2Screen()));
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Reading Plans',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Icon(Icons.arrow_forward_ios_rounded,
+                              size: 16,
+                              color: theme.primaryColor.withValues(alpha: 0.5)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                if (activePlanIds.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+                    child: Material(
                       color: Colors.transparent,
                       child: InkWell(
-                        borderRadius:
-                            const BorderRadius.vertical(top: Radius.circular(24)),
+                        borderRadius: BorderRadius.circular(20),
                         onTap: () {
-                          if (activePlanIds.isNotEmpty) {
-                            Navigator.of(context).push(CupertinoPageRoute(
-                                builder: (_) => ReadingPlanBrowser(
-                                    planId: activePlanIds.first)));
-                          } else {
-                            Navigator.of(context).push(CupertinoPageRoute(
-                                builder: (_) => const ReadingPlansHubScreen()));
-                          }
+                          Navigator.of(context).push(CupertinoPageRoute(
+                              builder: (_) => const PlansHubV2Screen()));
                         },
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        child: Container(
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: theme.primaryColor.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                                color:
+                                    theme.primaryColor.withValues(alpha: 0.2)),
+                          ),
+                          child: Column(
                             children: [
-                              Text(
-                                'Reading Plans',
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Icon(Icons.arrow_forward_ios_rounded,
-                                  size: 16,
-                                  color: theme.primaryColor.withValues(alpha: 0.5)),
+                              Icon(Icons.menu_book_rounded,
+                                  size: 40,
+                                  color: theme.primaryColor
+                                      .withValues(alpha: 0.8)),
+                              const SizedBox(height: 16),
+                              Text('Start a reading plan',
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: theme.primaryColor)),
+                              const SizedBox(height: 4),
+                              Text('Grow in the Word daily.',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                      color: theme.colorScheme.onSurface
+                                          .withValues(alpha: 0.7))),
                             ],
                           ),
                         ),
                       ),
                     ),
-                    if (activePlanIds.isEmpty)
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(20),
-                            onTap: () {
-                              Navigator.of(context).push(CupertinoPageRoute(
-                                  builder: (_) => const ReadingPlansHubScreen()));
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(24),
-                              decoration: BoxDecoration(
-                                color: theme.primaryColor.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                    color:
-                                        theme.primaryColor.withValues(alpha: 0.2)),
-                              ),
-                              child: Column(
-                                children: [
-                                  Icon(Icons.menu_book_rounded,
-                                      size: 40,
-                                      color: theme.primaryColor
-                                          .withValues(alpha: 0.8)),
-                                  const SizedBox(height: 16),
-                                  Text('Start a reading plan',
-                                      style: theme.textTheme.titleMedium?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                          color: theme.primaryColor)),
-                                  const SizedBox(height: 4),
-                                  Text('Grow in the Word daily.',
-                                      style: theme.textTheme.bodySmall?.copyWith(
-                                          color: theme.colorScheme.onSurface
-                                              .withValues(alpha: 0.7))),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      )
-                    else ...[
-                      ...activePlanIds.map((planId) {
-                        return _PlanRowWidget(planId: planId);
-                      }),
-                      const SizedBox(height: 8),
-                    ],
-                  ],
-                );
-              },
-            ),
-          ),
-        ),
-      );
-  }
-}
-
-class _PlanRowWidget extends ConsumerStatefulWidget {
-  final String planId;
-  const _PlanRowWidget({required this.planId});
-
-  @override
-  ConsumerState<_PlanRowWidget> createState() => _PlanRowWidgetState();
-}
-
-class _PlanRowWidgetState extends ConsumerState<_PlanRowWidget> {
-  double _lastPct = 0.0;
-  bool _isInit = false;
-
-  String _getPlanTitle(String planId, WidgetRef ref) {
-    if (planId == 'chronological_1yr') return 'Chronological Bible in a Year';
-    if (planId == 'great_controversy') return 'The Great Controversy';
-    if (planId == 'prophetic_timeline') return 'Prophetic Timeline';
-    final customPlan = ref.read(preferencesProvider).getCustomPlan(planId);
-    return customPlan?['title'] ?? 'Custom Plan';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final planId = widget.planId;
-    final planState = ref.watch(readingPlanProvider(planId));
-    final title = _getPlanTitle(planId, ref);
-    final pct = planState.percentComplete;
-
-    if (!_isInit) {
-      _lastPct = pct;
-      _isInit = true;
-    }
-    final beginPct = _lastPct;
-    _lastPct = pct;
-
-    String subtitle =
-        'Day ${planState.currentDay} of ${planState.planData.length}';
-    if (planState.currentDay > 0 &&
-        planState.currentDay <= planState.planData.length) {
-      final dayData = planState.planData[planState.currentDay - 1];
-      if (dayData.passages.isEmpty) {
-        subtitle = 'Today: Rest & Reflection';
-      } else {
-        subtitle = 'Today: ${dayData.passages.first.label}';
-        if (dayData.passages.length > 1) {
-          subtitle += ' + ${dayData.passages.length - 1} more';
-        }
-      }
-    } else if (planState.currentDay == 0) {
-      subtitle = 'Not Started';
-    } else if (planState.isPlanComplete) {
-      subtitle = 'Plan Completed!';
-    }
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: () {
-            if (planState.currentDay == 0) {
-              ref.read(readingPlanProvider(planId).notifier).startPlan();
-            }
-            Navigator.of(context).push(CupertinoPageRoute(
-              builder: (_) => ReadingPlanBrowser(planId: planId),
-            ));
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surface.withValues(alpha: 0.5),
-              borderRadius: BorderRadius.circular(16),
-              border:
-                  Border.all(color: theme.primaryColor.withValues(alpha: 0.1)),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(title,
-                          style: theme.textTheme.titleSmall
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis),
-                      const SizedBox(height: 2),
-                      Text(subtitle,
-                          style: theme.textTheme.bodySmall
-                              ?.copyWith(color: theme.primaryColor)),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 12),
-                TweenAnimationBuilder<double>(
-                    tween: Tween<double>(begin: beginPct, end: pct),
-                    duration: const Duration(milliseconds: 800),
-                    curve: Curves.easeOutCubic,
-                    builder: (context, value, _) {
-                      return SizedBox(
-                        width: 36,
-                        height: 36,
-                        child: Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            CircularProgressIndicator(
-                              value: 1.0,
-                              strokeWidth: 3,
-                              valueColor: AlwaysStoppedAnimation(
-                                  theme.primaryColor.withValues(alpha: 0.15)),
-                            ),
-                            CircularProgressIndicator(
-                              value: value,
-                              strokeWidth: 3,
-                              valueColor:
-                                  AlwaysStoppedAnimation(theme.primaryColor),
-                              strokeCap: StrokeCap.round,
-                            ),
-                            Center(
-                              child: Text(
-                                '${(value * 100).toStringAsFixed(0)}%',
-                                style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                    color: theme.primaryColor),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }),
+                  )
+                else ...[
+                  ...activePlanIds.map((planId) {
+                    return PlanRowWidget(planId: planId);
+                  }),
+                  const SizedBox(height: 8),
+                ],
               ],
             ),
           ),
@@ -798,9 +698,11 @@ class CommentaryBanner extends ConsumerWidget {
       }
     }
 
-    if (size == CardSize.large) {
-      return _buildLargeBanner(context, theme);
-    }
+    final parsedRef = activeVerse != null
+        ? _parseReference(activeVerse)
+        : _ParsedRef('Genesis', 1, null);
+    final hasChapterCommentary = ref.watch(
+        commentaryForChapterProvider((parsedRef.book, parsedRef.chapter)));
 
     return AnimatedSize(
       duration: const Duration(milliseconds: 250),
@@ -810,284 +712,244 @@ class CommentaryBanner extends ConsumerWidget {
           isScrollable: true,
           borderRadius: BorderRadius.circular(28),
           padding: EdgeInsets.zero,
-          child: Builder(
-            builder: (context) {
-              final theme = Theme.of(context);
-              return Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(28),
-                  gradient: LinearGradient(
-                    colors: [
-                      theme.primaryColor.withValues(alpha: 0.1),
-                      Colors.transparent,
-                      theme.primaryColor.withValues(alpha: 0.05),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(28),
-                    onTap: () {
-                      final refStr = activeVerse ?? 'Genesis 1';
-                      String bookName = '';
-                      int chapterNum = 1;
-                      final lastSpaceIdx = refStr.lastIndexOf(' ');
-                      if (lastSpaceIdx != -1) {
-                        bookName = refStr.substring(0, lastSpaceIdx);
-                        final refParts =
-                            refStr.substring(lastSpaceIdx + 1).split(':');
-                        if (refParts.isNotEmpty) {
-                          chapterNum = int.tryParse(refParts[0]) ?? 1;
-                        }
-                      } else {
-                        bookName = refStr;
-                      }
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(28),
+              gradient: LinearGradient(
+                colors: [
+                  theme.primaryColor.withValues(alpha: 0.1),
+                  Colors.transparent,
+                  theme.primaryColor.withValues(alpha: 0.05),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(28),
+                onTap: () {
+                  if (!hasChapterCommentary) {
+                    Navigator.of(context).push(CupertinoPageRoute(
+                        builder: (_) => const CommentaryLibraryScreen()));
+                    return;
+                  }
+                  final refStr = activeVerse ?? 'Genesis 1';
+                  String bookName = '';
+                  int chapterNum = 1;
+                  final lastSpaceIdx = refStr.lastIndexOf(' ');
+                  if (lastSpaceIdx != -1) {
+                    bookName = refStr.substring(0, lastSpaceIdx);
+                    final refParts =
+                        refStr.substring(lastSpaceIdx + 1).split(':');
+                    if (refParts.isNotEmpty) {
+                      chapterNum = int.tryParse(refParts[0]) ?? 1;
+                    }
+                  } else {
+                    bookName = refStr;
+                  }
 
-                      Navigator.of(context).push(CupertinoPageRoute(
-                          builder: (_) => CommentaryHubScreen(
-                                book: bookName,
-                                chapter: chapterNum,
-                                verse: null, // Force chapter-level browse view
-                              )));
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                  Navigator.of(context).push(CupertinoPageRoute(
+                      builder: (_) => CommentaryHubScreen(
+                            book: bookName,
+                            chapter: chapterNum,
+                            verse: null,
+                          )));
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
                         children: [
-                          Row(
-                            children: [
-                              Icon(Icons.library_books_rounded,
-                                  size: 20, color: theme.primaryColor),
-                              const SizedBox(width: 8),
-                              Text(
-                                displayAuthor,
-                                style: theme.textTheme.labelSmall?.copyWith(
-                                  color: theme.primaryColor,
-                                  letterSpacing: 1.5,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
+                          Icon(Icons.library_books_rounded,
+                              size: 20, color: theme.primaryColor),
+                          const SizedBox(width: 8),
                           Text(
-                            displayReference,
-                            style: theme.textTheme.titleMedium?.copyWith(
+                            displayAuthor,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.primaryColor,
+                              letterSpacing: 1.5,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            displaySnippet,
-                            maxLines: size == CardSize.small ? 6 : 10,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              height: 1.5,
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.8),
-                              fontStyle: FontStyle.italic,
-                            ),
-                          ),
-                          if (size == CardSize.medium) ...[
-                            const SizedBox(height: 16),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 8, horizontal: 16),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                    color:
-                                        theme.primaryColor.withValues(alpha: 0.3)),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    'Read Full Commentary',
-                                    style: theme.textTheme.labelMedium?.copyWith(
-                                      color: theme.primaryColor,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Icon(Icons.arrow_forward_rounded,
-                                      size: 16, color: theme.primaryColor),
-                                ],
-                              ),
-                            ),
-                          ],
                         ],
                       ),
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLargeBanner(BuildContext context, ThemeData theme) {
-    return TexturedGlassContainer(
-      isScrollable: false,
-      borderRadius: BorderRadius.circular(28),
-      padding: EdgeInsets.zero,
-      child: Consumer(
-        builder: (context, ref, child) {
-          final theme = Theme.of(context);
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.library_books_rounded, size: 20, color: theme.primaryColor),
-                        const SizedBox(width: 8),
-                        Text(
-                          'COMMENTARY LIBRARY',
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: theme.primaryColor,
-                            letterSpacing: 1.5,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        final activeVerse = ref.read(activeStudyVerseProvider);
-                        final parsed = activeVerse != null
-                            ? _parseReference(activeVerse)
-                            : _ParsedRef('Genesis', 1, null);
-                        Navigator.of(context).push(CupertinoPageRoute(
-                          builder: (_) => CommentaryHubScreen(
-                            book: parsed.book,
-                            chapter: parsed.chapter,
-                          ),
-                        ));
-                      },
-                      child: Text(
-                        'See all',
-                        style: theme.textTheme.labelMedium?.copyWith(
-                          color: theme.primaryColor,
+                      const SizedBox(height: 12),
+                      Text(
+                        displayReference,
+                        style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 220,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: kAvailableCommentaries.length,
-                  itemBuilder: (context, index) {
-                    final book = kAvailableCommentaries[index];
-                    return _buildBookCard(context, ref, theme, book);
-                  },
-                ),
-              ),
-              const SizedBox(height: 16),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildBookCard(BuildContext context, WidgetRef ref, ThemeData theme, CommentaryBook book) {
-    return GestureDetector(
-      onTap: () {
-        if (!book.isComingSoon) {
-          final activeVerse = ref.read(activeStudyVerseProvider);
-          final parsed = activeVerse != null
-              ? _parseReference(activeVerse)
-              : _ParsedRef('Genesis', 1, null);
-          Navigator.of(context).push(CupertinoPageRoute(
-            builder: (_) => CommentaryHubScreen(
-              book: parsed.book,
-              chapter: parsed.chapter,
-            ),
-          ));
-        }
-      },
-      child: Container(
-        width: 140,
-        margin: const EdgeInsets.symmetric(horizontal: 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  color: book.isComingSoon 
-                      ? theme.colorScheme.surface.withValues(alpha: 0.5)
-                      : theme.primaryColor.withValues(alpha: 0.15),
-                  border: Border.all(
-                    color: book.isComingSoon 
-                        ? theme.dividerColor.withValues(alpha: 0.2)
-                        : theme.primaryColor.withValues(alpha: 0.3),
-                  ),
-                ),
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Text(
-                      book.title,
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontFamily: 'EB Garamond',
-                        fontWeight: FontWeight.bold,
-                        color: book.isComingSoon 
-                            ? theme.colorScheme.onSurface.withValues(alpha: 0.5)
-                            : theme.colorScheme.onSurface,
+                      const SizedBox(height: 8),
+                      Text(
+                        displaySnippet,
+                        maxLines: size == CardSize.small
+                            ? 3
+                            : (size == CardSize.medium ? 6 : 10),
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          height: 1.5,
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.8),
+                          fontStyle: FontStyle.italic,
+                        ),
                       ),
-                    ),
+                      if (size == CardSize.large) ...[
+                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 8, horizontal: 16),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                                color:
+                                    theme.primaryColor.withValues(alpha: 0.3)),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                hasChapterCommentary
+                                    ? 'Read Full Commentary'
+                                    : 'Browse Available Commentary',
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  color: theme.primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Icon(Icons.arrow_forward_rounded,
+                                  size: 16, color: theme.primaryColor),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 12),
-            Text(
-              book.title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.labelMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: book.isComingSoon ? theme.colorScheme.onSurface.withValues(alpha: 0.5) : theme.colorScheme.onSurface,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              book.isComingSoon ? 'Coming soon' : book.author,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: book.isComingSoon 
-                    ? theme.colorScheme.primary.withValues(alpha: 0.7)
-                    : theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                fontWeight: book.isComingSoon ? FontWeight.bold : FontWeight.normal,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 }
 
+
+class DictionaryBanner extends ConsumerWidget {
+  final CardSize size;
+  const DictionaryBanner({super.key, required this.size});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeInOut,
+      child: RepaintBoundary(
+        child: TexturedGlassContainer(
+          isScrollable: true,
+          borderRadius: BorderRadius.circular(28),
+          padding: EdgeInsets.zero,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(28),
+              gradient: LinearGradient(
+                colors: [
+                  theme.primaryColor.withValues(alpha: 0.1),
+                  Colors.transparent,
+                  theme.primaryColor.withValues(alpha: 0.05),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(28),
+                onTap: () {
+                  Navigator.of(context).push(CupertinoPageRoute(
+                    builder: (_) => const DictionaryScreen(),
+                  ));
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.import_contacts_rounded,
+                              size: 20, color: theme.primaryColor),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Dictionary',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.primaryColor,
+                              letterSpacing: 1.5,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Bible Dictionary',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Browse or search 8,500+ definitions and scripture references from Easton and Smith.',
+                        maxLines: size == CardSize.small ? 2 : 4,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          height: 1.5,
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                        ),
+                      ),
+                      if (size == CardSize.large) ...[
+                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                                color: theme.primaryColor.withValues(alpha: 0.3)),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Open Dictionary',
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  color: theme.primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Icon(Icons.arrow_forward_rounded,
+                                  size: 16, color: theme.primaryColor),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

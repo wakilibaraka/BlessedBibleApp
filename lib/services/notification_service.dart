@@ -43,7 +43,6 @@ class NotificationService {
     );
 
     _initialized = true;
-    debugPrint('NotificationService initialized successfully.');
   }
 
   Future<void> requestPermissions() async {
@@ -91,11 +90,39 @@ class NotificationService {
           priority: Priority.high,
         ),
       ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       matchDateTimeComponents: DateTimeComponents.time,
     );
-    debugPrint(
-        "NotificationService: scheduled daily reminder at $hour:$minute");
+  }
+
+  Future<void> schedulePrayerReminder(int hour, int minute) async {
+    await requestPermissions();
+
+    final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
+    tz.TZDateTime scheduledDate =
+        tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
+
+    if (scheduledDate.isBefore(now)) {
+      scheduledDate = scheduledDate.add(const Duration(days: 1));
+    }
+
+    await _flutterLocalNotificationsPlugin.zonedSchedule(
+      id: 2,
+      title: "Time for Prayer",
+      body: "Pause for a moment of reflection and prayer.",
+      scheduledDate: scheduledDate,
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
+          "prayer_reminder_channel",
+          "Prayer Reminders",
+          channelDescription: "Daily prayer reminders",
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      matchDateTimeComponents: DateTimeComponents.time,
+    );
   }
 
   Future<void> scheduleWeeklyReminder(int weekday, int hour, int minute) async {
@@ -129,11 +156,9 @@ class NotificationService {
           priority: Priority.high,
         ),
       ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
     );
-    debugPrint(
-        "NotificationService: scheduled weekly reminder on weekday $weekday at $hour:$minute");
   }
 
   Future<void> scheduleSabbathReminder(double lat, double lng) async {
@@ -179,28 +204,28 @@ class NotificationService {
             priority: Priority.high,
           ),
         ),
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       );
     }
-    debugPrint(
-        "NotificationService: scheduled next 4 Sabbath reminders starting at ${sunset.toLocal()}");
   }
 
   Future<void> cancelDailyReminder() async {
     await _flutterLocalNotificationsPlugin.cancel(id: 0);
-    debugPrint('NotificationService: cancelled daily reminder');
   }
+
+  Future<void> cancelPrayerReminder() async {
+    await _flutterLocalNotificationsPlugin.cancel(id: 2);
+  }
+
 
   Future<void> cancelWeeklyReminder() async {
     await _flutterLocalNotificationsPlugin.cancel(id: 1);
-    debugPrint('NotificationService: cancelled weekly reminder');
   }
 
   Future<void> cancelSabbathReminders() async {
     for (int i = 0; i < 4; i++) {
       await _flutterLocalNotificationsPlugin.cancel(id: 10 + i);
     }
-    debugPrint('NotificationService: cancelled Sabbath reminders');
   }
 
   // Legacy support for previous Mock
@@ -238,11 +263,9 @@ class NotificationService {
               'reading_plan_channel', 'Reading Plan',
               importance: Importance.high, priority: Priority.high),
         ),
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         matchDateTimeComponents: DateTimeComponents.time,
       );
-      debugPrint(
-          "NotificationService: scheduled daily reading plan reminder at $hour:$minute");
     } else {
       // Schedule weekly reminder for the 6 non-rest days
       for (int i = 1; i <= 7; i++) {
@@ -266,12 +289,10 @@ class NotificationService {
                 'reading_plan_channel', 'Reading Plan',
                 importance: Importance.high, priority: Priority.high),
           ),
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
           matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
         );
       }
-      debugPrint(
-          "NotificationService: scheduled 6 weekly reading plan reminders at $hour:$minute (skipping rest day $restDay)");
     }
   }
 }

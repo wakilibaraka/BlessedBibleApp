@@ -5,6 +5,12 @@ class AppColors {
   static const Color goldAccent = Color(0xFFC9A227);
   static const Color transparent = Colors.transparent;
 
+  // Fresh Paperlike Specific
+  static const Color paperTerracotta = Color(0xFFB56553);
+  static const Color paperAmber = Color(0xFFD49A36);
+  static const Color paperOlive = Color(0xFF7D8C61);
+  static const Color paperGlyphCream = Color(0xFFF9F4E8);
+
   // Light Theme (Modern Glass Ivory)
   static const Color lightBackground = Color(0xFFF5F5F7);
   static const Color lightSurface = Color(0xFFFFFFFF);

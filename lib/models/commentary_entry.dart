@@ -1,3 +1,5 @@
+import 'study_content_category.dart';
+
 class CommentaryScope {
   final String type;
   final String? book;
@@ -53,6 +55,7 @@ class CommentaryEntry {
   final CommentaryScope scope;
   final String text;
   final String? dateAdded;
+  final StudyContentCategory category;
 
   CommentaryEntry({
     required this.id,
@@ -61,6 +64,7 @@ class CommentaryEntry {
     required this.scope,
     required this.text,
     this.dateAdded,
+    required this.category,
   });
 
   factory CommentaryEntry.fromJson(Map<String, dynamic> json) {
@@ -73,9 +77,10 @@ class CommentaryEntry {
 
     String id = json['id'] as String? ?? '';
     if (id.isEmpty) {
-      // Generate stable ID if missing using hashCode of key fields
-      id =
-          '${author.hashCode ^ scope.toJson().toString().hashCode ^ text.hashCode}';
+      // Generate stable deterministic ID if missing (Dart hashCode is not persistent across runs)
+      final slugLen = text.length > 20 ? 20 : text.length;
+      final slug = text.substring(0, slugLen).replaceAll(RegExp(r'[^a-zA-Z0-9]'), '').toLowerCase();
+      id = 'c_${scope.type}_${scope.book ?? "x"}_${scope.chapter ?? 0}_${scope.verse ?? 0}_$slug';
     }
 
     return CommentaryEntry(
@@ -85,6 +90,7 @@ class CommentaryEntry {
       scope: scope,
       text: text,
       dateAdded: json['dateAdded'] as String?,
+      category: StudyContentCategory.fromSource(source),
     );
   }
 

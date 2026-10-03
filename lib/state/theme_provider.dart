@@ -1,4 +1,4 @@
-import 'dart:async';
+import '../theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,153 +21,146 @@ enum AppThemeMode {
 }
 
 extension AppThemeModeExtension on AppThemeMode {
-  AppThemeMode resolve(BuildContext context) {
+  AppThemeMode resolve([BuildContext? context]) {
     if (this == AppThemeMode.automatic) {
-      return Theme.of(context).brightness == Brightness.dark
-          ? AppThemeMode.dark
-          : AppThemeMode.light;
+      final days = DateTime.now().millisecondsSinceEpoch ~/ 86400000;
+      const cycle = [
+        AppThemeMode.light, AppThemeMode.sepia, AppThemeMode.dawn, 
+        AppThemeMode.fresh, AppThemeMode.lilies, AppThemeMode.roses, 
+        AppThemeMode.olives, AppThemeMode.dusk, AppThemeMode.priestlyPurple, 
+        AppThemeMode.galileeBlue, AppThemeMode.scarletRed
+      ];
+      return cycle[days % cycle.length];
     }
     return this;
   }
-}
 
-enum ThemeEngineMode { locked, timeBased }
+  bool get isFirmamentTheme {
+    return this == AppThemeMode.dawn ||
+        this == AppThemeMode.fresh ||
+        this == AppThemeMode.dusk;
+  }
+
+  bool get isSanctuaryTheme {
+    return this == AppThemeMode.priestlyPurple ||
+        this == AppThemeMode.galileeBlue ||
+        this == AppThemeMode.scarletRed;
+  }
+
+  String get subGreeting {
+    switch (this) {
+      case AppThemeMode.dark:
+      case AppThemeMode.oled:
+      case AppThemeMode.dusk:
+      case AppThemeMode.automatic:
+        return "Rest in the peace of His promises.";
+      case AppThemeMode.sepia:
+        return "Reflect on the ancient wisdom.";
+      default:
+        return "Embrace the light of His word.";
+    }
+  }
+
+  bool get is3DTheme {
+    return this == AppThemeMode.dawn ||
+        this == AppThemeMode.lilies ||
+        this == AppThemeMode.roses ||
+        this == AppThemeMode.olives ||
+        this == AppThemeMode.dusk ||
+        this == AppThemeMode.fresh;
+  }
+
+  Color get backgroundColor {
+    switch (this) {
+      case AppThemeMode.dawn:
+        return AppColors.dawnBackground;
+      case AppThemeMode.lilies:
+        return AppColors.liliesBackground;
+      case AppThemeMode.roses:
+        return AppColors.rosesBackground;
+      case AppThemeMode.olives:
+        return AppColors.olivesBackground;
+      case AppThemeMode.dusk:
+        return const Color(0xFF312C51);
+      case AppThemeMode.fresh:
+        return const Color(0xFF132C33);
+      default:
+        return Colors.transparent; // callers will coalesce with theme.scaffoldBackgroundColor
+    }
+  }
+
+  Color get redLetterColor {
+    switch (this) {
+      case AppThemeMode.dark:
+      case AppThemeMode.oled:
+      case AppThemeMode.dusk:
+      case AppThemeMode.automatic:
+        return const Color(0xFFD46A6A);
+      case AppThemeMode.sepia:
+        return const Color(0xFFA63C3C);
+      default:
+        return const Color(0xFFB33A3A);
+    }
+  }
+
+  Color get starColor {
+    switch (this) {
+      case AppThemeMode.dark:
+      case AppThemeMode.oled:
+      case AppThemeMode.dusk:
+      case AppThemeMode.automatic:
+        return Colors.amber.shade400;
+      case AppThemeMode.sepia:
+        return Colors.orange.shade700;
+      default:
+        return Colors.deepOrange.shade400;
+    }
+  }
+
+}
 
 class ThemeNotifier extends Notifier<AppThemeMode> {
   static const _themeKey = 'app_theme_mode';
-  static const _lockedThemeKey = 'theme_locked_mode';
-  static const _engineModeKey = 'theme_engine_mode';
-  static const _engineMigratedKey = 'engine_migrated_v1';
-  static const _isSingleThemeKey = 'theme_is_single';
-  static const _isMatchSystemKey = 'theme_is_match_system';
-
-  ThemeEngineMode _engineMode = ThemeEngineMode.locked;
-  AppThemeMode _lockedTheme = AppThemeMode.sepia;
-  Timer? _timeWatcher;
-
-  ThemeEngineMode get engineMode => _engineMode;
-  AppThemeMode get lockedTheme => _lockedTheme;
+  static const _lockedThemeKey = 'theme_locked_mode'; // Legacy fallback
+  static const _engineModeKey = 'theme_engine_mode'; // Legacy migration
 
   @override
   AppThemeMode build() {
     _loadTheme();
-
-    ref.onDispose(() {
-      _timeWatcher?.cancel();
-    });
-
-    return AppThemeMode.sepia;
+    return AppThemeMode.automatic;
   }
 
   Future<void> _loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
 
-    final lockedIndex = prefs.getInt(_lockedThemeKey);
-    if (lockedIndex != null &&
-        lockedIndex >= 0 &&
-        lockedIndex < AppThemeMode.values.length) {
-      _lockedTheme = AppThemeMode.values[lockedIndex];
-    } else {
-      final oldIndex = prefs.getInt(_themeKey);
-      if (oldIndex != null &&
-          oldIndex >= 0 &&
-          oldIndex < AppThemeMode.values.length) {
-        _lockedTheme = AppThemeMode.values[oldIndex];
-      }
-    }
-
-    final migrated = prefs.getBool(_engineMigratedKey) ?? false;
+    // Migration from old Time-Based engine
+    final migrated = prefs.getBool('engine_migrated_v3') ?? false;
     if (!migrated) {
-      final isSingle = prefs.getBool(_isSingleThemeKey) ?? false;
-      final isMatchSystem = prefs.getBool(_isMatchSystemKey) ?? false;
-      if (isSingle || isMatchSystem) {
-        _engineMode = ThemeEngineMode.locked;
-      } else {
-        _engineMode = ThemeEngineMode.timeBased;
+      final engineMode = prefs.getInt(_engineModeKey);
+      if (engineMode == 1) { // 1 was ThemeEngineMode.timeBased
+        await prefs.setInt(_themeKey, AppThemeMode.automatic.index);
       }
-      await prefs.setBool(_engineMigratedKey, true);
-      await prefs.setInt(_engineModeKey, _engineMode.index);
-    } else {
-      final savedEngine = prefs.getInt(_engineModeKey);
-      if (savedEngine != null &&
-          savedEngine >= 0 &&
-          savedEngine < ThemeEngineMode.values.length) {
-        _engineMode = ThemeEngineMode.values[savedEngine];
-      }
+      await prefs.setBool('engine_migrated_v3', true);
     }
 
-    _updateState();
-    _updateTimer();
-  }
-
-  void _updateTimer() {
-    if (_engineMode == ThemeEngineMode.timeBased) {
-      if (_timeWatcher == null || !_timeWatcher!.isActive) {
-        _timeWatcher = Timer.periodic(const Duration(minutes: 1), (_) {
-          _updateState();
-        });
-      }
+    final saved = prefs.getInt(_themeKey) ?? prefs.getInt(_lockedThemeKey);
+    if (saved != null && saved >= 0 && saved < AppThemeMode.values.length) {
+      state = AppThemeMode.values[saved];
     } else {
-      _timeWatcher?.cancel();
-      _timeWatcher = null;
+      state = AppThemeMode.automatic;
     }
-  }
-
-  AppThemeMode _getTimeBasedTheme() {
-    final hour = DateTime.now().hour;
-    if (hour >= 5 && hour < 10) {
-      return AppThemeMode.light;
-    } else if (hour >= 10 && hour < 17) {
-      return AppThemeMode.sepia;
-    } else if (hour >= 17 && hour < 21) {
-      return AppThemeMode.dark;
-    } else {
-      return AppThemeMode.oled;
-    }
-  }
-
-  void _updateState() {
-    if (_engineMode == ThemeEngineMode.locked) {
-      if (state != _lockedTheme) {
-        state = _lockedTheme;
-      }
-    } else {
-      final timeTheme = _getTimeBasedTheme();
-      if (state != timeTheme) {
-        state = timeTheme;
-      }
-    }
-  }
-
-  Future<void> setEngineMode(ThemeEngineMode mode) async {
-    _engineMode = mode;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_engineModeKey, mode.index);
-    _updateState();
-    _updateTimer();
   }
 
   Future<void> setTheme(AppThemeMode mode) async {
-    _engineMode = ThemeEngineMode.locked;
-    _lockedTheme = mode;
-
+    state = mode;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_engineModeKey, ThemeEngineMode.locked.index);
-    await prefs.setInt(_lockedThemeKey, mode.index);
     await prefs.setInt(_themeKey, mode.index);
-
-    _updateState();
-    _updateTimer();
+    await prefs.setInt(_lockedThemeKey, mode.index); // Keep updated for backwards safety if ever downgraded
   }
 }
 
 final themeProvider =
     NotifierProvider<ThemeNotifier, AppThemeMode>(ThemeNotifier.new);
-
-final engineModeProvider = Provider<ThemeEngineMode>((ref) {
-  ref.watch(themeProvider);
-  return ref.read(themeProvider.notifier).engineMode;
-});
 
 class NoAnimationPageTransitionsBuilder extends PageTransitionsBuilder {
   const NoAnimationPageTransitionsBuilder();

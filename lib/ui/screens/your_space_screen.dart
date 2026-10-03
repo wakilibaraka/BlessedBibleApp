@@ -10,7 +10,11 @@ import '../../state/theme_provider.dart';
 import '../widgets/animated_background.dart';
 import '../widgets/shared_app_bar.dart';
 import 'notes_list_screen.dart'; // for showAddNoteSheet
-import 'note_editor_screen.dart';
+import '../../services/share_service.dart';
+import '../../state/translation_provider.dart';
+import '../../state/read_settings_provider.dart';
+import '../../data/models/bookmark_model.dart';
+import '../widgets/journal_segment.dart';
 
 class YourSpaceScreen extends ConsumerStatefulWidget {
   final int initialTab; // 0=Highlights, 1=Bookmarks, 2=Notes
@@ -19,6 +23,25 @@ class YourSpaceScreen extends ConsumerStatefulWidget {
   @override
   ConsumerState<YourSpaceScreen> createState() => _YourSpaceScreenState();
 }
+
+class YourSpaceExpandedChipsNotifier extends Notifier<Map<String, String?>> {
+  @override
+  Map<String, String?> build() => {};
+
+  void setLanguage(String refStr, String translationId) {
+    state = {...state, refStr: translationId};
+  }
+
+  void clear(String refStr) {
+    final newState = Map<String, String?>.from(state);
+    newState.remove(refStr);
+    state = newState;
+  }
+}
+
+final yourSpaceExpandedChipsProvider =
+    NotifierProvider<YourSpaceExpandedChipsNotifier, Map<String, String?>>(
+        YourSpaceExpandedChipsNotifier.new);
 
 class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
   late int _selectedIndex;
@@ -108,6 +131,14 @@ class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
                           theme: theme,
                         ),
                       ),
+                      Expanded(
+                        child: _SegmentTab(
+                          label: 'Journal',
+                          isSelected: _selectedIndex == 3,
+                          onTap: () => _onTabTapped(3),
+                          theme: theme,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -129,6 +160,7 @@ class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
                       _HighlightsSegment(theme: theme),
                       _BookmarksSegment(theme: theme),
                       _NotesSegment(theme: theme),
+                      JournalSegment(theme: theme),
                     ],
                   ),
                 ),
@@ -279,44 +311,356 @@ class _HighlightsSegment extends ConsumerWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 // BOOKMARKS SEGMENT
 // ─────────────────────────────────────────────────────────────────────────────
-class _BookmarksSegment extends ConsumerWidget {
+// ─────────────────────────────────────────────────────────────────────────────
+// BOOKMARK FOLDER DIALOGS
+// ─────────────────────────────────────────────────────────────────────────────
+
+void _showAddFolderDialog(BuildContext context, WidgetRef ref) {
+  final nameController = TextEditingController();
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('New Folder'),
+        content: TextField(
+          controller: nameController,
+          autofocus: true,
+          decoration: const InputDecoration(hintText: 'Folder name'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              if (nameController.text.trim().isNotEmpty) {
+                ref.read(bookmarkDataProvider.notifier).addFolder(nameController.text.trim());
+              }
+              Navigator.pop(context);
+            },
+            child: const Text('Create'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+void _showRenameFolderDialog(BuildContext context, WidgetRef ref, String folderId, String currentName) {
+  final nameController = TextEditingController(text: currentName);
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Rename Folder'),
+        content: TextField(
+          controller: nameController,
+          autofocus: true,
+          decoration: const InputDecoration(hintText: 'Folder name'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              if (nameController.text.trim().isNotEmpty) {
+                ref.read(bookmarkDataProvider.notifier).renameFolder(folderId, nameController.text.trim());
+              }
+              Navigator.pop(context);
+            },
+            child: const Text('Rename'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+void _showDeleteFolderDialog(BuildContext context, WidgetRef ref, String folderId, String folderName) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Delete Folder?'),
+        content: Text('Are you sure you want to delete "$folderName"?\n\nYour bookmarks inside this folder will NOT be deleted; they will be moved to Unfiled.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              ref.read(bookmarkDataProvider.notifier).deleteFolder(folderId);
+              Navigator.pop(context);
+            },
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+void _showMoveToFolderSheet(BuildContext context, WidgetRef ref, String refStr, ThemeData theme) {
+  final bookmarkData = ref.read(bookmarkDataProvider);
+  final currentFolderId = bookmarkData.nodes[refStr]?.folderId;
+
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: theme.scaffoldBackgroundColor,
+    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+    builder: (context) {
+      return SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text('Move to Folder', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+              ),
+              ListTile(
+                title: const Text('Unfiled'),
+                trailing: currentFolderId == null ? Icon(Icons.check, color: theme.primaryColor) : null,
+                onTap: () {
+                  ref.read(bookmarkDataProvider.notifier).moveBookmark(refStr, null);
+                  Navigator.pop(context);
+                },
+              ),
+              ...bookmarkData.folders.map((f) => ListTile(
+                    title: Text(f.name),
+                    trailing: currentFolderId == f.id ? Icon(Icons.check, color: theme.primaryColor) : null,
+                    onTap: () {
+                      ref.read(bookmarkDataProvider.notifier).moveBookmark(refStr, f.id);
+                      Navigator.pop(context);
+                    },
+                  )),
+              const SizedBox(height: 16),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+enum _BookmarkViewType { all, unfiled, folder, byDate, byBook }
+
+class _BookmarksSegment extends ConsumerStatefulWidget {
   final ThemeData theme;
   const _BookmarksSegment({required this.theme});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final bookmarks = ref.watch(bookmarksProvider).toList();
+  ConsumerState<_BookmarksSegment> createState() => _BookmarksSegmentState();
+}
+
+class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
+  _BookmarkViewType _viewType = _BookmarkViewType.all;
+  String? _selectedFolderId;
+
+  @override
+  Widget build(BuildContext context) {
+    final bookmarkData = ref.watch(bookmarkDataProvider);
     final flatChapters = ref.watch(flatChaptersProvider);
+
+    // Filter bookmarks
+    List<BookmarkNode> filteredNodes = [];
+    if (_viewType == _BookmarkViewType.all) {
+      filteredNodes = bookmarkData.nodes.values.toList();
+    } else if (_viewType == _BookmarkViewType.unfiled) {
+      filteredNodes = bookmarkData.nodes.values.where((n) => n.folderId == null).toList();
+    } else if (_viewType == _BookmarkViewType.folder && _selectedFolderId != null) {
+      filteredNodes = bookmarkData.nodes.values.where((n) => n.folderId == _selectedFolderId).toList();
+    } else if (_viewType == _BookmarkViewType.byDate || _viewType == _BookmarkViewType.byBook) {
+      filteredNodes = bookmarkData.nodes.values.toList();
+    }
+    
+    // Sort descending by created date
+    filteredNodes.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+    // For grouping
+    Map<String, List<BookmarkNode>> groups = {};
+    if (_viewType == _BookmarkViewType.byDate) {
+      final now = DateTime.now();
+      for (final n in filteredNodes) {
+        final diff = now.difference(n.createdAt);
+        String group = 'Earlier';
+        if (diff.inDays <= 7) {
+          group = 'Last 7 Days';
+        } else if (diff.inDays <= 30) {
+          group = 'Last 30 Days';
+        }
+        
+        groups.putIfAbsent(group, () => []).add(n);
+      }
+    } else if (_viewType == _BookmarkViewType.byBook) {
+      for (final n in filteredNodes) {
+        final data = _parseVerseRef(n.reference, flatChapters);
+        final group = data?.bookName ?? 'Unknown Book';
+        groups.putIfAbsent(group, () => []).add(n);
+      }
+    }
+
+    Widget content;
+    if (_viewType == _BookmarkViewType.byDate || _viewType == _BookmarkViewType.byBook) {
+      final groupKeys = groups.keys.toList();
+      content = ListView.builder(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        itemCount: groupKeys.length,
+        itemBuilder: (context, index) {
+          final groupKey = groupKeys[index];
+          final nodes = groups[groupKey]!;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Text(
+                  groupKey,
+                  style: widget.theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: widget.theme.colorScheme.primary,
+                  ),
+                ),
+              ),
+              ...nodes.map((n) {
+                final data = _parseVerseRef(n.reference, flatChapters);
+                if (data == null) return const SizedBox.shrink();
+                return _buildRealVerseCard(context, ref, n.reference, data, widget.theme, isBookmarked: true);
+              }),
+            ],
+          );
+        },
+      );
+    } else {
+      content = filteredNodes.isEmpty
+          ? Center(
+              child: Text(
+                'No bookmarks here.',
+                style: widget.theme.textTheme.bodySmall?.copyWith(
+                  color: widget.theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                ),
+              ),
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              itemCount: filteredNodes.length,
+              itemBuilder: (context, index) {
+                final n = filteredNodes[index];
+                final data = _parseVerseRef(n.reference, flatChapters);
+                if (data == null) return const SizedBox.shrink();
+                return _buildRealVerseCard(context, ref, n.reference, data, widget.theme, isBookmarked: true);
+              },
+            );
+    }
+
+    BookmarkFolder? selectedFolder;
+    if (_viewType == _BookmarkViewType.folder && _selectedFolderId != null) {
+      selectedFolder = bookmarkData.folders.where((f) => f.id == _selectedFolderId).firstOrNull;
+    }
 
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-          child: Text(
-            "Verses you're going to reflect on and study more.",
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-              height: 1.4,
-            ),
+        // Chips Row
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.fromLTRB(16, 20, 16, 10),
+          child: Row(
+            children: [
+              ChoiceChip(
+                label: const Text('All'),
+                selected: _viewType == _BookmarkViewType.all,
+                onSelected: (val) {
+                  if (val) setState(() => _viewType = _BookmarkViewType.all);
+                },
+              ),
+              const SizedBox(width: 8),
+              ChoiceChip(
+                label: const Text('Unfiled'),
+                selected: _viewType == _BookmarkViewType.unfiled,
+                onSelected: (val) {
+                  if (val) setState(() => _viewType = _BookmarkViewType.unfiled);
+                },
+              ),
+              const SizedBox(width: 8),
+              Container(width: 1, height: 20, color: widget.theme.dividerColor.withValues(alpha: 0.2)),
+              const SizedBox(width: 8),
+              ...bookmarkData.folders.map((f) => Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: ChoiceChip(
+                      label: Text(f.name),
+                      selected: _viewType == _BookmarkViewType.folder && _selectedFolderId == f.id,
+                      onSelected: (val) {
+                        if (val) {
+                          setState(() {
+                            _viewType = _BookmarkViewType.folder;
+                            _selectedFolderId = f.id;
+                          });
+                        }
+                      },
+                    ),
+                  )),
+              ActionChip(
+                avatar: const Icon(Icons.add, size: 16),
+                label: const Text('New Folder'),
+                onPressed: () => _showAddFolderDialog(context, ref),
+              ),
+              const SizedBox(width: 8),
+              Container(width: 1, height: 20, color: widget.theme.dividerColor.withValues(alpha: 0.2)),
+              const SizedBox(width: 8),
+              ChoiceChip(
+                label: const Text('By Date'),
+                selected: _viewType == _BookmarkViewType.byDate,
+                onSelected: (val) {
+                  if (val) setState(() => _viewType = _BookmarkViewType.byDate);
+                },
+              ),
+              const SizedBox(width: 8),
+              ChoiceChip(
+                label: const Text('By Book'),
+                selected: _viewType == _BookmarkViewType.byBook,
+                onSelected: (val) {
+                  if (val) setState(() => _viewType = _BookmarkViewType.byBook);
+                },
+              ),
+            ],
           ),
         ),
-        Expanded(
-          child: bookmarks.isEmpty
-              ? const SizedBox.shrink()
-              : ListView.builder(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  itemCount: bookmarks.length,
-                  itemBuilder: (context, index) {
-                    final refStr = bookmarks[index];
-                    final data = _parseVerseRef(refStr, flatChapters);
-                    if (data == null) return const SizedBox.shrink();
-                    return _buildRealVerseCard(
-                        context, ref, refStr, data, theme,
-                        isBookmarked: true);
-                  },
+        
+        // Folder Header (Edit/Delete)
+        if (selectedFolder != null)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  selectedFolder.name,
+                  style: widget.theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
-        ),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.edit, size: 20),
+                      onPressed: () => _showRenameFolderDialog(context, ref, selectedFolder!.id, selectedFolder.name),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete, size: 20, color: Colors.red),
+                      onPressed: () {
+                        setState(() => _viewType = _BookmarkViewType.all);
+                        _showDeleteFolderDialog(context, ref, selectedFolder!.id, selectedFolder.name);
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          
+        Expanded(child: content),
       ],
     );
   }
@@ -332,7 +676,6 @@ class _NotesSegment extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notes = ref.watch(notesProvider);
-    final flatChapters = ref.watch(flatChaptersProvider);
 
     return Column(
       children: [
@@ -376,89 +719,75 @@ class _NotesSegment extends ConsumerWidget {
                     final note = notes[index];
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 12.0),
-                      child: Dismissible(
-                        key: ValueKey(note.title + note.date + index.toString()),
-                        direction: DismissDirection.endToStart,
-                        background: Container(
-                          alignment: Alignment.centerRight,
-                          padding: const EdgeInsets.only(right: 20),
-                          decoration: BoxDecoration(
-                            color: Colors.red.withValues(alpha: 0.8),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: const Icon(Icons.delete, color: Colors.white),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color:
+                              theme.colorScheme.surface.withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                              color: theme.dividerColor.withValues(alpha: 0.1)),
                         ),
-                        onDismissed: (_) {
-                          ref.read(notesProvider.notifier).remove(index);
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color:
-                                theme.colorScheme.surface.withValues(alpha: 0.5),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                                color: theme.dividerColor.withValues(alpha: 0.1)),
-                          ),
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(16),
-                            onTap: () {
-                               Navigator.of(context).push(MaterialPageRoute(
-                                 builder: (_) => NoteEditorScreen(
-                                   initialNote: note,
-                                   noteIndex: index,
-                                 ),
-                               ));
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          note.title.isNotEmpty ? note.title : 'New Note',
-                                          style: theme.textTheme.titleSmall
-                                              ?.copyWith(
-                                                  fontWeight: FontWeight.bold),
-                                        ),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () {
+                            showAddNoteSheet(
+                              context,
+                              ref,
+                              theme,
+                              editingNote: note,
+                              editingId: note.id,
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        note.title,
+                                        style: theme.textTheme.titleSmall
+                                            ?.copyWith(
+                                                fontWeight: FontWeight.bold),
                                       ),
-                                      Text(
-                                        note.date,
-                                        style:
-                                            theme.textTheme.bodySmall?.copyWith(
-                                          color: theme.colorScheme.onSurface
-                                              .withValues(alpha: 0.5),
-                                          fontSize: 10,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  if (note.reference != null) ...[
-                                    const SizedBox(height: 4),
+                                    ),
                                     Text(
-                                      note.reference!,
-                                      style: theme.textTheme.labelSmall?.copyWith(
-                                        color: theme.primaryColor,
-                                        fontWeight: FontWeight.w600,
+                                      note.date,
+                                      style:
+                                          theme.textTheme.bodySmall?.copyWith(
+                                        color: theme.colorScheme.onSurface
+                                            .withValues(alpha: 0.5),
+                                        fontSize: 10,
                                       ),
                                     ),
                                   ],
-                                  const SizedBox(height: 8),
+                                ),
+                                if (note.reference != null) ...[
+                                  const SizedBox(height: 4),
                                   Text(
-                                    note.content.isNotEmpty ? note.content.replaceAll('\n', ' ') : 'No additional text',
-                                    maxLines: 3,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: theme.colorScheme.onSurface
-                                          .withValues(alpha: 0.8),
+                                    note.reference!,
+                                    style: theme.textTheme.labelSmall?.copyWith(
+                                      color: theme.primaryColor,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                 ],
-                              ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  note.content,
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.8),
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -466,7 +795,6 @@ class _NotesSegment extends ConsumerWidget {
                     );
                   },
                 ),
-
         ),
       ],
     );
@@ -480,16 +808,18 @@ class _NotesSegment extends ConsumerWidget {
 class _ParsedVerseData {
   final String bookAbbrev;
   final String bookName;
+  final int bookNumber;
   final int chapter;
   final int verseNum;
-  final String text;
+  final String fallbackText;
 
   _ParsedVerseData({
     required this.bookAbbrev,
     required this.bookName,
+    required this.bookNumber,
     required this.chapter,
     required this.verseNum,
-    required this.text,
+    required this.fallbackText,
   });
 }
 
@@ -525,11 +855,12 @@ _ParsedVerseData? _parseVerseRef(
   if (vIndex == -1) return null;
 
   return _ParsedVerseData(
-    bookAbbrev: fc.book.abbreviation, // canonical lowercase from JSON
+    bookAbbrev: fc.book.abbreviation, 
     bookName: fc.book.name,
+    bookNumber: fc.bookNumber,
     chapter: chapter,
     verseNum: verseNum,
-    text: fc.chapter.verses[vIndex].text,
+    fallbackText: fc.chapter.verses[vIndex].text,
   );
 }
 
@@ -588,13 +919,9 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                       ),
                     ),
                   ),
-                  if (isBookmarked)
-                    Icon(Icons.bookmark_rounded,
-                        size: 16,
-                        color: theme.primaryColor.withValues(alpha: 0.7)),
                   if (highlightColor != null)
                     Padding(
-                      padding: const EdgeInsets.only(left: 6),
+                      padding: const EdgeInsets.only(left: 6, right: 6),
                       child: Container(
                         width: 12,
                         height: 12,
@@ -602,17 +929,252 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                             color: highlightColor, shape: BoxShape.circle),
                       ),
                     ),
+                  PopupMenuButton<int>(
+                    icon: Icon(Icons.more_vert_rounded,
+                        size: 20,
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
+                    onSelected: (value) {
+                      switch (value) {
+                        case 0:
+                          ref.read(readLocationProvider.notifier).updateLocation(
+                                bookAbbrev: data.bookAbbrev,
+                                bookName: data.bookName,
+                                chapter: data.chapter,
+                                verse: data.verseNum,
+                              );
+                          Navigator.of(context).pop();
+                          ref.read(navProvider.notifier).setIndex(1);
+                          break;
+                        case 1:
+                          showAddNoteSheet(context, ref, theme, initialReference: formattedRef);
+                          break;
+                        case 2:
+                          // We use fallbackText for sharing from Your Space for simplicity, unless we await the translation.
+                          // To keep it sync, we'll just share the fallback text.
+                          ShareService.shareText(body: '"${data.fallbackText}" — $formattedRef');
+                          break;
+                        case 3:
+                          if (isBookmarked) {
+                            ref.read(bookmarksProvider.notifier).toggle(refStr);
+                          } else if (highlightColorIndex != null) {
+                            ref.read(highlightsProvider.notifier).toggleHighlight(refStr, highlightColorIndex);
+                          }
+                          break;
+                        case 4:
+                          _showMoveToFolderSheet(context, ref, refStr, theme);
+                          break;
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(value: 0, child: Text('Open in Read')),
+                      const PopupMenuItem(value: 1, child: Text('Add Note')),
+                      const PopupMenuItem(value: 2, child: Text('Share')),
+                      if (isBookmarked)
+                        const PopupMenuItem(value: 4, child: Text('Move to folder')),
+                      PopupMenuItem(
+                          value: 3,
+                          child: Text(isBookmarked ? 'Remove Bookmark' : 'Remove Highlight',
+                              style: const TextStyle(color: Colors.redAccent))),
+                    ],
+                  ),
                 ],
               ),
               const SizedBox(height: 6),
-              Text(
-                data.text,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  height: 1.4,
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
-                  decoration: isBookmarked ? TextDecoration.underline : null,
-                  decorationColor: isBookmarked ? theme.primaryColor : null,
-                ),
+              Consumer(
+                builder: (context, ref, _) {
+                  final settings = ref.watch(readSettingsProvider);
+                  final activeTransId = ref.watch(activeTranslationProvider);
+                  final showChips = settings.showChipsOnSavedItems;
+                  
+                  final installedTranslations = ref.watch(availableTranslationsProvider).value ?? [];
+                  final targetLanguages = <String, String>{};
+                  for (final t in installedTranslations) {
+                    if (!targetLanguages.containsKey(t.languageName)) {
+                      targetLanguages[t.languageName] = t.languageName.length > 3 
+                          ? t.languageName.substring(0, 3).toUpperCase() 
+                          : t.languageName.toUpperCase();
+                    }
+                  }
+
+                  final availableChips = <String, String>{};
+                  String? activeLanguageLabel;
+                  for (final t in installedTranslations) {
+                    final label = targetLanguages[t.languageName]!;
+                    if (!availableChips.containsKey(label)) {
+                      availableChips[label] = t.translationId;
+                    }
+                    if (t.translationId == activeTransId) {
+                      activeLanguageLabel = label;
+                    }
+                  }
+
+                  final chipsToRender = targetLanguages.entries
+                      .where((e) => e.value != activeLanguageLabel)
+                      .toList();
+
+                  final expandedChipsMap = ref.watch(yourSpaceExpandedChipsProvider);
+                  final activeChipId = expandedChipsMap[refStr];
+
+                  Widget verseWidget;
+                  if (!settings.syncSavedItemsLanguage || activeTransId == 'kjv') {
+                    verseWidget = Text(
+                      data.fallbackText,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        height: 1.4,
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                        decoration: isBookmarked ? TextDecoration.underline : null,
+                        decorationColor: isBookmarked ? theme.primaryColor : null,
+                      ),
+                    );
+                  } else {
+                    final request = (
+                      translationId: activeTransId,
+                      bookNumber: data.bookNumber,
+                      chapter: data.chapter,
+                      verse: data.verseNum
+                    );
+                    final verseAsync = ref.watch(verseTranslationProvider(request));
+
+                    verseWidget = verseAsync.when(
+                      data: (verseData) {
+                        final displayText = verseData?.text ?? data.fallbackText;
+                        return Text(
+                          displayText,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            height: 1.4,
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                            decoration: isBookmarked ? TextDecoration.underline : null,
+                            decorationColor: isBookmarked ? theme.primaryColor : null,
+                          ),
+                        );
+                      },
+                      loading: () => Text(
+                        data.fallbackText,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          height: 1.4,
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                        ),
+                      ),
+                      error: (_, __) => Text(
+                        data.fallbackText,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          height: 1.4,
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                        ),
+                      ),
+                    );
+                  }
+
+                  Widget? expandedTranslationWidget;
+                  if (activeChipId != null) {
+                    final request = (
+                      translationId: activeChipId,
+                      bookNumber: data.bookNumber,
+                      chapter: data.chapter,
+                      verse: data.verseNum
+                    );
+                    final expandedAsync = ref.watch(verseTranslationProvider(request));
+                    expandedTranslationWidget = expandedAsync.when(
+                      data: (verseData) {
+                        if (verseData == null) return const SizedBox.shrink();
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(
+                            verseData.text,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              height: 1.4,
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        );
+                      },
+                      loading: () => const Padding(
+                        padding: EdgeInsets.only(top: 8.0),
+                        child: SizedBox(
+                          height: 12,
+                          width: 12,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+                      error: (_, __) => const SizedBox.shrink(),
+                    );
+                  }
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      verseWidget,
+                      if (expandedTranslationWidget != null) expandedTranslationWidget,
+                      if (showChips && chipsToRender.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            for (int i = 0; i < chipsToRender.length; i++)
+                              Expanded(
+                                child: Padding(
+                                  padding: EdgeInsets.only(
+                                      right: i == chipsToRender.length - 1 ? 0.0 : 6.0),
+                                  child: Builder(builder: (context) {
+                                    final langEntry = chipsToRender[i];
+                                    final isInstalled = availableChips.containsKey(langEntry.value);
+                                    final translationId = availableChips[langEntry.value];
+                                    final isSelected = activeChipId == translationId;
+
+                                    return Material(
+                                      color: isSelected
+                                          ? theme.primaryColor.withValues(alpha: 0.15)
+                                          : theme.colorScheme.surface,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        side: BorderSide(
+                                          color: isSelected
+                                              ? theme.primaryColor.withValues(alpha: 0.5)
+                                              : theme.colorScheme.onSurface.withValues(
+                                                  alpha: isInstalled ? 0.15 : 0.05),
+                                        ),
+                                      ),
+                                      clipBehavior: Clip.antiAlias,
+                                      child: InkWell(
+                                        onTap: () {
+                                          if (isInstalled && translationId != null) {
+                                            if (isSelected) {
+                                              ref.read(yourSpaceExpandedChipsProvider.notifier).clear(refStr);
+                                            } else {
+                                              ref.read(yourSpaceExpandedChipsProvider.notifier).setLanguage(refStr, translationId);
+                                            }
+                                          }
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 6.0),
+                                          child: Center(
+                                            child: Text(
+                                              langEntry.value,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                                                color: isSelected
+                                                    ? theme.primaryColor
+                                                    : (isInstalled
+                                                        ? theme.colorScheme.onSurface.withValues(alpha: 0.7)
+                                                        : theme.colorScheme.onSurface.withValues(alpha: 0.3)),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ],
+                    ],
+                  );
+                },
               ),
             ],
           ),
@@ -621,3 +1183,4 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
     ),
   );
 }
+

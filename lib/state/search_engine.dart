@@ -2,14 +2,16 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/models/bible_model.dart';
 import '../models/commentary_entry.dart';
+import '../models/pericope_entry.dart';
 import '../data/models/home_data.dart';
 import 'bible_provider.dart';
 import 'notes_provider.dart';
 import 'commentary_provider.dart';
 import 'translation_provider.dart';
+import 'pericopes_provider.dart';
 import '../services/bible_database_service.dart';
 
-enum SearchResultType { reference, bible, commentary, history, note }
+enum SearchResultType { reference, bible, commentary, history, note, pericope, dictionary }
 
 class SearchResult {
   final String title;
@@ -67,18 +69,21 @@ class SearchItem {
 class IndexData {
   final List<SearchItem> corpus;
   final Map<String, List<int>> invertedIndex;
+  final List<String> sortedKeys;
 
-  IndexData(this.corpus, this.invertedIndex);
+  IndexData(this.corpus, this.invertedIndex, [List<String>? sortedKeys])
+      : sortedKeys = sortedKeys ?? invertedIndex.keys.toList()..sort();
 }
 
 class IndexBuildArgs {
   final List<BibleBook>? bibleBooks;
   final List<Map<String, dynamic>>? dbVerses;
   final List<CommentaryEntry>? commentaryData;
+  final List<PericopeEntry>? pericopes;
   final List<PersonalNote> notes;
 
   IndexBuildArgs(
-      this.bibleBooks, this.dbVerses, this.commentaryData, this.notes);
+      this.bibleBooks, this.dbVerses, this.commentaryData, this.pericopes, this.notes);
 }
 
 class SearchQueryArgs {
@@ -92,6 +97,7 @@ class SearchQueryArgs {
   final bool includeCommentary;
   final bool includeNotes;
   final bool exactMatch;
+  final String? filterBook;
 
   SearchQueryArgs(
     this.query,
@@ -104,6 +110,7 @@ class SearchQueryArgs {
     this.includeCommentary,
     this.includeNotes,
     this.exactMatch,
+    this.filterBook,
   );
 }
 
@@ -221,6 +228,26 @@ IndexData buildIndexIsolate(IndexBuildArgs args) {
 
   // Notes are now indexed separately during search to avoid full re-index
 
+  // 3. Pericopes
+  if (args.pericopes != null) {
+    for (final pericope in args.pericopes!) {
+      final item = SearchItem(
+        id: nextId++,
+        type: SearchResultType.pericope,
+        title: pericope.title,
+        subtitle: '${pericope.book} ${pericope.startChapter}:${pericope.startVerse}',
+        text: pericope.title,
+        metadata: {
+          'bookName': pericope.book,
+          'chapter': pericope.startChapter,
+          'verse': pericope.startVerse,
+        },
+      );
+      corpus.add(item);
+      addTokens(item.id, item.title);
+    }
+  }
+
   return IndexData(corpus, index);
 }
 
@@ -254,7 +281,10 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
         title: note.title,
         subtitle: 'Note • ${note.date}',
         text: note.content,
-        metadata: {'title': note.title},
+        metadata: {
+          'title': note.title,
+          if (note.reference != null) 'reference': note.reference,
+        },
       );
       noteCorpus.add(item);
       addNoteTokens(item.id, '${item.title} ${item.text}');
@@ -281,7 +311,7 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
   // 0. Exact Reference Match (highest priority)
   if ((args.includeOt || args.includeNt) && args.bibleBooks != null) {
     final regex =
-        RegExp(r'^((?:\d\s*)?[a-z]+(?:\s+[a-z]+)*)\s*(?:(\d+)[\s:.]*(\d+)?)?$');
+        RegExp(r'^((?:\d\s*)?[a-z]+(?:\s+[a-z]+)*)\s*(?:(\d+)[\s:.]*(\d+)?(?:-\d+)?)?$');
     final match = regex.firstMatch(queryLower);
 
     if (match != null) {
@@ -300,7 +330,12 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
           if (chapterStr != null) {
             chapter = int.tryParse(chapterStr);
             if (chapter != null) {
-              chapter = chapter.clamp(1, book.chapters.length);
+              if (verseStr == null && book.chapters.length == 1) {
+                verse = chapter.clamp(1, book.chapters[0].verses.length);
+                chapter = 1;
+              } else {
+                chapter = chapter.clamp(1, book.chapters.length);
+              }
             }
           }
 
@@ -345,40 +380,92 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
   // Store matching metadata for ranking later
   final matchQuality = <int, int>{}; // id -> score (higher is better)
 
-  for (final token in queryTokens) {
+  const syns = {
+    'saviour': ['saviour', 'savior'],
+    'savior': ['saviour', 'savior'],
+    'colour': ['colour', 'color'],
+    'color': ['colour', 'color'],
+    'favour': ['favour', 'favor'],
+    'favor': ['favour', 'favor'],
+    'honour': ['honour', 'honor'],
+    'honor': ['honour', 'honor'],
+    'labour': ['labour', 'labor'],
+    'labor': ['labour', 'labor'],
+    'neighbour': ['neighbour', 'neighbor'],
+    'neighbor': ['neighbour', 'neighbor'],
+    'isaac': ['isaac', 'issac'],
+    'issac': ['isaac', 'issac'],
+    'immanuel': ['immanuel', 'emmanuel'],
+    'emmanuel': ['immanuel', 'emmanuel'],
+    'judas': ['judas', 'jude'],
+    'jude': ['judas', 'jude'],
+    'elijah': ['elijah', 'elias'],
+    'elias': ['elijah', 'elias'],
+    'elisha': ['elisha', 'eliseus'],
+    'eliseus': ['elisha', 'eliseus'],
+    'messiah': ['messiah', 'messias'],
+    'messias': ['messiah', 'messias'],
+  };
+
+  final sortedKeys = args.indexData.sortedKeys;
+
+  for (final rawToken in queryTokens) {
     final currentTokenMatches = <int>{};
+    final synTokens = syns[rawToken] ?? [rawToken];
 
-    // Exact matches
-    if (index.containsKey(token)) {
-      for (final id in index[token]!) {
-        currentTokenMatches.add(id);
-        matchQuality[id] =
-            (matchQuality[id] ?? 0) + 10; // Exact word match = 10 pts
-      }
-    }
-    if (noteIndex.containsKey(token)) {
-      for (final id in noteIndex[token]!) {
-        currentTokenMatches.add(id);
-        matchQuality[id] = (matchQuality[id] ?? 0) + 10;
-      }
-    }
-
-    // Prefix matches (only if token is reasonably long, e.g., > 1 char to avoid exploding)
-    if (token.isNotEmpty) {
-      for (final key in index.keys) {
-        if (key != token && key.startsWith(token)) {
-          for (final id in index[key]!) {
-            currentTokenMatches.add(id);
-            matchQuality[id] =
-                (matchQuality[id] ?? 0) + 1; // Prefix match = 1 pt
-          }
+    for (final token in synTokens) {
+      // Exact matches
+      if (index.containsKey(token)) {
+        for (final id in index[token]!) {
+          currentTokenMatches.add(id);
+          matchQuality[id] = (matchQuality[id] ?? 0) + 10;
         }
       }
-      for (final key in noteIndex.keys) {
-        if (key != token && key.startsWith(token)) {
-          for (final id in noteIndex[key]!) {
-            currentTokenMatches.add(id);
-            matchQuality[id] = (matchQuality[id] ?? 0) + 1;
+      if (noteIndex.containsKey(token)) {
+        for (final id in noteIndex[token]!) {
+          currentTokenMatches.add(id);
+          matchQuality[id] = (matchQuality[id] ?? 0) + 10;
+        }
+      }
+
+      // Prefix matches
+      if (token.isNotEmpty && !args.exactMatch) {
+        // Binary search for prefix in main index
+        int low = 0;
+        int high = sortedKeys.length - 1;
+        int startIndex = sortedKeys.length;
+        
+        while (low <= high) {
+          int mid = (low + high) >> 1;
+          if (sortedKeys[mid].compareTo(token) >= 0) {
+            startIndex = mid;
+            high = mid - 1;
+          } else {
+            low = mid + 1;
+          }
+        }
+        
+        for (int i = startIndex; i < sortedKeys.length; i++) {
+          final key = sortedKeys[i];
+          if (key.startsWith(token)) {
+            if (key != token) {
+              for (final id in index[key]!) {
+                currentTokenMatches.add(id);
+                matchQuality[id] = (matchQuality[id] ?? 0) + 1;
+              }
+            }
+          } else {
+            break; // Stop since list is sorted
+          }
+        }
+
+        // Linear scan for noteIndex (it's small)
+        for (final key in noteIndex.keys) {
+          if (key != token && key.startsWith(token)) {
+            for (final id in noteIndex[key]!) {
+              currentTokenMatches.add(id);
+              matchQuality[id] = (matchQuality[id] ?? 0) + 1;
+            }
           }
         }
       }
@@ -390,7 +477,6 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
       matchingIds = matchingIds.intersection(currentTokenMatches);
     }
 
-    // If at any point the intersection is empty, we can abort early
     if (matchingIds.isEmpty) break;
   }
 
@@ -412,6 +498,10 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
         if (!args.includeCommentary) continue;
       } else if (item.type == SearchResultType.note) {
         if (!args.includeNotes) continue;
+      }
+      if (args.filterBook != null) {
+        final bName = item.metadata['bookName'] ?? item.metadata['book'];
+        if (bName != args.filterBook) continue;
       }
       matchedItems.add(item);
     }
@@ -465,6 +555,7 @@ class SearchEngine {
     bool includeCommentary = true,
     bool includeNotes = true,
     bool exactMatch = false,
+    String? filterBook,
   }) async {
     final indexData = await baseIndexFuture;
 
@@ -481,6 +572,7 @@ class SearchEngine {
         includeCommentary,
         includeNotes,
         exactMatch,
+        filterBook,
       ),
     );
   }
@@ -501,11 +593,16 @@ final baseSearchIndexProvider = FutureProvider<IndexData>((ref) async {
 
   // Commentary is optional — use whatever is already available without blocking
   final commentaryAsync = ref.watch(commentaryProvider);
+  final pericopesMap = ref.watch(pericopesProvider);
+  final pericopes = pericopesMap.values.expand((e) => e)
+      .where((p) => p.translationId == null || p.translationId == activeTranslation)
+      .toList();
 
   final args = IndexBuildArgs(
     bibleState.books,
     dbVerses,
     commentaryAsync.asData?.value,
+    pericopes,
     [], // Notes handled dynamically
   );
   return await compute(buildIndexIsolate, args);

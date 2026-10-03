@@ -16,9 +16,7 @@ const double _kNoiseAlphaDark = 0.030;
 const double _kNoiseAlphaLight = 0.025;
 const double _kNoiseDensity = 0.015;
 
-const bool kEnable3DMotion = true;
-
-class TexturedGlassContainer extends ConsumerStatefulWidget {
+class TexturedGlassContainer extends ConsumerWidget {
   final Widget child;
   final BorderRadius? borderRadius;
   final EdgeInsetsGeometry? padding;
@@ -43,76 +41,57 @@ class TexturedGlassContainer extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<TexturedGlassContainer> createState() => _TexturedGlassContainerState();
-}
-
-class _TexturedGlassContainerState extends ConsumerState<TexturedGlassContainer> with SingleTickerProviderStateMixin {
-  late AnimationController _tiltController;
-  late Animation<double> _tiltAnimation;
-  Offset _tiltOffset = Offset.zero;
-
-  @override
-  void initState() {
-    super.initState();
-    _tiltController = AnimationController(vsync: this, duration: const Duration(milliseconds: 600));
-    _tiltAnimation = CurvedAnimation(parent: _tiltController, curve: Curves.elasticOut);
-    _tiltController.addListener(() => setState(() {}));
-  }
-
-  @override
-  void dispose() {
-    _tiltController.dispose();
-    super.dispose();
-  }
-
-  void _onPointerMove(PointerEvent event) {
-    if (!kEnable3DMotion) return;
-    final renderBox = context.findRenderObject() as RenderBox?;
-    if (renderBox == null) return;
-    final size = renderBox.size;
-    final dx = (event.localPosition.dx - size.width / 2) / (size.width / 2);
-    final dy = (event.localPosition.dy - size.height / 2) / (size.height / 2);
-    setState(() {
-      _tiltOffset = Offset(dx.clamp(-1.0, 1.0), dy.clamp(-1.0, 1.0));
-    });
-    _tiltController.stop();
-  }
-
-  void _onPointerUp(PointerEvent event) {
-    if (!kEnable3DMotion) return;
-    _tiltController.forward(from: 0.0).then((_) {
-      _tiltOffset = Offset.zero;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final appTheme = ref.watch(themeProvider);
-    final appThemeResolved = appTheme.resolve(context);
     final surfaceStyle = ref.watch(surfaceStyleProvider);
-    final isDepth3D = surfaceStyle == SurfaceStyle.depth3D;
+    
+    final is3D = surfaceStyle == SurfaceStyle.threeDimensional;
+    final isPaperlike = surfaceStyle == SurfaceStyle.paperlike;
+    final isClaymorphic = surfaceStyle == SurfaceStyle.claymorphic;
+    final isFrutigerAero = surfaceStyle == SurfaceStyle.frutigerAero;
+    final isSkeuomorphic = surfaceStyle == SurfaceStyle.skeuomorphic;
+    final isFrosted = surfaceStyle == SurfaceStyle.frosted;
+    final useBlur = isFrosted && !isScrollable;
 
     BorderRadius radius;
-    if (isDepth3D) {
-      if (widget.borderRadius != null && widget.borderRadius!.topLeft.x < 28) {
+    if (isClaymorphic) {
+      final minR = borderRadius != null && borderRadius!.topLeft.x > 24
+          ? borderRadius!.topLeft.x
+          : 28.0;
+      radius = BorderRadius.circular(minR);
+    } else if (isSkeuomorphic) {
+      if (borderRadius != null && borderRadius!.topLeft.x < 28) {
         radius = BorderRadius.circular(28);
       } else {
-        radius = widget.borderRadius ?? BorderRadius.circular(28);
+        radius = borderRadius ?? BorderRadius.circular(28);
       }
     } else {
-      radius = widget.borderRadius ?? BorderRadius.circular(24);
+      radius = borderRadius ?? BorderRadius.circular(24);
     }
-
-    final useBlur = (surfaceStyle == SurfaceStyle.frosted || isDepth3D) && !widget.isScrollable;
-    final is3D = surfaceStyle == SurfaceStyle.threeDimensional;
 
     final tokens = Theme.of(context).extension<ReadingTokens>()!;
 
     Color fillColor;
     bool isDarkPanel = false;
 
-    if (useBlur) {
-      switch (appThemeResolved) {
+    if (isSkeuomorphic) {
+      final baseColor = tokens.readingSurface;
+      final isDark = baseColor.computeLuminance() < 0.4;
+      isDarkPanel = isDark;
+      fillColor = isActive
+          ? baseColor.withValues(alpha: isDark ? 0.8 : 0.9)
+          : baseColor;
+    } else if (isClaymorphic) {
+      fillColor = tokens.readingSurface;
+      isDarkPanel = tokens.readingSurface.computeLuminance() < 0.4;
+    } else if (isFrutigerAero) {
+      final baseColor = tokens.readingSurface;
+      isDarkPanel = baseColor.computeLuminance() < 0.4;
+      fillColor = isDarkPanel
+          ? baseColor.withValues(alpha: 0.82)
+          : baseColor.withValues(alpha: 0.78);
+    } else if (useBlur) {
+      switch (appTheme.resolve(context)) {
         case AppThemeMode.sepia:
           fillColor =
               const Color(0xFFF5EAD0).withValues(alpha: _kTintLightAlpha);
@@ -138,89 +117,55 @@ class _TexturedGlassContainerState extends ConsumerState<TexturedGlassContainer>
           isDarkPanel = true;
           break;
       }
-    } else if ((surfaceStyle == SurfaceStyle.frosted || isDepth3D) && widget.isScrollable) {
-      fillColor = tokens.readingSurface.withValues(alpha: 0.95);
+    } else if (isFrosted && isScrollable) {
+      fillColor = tokens.readingSurface.withValues(alpha: 0.92);
       isDarkPanel = tokens.readingSurface.computeLuminance() < 0.4;
     } else {
       fillColor = tokens.readingSurface;
       isDarkPanel = tokens.readingSurface.computeLuminance() < 0.4;
     }
 
-    if (isDepth3D) {
-      if (appThemeResolved == AppThemeMode.priestlyPurple) {
-        fillColor = const Color(0xFF291040).withValues(alpha: useBlur ? 0.85 : 1.0);
-        isDarkPanel = true;
-      } else if (appThemeResolved == AppThemeMode.galileeBlue) {
-        fillColor = const Color(0xFF082B44).withValues(alpha: useBlur ? 0.75 : 1.0);
-        isDarkPanel = true;
-      } else if (appThemeResolved == AppThemeMode.scarletRed) {
-        fillColor = const Color(0xFF3D0C0C).withValues(alpha: useBlur ? 0.85 : 1.0);
-        isDarkPanel = true;
-      }
-    }
-
     final bgLuminance = tokens.readingSurface.computeLuminance();
     final isDarkBg = bgLuminance < 0.4;
 
     final List<BoxShadow> shadows;
-    if (isDepth3D) {
-      Color highlightColor = isDarkBg ? Colors.white.withValues(alpha: 0.08) : Colors.white.withValues(alpha: 0.90);
-      Color dropShadowColor = isDarkBg ? Colors.black.withValues(alpha: 0.60) : Colors.black.withValues(alpha: 0.15);
-      Color glowColor = widget.isActive ? Theme.of(context).primaryColor.withValues(alpha: 0.40) : Colors.transparent;
-
-      if (appThemeResolved == AppThemeMode.priestlyPurple) {
-        highlightColor = const Color(0xFFFFD700).withValues(alpha: 0.15);
-        dropShadowColor = const Color(0xFF10002B).withValues(alpha: 0.80);
-        if (widget.isActive) glowColor = const Color(0xFFFFD700).withValues(alpha: 0.40);
-      } else if (appThemeResolved == AppThemeMode.galileeBlue) {
-        highlightColor = const Color(0xFF88CCFF).withValues(alpha: 0.20);
-        dropShadowColor = const Color(0xFF001122).withValues(alpha: 0.70);
-        if (widget.isActive) glowColor = const Color(0xFF00FFFF).withValues(alpha: 0.40);
-      } else if (appThemeResolved == AppThemeMode.scarletRed) {
-        highlightColor = const Color(0xFFFF8888).withValues(alpha: 0.15);
-        dropShadowColor = const Color(0xFF220000).withValues(alpha: 0.85);
-        if (widget.isActive) glowColor = const Color(0xFFFF3300).withValues(alpha: 0.50);
-      }
-
-      if (useBlur) {
-        shadows = [
-          BoxShadow(
-              color: dropShadowColor,
-              offset: const Offset(8, 12),
-              blurRadius: 24,
-              spreadRadius: -4),
-          BoxShadow(
-              color: highlightColor,
-              offset: const Offset(-4, -4),
-              blurRadius: 16,
-              spreadRadius: 0),
-          if (widget.isActive)
-            BoxShadow(
-                color: glowColor,
-                offset: Offset.zero,
-                blurRadius: 32,
-                spreadRadius: 4),
-        ];
-      } else {
-        shadows = [
-          BoxShadow(
-              color: dropShadowColor,
-              offset: const Offset(4, 6),
-              blurRadius: 12,
-              spreadRadius: -2),
-          BoxShadow(
-              color: highlightColor,
-              offset: const Offset(-2, -2),
-              blurRadius: 8,
-              spreadRadius: 0),
-          if (widget.isActive)
-            BoxShadow(
-                color: glowColor,
-                offset: Offset.zero,
-                blurRadius: 16,
-                spreadRadius: 2),
-        ];
-      }
+    if (isClaymorphic) {
+      final primary = Theme.of(context).primaryColor;
+      final dropColor = isDarkBg
+          ? Colors.black.withValues(alpha: 0.45)
+          : primary.withValues(alpha: 0.22);
+      final floorColor = isDarkBg
+          ? Colors.black.withValues(alpha: 0.25)
+          : Colors.black.withValues(alpha: 0.10);
+      shadows = [
+        BoxShadow(
+          color: dropColor,
+          offset: const Offset(0, 10),
+          blurRadius: 20,
+          spreadRadius: -2,
+        ),
+        BoxShadow(
+          color: floorColor,
+          offset: const Offset(0, 3),
+          blurRadius: 6,
+        ),
+      ];
+    } else if (isFrutigerAero) {
+      final glassBlue = Colors.lightBlue.withValues(alpha: isDarkBg ? 0.30 : 0.20);
+      shadows = [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: isDarkBg ? 0.45 : 0.18),
+          blurRadius: 28,
+          spreadRadius: -2,
+          offset: const Offset(0, 12),
+        ),
+        BoxShadow(
+          color: glassBlue,
+          blurRadius: 16,
+          spreadRadius: 0,
+          offset: const Offset(0, 4),
+        ),
+      ];
     } else if (is3D) {
       shadows = isDarkBg
           ? [
@@ -243,7 +188,7 @@ class _TexturedGlassContainerState extends ConsumerState<TexturedGlassContainer>
                   offset: const Offset(4.0, 4.0),
                   blurRadius: 6),
             ];
-    } else if (surfaceStyle == SurfaceStyle.frosted) {
+    } else if (isFrosted) {
       shadows = [
         BoxShadow(
           color: Colors.black.withValues(alpha: isDarkBg ? 0.45 : 0.18),
@@ -258,6 +203,13 @@ class _TexturedGlassContainerState extends ConsumerState<TexturedGlassContainer>
           offset: const Offset(0, 3),
         ),
       ];
+    } else if (isPaperlike) {
+      shadows = [
+        BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 2,
+            offset: const Offset(0, 1)),
+      ];
     } else {
       shadows = [
         BoxShadow(
@@ -269,113 +221,80 @@ class _TexturedGlassContainerState extends ConsumerState<TexturedGlassContainer>
 
     final rimAlpha = isDarkPanel ? _kRimDarkAlpha : _kRimLightAlpha;
 
-    Widget finalChild = widget.child;
-    if (isDepth3D) {
-      Color? overrideAccent;
-      if (appThemeResolved == AppThemeMode.priestlyPurple) {
-        overrideAccent = const Color(0xFFFFD700);
-      } else if (appThemeResolved == AppThemeMode.galileeBlue) {
-        overrideAccent = const Color(0xFF88CCFF);
-      } else if (appThemeResolved == AppThemeMode.scarletRed) {
-        overrideAccent = const Color(0xFFFF8888);
-      } else if (isDarkPanel) {
-        // All other dark themes (dark, AMOLED, dusk, fresh) also need
-        // white-text override when the 3D surface is darkened.
-        overrideAccent = Theme.of(context).primaryColor;
-      }
-
-      if (overrideAccent != null) {
-        final overrideTokens = ReadingTokens(
-          readingPaper: tokens.readingPaper,
-          readingSurface: fillColor,
-          readingInk: Colors.white,
-          readingInkMuted: Colors.white.withValues(alpha: 0.80),
-          readingAccent: overrideAccent,
-          readingBorder: Colors.white.withValues(alpha: 0.15),
-        );
-        final theme = Theme.of(context);
-        final darkTextTheme = theme.textTheme.copyWith(
-          displayLarge: theme.textTheme.displayLarge?.copyWith(color: Colors.white),
-          displayMedium: theme.textTheme.displayMedium?.copyWith(color: Colors.white),
-          displaySmall: theme.textTheme.displaySmall?.copyWith(color: Colors.white),
-          headlineLarge: theme.textTheme.headlineLarge?.copyWith(color: Colors.white),
-          headlineMedium: theme.textTheme.headlineMedium?.copyWith(color: Colors.white),
-          headlineSmall: theme.textTheme.headlineSmall?.copyWith(color: Colors.white),
-          titleLarge: theme.textTheme.titleLarge?.copyWith(color: Colors.white),
-          titleMedium: theme.textTheme.titleMedium?.copyWith(color: Colors.white),
-          titleSmall: theme.textTheme.titleSmall?.copyWith(color: Colors.white),
-          bodyLarge: theme.textTheme.bodyLarge?.copyWith(color: Colors.white.withValues(alpha: 0.95)),
-          bodyMedium: theme.textTheme.bodyMedium?.copyWith(color: Colors.white.withValues(alpha: 0.90)),
-          bodySmall: theme.textTheme.bodySmall?.copyWith(color: Colors.white.withValues(alpha: 0.80)),
-          labelLarge: theme.textTheme.labelLarge?.copyWith(color: Colors.white.withValues(alpha: 0.85)),
-          labelMedium: theme.textTheme.labelMedium?.copyWith(color: Colors.white.withValues(alpha: 0.80)),
-          labelSmall: theme.textTheme.labelSmall?.copyWith(color: Colors.white.withValues(alpha: 0.75)),
-        );
-
-        finalChild = Theme(
-          data: theme.copyWith(
-            brightness: Brightness.dark,
-            primaryColor: overrideAccent,
-            colorScheme: theme.colorScheme.copyWith(
-              brightness: Brightness.dark,
-              primary: overrideAccent,
-              onSurface: Colors.white,
-              onSurfaceVariant: Colors.white.withValues(alpha: 0.80),
-              surface: fillColor,
-            ),
-            textTheme: darkTextTheme,
-            iconTheme: theme.iconTheme.copyWith(color: Colors.white),
-            extensions: [overrideTokens],
-          ),
-          child: DefaultTextStyle(
-            style: const TextStyle(color: Colors.white),
-            child: finalChild,
-          ),
-        );
-      }
+    Border? containerBorder;
+    if (useBlur || isClaymorphic) {
+      containerBorder = null;
+    } else if (isSkeuomorphic) {
+      containerBorder = Border.all(
+        width: 1.0,
+        color: isDarkBg
+            ? Colors.white.withValues(alpha: 0.08)
+            : Colors.black.withValues(alpha: 0.15),
+      );
+    } else if (isFrutigerAero) {
+      containerBorder = Border.all(
+        width: 1.5,
+        color: Colors.lightBlue.withValues(alpha: isDarkBg ? 0.25 : 0.40),
+      );
+    } else {
+      containerBorder = Border.all(
+        width: is3D ? 0.0 : (isPaperlike ? 0.8 : 0.5),
+        color: is3D ? Colors.transparent : (isPaperlike ? tokens.readingBorder.withValues(alpha: 0.4) : tokens.readingBorder),
+      );
     }
 
     Widget content = AnimatedContainer(
       duration: const Duration(milliseconds: 300),
-      padding: widget.padding,
+      padding: padding,
       decoration: BoxDecoration(
         color: fillColor,
         borderRadius: radius,
-        border: useBlur
-            ? null
-            : isDepth3D
-                ? Border.all(
-                    width: 1.0,
-                    color: appThemeResolved == AppThemeMode.priestlyPurple ? const Color(0xFFFFD700).withValues(alpha: 0.15)
-                        : appThemeResolved == AppThemeMode.galileeBlue ? const Color(0xFF88CCFF).withValues(alpha: 0.15)
-                        : appThemeResolved == AppThemeMode.scarletRed ? const Color(0xFFFF8888).withValues(alpha: 0.15)
-                        : isDarkBg
-                            ? Colors.white.withValues(alpha: 0.05)
-                            : Colors.black.withValues(alpha: 0.03),
-                  )
-                : Border.all(
-                    width: is3D ? 0.0 : 0.5,
-                    color: is3D ? Colors.transparent : tokens.readingBorder,
-                  ),
+        border: containerBorder,
       ),
-      child: finalChild,
+      child: child,
     );
 
-    if (useBlur) {
+    if (isSkeuomorphic) {
+      content = CustomPaint(
+        foregroundPainter: _SkeuomorphicPainter(
+          borderRadius: radius,
+          isDark: isDarkPanel,
+          baseColor: fillColor,
+        ),
+        child: content,
+      );
+    } else if (isClaymorphic) {
+      content = CustomPaint(
+        foregroundPainter: _ClaymorphicPainter(
+          borderRadius: radius,
+          isDark: isDarkPanel,
+          fillColor: fillColor,
+        ),
+        child: content,
+      );
+    } else if (isFrutigerAero) {
+      content = CustomPaint(
+        foregroundPainter: _FrutigerAeroPainter(
+          borderRadius: radius,
+          isDark: isDarkPanel,
+        ),
+        child: content,
+      );
+    } else if (useBlur) {
       content = CustomPaint(
         foregroundPainter: _RimAndNoisePainter(
           borderRadius: radius,
-          rimAlpha: isDepth3D ? rimAlpha * 0.5 : rimAlpha,
+          rimAlpha: rimAlpha,
           isDark: isDarkPanel,
         ),
         child: content,
       );
     }
 
-    Widget container = AnimatedContainer(
+    return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeOut,
-      margin: widget.margin,
+      margin: margin,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         borderRadius: radius,
@@ -385,43 +304,24 @@ class _TexturedGlassContainerState extends ConsumerState<TexturedGlassContainer>
         borderRadius: radius,
         clipBehavior: Clip.antiAlias,
         child: RepaintBoundary(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(
-              sigmaX: useBlur ? widget.sigmaX : 0.001,
-              sigmaY: useBlur ? widget.sigmaY : 0.001,
-            ),
-            child: content,
-          ),
+          child: (useBlur || isFrutigerAero)
+              ? BackdropFilter(
+                  filter: ImageFilter.blur(
+                    sigmaX: isFrutigerAero ? (isScrollable ? 0.001 : 16.0) : (useBlur ? sigmaX : 0.001),
+                    sigmaY: isFrutigerAero ? (isScrollable ? 0.001 : 16.0) : (useBlur ? sigmaY : 0.001),
+                  ),
+                  child: content,
+                )
+              : content,
         ),
       ),
     );
-
-    if (isDepth3D && useBlur && kEnable3DMotion) {
-      final maxTilt = 0.05;
-      final currentDx = _tiltOffset.dx * (1.0 - _tiltAnimation.value);
-      final currentDy = _tiltOffset.dy * (1.0 - _tiltAnimation.value);
-
-      final matrix = Matrix4.identity()
-        ..setEntry(3, 2, 0.001)
-        ..rotateX(-currentDy * maxTilt)
-        ..rotateY(currentDx * maxTilt);
-
-      return Listener(
-        behavior: HitTestBehavior.translucent,
-        onPointerMove: _onPointerMove,
-        onPointerUp: _onPointerUp,
-        onPointerCancel: _onPointerUp,
-        child: Transform(
-          transform: matrix,
-          alignment: Alignment.center,
-          child: container,
-        ),
-      );
-    }
-
-    return container;
   }
 }
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  PAINTERS
+// ══════════════════════════════════════════════════════════════════════════════
 
 class _RimAndNoisePainter extends CustomPainter {
   final BorderRadius borderRadius;
@@ -437,7 +337,6 @@ class _RimAndNoisePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final rrect = borderRadius.toRRect(Offset.zero & size);
-
     canvas.save();
     canvas.clipRRect(rrect);
 
@@ -502,4 +401,213 @@ class _RimAndNoisePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _RimAndNoisePainter old) =>
       old.rimAlpha != rimAlpha || old.isDark != isDark;
+}
+
+
+class _ClaymorphicPainter extends CustomPainter {
+  final BorderRadius borderRadius;
+  final bool isDark;
+  final Color fillColor;
+
+  _ClaymorphicPainter({
+    required this.borderRadius,
+    required this.isDark,
+    required this.fillColor,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rrect = borderRadius.toRRect(Offset.zero & size);
+    canvas.save();
+    canvas.clipRRect(rrect);
+
+    final topHighlightPaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          Colors.white.withValues(alpha: isDark ? 0.28 : 0.55),
+          Colors.white.withValues(alpha: 0.0),
+        ],
+        stops: const [0.0, 1.0],
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height * 0.50));
+    canvas.drawRRect(
+      borderRadius.toRRect(
+          Rect.fromLTWH(1.5, 1.5, size.width - 3, size.height - 3)),
+      topHighlightPaint,
+    );
+
+    final bottomShadowPaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.bottomCenter,
+        end: Alignment.topCenter,
+        colors: [
+          Colors.black.withValues(alpha: isDark ? 0.32 : 0.16),
+          Colors.transparent,
+        ],
+        stops: const [0.0, 1.0],
+      ).createShader(
+          Rect.fromLTWH(0, size.height * 0.55, size.width, size.height * 0.45));
+    canvas.drawRRect(rrect, bottomShadowPaint);
+
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _ClaymorphicPainter old) =>
+      old.isDark != isDark || old.fillColor != fillColor;
+}
+
+class _FrutigerAeroPainter extends CustomPainter {
+  final BorderRadius borderRadius;
+  final bool isDark;
+
+  _FrutigerAeroPainter({
+    required this.borderRadius,
+    required this.isDark,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rrect = borderRadius.toRRect(Offset.zero & size);
+    canvas.save();
+    canvas.clipRRect(rrect);
+
+    final glareRect = Rect.fromLTWH(
+      size.width * 0.08,
+      size.height * -0.1,
+      size.width * 0.84,
+      size.height * 0.52,
+    );
+    final glarePath = Path()..addOval(glareRect);
+    canvas.drawPath(
+      glarePath,
+      Paint()
+        ..shader = RadialGradient(
+          center: const Alignment(0.0, -0.4),
+          radius: 0.65,
+          colors: [
+            Colors.white.withValues(alpha: isDark ? 0.45 : 0.55),
+            Colors.white.withValues(alpha: isDark ? 0.08 : 0.12),
+            Colors.transparent,
+          ],
+          stops: const [0.0, 0.55, 1.0],
+        ).createShader(glareRect),
+    );
+
+    canvas.drawRRect(
+      rrect,
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white.withValues(alpha: isDark ? 0.12 : 0.22),
+            Colors.transparent,
+            Colors.lightBlue.withValues(alpha: isDark ? 0.06 : 0.10),
+          ],
+          stops: const [0.0, 0.45, 1.0],
+        ).createShader(Rect.fromLTWH(0, 0, size.width, size.height)),
+    );
+
+    canvas.drawRRect(
+      borderRadius.toRRect(
+          Rect.fromLTWH(0.75, 0.75, size.width - 1.5, size.height - 1.5)),
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Colors.white.withValues(alpha: isDark ? 0.55 : 0.70),
+            Colors.lightBlue.withValues(alpha: isDark ? 0.20 : 0.35),
+            Colors.cyan.withValues(alpha: 0.0),
+          ],
+          stops: const [0.0, 0.40, 1.0],
+        ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.5,
+    );
+
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _FrutigerAeroPainter old) =>
+      old.isDark != isDark;
+}
+
+class _SkeuomorphicPainter extends CustomPainter {
+  final BorderRadius borderRadius;
+  final bool isDark;
+  final Color baseColor;
+
+  _SkeuomorphicPainter({
+    required this.borderRadius,
+    required this.isDark,
+    required this.baseColor,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rrect = borderRadius.toRRect(Offset.zero & size);
+    canvas.save();
+    canvas.clipRRect(rrect);
+
+    final random = math.Random(12345);
+    final count = (size.width * size.height * 0.08).toInt().clamp(0, 15000);
+    final darkPoints = <Offset>[];
+    final lightPoints = <Offset>[];
+    for (int i = 0; i < count; i++) {
+      final x = random.nextDouble() * size.width;
+      final y = random.nextDouble() * size.height;
+      if (random.nextBool()) {
+        darkPoints.add(Offset(x, y));
+      } else {
+        lightPoints.add(Offset(x, y));
+      }
+    }
+    final noiseAlphaDark = isDark ? 0.08 : 0.04;
+    final noiseAlphaLight = isDark ? 0.04 : 0.15;
+    canvas.drawPoints(
+        PointMode.points,
+        darkPoints,
+        Paint()
+          ..color = Colors.black.withValues(alpha: noiseAlphaDark)
+          ..strokeWidth = 1.2);
+    canvas.drawPoints(
+        PointMode.points,
+        lightPoints,
+        Paint()
+          ..color = Colors.white.withValues(alpha: noiseAlphaLight)
+          ..strokeWidth = 1.2);
+
+    canvas.drawRRect(
+      rrect,
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white.withValues(alpha: isDark ? 0.10 : 0.35),
+            Colors.transparent,
+            Colors.black.withValues(alpha: isDark ? 0.40 : 0.05),
+          ],
+          stops: const [0.0, 0.4, 1.0],
+        ).createShader(Rect.fromLTWH(0, 0, size.width, size.height)),
+    );
+
+    canvas.drawRRect(
+      borderRadius.toRRect(
+          Rect.fromLTWH(1.5, 1.5, size.width - 3.0, size.height * 0.18)),
+      Paint()
+        ..color = Colors.white.withValues(alpha: isDark ? 0.12 : 0.40)
+        ..style = PaintingStyle.fill,
+    );
+
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _SkeuomorphicPainter old) =>
+      old.isDark != isDark || old.baseColor != baseColor;
 }

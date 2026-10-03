@@ -3,19 +3,22 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../state/wotd_provider.dart';
+import '../widgets/dictionary_entry_sheet.dart';
 
 import '../../data/models/home_data.dart';
 import '../../state/home_provider.dart';
 import '../../state/votd_tracker_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../state/nav_provider.dart';
+import '../../state/read_location_provider.dart';
 import '../widgets/shared_top_header.dart';
 import '../widgets/glass_container.dart';
 import '../widgets/bouncy_entrance.dart';
-import '../widgets/commentary_view.dart';
+import 'commentary_hub_screen.dart';
+import '../../state/commentary_provider.dart';
 import 'today_screen.dart';
 import '../../services/share_service.dart';
-import '../sheets/theme_picker_sheet.dart';
 
 class StrictHorizontalDragGestureRecognizer
     extends HorizontalDragGestureRecognizer {
@@ -58,13 +61,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   late final AnimationController _verseController;
   late final Animation<double> _verseFade;
 
-  bool _hasFiredArmedHaptic = false;
-  double _overscrollAccum = 0.0;
-  static const double _kOverscrollThreshold = 80.0;
-  
-  double _dragStartY = 0.0;
-  bool _isDragging = false;
-  final ScrollController _scrollController = ScrollController();
+
 
   @override
   void initState() {
@@ -89,7 +86,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   @override
   void dispose() {
     _verseController.dispose();
-    _scrollController.dispose();
     super.dispose();
   }
 
@@ -117,65 +113,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       ..onUpdate = (details) {}
                       ..onEnd = (details) {
                         if (details.primaryVelocity == null) return;
-                        if (details.primaryVelocity!.abs() > 300) {
-                          // Swipe Left/Right -> Appearance Sheet
-                          ThemePickerSheet.show(context);
+                        // Swipe Left → go to Read tab
+                        if (details.primaryVelocity! < -300) {
+                          HapticFeedback.selectionClick();
+                          ref.read(navProvider.notifier).setIndex(1);
                         }
                       };
                   },
                 ),
               },
-              child: Listener(
-                onPointerDown: (e) {
-                  _dragStartY = e.position.dy;
-                  _isDragging = true;
-                },
-                onPointerMove: (e) {
-                  if (!_isDragging) return;
-
-                  bool isAtTop = true;
-                  if (_scrollController.hasClients) {
-                    isAtTop = _scrollController.offset <= 16.0;
-                  }
-                  if (!isAtTop) return;
-
-                  final dy = e.position.dy - _dragStartY;
-                  if (dy < -10) {
-                    _isDragging = false;
-                    _overscrollAccum = 0.0;
-                    if (mounted) setState(() {});
-                    return;
-                  }
-                  
-                  // Map drag delta to overscroll accumulator for the indicator
-                  if (dy > 0) {
-                    _overscrollAccum = dy;
-                    if (_overscrollAccum >= _kOverscrollThreshold && !_hasFiredArmedHaptic) {
-                      _hasFiredArmedHaptic = true;
-                      HapticFeedback.mediumImpact();
-                    }
-                    if (mounted) setState(() {});
-                  }
-                },
-                onPointerUp: (e) {
-                  _isDragging = false;
-                  if (_overscrollAccum >= _kOverscrollThreshold) {
-                    ref.read(navProvider.notifier).setIndex(4); // 4 = Settings
-                  }
-                  _overscrollAccum = 0.0;
-                  _hasFiredArmedHaptic = false;
-                  if (mounted) setState(() {});
-                },
-                onPointerCancel: (e) {
-                  _isDragging = false;
-                  _overscrollAccum = 0.0;
-                  _hasFiredArmedHaptic = false;
-                  if (mounted) setState(() {});
+              child: RefreshIndicator.adaptive(
+                color: Theme.of(context).primaryColor,
+                backgroundColor: Theme.of(context).colorScheme.surface,
+                onRefresh: () async {
+                  // CMS: fetch remote content here in future
+                  await Future.delayed(const Duration(milliseconds: 500));
+                  ref.invalidate(homeProvider);
                 },
                 child: SingleChildScrollView(
-                  controller: _scrollController,
-                  physics: const BouncingScrollPhysics(
-                      parent: AlwaysScrollableScrollPhysics()),
+                  physics: const AlwaysScrollableScrollPhysics(),
                   child: FadeTransition(
                     opacity: _verseFade,
                     child: _buildPage(context, homeState, appThemeMode),
@@ -184,32 +140,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               ),
             ),
           ),
-          // Pull-to-Settings Indicator
-          if (_overscrollAccum > 0)
-            Positioned(
-              top: MediaQuery.paddingOf(context).top + 16,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Opacity(
-                  opacity: (_overscrollAccum / _kOverscrollThreshold)
-                      .clamp(0.0, 1.0),
-                  child: Transform.scale(
-                    scale: 0.5 +
-                        0.5 *
-                            (_overscrollAccum / _kOverscrollThreshold)
-                                .clamp(0.0, 1.0),
-                    child: Icon(
-                      Icons.settings_rounded,
-                      color: appThemeMode == AppThemeMode.dark
-                          ? Colors.white.withValues(alpha: 0.7)
-                          : Colors.black.withValues(alpha: 0.5),
-                      size: 28,
-                    ),
-                  ),
-                ),
-              ),
-            ),
         ],
       ),
     );
@@ -221,6 +151,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
     // Get dynamic commentary snippet for VOTD
     String? excerpt = data.verseOfTheDay.commentarySnippet;
+
+    // Parse VOTD reference for availability check
+    final votdRef = data.verseOfTheDay.reference;
+    final votdLastSpace = votdRef.lastIndexOf(' ');
+    final votdBook = votdLastSpace != -1 ? votdRef.substring(0, votdLastSpace) : votdRef;
+    final votdChapterStr = votdLastSpace != -1 ? votdRef.substring(votdLastSpace + 1).split(':').first : '1';
+    final votdChapter = int.tryParse(votdChapterStr) ?? 1;
+    final hasVotdCommentary = ref.watch(
+        commentaryForChapterProvider((votdBook, votdChapter)));
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -280,39 +219,58 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           const SizedBox(height: 56),
 
           // ── Verse of the Day ──────────────────────────────────────────
-          BouncyEntrance(
-            delay: const Duration(milliseconds: 100),
-            child: Text(
-              'VERSE OF THE DAY',
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.primaryColor,
-                letterSpacing: 2.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          BouncyEntrance(
-            delay: const Duration(milliseconds: 200),
-            child: Text(
-              '\u201c${data.verseOfTheDay.text}\u201d',
-              textAlign: TextAlign.center,
-              style: theme.textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                height: 1.42,
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          BouncyEntrance(
-            delay: const Duration(milliseconds: 300),
-            child: Text(
-              data.verseOfTheDay.reference,
-              style: theme.textTheme.titleSmall?.copyWith(
-                color: theme.primaryColor,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.5,
-              ),
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              final refParts = votdRef.split(':');
+              final verseNum = refParts.length > 1 ? int.tryParse(refParts.last) : 1;
+              openReaderAtVerse(
+                ref,
+                bookName: votdBook,
+                chapter: votdChapter,
+                verse: verseNum,
+              );
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                BouncyEntrance(
+                  delay: const Duration(milliseconds: 100),
+                  child: Text(
+                    'VERSE OF THE DAY',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.primaryColor,
+                      letterSpacing: 2.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                BouncyEntrance(
+                  delay: const Duration(milliseconds: 200),
+                  child: Text(
+                    '\u201c${data.verseOfTheDay.text}\u201d',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      height: 1.42,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                BouncyEntrance(
+                  delay: const Duration(milliseconds: 300),
+                  child: Text(
+                    data.verseOfTheDay.reference,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      color: theme.primaryColor,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
 
@@ -331,8 +289,40 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Commentary text excerpt (fallback to omitted if none exists)
+                  // Commentary / Devotional text excerpt (fallback to omitted if none exists)
                   if (excerpt != null) ...[
+                    Row(
+                      children: [
+                        Icon(
+                          data.verseOfTheDay.isDevotional
+                              ? Icons.favorite_rounded
+                              : Icons.library_books_rounded,
+                          size: 13,
+                          color: theme.primaryColor,
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            (data.verseOfTheDay.isDevotional
+                                    ? 'DEVOTIONAL'
+                                    : 'COMMENTARY') +
+                                (data.verseOfTheDay.author != null
+                                    ? ' · ${data.verseOfTheDay.author}'
+                                    : (data.verseOfTheDay.sourceTitle != null
+                                        ? ' · ${data.verseOfTheDay.sourceTitle}'
+                                        : '')),
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.8,
+                              color: theme.primaryColor,
+                              fontSize: 11,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
                     Text(
                       excerpt,
                       maxLines: 8,
@@ -346,43 +336,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     const SizedBox(height: 14),
                   ],
 
-                  // Primary action row: Go Deeper + Share
+                  // Primary action row: Go Deeper + Share + Bookmark
                   Row(
                     children: [
-                      Expanded(
-                        flex: 3,
-                        child: _PillButton(
-                          label: 'Go Deeper',
-                          filled: true,
-                          onPressed: () {
-                            final refStr = data.verseOfTheDay.reference;
-                            final lastSpaceIdx = refStr.lastIndexOf(' ');
-                            final bookName = lastSpaceIdx != -1
-                                ? refStr.substring(0, lastSpaceIdx)
-                                : refStr;
-                            final refParts = lastSpaceIdx != -1
-                                ? refStr.substring(lastSpaceIdx + 1).split(':')
-                                : [];
-                            final chapterNum = refParts.isNotEmpty
-                                ? (int.tryParse(refParts[0]) ?? 1)
-                                : 1;
-                            final verseNum = refParts.length > 1
-                                ? int.tryParse(refParts[1])
-                                : null;
+                      if (hasVotdCommentary)
+                        Expanded(
+                          flex: 3,
+                          child: _PillButton(
+                            label: 'Go Deeper',
+                            filled: true,
+                            onPressed: () {
+                              final refStr = data.verseOfTheDay.reference;
+                              final lastSpaceIdx = refStr.lastIndexOf(' ');
+                              final bookName = lastSpaceIdx != -1
+                                  ? refStr.substring(0, lastSpaceIdx)
+                                  : refStr;
+                              final refParts = lastSpaceIdx != -1
+                                  ? refStr.substring(lastSpaceIdx + 1).split(':')
+                                  : [];
+                              final chapterNum = refParts.isNotEmpty
+                                  ? (int.tryParse(refParts[0]) ?? 1)
+                                  : 1;
+                              final verseNum = refParts.length > 1
+                                  ? int.tryParse(refParts[1])
+                                  : null;
 
-                            Navigator.of(context).push(CupertinoPageRoute(
-                                builder: (_) => Scaffold(
-                                      body: CommentaryView(
+                              Navigator.of(context).push(CupertinoPageRoute(
+                                  builder: (_) => CommentaryHubScreen(
                                         book: bookName,
                                         chapter: chapterNum,
                                         verse: verseNum,
                                         verseText: data.verseOfTheDay.text,
-                                        isCompact: false,
-                                      ),
-                                    )));
-                          },
+                                      )));
+                            },
+                          ),
                         ),
-                      ),
                       const SizedBox(width: 10),
                       Expanded(
                         flex: 2,
@@ -396,6 +384,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           },
                         ),
                       ),
+
                     ],
                   ),
                 ],
@@ -405,41 +394,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
           const SizedBox(height: 16),
 
-          // ── Pill Watch & Listen Liquid Glass Buttons ──────────────
-          BouncyEntrance(
-            delay: const Duration(milliseconds: 500),
-            child: Row(
-              children: [
-                Expanded(
-                  child: _PillGlassButton(
-                    icon: Icons.play_arrow_rounded,
-                    label: 'Watch',
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text(
-                                'Media features coming in a future update')),
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _PillGlassButton(
-                    icon: Icons.headphones_rounded,
-                    label: 'Listen',
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text(
-                                'Media features coming in a future update')),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
+          // ── Word of the Day Section ──────────────
+          const WordOfTheDaySection(),
 
           // Clearance above the floating nav bar
           const SizedBox(height: 140),
@@ -516,51 +472,83 @@ class _PillButton extends StatelessWidget {
   }
 }
 
-// ── Pill Liquid Glass Button for Watch / Listen ─────────────────────
-class _PillGlassButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
 
-  const _PillGlassButton({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
+
+class WordOfTheDaySection extends ConsumerWidget {
+  const WordOfTheDaySection({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final gold = theme.primaryColor;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: SizedBox(
-        height: 48,
-        child: GlassContainer(
-          isScrollable: true,
-          borderRadius: BorderRadius.circular(50),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+    final wotdAsync = ref.watch(wordOfTheDayProvider);
+    
+    return wotdAsync.when(
+      data: (wotd) {
+        if (wotd == null) return const SizedBox.shrink();
+        
+        return BouncyEntrance(
+          delay: const Duration(milliseconds: 500),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                icon,
-                size: 20,
-                color: gold,
-              ),
-              const SizedBox(width: 8),
               Text(
-                label,
-                style: theme.textTheme.labelMedium?.copyWith(
+                'WORD OF THE DAY',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.primaryColor,
+                  letterSpacing: 2.0,
                   fontWeight: FontWeight.bold,
-                  color: gold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                wotd.word,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  height: 1.42,
+                ),
+              ),
+              const SizedBox(height: 16),
+              GlassContainer(
+                isScrollable: false,
+                borderRadius: BorderRadius.circular(24),
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      wotd.snippet,
+                      maxLines: 4,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        height: 1.60,
+                        color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.82),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    _PillButton(
+                      label: 'Read Full Definition',
+                      filled: true,
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (context) => DictionaryEntrySheet(normalizedWord: wotd.word.toLowerCase()),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-        ),
-      ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
     );
   }
 }

@@ -1,12 +1,11 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/local_storage/preferences_service.dart';
-import '../data/models/home_data.dart';
+import '../data/models/journal_entry.dart';
+import '../services/ai_journal_service.dart';
 
-/// Persists user journal entries to SharedPreferences.
-/// Journal entries are stored as JSON under the 'user_journal' key.
 class JournalNotifier extends Notifier<List<JournalEntry>> {
-  static const _key = 'user_journal';
+  static const _key = 'user_journal_entries';
 
   @override
   List<JournalEntry> build() {
@@ -31,19 +30,25 @@ class JournalNotifier extends Notifier<List<JournalEntry>> {
     ref.read(preferencesProvider).prefs.setString(_key, json);
   }
 
-  void add(JournalEntry entry) {
+  Future<void> add(String content) async {
+    final aiService = ref.read(aiJournalServiceProvider);
+    final reflection = await aiService.analyzeEntry(content);
+
+    final entry = JournalEntry(
+      date: DateTime.now().toIso8601String(),
+      content: content,
+      detectedEmotions: reflection.emotions,
+      prayerPoints: reflection.prayerPoints,
+      recommendedVerses: reflection.recommendedVerses,
+    );
+
     state = [entry, ...state];
     _save();
   }
 
-  void update(int index, JournalEntry entry) {
-    final copy = [...state];
-    copy[index] = entry;
-    state = copy;
-    _save();
-  }
-
-  void remove(int index) {
+  void remove(String id) {
+    final index = state.indexWhere((n) => n.id == id);
+    if (index == -1) return;
     final copy = [...state];
     copy.removeAt(index);
     state = copy;

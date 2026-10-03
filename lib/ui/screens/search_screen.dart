@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../sheets/search_settings_sheet.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/search_provider.dart';
 import '../../state/search_engine.dart';
@@ -8,8 +10,10 @@ import '../../state/read_location_provider.dart';
 import '../../state/surface_style_provider.dart';
 import '../../state/bible_provider.dart';
 import '../../state/search_settings_provider.dart';
+import '../widgets/dictionary_entry_sheet.dart';
 import '../../state/most_read_provider.dart';
-import '../../data/local_storage/preferences_service.dart';
+import 'package:flutter/services.dart';
+import '../../state/typography_provider.dart';
 import '../widgets/textured_glass_container.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
@@ -28,9 +32,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
-  bool _showSwipeHint = false;
-  double _dragStartY = 0;
-  bool _isDragging = false;
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -41,7 +42,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     );
     _focusNode = FocusNode();
     _focusNode.addListener(() {
-      if (mounted) setState(() {});
+      if (mounted) {
+        setState(() {});
+      }
     });
 
     _animationController = AnimationController(
@@ -58,12 +61,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-
-      final prefs = ref.read(preferencesProvider);
-      final seenHints = prefs.getSeenHints();
-      if (!seenHints.contains('search_swipe_hint')) {
-        setState(() => _showSwipeHint = true);
-      }
 
       _animationController.forward();
       _focusTimer = Timer(const Duration(milliseconds: 150), () {
@@ -87,7 +84,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     ref.read(searchStateProvider.notifier).addRecentPlace(result);
 
     if (result.type == SearchResultType.bible ||
-        result.type == SearchResultType.reference) {
+        result.type == SearchResultType.reference ||
+        result.type == SearchResultType.pericope) {
       ref.read(navProvider.notifier).setIndex(1);
       ref.read(readLocationProvider.notifier).updateLocation(
             bookAbbrev: result.metadata['bookAbbrev'],
@@ -95,10 +93,18 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
             chapter: result.metadata['chapter'],
             verse: result.metadata['verse'],
           );
+    } else if (result.type == SearchResultType.dictionary) {
+      final normWord = result.metadata['normalized_word'] as String;
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => DictionaryEntrySheet(normalizedWord: normWord),
+      );
     } else if (result.type == SearchResultType.commentary) {
       ref.read(navProvider.notifier).setIndex(1);
       final books = ref.read(bibleProvider).books;
-      final bookName = result.metadata['book'] as String;
+      final bookName = (result.metadata['bookName'] ?? result.metadata['book']) as String;
       final book = books.firstWhere((b) => b.name == bookName,
           orElse: () => books.first);
       ref.read(readLocationProvider.notifier).updateLocation(
@@ -108,6 +114,46 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
             verse: result.metadata['verse'],
             openCommentary: true,
           );
+    } else if (result.type == SearchResultType.note) {
+      final refStr = result.metadata['reference'] as String?;
+      if (refStr != null && refStr.isNotEmpty) {
+        // Try to parse reference to navigate to verse
+        final regex = RegExp(r'^((?:\d\s*)?[a-z]+(?:\s+[a-z]+)*)\s*(?:(\d+)[\s:.]*(\d+)?(?:-\d+)?)?$');
+        final match = regex.firstMatch(refStr.toLowerCase());
+        if (match != null) {
+          final bookStr = match.group(1)?.trim() ?? '';
+          final chapterStr = match.group(2);
+          final verseStr = match.group(3);
+          
+          final books = ref.read(bibleProvider).books;
+          for (final book in books) {
+            if (book.name.toLowerCase().startsWith(bookStr) || book.abbreviation.toLowerCase().startsWith(bookStr)) {
+              int chapter = 1;
+              if (chapterStr != null) {
+                chapter = int.tryParse(chapterStr) ?? 1;
+                if (verseStr == null && book.chapters.length == 1) {
+                  chapter = 1;
+                }
+              }
+              int? verse = verseStr != null ? int.tryParse(verseStr) : null;
+              if (chapterStr != null && verseStr == null && book.chapters.length == 1) {
+                verse = int.tryParse(chapterStr);
+              }
+              
+              ref.read(navProvider.notifier).setIndex(1);
+              ref.read(readLocationProvider.notifier).updateLocation(
+                bookAbbrev: book.abbreviation,
+                bookName: book.name,
+                chapter: chapter,
+                verse: verse,
+              );
+              return;
+            }
+          }
+        }
+      }
+      // If no valid reference or parsing failed, just go to Notes tab (Study)
+      ref.read(navProvider.notifier).setIndex(3);
     }
   }
 
@@ -115,7 +161,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
   Widget build(BuildContext context) {
     final searchState = ref.watch(searchStateProvider);
     final theme = Theme.of(context);
-    final isGlassy = ref.watch(surfaceStyleProvider) == SurfaceStyle.frosted;
+    final surfaceStyleVal = ref.watch(surfaceStyleProvider);
+    final isGlassy = surfaceStyleVal == SurfaceStyle.frosted || 
+                     surfaceStyleVal == SurfaceStyle.frutigerAero;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -128,45 +176,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
             child: Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 800),
-                child: Listener(
-                  onPointerDown: (e) {
-                    _dragStartY = e.position.dy;
-                    _isDragging = true;
-                  },
-                  onPointerMove: (e) {
-                    if (!_isDragging) return;
-
-                    bool isAtTop = true;
-                    if (_scrollController.hasClients) {
-                      isAtTop = _scrollController.offset <= 16.0;
-                    }
-
-                    if (!isAtTop) return;
-
-                    final dy = e.position.dy - _dragStartY;
-                    if (dy < -10) {
-                      _isDragging = false;
-                      return;
-                    }
-
-                    if (dy > 40) {
-                      _isDragging = false;
-                      if (!_focusNode.hasFocus) {
-                        _focusNode.requestFocus();
-                      }
-                      if (_showSwipeHint) {
-                        setState(() => _showSwipeHint = false);
-                        final prefs = ref.read(preferencesProvider);
-                        final seen = prefs.getSeenHints();
-                        if (!seen.contains('search_swipe_hint')) {
-                          prefs.saveSeenHints([...seen, 'search_swipe_hint']);
-                        }
-                      }
-                    }
-                  },
-                  onPointerUp: (e) => _isDragging = false,
-                  onPointerCancel: (e) => _isDragging = false,
-                  child: Column(
+                child: Column(
                     children: [
                       const SizedBox(height: 24),
 
@@ -294,26 +304,61 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         _buildFilterChip(
-                                          label: 'OT',
-                                          icon: Icons.history_edu_rounded,
-                                          isActive: searchState.filterOt,
-                                          onTap: () => ref
-                                              .read(
-                                                  searchStateProvider.notifier)
-                                              .toggleOtFilter(),
-                                          theme: theme,
-                                        ),
-                                        const SizedBox(width: 8),
-                                        _buildFilterChip(
-                                          label: 'NT',
+                                          label: searchState.filterBook ?? 'All Books',
                                           icon: Icons.menu_book_rounded,
-                                          isActive: searchState.filterNt,
-                                          onTap: () => ref
-                                              .read(
-                                                  searchStateProvider.notifier)
-                                              .toggleNtFilter(),
+                                          isActive: searchState.filterBook != null,
+                                          onTap: () async {
+                                            // Show book picker modal
+                                            if (searchState.filterBook != null) {
+                                              ref.read(searchStateProvider.notifier).setFilterBook(null);
+                                              return;
+                                            }
+                                            // Need a way to pick a book. 
+                                            // For simplicity, we could open a bottom sheet with a list of books.
+                                            // Actually, the SettingsSheet might be a better place. But since N2 asks for it, let's keep it simple.
+                                            // For now, let's just make it a chip that opens a modal.
+                                            final books = ref.read(bibleProvider).books;
+                                            showModalBottomSheet(
+                                              context: context,
+                                              backgroundColor: theme.scaffoldBackgroundColor,
+                                              builder: (ctx) => ListView.builder(
+                                                itemCount: books.length,
+                                                itemBuilder: (c, i) => ListTile(
+                                                  title: Text(books[i].name),
+                                                  onTap: () {
+                                                    ref.read(searchStateProvider.notifier).setFilterBook(books[i].name);
+                                                    Navigator.pop(ctx);
+                                                  },
+                                                ),
+                                              ),
+                                            );
+                                          },
                                           theme: theme,
                                         ),
+                                        if (searchState.filterBook == null) ...[
+                                          const SizedBox(width: 8),
+                                          _buildFilterChip(
+                                            label: 'OT',
+                                            icon: Icons.history_edu_rounded,
+                                            isActive: searchState.filterOt,
+                                            onTap: () => ref
+                                                .read(searchStateProvider.notifier)
+                                                .toggleOtFilter(),
+                                            theme: theme,
+                                          ),
+                                        ],
+                                        if (searchState.filterBook == null) ...[
+                                          const SizedBox(width: 8),
+                                          _buildFilterChip(
+                                            label: 'NT',
+                                            icon: Icons.menu_book_rounded,
+                                            isActive: searchState.filterNt,
+                                            onTap: () => ref
+                                                .read(searchStateProvider.notifier)
+                                                .toggleNtFilter(),
+                                            theme: theme,
+                                          ),
+                                        ],
                                         const SizedBox(width: 8),
                                         _buildFilterChip(
                                           label: 'Commentary',
@@ -327,15 +372,34 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                           theme: theme,
                                         ),
                                         const SizedBox(width: 8),
-                                        _buildFilterChip(
-                                          label: 'My Notes',
-                                          icon: Icons.sticky_note_2_outlined,
-                                          isActive: searchState.filterNotes,
-                                          onTap: () => ref
-                                              .read(
-                                                  searchStateProvider.notifier)
-                                              .toggleNotesFilter(),
-                                          theme: theme,
+                                        Consumer(builder: (context, ref, _) {
+                                          final includeNotes = ref.watch(searchSettingsProvider
+                                              .select((s) => s.includeNotesInSearch));
+                                          if (!includeNotes) return const SizedBox.shrink();
+                                          return _buildFilterChip(
+                                            label: 'My Notes',
+                                            icon: Icons.sticky_note_2_outlined,
+                                            isActive: searchState.filterNotes,
+                                            onTap: () => ref
+                                                .read(searchStateProvider.notifier)
+                                                .toggleNotesFilter(),
+                                            theme: theme,
+                                          );
+                                        }),
+                                        const SizedBox(width: 8),
+                                        IconButton(
+                                          icon: Icon(Icons.settings_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                                          iconSize: 20,
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                          constraints: const BoxConstraints(),
+                                          onPressed: () {
+                                            showModalBottomSheet(
+                                              context: context,
+                                              backgroundColor: Colors.transparent,
+                                              isScrollControlled: true,
+                                              builder: (context) => const SearchSettingsSheet(),
+                                            );
+                                          },
                                         ),
                                       ],
                                     ),
@@ -351,69 +415,20 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
 
                       // ── Results ────────────────────────────────────────────
                       Expanded(
-                        child: Stack(
-                          children: [
-                            searchState.query.isEmpty
-                                ? _buildRecentPlaces(searchState, theme)
-                                : _buildSearchResults(searchState, theme),
-                            Positioned(
-                              top: 16,
-                              left: 0,
-                              right: 0,
-                              child: IgnorePointer(
-                                child: AnimatedOpacity(
-                                  duration: const Duration(milliseconds: 300),
-                                  opacity: _showSwipeHint ? 1.0 : 0.0,
-                                  child: Center(
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 16, vertical: 8),
-                                      decoration: BoxDecoration(
-                                        color: theme.colorScheme.surface
-                                            .withValues(
-                                                alpha: isGlassy ? 0.7 : 1.0),
-                                        borderRadius: BorderRadius.circular(20),
-                                        border: Border.all(
-                                          color: theme.colorScheme.onSurface
-                                              .withValues(alpha: 0.1),
-                                        ),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black
-                                                .withValues(alpha: 0.05),
-                                            blurRadius: 10,
-                                          )
-                                        ],
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(
-                                              Icons.keyboard_arrow_down_rounded,
-                                              size: 16,
-                                              color: theme.colorScheme.onSurface
-                                                  .withValues(alpha: 0.6)),
-                                          const SizedBox(width: 8),
-                                          Text(
-                                            'Swipe down for keyboard',
-                                            style: theme.textTheme.labelMedium
-                                                ?.copyWith(
-                                              color: theme.colorScheme.onSurface
-                                                  .withValues(alpha: 0.6),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
+                        child: GestureDetector(
+                          onTap: () => FocusScope.of(context).unfocus(),
+                          behavior: HitTestBehavior.opaque,
+                          child: Stack(
+                            children: [
+                              searchState.query.isEmpty
+                                  ? _buildRecentPlaces(searchState, theme)
+                                  : _buildSearchResults(searchState, theme),
+
                           ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -476,7 +491,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     final mostRead = ref.watch(mostReadProvider);
     final showMostRead = mostRead.length >= 5;
 
-    if (state.recentPlaces.isEmpty && !showMostRead) {
+    if (state.recentPlaces.isEmpty && state.recentQueries.isEmpty && !showMostRead) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -502,11 +517,76 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
 
     return ListView(
       controller: _scrollController,
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
       children: [
+        if (state.recentQueries.isNotEmpty) ...[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'RECENT SEARCHES',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              GestureDetector(
+                onTap: () => ref.read(searchStateProvider.notifier).clearRecentQueries(),
+                child: Text(
+                  'CLEAR',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.primaryColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: state.recentQueries.map((query) => GestureDetector(
+              onTap: () {
+                _controller.text = query;
+                ref.read(searchStateProvider.notifier).setQuery(query);
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surface,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.history_rounded,
+                      size: 14,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      query,
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )).toList(),
+          ),
+          const SizedBox(height: 24),
+        ],
         if (state.recentPlaces.isNotEmpty) ...[
           Text(
-            'RECENT',
+            'RECENT PLACES',
             style: theme.textTheme.labelSmall?.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
               fontWeight: FontWeight.bold,
@@ -577,32 +657,63 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     final commentaryResults = state.results
         .where((r) => r.type == SearchResultType.commentary)
         .toList();
+    final dictionaryResults = state.results
+        .where((r) => r.type == SearchResultType.dictionary)
+        .toList();
     final noteResults =
         state.results.where((r) => r.type == SearchResultType.note).toList();
 
+    final pericopeResults = state.results
+        .where((r) => r.type == SearchResultType.pericope)
+        .toList();
+
     return ListView(
       controller: _scrollController,
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
       children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 16.0, left: 4.0),
+          child: Text(
+            state.results.length >= 100 ? 'Showing top 100 results' : '${state.results.length} results found',
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ),
+        if (dictionaryResults.isNotEmpty) ...[
+          _buildSectionHeader('DICTIONARY (${dictionaryResults.length})', theme),
+          ...dictionaryResults
+              .map((r) => _buildResultItem(r, theme, state.query)),
+          const SizedBox(height: 12),
+        ],
+
+        if (pericopeResults.isNotEmpty) ...[
+          _buildSectionHeader('STORIES (${pericopeResults.length})', theme),
+          ...pericopeResults
+              .map((r) => _buildResultItem(r, theme, state.query)),
+          const SizedBox(height: 12),
+        ],
         if (referenceResults.isNotEmpty) ...[
-          _buildSectionHeader('JUMP TO', theme),
+          _buildSectionHeader('JUMP TO (${referenceResults.length})', theme),
           ...referenceResults
               .map((r) => _buildResultItem(r, theme, state.query)),
           const SizedBox(height: 12),
         ],
         if (bibleResults.isNotEmpty) ...[
-          _buildSectionHeader('VERSES', theme),
+          _buildSectionHeader('VERSES (${bibleResults.length})', theme),
           ...bibleResults.map((r) => _buildResultItem(r, theme, state.query)),
           const SizedBox(height: 12),
         ],
         if (commentaryResults.isNotEmpty) ...[
-          _buildSectionHeader('COMMENTARY', theme),
+          _buildSectionHeader('COMMENTARY (${commentaryResults.length})', theme),
           ...commentaryResults
               .map((r) => _buildResultItem(r, theme, state.query)),
           const SizedBox(height: 12),
         ],
         if (noteResults.isNotEmpty) ...[
-          _buildSectionHeader('MY NOTES', theme),
+          _buildSectionHeader('MY NOTES (${noteResults.length})', theme),
           ...noteResults.map((r) => _buildResultItem(r, theme, state.query)),
           const SizedBox(height: 12),
         ],
@@ -635,6 +746,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
       icon = Icons.menu_book_rounded;
     } else if (result.type == SearchResultType.note) {
       icon = Icons.sticky_note_2_outlined;
+    } else if (result.type == SearchResultType.pericope) {
+      icon = Icons.auto_stories_rounded;
+    } else if (result.type == SearchResultType.dictionary) {
+      icon = Icons.import_contacts_rounded;
     } else {
       icon = Icons.library_books_rounded;
     }
@@ -643,6 +758,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
       padding: const EdgeInsets.only(bottom: 12.0),
       child: GestureDetector(
         onTap: () => _onResultTap(result),
+        onLongPress: () {
+          Clipboard.setData(ClipboardData(text: '${result.title}\n${result.snippet.replaceAll('...', '')}'));
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Copied to clipboard')),
+          );
+        },
         child: TexturedGlassContainer(
           isScrollable: true,
           borderRadius: BorderRadius.circular(20),
@@ -683,46 +804,65 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
   }
 
   Widget _buildSnippet(String text, String query, ThemeData theme) {
-    final style = theme.textTheme.bodyMedium?.copyWith(
+    final typography = ref.watch(typographyProvider);
+    
+    // Scale down the reading font size proportionally for list view (e.g. 80%)
+    // But keep a reasonable minimum size so it's readable.
+    final resultFontSize = (typography.fontSize * 0.85).clamp(14.0, 24.0);
+    
+    final baseStyle = theme.textTheme.bodyMedium?.copyWith(
       color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
       height: 1.5,
+      fontSize: resultFontSize,
+      fontFamily: typography.fontFamily,
+      fontStyle: typography.fontStyle,
     );
 
     if (query.isEmpty) {
       return Text(text,
-          style: style, maxLines: 2, overflow: TextOverflow.ellipsis);
+          style: baseStyle, maxLines: 2, overflow: TextOverflow.ellipsis);
     }
 
     final queryLower = query.toLowerCase();
     final textLower = text.toLowerCase();
-    final index = textLower.indexOf(queryLower);
-
-    if (index == -1) {
+    
+    if (!textLower.contains(queryLower)) {
       return Text(text,
-          style: style, maxLines: 2, overflow: TextOverflow.ellipsis);
+          style: baseStyle, maxLines: 2, overflow: TextOverflow.ellipsis);
     }
 
     final highlightColor = theme.brightness == Brightness.dark
         ? Colors.amberAccent
         : Colors.amber.shade800;
-    final highlightStyle = style?.copyWith(
+    final highlightStyle = baseStyle?.copyWith(
       color: highlightColor,
       fontWeight: FontWeight.bold,
       backgroundColor: highlightColor.withValues(alpha: 0.12),
     );
 
+    List<InlineSpan> spans = [];
+    int start = 0;
+    int idx;
+    
+    while ((idx = textLower.indexOf(queryLower, start)) != -1) {
+      if (idx > start) {
+        spans.add(TextSpan(text: text.substring(start, idx), style: baseStyle));
+      }
+      spans.add(TextSpan(
+          text: text.substring(idx, idx + query.length),
+          style: highlightStyle));
+      start = idx + query.length;
+    }
+    if (start < text.length) {
+      spans.add(TextSpan(text: text.substring(start), style: baseStyle));
+    }
+
     return RichText(
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
       text: TextSpan(
-        style: style,
-        children: [
-          TextSpan(text: text.substring(0, index)),
-          TextSpan(
-              text: text.substring(index, index + query.length),
-              style: highlightStyle),
-          TextSpan(text: text.substring(index + query.length)),
-        ],
+        style: baseStyle,
+        children: spans,
       ),
     );
   }

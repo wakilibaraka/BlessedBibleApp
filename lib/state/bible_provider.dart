@@ -42,22 +42,17 @@ class BibleNotifier extends Notifier<BibleState> {
       final jsonString =
           await rootBundle.loadString('assets/data/kjvbible.json');
       if (kStartupTrace) {
-        debugPrint(
-            'Bible JSON string loaded: ${startupStopwatch.elapsedMilliseconds} ms');
       }
 
       final booksList = await compute(parseBibleJson, jsonString);
       if (kStartupTrace) {
-        debugPrint(
-            'Bible data ready: ${startupStopwatch.elapsedMilliseconds} ms');
       }
 
       // Await DB copy/initialization so the splash screen stays active until DB is fully ready
       await bibleDbService.database;
       if (kStartupTrace) {
-        debugPrint(
-            'Database ready: ${startupStopwatch.elapsedMilliseconds} ms');
       }
+      
 
       state = state.copyWith(isLoading: false, books: booksList);
     } catch (e) {
@@ -72,8 +67,9 @@ final bibleProvider =
 
 class FlatChapter {
   final BibleBook book;
+  final int bookNumber;
   final BibleChapter chapter;
-  FlatChapter(this.book, this.chapter);
+  FlatChapter(this.book, this.bookNumber, this.chapter);
 }
 
 final flatChaptersProvider = Provider<List<FlatChapter>>((ref) {
@@ -81,9 +77,11 @@ final flatChaptersProvider = Provider<List<FlatChapter>>((ref) {
   if (bibleState.isLoading || bibleState.books.isEmpty) return [];
 
   List<FlatChapter> chapters = [];
-  for (final book in bibleState.books) {
+  for (int i = 0; i < bibleState.books.length; i++) {
+    final book = bibleState.books[i];
+    final bookNum = i + 1;
     for (final chapter in book.chapters) {
-      chapters.add(FlatChapter(book, chapter));
+      chapters.add(FlatChapter(book, bookNum, chapter));
     }
   }
   return chapters;

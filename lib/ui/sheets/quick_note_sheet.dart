@@ -61,6 +61,7 @@ class _QuickNoteSheetState extends ConsumerState<QuickNoteSheet> {
     final dateStamp = '$month ${now.day}, ${now.year} at $hour:$minute $ampm';
 
     final newNote = PersonalNote(
+      widget.initialNote?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
       title,
       body,
       dateStamp,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../state/theme_provider.dart';
-import '../sheets/theme_picker_sheet.dart';
+import '../sheets/appearance_settings_sheet.dart';
 
 class SharedTopHeader extends ConsumerWidget {
   final Widget? leading;
@@ -72,7 +72,7 @@ class SharedTopHeader extends ConsumerWidget {
     return Center(
       child: GestureDetector(
         onTap: () {
-          ThemePickerSheet.show(context);
+          AppearanceSettingsSheet.show(context, initialTab: AppearanceTab.theme);
         },
         child: AnimatedSwitcher(
           duration: const Duration(milliseconds: 350),

@@ -5,13 +5,17 @@ import '../../theme/reading_tokens.dart';
 import '../../state/commentary_provider.dart';
 import '../../state/bible_provider.dart';
 import '../../state/typography_provider.dart';
-
+import '../../state/user_data_provider.dart';
+import '../../state/translation_provider.dart';
+import '../../state/read_settings_provider.dart';
 import '../../state/theme_provider.dart';
+import '../screens/read_screen.dart' show VerseActionLogic;
 
 import '../../models/commentary_entry.dart';
+import '../../models/study_content_category.dart';
 
-import 'pinch_to_zoom_font_wrapper.dart';
 import '../screens/commentary_hub_screen.dart';
+import '../../state/read_location_provider.dart';
 
 class CommentaryView extends ConsumerStatefulWidget {
   final String book;
@@ -39,7 +43,9 @@ class CommentaryView extends ConsumerStatefulWidget {
 
 class _CommentaryViewState extends ConsumerState<CommentaryView> {
   bool _showChapter = false;
+  bool _userToggledChapter = false;
   bool _showBook = false;
+  bool _userToggledBook = false;
   int? _currentVerseNum;
   final Map<int, GlobalKey> _entryKeys = {};
 
@@ -93,16 +99,6 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
         appThemeMode == AppThemeMode.fresh;
 
     final chapterNum = widget.chapter;
-    final displayVerse = widget.verse ?? _currentVerseNum;
-
-    final referenceString = displayVerse != null
-        ? '$bookName $chapterNum:$displayVerse'
-        : '$bookName $chapterNum';
-
-    final isBookmarked = ref
-        .read(commentaryBookmarksProvider.notifier)
-        .isBookmarked(bookName, chapterNum, displayVerse);
-    final fetchedVerseText = _lookupVerseText(ref, displayVerse);
 
     List<CommentaryEntry> verseEntries = [];
     List<CommentaryEntry> chapterEntries = [];
@@ -119,15 +115,135 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
         commentaryNotifier.commentaryForChapter(bookName, chapterNum);
     bookEntries = commentaryNotifier.commentaryForBook(bookName);
 
+    // Eagerly resolve the initial verse if missing, without mutating state during build
+    final displayVerse = widget.verse ??
+        _currentVerseNum ??
+        (verseEntries.isNotEmpty ? verseEntries.first.scope.verse : null);
+
+    if (_currentVerseNum == null && displayVerse != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _currentVerseNum == null) {
+          setState(() {
+            _currentVerseNum = displayVerse;
+          });
+        }
+      });
+    }
+
+    final panelBackgroundColor = widget.isCompact
+        ? (theme.bottomSheetTheme.backgroundColor ??
+            (is3DTheme ? theme.colorScheme.surface : tokens.readingSurface))
+        : theme.scaffoldBackgroundColor;
+
+    final referenceString = displayVerse != null
+        ? '$bookName $chapterNum:$displayVerse'
+        : '$bookName $chapterNum';
+
+    final isBookmarked = displayVerse != null 
+        ? ref.watch(bookmarksProvider).any((b) => b.endsWith('_$chapterNum:$displayVerse'))
+        : ref.watch(bookmarksProvider).any((b) => b.endsWith('_$chapterNum:1'));
+    final fallbackVerseText = _lookupVerseText(ref, displayVerse);
+    String? finalVerseText = fallbackVerseText;
+    
+    final settings = ref.watch(readSettingsProvider);
+    final activeTransId = ref.watch(activeTranslationProvider);
+    
+    if (settings.syncSavedItemsLanguage && activeTransId != 'kjv' && displayVerse != null) {
+      final bibleState = ref.watch(bibleProvider);
+      int? bookNum;
+      try {
+        final b = bibleState.books.firstWhere(
+          (b) => b.name.toLowerCase() == widget.book.toLowerCase() ||
+                 b.abbreviation.toLowerCase() == widget.book.toLowerCase(),
+        );
+        bookNum = bibleState.books.indexOf(b) + 1;
+      } catch (_) {}
+      
+      if (bookNum != null) {
+        final request = (
+          translationId: activeTransId,
+          bookNumber: bookNum,
+          chapter: chapterNum,
+          verse: displayVerse
+        );
+        final verseAsync = ref.watch(verseTranslationProvider(request));
+        finalVerseText = verseAsync.value?.text ?? fallbackVerseText;
+      }
+    }
+
     final hasContent = verseEntries.isNotEmpty ||
         chapterEntries.isNotEmpty ||
         bookEntries.isNotEmpty;
 
-    return PinchToZoomFontWrapper(
-      child: Stack(
-        children: [
-          // Base: Scrollable Content
-          _buildScrollableContent(
+    return Column(
+      children: [
+        // 1. OPAQUE HEADER ZONE
+        Container(
+          color: panelBackgroundColor,
+          padding: EdgeInsets.only(
+            top: widget.isCompact ? 16 : MediaQuery.paddingOf(context).top + 16,
+            left: 16,
+            right: 16,
+            bottom: 12,
+          ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: IconButton(
+                  icon: Icon(Icons.arrow_back_ios_new_rounded, color: theme.primaryColor),
+                  onPressed: () => Navigator.pop(context),
+                  tooltip: 'Back',
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(color: tokens.readingAccent.withValues(alpha: 0.5)),
+                ),
+                child: Text(
+                  referenceString,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: tokens.readingAccent,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded,
+                        color: isBookmarked ? tokens.readingAccent : tokens.readingInkMuted,
+                      ),
+                      tooltip: isBookmarked ? 'Remove Bookmark' : 'Bookmark Commentary',
+                      onPressed: () {
+                        VerseActionLogic.handleBookmark(context, theme, ref, bookName, chapterNum, [displayVerse ?? 1]);
+                      },
+                    ),
+                    if (widget.onExpand != null)
+                      IconButton(
+                        icon: Icon(Icons.open_in_full_rounded, color: tokens.readingAccent, size: 20),
+                        tooltip: 'Expand to full screen',
+                        onPressed: widget.onExpand,
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        
+        // Base: Scrollable Content
+        Expanded(
+          child: _buildScrollableContent(
               verseEntries,
               chapterEntries,
               bookEntries,
@@ -136,167 +252,14 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
               theme,
               tokens,
               is3DTheme,
-              typography),
-
-          // Floating Top Header
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Container(
-                    margin: EdgeInsets.only(
-                      top: widget.isCompact
-                          ? 16
-                          : MediaQuery.paddingOf(context).top + 16,
-                    ),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: is3DTheme
-                          ? theme.colorScheme.surface
-                          : theme.scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(
-                        color: tokens.readingInkMuted.withValues(alpha: 0.15),
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.08),
-                          blurRadius: 20,
-                          offset: const Offset(0, 8),
-                        )
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        // 1. TOP ROW
-                        Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: IconButton(
-                                icon: Icon(Icons.arrow_back_ios_new_rounded,
-                                    color: theme.primaryColor),
-                                onPressed: () {
-                                  if (widget.isCompact) {
-                                    Navigator.pop(context);
-                                  } else {
-                                    Navigator.pop(context);
-                                  }
-                                },
-                                tooltip: 'Back',
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                borderRadius: BorderRadius.circular(30),
-                                border: Border.all(
-                                    color: tokens.readingAccent
-                                        .withValues(alpha: 0.5)),
-                              ),
-                              child: Text(
-                                referenceString,
-                                style: theme.textTheme.titleSmall?.copyWith(
-                                  color: tokens.readingAccent,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                            ),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: Icon(
-                                      isBookmarked
-                                          ? Icons.bookmark_rounded
-                                          : Icons.bookmark_outline_rounded,
-                                      color: isBookmarked
-                                          ? tokens.readingAccent
-                                          : tokens.readingInkMuted,
-                                    ),
-                                    tooltip: isBookmarked
-                                        ? 'Remove Bookmark'
-                                        : 'Bookmark Commentary',
-                                    onPressed: () {
-                                      ref
-                                          .read(commentaryBookmarksProvider
-                                              .notifier)
-                                          .toggleBookmark(
-                                              bookName, chapterNum, displayVerse);
-                                    },
-                                  ),
-                                  if (widget.onExpand != null)
-                                    IconButton(
-                                      icon: Icon(
-                                        Icons.open_in_full_rounded,
-                                        color: tokens.readingAccent,
-                                        size: 20,
-                                      ),
-                                      tooltip: 'Expand to full screen',
-                                      onPressed: widget.onExpand,
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // 2. FLOATING VERSE CARD
-                if (fetchedVerseText != null)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Container(
-                      margin: const EdgeInsets.only(top: 12),
-                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-                    decoration: BoxDecoration(
-                      color: is3DTheme
-                          ? theme.colorScheme.surface
-                          : theme.scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(
-                          color:
-                              tokens.readingInkMuted.withValues(alpha: 0.15)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.08),
-                          blurRadius: 20,
-                          offset: const Offset(0, 8),
-                        )
-                      ],
-                    ),
-                    child: Text(
-                      '\u201c$fetchedVerseText\u201d',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        height: 1.42,
-                        fontSize: typography.fontSize * 1.05,
-                        fontFamily: typography.fontFamily,
-                        color: tokens.readingInk,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              typography,
+              finalVerseText,
+              bookName,
+              chapterNum,
+              displayVerse,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -310,6 +273,10 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
     ReadingTokens tokens,
     bool is3DTheme,
     TypographyState typography,
+    String? finalVerseText,
+    String bookName,
+    int chapterNum,
+    int? displayVerse,
   ) {
     return NotificationListener<ScrollNotification>(
       onNotification: (scrollNotification) {
@@ -349,14 +316,78 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
       child: CustomScrollView(
         controller: widget.scrollController,
         slivers: [
-          // Spacer for floating header
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: widget.isCompact
-                  ? 240.0
-                  : MediaQuery.paddingOf(context).top + 240.0,
+          // Verse Card (Scrolls with content)
+          if (finalVerseText != null)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                child: GestureDetector(
+                  onTap: () {
+                    // Dismiss commentary hub back to root
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                    // Jump to verse in main reader
+                    openReaderAtVerse(
+                      ref,
+                      bookName: bookName,
+                      chapter: chapterNum,
+                      verse: displayVerse,
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+                    decoration: BoxDecoration(
+                      color: tokens.readingSurface,
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                          color: tokens.readingInkMuted.withValues(alpha: 0.15)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.08),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
+                        )
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '\u201c$finalVerseText\u201d',
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            height: 1.42,
+                            fontSize: typography.fontSize * 1.05,
+                            fontFamily: typography.fontFamily,
+                            fontStyle: typography.fontStyle,
+                            color: tokens.readingInk,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Tap to read in context',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: tokens.readingInkMuted.withValues(alpha: 0.6),
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Icon(
+                              Icons.open_in_new_rounded,
+                              size: 12,
+                              color: tokens.readingInkMuted.withValues(alpha: 0.6),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
-          ),
           if (commentaryAsync.isLoading)
             const SliverToBoxAdapter(
               child: Padding(
@@ -394,10 +425,14 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                   theme: theme,
                   tokens: tokens,
                   title: 'On this chapter',
-                  isExpanded: _showChapter,
+                  isExpanded: _userToggledChapter ? _showChapter : (verseEntries.isEmpty || _showChapter),
                   entries: chapterEntries,
                   typography: typography,
-                  onToggle: () => setState(() => _showChapter = !_showChapter),
+                  onToggle: () => setState(() {
+                    final currentlyExpanded = _userToggledChapter ? _showChapter : (verseEntries.isEmpty || _showChapter);
+                    _userToggledChapter = true;
+                    _showChapter = !currentlyExpanded;
+                  }),
                 ),
               ),
             if (bookEntries.isNotEmpty)
@@ -406,10 +441,14 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                   theme: theme,
                   tokens: tokens,
                   title: 'On this book',
-                  isExpanded: _showBook,
+                  isExpanded: _userToggledBook ? _showBook : (verseEntries.isEmpty && chapterEntries.isEmpty || _showBook),
                   entries: bookEntries,
                   typography: typography,
-                  onToggle: () => setState(() => _showBook = !_showBook),
+                  onToggle: () => setState(() {
+                    final currentlyExpanded = _userToggledBook ? _showBook : (verseEntries.isEmpty && chapterEntries.isEmpty || _showBook);
+                    _userToggledBook = true;
+                    _showBook = !currentlyExpanded;
+                  }),
                 ),
               ),
           ],
@@ -516,49 +555,109 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
 
   Widget _buildEntryCard(ThemeData theme, ReadingTokens tokens,
       CommentaryEntry entry, TypographyState typography) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+    final isDevotional = entry.category == StudyContentCategory.devotional;
+    final isStudyNote = entry.category == StudyContentCategory.studyNote;
+    
+    final bgColor = isDevotional 
+        ? tokens.readingAccent.withValues(alpha: 0.05) 
+        : isStudyNote 
+            ? tokens.readingInkMuted.withValues(alpha: 0.05)
+            : Colors.transparent;
+            
+    final border = isDevotional 
+        ? Border.all(color: tokens.readingAccent.withValues(alpha: 0.2)) 
+        : null;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      padding: const EdgeInsets.all(20.0),
+      decoration: BoxDecoration(
+        color: bgColor,
+        border: border,
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: _buildEntryContent(theme, tokens, entry, typography),
     );
+  }
+
+  List<TextSpan> _parseMarkdown(String text, TextStyle? baseStyle) {
+    final spans = <TextSpan>[];
+    final RegExp exp = RegExp(r'\*\*(.*?)\*\*');
+    int start = 0;
+    
+    for (final match in exp.allMatches(text)) {
+      if (match.start > start) {
+        spans.add(TextSpan(text: text.substring(start, match.start)));
+      }
+      spans.add(TextSpan(
+        text: match.group(1),
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ));
+      start = match.end;
+    }
+    
+    if (start < text.length) {
+      spans.add(TextSpan(text: text.substring(start)));
+    }
+    
+    return spans;
   }
 
   Widget _buildEntryContent(ThemeData theme, ReadingTokens tokens,
       CommentaryEntry entry, TypographyState typography) {
     final paragraphs = entry.text.split('\n\n');
+    final isDevotional = entry.category == StudyContentCategory.devotional;
+    final isStudyNote = entry.category == StudyContentCategory.studyNote;
+
+    final baseStyle = theme.textTheme.bodyLarge?.copyWith(
+      fontSize: typography.fontSize,
+      height: typography.lineHeight,
+      fontFamily: typography.fontFamily,
+      fontStyle: typography.fontStyle,
+      color: tokens.readingInk,
+    );
+
+    IconData sourceIcon = Icons.library_books_rounded;
+    if (isDevotional) sourceIcon = Icons.favorite_rounded;
+    if (isStudyNote) sourceIcon = Icons.edit_note_rounded;
 
     return SelectionArea(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            children: [
+              Icon(sourceIcon, size: 16, color: tokens.readingAccent),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  entry.source.isNotEmpty ? entry.source : 'Commentary',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.1,
+                    color: tokens.readingAccent,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Text(
+                entry.author,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: tokens.readingInkMuted,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
           ...paragraphs.map((p) => Padding(
                 padding: const EdgeInsets.only(bottom: 16.0),
-                child: Text(
-                  p.trim(),
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    fontSize: typography.fontSize,
-                    height: typography.lineHeight,
-                    fontFamily: typography.fontFamily,
-                    color: tokens.readingInk,
+                child: RichText(
+                  text: TextSpan(
+                    style: baseStyle,
+                    children: _parseMarkdown(p.trim(), baseStyle),
                   ),
                 ),
               )),
-          const Divider(height: 24),
-          Text(
-            entry.author,
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: tokens.readingAccent,
-            ),
-          ),
-          if (entry.source.isNotEmpty) ...[
-            const SizedBox(height: 2),
-            Text(
-              entry.source,
-              style: theme.textTheme.labelMedium?.copyWith(
-                color: tokens.readingInkMuted,
-              ),
-            ),
-          ],
         ],
       ),
     );

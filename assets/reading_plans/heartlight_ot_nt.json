@@ -1,0 +1,7227 @@
+{
+  "title": "Heartlight Old & New Testament",
+  "id": "heartlight_ot_nt",
+  "description": "Harmonious parallel daily reading pairing Old Testament narrative with New Testament revelation.",
+  "category": "Whole Bible",
+  "badge": "2 Passages/day",
+  "totalDays": 365,
+  "readings": [
+    {
+      "day": 1,
+      "week": 1,
+      "title": "Genesis 1-3, Matthew 1",
+      "passages": [
+        {
+          "label": "Genesis 1-3",
+          "refs": [
+            "Genesis 1-3"
+          ]
+        },
+        {
+          "label": "Matthew 1",
+          "refs": [
+            "Matthew 1"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 2,
+      "week": 1,
+      "title": "Genesis 4-6, Matthew 2",
+      "passages": [
+        {
+          "label": "Genesis 4-6",
+          "refs": [
+            "Genesis 4-6"
+          ]
+        },
+        {
+          "label": "Matthew 2",
+          "refs": [
+            "Matthew 2"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 3,
+      "week": 1,
+      "title": "Genesis 7-9, Matthew 3",
+      "passages": [
+        {
+          "label": "Genesis 7-9",
+          "refs": [
+            "Genesis 7-9"
+          ]
+        },
+        {
+          "label": "Matthew 3",
+          "refs": [
+            "Matthew 3"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 4,
+      "week": 1,
+      "title": "Genesis 10-12, Matthew 4",
+      "passages": [
+        {
+          "label": "Genesis 10-12",
+          "refs": [
+            "Genesis 10-12"
+          ]
+        },
+        {
+          "label": "Matthew 4",
+          "refs": [
+            "Matthew 4"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 5,
+      "week": 1,
+      "title": "Genesis 13-15, Matthew 5:1-26",
+      "passages": [
+        {
+          "label": "Genesis 13-15",
+          "refs": [
+            "Genesis 13-15"
+          ]
+        },
+        {
+          "label": "Matthew 5:1-26",
+          "refs": [
+            "Matthew 5:1-26"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 6,
+      "week": 1,
+      "title": "Genesis 16-17, Matthew 5:27-48",
+      "passages": [
+        {
+          "label": "Genesis 16-17",
+          "refs": [
+            "Genesis 16-17"
+          ]
+        },
+        {
+          "label": "Matthew 5:27-48",
+          "refs": [
+            "Matthew 5:27-48"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 7,
+      "week": 1,
+      "title": "Genesis 18-19, Matthew 6:1-18",
+      "passages": [
+        {
+          "label": "Genesis 18-19",
+          "refs": [
+            "Genesis 18-19"
+          ]
+        },
+        {
+          "label": "Matthew 6:1-18",
+          "refs": [
+            "Matthew 6:1-18"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 8,
+      "week": 2,
+      "title": "Genesis 20-22, Matthew 6:19-34",
+      "passages": [
+        {
+          "label": "Genesis 20-22",
+          "refs": [
+            "Genesis 20-22"
+          ]
+        },
+        {
+          "label": "Matthew 6:19-34",
+          "refs": [
+            "Matthew 6:19-34"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 9,
+      "week": 2,
+      "title": "Job 1-2, Matthew 7",
+      "passages": [
+        {
+          "label": "Job 1-2",
+          "refs": [
+            "Job 1-2"
+          ]
+        },
+        {
+          "label": "Matthew 7",
+          "refs": [
+            "Matthew 7"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 10,
+      "week": 2,
+      "title": "Job 3-4, Matthew 8:1-17",
+      "passages": [
+        {
+          "label": "Job 3-4",
+          "refs": [
+            "Job 3-4"
+          ]
+        },
+        {
+          "label": "Matthew 8:1-17",
+          "refs": [
+            "Matthew 8:1-17"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 11,
+      "week": 2,
+      "title": "Job 5-7, Matthew 8:18-34",
+      "passages": [
+        {
+          "label": "Job 5-7",
+          "refs": [
+            "Job 5-7"
+          ]
+        },
+        {
+          "label": "Matthew 8:18-34",
+          "refs": [
+            "Matthew 8:18-34"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 12,
+      "week": 2,
+      "title": "Job 8-10, Matthew 9:1-17",
+      "passages": [
+        {
+          "label": "Job 8-10",
+          "refs": [
+            "Job 8-10"
+          ]
+        },
+        {
+          "label": "Matthew 9:1-17",
+          "refs": [
+            "Matthew 9:1-17"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 13,
+      "week": 2,
+      "title": "Job 11-13, Matthew 9:18-38",
+      "passages": [
+        {
+          "label": "Job 11-13",
+          "refs": [
+            "Job 11-13"
+          ]
+        },
+        {
+          "label": "Matthew 9:18-38",
+          "refs": [
+            "Matthew 9:18-38"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 14,
+      "week": 2,
+      "title": "Job 14-16, Matthew 10:1-20",
+      "passages": [
+        {
+          "label": "Job 14-16",
+          "refs": [
+            "Job 14-16"
+          ]
+        },
+        {
+          "label": "Matthew 10:1-20",
+          "refs": [
+            "Matthew 10:1-20"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 15,
+      "week": 3,
+      "title": "Job 17-19, Matthew 10:21-42",
+      "passages": [
+        {
+          "label": "Job 17-19",
+          "refs": [
+            "Job 17-19"
+          ]
+        },
+        {
+          "label": "Matthew 10:21-42",
+          "refs": [
+            "Matthew 10:21-42"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 16,
+      "week": 3,
+      "title": "Job 20-21, Matthew 11",
+      "passages": [
+        {
+          "label": "Job 20-21",
+          "refs": [
+            "Job 20-21"
+          ]
+        },
+        {
+          "label": "Matthew 11",
+          "refs": [
+            "Matthew 11"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 17,
+      "week": 3,
+      "title": "Job 22-24, Matthew 12:1-23",
+      "passages": [
+        {
+          "label": "Job 22-24",
+          "refs": [
+            "Job 22-24"
+          ]
+        },
+        {
+          "label": "Matthew 12:1-23",
+          "refs": [
+            "Matthew 12:1-23"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 18,
+      "week": 3,
+      "title": "Job 25-27, Matthew 12:24-50",
+      "passages": [
+        {
+          "label": "Job 25-27",
+          "refs": [
+            "Job 25-27"
+          ]
+        },
+        {
+          "label": "Matthew 12:24-50",
+          "refs": [
+            "Matthew 12:24-50"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 19,
+      "week": 3,
+      "title": "Job 28-29, Matthew 13:1-30",
+      "passages": [
+        {
+          "label": "Job 28-29",
+          "refs": [
+            "Job 28-29"
+          ]
+        },
+        {
+          "label": "Matthew 13:1-30",
+          "refs": [
+            "Matthew 13:1-30"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 20,
+      "week": 3,
+      "title": "Job 30-31, Matthew 13:31-58",
+      "passages": [
+        {
+          "label": "Job 30-31",
+          "refs": [
+            "Job 30-31"
+          ]
+        },
+        {
+          "label": "Matthew 13:31-58",
+          "refs": [
+            "Matthew 13:31-58"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 21,
+      "week": 3,
+      "title": "Job 32-33, Matthew 14:1-21",
+      "passages": [
+        {
+          "label": "Job 32-33",
+          "refs": [
+            "Job 32-33"
+          ]
+        },
+        {
+          "label": "Matthew 14:1-21",
+          "refs": [
+            "Matthew 14:1-21"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 22,
+      "week": 4,
+      "title": "Job 34-35, Matthew 14:22-36",
+      "passages": [
+        {
+          "label": "Job 34-35",
+          "refs": [
+            "Job 34-35"
+          ]
+        },
+        {
+          "label": "Matthew 14:22-36",
+          "refs": [
+            "Matthew 14:22-36"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 23,
+      "week": 4,
+      "title": "Job 36-37, Matthew 15:1-20",
+      "passages": [
+        {
+          "label": "Job 36-37",
+          "refs": [
+            "Job 36-37"
+          ]
+        },
+        {
+          "label": "Matthew 15:1-20",
+          "refs": [
+            "Matthew 15:1-20"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 24,
+      "week": 4,
+      "title": "Job 38-40, Matthew 15:21-39",
+      "passages": [
+        {
+          "label": "Job 38-40",
+          "refs": [
+            "Job 38-40"
+          ]
+        },
+        {
+          "label": "Matthew 15:21-39",
+          "refs": [
+            "Matthew 15:21-39"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 25,
+      "week": 4,
+      "title": "Job 41-42, Matthew 16",
+      "passages": [
+        {
+          "label": "Job 41-42",
+          "refs": [
+            "Job 41-42"
+          ]
+        },
+        {
+          "label": "Matthew 16",
+          "refs": [
+            "Matthew 16"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 26,
+      "week": 4,
+      "title": "Genesis 23-24, Matthew 17",
+      "passages": [
+        {
+          "label": "Genesis 23-24",
+          "refs": [
+            "Genesis 23-24"
+          ]
+        },
+        {
+          "label": "Matthew 17",
+          "refs": [
+            "Matthew 17"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 27,
+      "week": 4,
+      "title": "Genesis 25-26, Matthew 18:1-20",
+      "passages": [
+        {
+          "label": "Genesis 25-26",
+          "refs": [
+            "Genesis 25-26"
+          ]
+        },
+        {
+          "label": "Matthew 18:1-20",
+          "refs": [
+            "Matthew 18:1-20"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 28,
+      "week": 4,
+      "title": "Genesis 27-28, Matthew 18:21-35",
+      "passages": [
+        {
+          "label": "Genesis 27-28",
+          "refs": [
+            "Genesis 27-28"
+          ]
+        },
+        {
+          "label": "Matthew 18:21-35",
+          "refs": [
+            "Matthew 18:21-35"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 29,
+      "week": 5,
+      "title": "Genesis 29-30, Matthew 19",
+      "passages": [
+        {
+          "label": "Genesis 29-30",
+          "refs": [
+            "Genesis 29-30"
+          ]
+        },
+        {
+          "label": "Matthew 19",
+          "refs": [
+            "Matthew 19"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 30,
+      "week": 5,
+      "title": "Genesis 31-32, Matthew 20:1-16",
+      "passages": [
+        {
+          "label": "Genesis 31-32",
+          "refs": [
+            "Genesis 31-32"
+          ]
+        },
+        {
+          "label": "Matthew 20:1-16",
+          "refs": [
+            "Matthew 20:1-16"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 31,
+      "week": 5,
+      "title": "Genesis 33-35, Matthew 20:17-34",
+      "passages": [
+        {
+          "label": "Genesis 33-35",
+          "refs": [
+            "Genesis 33-35"
+          ]
+        },
+        {
+          "label": "Matthew 20:17-34",
+          "refs": [
+            "Matthew 20:17-34"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 32,
+      "week": 5,
+      "title": "Genesis 36-38, Matthew 21:1-22",
+      "passages": [
+        {
+          "label": "Genesis 36-38",
+          "refs": [
+            "Genesis 36-38"
+          ]
+        },
+        {
+          "label": "Matthew 21:1-22",
+          "refs": [
+            "Matthew 21:1-22"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 33,
+      "week": 5,
+      "title": "Genesis 39-40, Matthew 21:23-46",
+      "passages": [
+        {
+          "label": "Genesis 39-40",
+          "refs": [
+            "Genesis 39-40"
+          ]
+        },
+        {
+          "label": "Matthew 21:23-46",
+          "refs": [
+            "Matthew 21:23-46"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 34,
+      "week": 5,
+      "title": "Genesis 41-42, Matthew 22:1-22",
+      "passages": [
+        {
+          "label": "Genesis 41-42",
+          "refs": [
+            "Genesis 41-42"
+          ]
+        },
+        {
+          "label": "Matthew 22:1-22",
+          "refs": [
+            "Matthew 22:1-22"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 35,
+      "week": 5,
+      "title": "Genesis 43-45, Matthew 22:23-46",
+      "passages": [
+        {
+          "label": "Genesis 43-45",
+          "refs": [
+            "Genesis 43-45"
+          ]
+        },
+        {
+          "label": "Matthew 22:23-46",
+          "refs": [
+            "Matthew 22:23-46"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 36,
+      "week": 6,
+      "title": "Genesis 46-48, Matthew 23:1-22",
+      "passages": [
+        {
+          "label": "Genesis 46-48",
+          "refs": [
+            "Genesis 46-48"
+          ]
+        },
+        {
+          "label": "Matthew 23:1-22",
+          "refs": [
+            "Matthew 23:1-22"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 37,
+      "week": 6,
+      "title": "Genesis 49-50, Matthew 23:23-29",
+      "passages": [
+        {
+          "label": "Genesis 49-50",
+          "refs": [
+            "Genesis 49-50"
+          ]
+        },
+        {
+          "label": "Matthew 23:23-29",
+          "refs": [
+            "Matthew 23:23-29"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 38,
+      "week": 6,
+      "title": "Exodus 1-3, Matthew 24:1-28",
+      "passages": [
+        {
+          "label": "Exodus 1-3",
+          "refs": [
+            "Exodus 1-3"
+          ]
+        },
+        {
+          "label": "Matthew 24:1-28",
+          "refs": [
+            "Matthew 24:1-28"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 39,
+      "week": 6,
+      "title": "Exodus 4-6, Matthew 24:29-51",
+      "passages": [
+        {
+          "label": "Exodus 4-6",
+          "refs": [
+            "Exodus 4-6"
+          ]
+        },
+        {
+          "label": "Matthew 24:29-51",
+          "refs": [
+            "Matthew 24:29-51"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 40,
+      "week": 6,
+      "title": "Exodus 7-8, Matthew 25:1-30",
+      "passages": [
+        {
+          "label": "Exodus 7-8",
+          "refs": [
+            "Exodus 7-8"
+          ]
+        },
+        {
+          "label": "Matthew 25:1-30",
+          "refs": [
+            "Matthew 25:1-30"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 41,
+      "week": 6,
+      "title": "Exodus 9-11, Matthew 25:31-46",
+      "passages": [
+        {
+          "label": "Exodus 9-11",
+          "refs": [
+            "Exodus 9-11"
+          ]
+        },
+        {
+          "label": "Matthew 25:31-46",
+          "refs": [
+            "Matthew 25:31-46"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 42,
+      "week": 6,
+      "title": "Exodus 12-13, Matthew 26:1-35",
+      "passages": [
+        {
+          "label": "Exodus 12-13",
+          "refs": [
+            "Exodus 12-13"
+          ]
+        },
+        {
+          "label": "Matthew 26:1-35",
+          "refs": [
+            "Matthew 26:1-35"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 43,
+      "week": 7,
+      "title": "Exodus 14-15, Matthew 26:36-75",
+      "passages": [
+        {
+          "label": "Exodus 14-15",
+          "refs": [
+            "Exodus 14-15"
+          ]
+        },
+        {
+          "label": "Matthew 26:36-75",
+          "refs": [
+            "Matthew 26:36-75"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 44,
+      "week": 7,
+      "title": "Exodus 16-18, Matthew 27:1-26",
+      "passages": [
+        {
+          "label": "Exodus 16-18",
+          "refs": [
+            "Exodus 16-18"
+          ]
+        },
+        {
+          "label": "Matthew 27:1-26",
+          "refs": [
+            "Matthew 27:1-26"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 45,
+      "week": 7,
+      "title": "Exodus 19-20, Matthew 27:27-50",
+      "passages": [
+        {
+          "label": "Exodus 19-20",
+          "refs": [
+            "Exodus 19-20"
+          ]
+        },
+        {
+          "label": "Matthew 27:27-50",
+          "refs": [
+            "Matthew 27:27-50"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 46,
+      "week": 7,
+      "title": "Exodus 21-22, Matthew 27:51-66",
+      "passages": [
+        {
+          "label": "Exodus 21-22",
+          "refs": [
+            "Exodus 21-22"
+          ]
+        },
+        {
+          "label": "Matthew 27:51-66",
+          "refs": [
+            "Matthew 27:51-66"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 47,
+      "week": 7,
+      "title": "Exodus 23-24, Matthew 28",
+      "passages": [
+        {
+          "label": "Exodus 23-24",
+          "refs": [
+            "Exodus 23-24"
+          ]
+        },
+        {
+          "label": "Matthew 28",
+          "refs": [
+            "Matthew 28"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 48,
+      "week": 7,
+      "title": "Exodus 25-26, Mark 1:1-22",
+      "passages": [
+        {
+          "label": "Exodus 25-26",
+          "refs": [
+            "Exodus 25-26"
+          ]
+        },
+        {
+          "label": "Mark 1:1-22",
+          "refs": [
+            "Mark 1:1-22"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 49,
+      "week": 7,
+      "title": "Exodus 27-28, Mark 1:23-45",
+      "passages": [
+        {
+          "label": "Exodus 27-28",
+          "refs": [
+            "Exodus 27-28"
+          ]
+        },
+        {
+          "label": "Mark 1:23-45",
+          "refs": [
+            "Mark 1:23-45"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 50,
+      "week": 8,
+      "title": "Exodus 29-30, Mark 2",
+      "passages": [
+        {
+          "label": "Exodus 29-30",
+          "refs": [
+            "Exodus 29-30"
+          ]
+        },
+        {
+          "label": "Mark 2",
+          "refs": [
+            "Mark 2"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 51,
+      "week": 8,
+      "title": "Exodus 31-33, Mark 3:1-19",
+      "passages": [
+        {
+          "label": "Exodus 31-33",
+          "refs": [
+            "Exodus 31-33"
+          ]
+        },
+        {
+          "label": "Mark 3:1-19",
+          "refs": [
+            "Mark 3:1-19"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 52,
+      "week": 8,
+      "title": "Exodus 34-35, Mark 3:20-35",
+      "passages": [
+        {
+          "label": "Exodus 34-35",
+          "refs": [
+            "Exodus 34-35"
+          ]
+        },
+        {
+          "label": "Mark 3:20-35",
+          "refs": [
+            "Mark 3:20-35"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 53,
+      "week": 8,
+      "title": "Exodus 36-38, Mark 4:1-20",
+      "passages": [
+        {
+          "label": "Exodus 36-38",
+          "refs": [
+            "Exodus 36-38"
+          ]
+        },
+        {
+          "label": "Mark 4:1-20",
+          "refs": [
+            "Mark 4:1-20"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 54,
+      "week": 8,
+      "title": "Exodus 39-40, Mark 4:21-41",
+      "passages": [
+        {
+          "label": "Exodus 39-40",
+          "refs": [
+            "Exodus 39-40"
+          ]
+        },
+        {
+          "label": "Mark 4:21-41",
+          "refs": [
+            "Mark 4:21-41"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 55,
+      "week": 8,
+      "title": "Psalms 90, Leviticus 1-2 (+1 more)",
+      "passages": [
+        {
+          "label": "Psalms 90",
+          "refs": [
+            "Psalms 90"
+          ]
+        },
+        {
+          "label": "Leviticus 1-2",
+          "refs": [
+            "Leviticus 1-2"
+          ]
+        },
+        {
+          "label": "Mark 5:1-20",
+          "refs": [
+            "Mark 5:1-20"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 56,
+      "week": 8,
+      "title": "Leviticus 3-5, Mark 5:21-43",
+      "passages": [
+        {
+          "label": "Leviticus 3-5",
+          "refs": [
+            "Leviticus 3-5"
+          ]
+        },
+        {
+          "label": "Mark 5:21-43",
+          "refs": [
+            "Mark 5:21-43"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 57,
+      "week": 9,
+      "title": "Leviticus 6-7, Mark 6:1-29",
+      "passages": [
+        {
+          "label": "Leviticus 6-7",
+          "refs": [
+            "Leviticus 6-7"
+          ]
+        },
+        {
+          "label": "Mark 6:1-29",
+          "refs": [
+            "Mark 6:1-29"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 58,
+      "week": 9,
+      "title": "Leviticus 8-10, Mark 6:30-56",
+      "passages": [
+        {
+          "label": "Leviticus 8-10",
+          "refs": [
+            "Leviticus 8-10"
+          ]
+        },
+        {
+          "label": "Mark 6:30-56",
+          "refs": [
+            "Mark 6:30-56"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 59,
+      "week": 9,
+      "title": "Leviticus 11-12, Mark 7:1-13",
+      "passages": [
+        {
+          "label": "Leviticus 11-12",
+          "refs": [
+            "Leviticus 11-12"
+          ]
+        },
+        {
+          "label": "Mark 7:1-13",
+          "refs": [
+            "Mark 7:1-13"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 60,
+      "week": 9,
+      "title": "Leviticus 13, Mark 7:14-37",
+      "passages": [
+        {
+          "label": "Leviticus 13",
+          "refs": [
+            "Leviticus 13"
+          ]
+        },
+        {
+          "label": "Mark 7:14-37",
+          "refs": [
+            "Mark 7:14-37"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 61,
+      "week": 9,
+      "title": "Leviticus 14, Mark 8:1-21",
+      "passages": [
+        {
+          "label": "Leviticus 14",
+          "refs": [
+            "Leviticus 14"
+          ]
+        },
+        {
+          "label": "Mark 8:1-21",
+          "refs": [
+            "Mark 8:1-21"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 62,
+      "week": 9,
+      "title": "Leviticus 15-16, Mark 8:22-38",
+      "passages": [
+        {
+          "label": "Leviticus 15-16",
+          "refs": [
+            "Leviticus 15-16"
+          ]
+        },
+        {
+          "label": "Mark 8:22-38",
+          "refs": [
+            "Mark 8:22-38"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 63,
+      "week": 9,
+      "title": "Leviticus 17-18, Mark 9:1-29",
+      "passages": [
+        {
+          "label": "Leviticus 17-18",
+          "refs": [
+            "Leviticus 17-18"
+          ]
+        },
+        {
+          "label": "Mark 9:1-29",
+          "refs": [
+            "Mark 9:1-29"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 64,
+      "week": 10,
+      "title": "Leviticus 19-20, Mark 9:30-50",
+      "passages": [
+        {
+          "label": "Leviticus 19-20",
+          "refs": [
+            "Leviticus 19-20"
+          ]
+        },
+        {
+          "label": "Mark 9:30-50",
+          "refs": [
+            "Mark 9:30-50"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 65,
+      "week": 10,
+      "title": "Leviticus 21-22, Mark 10:1-31",
+      "passages": [
+        {
+          "label": "Leviticus 21-22",
+          "refs": [
+            "Leviticus 21-22"
+          ]
+        },
+        {
+          "label": "Mark 10:1-31",
+          "refs": [
+            "Mark 10:1-31"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 66,
+      "week": 10,
+      "title": "Leviticus 23-24, Mark 10:32-52",
+      "passages": [
+        {
+          "label": "Leviticus 23-24",
+          "refs": [
+            "Leviticus 23-24"
+          ]
+        },
+        {
+          "label": "Mark 10:32-52",
+          "refs": [
+            "Mark 10:32-52"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 67,
+      "week": 10,
+      "title": "Leviticus 25, Mark 11:1-18",
+      "passages": [
+        {
+          "label": "Leviticus 25",
+          "refs": [
+            "Leviticus 25"
+          ]
+        },
+        {
+          "label": "Mark 11:1-18",
+          "refs": [
+            "Mark 11:1-18"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 68,
+      "week": 10,
+      "title": "Leviticus 26-27, Mark 11:19-33",
+      "passages": [
+        {
+          "label": "Leviticus 26-27",
+          "refs": [
+            "Leviticus 26-27"
+          ]
+        },
+        {
+          "label": "Mark 11:19-33",
+          "refs": [
+            "Mark 11:19-33"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 69,
+      "week": 10,
+      "title": "Numbers 1-2, Mark 12:1-27",
+      "passages": [
+        {
+          "label": "Numbers 1-2",
+          "refs": [
+            "Numbers 1-2"
+          ]
+        },
+        {
+          "label": "Mark 12:1-27",
+          "refs": [
+            "Mark 12:1-27"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 70,
+      "week": 10,
+      "title": "Numbers 3-4, Mark 12:28-44",
+      "passages": [
+        {
+          "label": "Numbers 3-4",
+          "refs": [
+            "Numbers 3-4"
+          ]
+        },
+        {
+          "label": "Mark 12:28-44",
+          "refs": [
+            "Mark 12:28-44"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 71,
+      "week": 11,
+      "title": "Numbers 5-6, Mark 13:1-20",
+      "passages": [
+        {
+          "label": "Numbers 5-6",
+          "refs": [
+            "Numbers 5-6"
+          ]
+        },
+        {
+          "label": "Mark 13:1-20",
+          "refs": [
+            "Mark 13:1-20"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 72,
+      "week": 11,
+      "title": "Numbers 7-8, Mark 13:21-37",
+      "passages": [
+        {
+          "label": "Numbers 7-8",
+          "refs": [
+            "Numbers 7-8"
+          ]
+        },
+        {
+          "label": "Mark 13:21-37",
+          "refs": [
+            "Mark 13:21-37"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 73,
+      "week": 11,
+      "title": "Numbers 9-11, Mark 14:1-26",
+      "passages": [
+        {
+          "label": "Numbers 9-11",
+          "refs": [
+            "Numbers 9-11"
+          ]
+        },
+        {
+          "label": "Mark 14:1-26",
+          "refs": [
+            "Mark 14:1-26"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 74,
+      "week": 11,
+      "title": "Numbers 12-14, Mark 14:27-53",
+      "passages": [
+        {
+          "label": "Numbers 12-14",
+          "refs": [
+            "Numbers 12-14"
+          ]
+        },
+        {
+          "label": "Mark 14:27-53",
+          "refs": [
+            "Mark 14:27-53"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 75,
+      "week": 11,
+      "title": "Numbers 15-16, Mark 14:54-72",
+      "passages": [
+        {
+          "label": "Numbers 15-16",
+          "refs": [
+            "Numbers 15-16"
+          ]
+        },
+        {
+          "label": "Mark 14:54-72",
+          "refs": [
+            "Mark 14:54-72"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 76,
+      "week": 11,
+      "title": "Numbers 17-19, Mark 15:1-25",
+      "passages": [
+        {
+          "label": "Numbers 17-19",
+          "refs": [
+            "Numbers 17-19"
+          ]
+        },
+        {
+          "label": "Mark 15:1-25",
+          "refs": [
+            "Mark 15:1-25"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 77,
+      "week": 11,
+      "title": "Numbers 20-22, Mark 15:26-47",
+      "passages": [
+        {
+          "label": "Numbers 20-22",
+          "refs": [
+            "Numbers 20-22"
+          ]
+        },
+        {
+          "label": "Mark 15:26-47",
+          "refs": [
+            "Mark 15:26-47"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 78,
+      "week": 12,
+      "title": "Numbers 23-25, Mark 16",
+      "passages": [
+        {
+          "label": "Numbers 23-25",
+          "refs": [
+            "Numbers 23-25"
+          ]
+        },
+        {
+          "label": "Mark 16",
+          "refs": [
+            "Mark 16"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 79,
+      "week": 12,
+      "title": "Numbers 26-27, Luke 1:1-20",
+      "passages": [
+        {
+          "label": "Numbers 26-27",
+          "refs": [
+            "Numbers 26-27"
+          ]
+        },
+        {
+          "label": "Luke 1:1-20",
+          "refs": [
+            "Luke 1:1-20"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 80,
+      "week": 12,
+      "title": "Numbers 28-30, Luke 1:21-38",
+      "passages": [
+        {
+          "label": "Numbers 28-30",
+          "refs": [
+            "Numbers 28-30"
+          ]
+        },
+        {
+          "label": "Luke 1:21-38",
+          "refs": [
+            "Luke 1:21-38"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 81,
+      "week": 12,
+      "title": "Numbers 31-33, Luke 1:39-56",
+      "passages": [
+        {
+          "label": "Numbers 31-33",
+          "refs": [
+            "Numbers 31-33"
+          ]
+        },
+        {
+          "label": "Luke 1:39-56",
+          "refs": [
+            "Luke 1:39-56"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 82,
+      "week": 12,
+      "title": "Numbers 34-36, Luke 1:57-80",
+      "passages": [
+        {
+          "label": "Numbers 34-36",
+          "refs": [
+            "Numbers 34-36"
+          ]
+        },
+        {
+          "label": "Luke 1:57-80",
+          "refs": [
+            "Luke 1:57-80"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 83,
+      "week": 12,
+      "title": "Deuteronomy 1-2, Luke 2:1-24",
+      "passages": [
+        {
+          "label": "Deuteronomy 1-2",
+          "refs": [
+            "Deuteronomy 1-2"
+          ]
+        },
+        {
+          "label": "Luke 2:1-24",
+          "refs": [
+            "Luke 2:1-24"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 84,
+      "week": 12,
+      "title": "Deuteronomy 3-4, Luke 2:25-52",
+      "passages": [
+        {
+          "label": "Deuteronomy 3-4",
+          "refs": [
+            "Deuteronomy 3-4"
+          ]
+        },
+        {
+          "label": "Luke 2:25-52",
+          "refs": [
+            "Luke 2:25-52"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 85,
+      "week": 13,
+      "title": "Deuteronomy 5-7, Luke 3",
+      "passages": [
+        {
+          "label": "Deuteronomy 5-7",
+          "refs": [
+            "Deuteronomy 5-7"
+          ]
+        },
+        {
+          "label": "Luke 3",
+          "refs": [
+            "Luke 3"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 86,
+      "week": 13,
+      "title": "Deuteronomy 8-10, Luke 4:1-30",
+      "passages": [
+        {
+          "label": "Deuteronomy 8-10",
+          "refs": [
+            "Deuteronomy 8-10"
+          ]
+        },
+        {
+          "label": "Luke 4:1-30",
+          "refs": [
+            "Luke 4:1-30"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 87,
+      "week": 13,
+      "title": "Deuteronomy 11-13, Luke 4:31-44",
+      "passages": [
+        {
+          "label": "Deuteronomy 11-13",
+          "refs": [
+            "Deuteronomy 11-13"
+          ]
+        },
+        {
+          "label": "Luke 4:31-44",
+          "refs": [
+            "Luke 4:31-44"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 88,
+      "week": 13,
+      "title": "Deuteronomy 14-16, Luke 5:1-16",
+      "passages": [
+        {
+          "label": "Deuteronomy 14-16",
+          "refs": [
+            "Deuteronomy 14-16"
+          ]
+        },
+        {
+          "label": "Luke 5:1-16",
+          "refs": [
+            "Luke 5:1-16"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 89,
+      "week": 13,
+      "title": "Deuteronomy 17-19, Luke 5:17-39",
+      "passages": [
+        {
+          "label": "Deuteronomy 17-19",
+          "refs": [
+            "Deuteronomy 17-19"
+          ]
+        },
+        {
+          "label": "Luke 5:17-39",
+          "refs": [
+            "Luke 5:17-39"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 90,
+      "week": 13,
+      "title": "Deuteronomy 20-22, Luke 6:1-26",
+      "passages": [
+        {
+          "label": "Deuteronomy 20-22",
+          "refs": [
+            "Deuteronomy 20-22"
+          ]
+        },
+        {
+          "label": "Luke 6:1-26",
+          "refs": [
+            "Luke 6:1-26"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 91,
+      "week": 13,
+      "title": "Deuteronomy 23-25, Luke 6:27-49",
+      "passages": [
+        {
+          "label": "Deuteronomy 23-25",
+          "refs": [
+            "Deuteronomy 23-25"
+          ]
+        },
+        {
+          "label": "Luke 6:27-49",
+          "refs": [
+            "Luke 6:27-49"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 92,
+      "week": 14,
+      "title": "Deuteronomy 26-27, Luke 7:1-30",
+      "passages": [
+        {
+          "label": "Deuteronomy 26-27",
+          "refs": [
+            "Deuteronomy 26-27"
+          ]
+        },
+        {
+          "label": "Luke 7:1-30",
+          "refs": [
+            "Luke 7:1-30"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 93,
+      "week": 14,
+      "title": "Deuteronomy 28-29, Luke 7:31-50",
+      "passages": [
+        {
+          "label": "Deuteronomy 28-29",
+          "refs": [
+            "Deuteronomy 28-29"
+          ]
+        },
+        {
+          "label": "Luke 7:31-50",
+          "refs": [
+            "Luke 7:31-50"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 94,
+      "week": 14,
+      "title": "Deuteronomy 30-31, Luke 8:1-25",
+      "passages": [
+        {
+          "label": "Deuteronomy 30-31",
+          "refs": [
+            "Deuteronomy 30-31"
+          ]
+        },
+        {
+          "label": "Luke 8:1-25",
+          "refs": [
+            "Luke 8:1-25"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 95,
+      "week": 14,
+      "title": "Deuteronomy 32-34, Luke 8:26-56",
+      "passages": [
+        {
+          "label": "Deuteronomy 32-34",
+          "refs": [
+            "Deuteronomy 32-34"
+          ]
+        },
+        {
+          "label": "Luke 8:26-56",
+          "refs": [
+            "Luke 8:26-56"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 96,
+      "week": 14,
+      "title": "Joshua 1-3, Luke 9:1-17",
+      "passages": [
+        {
+          "label": "Joshua 1-3",
+          "refs": [
+            "Joshua 1-3"
+          ]
+        },
+        {
+          "label": "Luke 9:1-17",
+          "refs": [
+            "Luke 9:1-17"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 97,
+      "week": 14,
+      "title": "Joshua 4-6, Luke 9:18-36",
+      "passages": [
+        {
+          "label": "Joshua 4-6",
+          "refs": [
+            "Joshua 4-6"
+          ]
+        },
+        {
+          "label": "Luke 9:18-36",
+          "refs": [
+            "Luke 9:18-36"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 98,
+      "week": 14,
+      "title": "Joshua 7-9, Luke 9:37-62",
+      "passages": [
+        {
+          "label": "Joshua 7-9",
+          "refs": [
+            "Joshua 7-9"
+          ]
+        },
+        {
+          "label": "Luke 9:37-62",
+          "refs": [
+            "Luke 9:37-62"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 99,
+      "week": 15,
+      "title": "Joshua 10-12, Luke 10:1-24",
+      "passages": [
+        {
+          "label": "Joshua 10-12",
+          "refs": [
+            "Joshua 10-12"
+          ]
+        },
+        {
+          "label": "Luke 10:1-24",
+          "refs": [
+            "Luke 10:1-24"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 100,
+      "week": 15,
+      "title": "Joshua 13-15, Luke 10:25-42",
+      "passages": [
+        {
+          "label": "Joshua 13-15",
+          "refs": [
+            "Joshua 13-15"
+          ]
+        },
+        {
+          "label": "Luke 10:25-42",
+          "refs": [
+            "Luke 10:25-42"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 101,
+      "week": 15,
+      "title": "Joshua 16-18, Luke 11:1-28",
+      "passages": [
+        {
+          "label": "Joshua 16-18",
+          "refs": [
+            "Joshua 16-18"
+          ]
+        },
+        {
+          "label": "Luke 11:1-28",
+          "refs": [
+            "Luke 11:1-28"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 102,
+      "week": 15,
+      "title": "Joshua 19-21, Luke 11:29-54",
+      "passages": [
+        {
+          "label": "Joshua 19-21",
+          "refs": [
+            "Joshua 19-21"
+          ]
+        },
+        {
+          "label": "Luke 11:29-54",
+          "refs": [
+            "Luke 11:29-54"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 103,
+      "week": 15,
+      "title": "Joshua 22-24, Luke 12:1-31",
+      "passages": [
+        {
+          "label": "Joshua 22-24",
+          "refs": [
+            "Joshua 22-24"
+          ]
+        },
+        {
+          "label": "Luke 12:1-31",
+          "refs": [
+            "Luke 12:1-31"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 104,
+      "week": 15,
+      "title": "Judges 1-3, Luke 12:32-59",
+      "passages": [
+        {
+          "label": "Judges 1-3",
+          "refs": [
+            "Judges 1-3"
+          ]
+        },
+        {
+          "label": "Luke 12:32-59",
+          "refs": [
+            "Luke 12:32-59"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 105,
+      "week": 15,
+      "title": "Judges 4-6, Luke 13:1-22",
+      "passages": [
+        {
+          "label": "Judges 4-6",
+          "refs": [
+            "Judges 4-6"
+          ]
+        },
+        {
+          "label": "Luke 13:1-22",
+          "refs": [
+            "Luke 13:1-22"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 106,
+      "week": 16,
+      "title": "Judges 7-8, Luke 13:23-35",
+      "passages": [
+        {
+          "label": "Judges 7-8",
+          "refs": [
+            "Judges 7-8"
+          ]
+        },
+        {
+          "label": "Luke 13:23-35",
+          "refs": [
+            "Luke 13:23-35"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 107,
+      "week": 16,
+      "title": "Judges 9-10, Luke 14:1-24",
+      "passages": [
+        {
+          "label": "Judges 9-10",
+          "refs": [
+            "Judges 9-10"
+          ]
+        },
+        {
+          "label": "Luke 14:1-24",
+          "refs": [
+            "Luke 14:1-24"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 108,
+      "week": 16,
+      "title": "Judges 11-12, Luke 14:25-35",
+      "passages": [
+        {
+          "label": "Judges 11-12",
+          "refs": [
+            "Judges 11-12"
+          ]
+        },
+        {
+          "label": "Luke 14:25-35",
+          "refs": [
+            "Luke 14:25-35"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 109,
+      "week": 16,
+      "title": "Judges 13-15, Luke 15:1-10",
+      "passages": [
+        {
+          "label": "Judges 13-15",
+          "refs": [
+            "Judges 13-15"
+          ]
+        },
+        {
+          "label": "Luke 15:1-10",
+          "refs": [
+            "Luke 15:1-10"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 110,
+      "week": 16,
+      "title": "Judges 16-18, Luke 15:11-32",
+      "passages": [
+        {
+          "label": "Judges 16-18",
+          "refs": [
+            "Judges 16-18"
+          ]
+        },
+        {
+          "label": "Luke 15:11-32",
+          "refs": [
+            "Luke 15:11-32"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 111,
+      "week": 16,
+      "title": "Judges 19-21, Luke 16",
+      "passages": [
+        {
+          "label": "Judges 19-21",
+          "refs": [
+            "Judges 19-21"
+          ]
+        },
+        {
+          "label": "Luke 16",
+          "refs": [
+            "Luke 16"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 112,
+      "week": 16,
+      "title": "Ruth 1-4, Luke 17:1-19",
+      "passages": [
+        {
+          "label": "Ruth 1-4",
+          "refs": [
+            "Ruth 1-4"
+          ]
+        },
+        {
+          "label": "Luke 17:1-19",
+          "refs": [
+            "Luke 17:1-19"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 113,
+      "week": 17,
+      "title": "1 Samuel 1-3, Luke 17:20-37",
+      "passages": [
+        {
+          "label": "1 Samuel 1-3",
+          "refs": [
+            "1 Samuel 1-3"
+          ]
+        },
+        {
+          "label": "Luke 17:20-37",
+          "refs": [
+            "Luke 17:20-37"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 114,
+      "week": 17,
+      "title": "1 Samuel 4-6, Luke 18:1-23",
+      "passages": [
+        {
+          "label": "1 Samuel 4-6",
+          "refs": [
+            "1 Samuel 4-6"
+          ]
+        },
+        {
+          "label": "Luke 18:1-23",
+          "refs": [
+            "Luke 18:1-23"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 115,
+      "week": 17,
+      "title": "1 Samuel 7-9, Luke 18:24-43",
+      "passages": [
+        {
+          "label": "1 Samuel 7-9",
+          "refs": [
+            "1 Samuel 7-9"
+          ]
+        },
+        {
+          "label": "Luke 18:24-43",
+          "refs": [
+            "Luke 18:24-43"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 116,
+      "week": 17,
+      "title": "1 Samuel 10-12, Luke 19:1-27",
+      "passages": [
+        {
+          "label": "1 Samuel 10-12",
+          "refs": [
+            "1 Samuel 10-12"
+          ]
+        },
+        {
+          "label": "Luke 19:1-27",
+          "refs": [
+            "Luke 19:1-27"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 117,
+      "week": 17,
+      "title": "1 Samuel 13-14, Luke 19:28-48",
+      "passages": [
+        {
+          "label": "1 Samuel 13-14",
+          "refs": [
+            "1 Samuel 13-14"
+          ]
+        },
+        {
+          "label": "Luke 19:28-48",
+          "refs": [
+            "Luke 19:28-48"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 118,
+      "week": 17,
+      "title": "1 Samuel 15-16, Luke 20:1-26",
+      "passages": [
+        {
+          "label": "1 Samuel 15-16",
+          "refs": [
+            "1 Samuel 15-16"
+          ]
+        },
+        {
+          "label": "Luke 20:1-26",
+          "refs": [
+            "Luke 20:1-26"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 119,
+      "week": 17,
+      "title": "1 Samuel 17-18, Luke 20:27-47",
+      "passages": [
+        {
+          "label": "1 Samuel 17-18",
+          "refs": [
+            "1 Samuel 17-18"
+          ]
+        },
+        {
+          "label": "Luke 20:27-47",
+          "refs": [
+            "Luke 20:27-47"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 120,
+      "week": 18,
+      "title": "1 Samuel 19, Psalms 23-59 (+1 more)",
+      "passages": [
+        {
+          "label": "1 Samuel 19",
+          "refs": [
+            "1 Samuel 19"
+          ]
+        },
+        {
+          "label": "Psalms 23-59",
+          "refs": [
+            "Psalms 23-59"
+          ]
+        },
+        {
+          "label": "Luke 21:1-19",
+          "refs": [
+            "Luke 21:1-19"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 121,
+      "week": 18,
+      "title": "1 Samuel 20-21, Psalms 34 (+1 more)",
+      "passages": [
+        {
+          "label": "1 Samuel 20-21",
+          "refs": [
+            "1 Samuel 20-21"
+          ]
+        },
+        {
+          "label": "Psalms 34",
+          "refs": [
+            "Psalms 34"
+          ]
+        },
+        {
+          "label": "Luke 21:20-38",
+          "refs": [
+            "Luke 21:20-38"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 122,
+      "week": 18,
+      "title": "1 Samuel 22, Psalms 56 (+1 more)",
+      "passages": [
+        {
+          "label": "1 Samuel 22",
+          "refs": [
+            "1 Samuel 22"
+          ]
+        },
+        {
+          "label": "Psalms 56",
+          "refs": [
+            "Psalms 56"
+          ]
+        },
+        {
+          "label": "Luke 22:1-23",
+          "refs": [
+            "Luke 22:1-23"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 123,
+      "week": 18,
+      "title": "Psalms 52, Psalms 57 (+2 more)",
+      "passages": [
+        {
+          "label": "Psalms 52",
+          "refs": [
+            "Psalms 52"
+          ]
+        },
+        {
+          "label": "Psalms 57",
+          "refs": [
+            "Psalms 57"
+          ]
+        },
+        {
+          "label": "Psalms 142",
+          "refs": [
+            "Psalms 142"
+          ]
+        },
+        {
+          "label": "Luke 22:24-46",
+          "refs": [
+            "Luke 22:24-46"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 124,
+      "week": 18,
+      "title": "1 Samuel 23, Psalms 54 (+2 more)",
+      "passages": [
+        {
+          "label": "1 Samuel 23",
+          "refs": [
+            "1 Samuel 23"
+          ]
+        },
+        {
+          "label": "Psalms 54",
+          "refs": [
+            "Psalms 54"
+          ]
+        },
+        {
+          "label": "Psalms 63",
+          "refs": [
+            "Psalms 63"
+          ]
+        },
+        {
+          "label": "Luke 22:47-71",
+          "refs": [
+            "Luke 22:47-71"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 125,
+      "week": 18,
+      "title": "1 Samuel 24-27, Luke 23:1-25",
+      "passages": [
+        {
+          "label": "1 Samuel 24-27",
+          "refs": [
+            "1 Samuel 24-27"
+          ]
+        },
+        {
+          "label": "Luke 23:1-25",
+          "refs": [
+            "Luke 23:1-25"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 126,
+      "week": 18,
+      "title": "1 Samuel 28-29, Luke 23:26-56",
+      "passages": [
+        {
+          "label": "1 Samuel 28-29",
+          "refs": [
+            "1 Samuel 28-29"
+          ]
+        },
+        {
+          "label": "Luke 23:26-56",
+          "refs": [
+            "Luke 23:26-56"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 127,
+      "week": 19,
+      "title": "1 Samuel 30-31, Luke 24:1-35",
+      "passages": [
+        {
+          "label": "1 Samuel 30-31",
+          "refs": [
+            "1 Samuel 30-31"
+          ]
+        },
+        {
+          "label": "Luke 24:1-35",
+          "refs": [
+            "Luke 24:1-35"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 128,
+      "week": 19,
+      "title": "2 Samuel 1-2, Luke 24:36-53",
+      "passages": [
+        {
+          "label": "2 Samuel 1-2",
+          "refs": [
+            "2 Samuel 1-2"
+          ]
+        },
+        {
+          "label": "Luke 24:36-53",
+          "refs": [
+            "Luke 24:36-53"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 129,
+      "week": 19,
+      "title": "2 Samuel 3-5, John 1:1-28",
+      "passages": [
+        {
+          "label": "2 Samuel 3-5",
+          "refs": [
+            "2 Samuel 3-5"
+          ]
+        },
+        {
+          "label": "John 1:1-28",
+          "refs": [
+            "John 1:1-28"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 130,
+      "week": 19,
+      "title": "2 Samuel 6-7, Psalms 30 (+1 more)",
+      "passages": [
+        {
+          "label": "2 Samuel 6-7",
+          "refs": [
+            "2 Samuel 6-7"
+          ]
+        },
+        {
+          "label": "Psalms 30",
+          "refs": [
+            "Psalms 30"
+          ]
+        },
+        {
+          "label": "John 1:29-51",
+          "refs": [
+            "John 1:29-51"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 131,
+      "week": 19,
+      "title": "2 Samuel 8-9, Psalms 60 (+1 more)",
+      "passages": [
+        {
+          "label": "2 Samuel 8-9",
+          "refs": [
+            "2 Samuel 8-9"
+          ]
+        },
+        {
+          "label": "Psalms 60",
+          "refs": [
+            "Psalms 60"
+          ]
+        },
+        {
+          "label": "John 2",
+          "refs": [
+            "John 2"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 132,
+      "week": 19,
+      "title": "2 Samuel 10-12, John 3:1-15",
+      "passages": [
+        {
+          "label": "2 Samuel 10-12",
+          "refs": [
+            "2 Samuel 10-12"
+          ]
+        },
+        {
+          "label": "John 3:1-15",
+          "refs": [
+            "John 3:1-15"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 133,
+      "week": 19,
+      "title": "Psalms 32, Psalms 51 (+1 more)",
+      "passages": [
+        {
+          "label": "Psalms 32",
+          "refs": [
+            "Psalms 32"
+          ]
+        },
+        {
+          "label": "Psalms 51",
+          "refs": [
+            "Psalms 51"
+          ]
+        },
+        {
+          "label": "John 3:16-36",
+          "refs": [
+            "John 3:16-36"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 134,
+      "week": 20,
+      "title": "2 Samuel 13-14, John 4:1-26",
+      "passages": [
+        {
+          "label": "2 Samuel 13-14",
+          "refs": [
+            "2 Samuel 13-14"
+          ]
+        },
+        {
+          "label": "John 4:1-26",
+          "refs": [
+            "John 4:1-26"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 135,
+      "week": 20,
+      "title": "2 Samuel 15, Psalms 3 (+2 more)",
+      "passages": [
+        {
+          "label": "2 Samuel 15",
+          "refs": [
+            "2 Samuel 15"
+          ]
+        },
+        {
+          "label": "Psalms 3",
+          "refs": [
+            "Psalms 3"
+          ]
+        },
+        {
+          "label": "Psalms 69",
+          "refs": [
+            "Psalms 69"
+          ]
+        },
+        {
+          "label": "John 4:27-54",
+          "refs": [
+            "John 4:27-54"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 136,
+      "week": 20,
+      "title": "2 Samuel 16-18, John 5:1-24",
+      "passages": [
+        {
+          "label": "2 Samuel 16-18",
+          "refs": [
+            "2 Samuel 16-18"
+          ]
+        },
+        {
+          "label": "John 5:1-24",
+          "refs": [
+            "John 5:1-24"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 137,
+      "week": 20,
+      "title": "2 Samuel 19-20, John 5:25-47",
+      "passages": [
+        {
+          "label": "2 Samuel 19-20",
+          "refs": [
+            "2 Samuel 19-20"
+          ]
+        },
+        {
+          "label": "John 5:25-47",
+          "refs": [
+            "John 5:25-47"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 138,
+      "week": 20,
+      "title": "Psalms 64, Psalms 70 (+1 more)",
+      "passages": [
+        {
+          "label": "Psalms 64",
+          "refs": [
+            "Psalms 64"
+          ]
+        },
+        {
+          "label": "Psalms 70",
+          "refs": [
+            "Psalms 70"
+          ]
+        },
+        {
+          "label": "John 6:1-21",
+          "refs": [
+            "John 6:1-21"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 139,
+      "week": 20,
+      "title": "2 Samuel 21-22, Psalms 18 (+1 more)",
+      "passages": [
+        {
+          "label": "2 Samuel 21-22",
+          "refs": [
+            "2 Samuel 21-22"
+          ]
+        },
+        {
+          "label": "Psalms 18",
+          "refs": [
+            "Psalms 18"
+          ]
+        },
+        {
+          "label": "John 6:22-40",
+          "refs": [
+            "John 6:22-40"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 140,
+      "week": 20,
+      "title": "2 Samuel 23-24, John 6:41-71",
+      "passages": [
+        {
+          "label": "2 Samuel 23-24",
+          "refs": [
+            "2 Samuel 23-24"
+          ]
+        },
+        {
+          "label": "John 6:41-71",
+          "refs": [
+            "John 6:41-71"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 141,
+      "week": 21,
+      "title": "Psalms 4-6, John 7:1-27",
+      "passages": [
+        {
+          "label": "Psalms 4-6",
+          "refs": [
+            "Psalms 4-6"
+          ]
+        },
+        {
+          "label": "John 7:1-27",
+          "refs": [
+            "John 7:1-27"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 142,
+      "week": 21,
+      "title": "Psalms 7-8, John 7:28-53",
+      "passages": [
+        {
+          "label": "Psalms 7-8",
+          "refs": [
+            "Psalms 7-8"
+          ]
+        },
+        {
+          "label": "John 7:28-53",
+          "refs": [
+            "John 7:28-53"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 143,
+      "week": 21,
+      "title": "Psalms 9-11, John 8:1-27",
+      "passages": [
+        {
+          "label": "Psalms 9-11",
+          "refs": [
+            "Psalms 9-11"
+          ]
+        },
+        {
+          "label": "John 8:1-27",
+          "refs": [
+            "John 8:1-27"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 144,
+      "week": 21,
+      "title": "Psalms 12-14, John 8:28-59",
+      "passages": [
+        {
+          "label": "Psalms 12-14",
+          "refs": [
+            "Psalms 12-14"
+          ]
+        },
+        {
+          "label": "John 8:28-59",
+          "refs": [
+            "John 8:28-59"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 145,
+      "week": 21,
+      "title": "Psalms 15-16, John 9:1-23",
+      "passages": [
+        {
+          "label": "Psalms 15-16",
+          "refs": [
+            "Psalms 15-16"
+          ]
+        },
+        {
+          "label": "John 9:1-23",
+          "refs": [
+            "John 9:1-23"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 146,
+      "week": 21,
+      "title": "Psalms 17-19, John 9:24-41",
+      "passages": [
+        {
+          "label": "Psalms 17-19",
+          "refs": [
+            "Psalms 17-19"
+          ]
+        },
+        {
+          "label": "John 9:24-41",
+          "refs": [
+            "John 9:24-41"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 147,
+      "week": 21,
+      "title": "Psalms 20-22, John 10:1-21",
+      "passages": [
+        {
+          "label": "Psalms 20-22",
+          "refs": [
+            "Psalms 20-22"
+          ]
+        },
+        {
+          "label": "John 10:1-21",
+          "refs": [
+            "John 10:1-21"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 148,
+      "week": 22,
+      "title": "Psalms 24-26, John 10:22-42",
+      "passages": [
+        {
+          "label": "Psalms 24-26",
+          "refs": [
+            "Psalms 24-26"
+          ]
+        },
+        {
+          "label": "John 10:22-42",
+          "refs": [
+            "John 10:22-42"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 149,
+      "week": 22,
+      "title": "Psalms 27-29, John 11:1-29",
+      "passages": [
+        {
+          "label": "Psalms 27-29",
+          "refs": [
+            "Psalms 27-29"
+          ]
+        },
+        {
+          "label": "John 11:1-29",
+          "refs": [
+            "John 11:1-29"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 150,
+      "week": 22,
+      "title": "Psalms 31-35, John 11:30-57",
+      "passages": [
+        {
+          "label": "Psalms 31-35",
+          "refs": [
+            "Psalms 31-35"
+          ]
+        },
+        {
+          "label": "John 11:30-57",
+          "refs": [
+            "John 11:30-57"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 151,
+      "week": 22,
+      "title": "Psalms 36-38, John 12:1-26",
+      "passages": [
+        {
+          "label": "Psalms 36-38",
+          "refs": [
+            "Psalms 36-38"
+          ]
+        },
+        {
+          "label": "John 12:1-26",
+          "refs": [
+            "John 12:1-26"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 152,
+      "week": 22,
+      "title": "Psalms 39-41, John 12:27-50",
+      "passages": [
+        {
+          "label": "Psalms 39-41",
+          "refs": [
+            "Psalms 39-41"
+          ]
+        },
+        {
+          "label": "John 12:27-50",
+          "refs": [
+            "John 12:27-50"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 153,
+      "week": 22,
+      "title": "Psalms 53-55, Psalms 58 (+1 more)",
+      "passages": [
+        {
+          "label": "Psalms 53-55",
+          "refs": [
+            "Psalms 53-55"
+          ]
+        },
+        {
+          "label": "Psalms 58",
+          "refs": [
+            "Psalms 58"
+          ]
+        },
+        {
+          "label": "John 13:1-20",
+          "refs": [
+            "John 13:1-20"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 154,
+      "week": 22,
+      "title": "Psalms 61-62, Psalms 65 (+1 more)",
+      "passages": [
+        {
+          "label": "Psalms 61-62",
+          "refs": [
+            "Psalms 61-62"
+          ]
+        },
+        {
+          "label": "Psalms 65",
+          "refs": [
+            "Psalms 65"
+          ]
+        },
+        {
+          "label": "John 13:21-38",
+          "refs": [
+            "John 13:21-38"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 155,
+      "week": 23,
+      "title": "Psalms 68-72, Psalms 86 (+1 more)",
+      "passages": [
+        {
+          "label": "Psalms 68-72",
+          "refs": [
+            "Psalms 68-72"
+          ]
+        },
+        {
+          "label": "Psalms 86",
+          "refs": [
+            "Psalms 86"
+          ]
+        },
+        {
+          "label": "John 14",
+          "refs": [
+            "John 14"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 156,
+      "week": 23,
+      "title": "Psalms 101-103, Psalms 108 (+1 more)",
+      "passages": [
+        {
+          "label": "Psalms 101-103",
+          "refs": [
+            "Psalms 101-103"
+          ]
+        },
+        {
+          "label": "Psalms 108",
+          "refs": [
+            "Psalms 108"
+          ]
+        },
+        {
+          "label": "John 15",
+          "refs": [
+            "John 15"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 157,
+      "week": 23,
+      "title": "Psalms 109-110, Psalms 138 (+1 more)",
+      "passages": [
+        {
+          "label": "Psalms 109-110",
+          "refs": [
+            "Psalms 109-110"
+          ]
+        },
+        {
+          "label": "Psalms 138",
+          "refs": [
+            "Psalms 138"
+          ]
+        },
+        {
+          "label": "John 16",
+          "refs": [
+            "John 16"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 158,
+      "week": 23,
+      "title": "Psalms 139-141, John 17",
+      "passages": [
+        {
+          "label": "Psalms 139-141",
+          "refs": [
+            "Psalms 139-141"
+          ]
+        },
+        {
+          "label": "John 17",
+          "refs": [
+            "John 17"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 159,
+      "week": 23,
+      "title": "Psalms 143-145, John 18:1-18",
+      "passages": [
+        {
+          "label": "Psalms 143-145",
+          "refs": [
+            "Psalms 143-145"
+          ]
+        },
+        {
+          "label": "John 18:1-18",
+          "refs": [
+            "John 18:1-18"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 160,
+      "week": 23,
+      "title": "1 Kings 1-2, John 18:19-40",
+      "passages": [
+        {
+          "label": "1 Kings 1-2",
+          "refs": [
+            "1 Kings 1-2"
+          ]
+        },
+        {
+          "label": "John 18:19-40",
+          "refs": [
+            "John 18:19-40"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 161,
+      "week": 23,
+      "title": "1 Kings 3-4, Proverbs 1 (+1 more)",
+      "passages": [
+        {
+          "label": "1 Kings 3-4",
+          "refs": [
+            "1 Kings 3-4"
+          ]
+        },
+        {
+          "label": "Proverbs 1",
+          "refs": [
+            "Proverbs 1"
+          ]
+        },
+        {
+          "label": "John 19:1-22",
+          "refs": [
+            "John 19:1-22"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 162,
+      "week": 24,
+      "title": "Proverbs 2-4, John 19:23-42",
+      "passages": [
+        {
+          "label": "Proverbs 2-4",
+          "refs": [
+            "Proverbs 2-4"
+          ]
+        },
+        {
+          "label": "John 19:23-42",
+          "refs": [
+            "John 19:23-42"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 163,
+      "week": 24,
+      "title": "Proverbs 5-7, John 20",
+      "passages": [
+        {
+          "label": "Proverbs 5-7",
+          "refs": [
+            "Proverbs 5-7"
+          ]
+        },
+        {
+          "label": "John 20",
+          "refs": [
+            "John 20"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 164,
+      "week": 24,
+      "title": "Proverbs 8-9, John 21",
+      "passages": [
+        {
+          "label": "Proverbs 8-9",
+          "refs": [
+            "Proverbs 8-9"
+          ]
+        },
+        {
+          "label": "John 21",
+          "refs": [
+            "John 21"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 165,
+      "week": 24,
+      "title": "Proverbs 10-12, Acts 1",
+      "passages": [
+        {
+          "label": "Proverbs 10-12",
+          "refs": [
+            "Proverbs 10-12"
+          ]
+        },
+        {
+          "label": "Acts 1",
+          "refs": [
+            "Acts 1"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 166,
+      "week": 24,
+      "title": "Proverbs 13-15, Acts 2:1-21",
+      "passages": [
+        {
+          "label": "Proverbs 13-15",
+          "refs": [
+            "Proverbs 13-15"
+          ]
+        },
+        {
+          "label": "Acts 2:1-21",
+          "refs": [
+            "Acts 2:1-21"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 167,
+      "week": 24,
+      "title": "Proverbs 16-18, Acts 2:22-47",
+      "passages": [
+        {
+          "label": "Proverbs 16-18",
+          "refs": [
+            "Proverbs 16-18"
+          ]
+        },
+        {
+          "label": "Acts 2:22-47",
+          "refs": [
+            "Acts 2:22-47"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 168,
+      "week": 24,
+      "title": "Proverbs 19-21, Acts 3",
+      "passages": [
+        {
+          "label": "Proverbs 19-21",
+          "refs": [
+            "Proverbs 19-21"
+          ]
+        },
+        {
+          "label": "Acts 3",
+          "refs": [
+            "Acts 3"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 169,
+      "week": 25,
+      "title": "Proverbs 22-24, Acts 4:1-22",
+      "passages": [
+        {
+          "label": "Proverbs 22-24",
+          "refs": [
+            "Proverbs 22-24"
+          ]
+        },
+        {
+          "label": "Acts 4:1-22",
+          "refs": [
+            "Acts 4:1-22"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 170,
+      "week": 25,
+      "title": "Proverbs 25-26, Acts 4:23-37",
+      "passages": [
+        {
+          "label": "Proverbs 25-26",
+          "refs": [
+            "Proverbs 25-26"
+          ]
+        },
+        {
+          "label": "Acts 4:23-37",
+          "refs": [
+            "Acts 4:23-37"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 171,
+      "week": 25,
+      "title": "Proverbs 27-29, Acts 5:1-21",
+      "passages": [
+        {
+          "label": "Proverbs 27-29",
+          "refs": [
+            "Proverbs 27-29"
+          ]
+        },
+        {
+          "label": "Acts 5:1-21",
+          "refs": [
+            "Acts 5:1-21"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 172,
+      "week": 25,
+      "title": "Proverbs 30-31, Acts 5:22-42",
+      "passages": [
+        {
+          "label": "Proverbs 30-31",
+          "refs": [
+            "Proverbs 30-31"
+          ]
+        },
+        {
+          "label": "Acts 5:22-42",
+          "refs": [
+            "Acts 5:22-42"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 173,
+      "week": 25,
+      "title": "Song of Solomon 1-3, Acts 6",
+      "passages": [
+        {
+          "label": "Song of Solomon 1-3",
+          "refs": [
+            "Song of Solomon 1-3"
+          ]
+        },
+        {
+          "label": "Acts 6",
+          "refs": [
+            "Acts 6"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 174,
+      "week": 25,
+      "title": "Song of Solomon 4-5, Acts 7:1-21",
+      "passages": [
+        {
+          "label": "Song of Solomon 4-5",
+          "refs": [
+            "Song of Solomon 4-5"
+          ]
+        },
+        {
+          "label": "Acts 7:1-21",
+          "refs": [
+            "Acts 7:1-21"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 175,
+      "week": 25,
+      "title": "Song of Solomon 6-8, Acts 7:22-43",
+      "passages": [
+        {
+          "label": "Song of Solomon 6-8",
+          "refs": [
+            "Song of Solomon 6-8"
+          ]
+        },
+        {
+          "label": "Acts 7:22-43",
+          "refs": [
+            "Acts 7:22-43"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 176,
+      "week": 26,
+      "title": "1 Kings 5-7, Acts 7:44-60",
+      "passages": [
+        {
+          "label": "1 Kings 5-7",
+          "refs": [
+            "1 Kings 5-7"
+          ]
+        },
+        {
+          "label": "Acts 7:44-60",
+          "refs": [
+            "Acts 7:44-60"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 177,
+      "week": 26,
+      "title": "1 Kings 8-9, Acts 8:1-25",
+      "passages": [
+        {
+          "label": "1 Kings 8-9",
+          "refs": [
+            "1 Kings 8-9"
+          ]
+        },
+        {
+          "label": "Acts 8:1-25",
+          "refs": [
+            "Acts 8:1-25"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 178,
+      "week": 26,
+      "title": "1 Kings 10-11, Acts 8:26-40",
+      "passages": [
+        {
+          "label": "1 Kings 10-11",
+          "refs": [
+            "1 Kings 10-11"
+          ]
+        },
+        {
+          "label": "Acts 8:26-40",
+          "refs": [
+            "Acts 8:26-40"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 179,
+      "week": 26,
+      "title": "Ecclesiastes 1-3, Acts 9:1-22",
+      "passages": [
+        {
+          "label": "Ecclesiastes 1-3",
+          "refs": [
+            "Ecclesiastes 1-3"
+          ]
+        },
+        {
+          "label": "Acts 9:1-22",
+          "refs": [
+            "Acts 9:1-22"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 180,
+      "week": 26,
+      "title": "Ecclesiastes 4-6, Acts 9:23-43",
+      "passages": [
+        {
+          "label": "Ecclesiastes 4-6",
+          "refs": [
+            "Ecclesiastes 4-6"
+          ]
+        },
+        {
+          "label": "Acts 9:23-43",
+          "refs": [
+            "Acts 9:23-43"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 181,
+      "week": 26,
+      "title": "Ecclesiastes 7-9, Acts 10:1-23",
+      "passages": [
+        {
+          "label": "Ecclesiastes 7-9",
+          "refs": [
+            "Ecclesiastes 7-9"
+          ]
+        },
+        {
+          "label": "Acts 10:1-23",
+          "refs": [
+            "Acts 10:1-23"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 182,
+      "week": 26,
+      "title": "Ecclesiastes 10-12, Acts 10:24-48",
+      "passages": [
+        {
+          "label": "Ecclesiastes 10-12",
+          "refs": [
+            "Ecclesiastes 10-12"
+          ]
+        },
+        {
+          "label": "Acts 10:24-48",
+          "refs": [
+            "Acts 10:24-48"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 183,
+      "week": 27,
+      "title": "1 Kings 12-13, Acts 11",
+      "passages": [
+        {
+          "label": "1 Kings 12-13",
+          "refs": [
+            "1 Kings 12-13"
+          ]
+        },
+        {
+          "label": "Acts 11",
+          "refs": [
+            "Acts 11"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 184,
+      "week": 27,
+      "title": "1 Kings 14-15, Acts 12",
+      "passages": [
+        {
+          "label": "1 Kings 14-15",
+          "refs": [
+            "1 Kings 14-15"
+          ]
+        },
+        {
+          "label": "Acts 12",
+          "refs": [
+            "Acts 12"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 185,
+      "week": 27,
+      "title": "1 Kings 16-18, Acts 13:1-25",
+      "passages": [
+        {
+          "label": "1 Kings 16-18",
+          "refs": [
+            "1 Kings 16-18"
+          ]
+        },
+        {
+          "label": "Acts 13:1-25",
+          "refs": [
+            "Acts 13:1-25"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 186,
+      "week": 27,
+      "title": "1 Kings 19-20, Acts 13:26-52",
+      "passages": [
+        {
+          "label": "1 Kings 19-20",
+          "refs": [
+            "1 Kings 19-20"
+          ]
+        },
+        {
+          "label": "Acts 13:26-52",
+          "refs": [
+            "Acts 13:26-52"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 187,
+      "week": 27,
+      "title": "1 Kings 21-22, Acts 14",
+      "passages": [
+        {
+          "label": "1 Kings 21-22",
+          "refs": [
+            "1 Kings 21-22"
+          ]
+        },
+        {
+          "label": "Acts 14",
+          "refs": [
+            "Acts 14"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 188,
+      "week": 27,
+      "title": "2 Kings 1-3, James 1",
+      "passages": [
+        {
+          "label": "2 Kings 1-3",
+          "refs": [
+            "2 Kings 1-3"
+          ]
+        },
+        {
+          "label": "James 1",
+          "refs": [
+            "James 1"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 189,
+      "week": 27,
+      "title": "2 Kings 4-6, James 2",
+      "passages": [
+        {
+          "label": "2 Kings 4-6",
+          "refs": [
+            "2 Kings 4-6"
+          ]
+        },
+        {
+          "label": "James 2",
+          "refs": [
+            "James 2"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 190,
+      "week": 28,
+      "title": "2 Kings 7-9, James 3",
+      "passages": [
+        {
+          "label": "2 Kings 7-9",
+          "refs": [
+            "2 Kings 7-9"
+          ]
+        },
+        {
+          "label": "James 3",
+          "refs": [
+            "James 3"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 191,
+      "week": 28,
+      "title": "2 Kings 10-12, James 4",
+      "passages": [
+        {
+          "label": "2 Kings 10-12",
+          "refs": [
+            "2 Kings 10-12"
+          ]
+        },
+        {
+          "label": "James 4",
+          "refs": [
+            "James 4"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 192,
+      "week": 28,
+      "title": "2 Kings 13-14, James 5",
+      "passages": [
+        {
+          "label": "2 Kings 13-14",
+          "refs": [
+            "2 Kings 13-14"
+          ]
+        },
+        {
+          "label": "James 5",
+          "refs": [
+            "James 5"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 193,
+      "week": 28,
+      "title": "Jonah 1-4, Acts 15:1-21",
+      "passages": [
+        {
+          "label": "Jonah 1-4",
+          "refs": [
+            "Jonah 1-4"
+          ]
+        },
+        {
+          "label": "Acts 15:1-21",
+          "refs": [
+            "Acts 15:1-21"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 194,
+      "week": 28,
+      "title": "Amos 1-3, Acts 15:22-41",
+      "passages": [
+        {
+          "label": "Amos 1-3",
+          "refs": [
+            "Amos 1-3"
+          ]
+        },
+        {
+          "label": "Acts 15:22-41",
+          "refs": [
+            "Acts 15:22-41"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 195,
+      "week": 28,
+      "title": "Amos 4-6, Galatians 1",
+      "passages": [
+        {
+          "label": "Amos 4-6",
+          "refs": [
+            "Amos 4-6"
+          ]
+        },
+        {
+          "label": "Galatians 1",
+          "refs": [
+            "Galatians 1"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 196,
+      "week": 28,
+      "title": "Amos 7-9, Galatians 2",
+      "passages": [
+        {
+          "label": "Amos 7-9",
+          "refs": [
+            "Amos 7-9"
+          ]
+        },
+        {
+          "label": "Galatians 2",
+          "refs": [
+            "Galatians 2"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 197,
+      "week": 29,
+      "title": "2 Kings 15-16, Galatians 3",
+      "passages": [
+        {
+          "label": "2 Kings 15-16",
+          "refs": [
+            "2 Kings 15-16"
+          ]
+        },
+        {
+          "label": "Galatians 3",
+          "refs": [
+            "Galatians 3"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 198,
+      "week": 29,
+      "title": "2 Kings 17-18, Galatians 4",
+      "passages": [
+        {
+          "label": "2 Kings 17-18",
+          "refs": [
+            "2 Kings 17-18"
+          ]
+        },
+        {
+          "label": "Galatians 4",
+          "refs": [
+            "Galatians 4"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 199,
+      "week": 29,
+      "title": "2 Kings 19-21, Galatians 5",
+      "passages": [
+        {
+          "label": "2 Kings 19-21",
+          "refs": [
+            "2 Kings 19-21"
+          ]
+        },
+        {
+          "label": "Galatians 5",
+          "refs": [
+            "Galatians 5"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 200,
+      "week": 29,
+      "title": "2 Kings 22-23, Galatians 6",
+      "passages": [
+        {
+          "label": "2 Kings 22-23",
+          "refs": [
+            "2 Kings 22-23"
+          ]
+        },
+        {
+          "label": "Galatians 6",
+          "refs": [
+            "Galatians 6"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 201,
+      "week": 29,
+      "title": "2 Kings 24-25, Acts 16:1-21",
+      "passages": [
+        {
+          "label": "2 Kings 24-25",
+          "refs": [
+            "2 Kings 24-25"
+          ]
+        },
+        {
+          "label": "Acts 16:1-21",
+          "refs": [
+            "Acts 16:1-21"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 202,
+      "week": 29,
+      "title": "Psalms 1-2, Psalms 10 (+1 more)",
+      "passages": [
+        {
+          "label": "Psalms 1-2",
+          "refs": [
+            "Psalms 1-2"
+          ]
+        },
+        {
+          "label": "Psalms 10",
+          "refs": [
+            "Psalms 10"
+          ]
+        },
+        {
+          "label": "Acts 16:22-40",
+          "refs": [
+            "Acts 16:22-40"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 203,
+      "week": 29,
+      "title": "Psalms 33, Psalms 43 (+2 more)",
+      "passages": [
+        {
+          "label": "Psalms 33",
+          "refs": [
+            "Psalms 33"
+          ]
+        },
+        {
+          "label": "Psalms 43",
+          "refs": [
+            "Psalms 43"
+          ]
+        },
+        {
+          "label": "Psalms 66",
+          "refs": [
+            "Psalms 66"
+          ]
+        },
+        {
+          "label": "Philippians 1",
+          "refs": [
+            "Philippians 1"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 204,
+      "week": 30,
+      "title": "Psalms 67-71, Philippians 2",
+      "passages": [
+        {
+          "label": "Psalms 67-71",
+          "refs": [
+            "Psalms 67-71"
+          ]
+        },
+        {
+          "label": "Philippians 2",
+          "refs": [
+            "Philippians 2"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 205,
+      "week": 30,
+      "title": "Psalms 89-92, Philippians 3",
+      "passages": [
+        {
+          "label": "Psalms 89-92",
+          "refs": [
+            "Psalms 89-92"
+          ]
+        },
+        {
+          "label": "Philippians 3",
+          "refs": [
+            "Philippians 3"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 206,
+      "week": 30,
+      "title": "Psalms 93-95, Philippians 4",
+      "passages": [
+        {
+          "label": "Psalms 93-95",
+          "refs": [
+            "Psalms 93-95"
+          ]
+        },
+        {
+          "label": "Philippians 4",
+          "refs": [
+            "Philippians 4"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 207,
+      "week": 30,
+      "title": "Psalms 96-98, Acts 17:1-15",
+      "passages": [
+        {
+          "label": "Psalms 96-98",
+          "refs": [
+            "Psalms 96-98"
+          ]
+        },
+        {
+          "label": "Acts 17:1-15",
+          "refs": [
+            "Acts 17:1-15"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 208,
+      "week": 30,
+      "title": "Psalms 99-100, Psalms 102 (+1 more)",
+      "passages": [
+        {
+          "label": "Psalms 99-100",
+          "refs": [
+            "Psalms 99-100"
+          ]
+        },
+        {
+          "label": "Psalms 102",
+          "refs": [
+            "Psalms 102"
+          ]
+        },
+        {
+          "label": "Acts 17:16-34",
+          "refs": [
+            "Acts 17:16-34"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 209,
+      "week": 30,
+      "title": "Psalms 104-105, 1 Thessalonians 1",
+      "passages": [
+        {
+          "label": "Psalms 104-105",
+          "refs": [
+            "Psalms 104-105"
+          ]
+        },
+        {
+          "label": "1 Thessalonians 1",
+          "refs": [
+            "1 Thessalonians 1"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 210,
+      "week": 30,
+      "title": "Psalms 106-112, 1 Thessalonians 2",
+      "passages": [
+        {
+          "label": "Psalms 106-112",
+          "refs": [
+            "Psalms 106-112"
+          ]
+        },
+        {
+          "label": "1 Thessalonians 2",
+          "refs": [
+            "1 Thessalonians 2"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 211,
+      "week": 31,
+      "title": "Psalms 113-115, 1 Thessalonians 3",
+      "passages": [
+        {
+          "label": "Psalms 113-115",
+          "refs": [
+            "Psalms 113-115"
+          ]
+        },
+        {
+          "label": "1 Thessalonians 3",
+          "refs": [
+            "1 Thessalonians 3"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 212,
+      "week": 31,
+      "title": "Psalms 116-118, 1 Thessalonians 4",
+      "passages": [
+        {
+          "label": "Psalms 116-118",
+          "refs": [
+            "Psalms 116-118"
+          ]
+        },
+        {
+          "label": "1 Thessalonians 4",
+          "refs": [
+            "1 Thessalonians 4"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 213,
+      "week": 31,
+      "title": "Psalms 119:1-88, 1 Thessalonians 5",
+      "passages": [
+        {
+          "label": "Psalms 119:1-88",
+          "refs": [
+            "Psalms 119:1-88"
+          ]
+        },
+        {
+          "label": "1 Thessalonians 5",
+          "refs": [
+            "1 Thessalonians 5"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 214,
+      "week": 31,
+      "title": "Psalms 119:89-176, 2 Thessalonians 1",
+      "passages": [
+        {
+          "label": "Psalms 119:89-176",
+          "refs": [
+            "Psalms 119:89-176"
+          ]
+        },
+        {
+          "label": "2 Thessalonians 1",
+          "refs": [
+            "2 Thessalonians 1"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 215,
+      "week": 31,
+      "title": "Psalms 120-122, 2 Thessalonians 2",
+      "passages": [
+        {
+          "label": "Psalms 120-122",
+          "refs": [
+            "Psalms 120-122"
+          ]
+        },
+        {
+          "label": "2 Thessalonians 2",
+          "refs": [
+            "2 Thessalonians 2"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 216,
+      "week": 31,
+      "title": "Psalms 123-125, 2 Thessalonians 3",
+      "passages": [
+        {
+          "label": "Psalms 123-125",
+          "refs": [
+            "Psalms 123-125"
+          ]
+        },
+        {
+          "label": "2 Thessalonians 3",
+          "refs": [
+            "2 Thessalonians 3"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 217,
+      "week": 31,
+      "title": "Psalms 127-129, Acts 18",
+      "passages": [
+        {
+          "label": "Psalms 127-129",
+          "refs": [
+            "Psalms 127-129"
+          ]
+        },
+        {
+          "label": "Acts 18",
+          "refs": [
+            "Acts 18"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 218,
+      "week": 32,
+      "title": "Psalms 130-132, 1 Corinthians 1",
+      "passages": [
+        {
+          "label": "Psalms 130-132",
+          "refs": [
+            "Psalms 130-132"
+          ]
+        },
+        {
+          "label": "1 Corinthians 1",
+          "refs": [
+            "1 Corinthians 1"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 219,
+      "week": 32,
+      "title": "Psalms 133-135, 1 Corinthians 2",
+      "passages": [
+        {
+          "label": "Psalms 133-135",
+          "refs": [
+            "Psalms 133-135"
+          ]
+        },
+        {
+          "label": "1 Corinthians 2",
+          "refs": [
+            "1 Corinthians 2"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 220,
+      "week": 32,
+      "title": "Psalms 136-146, 1 Corinthians 3",
+      "passages": [
+        {
+          "label": "Psalms 136-146",
+          "refs": [
+            "Psalms 136-146"
+          ]
+        },
+        {
+          "label": "1 Corinthians 3",
+          "refs": [
+            "1 Corinthians 3"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 221,
+      "week": 32,
+      "title": "Psalms 147-148, 1 Corinthians 4",
+      "passages": [
+        {
+          "label": "Psalms 147-148",
+          "refs": [
+            "Psalms 147-148"
+          ]
+        },
+        {
+          "label": "1 Corinthians 4",
+          "refs": [
+            "1 Corinthians 4"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 222,
+      "week": 32,
+      "title": "Psalms 149-150, 1 Corinthians 5",
+      "passages": [
+        {
+          "label": "Psalms 149-150",
+          "refs": [
+            "Psalms 149-150"
+          ]
+        },
+        {
+          "label": "1 Corinthians 5",
+          "refs": [
+            "1 Corinthians 5"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 223,
+      "week": 32,
+      "title": "1 Chronicles 1-3, 1 Corinthians 6",
+      "passages": [
+        {
+          "label": "1 Chronicles 1-3",
+          "refs": [
+            "1 Chronicles 1-3"
+          ]
+        },
+        {
+          "label": "1 Corinthians 6",
+          "refs": [
+            "1 Corinthians 6"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 224,
+      "week": 32,
+      "title": "1 Chronicles 4-6, 1 Corinthians 7:1-19",
+      "passages": [
+        {
+          "label": "1 Chronicles 4-6",
+          "refs": [
+            "1 Chronicles 4-6"
+          ]
+        },
+        {
+          "label": "1 Corinthians 7:1-19",
+          "refs": [
+            "1 Corinthians 7:1-19"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 225,
+      "week": 33,
+      "title": "1 Chronicles 7-9, 1 Corinthians 7:20-40",
+      "passages": [
+        {
+          "label": "1 Chronicles 7-9",
+          "refs": [
+            "1 Chronicles 7-9"
+          ]
+        },
+        {
+          "label": "1 Corinthians 7:20-40",
+          "refs": [
+            "1 Corinthians 7:20-40"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 226,
+      "week": 33,
+      "title": "1 Chronicles 10-12, 1 Corinthians 8",
+      "passages": [
+        {
+          "label": "1 Chronicles 10-12",
+          "refs": [
+            "1 Chronicles 10-12"
+          ]
+        },
+        {
+          "label": "1 Corinthians 8",
+          "refs": [
+            "1 Corinthians 8"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 227,
+      "week": 33,
+      "title": "1 Chronicles 13-15, 1 Corinthians 9",
+      "passages": [
+        {
+          "label": "1 Chronicles 13-15",
+          "refs": [
+            "1 Chronicles 13-15"
+          ]
+        },
+        {
+          "label": "1 Corinthians 9",
+          "refs": [
+            "1 Corinthians 9"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 228,
+      "week": 33,
+      "title": "1 Chronicles 16, Psalms 42 (+2 more)",
+      "passages": [
+        {
+          "label": "1 Chronicles 16",
+          "refs": [
+            "1 Chronicles 16"
+          ]
+        },
+        {
+          "label": "Psalms 42",
+          "refs": [
+            "Psalms 42"
+          ]
+        },
+        {
+          "label": "Psalms 44",
+          "refs": [
+            "Psalms 44"
+          ]
+        },
+        {
+          "label": "1 Corinthians 10:1-18",
+          "refs": [
+            "1 Corinthians 10:1-18"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 229,
+      "week": 33,
+      "title": "Psalms 45-47, 1 Corinthians 10:19-33",
+      "passages": [
+        {
+          "label": "Psalms 45-47",
+          "refs": [
+            "Psalms 45-47"
+          ]
+        },
+        {
+          "label": "1 Corinthians 10:19-33",
+          "refs": [
+            "1 Corinthians 10:19-33"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 230,
+      "week": 33,
+      "title": "Psalms 48-50, 1 Corinthians 11:1-16",
+      "passages": [
+        {
+          "label": "Psalms 48-50",
+          "refs": [
+            "Psalms 48-50"
+          ]
+        },
+        {
+          "label": "1 Corinthians 11:1-16",
+          "refs": [
+            "1 Corinthians 11:1-16"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 231,
+      "week": 33,
+      "title": "Psalms 73-85, 1 Corinthians 11:17-34",
+      "passages": [
+        {
+          "label": "Psalms 73-85",
+          "refs": [
+            "Psalms 73-85"
+          ]
+        },
+        {
+          "label": "1 Corinthians 11:17-34",
+          "refs": [
+            "1 Corinthians 11:17-34"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 232,
+      "week": 34,
+      "title": "Psalms 87-88, 1 Corinthians 12",
+      "passages": [
+        {
+          "label": "Psalms 87-88",
+          "refs": [
+            "Psalms 87-88"
+          ]
+        },
+        {
+          "label": "1 Corinthians 12",
+          "refs": [
+            "1 Corinthians 12"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 233,
+      "week": 34,
+      "title": "1 Chronicles 17-19, 1 Corinthians 13",
+      "passages": [
+        {
+          "label": "1 Chronicles 17-19",
+          "refs": [
+            "1 Chronicles 17-19"
+          ]
+        },
+        {
+          "label": "1 Corinthians 13",
+          "refs": [
+            "1 Corinthians 13"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 234,
+      "week": 34,
+      "title": "1 Chronicles 20-22, 1 Corinthians 14:1-20",
+      "passages": [
+        {
+          "label": "1 Chronicles 20-22",
+          "refs": [
+            "1 Chronicles 20-22"
+          ]
+        },
+        {
+          "label": "1 Corinthians 14:1-20",
+          "refs": [
+            "1 Corinthians 14:1-20"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 235,
+      "week": 34,
+      "title": "1 Chronicles 23-25, 1 Corinthians 14:21-40",
+      "passages": [
+        {
+          "label": "1 Chronicles 23-25",
+          "refs": [
+            "1 Chronicles 23-25"
+          ]
+        },
+        {
+          "label": "1 Corinthians 14:21-40",
+          "refs": [
+            "1 Corinthians 14:21-40"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 236,
+      "week": 34,
+      "title": "1 Chronicles 26-27, 1 Corinthians 15:1-28",
+      "passages": [
+        {
+          "label": "1 Chronicles 26-27",
+          "refs": [
+            "1 Chronicles 26-27"
+          ]
+        },
+        {
+          "label": "1 Corinthians 15:1-28",
+          "refs": [
+            "1 Corinthians 15:1-28"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 237,
+      "week": 34,
+      "title": "1 Chronicles 28-29, 1 Corinthians 15:29-58",
+      "passages": [
+        {
+          "label": "1 Chronicles 28-29",
+          "refs": [
+            "1 Chronicles 28-29"
+          ]
+        },
+        {
+          "label": "1 Corinthians 15:29-58",
+          "refs": [
+            "1 Corinthians 15:29-58"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 238,
+      "week": 34,
+      "title": "2 Chronicles 1-3, 1 Corinthians 16",
+      "passages": [
+        {
+          "label": "2 Chronicles 1-3",
+          "refs": [
+            "2 Chronicles 1-3"
+          ]
+        },
+        {
+          "label": "1 Corinthians 16",
+          "refs": [
+            "1 Corinthians 16"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 239,
+      "week": 35,
+      "title": "2 Chronicles 4-6, 2 Corinthians 1",
+      "passages": [
+        {
+          "label": "2 Chronicles 4-6",
+          "refs": [
+            "2 Chronicles 4-6"
+          ]
+        },
+        {
+          "label": "2 Corinthians 1",
+          "refs": [
+            "2 Corinthians 1"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 240,
+      "week": 35,
+      "title": "2 Chronicles 7-9, 2 Corinthians 2",
+      "passages": [
+        {
+          "label": "2 Chronicles 7-9",
+          "refs": [
+            "2 Chronicles 7-9"
+          ]
+        },
+        {
+          "label": "2 Corinthians 2",
+          "refs": [
+            "2 Corinthians 2"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 241,
+      "week": 35,
+      "title": "2 Chronicles 10-12, 2 Corinthians 3",
+      "passages": [
+        {
+          "label": "2 Chronicles 10-12",
+          "refs": [
+            "2 Chronicles 10-12"
+          ]
+        },
+        {
+          "label": "2 Corinthians 3",
+          "refs": [
+            "2 Corinthians 3"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 242,
+      "week": 35,
+      "title": "2 Chronicles 13-14, 2 Corinthians 4",
+      "passages": [
+        {
+          "label": "2 Chronicles 13-14",
+          "refs": [
+            "2 Chronicles 13-14"
+          ]
+        },
+        {
+          "label": "2 Corinthians 4",
+          "refs": [
+            "2 Corinthians 4"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 243,
+      "week": 35,
+      "title": "2 Chronicles 15-16, 2 Corinthians 5",
+      "passages": [
+        {
+          "label": "2 Chronicles 15-16",
+          "refs": [
+            "2 Chronicles 15-16"
+          ]
+        },
+        {
+          "label": "2 Corinthians 5",
+          "refs": [
+            "2 Corinthians 5"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 244,
+      "week": 35,
+      "title": "2 Chronicles 17-18, 2 Corinthians 6",
+      "passages": [
+        {
+          "label": "2 Chronicles 17-18",
+          "refs": [
+            "2 Chronicles 17-18"
+          ]
+        },
+        {
+          "label": "2 Corinthians 6",
+          "refs": [
+            "2 Corinthians 6"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 245,
+      "week": 35,
+      "title": "2 Chronicles 19-20, 2 Corinthians 7",
+      "passages": [
+        {
+          "label": "2 Chronicles 19-20",
+          "refs": [
+            "2 Chronicles 19-20"
+          ]
+        },
+        {
+          "label": "2 Corinthians 7",
+          "refs": [
+            "2 Corinthians 7"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 246,
+      "week": 36,
+      "title": "2 Chronicles 21, Obadiah (+1 more)",
+      "passages": [
+        {
+          "label": "2 Chronicles 21",
+          "refs": [
+            "2 Chronicles 21"
+          ]
+        },
+        {
+          "label": "Obadiah",
+          "refs": [
+            "Obadiah"
+          ]
+        },
+        {
+          "label": "2 Corinthians 8",
+          "refs": [
+            "2 Corinthians 8"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 247,
+      "week": 36,
+      "title": "2 Chronicles 22, Joel 1 (+1 more)",
+      "passages": [
+        {
+          "label": "2 Chronicles 22",
+          "refs": [
+            "2 Chronicles 22"
+          ]
+        },
+        {
+          "label": "Joel 1",
+          "refs": [
+            "Joel 1"
+          ]
+        },
+        {
+          "label": "2 Corinthians 9",
+          "refs": [
+            "2 Corinthians 9"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 248,
+      "week": 36,
+      "title": "2 Chronicles 23, Joel 2 (+2 more)",
+      "passages": [
+        {
+          "label": "2 Chronicles 23",
+          "refs": [
+            "2 Chronicles 23"
+          ]
+        },
+        {
+          "label": "Joel 2",
+          "refs": [
+            "Joel 2"
+          ]
+        },
+        {
+          "label": "Joel 3",
+          "refs": [
+            "Joel 3"
+          ]
+        },
+        {
+          "label": "2 Corinthians 10",
+          "refs": [
+            "2 Corinthians 10"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 249,
+      "week": 36,
+      "title": "2 Chronicles 24-26, 2 Corinthians 11:1-15",
+      "passages": [
+        {
+          "label": "2 Chronicles 24-26",
+          "refs": [
+            "2 Chronicles 24-26"
+          ]
+        },
+        {
+          "label": "2 Corinthians 11:1-15",
+          "refs": [
+            "2 Corinthians 11:1-15"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 250,
+      "week": 36,
+      "title": "Isaiah 1-2, 2 Corinthians 11:16-33",
+      "passages": [
+        {
+          "label": "Isaiah 1-2",
+          "refs": [
+            "Isaiah 1-2"
+          ]
+        },
+        {
+          "label": "2 Corinthians 11:16-33",
+          "refs": [
+            "2 Corinthians 11:16-33"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 251,
+      "week": 36,
+      "title": "Isaiah 3-4, 2 Corinthians 12",
+      "passages": [
+        {
+          "label": "Isaiah 3-4",
+          "refs": [
+            "Isaiah 3-4"
+          ]
+        },
+        {
+          "label": "2 Corinthians 12",
+          "refs": [
+            "2 Corinthians 12"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 252,
+      "week": 36,
+      "title": "Isaiah 5-6, 2 Corinthians 13",
+      "passages": [
+        {
+          "label": "Isaiah 5-6",
+          "refs": [
+            "Isaiah 5-6"
+          ]
+        },
+        {
+          "label": "2 Corinthians 13",
+          "refs": [
+            "2 Corinthians 13"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 253,
+      "week": 37,
+      "title": "2 Chronicles 27-28, Acts 19:1-20",
+      "passages": [
+        {
+          "label": "2 Chronicles 27-28",
+          "refs": [
+            "2 Chronicles 27-28"
+          ]
+        },
+        {
+          "label": "Acts 19:1-20",
+          "refs": [
+            "Acts 19:1-20"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 254,
+      "week": 37,
+      "title": "2 Chronicles 29-30, Acts 19:21-41",
+      "passages": [
+        {
+          "label": "2 Chronicles 29-30",
+          "refs": [
+            "2 Chronicles 29-30"
+          ]
+        },
+        {
+          "label": "Acts 19:21-41",
+          "refs": [
+            "Acts 19:21-41"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 255,
+      "week": 37,
+      "title": "2 Chronicles 31-32, Acts 20:1-16",
+      "passages": [
+        {
+          "label": "2 Chronicles 31-32",
+          "refs": [
+            "2 Chronicles 31-32"
+          ]
+        },
+        {
+          "label": "Acts 20:1-16",
+          "refs": [
+            "Acts 20:1-16"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 256,
+      "week": 37,
+      "title": "Isaiah 7-8, Acts 20:17-38",
+      "passages": [
+        {
+          "label": "Isaiah 7-8",
+          "refs": [
+            "Isaiah 7-8"
+          ]
+        },
+        {
+          "label": "Acts 20:17-38",
+          "refs": [
+            "Acts 20:17-38"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 257,
+      "week": 37,
+      "title": "Isaiah 9-10, Ephesians 1",
+      "passages": [
+        {
+          "label": "Isaiah 9-10",
+          "refs": [
+            "Isaiah 9-10"
+          ]
+        },
+        {
+          "label": "Ephesians 1",
+          "refs": [
+            "Ephesians 1"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 258,
+      "week": 37,
+      "title": "Isaiah 11-13, Ephesians 2",
+      "passages": [
+        {
+          "label": "Isaiah 11-13",
+          "refs": [
+            "Isaiah 11-13"
+          ]
+        },
+        {
+          "label": "Ephesians 2",
+          "refs": [
+            "Ephesians 2"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 259,
+      "week": 37,
+      "title": "Isaiah 14-16, Ephesians 3",
+      "passages": [
+        {
+          "label": "Isaiah 14-16",
+          "refs": [
+            "Isaiah 14-16"
+          ]
+        },
+        {
+          "label": "Ephesians 3",
+          "refs": [
+            "Ephesians 3"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 260,
+      "week": 38,
+      "title": "Isaiah 17-19, Ephesians 4",
+      "passages": [
+        {
+          "label": "Isaiah 17-19",
+          "refs": [
+            "Isaiah 17-19"
+          ]
+        },
+        {
+          "label": "Ephesians 4",
+          "refs": [
+            "Ephesians 4"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 261,
+      "week": 38,
+      "title": "Isaiah 20-22, Ephesians 5:1-16",
+      "passages": [
+        {
+          "label": "Isaiah 20-22",
+          "refs": [
+            "Isaiah 20-22"
+          ]
+        },
+        {
+          "label": "Ephesians 5:1-16",
+          "refs": [
+            "Ephesians 5:1-16"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 262,
+      "week": 38,
+      "title": "Isaiah 23-25, Ephesians 5:17-23",
+      "passages": [
+        {
+          "label": "Isaiah 23-25",
+          "refs": [
+            "Isaiah 23-25"
+          ]
+        },
+        {
+          "label": "Ephesians 5:17-23",
+          "refs": [
+            "Ephesians 5:17-23"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 263,
+      "week": 38,
+      "title": "Isaiah 26-27, Ephesians 6",
+      "passages": [
+        {
+          "label": "Isaiah 26-27",
+          "refs": [
+            "Isaiah 26-27"
+          ]
+        },
+        {
+          "label": "Ephesians 6",
+          "refs": [
+            "Ephesians 6"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 264,
+      "week": 38,
+      "title": "Isaiah 28-29, Romans 1",
+      "passages": [
+        {
+          "label": "Isaiah 28-29",
+          "refs": [
+            "Isaiah 28-29"
+          ]
+        },
+        {
+          "label": "Romans 1",
+          "refs": [
+            "Romans 1"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 265,
+      "week": 38,
+      "title": "Isaiah 30-31, Romans 2",
+      "passages": [
+        {
+          "label": "Isaiah 30-31",
+          "refs": [
+            "Isaiah 30-31"
+          ]
+        },
+        {
+          "label": "Romans 2",
+          "refs": [
+            "Romans 2"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 266,
+      "week": 38,
+      "title": "Isaiah 32-33, Romans 3",
+      "passages": [
+        {
+          "label": "Isaiah 32-33",
+          "refs": [
+            "Isaiah 32-33"
+          ]
+        },
+        {
+          "label": "Romans 3",
+          "refs": [
+            "Romans 3"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 267,
+      "week": 39,
+      "title": "Isaiah 34-36, Romans 4",
+      "passages": [
+        {
+          "label": "Isaiah 34-36",
+          "refs": [
+            "Isaiah 34-36"
+          ]
+        },
+        {
+          "label": "Romans 4",
+          "refs": [
+            "Romans 4"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 268,
+      "week": 39,
+      "title": "Isaiah 37-38, Romans 5",
+      "passages": [
+        {
+          "label": "Isaiah 37-38",
+          "refs": [
+            "Isaiah 37-38"
+          ]
+        },
+        {
+          "label": "Romans 5",
+          "refs": [
+            "Romans 5"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 269,
+      "week": 39,
+      "title": "Isaiah 39-40, Romans 6",
+      "passages": [
+        {
+          "label": "Isaiah 39-40",
+          "refs": [
+            "Isaiah 39-40"
+          ]
+        },
+        {
+          "label": "Romans 6",
+          "refs": [
+            "Romans 6"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 270,
+      "week": 39,
+      "title": "Isaiah 41-42, Romans 7",
+      "passages": [
+        {
+          "label": "Isaiah 41-42",
+          "refs": [
+            "Isaiah 41-42"
+          ]
+        },
+        {
+          "label": "Romans 7",
+          "refs": [
+            "Romans 7"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 271,
+      "week": 39,
+      "title": "Isaiah 43-44, Romans 8:1-21",
+      "passages": [
+        {
+          "label": "Isaiah 43-44",
+          "refs": [
+            "Isaiah 43-44"
+          ]
+        },
+        {
+          "label": "Romans 8:1-21",
+          "refs": [
+            "Romans 8:1-21"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 272,
+      "week": 39,
+      "title": "Isaiah 45-46, Romans 8:22-39",
+      "passages": [
+        {
+          "label": "Isaiah 45-46",
+          "refs": [
+            "Isaiah 45-46"
+          ]
+        },
+        {
+          "label": "Romans 8:22-39",
+          "refs": [
+            "Romans 8:22-39"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 273,
+      "week": 39,
+      "title": "Isaiah 47-49, Romans 9:1-15",
+      "passages": [
+        {
+          "label": "Isaiah 47-49",
+          "refs": [
+            "Isaiah 47-49"
+          ]
+        },
+        {
+          "label": "Romans 9:1-15",
+          "refs": [
+            "Romans 9:1-15"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 274,
+      "week": 40,
+      "title": "Isaiah 50-52, Romans 9:16-33",
+      "passages": [
+        {
+          "label": "Isaiah 50-52",
+          "refs": [
+            "Isaiah 50-52"
+          ]
+        },
+        {
+          "label": "Romans 9:16-33",
+          "refs": [
+            "Romans 9:16-33"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 275,
+      "week": 40,
+      "title": "Isaiah 53-55, Romans 10",
+      "passages": [
+        {
+          "label": "Isaiah 53-55",
+          "refs": [
+            "Isaiah 53-55"
+          ]
+        },
+        {
+          "label": "Romans 10",
+          "refs": [
+            "Romans 10"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 276,
+      "week": 40,
+      "title": "Isaiah 56-58, Romans 11:1-18",
+      "passages": [
+        {
+          "label": "Isaiah 56-58",
+          "refs": [
+            "Isaiah 56-58"
+          ]
+        },
+        {
+          "label": "Romans 11:1-18",
+          "refs": [
+            "Romans 11:1-18"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 277,
+      "week": 40,
+      "title": "Isaiah 59-61, Romans 11:19-36",
+      "passages": [
+        {
+          "label": "Isaiah 59-61",
+          "refs": [
+            "Isaiah 59-61"
+          ]
+        },
+        {
+          "label": "Romans 11:19-36",
+          "refs": [
+            "Romans 11:19-36"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 278,
+      "week": 40,
+      "title": "Isaiah 62-64, Romans 12",
+      "passages": [
+        {
+          "label": "Isaiah 62-64",
+          "refs": [
+            "Isaiah 62-64"
+          ]
+        },
+        {
+          "label": "Romans 12",
+          "refs": [
+            "Romans 12"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 279,
+      "week": 40,
+      "title": "Isaiah 65-66, Romans 13",
+      "passages": [
+        {
+          "label": "Isaiah 65-66",
+          "refs": [
+            "Isaiah 65-66"
+          ]
+        },
+        {
+          "label": "Romans 13",
+          "refs": [
+            "Romans 13"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 280,
+      "week": 40,
+      "title": "Hosea 1-4, Romans 14",
+      "passages": [
+        {
+          "label": "Hosea 1-4",
+          "refs": [
+            "Hosea 1-4"
+          ]
+        },
+        {
+          "label": "Romans 14",
+          "refs": [
+            "Romans 14"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 281,
+      "week": 41,
+      "title": "Hosea 5-8, Romans 15:1-13",
+      "passages": [
+        {
+          "label": "Hosea 5-8",
+          "refs": [
+            "Hosea 5-8"
+          ]
+        },
+        {
+          "label": "Romans 15:1-13",
+          "refs": [
+            "Romans 15:1-13"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 282,
+      "week": 41,
+      "title": "Hosea 9-11, Romans 15:14-33",
+      "passages": [
+        {
+          "label": "Hosea 9-11",
+          "refs": [
+            "Hosea 9-11"
+          ]
+        },
+        {
+          "label": "Romans 15:14-33",
+          "refs": [
+            "Romans 15:14-33"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 283,
+      "week": 41,
+      "title": "Hosea 12-14, Romans 16",
+      "passages": [
+        {
+          "label": "Hosea 12-14",
+          "refs": [
+            "Hosea 12-14"
+          ]
+        },
+        {
+          "label": "Romans 16",
+          "refs": [
+            "Romans 16"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 284,
+      "week": 41,
+      "title": "Micah 1-3, Acts 21:1-17",
+      "passages": [
+        {
+          "label": "Micah 1-3",
+          "refs": [
+            "Micah 1-3"
+          ]
+        },
+        {
+          "label": "Acts 21:1-17",
+          "refs": [
+            "Acts 21:1-17"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 285,
+      "week": 41,
+      "title": "Micah 4-5, Acts 21:18-40",
+      "passages": [
+        {
+          "label": "Micah 4-5",
+          "refs": [
+            "Micah 4-5"
+          ]
+        },
+        {
+          "label": "Acts 21:18-40",
+          "refs": [
+            "Acts 21:18-40"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 286,
+      "week": 41,
+      "title": "Micah 6-7, Acts 22",
+      "passages": [
+        {
+          "label": "Micah 6-7",
+          "refs": [
+            "Micah 6-7"
+          ]
+        },
+        {
+          "label": "Acts 22",
+          "refs": [
+            "Acts 22"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 287,
+      "week": 41,
+      "title": "Nahum 1-3, Acts 23:1-15",
+      "passages": [
+        {
+          "label": "Nahum 1-3",
+          "refs": [
+            "Nahum 1-3"
+          ]
+        },
+        {
+          "label": "Acts 23:1-15",
+          "refs": [
+            "Acts 23:1-15"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 288,
+      "week": 42,
+      "title": "2 Chronicles 33-34, Acts 23:16-35",
+      "passages": [
+        {
+          "label": "2 Chronicles 33-34",
+          "refs": [
+            "2 Chronicles 33-34"
+          ]
+        },
+        {
+          "label": "Acts 23:16-35",
+          "refs": [
+            "Acts 23:16-35"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 289,
+      "week": 42,
+      "title": "Zephaniah 1-3, Acts 24",
+      "passages": [
+        {
+          "label": "Zephaniah 1-3",
+          "refs": [
+            "Zephaniah 1-3"
+          ]
+        },
+        {
+          "label": "Acts 24",
+          "refs": [
+            "Acts 24"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 290,
+      "week": 42,
+      "title": "2 Chronicles 35, Habakkuk 1-3 (+1 more)",
+      "passages": [
+        {
+          "label": "2 Chronicles 35",
+          "refs": [
+            "2 Chronicles 35"
+          ]
+        },
+        {
+          "label": "Habakkuk 1-3",
+          "refs": [
+            "Habakkuk 1-3"
+          ]
+        },
+        {
+          "label": "Acts 25",
+          "refs": [
+            "Acts 25"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 291,
+      "week": 42,
+      "title": "Jeremiah 1-2, Acts 26",
+      "passages": [
+        {
+          "label": "Jeremiah 1-2",
+          "refs": [
+            "Jeremiah 1-2"
+          ]
+        },
+        {
+          "label": "Acts 26",
+          "refs": [
+            "Acts 26"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 292,
+      "week": 42,
+      "title": "Jeremiah 3-5, Acts 27:1-26",
+      "passages": [
+        {
+          "label": "Jeremiah 3-5",
+          "refs": [
+            "Jeremiah 3-5"
+          ]
+        },
+        {
+          "label": "Acts 27:1-26",
+          "refs": [
+            "Acts 27:1-26"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 293,
+      "week": 42,
+      "title": "Jeremiah 6, Jeremiah 11-12 (+1 more)",
+      "passages": [
+        {
+          "label": "Jeremiah 6",
+          "refs": [
+            "Jeremiah 6"
+          ]
+        },
+        {
+          "label": "Jeremiah 11-12",
+          "refs": [
+            "Jeremiah 11-12"
+          ]
+        },
+        {
+          "label": "Acts 27:27-44",
+          "refs": [
+            "Acts 27:27-44"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 294,
+      "week": 42,
+      "title": "Jeremiah 7-8, Jeremiah 26 (+1 more)",
+      "passages": [
+        {
+          "label": "Jeremiah 7-8",
+          "refs": [
+            "Jeremiah 7-8"
+          ]
+        },
+        {
+          "label": "Jeremiah 26",
+          "refs": [
+            "Jeremiah 26"
+          ]
+        },
+        {
+          "label": "Acts 28",
+          "refs": [
+            "Acts 28"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 295,
+      "week": 43,
+      "title": "Jeremiah 9-10, Jeremiah 14 (+1 more)",
+      "passages": [
+        {
+          "label": "Jeremiah 9-10",
+          "refs": [
+            "Jeremiah 9-10"
+          ]
+        },
+        {
+          "label": "Jeremiah 14",
+          "refs": [
+            "Jeremiah 14"
+          ]
+        },
+        {
+          "label": "Colossians 1",
+          "refs": [
+            "Colossians 1"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 296,
+      "week": 43,
+      "title": "Jeremiah 15-17, Colossians 2",
+      "passages": [
+        {
+          "label": "Jeremiah 15-17",
+          "refs": [
+            "Jeremiah 15-17"
+          ]
+        },
+        {
+          "label": "Colossians 2",
+          "refs": [
+            "Colossians 2"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 297,
+      "week": 43,
+      "title": "Jeremiah 18-19, Colossians 3",
+      "passages": [
+        {
+          "label": "Jeremiah 18-19",
+          "refs": [
+            "Jeremiah 18-19"
+          ]
+        },
+        {
+          "label": "Colossians 3",
+          "refs": [
+            "Colossians 3"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 298,
+      "week": 43,
+      "title": "Jeremiah 20, Jeremiah 35-36 (+1 more)",
+      "passages": [
+        {
+          "label": "Jeremiah 20",
+          "refs": [
+            "Jeremiah 20"
+          ]
+        },
+        {
+          "label": "Jeremiah 35-36",
+          "refs": [
+            "Jeremiah 35-36"
+          ]
+        },
+        {
+          "label": "Colossians 4",
+          "refs": [
+            "Colossians 4"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 299,
+      "week": 43,
+      "title": "Jeremiah 25, Jeremiah 45-46 (+1 more)",
+      "passages": [
+        {
+          "label": "Jeremiah 25",
+          "refs": [
+            "Jeremiah 25"
+          ]
+        },
+        {
+          "label": "Jeremiah 45-46",
+          "refs": [
+            "Jeremiah 45-46"
+          ]
+        },
+        {
+          "label": "Hebrews 1",
+          "refs": [
+            "Hebrews 1"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 300,
+      "week": 43,
+      "title": "Jeremiah 47-48, Hebrews 2",
+      "passages": [
+        {
+          "label": "Jeremiah 47-48",
+          "refs": [
+            "Jeremiah 47-48"
+          ]
+        },
+        {
+          "label": "Hebrews 2",
+          "refs": [
+            "Hebrews 2"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 301,
+      "week": 43,
+      "title": "Jeremiah 49, Jeremiah 13 (+2 more)",
+      "passages": [
+        {
+          "label": "Jeremiah 49",
+          "refs": [
+            "Jeremiah 49"
+          ]
+        },
+        {
+          "label": "Jeremiah 13",
+          "refs": [
+            "Jeremiah 13"
+          ]
+        },
+        {
+          "label": "Jeremiah 22",
+          "refs": [
+            "Jeremiah 22"
+          ]
+        },
+        {
+          "label": "Hebrews 3",
+          "refs": [
+            "Hebrews 3"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 302,
+      "week": 44,
+      "title": "Jeremiah 23-24, Hebrews 4",
+      "passages": [
+        {
+          "label": "Jeremiah 23-24",
+          "refs": [
+            "Jeremiah 23-24"
+          ]
+        },
+        {
+          "label": "Hebrews 4",
+          "refs": [
+            "Hebrews 4"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 303,
+      "week": 44,
+      "title": "Jeremiah 27-29, Hebrews 5",
+      "passages": [
+        {
+          "label": "Jeremiah 27-29",
+          "refs": [
+            "Jeremiah 27-29"
+          ]
+        },
+        {
+          "label": "Hebrews 5",
+          "refs": [
+            "Hebrews 5"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 304,
+      "week": 44,
+      "title": "Jeremiah 50, Hebrews 6",
+      "passages": [
+        {
+          "label": "Jeremiah 50",
+          "refs": [
+            "Jeremiah 50"
+          ]
+        },
+        {
+          "label": "Hebrews 6",
+          "refs": [
+            "Hebrews 6"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 305,
+      "week": 44,
+      "title": "Jeremiah 51, Jeremiah 30 (+1 more)",
+      "passages": [
+        {
+          "label": "Jeremiah 51",
+          "refs": [
+            "Jeremiah 51"
+          ]
+        },
+        {
+          "label": "Jeremiah 30",
+          "refs": [
+            "Jeremiah 30"
+          ]
+        },
+        {
+          "label": "Hebrews 7",
+          "refs": [
+            "Hebrews 7"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 306,
+      "week": 44,
+      "title": "Jeremiah 31-32, Hebrews 8",
+      "passages": [
+        {
+          "label": "Jeremiah 31-32",
+          "refs": [
+            "Jeremiah 31-32"
+          ]
+        },
+        {
+          "label": "Hebrews 8",
+          "refs": [
+            "Hebrews 8"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 307,
+      "week": 44,
+      "title": "Jeremiah 33, Jeremiah 21 (+1 more)",
+      "passages": [
+        {
+          "label": "Jeremiah 33",
+          "refs": [
+            "Jeremiah 33"
+          ]
+        },
+        {
+          "label": "Jeremiah 21",
+          "refs": [
+            "Jeremiah 21"
+          ]
+        },
+        {
+          "label": "Hebrews 9",
+          "refs": [
+            "Hebrews 9"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 308,
+      "week": 44,
+      "title": "Jeremiah 34, Jeremiah 37-38 (+1 more)",
+      "passages": [
+        {
+          "label": "Jeremiah 34",
+          "refs": [
+            "Jeremiah 34"
+          ]
+        },
+        {
+          "label": "Jeremiah 37-38",
+          "refs": [
+            "Jeremiah 37-38"
+          ]
+        },
+        {
+          "label": "Hebrews 10:1-18",
+          "refs": [
+            "Hebrews 10:1-18"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 309,
+      "week": 45,
+      "title": "Jeremiah 39, Jeremiah 40 (+1 more)",
+      "passages": [
+        {
+          "label": "Jeremiah 39",
+          "refs": [
+            "Jeremiah 39"
+          ]
+        },
+        {
+          "label": "Jeremiah 40",
+          "refs": [
+            "Jeremiah 40"
+          ]
+        },
+        {
+          "label": "Hebrews 10:19-39",
+          "refs": [
+            "Hebrews 10:19-39"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 310,
+      "week": 45,
+      "title": "Jeremiah 41-42, Hebrews 11:1-19",
+      "passages": [
+        {
+          "label": "Jeremiah 41-42",
+          "refs": [
+            "Jeremiah 41-42"
+          ]
+        },
+        {
+          "label": "Hebrews 11:1-19",
+          "refs": [
+            "Hebrews 11:1-19"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 311,
+      "week": 45,
+      "title": "Jeremiah 43-44, Hebrews 11:20-40",
+      "passages": [
+        {
+          "label": "Jeremiah 43-44",
+          "refs": [
+            "Jeremiah 43-44"
+          ]
+        },
+        {
+          "label": "Hebrews 11:20-40",
+          "refs": [
+            "Hebrews 11:20-40"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 312,
+      "week": 45,
+      "title": "Lamentations 1-2, Hebrews 12",
+      "passages": [
+        {
+          "label": "Lamentations 1-2",
+          "refs": [
+            "Lamentations 1-2"
+          ]
+        },
+        {
+          "label": "Hebrews 12",
+          "refs": [
+            "Hebrews 12"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 313,
+      "week": 45,
+      "title": "Lamentations 3-5, Hebrews 13",
+      "passages": [
+        {
+          "label": "Lamentations 3-5",
+          "refs": [
+            "Lamentations 3-5"
+          ]
+        },
+        {
+          "label": "Hebrews 13",
+          "refs": [
+            "Hebrews 13"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 314,
+      "week": 45,
+      "title": "2 Chronicles 36, Daniel 1-2 (+1 more)",
+      "passages": [
+        {
+          "label": "2 Chronicles 36",
+          "refs": [
+            "2 Chronicles 36"
+          ]
+        },
+        {
+          "label": "Daniel 1-2",
+          "refs": [
+            "Daniel 1-2"
+          ]
+        },
+        {
+          "label": "Titus 1",
+          "refs": [
+            "Titus 1"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 315,
+      "week": 45,
+      "title": "Daniel 3-4, Titus 2",
+      "passages": [
+        {
+          "label": "Daniel 3-4",
+          "refs": [
+            "Daniel 3-4"
+          ]
+        },
+        {
+          "label": "Titus 2",
+          "refs": [
+            "Titus 2"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 316,
+      "week": 46,
+      "title": "Daniel 5-7, Titus 3",
+      "passages": [
+        {
+          "label": "Daniel 5-7",
+          "refs": [
+            "Daniel 5-7"
+          ]
+        },
+        {
+          "label": "Titus 3",
+          "refs": [
+            "Titus 3"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 317,
+      "week": 46,
+      "title": "Daniel 8-10, Philemon",
+      "passages": [
+        {
+          "label": "Daniel 8-10",
+          "refs": [
+            "Daniel 8-10"
+          ]
+        },
+        {
+          "label": "Philemon",
+          "refs": [
+            "Philemon"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 318,
+      "week": 46,
+      "title": "Daniel 11-12, 1 Timothy 1",
+      "passages": [
+        {
+          "label": "Daniel 11-12",
+          "refs": [
+            "Daniel 11-12"
+          ]
+        },
+        {
+          "label": "1 Timothy 1",
+          "refs": [
+            "1 Timothy 1"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 319,
+      "week": 46,
+      "title": "Psalms 137, Ezekiel 1-2 (+1 more)",
+      "passages": [
+        {
+          "label": "Psalms 137",
+          "refs": [
+            "Psalms 137"
+          ]
+        },
+        {
+          "label": "Ezekiel 1-2",
+          "refs": [
+            "Ezekiel 1-2"
+          ]
+        },
+        {
+          "label": "1 Timothy 2",
+          "refs": [
+            "1 Timothy 2"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 320,
+      "week": 46,
+      "title": "Ezekiel 3-4, 1 Timothy 3",
+      "passages": [
+        {
+          "label": "Ezekiel 3-4",
+          "refs": [
+            "Ezekiel 3-4"
+          ]
+        },
+        {
+          "label": "1 Timothy 3",
+          "refs": [
+            "1 Timothy 3"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 321,
+      "week": 46,
+      "title": "Ezekiel 5-7, 1 Timothy 4",
+      "passages": [
+        {
+          "label": "Ezekiel 5-7",
+          "refs": [
+            "Ezekiel 5-7"
+          ]
+        },
+        {
+          "label": "1 Timothy 4",
+          "refs": [
+            "1 Timothy 4"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 322,
+      "week": 46,
+      "title": "Ezekiel 8-10, 1 Timothy 5",
+      "passages": [
+        {
+          "label": "Ezekiel 8-10",
+          "refs": [
+            "Ezekiel 8-10"
+          ]
+        },
+        {
+          "label": "1 Timothy 5",
+          "refs": [
+            "1 Timothy 5"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 323,
+      "week": 47,
+      "title": "Ezekiel 11-13, 1 Timothy 6",
+      "passages": [
+        {
+          "label": "Ezekiel 11-13",
+          "refs": [
+            "Ezekiel 11-13"
+          ]
+        },
+        {
+          "label": "1 Timothy 6",
+          "refs": [
+            "1 Timothy 6"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 324,
+      "week": 47,
+      "title": "Ezekiel 14-15, 2 Timothy 1",
+      "passages": [
+        {
+          "label": "Ezekiel 14-15",
+          "refs": [
+            "Ezekiel 14-15"
+          ]
+        },
+        {
+          "label": "2 Timothy 1",
+          "refs": [
+            "2 Timothy 1"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 325,
+      "week": 47,
+      "title": "Ezekiel 16-17, 2 Timothy 2",
+      "passages": [
+        {
+          "label": "Ezekiel 16-17",
+          "refs": [
+            "Ezekiel 16-17"
+          ]
+        },
+        {
+          "label": "2 Timothy 2",
+          "refs": [
+            "2 Timothy 2"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 326,
+      "week": 47,
+      "title": "Ezekiel 18-19, 2 Timothy 3",
+      "passages": [
+        {
+          "label": "Ezekiel 18-19",
+          "refs": [
+            "Ezekiel 18-19"
+          ]
+        },
+        {
+          "label": "2 Timothy 3",
+          "refs": [
+            "2 Timothy 3"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 327,
+      "week": 47,
+      "title": "Ezekiel 20-21, 2 Timothy 4",
+      "passages": [
+        {
+          "label": "Ezekiel 20-21",
+          "refs": [
+            "Ezekiel 20-21"
+          ]
+        },
+        {
+          "label": "2 Timothy 4",
+          "refs": [
+            "2 Timothy 4"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 328,
+      "week": 47,
+      "title": "Ezekiel 22-23, 1 Peter 1",
+      "passages": [
+        {
+          "label": "Ezekiel 22-23",
+          "refs": [
+            "Ezekiel 22-23"
+          ]
+        },
+        {
+          "label": "1 Peter 1",
+          "refs": [
+            "1 Peter 1"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 329,
+      "week": 47,
+      "title": "Ezekiel 24-26, 1 Peter 2",
+      "passages": [
+        {
+          "label": "Ezekiel 24-26",
+          "refs": [
+            "Ezekiel 24-26"
+          ]
+        },
+        {
+          "label": "1 Peter 2",
+          "refs": [
+            "1 Peter 2"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 330,
+      "week": 48,
+      "title": "Ezekiel 27-29, 1 Peter 3",
+      "passages": [
+        {
+          "label": "Ezekiel 27-29",
+          "refs": [
+            "Ezekiel 27-29"
+          ]
+        },
+        {
+          "label": "1 Peter 3",
+          "refs": [
+            "1 Peter 3"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 331,
+      "week": 48,
+      "title": "Ezekiel 30-32, 1 Peter 4",
+      "passages": [
+        {
+          "label": "Ezekiel 30-32",
+          "refs": [
+            "Ezekiel 30-32"
+          ]
+        },
+        {
+          "label": "1 Peter 4",
+          "refs": [
+            "1 Peter 4"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 332,
+      "week": 48,
+      "title": "Ezekiel 33-34, 1 Peter 5",
+      "passages": [
+        {
+          "label": "Ezekiel 33-34",
+          "refs": [
+            "Ezekiel 33-34"
+          ]
+        },
+        {
+          "label": "1 Peter 5",
+          "refs": [
+            "1 Peter 5"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 333,
+      "week": 48,
+      "title": "Ezekiel 35-36, 2 Peter 1",
+      "passages": [
+        {
+          "label": "Ezekiel 35-36",
+          "refs": [
+            "Ezekiel 35-36"
+          ]
+        },
+        {
+          "label": "2 Peter 1",
+          "refs": [
+            "2 Peter 1"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 334,
+      "week": 48,
+      "title": "Ezekiel 37-39, 2 Peter 2",
+      "passages": [
+        {
+          "label": "Ezekiel 37-39",
+          "refs": [
+            "Ezekiel 37-39"
+          ]
+        },
+        {
+          "label": "2 Peter 2",
+          "refs": [
+            "2 Peter 2"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 335,
+      "week": 48,
+      "title": "Ezekiel 40-41, 2 Peter 3",
+      "passages": [
+        {
+          "label": "Ezekiel 40-41",
+          "refs": [
+            "Ezekiel 40-41"
+          ]
+        },
+        {
+          "label": "2 Peter 3",
+          "refs": [
+            "2 Peter 3"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 336,
+      "week": 48,
+      "title": "Ezekiel 42-44, 1 John 1",
+      "passages": [
+        {
+          "label": "Ezekiel 42-44",
+          "refs": [
+            "Ezekiel 42-44"
+          ]
+        },
+        {
+          "label": "1 John 1",
+          "refs": [
+            "1 John 1"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 337,
+      "week": 49,
+      "title": "Ezekiel 45-46, 1 John 2",
+      "passages": [
+        {
+          "label": "Ezekiel 45-46",
+          "refs": [
+            "Ezekiel 45-46"
+          ]
+        },
+        {
+          "label": "1 John 2",
+          "refs": [
+            "1 John 2"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 338,
+      "week": 49,
+      "title": "Ezekiel 47-48, 1 John 3",
+      "passages": [
+        {
+          "label": "Ezekiel 47-48",
+          "refs": [
+            "Ezekiel 47-48"
+          ]
+        },
+        {
+          "label": "1 John 3",
+          "refs": [
+            "1 John 3"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 339,
+      "week": 49,
+      "title": "Ezra 1-2, 1 John 4",
+      "passages": [
+        {
+          "label": "Ezra 1-2",
+          "refs": [
+            "Ezra 1-2"
+          ]
+        },
+        {
+          "label": "1 John 4",
+          "refs": [
+            "1 John 4"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 340,
+      "week": 49,
+      "title": "Ezra 3-4, 1 John 5",
+      "passages": [
+        {
+          "label": "Ezra 3-4",
+          "refs": [
+            "Ezra 3-4"
+          ]
+        },
+        {
+          "label": "1 John 5",
+          "refs": [
+            "1 John 5"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 341,
+      "week": 49,
+      "title": "Haggai 1-2, 2 John",
+      "passages": [
+        {
+          "label": "Haggai 1-2",
+          "refs": [
+            "Haggai 1-2"
+          ]
+        },
+        {
+          "label": "2 John",
+          "refs": [
+            "2 John"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 342,
+      "week": 49,
+      "title": "Zechariah 1-4, 3 John",
+      "passages": [
+        {
+          "label": "Zechariah 1-4",
+          "refs": [
+            "Zechariah 1-4"
+          ]
+        },
+        {
+          "label": "3 John",
+          "refs": [
+            "3 John"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 343,
+      "week": 49,
+      "title": "Zechariah 5-8, Jude",
+      "passages": [
+        {
+          "label": "Zechariah 5-8",
+          "refs": [
+            "Zechariah 5-8"
+          ]
+        },
+        {
+          "label": "Jude",
+          "refs": [
+            "Jude"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 344,
+      "week": 50,
+      "title": "Zechariah 9-10, Revelation 1",
+      "passages": [
+        {
+          "label": "Zechariah 9-10",
+          "refs": [
+            "Zechariah 9-10"
+          ]
+        },
+        {
+          "label": "Revelation 1",
+          "refs": [
+            "Revelation 1"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 345,
+      "week": 50,
+      "title": "Zechariah 11-12, Revelation 2",
+      "passages": [
+        {
+          "label": "Zechariah 11-12",
+          "refs": [
+            "Zechariah 11-12"
+          ]
+        },
+        {
+          "label": "Revelation 2",
+          "refs": [
+            "Revelation 2"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 346,
+      "week": 50,
+      "title": "Zechariah 13-14, Revelation 3-4",
+      "passages": [
+        {
+          "label": "Zechariah 13-14",
+          "refs": [
+            "Zechariah 13-14"
+          ]
+        },
+        {
+          "label": "Revelation 3-4",
+          "refs": [
+            "Revelation 3-4"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 347,
+      "week": 50,
+      "title": "Psalms 74-76, Revelation 5",
+      "passages": [
+        {
+          "label": "Psalms 74-76",
+          "refs": [
+            "Psalms 74-76"
+          ]
+        },
+        {
+          "label": "Revelation 5",
+          "refs": [
+            "Revelation 5"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 348,
+      "week": 50,
+      "title": "Psalms 77-78, Revelation 6",
+      "passages": [
+        {
+          "label": "Psalms 77-78",
+          "refs": [
+            "Psalms 77-78"
+          ]
+        },
+        {
+          "label": "Revelation 6",
+          "refs": [
+            "Revelation 6"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 349,
+      "week": 50,
+      "title": "Psalms 79-80, Revelation 7",
+      "passages": [
+        {
+          "label": "Psalms 79-80",
+          "refs": [
+            "Psalms 79-80"
+          ]
+        },
+        {
+          "label": "Revelation 7",
+          "refs": [
+            "Revelation 7"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 350,
+      "week": 50,
+      "title": "Psalms 81-83, Revelation 8",
+      "passages": [
+        {
+          "label": "Psalms 81-83",
+          "refs": [
+            "Psalms 81-83"
+          ]
+        },
+        {
+          "label": "Revelation 8",
+          "refs": [
+            "Revelation 8"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 351,
+      "week": 51,
+      "title": "Psalms 84-90, Revelation 9",
+      "passages": [
+        {
+          "label": "Psalms 84-90",
+          "refs": [
+            "Psalms 84-90"
+          ]
+        },
+        {
+          "label": "Revelation 9",
+          "refs": [
+            "Revelation 9"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 352,
+      "week": 51,
+      "title": "Psalms 107, Psalms 126 (+1 more)",
+      "passages": [
+        {
+          "label": "Psalms 107",
+          "refs": [
+            "Psalms 107"
+          ]
+        },
+        {
+          "label": "Psalms 126",
+          "refs": [
+            "Psalms 126"
+          ]
+        },
+        {
+          "label": "Revelation 10",
+          "refs": [
+            "Revelation 10"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 353,
+      "week": 51,
+      "title": "Ezra 5-7, Revelation 11",
+      "passages": [
+        {
+          "label": "Ezra 5-7",
+          "refs": [
+            "Ezra 5-7"
+          ]
+        },
+        {
+          "label": "Revelation 11",
+          "refs": [
+            "Revelation 11"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 354,
+      "week": 51,
+      "title": "Esther 1-2, Matthew 1 (+1 more)",
+      "passages": [
+        {
+          "label": "Esther 1-2",
+          "refs": [
+            "Esther 1-2"
+          ]
+        },
+        {
+          "label": "Matthew 1",
+          "refs": [
+            "Matthew 1"
+          ]
+        },
+        {
+          "label": "Luke 3",
+          "refs": [
+            "Luke 3"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 355,
+      "week": 51,
+      "title": "Esther 3-5, Revelation 12",
+      "passages": [
+        {
+          "label": "Esther 3-5",
+          "refs": [
+            "Esther 3-5"
+          ]
+        },
+        {
+          "label": "Revelation 12",
+          "refs": [
+            "Revelation 12"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 356,
+      "week": 51,
+      "title": "Esther 6-8, Revelation 13",
+      "passages": [
+        {
+          "label": "Esther 6-8",
+          "refs": [
+            "Esther 6-8"
+          ]
+        },
+        {
+          "label": "Revelation 13",
+          "refs": [
+            "Revelation 13"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 357,
+      "week": 51,
+      "title": "Esther 9-10, Revelation 14",
+      "passages": [
+        {
+          "label": "Esther 9-10",
+          "refs": [
+            "Esther 9-10"
+          ]
+        },
+        {
+          "label": "Revelation 14",
+          "refs": [
+            "Revelation 14"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 358,
+      "week": 52,
+      "title": "Ezra 8-10, Revelation 15",
+      "passages": [
+        {
+          "label": "Ezra 8-10",
+          "refs": [
+            "Ezra 8-10"
+          ]
+        },
+        {
+          "label": "Revelation 15",
+          "refs": [
+            "Revelation 15"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 359,
+      "week": 52,
+      "title": "Nehemiah 1-3, Revelation 16",
+      "passages": [
+        {
+          "label": "Nehemiah 1-3",
+          "refs": [
+            "Nehemiah 1-3"
+          ]
+        },
+        {
+          "label": "Revelation 16",
+          "refs": [
+            "Revelation 16"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 360,
+      "week": 52,
+      "title": "Nehemiah 4-6, Revelation 17",
+      "passages": [
+        {
+          "label": "Nehemiah 4-6",
+          "refs": [
+            "Nehemiah 4-6"
+          ]
+        },
+        {
+          "label": "Revelation 17",
+          "refs": [
+            "Revelation 17"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 361,
+      "week": 52,
+      "title": "Nehemiah 7-9, Revelation 18",
+      "passages": [
+        {
+          "label": "Nehemiah 7-9",
+          "refs": [
+            "Nehemiah 7-9"
+          ]
+        },
+        {
+          "label": "Revelation 18",
+          "refs": [
+            "Revelation 18"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 362,
+      "week": 52,
+      "title": "Nehemiah 10-11, Revelation 19",
+      "passages": [
+        {
+          "label": "Nehemiah 10-11",
+          "refs": [
+            "Nehemiah 10-11"
+          ]
+        },
+        {
+          "label": "Revelation 19",
+          "refs": [
+            "Revelation 19"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 363,
+      "week": 52,
+      "title": "Nehemiah 12-13, Revelation 20",
+      "passages": [
+        {
+          "label": "Nehemiah 12-13",
+          "refs": [
+            "Nehemiah 12-13"
+          ]
+        },
+        {
+          "label": "Revelation 20",
+          "refs": [
+            "Revelation 20"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 364,
+      "week": 52,
+      "title": "Malachi 1-2, Revelation 21",
+      "passages": [
+        {
+          "label": "Malachi 1-2",
+          "refs": [
+            "Malachi 1-2"
+          ]
+        },
+        {
+          "label": "Revelation 21",
+          "refs": [
+            "Revelation 21"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 365,
+      "week": 53,
+      "title": "Malachi 3-4, Revelation 22",
+      "passages": [
+        {
+          "label": "Malachi 3-4",
+          "refs": [
+            "Malachi 3-4"
+          ]
+        },
+        {
+          "label": "Revelation 22",
+          "refs": [
+            "Revelation 22"
+          ]
+        }
+      ]
+    }
+  ]
+}

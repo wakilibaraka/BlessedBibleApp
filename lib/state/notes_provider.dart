@@ -18,9 +18,23 @@ class NotesNotifier extends Notifier<List<PersonalNote>> {
     if (json == null) return [];
     try {
       final list = jsonDecode(json) as List;
-      return list
+      final notes = list
           .map((e) => PersonalNote.fromJson(e as Map<String, dynamic>))
           .toList();
+
+      // Non-destructive migration: if any note lacked an 'id' in JSON, fromJson assigned one.
+      // Save them back to persist the new IDs.
+      final needsMigration = list.any((e) => !(e as Map<String, dynamic>).containsKey('id'));
+      if (needsMigration) {
+        if (notes.length == list.length) {
+          Future.microtask(() {
+            final jsonStr = jsonEncode(notes.map((n) => n.toJson()).toList());
+            ref.read(preferencesProvider).prefs.setString(_key, jsonStr);
+          });
+        }
+      }
+
+      return notes;
     } catch (_) {
       return [];
     }
@@ -36,14 +50,18 @@ class NotesNotifier extends Notifier<List<PersonalNote>> {
     _save();
   }
 
-  void update(int index, PersonalNote note) {
+  void update(String id, PersonalNote note) {
+    final index = state.indexWhere((n) => n.id == id);
+    if (index == -1) return;
     final copy = [...state];
     copy[index] = note;
     state = copy;
     _save();
   }
 
-  void remove(int index) {
+  void remove(String id) {
+    final index = state.indexWhere((n) => n.id == id);
+    if (index == -1) return;
     final copy = [...state];
     copy.removeAt(index);
     state = copy;

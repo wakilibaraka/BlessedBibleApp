@@ -1,2257 +1,6862 @@
 [
   {
-    "day": 1,
-    "readings": [
-      "Genesis 1-3"
-    ]
+    "book": "Genesis",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 3,
+    "endVerse": 24
   },
   {
-    "day": 2,
-    "readings": [
-      "Genesis 4-7"
-    ]
+    "book": "Genesis",
+    "startChapter": 4,
+    "startVerse": 1,
+    "endChapter": 5,
+    "endVerse": 32
   },
   {
-    "day": 3,
-    "readings": [
-      "Genesis 8-11"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 1,
+    "endVerse": 4
   },
   {
-    "day": 4,
-    "readings": [
-      "Job 1-5"
-    ]
+    "book": "Genesis",
+    "startChapter": 6,
+    "startVerse": 1,
+    "endChapter": 6,
+    "endVerse": 22
   },
   {
-    "day": 5,
-    "readings": [
-      "Job 6-9"
-    ]
+    "book": "Genesis",
+    "startChapter": 7,
+    "startVerse": 1,
+    "endChapter": 10,
+    "endVerse": 5
   },
   {
-    "day": 6,
-    "readings": [
-      "Job 10-13"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 1,
+    "startVerse": 5,
+    "endChapter": 1,
+    "endVerse": 7
   },
   {
-    "day": 7,
-    "readings": [
-      "Job 14-16"
-    ]
+    "book": "Genesis",
+    "startChapter": 10,
+    "startVerse": 6,
+    "endChapter": 10,
+    "endVerse": 20
   },
   {
-    "day": 8,
-    "readings": [
-      "Job 17-20"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 1,
+    "startVerse": 8,
+    "endChapter": 1,
+    "endVerse": 16
   },
   {
-    "day": 9,
-    "readings": [
-      "Job 21-23"
-    ]
+    "book": "Genesis",
+    "startChapter": 10,
+    "startVerse": 21,
+    "endChapter": 10,
+    "endVerse": 30
   },
   {
-    "day": 10,
-    "readings": [
-      "Job 24-28"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 1,
+    "startVerse": 17,
+    "endChapter": 1,
+    "endVerse": 23
   },
   {
-    "day": 11,
-    "readings": [
-      "Job 29-31"
-    ]
+    "book": "Genesis",
+    "startChapter": 10,
+    "startVerse": 31,
+    "endChapter": 10,
+    "endVerse": 32
   },
   {
-    "day": 12,
-    "readings": [
-      "Job 32-34"
-    ]
+    "book": "Genesis",
+    "startChapter": 11,
+    "startVerse": 1,
+    "endChapter": 11,
+    "endVerse": 26
   },
   {
-    "day": 13,
-    "readings": [
-      "Job 35-37"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 1,
+    "startVerse": 24,
+    "endChapter": 1,
+    "endVerse": 27
   },
   {
-    "day": 14,
-    "readings": [
-      "Job 38-39"
-    ]
+    "book": "Genesis",
+    "startChapter": 11,
+    "startVerse": 27,
+    "endChapter": 11,
+    "endVerse": 31
   },
   {
-    "day": 15,
-    "readings": [
-      "Job 40-42"
-    ]
+    "book": "Genesis",
+    "startChapter": 12,
+    "startVerse": 1,
+    "endChapter": 14,
+    "endVerse": 24
   },
   {
-    "day": 16,
-    "readings": [
-      "Genesis 12-15"
-    ]
+    "book": "Genesis",
+    "startChapter": 15,
+    "startVerse": 1,
+    "endChapter": 17,
+    "endVerse": 27
   },
   {
-    "day": 17,
-    "readings": [
-      "Genesis 16-18"
-    ]
+    "book": "Genesis",
+    "startChapter": 18,
+    "startVerse": 1,
+    "endChapter": 21,
+    "endVerse": 7
   },
   {
-    "day": 18,
-    "readings": [
-      "Genesis 19-21"
-    ]
+    "book": "Genesis",
+    "startChapter": 21,
+    "startVerse": 8,
+    "endChapter": 23,
+    "endVerse": 20
   },
   {
-    "day": 19,
-    "readings": [
-      "Genesis 22-24"
-    ]
+    "book": "Genesis",
+    "startChapter": 11,
+    "startVerse": 32,
+    "endChapter": 11,
+    "endVerse": 32
   },
   {
-    "day": 20,
-    "readings": [
-      "Genesis 25-26"
-    ]
+    "book": "Genesis",
+    "startChapter": 24,
+    "startVerse": 1,
+    "endChapter": 24,
+    "endVerse": 67
   },
   {
-    "day": 21,
-    "readings": [
-      "Genesis 27-29"
-    ]
+    "book": "Genesis",
+    "startChapter": 25,
+    "startVerse": 1,
+    "endChapter": 25,
+    "endVerse": 4
   },
   {
-    "day": 22,
-    "readings": [
-      "Genesis 30-31"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 1,
+    "startVerse": 32,
+    "endChapter": 1,
+    "endVerse": 33
   },
   {
-    "day": 23,
-    "readings": [
-      "Genesis 32-34"
-    ]
+    "book": "Genesis",
+    "startChapter": 25,
+    "startVerse": 5,
+    "endChapter": 25,
+    "endVerse": 6
   },
   {
-    "day": 24,
-    "readings": [
-      "Genesis 35-37"
-    ]
+    "book": "Genesis",
+    "startChapter": 25,
+    "startVerse": 12,
+    "endChapter": 25,
+    "endVerse": 18
   },
   {
-    "day": 25,
-    "readings": [
-      "Genesis 38-40"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 1,
+    "startVerse": 28,
+    "endChapter": 1,
+    "endVerse": 31
   },
   {
-    "day": 26,
-    "readings": [
-      "Genesis 41-42"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 1,
+    "startVerse": 34,
+    "endChapter": 1,
+    "endVerse": 34
   },
   {
-    "day": 27,
-    "readings": [
-      "Genesis 43-45"
-    ]
+    "book": "Genesis",
+    "startChapter": 25,
+    "startVerse": 19,
+    "endChapter": 25,
+    "endVerse": 26
   },
   {
-    "day": 28,
-    "readings": [
-      "Genesis 46-47"
-    ]
+    "book": "Genesis",
+    "startChapter": 25,
+    "startVerse": 7,
+    "endChapter": 25,
+    "endVerse": 11
   },
   {
-    "day": 29,
-    "readings": [
-      "Genesis 48-50"
-    ]
+    "book": "Genesis",
+    "startChapter": 25,
+    "startVerse": 27,
+    "endChapter": 28,
+    "endVerse": 5
   },
   {
-    "day": 30,
-    "readings": [
-      "Exodus 1-3"
-    ]
+    "book": "Genesis",
+    "startChapter": 28,
+    "startVerse": 6,
+    "endChapter": 30,
+    "endVerse": 24
   },
   {
-    "day": 31,
-    "readings": [
-      "Exodus 4-6"
-    ]
+    "book": "Genesis",
+    "startChapter": 30,
+    "startVerse": 25,
+    "endChapter": 31,
+    "endVerse": 55
   },
   {
-    "day": 32,
-    "readings": [
-      "Exodus 7-9"
-    ]
+    "book": "Genesis",
+    "startChapter": 32,
+    "startVerse": 1,
+    "endChapter": 35,
+    "endVerse": 27
   },
   {
-    "day": 33,
-    "readings": [
-      "Exodus 10-12"
-    ]
+    "book": "Genesis",
+    "startChapter": 36,
+    "startVerse": 1,
+    "endChapter": 36,
+    "endVerse": 19
   },
   {
-    "day": 34,
-    "readings": [
-      "Exodus 13-15"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 1,
+    "startVerse": 35,
+    "endChapter": 1,
+    "endVerse": 37
   },
   {
-    "day": 35,
-    "readings": [
-      "Exodus 16-18"
-    ]
+    "book": "Genesis",
+    "startChapter": 36,
+    "startVerse": 20,
+    "endChapter": 36,
+    "endVerse": 30
   },
   {
-    "day": 36,
-    "readings": [
-      "Exodus 19-21"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 1,
+    "startVerse": 38,
+    "endChapter": 1,
+    "endVerse": 42
   },
   {
-    "day": 37,
-    "readings": [
-      "Exodus 22-24"
-    ]
+    "book": "Genesis",
+    "startChapter": 36,
+    "startVerse": 31,
+    "endChapter": 36,
+    "endVerse": 43
   },
   {
-    "day": 38,
-    "readings": [
-      "Exodus 25-27"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 1,
+    "startVerse": 43,
+    "endChapter": 2,
+    "endVerse": 2
   },
   {
-    "day": 39,
-    "readings": [
-      "Exodus 28-29"
-    ]
+    "book": "Genesis",
+    "startChapter": 37,
+    "startVerse": 1,
+    "endChapter": 38,
+    "endVerse": 30
   },
   {
-    "day": 40,
-    "readings": [
-      "Exodus 30-32"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 2,
+    "startVerse": 3,
+    "endChapter": 2,
+    "endVerse": 6
   },
   {
-    "day": 41,
-    "readings": [
-      "Exodus 33-35"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 2,
+    "startVerse": 8,
+    "endChapter": 2,
+    "endVerse": 8
   },
   {
-    "day": 42,
-    "readings": [
-      "Exodus 36-38"
-    ]
+    "book": "Genesis",
+    "startChapter": 39,
+    "startVerse": 1,
+    "endChapter": 39,
+    "endVerse": 23
   },
   {
-    "day": 43,
-    "readings": [
-      "Exodus 39-40"
-    ]
+    "book": "Genesis",
+    "startChapter": 40,
+    "startVerse": 1,
+    "endChapter": 40,
+    "endVerse": 23
   },
   {
-    "day": 44,
-    "readings": [
-      "Leviticus 1-4"
-    ]
+    "book": "Genesis",
+    "startChapter": 35,
+    "startVerse": 28,
+    "endChapter": 35,
+    "endVerse": 29
   },
   {
-    "day": 45,
-    "readings": [
-      "Leviticus 5-7"
-    ]
+    "book": "Genesis",
+    "startChapter": 41,
+    "startVerse": 1,
+    "endChapter": 41,
+    "endVerse": 57
   },
   {
-    "day": 46,
-    "readings": [
-      "Leviticus 8-10"
-    ]
+    "book": "Genesis",
+    "startChapter": 42,
+    "startVerse": 1,
+    "endChapter": 45,
+    "endVerse": 15
   },
   {
-    "day": 47,
-    "readings": [
-      "Leviticus 11-13"
-    ]
+    "book": "Genesis",
+    "startChapter": 45,
+    "startVerse": 16,
+    "endChapter": 47,
+    "endVerse": 27
   },
   {
-    "day": 48,
-    "readings": [
-      "Leviticus 14-15"
-    ]
+    "book": "Genesis",
+    "startChapter": 47,
+    "startVerse": 28,
+    "endChapter": 50,
+    "endVerse": 26
   },
   {
-    "day": 49,
-    "readings": [
-      "Leviticus 16-18"
-    ]
+    "book": "Job",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 4,
+    "endVerse": 21
   },
   {
-    "day": 50,
-    "readings": [
-      "Leviticus 19-21"
-    ]
+    "book": "Job",
+    "startChapter": 5,
+    "startVerse": 1,
+    "endChapter": 7,
+    "endVerse": 21
   },
   {
-    "day": 51,
-    "readings": [
-      "Leviticus 22-23"
-    ]
+    "book": "Job",
+    "startChapter": 8,
+    "startVerse": 1,
+    "endChapter": 11,
+    "endVerse": 20
   },
   {
-    "day": 52,
-    "readings": [
-      "Leviticus 24-25"
-    ]
+    "book": "Job",
+    "startChapter": 12,
+    "startVerse": 1,
+    "endChapter": 14,
+    "endVerse": 22
   },
   {
-    "day": 53,
-    "readings": [
-      "Leviticus 26-27"
-    ]
+    "book": "Job",
+    "startChapter": 15,
+    "startVerse": 1,
+    "endChapter": 18,
+    "endVerse": 21
   },
   {
-    "day": 54,
-    "readings": [
-      "Numbers 1-2"
-    ]
+    "book": "Job",
+    "startChapter": 19,
+    "startVerse": 1,
+    "endChapter": 21,
+    "endVerse": 34
   },
   {
-    "day": 55,
-    "readings": [
-      "Numbers 3-4"
-    ]
+    "book": "Job",
+    "startChapter": 22,
+    "startVerse": 1,
+    "endChapter": 25,
+    "endVerse": 6
   },
   {
-    "day": 56,
-    "readings": [
-      "Numbers 5-6"
-    ]
+    "book": "Job",
+    "startChapter": 26,
+    "startVerse": 1,
+    "endChapter": 29,
+    "endVerse": 25
   },
   {
-    "day": 57,
-    "readings": [
-      "Numbers 7"
-    ]
+    "book": "Job",
+    "startChapter": 30,
+    "startVerse": 1,
+    "endChapter": 31,
+    "endVerse": 40
   },
   {
-    "day": 58,
-    "readings": [
-      "Numbers 8-10"
-    ]
+    "book": "Job",
+    "startChapter": 32,
+    "startVerse": 1,
+    "endChapter": 34,
+    "endVerse": 37
   },
   {
-    "day": 59,
-    "readings": [
-      "Numbers 11-13"
-    ]
+    "book": "Job",
+    "startChapter": 35,
+    "startVerse": 1,
+    "endChapter": 37,
+    "endVerse": 24
   },
   {
-    "day": 60,
-    "readings": [
-      "Numbers 14-15"
-    ]
+    "book": "Job",
+    "startChapter": 38,
+    "startVerse": 1,
+    "endChapter": 40,
+    "endVerse": 5
   },
   {
-    "day": 61,
-    "readings": [
-      "Numbers 16-17"
-    ]
+    "book": "Job",
+    "startChapter": 40,
+    "startVerse": 6,
+    "endChapter": 42,
+    "endVerse": 17
   },
   {
-    "day": 62,
-    "readings": [
-      "Numbers 18-20"
-    ]
+    "book": "Exodus",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 2,
+    "endVerse": 25
   },
   {
-    "day": 63,
-    "readings": [
-      "Numbers 21-22"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 6,
+    "startVerse": 1,
+    "endChapter": 6,
+    "endVerse": 3
   },
   {
-    "day": 64,
-    "readings": [
-      "Numbers 23-25"
-    ]
+    "book": "Exodus",
+    "startChapter": 3,
+    "startVerse": 1,
+    "endChapter": 4,
+    "endVerse": 17
   },
   {
-    "day": 65,
-    "readings": [
-      "Numbers 26-27"
-    ]
+    "book": "Exodus",
+    "startChapter": 4,
+    "startVerse": 18,
+    "endChapter": 7,
+    "endVerse": 13
   },
   {
-    "day": 66,
-    "readings": [
-      "Numbers 28-30"
-    ]
+    "book": "Exodus",
+    "startChapter": 7,
+    "startVerse": 14,
+    "endChapter": 9,
+    "endVerse": 35
   },
   {
-    "day": 67,
-    "readings": [
-      "Numbers 31-32"
-    ]
+    "book": "Exodus",
+    "startChapter": 10,
+    "startVerse": 1,
+    "endChapter": 12,
+    "endVerse": 51
   },
   {
-    "day": 68,
-    "readings": [
-      "Numbers 33-34"
-    ]
+    "book": "Exodus",
+    "startChapter": 13,
+    "startVerse": 1,
+    "endChapter": 15,
+    "endVerse": 27
   },
   {
-    "day": 69,
-    "readings": [
-      "Numbers 35-36"
-    ]
+    "book": "Exodus",
+    "startChapter": 16,
+    "startVerse": 1,
+    "endChapter": 19,
+    "endVerse": 25
   },
   {
-    "day": 70,
-    "readings": [
-      "Deuteronomy 1-2"
-    ]
+    "book": "Exodus",
+    "startChapter": 20,
+    "startVerse": 1,
+    "endChapter": 22,
+    "endVerse": 15
   },
   {
-    "day": 71,
-    "readings": [
-      "Deuteronomy 3-4"
-    ]
+    "book": "Exodus",
+    "startChapter": 22,
+    "startVerse": 16,
+    "endChapter": 24,
+    "endVerse": 18
   },
   {
-    "day": 72,
-    "readings": [
-      "Deuteronomy 5-7"
-    ]
+    "book": "Exodus",
+    "startChapter": 25,
+    "startVerse": 1,
+    "endChapter": 28,
+    "endVerse": 43
   },
   {
-    "day": 73,
-    "readings": [
-      "Deuteronomy 8-10"
-    ]
+    "book": "Exodus",
+    "startChapter": 29,
+    "startVerse": 1,
+    "endChapter": 31,
+    "endVerse": 18
   },
   {
-    "day": 74,
-    "readings": [
-      "Deuteronomy 11-13"
-    ]
+    "book": "Exodus",
+    "startChapter": 32,
+    "startVerse": 1,
+    "endChapter": 34,
+    "endVerse": 35
   },
   {
-    "day": 75,
-    "readings": [
-      "Deuteronomy 14-16"
-    ]
+    "book": "Exodus",
+    "startChapter": 35,
+    "startVerse": 1,
+    "endChapter": 36,
+    "endVerse": 38
   },
   {
-    "day": 76,
-    "readings": [
-      "Deuteronomy 17-20"
-    ]
+    "book": "Exodus",
+    "startChapter": 37,
+    "startVerse": 1,
+    "endChapter": 39,
+    "endVerse": 31
   },
   {
-    "day": 77,
-    "readings": [
-      "Deuteronomy 21-23"
-    ]
+    "book": "Exodus",
+    "startChapter": 39,
+    "startVerse": 32,
+    "endChapter": 40,
+    "endVerse": 38
   },
   {
-    "day": 78,
-    "readings": [
-      "Deuteronomy 24-27"
-    ]
+    "book": "Numbers",
+    "startChapter": 9,
+    "startVerse": 15,
+    "endChapter": 9,
+    "endVerse": 23
   },
   {
-    "day": 79,
-    "readings": [
-      "Deuteronomy 28-29"
-    ]
+    "book": "Numbers",
+    "startChapter": 7,
+    "startVerse": 1,
+    "endChapter": 7,
+    "endVerse": 89
   },
   {
-    "day": 80,
-    "readings": [
-      "Deuteronomy 30-31"
-    ]
+    "book": "Numbers",
+    "startChapter": 8,
+    "startVerse": 1,
+    "endChapter": 9,
+    "endVerse": 14
   },
   {
-    "day": 81,
-    "readings": [
-      "Deuteronomy 32-34",
-      "Psalm 90"
-    ]
+    "book": "Leviticus",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 3,
+    "endVerse": 17
   },
   {
-    "day": 82,
-    "readings": [
-      "Joshua 1-4"
-    ]
+    "book": "Leviticus",
+    "startChapter": 4,
+    "startVerse": 1,
+    "endChapter": 6,
+    "endVerse": 30
   },
   {
-    "day": 83,
-    "readings": [
-      "Joshua 5-8"
-    ]
+    "book": "Leviticus",
+    "startChapter": 7,
+    "startVerse": 1,
+    "endChapter": 8,
+    "endVerse": 36
   },
   {
-    "day": 84,
-    "readings": [
-      "Joshua 9-11"
-    ]
+    "book": "Leviticus",
+    "startChapter": 9,
+    "startVerse": 1,
+    "endChapter": 11,
+    "endVerse": 47
   },
   {
-    "day": 85,
-    "readings": [
-      "Joshua 12-15"
-    ]
+    "book": "Leviticus",
+    "startChapter": 12,
+    "startVerse": 1,
+    "endChapter": 14,
+    "endVerse": 32
   },
   {
-    "day": 86,
-    "readings": [
-      "Joshua 16-18"
-    ]
+    "book": "Leviticus",
+    "startChapter": 14,
+    "startVerse": 33,
+    "endChapter": 16,
+    "endVerse": 34
   },
   {
-    "day": 87,
-    "readings": [
-      "Joshua 19-21"
-    ]
+    "book": "Leviticus",
+    "startChapter": 17,
+    "startVerse": 1,
+    "endChapter": 19,
+    "endVerse": 37
   },
   {
-    "day": 88,
-    "readings": [
-      "Joshua 22-24"
-    ]
+    "book": "Leviticus",
+    "startChapter": 20,
+    "startVerse": 1,
+    "endChapter": 22,
+    "endVerse": 33
   },
   {
-    "day": 89,
-    "readings": [
-      "Judges 1-2"
-    ]
+    "book": "Leviticus",
+    "startChapter": 23,
+    "startVerse": 1,
+    "endChapter": 25,
+    "endVerse": 23
   },
   {
-    "day": 90,
-    "readings": [
-      "Judges 3-5"
-    ]
+    "book": "Leviticus",
+    "startChapter": 25,
+    "startVerse": 24,
+    "endChapter": 26,
+    "endVerse": 46
   },
   {
-    "day": 91,
-    "readings": [
-      "Judges 6-7"
-    ]
+    "book": "Leviticus",
+    "startChapter": 27,
+    "startVerse": 1,
+    "endChapter": 27,
+    "endVerse": 34
   },
   {
-    "day": 92,
-    "readings": [
-      "Judges 8-9"
-    ]
+    "book": "Numbers",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 1,
+    "endVerse": 54
   },
   {
-    "day": 93,
-    "readings": [
-      "Judges 10-12"
-    ]
+    "book": "Numbers",
+    "startChapter": 2,
+    "startVerse": 1,
+    "endChapter": 3,
+    "endVerse": 51
   },
   {
-    "day": 94,
-    "readings": [
-      "Judges 13-15"
-    ]
+    "book": "Numbers",
+    "startChapter": 4,
+    "startVerse": 1,
+    "endChapter": 5,
+    "endVerse": 31
   },
   {
-    "day": 95,
-    "readings": [
-      "Judges 16-18"
-    ]
+    "book": "Numbers",
+    "startChapter": 6,
+    "startVerse": 1,
+    "endChapter": 6,
+    "endVerse": 27
   },
   {
-    "day": 96,
-    "readings": [
-      "Judges 19-21"
-    ]
+    "book": "Numbers",
+    "startChapter": 10,
+    "startVerse": 1,
+    "endChapter": 10,
+    "endVerse": 36
   },
   {
-    "day": 97,
-    "readings": [
-      "Ruth"
-    ]
+    "book": "Numbers",
+    "startChapter": 11,
+    "startVerse": 1,
+    "endChapter": 13,
+    "endVerse": 33
   },
   {
-    "day": 98,
-    "readings": [
-      "1 Samuel 1-3"
-    ]
+    "book": "Numbers",
+    "startChapter": 14,
+    "startVerse": 1,
+    "endChapter": 15,
+    "endVerse": 41
   },
   {
-    "day": 99,
-    "readings": [
-      "1 Samuel 4-8"
-    ]
+    "book": "Numbers",
+    "startChapter": 16,
+    "startVerse": 1,
+    "endChapter": 18,
+    "endVerse": 32
   },
   {
-    "day": 100,
-    "readings": [
-      "1 Samuel 9-12"
-    ]
+    "book": "Numbers",
+    "startChapter": 19,
+    "startVerse": 1,
+    "endChapter": 21,
+    "endVerse": 35
   },
   {
-    "day": 101,
-    "readings": [
-      "1 Samuel 13-14"
-    ]
+    "book": "Numbers",
+    "startChapter": 22,
+    "startVerse": 1,
+    "endChapter": 24,
+    "endVerse": 25
   },
   {
-    "day": 102,
-    "readings": [
-      "1 Samuel 15-17"
-    ]
+    "book": "Numbers",
+    "startChapter": 25,
+    "startVerse": 1,
+    "endChapter": 26,
+    "endVerse": 65
   },
   {
-    "day": 103,
-    "readings": [
-      "1 Samuel 18-20",
-      "Psalms 11, 59"
-    ]
+    "book": "Numbers",
+    "startChapter": 27,
+    "startVerse": 1,
+    "endChapter": 29,
+    "endVerse": 40
   },
   {
-    "day": 104,
-    "readings": [
-      "1 Samuel 21-24",
-      "Psalm 91"
-    ]
+    "book": "Numbers",
+    "startChapter": 30,
+    "startVerse": 1,
+    "endChapter": 31,
+    "endVerse": 54
   },
   {
-    "day": 105,
-    "readings": [
-      "Psalms 7, 27, 31, 34, 52"
-    ]
+    "book": "Numbers",
+    "startChapter": 32,
+    "startVerse": 1,
+    "endChapter": 33,
+    "endVerse": 56
   },
   {
-    "day": 106,
-    "readings": [
-      "Psalms 56, 120, 140-142"
-    ]
+    "book": "Numbers",
+    "startChapter": 34,
+    "startVerse": 1,
+    "endChapter": 36,
+    "endVerse": 13
   },
   {
-    "day": 107,
-    "readings": [
-      "1 Samuel 25-27"
-    ]
+    "book": "Deuteronomy",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 3,
+    "endVerse": 20
   },
   {
-    "day": 108,
-    "readings": [
-      "Psalms 17, 35, 54, 63"
-    ]
+    "book": "Deuteronomy",
+    "startChapter": 3,
+    "startVerse": 21,
+    "endChapter": 5,
+    "endVerse": 33
   },
   {
-    "day": 109,
-    "readings": [
-      "1 Samuel 28-31",
-      "Psalm 18"
-    ]
+    "book": "Deuteronomy",
+    "startChapter": 6,
+    "startVerse": 1,
+    "endChapter": 9,
+    "endVerse": 29
   },
   {
-    "day": 110,
-    "readings": [
-      "Psalms 121, 123-125, 128-130"
-    ]
+    "book": "Deuteronomy",
+    "startChapter": 10,
+    "startVerse": 1,
+    "endChapter": 12,
+    "endVerse": 32
   },
   {
-    "day": 111,
-    "readings": [
-      "2 Samuel 1-4"
-    ]
+    "book": "Deuteronomy",
+    "startChapter": 13,
+    "startVerse": 1,
+    "endChapter": 16,
+    "endVerse": 17
   },
   {
-    "day": 112,
-    "readings": [
-      "Psalms 6, 8-10, 14, 16, 19, 21"
-    ]
+    "book": "Deuteronomy",
+    "startChapter": 16,
+    "startVerse": 18,
+    "endChapter": 21,
+    "endVerse": 9
   },
   {
-    "day": 113,
-    "readings": [
-      "1 Chronicles 1-2"
-    ]
+    "book": "Deuteronomy",
+    "startChapter": 21,
+    "startVerse": 10,
+    "endChapter": 25,
+    "endVerse": 19
   },
   {
-    "day": 114,
-    "readings": [
-      "Psalms 43-45, 49, 84-85, 87"
-    ]
+    "book": "Deuteronomy",
+    "startChapter": 26,
+    "startVerse": 1,
+    "endChapter": 29,
+    "endVerse": 1
   },
   {
-    "day": 115,
-    "readings": [
-      "1 Chronicles 3-5"
-    ]
+    "book": "Deuteronomy",
+    "startChapter": 29,
+    "startVerse": 2,
+    "endChapter": 31,
+    "endVerse": 29
   },
   {
-    "day": 116,
-    "readings": [
-      "Psalms 73, 77-78"
-    ]
+    "book": "Deuteronomy",
+    "startChapter": 31,
+    "startVerse": 30,
+    "endChapter": 32,
+    "endVerse": 52
   },
   {
-    "day": 117,
-    "readings": [
-      "1 Chronicles 6"
-    ]
+    "book": "Psalms",
+    "startChapter": 90,
+    "startVerse": 1,
+    "endChapter": 90,
+    "endVerse": 17
   },
   {
-    "day": 118,
-    "readings": [
-      "Psalms 81, 88, 92-93"
-    ]
+    "book": "Deuteronomy",
+    "startChapter": 33,
+    "startVerse": 1,
+    "endChapter": 34,
+    "endVerse": 12
   },
   {
-    "day": 119,
-    "readings": [
-      "1 Chronicles 7-10"
-    ]
+    "book": "Joshua",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 2,
+    "endVerse": 24
   },
   {
-    "day": 120,
-    "readings": [
-      "Psalms 102-104"
-    ]
+    "book": "Joshua",
+    "startChapter": 3,
+    "startVerse": 1,
+    "endChapter": 6,
+    "endVerse": 27
   },
   {
-    "day": 121,
-    "readings": [
-      "2 Samuel 5",
-      "1 Chronicles 11-12"
-    ]
+    "book": "Joshua",
+    "startChapter": 7,
+    "startVerse": 1,
+    "endChapter": 7,
+    "endVerse": 1
   },
   {
-    "day": 122,
-    "readings": [
-      "Psalm 133"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 2,
+    "startVerse": 7,
+    "endChapter": 2,
+    "endVerse": 7
   },
   {
-    "day": 123,
-    "readings": [
-      "Psalms 106-107"
-    ]
+    "book": "Joshua",
+    "startChapter": 7,
+    "startVerse": 2,
+    "endChapter": 9,
+    "endVerse": 27
   },
   {
-    "day": 124,
-    "readings": [
-      "1 Chronicles 13-16"
-    ]
+    "book": "Joshua",
+    "startChapter": 10,
+    "startVerse": 1,
+    "endChapter": 12,
+    "endVerse": 6
   },
   {
-    "day": 125,
-    "readings": [
-      "Psalms 1-2, 15, 22-24, 47, 68"
-    ]
+    "book": "Joshua",
+    "startChapter": 12,
+    "startVerse": 7,
+    "endChapter": 15,
+    "endVerse": 19
   },
   {
-    "day": 126,
-    "readings": [
-      "Psalms 89, 96, 100-101, 105, 132"
-    ]
+    "book": "Joshua",
+    "startChapter": 15,
+    "startVerse": 20,
+    "endChapter": 17,
+    "endVerse": 18
   },
   {
-    "day": 127,
-    "readings": [
-      "2 Samuel 6-7",
-      "1 Chronicles 17"
-    ]
+    "book": "Joshua",
+    "startChapter": 18,
+    "startVerse": 1,
+    "endChapter": 19,
+    "endVerse": 48
   },
   {
-    "day": 128,
-    "readings": [
-      "Psalms 25, 29, 33, 36, 39"
-    ]
+    "book": "Joshua",
+    "startChapter": 19,
+    "startVerse": 49,
+    "endChapter": 21,
+    "endVerse": 45
   },
   {
-    "day": 129,
-    "readings": [
-      "2 Samuel 8-9",
-      "1 Chronicles 18"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 6,
+    "startVerse": 54,
+    "endChapter": 6,
+    "endVerse": 81
   },
   {
-    "day": 130,
-    "readings": [
-      "Psalms 50, 53, 60, 75"
-    ]
+    "book": "Joshua",
+    "startChapter": 22,
+    "startVerse": 1,
+    "endChapter": 24,
+    "endVerse": 33
   },
   {
-    "day": 131,
-    "readings": [
-      "2 Samuel 10",
-      "1 Chronicles 19",
-      "Psalm 20"
-    ]
+    "book": "Judges",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 3,
+    "endVerse": 30
   },
   {
-    "day": 132,
-    "readings": [
-      "Psalms 65-67, 69-70"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 2,
+    "startVerse": 9,
+    "endChapter": 2,
+    "endVerse": 55
   },
   {
-    "day": 133,
-    "readings": [
-      "2 Samuel 11-12",
-      "1 Chronicles 20"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 4,
+    "startVerse": 1,
+    "endChapter": 4,
+    "endVerse": 23
   },
   {
-    "day": 134,
-    "readings": [
-      "Psalms 32, 51, 86, 122"
-    ]
+    "book": "1 Samuel",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 1,
+    "endVerse": 8
   },
   {
-    "day": 135,
-    "readings": [
-      "2 Samuel 13-15"
-    ]
+    "book": "1 Samuel",
+    "startChapter": 13,
+    "startVerse": 1,
+    "endChapter": 13,
+    "endVerse": 5
   },
   {
-    "day": 136,
-    "readings": [
-      "Psalms 3-4, 12-13, 28, 55"
-    ]
+    "book": "1 Samuel",
+    "startChapter": 13,
+    "startVerse": 19,
+    "endChapter": 13,
+    "endVerse": 23
   },
   {
-    "day": 137,
-    "readings": [
-      "2 Samuel 16-18"
-    ]
+    "book": "1 Samuel",
+    "startChapter": 13,
+    "startVerse": 6,
+    "endChapter": 13,
+    "endVerse": 18
   },
   {
-    "day": 138,
-    "readings": [
-      "Psalms 26, 40, 58, 61-62, 64"
-    ]
+    "book": "1 Samuel",
+    "startChapter": 14,
+    "startVerse": 1,
+    "endChapter": 14,
+    "endVerse": 52
   },
   {
-    "day": 139,
-    "readings": [
-      "2 Samuel 19-21"
-    ]
+    "book": "Psalms",
+    "startChapter": 59,
+    "startVerse": 1,
+    "endChapter": 59,
+    "endVerse": 17
   },
   {
-    "day": 140,
-    "readings": [
-      "Psalms 5, 38, 41-42"
-    ]
+    "book": "1 Samuel",
+    "startChapter": 19,
+    "startVerse": 18,
+    "endChapter": 19,
+    "endVerse": 24
   },
   {
-    "day": 141,
-    "readings": [
-      "2 Samuel 22-23",
-      "Psalm 57"
-    ]
+    "book": "Psalms",
+    "startChapter": 34,
+    "startVerse": 1,
+    "endChapter": 34,
+    "endVerse": 22
   },
   {
-    "day": 142,
-    "readings": [
-      "Psalms 95, 97-99"
-    ]
+    "book": "Psalms",
+    "startChapter": 57,
+    "startVerse": 1,
+    "endChapter": 57,
+    "endVerse": 11
   },
   {
-    "day": 143,
-    "readings": [
-      "2 Samuel 24",
-      "1 Chronicles 21-22",
-      "Psalm 30"
-    ]
+    "book": "Psalms",
+    "startChapter": 142,
+    "startVerse": 1,
+    "endChapter": 142,
+    "endVerse": 7
   },
   {
-    "day": 144,
-    "readings": [
-      "Psalms 108-110"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 12,
+    "startVerse": 8,
+    "endChapter": 12,
+    "endVerse": 18
   },
   {
-    "day": 145,
-    "readings": [
-      "1 Chronicles 23-25"
-    ]
+    "book": "1 Samuel",
+    "startChapter": 22,
+    "startVerse": 3,
+    "endChapter": 22,
+    "endVerse": 23
   },
   {
-    "day": 146,
-    "readings": [
-      "Psalms 131, 138-139, 143-145"
-    ]
+    "book": "Psalms",
+    "startChapter": 52,
+    "startVerse": 1,
+    "endChapter": 52,
+    "endVerse": 9
   },
   {
-    "day": 147,
-    "readings": [
-      "1 Chronicles 26-29",
-      "Psalm 127"
-    ]
+    "book": "1 Samuel",
+    "startChapter": 23,
+    "startVerse": 1,
+    "endChapter": 23,
+    "endVerse": 12
   },
   {
-    "day": 148,
-    "readings": [
-      "Psalms 111-118"
-    ]
+    "book": "Psalms",
+    "startChapter": 54,
+    "startVerse": 1,
+    "endChapter": 54,
+    "endVerse": 7
   },
   {
-    "day": 149,
-    "readings": [
-      "1 Kings 1-2",
-      "Psalms 37, 71, 94"
-    ]
+    "book": "1 Samuel",
+    "startChapter": 24,
+    "startVerse": 1,
+    "endChapter": 25,
+    "endVerse": 44
   },
   {
-    "day": 150,
-    "readings": [
-      "Psalm 119"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 12,
+    "startVerse": 1,
+    "endChapter": 12,
+    "endVerse": 7
   },
   {
-    "day": 151,
-    "readings": [
-      "1 Kings 3-4"
-    ]
+    "book": "1 Samuel",
+    "startChapter": 27,
+    "startVerse": 8,
+    "endChapter": 29,
+    "endVerse": 11
   },
   {
-    "day": 152,
-    "readings": [
-      "2 Chronicles 1",
-      "Psalm 72"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 12,
+    "startVerse": 19,
+    "endChapter": 12,
+    "endVerse": 19
   },
   {
-    "day": 153,
-    "readings": [
-      "Song of Solomon"
-    ]
+    "book": "Psalms",
+    "startChapter": 56,
+    "startVerse": 1,
+    "endChapter": 56,
+    "endVerse": 13
   },
   {
-    "day": 154,
-    "readings": [
-      "Proverbs 1-3"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 12,
+    "startVerse": 20,
+    "endChapter": 12,
+    "endVerse": 22
   },
   {
-    "day": 155,
-    "readings": [
-      "Proverbs 4-6"
-    ]
+    "book": "1 Samuel",
+    "startChapter": 31,
+    "startVerse": 1,
+    "endChapter": 31,
+    "endVerse": 13
   },
   {
-    "day": 156,
-    "readings": [
-      "Proverbs 7-9"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 10,
+    "startVerse": 1,
+    "endChapter": 10,
+    "endVerse": 14
   },
   {
-    "day": 157,
-    "readings": [
-      "Proverbs 10-12"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 9,
+    "startVerse": 40,
+    "endChapter": 9,
+    "endVerse": 44
   },
   {
-    "day": 158,
-    "readings": [
-      "Proverbs 13-15"
-    ]
+    "book": "2 Samuel",
+    "startChapter": 4,
+    "startVerse": 4,
+    "endChapter": 4,
+    "endVerse": 4
   },
   {
-    "day": 159,
-    "readings": [
-      "Proverbs 16-18"
-    ]
+    "book": "2 Samuel",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 1,
+    "endVerse": 27
   },
   {
-    "day": 160,
-    "readings": [
-      "Proverbs 19-21"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 3,
+    "startVerse": 1,
+    "endChapter": 3,
+    "endVerse": 4
   },
   {
-    "day": 161,
-    "readings": [
-      "Proverbs 22-24"
-    ]
+    "book": "2 Samuel",
+    "startChapter": 23,
+    "startVerse": 8,
+    "endChapter": 23,
+    "endVerse": 17
   },
   {
-    "day": 162,
-    "readings": [
-      "1 Kings 5-6",
-      "2 Chronicles 2-3"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 11,
+    "startVerse": 10,
+    "endChapter": 11,
+    "endVerse": 19
   },
   {
-    "day": 163,
-    "readings": [
-      "1 Kings 7",
-      "2 Chronicles 4"
-    ]
+    "book": "2 Samuel",
+    "startChapter": 23,
+    "startVerse": 18,
+    "endChapter": 23,
+    "endVerse": 39
   },
   {
-    "day": 164,
-    "readings": [
-      "1 Kings 8",
-      "2 Chronicles 5"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 11,
+    "startVerse": 20,
+    "endChapter": 11,
+    "endVerse": 47
   },
   {
-    "day": 165,
-    "readings": [
-      "2 Chronicles 6-7",
-      "Psalm 136"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 11,
+    "startVerse": 1,
+    "endChapter": 11,
+    "endVerse": 3
   },
   {
-    "day": 166,
-    "readings": [
-      "Psalms 134, 146-150"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 12,
+    "startVerse": 23,
+    "endChapter": 12,
+    "endVerse": 40
   },
   {
-    "day": 167,
-    "readings": [
-      "1 Kings 9",
-      "2 Chronicles 8"
-    ]
+    "book": "2 Samuel",
+    "startChapter": 5,
+    "startVerse": 17,
+    "endChapter": 5,
+    "endVerse": 25
   },
   {
-    "day": 168,
-    "readings": [
-      "Proverbs 25-26"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 14,
+    "startVerse": 8,
+    "endChapter": 14,
+    "endVerse": 17
   },
   {
-    "day": 169,
-    "readings": [
-      "Proverbs 27-29"
-    ]
+    "book": "2 Samuel",
+    "startChapter": 5,
+    "startVerse": 6,
+    "endChapter": 5,
+    "endVerse": 10
   },
   {
-    "day": 170,
-    "readings": [
-      "Ecclesiastes 1-6"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 11,
+    "startVerse": 4,
+    "endChapter": 11,
+    "endVerse": 9
   },
   {
-    "day": 171,
-    "readings": [
-      "Ecclesiastes 7-12"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 3,
+    "startVerse": 4,
+    "endChapter": 3,
+    "endVerse": 4
   },
   {
-    "day": 172,
-    "readings": [
-      "1 Kings 10-11",
-      "2 Chronicles 9"
-    ]
+    "book": "2 Samuel",
+    "startChapter": 5,
+    "startVerse": 13,
+    "endChapter": 5,
+    "endVerse": 13
   },
   {
-    "day": 173,
-    "readings": [
-      "Proverbs 30-31"
-    ]
+    "book": "2 Samuel",
+    "startChapter": 5,
+    "startVerse": 4,
+    "endChapter": 5,
+    "endVerse": 5
   },
   {
-    "day": 174,
-    "readings": [
-      "1 Kings 12-14"
-    ]
+    "book": "2 Samuel",
+    "startChapter": 5,
+    "startVerse": 11,
+    "endChapter": 5,
+    "endVerse": 12
   },
   {
-    "day": 175,
-    "readings": [
-      "2 Chronicles 10-12"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 14,
+    "startVerse": 1,
+    "endChapter": 14,
+    "endVerse": 2
   },
   {
-    "day": 176,
-    "readings": [
-      "1 Kings 15",
-      "2 Chronicles 13-16"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 13,
+    "startVerse": 1,
+    "endChapter": 13,
+    "endVerse": 5
   },
   {
-    "day": 177,
-    "readings": [
-      "1 Kings 16",
-      "2 Chronicles 17"
-    ]
+    "book": "2 Samuel",
+    "startChapter": 6,
+    "startVerse": 1,
+    "endChapter": 6,
+    "endVerse": 11
   },
   {
-    "day": 178,
-    "readings": [
-      "1 Kings 17-19"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 13,
+    "startVerse": 6,
+    "endChapter": 13,
+    "endVerse": 14
   },
   {
-    "day": 179,
-    "readings": [
-      "1 Kings 20-21"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 15,
+    "startVerse": 1,
+    "endChapter": 15,
+    "endVerse": 28
   },
   {
-    "day": 180,
-    "readings": [
-      "1 Kings 22",
-      "2 Chronicles 18"
-    ]
+    "book": "2 Samuel",
+    "startChapter": 6,
+    "startVerse": 12,
+    "endChapter": 6,
+    "endVerse": 16
   },
   {
-    "day": 181,
-    "readings": [
-      "2 Chronicles 19-23"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 15,
+    "startVerse": 29,
+    "endChapter": 15,
+    "endVerse": 29
   },
   {
-    "day": 182,
-    "readings": [
-      "Obadiah",
-      "Psalms 82-83"
-    ]
+    "book": "2 Samuel",
+    "startChapter": 6,
+    "startVerse": 17,
+    "endChapter": 6,
+    "endVerse": 19
   },
   {
-    "day": 183,
-    "readings": [
-      "2 Kings 1-4"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 16,
+    "startVerse": 1,
+    "endChapter": 16,
+    "endVerse": 43
   },
   {
-    "day": 184,
-    "readings": [
-      "2 Kings 5-8"
-    ]
+    "book": "2 Samuel",
+    "startChapter": 6,
+    "startVerse": 19,
+    "endChapter": 6,
+    "endVerse": 23
   },
   {
-    "day": 185,
-    "readings": [
-      "2 Kings 9-11"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 17,
+    "startVerse": 1,
+    "endChapter": 17,
+    "endVerse": 15
   },
   {
-    "day": 186,
-    "readings": [
-      "2 Kings 12-13",
-      "2 Chronicles 24"
-    ]
+    "book": "2 Samuel",
+    "startChapter": 7,
+    "startVerse": 18,
+    "endChapter": 7,
+    "endVerse": 29
   },
   {
-    "day": 187,
-    "readings": [
-      "2 Kings 14",
-      "2 Chronicles 25"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 17,
+    "startVerse": 16,
+    "endChapter": 17,
+    "endVerse": 27
   },
   {
-    "day": 188,
-    "readings": [
-      "Jonah"
-    ]
+    "book": "2 Samuel",
+    "startChapter": 8,
+    "startVerse": 1,
+    "endChapter": 8,
+    "endVerse": 14
   },
   {
-    "day": 189,
-    "readings": [
-      "2 Kings 15",
-      "2 Chronicles 26"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 18,
+    "startVerse": 1,
+    "endChapter": 18,
+    "endVerse": 13
   },
   {
-    "day": 190,
-    "readings": [
-      "Isaiah 1-4"
-    ]
+    "book": "Psalms",
+    "startChapter": 60,
+    "startVerse": 1,
+    "endChapter": 60,
+    "endVerse": 12
   },
   {
-    "day": 191,
-    "readings": [
-      "Isaiah 5-8"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 18,
+    "startVerse": 14,
+    "endChapter": 18,
+    "endVerse": 17
   },
   {
-    "day": 192,
-    "readings": [
-      "Amos 1-5"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 6,
+    "startVerse": 16,
+    "endChapter": 6,
+    "endVerse": 30
   },
   {
-    "day": 193,
-    "readings": [
-      "Amos 6-9"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 6,
+    "startVerse": 50,
+    "endChapter": 6,
+    "endVerse": 53
   },
   {
-    "day": 194,
-    "readings": [
-      "2 Chronicles 27",
-      "Isaiah 9-12"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 6,
+    "startVerse": 31,
+    "endChapter": 6,
+    "endVerse": 48
   },
   {
-    "day": 195,
-    "readings": [
-      "Micah"
-    ]
+    "book": "2 Samuel",
+    "startChapter": 9,
+    "startVerse": 1,
+    "endChapter": 10,
+    "endVerse": 19
   },
   {
-    "day": 196,
-    "readings": [
-      "2 Chronicles 28",
-      "2 Kings 16-17"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 19,
+    "startVerse": 1,
+    "endChapter": 19,
+    "endVerse": 19
   },
   {
-    "day": 197,
-    "readings": [
-      "Isaiah 13-17"
-    ]
+    "book": "2 Samuel",
+    "startChapter": 11,
+    "startVerse": 1,
+    "endChapter": 12,
+    "endVerse": 14
   },
   {
-    "day": 198,
-    "readings": [
-      "Isaiah 18-22"
-    ]
+    "book": "Psalms",
+    "startChapter": 51,
+    "startVerse": 1,
+    "endChapter": 51,
+    "endVerse": 19
   },
   {
-    "day": 199,
-    "readings": [
-      "Isaiah 23-27"
-    ]
+    "book": "2 Samuel",
+    "startChapter": 12,
+    "startVerse": 15,
+    "endChapter": 12,
+    "endVerse": 25
   },
   {
-    "day": 200,
-    "readings": [
-      "2 Kings 18",
-      "2 Chronicles 29-31",
-      "Psalm 48"
-    ]
+    "book": "2 Samuel",
+    "startChapter": 5,
+    "startVerse": 14,
+    "endChapter": 5,
+    "endVerse": 16
   },
   {
-    "day": 201,
-    "readings": [
-      "Hosea 1-7"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 14,
+    "startVerse": 3,
+    "endChapter": 14,
+    "endVerse": 7
   },
   {
-    "day": 202,
-    "readings": [
-      "Hosea 8-14"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 3,
+    "startVerse": 5,
+    "endChapter": 3,
+    "endVerse": 9
   },
   {
-    "day": 203,
-    "readings": [
-      "Isaiah 28-30"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 20,
+    "startVerse": 2,
+    "endChapter": 20,
+    "endVerse": 3
   },
   {
-    "day": 204,
-    "readings": [
-      "Isaiah 31-34"
-    ]
+    "book": "2 Samuel",
+    "startChapter": 13,
+    "startVerse": 1,
+    "endChapter": 14,
+    "endVerse": 33
   },
   {
-    "day": 205,
-    "readings": [
-      "Isaiah 35-36"
-    ]
+    "book": "Psalms",
+    "startChapter": 3,
+    "startVerse": 1,
+    "endChapter": 3,
+    "endVerse": 8
   },
   {
-    "day": 206,
-    "readings": [
-      "Isaiah 37-39",
-      "Psalm 76"
-    ]
+    "book": "Psalms",
+    "startChapter": 63,
+    "startVerse": 1,
+    "endChapter": 63,
+    "endVerse": 11
   },
   {
-    "day": 207,
-    "readings": [
-      "Isaiah 40-43"
-    ]
+    "book": "2 Samuel",
+    "startChapter": 18,
+    "startVerse": 1,
+    "endChapter": 19,
+    "endVerse": 30
   },
   {
-    "day": 208,
-    "readings": [
-      "Isaiah 44-48"
-    ]
+    "book": "Psalms",
+    "startChapter": 7,
+    "startVerse": 1,
+    "endChapter": 7,
+    "endVerse": 17
   },
   {
-    "day": 209,
-    "readings": [
-      "2 Kings 19",
-      "Psalms 46, 80, 135"
-    ]
+    "book": "2 Samuel",
+    "startChapter": 21,
+    "startVerse": 1,
+    "endChapter": 21,
+    "endVerse": 22
   },
   {
-    "day": 210,
-    "readings": [
-      "Isaiah 49-53"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 20,
+    "startVerse": 4,
+    "endChapter": 20,
+    "endVerse": 8
   },
   {
-    "day": 211,
-    "readings": [
-      "Isaiah 54-58"
-    ]
+    "book": "Psalms",
+    "startChapter": 18,
+    "startVerse": 1,
+    "endChapter": 18,
+    "endVerse": 50
   },
   {
-    "day": 212,
-    "readings": [
-      "Isaiah 59-63"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 21,
+    "startVerse": 1,
+    "endChapter": 21,
+    "endVerse": 6
   },
   {
-    "day": 213,
-    "readings": [
-      "Isaiah 64-66"
-    ]
+    "book": "2 Samuel",
+    "startChapter": 24,
+    "startVerse": 10,
+    "endChapter": 24,
+    "endVerse": 17
   },
   {
-    "day": 214,
-    "readings": [
-      "2 Kings 20-21"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 21,
+    "startVerse": 7,
+    "endChapter": 21,
+    "endVerse": 17
   },
   {
-    "day": 215,
-    "readings": [
-      "2 Chronicles 32-33"
-    ]
+    "book": "2 Samuel",
+    "startChapter": 24,
+    "startVerse": 18,
+    "endChapter": 24,
+    "endVerse": 25
   },
   {
-    "day": 216,
-    "readings": [
-      "Nahum"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 21,
+    "startVerse": 18,
+    "endChapter": 22,
+    "endVerse": 19
   },
   {
-    "day": 217,
-    "readings": [
-      "2 Kings 22-23",
-      "2 Chronicles 34-35"
-    ]
+    "book": "1 Kings",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 1,
+    "endVerse": 53
   },
   {
-    "day": 218,
-    "readings": [
-      "Zephaniah"
-    ]
+    "book": "2 Samuel",
+    "startChapter": 23,
+    "startVerse": 1,
+    "endChapter": 23,
+    "endVerse": 7
   },
   {
-    "day": 219,
-    "readings": [
-      "Jeremiah 1-3"
-    ]
+    "book": "1 Kings",
+    "startChapter": 2,
+    "startVerse": 10,
+    "endChapter": 2,
+    "endVerse": 12
   },
   {
-    "day": 220,
-    "readings": [
-      "Jeremiah 4-6"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 29,
+    "startVerse": 26,
+    "endChapter": 29,
+    "endVerse": 30
   },
   {
-    "day": 221,
-    "readings": [
-      "Jeremiah 7-9"
-    ]
+    "book": "Psalms",
+    "startChapter": 4,
+    "startVerse": 1,
+    "endChapter": 6,
+    "endVerse": 10
   },
   {
-    "day": 222,
-    "readings": [
-      "Jeremiah 10-13"
-    ]
+    "book": "Psalms",
+    "startChapter": 8,
+    "startVerse": 1,
+    "endChapter": 9,
+    "endVerse": 20
   },
   {
-    "day": 223,
-    "readings": [
-      "Jeremiah 14-17"
-    ]
+    "book": "Psalms",
+    "startChapter": 11,
+    "startVerse": 1,
+    "endChapter": 11,
+    "endVerse": 7
   },
   {
-    "day": 224,
-    "readings": [
-      "Jeremiah 18-22"
-    ]
+    "book": "Psalms",
+    "startChapter": 19,
+    "startVerse": 1,
+    "endChapter": 21,
+    "endVerse": 13
   },
   {
-    "day": 225,
-    "readings": [
-      "Jeremiah 23-25"
-    ]
+    "book": "Psalms",
+    "startChapter": 53,
+    "startVerse": 1,
+    "endChapter": 53,
+    "endVerse": 6
   },
   {
-    "day": 226,
-    "readings": [
-      "Jeremiah 26-29"
-    ]
+    "book": "Psalms",
+    "startChapter": 55,
+    "startVerse": 1,
+    "endChapter": 55,
+    "endVerse": 23
   },
   {
-    "day": 227,
-    "readings": [
-      "Jeremiah 30-31"
-    ]
+    "book": "Psalms",
+    "startChapter": 58,
+    "startVerse": 1,
+    "endChapter": 58,
+    "endVerse": 11
   },
   {
-    "day": 228,
-    "readings": [
-      "Jeremiah 32-34"
-    ]
+    "book": "Psalms",
+    "startChapter": 64,
+    "startVerse": 1,
+    "endChapter": 67,
+    "endVerse": 7
   },
   {
-    "day": 229,
-    "readings": [
-      "Jeremiah 35-37"
-    ]
+    "book": "Psalms",
+    "startChapter": 86,
+    "startVerse": 1,
+    "endChapter": 86,
+    "endVerse": 17
   },
   {
-    "day": 230,
-    "readings": [
-      "Jeremiah 38-40",
-      "Psalms 74, 79"
-    ]
+    "book": "Psalms",
+    "startChapter": 101,
+    "startVerse": 1,
+    "endChapter": 101,
+    "endVerse": 8
   },
   {
-    "day": 231,
-    "readings": [
-      "2 Kings 24-25",
-      "2 Chronicles 36"
-    ]
+    "book": "Psalms",
+    "startChapter": 108,
+    "startVerse": 1,
+    "endChapter": 110,
+    "endVerse": 7
   },
   {
-    "day": 232,
-    "readings": [
-      "Habakkuk"
-    ]
+    "book": "Psalms",
+    "startChapter": 122,
+    "startVerse": 1,
+    "endChapter": 122,
+    "endVerse": 9
   },
   {
-    "day": 233,
-    "readings": [
-      "Jeremiah 41-45"
-    ]
+    "book": "Psalms",
+    "startChapter": 124,
+    "startVerse": 1,
+    "endChapter": 124,
+    "endVerse": 8
   },
   {
-    "day": 234,
-    "readings": [
-      "Jeremiah 46-48"
-    ]
+    "book": "Psalms",
+    "startChapter": 133,
+    "startVerse": 1,
+    "endChapter": 133,
+    "endVerse": 3
   },
   {
-    "day": 235,
-    "readings": [
-      "Jeremiah 49-50"
-    ]
+    "book": "Psalms",
+    "startChapter": 138,
+    "startVerse": 1,
+    "endChapter": 141,
+    "endVerse": 10
   },
   {
-    "day": 236,
-    "readings": [
-      "Jeremiah 51-52"
-    ]
+    "book": "Psalms",
+    "startChapter": 143,
+    "startVerse": 1,
+    "endChapter": 143,
+    "endVerse": 12
   },
   {
-    "day": 237,
-    "readings": [
-      "Lamentations 1-2"
-    ]
+    "book": "Psalms",
+    "startChapter": 88,
+    "startVerse": 1,
+    "endChapter": 89,
+    "endVerse": 52
   },
   {
-    "day": 238,
-    "readings": [
-      "Lamentations 3-5"
-    ]
+    "book": "Psalms",
+    "startChapter": 73,
+    "startVerse": 1,
+    "endChapter": 74,
+    "endVerse": 23
   },
   {
-    "day": 239,
-    "readings": [
-      "Ezekiel 1-4"
-    ]
+    "book": "1 Chronicles",
+    "startChapter": 29,
+    "startVerse": 23,
+    "endChapter": 29,
+    "endVerse": 25
   },
   {
-    "day": 240,
-    "readings": [
-      "Ezekiel 5-8"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 1,
+    "endVerse": 1
   },
   {
-    "day": 241,
-    "readings": [
-      "Ezekiel 9-12"
-    ]
+    "book": "1 Kings",
+    "startChapter": 2,
+    "startVerse": 13,
+    "endChapter": 3,
+    "endVerse": 4
   },
   {
-    "day": 242,
-    "readings": [
-      "Ezekiel 13-15"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 1,
+    "startVerse": 2,
+    "endChapter": 1,
+    "endVerse": 6
   },
   {
-    "day": 243,
-    "readings": [
-      "Ezekiel 16-17"
-    ]
+    "book": "1 Kings",
+    "startChapter": 3,
+    "startVerse": 5,
+    "endChapter": 3,
+    "endVerse": 15
   },
   {
-    "day": 244,
-    "readings": [
-      "Ezekiel 18-20"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 1,
+    "startVerse": 7,
+    "endChapter": 1,
+    "endVerse": 13
   },
   {
-    "day": 245,
-    "readings": [
-      "Ezekiel 21-22"
-    ]
+    "book": "1 Kings",
+    "startChapter": 5,
+    "startVerse": 1,
+    "endChapter": 5,
+    "endVerse": 18
   },
   {
-    "day": 246,
-    "readings": [
-      "Ezekiel 23-24"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 2,
+    "startVerse": 1,
+    "endChapter": 2,
+    "endVerse": 18
   },
   {
-    "day": 247,
-    "readings": [
-      "Ezekiel 25-27"
-    ]
+    "book": "1 Kings",
+    "startChapter": 6,
+    "startVerse": 1,
+    "endChapter": 6,
+    "endVerse": 13
   },
   {
-    "day": 248,
-    "readings": [
-      "Ezekiel 28-30"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 3,
+    "startVerse": 1,
+    "endChapter": 3,
+    "endVerse": 14
   },
   {
-    "day": 249,
-    "readings": [
-      "Ezekiel 31-33"
-    ]
+    "book": "1 Kings",
+    "startChapter": 6,
+    "startVerse": 14,
+    "endChapter": 6,
+    "endVerse": 38
   },
   {
-    "day": 250,
-    "readings": [
-      "Ezekiel 34-36"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 3,
+    "startVerse": 15,
+    "endChapter": 4,
+    "endVerse": 22
   },
   {
-    "day": 251,
-    "readings": [
-      "Ezekiel 37-39"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 5,
+    "startVerse": 1,
+    "endChapter": 5,
+    "endVerse": 14
   },
   {
-    "day": 252,
-    "readings": [
-      "Ezekiel 40-42"
-    ]
+    "book": "1 Kings",
+    "startChapter": 8,
+    "startVerse": 12,
+    "endChapter": 8,
+    "endVerse": 21
   },
   {
-    "day": 253,
-    "readings": [
-      "Ezekiel 43-45"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 6,
+    "startVerse": 1,
+    "endChapter": 6,
+    "endVerse": 11
   },
   {
-    "day": 254,
-    "readings": [
-      "Ezekiel 46-48"
-    ]
+    "book": "1 Kings",
+    "startChapter": 8,
+    "startVerse": 22,
+    "endChapter": 8,
+    "endVerse": 53
   },
   {
-    "day": 255,
-    "readings": [
-      "Joel"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 6,
+    "startVerse": 12,
+    "endChapter": 6,
+    "endVerse": 42
   },
   {
-    "day": 256,
-    "readings": [
-      "Daniel 1-3"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 7,
+    "startVerse": 1,
+    "endChapter": 7,
+    "endVerse": 10
   },
   {
-    "day": 257,
-    "readings": [
-      "Daniel 4-6"
-    ]
+    "book": "1 Kings",
+    "startChapter": 9,
+    "startVerse": 1,
+    "endChapter": 9,
+    "endVerse": 9
   },
   {
-    "day": 258,
-    "readings": [
-      "Daniel 7-9"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 7,
+    "startVerse": 11,
+    "endChapter": 7,
+    "endVerse": 22
   },
   {
-    "day": 259,
-    "readings": [
-      "Daniel 10-12"
-    ]
+    "book": "1 Kings",
+    "startChapter": 9,
+    "startVerse": 10,
+    "endChapter": 9,
+    "endVerse": 14
   },
   {
-    "day": 260,
-    "readings": [
-      "Ezra 1-3"
-    ]
+    "book": "1 Kings",
+    "startChapter": 9,
+    "startVerse": 15,
+    "endChapter": 10,
+    "endVerse": 13
   },
   {
-    "day": 261,
-    "readings": [
-      "Ezra 4-6",
-      "Psalm 137"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 9,
+    "startVerse": 1,
+    "endChapter": 9,
+    "endVerse": 12
   },
   {
-    "day": 262,
-    "readings": [
-      "Haggai"
-    ]
+    "book": "1 Kings",
+    "startChapter": 10,
+    "startVerse": 14,
+    "endChapter": 10,
+    "endVerse": 29
   },
   {
-    "day": 263,
-    "readings": [
-      "Zechariah 1-4"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 9,
+    "startVerse": 13,
+    "endChapter": 9,
+    "endVerse": 28
   },
   {
-    "day": 264,
-    "readings": [
-      "Zechariah 5-9"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 1,
+    "startVerse": 14,
+    "endChapter": 1,
+    "endVerse": 17
   },
   {
-    "day": 265,
-    "readings": [
-      "Zechariah 10-14"
-    ]
+    "book": "Psalms",
+    "startChapter": 72,
+    "startVerse": 1,
+    "endChapter": 72,
+    "endVerse": 20
   },
   {
-    "day": 266,
-    "readings": [
-      "Esther 1-5"
-    ]
+    "book": "Psalms",
+    "startChapter": 127,
+    "startVerse": 1,
+    "endChapter": 127,
+    "endVerse": 5
   },
   {
-    "day": 267,
-    "readings": [
-      "Esther 6-10"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 9,
+    "startVerse": 29,
+    "endChapter": 9,
+    "endVerse": 31
   },
   {
-    "day": 268,
-    "readings": [
-      "Ezra 7-10"
-    ]
+    "book": "Ecclesiastes",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 1,
+    "endVerse": 11
   },
   {
-    "day": 269,
-    "readings": [
-      "Nehemiah 1-5"
-    ]
+    "book": "1 Kings",
+    "startChapter": 12,
+    "startVerse": 1,
+    "endChapter": 12,
+    "endVerse": 20
   },
   {
-    "day": 270,
-    "readings": [
-      "Nehemiah 6-7"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 10,
+    "startVerse": 1,
+    "endChapter": 10,
+    "endVerse": 19
   },
   {
-    "day": 271,
-    "readings": [
-      "Nehemiah 8-10"
-    ]
+    "book": "1 Kings",
+    "startChapter": 12,
+    "startVerse": 21,
+    "endChapter": 12,
+    "endVerse": 24
   },
   {
-    "day": 272,
-    "readings": [
-      "Nehemiah 11-13",
-      "Psalm 126"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 11,
+    "startVerse": 1,
+    "endChapter": 11,
+    "endVerse": 4
   },
   {
-    "day": 273,
-    "readings": [
-      "Malachi"
-    ]
+    "book": "1 Kings",
+    "startChapter": 12,
+    "startVerse": 25,
+    "endChapter": 12,
+    "endVerse": 33
   },
   {
-    "day": 274,
-    "readings": [
-      "Luke 1",
-      "John 1"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 11,
+    "startVerse": 5,
+    "endChapter": 11,
+    "endVerse": 17
   },
   {
-    "day": 275,
-    "readings": [
-      "Matthew 1",
-      "Luke 2"
-    ]
+    "book": "1 Kings",
+    "startChapter": 14,
+    "startVerse": 21,
+    "endChapter": 14,
+    "endVerse": 24
   },
   {
-    "day": 276,
-    "readings": [
-      "Matthew 2"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 12,
+    "startVerse": 13,
+    "endChapter": 12,
+    "endVerse": 14
   },
   {
-    "day": 277,
-    "readings": [
-      "Matthew 3",
-      "Mark 1",
-      "Luke 3"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 11,
+    "startVerse": 18,
+    "endChapter": 11,
+    "endVerse": 23
   },
   {
-    "day": 278,
-    "readings": [
-      "Matthew 4",
-      "Luke 4-5"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 12,
+    "startVerse": 1,
+    "endChapter": 12,
+    "endVerse": 12
   },
   {
-    "day": 279,
-    "readings": [
-      "John 2-4"
-    ]
+    "book": "1 Kings",
+    "startChapter": 14,
+    "startVerse": 25,
+    "endChapter": 14,
+    "endVerse": 28
   },
   {
-    "day": 280,
-    "readings": [
-      "Matthew 8",
-      "Mark 2"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 12,
+    "startVerse": 15,
+    "endChapter": 12,
+    "endVerse": 16
   },
   {
-    "day": 281,
-    "readings": [
-      "John 5"
-    ]
+    "book": "1 Kings",
+    "startChapter": 14,
+    "startVerse": 29,
+    "endChapter": 15,
+    "endVerse": 5
   },
   {
-    "day": 282,
-    "readings": [
-      "Matthew 12",
-      "Mark 3",
-      "Luke 6"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 13,
+    "startVerse": 1,
+    "endChapter": 13,
+    "endVerse": 22
   },
   {
-    "day": 283,
-    "readings": [
-      "Matthew 5-7"
-    ]
+    "book": "1 Kings",
+    "startChapter": 15,
+    "startVerse": 6,
+    "endChapter": 15,
+    "endVerse": 8
   },
   {
-    "day": 284,
-    "readings": [
-      "Matthew 9",
-      "Luke 7"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 14,
+    "startVerse": 1,
+    "endChapter": 14,
+    "endVerse": 8
   },
   {
-    "day": 285,
-    "readings": [
-      "Matthew 11"
-    ]
+    "book": "1 Kings",
+    "startChapter": 15,
+    "startVerse": 9,
+    "endChapter": 15,
+    "endVerse": 15
   },
   {
-    "day": 286,
-    "readings": [
-      "Luke 11"
-    ]
+    "book": "1 Kings",
+    "startChapter": 14,
+    "startVerse": 19,
+    "endChapter": 14,
+    "endVerse": 20
   },
   {
-    "day": 287,
-    "readings": [
-      "Matthew 13",
-      "Luke 8"
-    ]
+    "book": "1 Kings",
+    "startChapter": 15,
+    "startVerse": 25,
+    "endChapter": 15,
+    "endVerse": 34
   },
   {
-    "day": 288,
-    "readings": [
-      "Mark 4-5"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 14,
+    "startVerse": 9,
+    "endChapter": 14,
+    "endVerse": 15
   },
   {
-    "day": 289,
-    "readings": [
-      "Matthew 10"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 15,
+    "startVerse": 1,
+    "endChapter": 15,
+    "endVerse": 19
   },
   {
-    "day": 290,
-    "readings": [
-      "Matthew 14",
-      "Mark 6",
-      "Luke 9"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 16,
+    "startVerse": 1,
+    "endChapter": 16,
+    "endVerse": 10
   },
   {
-    "day": 291,
-    "readings": [
-      "John 6"
-    ]
+    "book": "1 Kings",
+    "startChapter": 16,
+    "startVerse": 1,
+    "endChapter": 16,
+    "endVerse": 34
   },
   {
-    "day": 292,
-    "readings": [
-      "Matthew 15",
-      "Mark 7"
-    ]
+    "book": "1 Kings",
+    "startChapter": 15,
+    "startVerse": 23,
+    "endChapter": 15,
+    "endVerse": 24
   },
   {
-    "day": 293,
-    "readings": [
-      "Matthew 16",
-      "Mark 8"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 16,
+    "startVerse": 11,
+    "endChapter": 17,
+    "endVerse": 19
   },
   {
-    "day": 294,
-    "readings": [
-      "Matthew 17",
-      "Mark 9"
-    ]
+    "book": "1 Kings",
+    "startChapter": 17,
+    "startVerse": 1,
+    "endChapter": 17,
+    "endVerse": 7
   },
   {
-    "day": 295,
-    "readings": [
-      "Matthew 18"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 18,
+    "startVerse": 1,
+    "endChapter": 18,
+    "endVerse": 8
   },
   {
-    "day": 296,
-    "readings": [
-      "John 7-8"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 18,
+    "startVerse": 9,
+    "endChapter": 18,
+    "endVerse": 27
   },
   {
-    "day": 297,
-    "readings": [
-      "John 9-10"
-    ]
+    "book": "1 Kings",
+    "startChapter": 22,
+    "startVerse": 29,
+    "endChapter": 22,
+    "endVerse": 35
   },
   {
-    "day": 298,
-    "readings": [
-      "Luke 10"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 18,
+    "startVerse": 28,
+    "endChapter": 18,
+    "endVerse": 34
   },
   {
-    "day": 299,
-    "readings": [
-      "Luke 12-13"
-    ]
+    "book": "1 Kings",
+    "startChapter": 22,
+    "startVerse": 36,
+    "endChapter": 22,
+    "endVerse": 40
   },
   {
-    "day": 300,
-    "readings": [
-      "Luke 14-15"
-    ]
+    "book": "1 Kings",
+    "startChapter": 22,
+    "startVerse": 51,
+    "endChapter": 22,
+    "endVerse": 53
   },
   {
-    "day": 301,
-    "readings": [
-      "Luke 16-17"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 19,
+    "startVerse": 1,
+    "endChapter": 20,
+    "endVerse": 30
   },
   {
-    "day": 302,
-    "readings": [
-      "John 11"
-    ]
+    "book": "2 Kings",
+    "startChapter": 3,
+    "startVerse": 1,
+    "endChapter": 3,
+    "endVerse": 27
   },
   {
-    "day": 303,
-    "readings": [
-      "Luke 18"
-    ]
+    "book": "1 Kings",
+    "startChapter": 22,
+    "startVerse": 41,
+    "endChapter": 22,
+    "endVerse": 49
   },
   {
-    "day": 304,
-    "readings": [
-      "Matthew 19",
-      "Mark 10"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 20,
+    "startVerse": 31,
+    "endChapter": 20,
+    "endVerse": 37
   },
   {
-    "day": 305,
-    "readings": [
-      "Matthew 20-21"
-    ]
+    "book": "1 Kings",
+    "startChapter": 22,
+    "startVerse": 50,
+    "endChapter": 22,
+    "endVerse": 50
   },
   {
-    "day": 306,
-    "readings": [
-      "Luke 19"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 21,
+    "startVerse": 1,
+    "endChapter": 21,
+    "endVerse": 4
   },
   {
-    "day": 307,
-    "readings": [
-      "Mark 11",
-      "John 12"
-    ]
+    "book": "2 Kings",
+    "startChapter": 8,
+    "startVerse": 16,
+    "endChapter": 8,
+    "endVerse": 22
   },
   {
-    "day": 308,
-    "readings": [
-      "Matthew 22",
-      "Mark 12"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 21,
+    "startVerse": 5,
+    "endChapter": 21,
+    "endVerse": 7
   },
   {
-    "day": 309,
-    "readings": [
-      "Matthew 23",
-      "Luke 20-21"
-    ]
+    "book": "2 Kings",
+    "startChapter": 4,
+    "startVerse": 1,
+    "endChapter": 4,
+    "endVerse": 44
   },
   {
-    "day": 310,
-    "readings": [
-      "Mark 13"
-    ]
+    "book": "2 Kings",
+    "startChapter": 8,
+    "startVerse": 23,
+    "endChapter": 8,
+    "endVerse": 29
   },
   {
-    "day": 311,
-    "readings": [
-      "Matthew 24"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 22,
+    "startVerse": 1,
+    "endChapter": 22,
+    "endVerse": 7
   },
   {
-    "day": 312,
-    "readings": [
-      "Matthew 25"
-    ]
+    "book": "2 Kings",
+    "startChapter": 9,
+    "startVerse": 1,
+    "endChapter": 10,
+    "endVerse": 17
   },
   {
-    "day": 313,
-    "readings": [
-      "Matthew 26",
-      "Mark 14"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 22,
+    "startVerse": 8,
+    "endChapter": 22,
+    "endVerse": 9
   },
   {
-    "day": 314,
-    "readings": [
-      "Luke 22",
-      "John 13"
-    ]
+    "book": "2 Kings",
+    "startChapter": 10,
+    "startVerse": 18,
+    "endChapter": 10,
+    "endVerse": 31
   },
   {
-    "day": 315,
-    "readings": [
-      "John 14-17"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 22,
+    "startVerse": 10,
+    "endChapter": 22,
+    "endVerse": 12
   },
   {
-    "day": 316,
-    "readings": [
-      "Matthew 27",
-      "Mark 15"
-    ]
+    "book": "2 Kings",
+    "startChapter": 11,
+    "startVerse": 4,
+    "endChapter": 11,
+    "endVerse": 12
   },
   {
-    "day": 317,
-    "readings": [
-      "Luke 23",
-      "John 18-19"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 23,
+    "startVerse": 1,
+    "endChapter": 23,
+    "endVerse": 11
   },
   {
-    "day": 318,
-    "readings": [
-      "Matthew 28",
-      "Mark 16"
-    ]
+    "book": "2 Kings",
+    "startChapter": 11,
+    "startVerse": 13,
+    "endChapter": 11,
+    "endVerse": 16
   },
   {
-    "day": 319,
-    "readings": [
-      "Luke 24",
-      "John 20-21"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 23,
+    "startVerse": 12,
+    "endChapter": 23,
+    "endVerse": 15
   },
   {
-    "day": 320,
-    "readings": [
-      "Acts 1-3"
-    ]
+    "book": "2 Kings",
+    "startChapter": 11,
+    "startVerse": 17,
+    "endChapter": 11,
+    "endVerse": 21
   },
   {
-    "day": 321,
-    "readings": [
-      "Acts 4-6"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 23,
+    "startVerse": 16,
+    "endChapter": 23,
+    "endVerse": 21
   },
   {
-    "day": 322,
-    "readings": [
-      "Acts 7-8"
-    ]
+    "book": "2 Kings",
+    "startChapter": 12,
+    "startVerse": 1,
+    "endChapter": 12,
+    "endVerse": 16
   },
   {
-    "day": 323,
-    "readings": [
-      "Acts 9-10"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 24,
+    "startVerse": 1,
+    "endChapter": 24,
+    "endVerse": 22
   },
   {
-    "day": 324,
-    "readings": [
-      "Acts 11-12"
-    ]
+    "book": "2 Kings",
+    "startChapter": 10,
+    "startVerse": 32,
+    "endChapter": 10,
+    "endVerse": 36
   },
   {
-    "day": 325,
-    "readings": [
-      "Acts 13-14"
-    ]
+    "book": "2 Kings",
+    "startChapter": 12,
+    "startVerse": 17,
+    "endChapter": 12,
+    "endVerse": 21
   },
   {
-    "day": 326,
-    "readings": [
-      "James"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 24,
+    "startVerse": 23,
+    "endChapter": 24,
+    "endVerse": 27
   },
   {
-    "day": 327,
-    "readings": [
-      "Acts 15-16"
-    ]
+    "book": "2 Kings",
+    "startChapter": 13,
+    "startVerse": 14,
+    "endChapter": 13,
+    "endVerse": 25
   },
   {
-    "day": 328,
-    "readings": [
-      "Galatians 1-3"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 25,
+    "startVerse": 1,
+    "endChapter": 25,
+    "endVerse": 24
   },
   {
-    "day": 329,
-    "readings": [
-      "Galatians 4-6"
-    ]
+    "book": "2 Kings",
+    "startChapter": 13,
+    "startVerse": 12,
+    "endChapter": 13,
+    "endVerse": 13
   },
   {
-    "day": 330,
-    "readings": [
-      "Acts 17"
-    ]
+    "book": "2 Kings",
+    "startChapter": 14,
+    "startVerse": 15,
+    "endChapter": 14,
+    "endVerse": 16
   },
   {
-    "day": 331,
-    "readings": [
-      "1 & 2 Thessalonians"
-    ]
+    "book": "2 Kings",
+    "startChapter": 14,
+    "startVerse": 23,
+    "endChapter": 14,
+    "endVerse": 27
   },
   {
-    "day": 332,
-    "readings": [
-      "Acts 18-19"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 25,
+    "startVerse": 25,
+    "endChapter": 25,
+    "endVerse": 28
   },
   {
-    "day": 333,
-    "readings": [
-      "1 Corinthians 1-4"
-    ]
+    "book": "2 Kings",
+    "startChapter": 14,
+    "startVerse": 17,
+    "endChapter": 14,
+    "endVerse": 22
   },
   {
-    "day": 334,
-    "readings": [
-      "1 Corinthians 5-8"
-    ]
+    "book": "2 Kings",
+    "startChapter": 15,
+    "startVerse": 1,
+    "endChapter": 15,
+    "endVerse": 15
   },
   {
-    "day": 335,
-    "readings": [
-      "1 Corinthians 9-11"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 26,
+    "startVerse": 1,
+    "endChapter": 26,
+    "endVerse": 21
   },
   {
-    "day": 336,
-    "readings": [
-      "1 Corinthians 12-14"
-    ]
+    "book": "Jonah",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 4,
+    "endVerse": 11
   },
   {
-    "day": 337,
-    "readings": [
-      "1 Corinthians 15-16"
-    ]
+    "book": "2 Kings",
+    "startChapter": 14,
+    "startVerse": 28,
+    "endChapter": 14,
+    "endVerse": 29
   },
   {
-    "day": 338,
-    "readings": [
-      "2 Corinthians 1-4"
-    ]
+    "book": "2 Kings",
+    "startChapter": 15,
+    "startVerse": 8,
+    "endChapter": 15,
+    "endVerse": 29
   },
   {
-    "day": 339,
-    "readings": [
-      "2 Corinthians 5-9"
-    ]
+    "book": "2 Kings",
+    "startChapter": 15,
+    "startVerse": 6,
+    "endChapter": 15,
+    "endVerse": 7
   },
   {
-    "day": 340,
-    "readings": [
-      "2 Corinthians 10-13"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 26,
+    "startVerse": 22,
+    "endChapter": 26,
+    "endVerse": 23
   },
   {
-    "day": 341,
-    "readings": [
-      "Romans 1-3"
-    ]
+    "book": "Isaiah",
+    "startChapter": 6,
+    "startVerse": 1,
+    "endChapter": 6,
+    "endVerse": 13
   },
   {
-    "day": 342,
-    "readings": [
-      "Romans 4-7"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 27,
+    "startVerse": 1,
+    "endChapter": 27,
+    "endVerse": 9
   },
   {
-    "day": 343,
-    "readings": [
-      "Romans 8-10"
-    ]
+    "book": "Micah",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 1,
+    "endVerse": 16
   },
   {
-    "day": 344,
-    "readings": [
-      "Romans 11-13"
-    ]
+    "book": "2 Kings",
+    "startChapter": 16,
+    "startVerse": 1,
+    "endChapter": 16,
+    "endVerse": 9
   },
   {
-    "day": 345,
-    "readings": [
-      "Romans 14-16"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 28,
+    "startVerse": 1,
+    "endChapter": 28,
+    "endVerse": 15
   },
   {
-    "day": 346,
-    "readings": [
-      "Acts 20-23"
-    ]
+    "book": "Isaiah",
+    "startChapter": 7,
+    "startVerse": 1,
+    "endChapter": 7,
+    "endVerse": 25
   },
   {
-    "day": 347,
-    "readings": [
-      "Acts 24-26"
-    ]
+    "book": "Isaiah",
+    "startChapter": 17,
+    "startVerse": 1,
+    "endChapter": 17,
+    "endVerse": 14
   },
   {
-    "day": 348,
-    "readings": [
-      "Acts 27-28"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 28,
+    "startVerse": 16,
+    "endChapter": 28,
+    "endVerse": 21
   },
   {
-    "day": 349,
-    "readings": [
-      "Colossians, Philemon"
-    ]
+    "book": "2 Kings",
+    "startChapter": 16,
+    "startVerse": 10,
+    "endChapter": 16,
+    "endVerse": 18
   },
   {
-    "day": 350,
-    "readings": [
-      "Ephesians"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 28,
+    "startVerse": 22,
+    "endChapter": 28,
+    "endVerse": 25
   },
   {
-    "day": 351,
-    "readings": [
-      "Philippians"
-    ]
+    "book": "2 Kings",
+    "startChapter": 18,
+    "startVerse": 1,
+    "endChapter": 18,
+    "endVerse": 8
   },
   {
-    "day": 352,
-    "readings": [
-      "1 Timothy"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 29,
+    "startVerse": 1,
+    "endChapter": 29,
+    "endVerse": 2
   },
   {
-    "day": 353,
-    "readings": [
-      "Titus"
-    ]
+    "book": "2 Kings",
+    "startChapter": 15,
+    "startVerse": 30,
+    "endChapter": 15,
+    "endVerse": 31
   },
   {
-    "day": 354,
-    "readings": [
-      "1 Peter"
-    ]
+    "book": "2 Kings",
+    "startChapter": 17,
+    "startVerse": 1,
+    "endChapter": 17,
+    "endVerse": 4
   },
   {
-    "day": 355,
-    "readings": [
-      "Hebrews 1-6"
-    ]
+    "book": "Hosea",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 2,
+    "endVerse": 13
   },
   {
-    "day": 356,
-    "readings": [
-      "Hebrews 7-10"
-    ]
+    "book": "2 Kings",
+    "startChapter": 17,
+    "startVerse": 5,
+    "endChapter": 17,
+    "endVerse": 5
   },
   {
-    "day": 357,
-    "readings": [
-      "Hebrews 11-13"
-    ]
+    "book": "2 Kings",
+    "startChapter": 18,
+    "startVerse": 9,
+    "endChapter": 18,
+    "endVerse": 12
   },
   {
-    "day": 358,
-    "readings": [
-      "2 Timothy"
-    ]
+    "book": "2 Kings",
+    "startChapter": 17,
+    "startVerse": 6,
+    "endChapter": 17,
+    "endVerse": 41
   },
   {
-    "day": 359,
-    "readings": [
-      "2 Peter, Jude"
-    ]
+    "book": "Isaiah",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 1,
+    "endVerse": 20
   },
   {
-    "day": 360,
-    "readings": [
-      "1 John"
-    ]
+    "book": "2 Chronicles",
+    "startChapter": 28,
+    "startVerse": 26,
+    "endChapter": 28,
+    "endVerse": 27
   },
   {
-    "day": 361,
-    "readings": [
-      "2, 3 John"
-    ]
+    "book": "Isaiah",
+    "startChapter": 13,
+    "startVerse": 1,
+    "endChapter": 16,
+    "endVerse": 14
   },
   {
-    "day": 362,
-    "readings": [
-      "Revelation 1-5"
-    ]
+    "book": "Psalms",
+    "startChapter": 43,
+    "startVerse": 1,
+    "endChapter": 43,
+    "endVerse": 5
   },
   {
-    "day": 363,
-    "readings": [
-      "Revelation 6-11"
-    ]
+    "book": "Psalms",
+    "startChapter": 44,
+    "startVerse": 1,
+    "endChapter": 44,
+    "endVerse": 26
   },
   {
-    "day": 364,
-    "readings": [
-      "Revelation 12-18"
-    ]
+    "book": "Psalms",
+    "startChapter": 45,
+    "startVerse": 1,
+    "endChapter": 45,
+    "endVerse": 17
   },
   {
-    "day": 365,
-    "readings": [
-      "Revelation 19-22"
-    ]
+    "book": "Psalms",
+    "startChapter": 46,
+    "startVerse": 1,
+    "endChapter": 46,
+    "endVerse": 11
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 48,
+    "startVerse": 1,
+    "endChapter": 48,
+    "endVerse": 14
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 49,
+    "startVerse": 1,
+    "endChapter": 49,
+    "endVerse": 20
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 84,
+    "startVerse": 1,
+    "endChapter": 84,
+    "endVerse": 12
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 85,
+    "startVerse": 1,
+    "endChapter": 85,
+    "endVerse": 13
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 87,
+    "startVerse": 1,
+    "endChapter": 87,
+    "endVerse": 7
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 10,
+    "startVerse": 1,
+    "endChapter": 10,
+    "endVerse": 18
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 33,
+    "startVerse": 1,
+    "endChapter": 33,
+    "endVerse": 22
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 71,
+    "startVerse": 1,
+    "endChapter": 71,
+    "endVerse": 24
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 91,
+    "startVerse": 1,
+    "endChapter": 91,
+    "endVerse": 16
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 93,
+    "startVerse": 1,
+    "endChapter": 93,
+    "endVerse": 5
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 94,
+    "startVerse": 1,
+    "endChapter": 94,
+    "endVerse": 23
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 95,
+    "startVerse": 1,
+    "endChapter": 95,
+    "endVerse": 11
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 96,
+    "startVerse": 1,
+    "endChapter": 96,
+    "endVerse": 13
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 97,
+    "startVerse": 1,
+    "endChapter": 97,
+    "endVerse": 12
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 99,
+    "startVerse": 1,
+    "endChapter": 99,
+    "endVerse": 9
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 100,
+    "startVerse": 1,
+    "endChapter": 100,
+    "endVerse": 5
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 102,
+    "startVerse": 1,
+    "endChapter": 102,
+    "endVerse": 28
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 104,
+    "startVerse": 1,
+    "endChapter": 104,
+    "endVerse": 35
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 106,
+    "startVerse": 1,
+    "endChapter": 106,
+    "endVerse": 48
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 111,
+    "startVerse": 1,
+    "endChapter": 111,
+    "endVerse": 10
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 112,
+    "startVerse": 1,
+    "endChapter": 112,
+    "endVerse": 10
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 113,
+    "startVerse": 1,
+    "endChapter": 113,
+    "endVerse": 9
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 114,
+    "startVerse": 1,
+    "endChapter": 114,
+    "endVerse": 8
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 116,
+    "startVerse": 1,
+    "endChapter": 116,
+    "endVerse": 19
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 117,
+    "startVerse": 1,
+    "endChapter": 117,
+    "endVerse": 2
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 118,
+    "startVerse": 1,
+    "endChapter": 118,
+    "endVerse": 29
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 121,
+    "startVerse": 1,
+    "endChapter": 121,
+    "endVerse": 8
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 123,
+    "startVerse": 1,
+    "endChapter": 123,
+    "endVerse": 4
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 125,
+    "startVerse": 1,
+    "endChapter": 125,
+    "endVerse": 5
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 126,
+    "startVerse": 1,
+    "endChapter": 126,
+    "endVerse": 6
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 129,
+    "startVerse": 1,
+    "endChapter": 129,
+    "endVerse": 8
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 130,
+    "startVerse": 1,
+    "endChapter": 130,
+    "endVerse": 8
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 132,
+    "startVerse": 1,
+    "endChapter": 132,
+    "endVerse": 18
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 134,
+    "startVerse": 1,
+    "endChapter": 134,
+    "endVerse": 3
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 135,
+    "startVerse": 1,
+    "endChapter": 135,
+    "endVerse": 21
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 146,
+    "startVerse": 1,
+    "endChapter": 146,
+    "endVerse": 10
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 147,
+    "startVerse": 1,
+    "endChapter": 147,
+    "endVerse": 20
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 148,
+    "startVerse": 1,
+    "endChapter": 148,
+    "endVerse": 14
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 149,
+    "startVerse": 1,
+    "endChapter": 149,
+    "endVerse": 9
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 150,
+    "startVerse": 1,
+    "endChapter": 150,
+    "endVerse": 6
+  },
+  {
+    "book": "Isaiah",
+    "startChapter": 29,
+    "startVerse": 1,
+    "endChapter": 29,
+    "endVerse": 24
+  },
+  {
+    "book": "Micah",
+    "startChapter": 2,
+    "startVerse": 1,
+    "endChapter": 5,
+    "endVerse": 15
+  },
+  {
+    "book": "2 Chronicles",
+    "startChapter": 32,
+    "startVerse": 1,
+    "endChapter": 32,
+    "endVerse": 8
+  },
+  {
+    "book": "2 Kings",
+    "startChapter": 18,
+    "startVerse": 13,
+    "endChapter": 18,
+    "endVerse": 18
+  },
+  {
+    "book": "Isaiah",
+    "startChapter": 36,
+    "startVerse": 1,
+    "endChapter": 36,
+    "endVerse": 3
+  },
+  {
+    "book": "2 Kings",
+    "startChapter": 18,
+    "startVerse": 19,
+    "endChapter": 18,
+    "endVerse": 37
+  },
+  {
+    "book": "Isaiah",
+    "startChapter": 36,
+    "startVerse": 4,
+    "endChapter": 36,
+    "endVerse": 22
+  },
+  {
+    "book": "Isaiah",
+    "startChapter": 37,
+    "startVerse": 1,
+    "endChapter": 37,
+    "endVerse": 20
+  },
+  {
+    "book": "2 Chronicles",
+    "startChapter": 32,
+    "startVerse": 9,
+    "endChapter": 32,
+    "endVerse": 19
+  },
+  {
+    "book": "2 Kings",
+    "startChapter": 19,
+    "startVerse": 20,
+    "endChapter": 19,
+    "endVerse": 37
+  },
+  {
+    "book": "Isaiah",
+    "startChapter": 37,
+    "startVerse": 21,
+    "endChapter": 37,
+    "endVerse": 38
+  },
+  {
+    "book": "2 Chronicles",
+    "startChapter": 32,
+    "startVerse": 20,
+    "endChapter": 32,
+    "endVerse": 23
+  },
+  {
+    "book": "Isaiah",
+    "startChapter": 38,
+    "startVerse": 1,
+    "endChapter": 38,
+    "endVerse": 8
+  },
+  {
+    "book": "2 Chronicles",
+    "startChapter": 32,
+    "startVerse": 24,
+    "endChapter": 32,
+    "endVerse": 31
+  },
+  {
+    "book": "Isaiah",
+    "startChapter": 38,
+    "startVerse": 9,
+    "endChapter": 38,
+    "endVerse": 22
+  },
+  {
+    "book": "2 Kings",
+    "startChapter": 20,
+    "startVerse": 12,
+    "endChapter": 20,
+    "endVerse": 19
+  },
+  {
+    "book": "Isaiah",
+    "startChapter": 39,
+    "startVerse": 1,
+    "endChapter": 39,
+    "endVerse": 8
+  },
+  {
+    "book": "2 Kings",
+    "startChapter": 20,
+    "startVerse": 20,
+    "endChapter": 20,
+    "endVerse": 21
+  },
+  {
+    "book": "2 Chronicles",
+    "startChapter": 32,
+    "startVerse": 32,
+    "endChapter": 32,
+    "endVerse": 33
+  },
+  {
+    "book": "2 Chronicles",
+    "startChapter": 33,
+    "startVerse": 1,
+    "endChapter": 33,
+    "endVerse": 9
+  },
+  {
+    "book": "2 Kings",
+    "startChapter": 21,
+    "startVerse": 10,
+    "endChapter": 21,
+    "endVerse": 17
+  },
+  {
+    "book": "2 Chronicles",
+    "startChapter": 33,
+    "startVerse": 10,
+    "endChapter": 33,
+    "endVerse": 19
+  },
+  {
+    "book": "2 Kings",
+    "startChapter": 21,
+    "startVerse": 18,
+    "endChapter": 21,
+    "endVerse": 18
+  },
+  {
+    "book": "2 Chronicles",
+    "startChapter": 33,
+    "startVerse": 20,
+    "endChapter": 33,
+    "endVerse": 20
+  },
+  {
+    "book": "2 Kings",
+    "startChapter": 21,
+    "startVerse": 19,
+    "endChapter": 21,
+    "endVerse": 26
+  },
+  {
+    "book": "2 Chronicles",
+    "startChapter": 33,
+    "startVerse": 21,
+    "endChapter": 33,
+    "endVerse": 25
+  },
+  {
+    "book": "2 Kings",
+    "startChapter": 22,
+    "startVerse": 1,
+    "endChapter": 22,
+    "endVerse": 2
+  },
+  {
+    "book": "2 Chronicles",
+    "startChapter": 34,
+    "startVerse": 1,
+    "endChapter": 34,
+    "endVerse": 7
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 2,
+    "endVerse": 22
+  },
+  {
+    "book": "2 Kings",
+    "startChapter": 22,
+    "startVerse": 3,
+    "endChapter": 22,
+    "endVerse": 20
+  },
+  {
+    "book": "2 Chronicles",
+    "startChapter": 34,
+    "startVerse": 8,
+    "endChapter": 34,
+    "endVerse": 28
+  },
+  {
+    "book": "2 Kings",
+    "startChapter": 23,
+    "startVerse": 1,
+    "endChapter": 23,
+    "endVerse": 20
+  },
+  {
+    "book": "2 Chronicles",
+    "startChapter": 34,
+    "startVerse": 29,
+    "endChapter": 34,
+    "endVerse": 33
+  },
+  {
+    "book": "2 Kings",
+    "startChapter": 23,
+    "startVerse": 21,
+    "endChapter": 23,
+    "endVerse": 28
+  },
+  {
+    "book": "2 Chronicles",
+    "startChapter": 35,
+    "startVerse": 1,
+    "endChapter": 35,
+    "endVerse": 19
+  },
+  {
+    "book": "Nahum",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 3,
+    "endVerse": 19
+  },
+  {
+    "book": "Habakkuk",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 3,
+    "endVerse": 19
+  },
+  {
+    "book": "Zephaniah",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 2,
+    "endVerse": 7
+  },
+  {
+    "book": "Zephaniah",
+    "startChapter": 2,
+    "startVerse": 8,
+    "endChapter": 3,
+    "endVerse": 20
+  },
+  {
+    "book": "2 Chronicles",
+    "startChapter": 35,
+    "startVerse": 20,
+    "endChapter": 35,
+    "endVerse": 27
+  },
+  {
+    "book": "2 Kings",
+    "startChapter": 23,
+    "startVerse": 29,
+    "endChapter": 23,
+    "endVerse": 30
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 47,
+    "startVerse": 1,
+    "endChapter": 48,
+    "endVerse": 47
+  },
+  {
+    "book": "2 Chronicles",
+    "startChapter": 36,
+    "startVerse": 1,
+    "endChapter": 36,
+    "endVerse": 4
+  },
+  {
+    "book": "2 Kings",
+    "startChapter": 23,
+    "startVerse": 31,
+    "endChapter": 23,
+    "endVerse": 37
+  },
+  {
+    "book": "2 Chronicles",
+    "startChapter": 36,
+    "startVerse": 5,
+    "endChapter": 36,
+    "endVerse": 5
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 22,
+    "startVerse": 1,
+    "endChapter": 22,
+    "endVerse": 23
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 26,
+    "startVerse": 1,
+    "endChapter": 26,
+    "endVerse": 24
+  },
+  {
+    "book": "2 Kings",
+    "startChapter": 24,
+    "startVerse": 1,
+    "endChapter": 24,
+    "endVerse": 4
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 25,
+    "startVerse": 1,
+    "endChapter": 25,
+    "endVerse": 14
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 25,
+    "startVerse": 15,
+    "endChapter": 25,
+    "endVerse": 38
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 36,
+    "startVerse": 1,
+    "endChapter": 36,
+    "endVerse": 32
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 45,
+    "startVerse": 1,
+    "endChapter": 46,
+    "endVerse": 28
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 19,
+    "startVerse": 1,
+    "endChapter": 20,
+    "endVerse": 18
+  },
+  {
+    "book": "Daniel",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 1,
+    "endVerse": 21
+  },
+  {
+    "book": "Daniel",
+    "startChapter": 2,
+    "startVerse": 1,
+    "endChapter": 3,
+    "endVerse": 30
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 7,
+    "startVerse": 1,
+    "endChapter": 8,
+    "endVerse": 3
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 8,
+    "startVerse": 4,
+    "endChapter": 11,
+    "endVerse": 23
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 12,
+    "startVerse": 1,
+    "endChapter": 15,
+    "endVerse": 21
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 16,
+    "startVerse": 1,
+    "endChapter": 18,
+    "endVerse": 23
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 35,
+    "startVerse": 1,
+    "endChapter": 35,
+    "endVerse": 19
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 49,
+    "startVerse": 1,
+    "endChapter": 49,
+    "endVerse": 33
+  },
+  {
+    "book": "2 Kings",
+    "startChapter": 24,
+    "startVerse": 5,
+    "endChapter": 24,
+    "endVerse": 7
+  },
+  {
+    "book": "2 Chronicles",
+    "startChapter": 36,
+    "startVerse": 6,
+    "endChapter": 36,
+    "endVerse": 8
+  },
+  {
+    "book": "2 Kings",
+    "startChapter": 24,
+    "startVerse": 8,
+    "endChapter": 24,
+    "endVerse": 9
+  },
+  {
+    "book": "2 Chronicles",
+    "startChapter": 36,
+    "startVerse": 9,
+    "endChapter": 36,
+    "endVerse": 9
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 22,
+    "startVerse": 24,
+    "endChapter": 23,
+    "endVerse": 32
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 23,
+    "startVerse": 33,
+    "endChapter": 24,
+    "endVerse": 10
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 29,
+    "startVerse": 1,
+    "endChapter": 31,
+    "endVerse": 14
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 31,
+    "startVerse": 15,
+    "endChapter": 31,
+    "endVerse": 40
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 49,
+    "startVerse": 34,
+    "endChapter": 51,
+    "endVerse": 14
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 51,
+    "startVerse": 15,
+    "endChapter": 51,
+    "endVerse": 58
+  },
+  {
+    "book": "2 Chronicles",
+    "startChapter": 36,
+    "startVerse": 10,
+    "endChapter": 36,
+    "endVerse": 10
+  },
+  {
+    "book": "2 Kings",
+    "startChapter": 24,
+    "startVerse": 10,
+    "endChapter": 24,
+    "endVerse": 17
+  },
+  {
+    "book": "1 Chronicles",
+    "startChapter": 3,
+    "startVerse": 10,
+    "endChapter": 3,
+    "endVerse": 16
+  },
+  {
+    "book": "2 Chronicles",
+    "startChapter": 36,
+    "startVerse": 11,
+    "endChapter": 36,
+    "endVerse": 14
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 52,
+    "startVerse": 1,
+    "endChapter": 52,
+    "endVerse": 3
+  },
+  {
+    "book": "2 Kings",
+    "startChapter": 24,
+    "startVerse": 18,
+    "endChapter": 24,
+    "endVerse": 20
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 37,
+    "startVerse": 1,
+    "endChapter": 37,
+    "endVerse": 10
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 37,
+    "startVerse": 11,
+    "endChapter": 38,
+    "endVerse": 28
+  },
+  {
+    "book": "Ezekiel",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 3,
+    "endVerse": 15
+  },
+  {
+    "book": "Ezekiel",
+    "startChapter": 3,
+    "startVerse": 16,
+    "endChapter": 4,
+    "endVerse": 17
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 27,
+    "startVerse": 1,
+    "endChapter": 28,
+    "endVerse": 17
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 51,
+    "startVerse": 59,
+    "endChapter": 51,
+    "endVerse": 64
+  },
+  {
+    "book": "Ezekiel",
+    "startChapter": 5,
+    "startVerse": 1,
+    "endChapter": 9,
+    "endVerse": 11
+  },
+  {
+    "book": "Ezekiel",
+    "startChapter": 10,
+    "startVerse": 1,
+    "endChapter": 13,
+    "endVerse": 23
+  },
+  {
+    "book": "Ezekiel",
+    "startChapter": 14,
+    "startVerse": 1,
+    "endChapter": 16,
+    "endVerse": 63
+  },
+  {
+    "book": "Ezekiel",
+    "startChapter": 17,
+    "startVerse": 1,
+    "endChapter": 19,
+    "endVerse": 14
+  },
+  {
+    "book": "Ezekiel",
+    "startChapter": 20,
+    "startVerse": 1,
+    "endChapter": 22,
+    "endVerse": 16
+  },
+  {
+    "book": "Ezekiel",
+    "startChapter": 22,
+    "startVerse": 17,
+    "endChapter": 23,
+    "endVerse": 49
+  },
+  {
+    "book": "2 Kings",
+    "startChapter": 24,
+    "startVerse": 20,
+    "endChapter": 25,
+    "endVerse": 2
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 52,
+    "startVerse": 3,
+    "endChapter": 52,
+    "endVerse": 5
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 39,
+    "startVerse": 1,
+    "endChapter": 39,
+    "endVerse": 1
+  },
+  {
+    "book": "Ezekiel",
+    "startChapter": 24,
+    "startVerse": 1,
+    "endChapter": 24,
+    "endVerse": 14
+  },
+  {
+    "book": "Ezekiel",
+    "startChapter": 24,
+    "startVerse": 15,
+    "endChapter": 25,
+    "endVerse": 17
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 34,
+    "startVerse": 1,
+    "endChapter": 34,
+    "endVerse": 22
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 21,
+    "startVerse": 1,
+    "endChapter": 21,
+    "endVerse": 14
+  },
+  {
+    "book": "Ezekiel",
+    "startChapter": 29,
+    "startVerse": 1,
+    "endChapter": 29,
+    "endVerse": 16
+  },
+  {
+    "book": "Ezekiel",
+    "startChapter": 30,
+    "startVerse": 20,
+    "endChapter": 31,
+    "endVerse": 18
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 32,
+    "startVerse": 1,
+    "endChapter": 33,
+    "endVerse": 26
+  },
+  {
+    "book": "Ezekiel",
+    "startChapter": 26,
+    "startVerse": 1,
+    "endChapter": 26,
+    "endVerse": 14
+  },
+  {
+    "book": "Ezekiel",
+    "startChapter": 26,
+    "startVerse": 15,
+    "endChapter": 28,
+    "endVerse": 26
+  },
+  {
+    "book": "2 Kings",
+    "startChapter": 25,
+    "startVerse": 3,
+    "endChapter": 25,
+    "endVerse": 7
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 52,
+    "startVerse": 6,
+    "endChapter": 52,
+    "endVerse": 11
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 39,
+    "startVerse": 2,
+    "endChapter": 39,
+    "endVerse": 10
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 39,
+    "startVerse": 11,
+    "endChapter": 39,
+    "endVerse": 18
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 40,
+    "startVerse": 1,
+    "endChapter": 40,
+    "endVerse": 6
+  },
+  {
+    "book": "2 Kings",
+    "startChapter": 25,
+    "startVerse": 8,
+    "endChapter": 25,
+    "endVerse": 21
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 52,
+    "startVerse": 12,
+    "endChapter": 52,
+    "endVerse": 27
+  },
+  {
+    "book": "2 Chronicles",
+    "startChapter": 36,
+    "startVerse": 15,
+    "endChapter": 36,
+    "endVerse": 21
+  },
+  {
+    "book": "Lamentations",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 1,
+    "endVerse": 22
+  },
+  {
+    "book": "Lamentations",
+    "startChapter": 2,
+    "startVerse": 1,
+    "endChapter": 4,
+    "endVerse": 22
+  },
+  {
+    "book": "Lamentations",
+    "startChapter": 5,
+    "startVerse": 1,
+    "endChapter": 5,
+    "endVerse": 22
+  },
+  {
+    "book": "Obadiah",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 1,
+    "endVerse": 21
+  },
+  {
+    "book": "2 Kings",
+    "startChapter": 25,
+    "startVerse": 22,
+    "endChapter": 25,
+    "endVerse": 26
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 40,
+    "startVerse": 7,
+    "endChapter": 41,
+    "endVerse": 18
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 42,
+    "startVerse": 1,
+    "endChapter": 44,
+    "endVerse": 30
+  },
+  {
+    "book": "Ezekiel",
+    "startChapter": 33,
+    "startVerse": 21,
+    "endChapter": 33,
+    "endVerse": 33
+  },
+  {
+    "book": "Ezekiel",
+    "startChapter": 34,
+    "startVerse": 1,
+    "endChapter": 36,
+    "endVerse": 38
+  },
+  {
+    "book": "Ezekiel",
+    "startChapter": 37,
+    "startVerse": 1,
+    "endChapter": 39,
+    "endVerse": 29
+  },
+  {
+    "book": "Ezekiel",
+    "startChapter": 32,
+    "startVerse": 1,
+    "endChapter": 32,
+    "endVerse": 16
+  },
+  {
+    "book": "Ezekiel",
+    "startChapter": 32,
+    "startVerse": 17,
+    "endChapter": 33,
+    "endVerse": 20
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 52,
+    "startVerse": 28,
+    "endChapter": 52,
+    "endVerse": 30
+  },
+  {
+    "book": "Psalms",
+    "startChapter": 137,
+    "startVerse": 1,
+    "endChapter": 137,
+    "endVerse": 9
+  },
+  {
+    "book": "1 Chronicles",
+    "startChapter": 4,
+    "startVerse": 24,
+    "endChapter": 5,
+    "endVerse": 17
+  },
+  {
+    "book": "1 Chronicles",
+    "startChapter": 5,
+    "startVerse": 18,
+    "endChapter": 5,
+    "endVerse": 26
+  },
+  {
+    "book": "1 Chronicles",
+    "startChapter": 6,
+    "startVerse": 3,
+    "endChapter": 6,
+    "endVerse": 3
+  },
+  {
+    "book": "1 Chronicles",
+    "startChapter": 6,
+    "startVerse": 49,
+    "endChapter": 6,
+    "endVerse": 49
+  },
+  {
+    "book": "1 Chronicles",
+    "startChapter": 6,
+    "startVerse": 4,
+    "endChapter": 6,
+    "endVerse": 15
+  },
+  {
+    "book": "1 Chronicles",
+    "startChapter": 7,
+    "startVerse": 1,
+    "endChapter": 8,
+    "endVerse": 28
+  },
+  {
+    "book": "1 Chronicles",
+    "startChapter": 8,
+    "startVerse": 29,
+    "endChapter": 9,
+    "endVerse": 1
+  },
+  {
+    "book": "Daniel",
+    "startChapter": 4,
+    "startVerse": 1,
+    "endChapter": 4,
+    "endVerse": 37
+  },
+  {
+    "book": "Ezekiel",
+    "startChapter": 40,
+    "startVerse": 1,
+    "endChapter": 40,
+    "endVerse": 37
+  },
+  {
+    "book": "Ezekiel",
+    "startChapter": 40,
+    "startVerse": 38,
+    "endChapter": 43,
+    "endVerse": 27
+  },
+  {
+    "book": "Ezekiel",
+    "startChapter": 44,
+    "startVerse": 1,
+    "endChapter": 46,
+    "endVerse": 24
+  },
+  {
+    "book": "Ezekiel",
+    "startChapter": 47,
+    "startVerse": 1,
+    "endChapter": 48,
+    "endVerse": 35
+  },
+  {
+    "book": "Ezekiel",
+    "startChapter": 29,
+    "startVerse": 17,
+    "endChapter": 30,
+    "endVerse": 19
+  },
+  {
+    "book": "2 Kings",
+    "startChapter": 25,
+    "startVerse": 27,
+    "endChapter": 25,
+    "endVerse": 30
+  },
+  {
+    "book": "Jeremiah",
+    "startChapter": 52,
+    "startVerse": 31,
+    "endChapter": 52,
+    "endVerse": 34
+  },
+  {
+    "book": "Daniel",
+    "startChapter": 7,
+    "startVerse": 1,
+    "endChapter": 8,
+    "endVerse": 27
+  },
+  {
+    "book": "Daniel",
+    "startChapter": 5,
+    "startVerse": 1,
+    "endChapter": 5,
+    "endVerse": 31
+  },
+  {
+    "book": "Daniel",
+    "startChapter": 6,
+    "startVerse": 1,
+    "endChapter": 6,
+    "endVerse": 28
+  },
+  {
+    "book": "Daniel",
+    "startChapter": 9,
+    "startVerse": 1,
+    "endChapter": 9,
+    "endVerse": 27
+  },
+  {
+    "book": "2 Chronicles",
+    "startChapter": 36,
+    "startVerse": 22,
+    "endChapter": 36,
+    "endVerse": 23
+  },
+  {
+    "book": "Ezra",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 1,
+    "endVerse": 11
+  },
+  {
+    "book": "1 Chronicles",
+    "startChapter": 3,
+    "startVerse": 17,
+    "endChapter": 3,
+    "endVerse": 19
+  },
+  {
+    "book": "Ezra",
+    "startChapter": 2,
+    "startVerse": 1,
+    "endChapter": 4,
+    "endVerse": 5
+  },
+  {
+    "book": "1 Chronicles",
+    "startChapter": 3,
+    "startVerse": 19,
+    "endChapter": 3,
+    "endVerse": 24
+  },
+  {
+    "book": "Daniel",
+    "startChapter": 10,
+    "startVerse": 1,
+    "endChapter": 12,
+    "endVerse": 13
+  },
+  {
+    "book": "Ezra",
+    "startChapter": 4,
+    "startVerse": 24,
+    "endChapter": 5,
+    "endVerse": 1
+  },
+  {
+    "book": "Haggai",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 1,
+    "endVerse": 15
+  },
+  {
+    "book": "Haggai",
+    "startChapter": 2,
+    "startVerse": 1,
+    "endChapter": 2,
+    "endVerse": 9
+  },
+  {
+    "book": "Zechariah",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 1,
+    "endVerse": 6
+  },
+  {
+    "book": "Haggai",
+    "startChapter": 2,
+    "startVerse": 10,
+    "endChapter": 2,
+    "endVerse": 19
+  },
+  {
+    "book": "Ezra",
+    "startChapter": 5,
+    "startVerse": 2,
+    "endChapter": 5,
+    "endVerse": 2
+  },
+  {
+    "book": "Haggai",
+    "startChapter": 2,
+    "startVerse": 20,
+    "endChapter": 2,
+    "endVerse": 23
+  },
+  {
+    "book": "Zechariah",
+    "startChapter": 1,
+    "startVerse": 7,
+    "endChapter": 5,
+    "endVerse": 11
+  },
+  {
+    "book": "Zechariah",
+    "startChapter": 6,
+    "startVerse": 1,
+    "endChapter": 6,
+    "endVerse": 15
+  },
+  {
+    "book": "Ezra",
+    "startChapter": 5,
+    "startVerse": 3,
+    "endChapter": 6,
+    "endVerse": 14
+  },
+  {
+    "book": "Zechariah",
+    "startChapter": 7,
+    "startVerse": 1,
+    "endChapter": 8,
+    "endVerse": 23
+  },
+  {
+    "book": "Zechariah",
+    "startChapter": 9,
+    "startVerse": 1,
+    "endChapter": 14,
+    "endVerse": 21
+  },
+  {
+    "book": "Ezra",
+    "startChapter": 6,
+    "startVerse": 14,
+    "endChapter": 6,
+    "endVerse": 22
+  },
+  {
+    "book": "Ezra",
+    "startChapter": 4,
+    "startVerse": 6,
+    "endChapter": 4,
+    "endVerse": 6
+  },
+  {
+    "book": "Esther",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 4,
+    "endVerse": 17
+  },
+  {
+    "book": "Esther",
+    "startChapter": 5,
+    "startVerse": 1,
+    "endChapter": 10,
+    "endVerse": 3
+  },
+  {
+    "book": "Ezra",
+    "startChapter": 4,
+    "startVerse": 7,
+    "endChapter": 4,
+    "endVerse": 23
+  },
+  {
+    "book": "Ezra",
+    "startChapter": 7,
+    "startVerse": 1,
+    "endChapter": 8,
+    "endVerse": 36
+  },
+  {
+    "book": "Ezra",
+    "startChapter": 9,
+    "startVerse": 1,
+    "endChapter": 10,
+    "endVerse": 44
+  },
+  {
+    "book": "Nehemiah",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 2,
+    "endVerse": 20
+  },
+  {
+    "book": "Nehemiah",
+    "startChapter": 3,
+    "startVerse": 1,
+    "endChapter": 5,
+    "endVerse": 13
+  },
+  {
+    "book": "Nehemiah",
+    "startChapter": 6,
+    "startVerse": 1,
+    "endChapter": 7,
+    "endVerse": 3
+  },
+  {
+    "book": "Nehemiah",
+    "startChapter": 7,
+    "startVerse": 4,
+    "endChapter": 8,
+    "endVerse": 12
+  },
+  {
+    "book": "Nehemiah",
+    "startChapter": 8,
+    "startVerse": 13,
+    "endChapter": 10,
+    "endVerse": 39
+  },
+  {
+    "book": "Nehemiah",
+    "startChapter": 11,
+    "startVerse": 1,
+    "endChapter": 12,
+    "endVerse": 26
+  },
+  {
+    "book": "1 Chronicles",
+    "startChapter": 9,
+    "startVerse": 1,
+    "endChapter": 9,
+    "endVerse": 34
+  },
+  {
+    "book": "Nehemiah",
+    "startChapter": 12,
+    "startVerse": 27,
+    "endChapter": 13,
+    "endVerse": 6
+  },
+  {
+    "book": "Nehemiah",
+    "startChapter": 5,
+    "startVerse": 14,
+    "endChapter": 5,
+    "endVerse": 19
+  },
+  {
+    "book": "Nehemiah",
+    "startChapter": 13,
+    "startVerse": 7,
+    "endChapter": 13,
+    "endVerse": 31
+  },
+  {
+    "book": "Malachi",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 2,
+    "endVerse": 9
+  },
+  {
+    "book": "Malachi",
+    "startChapter": 2,
+    "startVerse": 10,
+    "endChapter": 4,
+    "endVerse": 6
+  },
+  {
+    "book": "Joel",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 3,
+    "endVerse": 21
+  },
+  {
+    "book": "Mark",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 1,
+    "endVerse": 1
+  },
+  {
+    "book": "Luke",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 1,
+    "endVerse": 4
+  },
+  {
+    "book": "John",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 1,
+    "endVerse": 18
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 1,
+    "endVerse": 17
+  },
+  {
+    "book": "Luke",
+    "startChapter": 3,
+    "startVerse": 23,
+    "endChapter": 3,
+    "endVerse": 38
+  },
+  {
+    "book": "Luke",
+    "startChapter": 1,
+    "startVerse": 5,
+    "endChapter": 1,
+    "endVerse": 38
+  },
+  {
+    "book": "Luke",
+    "startChapter": 1,
+    "startVerse": 39,
+    "endChapter": 1,
+    "endVerse": 80
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 1,
+    "startVerse": 18,
+    "endChapter": 1,
+    "endVerse": 25
+  },
+  {
+    "book": "Luke",
+    "startChapter": 2,
+    "startVerse": 1,
+    "endChapter": 2,
+    "endVerse": 40
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 2,
+    "startVerse": 1,
+    "endChapter": 2,
+    "endVerse": 23
+  },
+  {
+    "book": "Luke",
+    "startChapter": 2,
+    "startVerse": 41,
+    "endChapter": 2,
+    "endVerse": 52
+  },
+  {
+    "book": "Mark",
+    "startChapter": 1,
+    "startVerse": 2,
+    "endChapter": 1,
+    "endVerse": 8
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 3,
+    "startVerse": 1,
+    "endChapter": 3,
+    "endVerse": 12
+  },
+  {
+    "book": "Luke",
+    "startChapter": 3,
+    "startVerse": 1,
+    "endChapter": 3,
+    "endVerse": 18
+  },
+  {
+    "book": "Mark",
+    "startChapter": 1,
+    "startVerse": 9,
+    "endChapter": 1,
+    "endVerse": 11
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 3,
+    "startVerse": 13,
+    "endChapter": 3,
+    "endVerse": 17
+  },
+  {
+    "book": "Luke",
+    "startChapter": 3,
+    "startVerse": 21,
+    "endChapter": 3,
+    "endVerse": 22
+  },
+  {
+    "book": "Mark",
+    "startChapter": 1,
+    "startVerse": 12,
+    "endChapter": 1,
+    "endVerse": 13
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 4,
+    "startVerse": 1,
+    "endChapter": 4,
+    "endVerse": 11
+  },
+  {
+    "book": "Luke",
+    "startChapter": 4,
+    "startVerse": 1,
+    "endChapter": 4,
+    "endVerse": 15
+  },
+  {
+    "book": "John",
+    "startChapter": 1,
+    "startVerse": 19,
+    "endChapter": 2,
+    "endVerse": 25
+  },
+  {
+    "book": "John",
+    "startChapter": 3,
+    "startVerse": 1,
+    "endChapter": 4,
+    "endVerse": 45
+  },
+  {
+    "book": "Luke",
+    "startChapter": 3,
+    "startVerse": 19,
+    "endChapter": 3,
+    "endVerse": 20
+  },
+  {
+    "book": "Mark",
+    "startChapter": 1,
+    "startVerse": 14,
+    "endChapter": 1,
+    "endVerse": 15
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 4,
+    "startVerse": 12,
+    "endChapter": 4,
+    "endVerse": 17
+  },
+  {
+    "book": "Luke",
+    "startChapter": 3,
+    "startVerse": 23,
+    "endChapter": 3,
+    "endVerse": 23
+  },
+  {
+    "book": "John",
+    "startChapter": 4,
+    "startVerse": 46,
+    "endChapter": 4,
+    "endVerse": 54
+  },
+  {
+    "book": "Luke",
+    "startChapter": 4,
+    "startVerse": 16,
+    "endChapter": 4,
+    "endVerse": 30
+  },
+  {
+    "book": "Mark",
+    "startChapter": 1,
+    "startVerse": 16,
+    "endChapter": 1,
+    "endVerse": 20
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 4,
+    "startVerse": 18,
+    "endChapter": 4,
+    "endVerse": 22
+  },
+  {
+    "book": "Mark",
+    "startChapter": 1,
+    "startVerse": 21,
+    "endChapter": 1,
+    "endVerse": 28
+  },
+  {
+    "book": "Luke",
+    "startChapter": 4,
+    "startVerse": 31,
+    "endChapter": 4,
+    "endVerse": 37
+  },
+  {
+    "book": "Mark",
+    "startChapter": 1,
+    "startVerse": 29,
+    "endChapter": 1,
+    "endVerse": 34
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 8,
+    "startVerse": 14,
+    "endChapter": 8,
+    "endVerse": 17
+  },
+  {
+    "book": "Luke",
+    "startChapter": 4,
+    "startVerse": 38,
+    "endChapter": 4,
+    "endVerse": 41
+  },
+  {
+    "book": "Mark",
+    "startChapter": 1,
+    "startVerse": 35,
+    "endChapter": 1,
+    "endVerse": 39
+  },
+  {
+    "book": "Luke",
+    "startChapter": 4,
+    "startVerse": 42,
+    "endChapter": 4,
+    "endVerse": 44
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 4,
+    "startVerse": 23,
+    "endChapter": 4,
+    "endVerse": 25
+  },
+  {
+    "book": "Luke",
+    "startChapter": 5,
+    "startVerse": 1,
+    "endChapter": 5,
+    "endVerse": 11
+  },
+  {
+    "book": "Mark",
+    "startChapter": 1,
+    "startVerse": 40,
+    "endChapter": 1,
+    "endVerse": 45
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 8,
+    "startVerse": 1,
+    "endChapter": 8,
+    "endVerse": 4
+  },
+  {
+    "book": "Luke",
+    "startChapter": 5,
+    "startVerse": 12,
+    "endChapter": 5,
+    "endVerse": 16
+  },
+  {
+    "book": "Mark",
+    "startChapter": 2,
+    "startVerse": 1,
+    "endChapter": 2,
+    "endVerse": 12
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 9,
+    "startVerse": 1,
+    "endChapter": 9,
+    "endVerse": 8
+  },
+  {
+    "book": "Luke",
+    "startChapter": 5,
+    "startVerse": 17,
+    "endChapter": 5,
+    "endVerse": 26
+  },
+  {
+    "book": "Mark",
+    "startChapter": 2,
+    "startVerse": 13,
+    "endChapter": 2,
+    "endVerse": 17
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 9,
+    "startVerse": 9,
+    "endChapter": 9,
+    "endVerse": 13
+  },
+  {
+    "book": "Luke",
+    "startChapter": 5,
+    "startVerse": 27,
+    "endChapter": 5,
+    "endVerse": 32
+  },
+  {
+    "book": "Mark",
+    "startChapter": 2,
+    "startVerse": 18,
+    "endChapter": 2,
+    "endVerse": 22
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 9,
+    "startVerse": 14,
+    "endChapter": 9,
+    "endVerse": 17
+  },
+  {
+    "book": "Luke",
+    "startChapter": 5,
+    "startVerse": 33,
+    "endChapter": 5,
+    "endVerse": 39
+  },
+  {
+    "book": "John",
+    "startChapter": 5,
+    "startVerse": 1,
+    "endChapter": 5,
+    "endVerse": 47
+  },
+  {
+    "book": "Mark",
+    "startChapter": 2,
+    "startVerse": 23,
+    "endChapter": 2,
+    "endVerse": 28
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 12,
+    "startVerse": 1,
+    "endChapter": 12,
+    "endVerse": 8
+  },
+  {
+    "book": "Luke",
+    "startChapter": 6,
+    "startVerse": 1,
+    "endChapter": 6,
+    "endVerse": 5
+  },
+  {
+    "book": "Mark",
+    "startChapter": 3,
+    "startVerse": 1,
+    "endChapter": 3,
+    "endVerse": 6
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 12,
+    "startVerse": 9,
+    "endChapter": 12,
+    "endVerse": 14
+  },
+  {
+    "book": "Luke",
+    "startChapter": 6,
+    "startVerse": 6,
+    "endChapter": 6,
+    "endVerse": 11
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 12,
+    "startVerse": 15,
+    "endChapter": 12,
+    "endVerse": 21
+  },
+  {
+    "book": "Mark",
+    "startChapter": 3,
+    "startVerse": 7,
+    "endChapter": 3,
+    "endVerse": 19
+  },
+  {
+    "book": "Luke",
+    "startChapter": 6,
+    "startVerse": 12,
+    "endChapter": 6,
+    "endVerse": 16
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 5,
+    "startVerse": 1,
+    "endChapter": 5,
+    "endVerse": 12
+  },
+  {
+    "book": "Luke",
+    "startChapter": 6,
+    "startVerse": 17,
+    "endChapter": 6,
+    "endVerse": 26
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 5,
+    "startVerse": 13,
+    "endChapter": 5,
+    "endVerse": 48
+  },
+  {
+    "book": "Luke",
+    "startChapter": 6,
+    "startVerse": 27,
+    "endChapter": 6,
+    "endVerse": 36
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 6,
+    "startVerse": 1,
+    "endChapter": 6,
+    "endVerse": 4
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 6,
+    "startVerse": 5,
+    "endChapter": 7,
+    "endVerse": 6
+  },
+  {
+    "book": "Luke",
+    "startChapter": 6,
+    "startVerse": 37,
+    "endChapter": 6,
+    "endVerse": 42
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 7,
+    "startVerse": 7,
+    "endChapter": 7,
+    "endVerse": 20
+  },
+  {
+    "book": "Luke",
+    "startChapter": 6,
+    "startVerse": 43,
+    "endChapter": 6,
+    "endVerse": 45
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 7,
+    "startVerse": 21,
+    "endChapter": 7,
+    "endVerse": 29
+  },
+  {
+    "book": "Luke",
+    "startChapter": 6,
+    "startVerse": 46,
+    "endChapter": 6,
+    "endVerse": 49
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 8,
+    "startVerse": 5,
+    "endChapter": 8,
+    "endVerse": 13
+  },
+  {
+    "book": "Luke",
+    "startChapter": 7,
+    "startVerse": 1,
+    "endChapter": 7,
+    "endVerse": 17
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 11,
+    "startVerse": 1,
+    "endChapter": 11,
+    "endVerse": 19
+  },
+  {
+    "book": "Luke",
+    "startChapter": 7,
+    "startVerse": 18,
+    "endChapter": 7,
+    "endVerse": 35
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 11,
+    "startVerse": 20,
+    "endChapter": 11,
+    "endVerse": 30
+  },
+  {
+    "book": "Luke",
+    "startChapter": 7,
+    "startVerse": 36,
+    "endChapter": 7,
+    "endVerse": 50
+  },
+  {
+    "book": "Luke",
+    "startChapter": 8,
+    "startVerse": 1,
+    "endChapter": 8,
+    "endVerse": 3
+  },
+  {
+    "book": "Mark",
+    "startChapter": 3,
+    "startVerse": 20,
+    "endChapter": 3,
+    "endVerse": 30
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 12,
+    "startVerse": 22,
+    "endChapter": 12,
+    "endVerse": 45
+  },
+  {
+    "book": "Mark",
+    "startChapter": 3,
+    "startVerse": 31,
+    "endChapter": 3,
+    "endVerse": 35
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 12,
+    "startVerse": 46,
+    "endChapter": 12,
+    "endVerse": 50
+  },
+  {
+    "book": "Luke",
+    "startChapter": 8,
+    "startVerse": 19,
+    "endChapter": 8,
+    "endVerse": 21
+  },
+  {
+    "book": "Mark",
+    "startChapter": 4,
+    "startVerse": 1,
+    "endChapter": 4,
+    "endVerse": 9
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 13,
+    "startVerse": 1,
+    "endChapter": 13,
+    "endVerse": 9
+  },
+  {
+    "book": "Luke",
+    "startChapter": 8,
+    "startVerse": 4,
+    "endChapter": 8,
+    "endVerse": 8
+  },
+  {
+    "book": "Mark",
+    "startChapter": 4,
+    "startVerse": 10,
+    "endChapter": 4,
+    "endVerse": 20
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 13,
+    "startVerse": 10,
+    "endChapter": 13,
+    "endVerse": 23
+  },
+  {
+    "book": "Luke",
+    "startChapter": 8,
+    "startVerse": 9,
+    "endChapter": 8,
+    "endVerse": 18
+  },
+  {
+    "book": "Mark",
+    "startChapter": 4,
+    "startVerse": 21,
+    "endChapter": 4,
+    "endVerse": 29
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 13,
+    "startVerse": 24,
+    "endChapter": 13,
+    "endVerse": 30
+  },
+  {
+    "book": "Mark",
+    "startChapter": 4,
+    "startVerse": 30,
+    "endChapter": 4,
+    "endVerse": 34
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 13,
+    "startVerse": 31,
+    "endChapter": 13,
+    "endVerse": 52
+  },
+  {
+    "book": "Mark",
+    "startChapter": 4,
+    "startVerse": 35,
+    "endChapter": 4,
+    "endVerse": 41
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 8,
+    "startVerse": 23,
+    "endChapter": 8,
+    "endVerse": 27
+  },
+  {
+    "book": "Luke",
+    "startChapter": 8,
+    "startVerse": 22,
+    "endChapter": 8,
+    "endVerse": 25
+  },
+  {
+    "book": "Mark",
+    "startChapter": 5,
+    "startVerse": 1,
+    "endChapter": 5,
+    "endVerse": 20
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 8,
+    "startVerse": 28,
+    "endChapter": 8,
+    "endVerse": 34
+  },
+  {
+    "book": "Luke",
+    "startChapter": 8,
+    "startVerse": 26,
+    "endChapter": 8,
+    "endVerse": 39
+  },
+  {
+    "book": "Mark",
+    "startChapter": 5,
+    "startVerse": 21,
+    "endChapter": 5,
+    "endVerse": 43
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 9,
+    "startVerse": 18,
+    "endChapter": 9,
+    "endVerse": 26
+  },
+  {
+    "book": "Luke",
+    "startChapter": 8,
+    "startVerse": 40,
+    "endChapter": 8,
+    "endVerse": 56
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 9,
+    "startVerse": 27,
+    "endChapter": 9,
+    "endVerse": 34
+  },
+  {
+    "book": "Mark",
+    "startChapter": 6,
+    "startVerse": 1,
+    "endChapter": 6,
+    "endVerse": 6
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 13,
+    "startVerse": 53,
+    "endChapter": 13,
+    "endVerse": 58
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 9,
+    "startVerse": 35,
+    "endChapter": 9,
+    "endVerse": 38
+  },
+  {
+    "book": "Mark",
+    "startChapter": 6,
+    "startVerse": 7,
+    "endChapter": 6,
+    "endVerse": 13
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 10,
+    "startVerse": 1,
+    "endChapter": 10,
+    "endVerse": 42
+  },
+  {
+    "book": "Luke",
+    "startChapter": 9,
+    "startVerse": 1,
+    "endChapter": 9,
+    "endVerse": 6
+  },
+  {
+    "book": "Luke",
+    "startChapter": 9,
+    "startVerse": 7,
+    "endChapter": 9,
+    "endVerse": 9
+  },
+  {
+    "book": "Mark",
+    "startChapter": 6,
+    "startVerse": 14,
+    "endChapter": 6,
+    "endVerse": 29
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 14,
+    "startVerse": 1,
+    "endChapter": 14,
+    "endVerse": 21
+  },
+  {
+    "book": "Mark",
+    "startChapter": 6,
+    "startVerse": 30,
+    "endChapter": 6,
+    "endVerse": 44
+  },
+  {
+    "book": "Luke",
+    "startChapter": 9,
+    "startVerse": 10,
+    "endChapter": 9,
+    "endVerse": 17
+  },
+  {
+    "book": "John",
+    "startChapter": 6,
+    "startVerse": 1,
+    "endChapter": 6,
+    "endVerse": 15
+  },
+  {
+    "book": "Mark",
+    "startChapter": 6,
+    "startVerse": 45,
+    "endChapter": 6,
+    "endVerse": 52
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 14,
+    "startVerse": 22,
+    "endChapter": 14,
+    "endVerse": 33
+  },
+  {
+    "book": "John",
+    "startChapter": 6,
+    "startVerse": 16,
+    "endChapter": 6,
+    "endVerse": 21
+  },
+  {
+    "book": "Mark",
+    "startChapter": 6,
+    "startVerse": 53,
+    "endChapter": 6,
+    "endVerse": 56
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 14,
+    "startVerse": 34,
+    "endChapter": 14,
+    "endVerse": 36
+  },
+  {
+    "book": "John",
+    "startChapter": 6,
+    "startVerse": 22,
+    "endChapter": 6,
+    "endVerse": 71
+  },
+  {
+    "book": "Mark",
+    "startChapter": 7,
+    "startVerse": 1,
+    "endChapter": 7,
+    "endVerse": 23
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 15,
+    "startVerse": 1,
+    "endChapter": 15,
+    "endVerse": 20
+  },
+  {
+    "book": "Mark",
+    "startChapter": 7,
+    "startVerse": 24,
+    "endChapter": 7,
+    "endVerse": 30
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 15,
+    "startVerse": 21,
+    "endChapter": 15,
+    "endVerse": 28
+  },
+  {
+    "book": "Mark",
+    "startChapter": 7,
+    "startVerse": 31,
+    "endChapter": 7,
+    "endVerse": 37
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 15,
+    "startVerse": 29,
+    "endChapter": 15,
+    "endVerse": 31
+  },
+  {
+    "book": "Mark",
+    "startChapter": 8,
+    "startVerse": 1,
+    "endChapter": 8,
+    "endVerse": 10
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 15,
+    "startVerse": 32,
+    "endChapter": 16,
+    "endVerse": 4
+  },
+  {
+    "book": "Mark",
+    "startChapter": 8,
+    "startVerse": 11,
+    "endChapter": 8,
+    "endVerse": 21
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 16,
+    "startVerse": 5,
+    "endChapter": 16,
+    "endVerse": 12
+  },
+  {
+    "book": "Mark",
+    "startChapter": 8,
+    "startVerse": 22,
+    "endChapter": 8,
+    "endVerse": 30
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 16,
+    "startVerse": 13,
+    "endChapter": 16,
+    "endVerse": 20
+  },
+  {
+    "book": "Luke",
+    "startChapter": 9,
+    "startVerse": 18,
+    "endChapter": 9,
+    "endVerse": 20
+  },
+  {
+    "book": "Mark",
+    "startChapter": 8,
+    "startVerse": 31,
+    "endChapter": 9,
+    "endVerse": 1
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 16,
+    "startVerse": 21,
+    "endChapter": 16,
+    "endVerse": 28
+  },
+  {
+    "book": "Luke",
+    "startChapter": 9,
+    "startVerse": 21,
+    "endChapter": 9,
+    "endVerse": 27
+  },
+  {
+    "book": "Mark",
+    "startChapter": 9,
+    "startVerse": 2,
+    "endChapter": 9,
+    "endVerse": 13
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 17,
+    "startVerse": 1,
+    "endChapter": 17,
+    "endVerse": 13
+  },
+  {
+    "book": "Luke",
+    "startChapter": 9,
+    "startVerse": 28,
+    "endChapter": 9,
+    "endVerse": 36
+  },
+  {
+    "book": "Mark",
+    "startChapter": 9,
+    "startVerse": 14,
+    "endChapter": 9,
+    "endVerse": 29
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 17,
+    "startVerse": 14,
+    "endChapter": 17,
+    "endVerse": 21
+  },
+  {
+    "book": "Luke",
+    "startChapter": 9,
+    "startVerse": 37,
+    "endChapter": 9,
+    "endVerse": 43
+  },
+  {
+    "book": "Mark",
+    "startChapter": 9,
+    "startVerse": 30,
+    "endChapter": 9,
+    "endVerse": 32
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 17,
+    "startVerse": 22,
+    "endChapter": 17,
+    "endVerse": 23
+  },
+  {
+    "book": "Luke",
+    "startChapter": 9,
+    "startVerse": 43,
+    "endChapter": 9,
+    "endVerse": 45
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 17,
+    "startVerse": 24,
+    "endChapter": 17,
+    "endVerse": 27
+  },
+  {
+    "book": "Mark",
+    "startChapter": 9,
+    "startVerse": 33,
+    "endChapter": 9,
+    "endVerse": 37
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 18,
+    "startVerse": 1,
+    "endChapter": 18,
+    "endVerse": 6
+  },
+  {
+    "book": "Luke",
+    "startChapter": 9,
+    "startVerse": 46,
+    "endChapter": 9,
+    "endVerse": 48
+  },
+  {
+    "book": "Mark",
+    "startChapter": 9,
+    "startVerse": 38,
+    "endChapter": 9,
+    "endVerse": 41
+  },
+  {
+    "book": "Luke",
+    "startChapter": 9,
+    "startVerse": 49,
+    "endChapter": 9,
+    "endVerse": 50
+  },
+  {
+    "book": "Mark",
+    "startChapter": 9,
+    "startVerse": 42,
+    "endChapter": 9,
+    "endVerse": 50
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 18,
+    "startVerse": 7,
+    "endChapter": 18,
+    "endVerse": 35
+  },
+  {
+    "book": "John",
+    "startChapter": 7,
+    "startVerse": 1,
+    "endChapter": 7,
+    "endVerse": 9
+  },
+  {
+    "book": "Luke",
+    "startChapter": 9,
+    "startVerse": 51,
+    "endChapter": 9,
+    "endVerse": 56
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 8,
+    "startVerse": 18,
+    "endChapter": 8,
+    "endVerse": 22
+  },
+  {
+    "book": "Luke",
+    "startChapter": 9,
+    "startVerse": 57,
+    "endChapter": 9,
+    "endVerse": 62
+  },
+  {
+    "book": "John",
+    "startChapter": 7,
+    "startVerse": 10,
+    "endChapter": 8,
+    "endVerse": 20
+  },
+  {
+    "book": "John",
+    "startChapter": 8,
+    "startVerse": 21,
+    "endChapter": 8,
+    "endVerse": 59
+  },
+  {
+    "book": "Luke",
+    "startChapter": 10,
+    "startVerse": 1,
+    "endChapter": 11,
+    "endVerse": 13
+  },
+  {
+    "book": "Luke",
+    "startChapter": 11,
+    "startVerse": 14,
+    "endChapter": 12,
+    "endVerse": 34
+  },
+  {
+    "book": "Luke",
+    "startChapter": 12,
+    "startVerse": 35,
+    "endChapter": 13,
+    "endVerse": 21
+  },
+  {
+    "book": "John",
+    "startChapter": 9,
+    "startVerse": 1,
+    "endChapter": 9,
+    "endVerse": 41
+  },
+  {
+    "book": "John",
+    "startChapter": 10,
+    "startVerse": 1,
+    "endChapter": 10,
+    "endVerse": 42
+  },
+  {
+    "book": "Luke",
+    "startChapter": 13,
+    "startVerse": 22,
+    "endChapter": 14,
+    "endVerse": 24
+  },
+  {
+    "book": "Luke",
+    "startChapter": 14,
+    "startVerse": 25,
+    "endChapter": 17,
+    "endVerse": 10
+  },
+  {
+    "book": "John",
+    "startChapter": 11,
+    "startVerse": 1,
+    "endChapter": 11,
+    "endVerse": 37
+  },
+  {
+    "book": "John",
+    "startChapter": 11,
+    "startVerse": 38,
+    "endChapter": 11,
+    "endVerse": 57
+  },
+  {
+    "book": "Luke",
+    "startChapter": 17,
+    "startVerse": 11,
+    "endChapter": 18,
+    "endVerse": 8
+  },
+  {
+    "book": "Luke",
+    "startChapter": 18,
+    "startVerse": 9,
+    "endChapter": 18,
+    "endVerse": 14
+  },
+  {
+    "book": "Mark",
+    "startChapter": 10,
+    "startVerse": 1,
+    "endChapter": 10,
+    "endVerse": 12
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 19,
+    "startVerse": 1,
+    "endChapter": 19,
+    "endVerse": 12
+  },
+  {
+    "book": "Mark",
+    "startChapter": 10,
+    "startVerse": 13,
+    "endChapter": 10,
+    "endVerse": 16
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 19,
+    "startVerse": 13,
+    "endChapter": 19,
+    "endVerse": 15
+  },
+  {
+    "book": "Luke",
+    "startChapter": 18,
+    "startVerse": 15,
+    "endChapter": 18,
+    "endVerse": 17
+  },
+  {
+    "book": "Mark",
+    "startChapter": 10,
+    "startVerse": 17,
+    "endChapter": 10,
+    "endVerse": 31
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 19,
+    "startVerse": 16,
+    "endChapter": 19,
+    "endVerse": 30
+  },
+  {
+    "book": "Luke",
+    "startChapter": 18,
+    "startVerse": 18,
+    "endChapter": 18,
+    "endVerse": 30
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 20,
+    "startVerse": 1,
+    "endChapter": 20,
+    "endVerse": 16
+  },
+  {
+    "book": "Mark",
+    "startChapter": 10,
+    "startVerse": 32,
+    "endChapter": 10,
+    "endVerse": 34
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 20,
+    "startVerse": 17,
+    "endChapter": 20,
+    "endVerse": 19
+  },
+  {
+    "book": "Luke",
+    "startChapter": 18,
+    "startVerse": 31,
+    "endChapter": 18,
+    "endVerse": 34
+  },
+  {
+    "book": "Mark",
+    "startChapter": 10,
+    "startVerse": 35,
+    "endChapter": 10,
+    "endVerse": 45
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 20,
+    "startVerse": 20,
+    "endChapter": 20,
+    "endVerse": 34
+  },
+  {
+    "book": "Mark",
+    "startChapter": 10,
+    "startVerse": 46,
+    "endChapter": 10,
+    "endVerse": 52
+  },
+  {
+    "book": "Luke",
+    "startChapter": 18,
+    "startVerse": 35,
+    "endChapter": 19,
+    "endVerse": 27
+  },
+  {
+    "book": "Mark",
+    "startChapter": 14,
+    "startVerse": 3,
+    "endChapter": 14,
+    "endVerse": 9
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 26,
+    "startVerse": 6,
+    "endChapter": 26,
+    "endVerse": 13
+  },
+  {
+    "book": "John",
+    "startChapter": 12,
+    "startVerse": 1,
+    "endChapter": 12,
+    "endVerse": 11
+  },
+  {
+    "book": "Mark",
+    "startChapter": 11,
+    "startVerse": 1,
+    "endChapter": 11,
+    "endVerse": 11
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 21,
+    "startVerse": 1,
+    "endChapter": 21,
+    "endVerse": 11
+  },
+  {
+    "book": "Luke",
+    "startChapter": 19,
+    "startVerse": 28,
+    "endChapter": 19,
+    "endVerse": 40
+  },
+  {
+    "book": "John",
+    "startChapter": 12,
+    "startVerse": 12,
+    "endChapter": 12,
+    "endVerse": 19
+  },
+  {
+    "book": "Luke",
+    "startChapter": 19,
+    "startVerse": 41,
+    "endChapter": 19,
+    "endVerse": 44
+  },
+  {
+    "book": "John",
+    "startChapter": 12,
+    "startVerse": 20,
+    "endChapter": 12,
+    "endVerse": 36
+  },
+  {
+    "book": "John",
+    "startChapter": 12,
+    "startVerse": 37,
+    "endChapter": 12,
+    "endVerse": 50
+  },
+  {
+    "book": "Mark",
+    "startChapter": 11,
+    "startVerse": 12,
+    "endChapter": 11,
+    "endVerse": 14
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 21,
+    "startVerse": 18,
+    "endChapter": 21,
+    "endVerse": 22
+  },
+  {
+    "book": "Mark",
+    "startChapter": 11,
+    "startVerse": 15,
+    "endChapter": 11,
+    "endVerse": 19
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 21,
+    "startVerse": 12,
+    "endChapter": 21,
+    "endVerse": 17
+  },
+  {
+    "book": "Luke",
+    "startChapter": 19,
+    "startVerse": 45,
+    "endChapter": 19,
+    "endVerse": 48
+  },
+  {
+    "book": "Mark",
+    "startChapter": 11,
+    "startVerse": 20,
+    "endChapter": 11,
+    "endVerse": 33
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 21,
+    "startVerse": 23,
+    "endChapter": 21,
+    "endVerse": 27
+  },
+  {
+    "book": "Luke",
+    "startChapter": 20,
+    "startVerse": 1,
+    "endChapter": 20,
+    "endVerse": 8
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 21,
+    "startVerse": 28,
+    "endChapter": 21,
+    "endVerse": 32
+  },
+  {
+    "book": "Mark",
+    "startChapter": 12,
+    "startVerse": 1,
+    "endChapter": 12,
+    "endVerse": 12
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 21,
+    "startVerse": 33,
+    "endChapter": 21,
+    "endVerse": 46
+  },
+  {
+    "book": "Luke",
+    "startChapter": 20,
+    "startVerse": 9,
+    "endChapter": 20,
+    "endVerse": 19
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 22,
+    "startVerse": 1,
+    "endChapter": 22,
+    "endVerse": 14
+  },
+  {
+    "book": "Mark",
+    "startChapter": 12,
+    "startVerse": 13,
+    "endChapter": 12,
+    "endVerse": 17
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 22,
+    "startVerse": 15,
+    "endChapter": 22,
+    "endVerse": 22
+  },
+  {
+    "book": "Luke",
+    "startChapter": 20,
+    "startVerse": 20,
+    "endChapter": 20,
+    "endVerse": 26
+  },
+  {
+    "book": "Mark",
+    "startChapter": 12,
+    "startVerse": 18,
+    "endChapter": 12,
+    "endVerse": 27
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 22,
+    "startVerse": 23,
+    "endChapter": 22,
+    "endVerse": 33
+  },
+  {
+    "book": "Luke",
+    "startChapter": 20,
+    "startVerse": 27,
+    "endChapter": 20,
+    "endVerse": 40
+  },
+  {
+    "book": "Mark",
+    "startChapter": 12,
+    "startVerse": 28,
+    "endChapter": 12,
+    "endVerse": 34
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 22,
+    "startVerse": 34,
+    "endChapter": 22,
+    "endVerse": 40
+  },
+  {
+    "book": "Mark",
+    "startChapter": 12,
+    "startVerse": 35,
+    "endChapter": 12,
+    "endVerse": 37
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 22,
+    "startVerse": 41,
+    "endChapter": 22,
+    "endVerse": 46
+  },
+  {
+    "book": "Luke",
+    "startChapter": 20,
+    "startVerse": 41,
+    "endChapter": 20,
+    "endVerse": 44
+  },
+  {
+    "book": "Mark",
+    "startChapter": 12,
+    "startVerse": 38,
+    "endChapter": 12,
+    "endVerse": 40
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 23,
+    "startVerse": 1,
+    "endChapter": 23,
+    "endVerse": 12
+  },
+  {
+    "book": "Luke",
+    "startChapter": 20,
+    "startVerse": 45,
+    "endChapter": 20,
+    "endVerse": 47
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 23,
+    "startVerse": 13,
+    "endChapter": 23,
+    "endVerse": 39
+  },
+  {
+    "book": "Mark",
+    "startChapter": 12,
+    "startVerse": 41,
+    "endChapter": 12,
+    "endVerse": 44
+  },
+  {
+    "book": "Luke",
+    "startChapter": 21,
+    "startVerse": 1,
+    "endChapter": 21,
+    "endVerse": 4
+  },
+  {
+    "book": "Mark",
+    "startChapter": 13,
+    "startVerse": 1,
+    "endChapter": 13,
+    "endVerse": 23
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 24,
+    "startVerse": 1,
+    "endChapter": 24,
+    "endVerse": 25
+  },
+  {
+    "book": "Luke",
+    "startChapter": 21,
+    "startVerse": 5,
+    "endChapter": 21,
+    "endVerse": 24
+  },
+  {
+    "book": "Mark",
+    "startChapter": 13,
+    "startVerse": 24,
+    "endChapter": 13,
+    "endVerse": 31
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 24,
+    "startVerse": 26,
+    "endChapter": 24,
+    "endVerse": 35
+  },
+  {
+    "book": "Luke",
+    "startChapter": 21,
+    "startVerse": 25,
+    "endChapter": 21,
+    "endVerse": 33
+  },
+  {
+    "book": "Mark",
+    "startChapter": 13,
+    "startVerse": 32,
+    "endChapter": 13,
+    "endVerse": 37
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 24,
+    "startVerse": 36,
+    "endChapter": 24,
+    "endVerse": 51
+  },
+  {
+    "book": "Luke",
+    "startChapter": 21,
+    "startVerse": 34,
+    "endChapter": 21,
+    "endVerse": 38
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 25,
+    "startVerse": 1,
+    "endChapter": 25,
+    "endVerse": 46
+  },
+  {
+    "book": "Mark",
+    "startChapter": 14,
+    "startVerse": 1,
+    "endChapter": 14,
+    "endVerse": 2
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 26,
+    "startVerse": 1,
+    "endChapter": 26,
+    "endVerse": 5
+  },
+  {
+    "book": "Luke",
+    "startChapter": 22,
+    "startVerse": 1,
+    "endChapter": 22,
+    "endVerse": 2
+  },
+  {
+    "book": "Mark",
+    "startChapter": 14,
+    "startVerse": 10,
+    "endChapter": 14,
+    "endVerse": 11
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 26,
+    "startVerse": 14,
+    "endChapter": 26,
+    "endVerse": 16
+  },
+  {
+    "book": "Luke",
+    "startChapter": 22,
+    "startVerse": 3,
+    "endChapter": 22,
+    "endVerse": 6
+  },
+  {
+    "book": "Mark",
+    "startChapter": 14,
+    "startVerse": 12,
+    "endChapter": 14,
+    "endVerse": 16
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 26,
+    "startVerse": 17,
+    "endChapter": 26,
+    "endVerse": 19
+  },
+  {
+    "book": "Luke",
+    "startChapter": 22,
+    "startVerse": 7,
+    "endChapter": 22,
+    "endVerse": 13
+  },
+  {
+    "book": "John",
+    "startChapter": 13,
+    "startVerse": 1,
+    "endChapter": 13,
+    "endVerse": 20
+  },
+  {
+    "book": "Mark",
+    "startChapter": 14,
+    "startVerse": 17,
+    "endChapter": 14,
+    "endVerse": 26
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 26,
+    "startVerse": 20,
+    "endChapter": 26,
+    "endVerse": 30
+  },
+  {
+    "book": "Luke",
+    "startChapter": 22,
+    "startVerse": 14,
+    "endChapter": 22,
+    "endVerse": 30
+  },
+  {
+    "book": "John",
+    "startChapter": 13,
+    "startVerse": 18,
+    "endChapter": 13,
+    "endVerse": 30
+  },
+  {
+    "book": "John",
+    "startChapter": 13,
+    "startVerse": 31,
+    "endChapter": 13,
+    "endVerse": 38
+  },
+  {
+    "book": "Mark",
+    "startChapter": 14,
+    "startVerse": 27,
+    "endChapter": 14,
+    "endVerse": 31
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 26,
+    "startVerse": 31,
+    "endChapter": 26,
+    "endVerse": 35
+  },
+  {
+    "book": "Luke",
+    "startChapter": 22,
+    "startVerse": 31,
+    "endChapter": 22,
+    "endVerse": 38
+  },
+  {
+    "book": "John",
+    "startChapter": 14,
+    "startVerse": 1,
+    "endChapter": 15,
+    "endVerse": 17
+  },
+  {
+    "book": "John",
+    "startChapter": 15,
+    "startVerse": 18,
+    "endChapter": 17,
+    "endVerse": 26
+  },
+  {
+    "book": "John",
+    "startChapter": 18,
+    "startVerse": 1,
+    "endChapter": 18,
+    "endVerse": 2
+  },
+  {
+    "book": "Mark",
+    "startChapter": 14,
+    "startVerse": 32,
+    "endChapter": 14,
+    "endVerse": 42
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 26,
+    "startVerse": 36,
+    "endChapter": 26,
+    "endVerse": 46
+  },
+  {
+    "book": "Luke",
+    "startChapter": 22,
+    "startVerse": 39,
+    "endChapter": 22,
+    "endVerse": 46
+  },
+  {
+    "book": "Mark",
+    "startChapter": 14,
+    "startVerse": 43,
+    "endChapter": 14,
+    "endVerse": 52
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 26,
+    "startVerse": 47,
+    "endChapter": 26,
+    "endVerse": 56
+  },
+  {
+    "book": "Luke",
+    "startChapter": 22,
+    "startVerse": 47,
+    "endChapter": 22,
+    "endVerse": 53
+  },
+  {
+    "book": "John",
+    "startChapter": 18,
+    "startVerse": 3,
+    "endChapter": 18,
+    "endVerse": 24
+  },
+  {
+    "book": "Mark",
+    "startChapter": 14,
+    "startVerse": 53,
+    "endChapter": 14,
+    "endVerse": 65
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 26,
+    "startVerse": 57,
+    "endChapter": 26,
+    "endVerse": 68
+  },
+  {
+    "book": "Mark",
+    "startChapter": 14,
+    "startVerse": 66,
+    "endChapter": 14,
+    "endVerse": 72
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 26,
+    "startVerse": 69,
+    "endChapter": 26,
+    "endVerse": 75
+  },
+  {
+    "book": "Luke",
+    "startChapter": 22,
+    "startVerse": 54,
+    "endChapter": 22,
+    "endVerse": 65
+  },
+  {
+    "book": "John",
+    "startChapter": 18,
+    "startVerse": 25,
+    "endChapter": 18,
+    "endVerse": 27
+  },
+  {
+    "book": "Mark",
+    "startChapter": 15,
+    "startVerse": 1,
+    "endChapter": 15,
+    "endVerse": 1
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 27,
+    "startVerse": 1,
+    "endChapter": 27,
+    "endVerse": 2
+  },
+  {
+    "book": "Luke",
+    "startChapter": 22,
+    "startVerse": 66,
+    "endChapter": 22,
+    "endVerse": 71
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 27,
+    "startVerse": 3,
+    "endChapter": 27,
+    "endVerse": 10
+  },
+  {
+    "book": "Mark",
+    "startChapter": 15,
+    "startVerse": 2,
+    "endChapter": 15,
+    "endVerse": 5
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 27,
+    "startVerse": 11,
+    "endChapter": 27,
+    "endVerse": 14
+  },
+  {
+    "book": "Luke",
+    "startChapter": 23,
+    "startVerse": 1,
+    "endChapter": 23,
+    "endVerse": 12
+  },
+  {
+    "book": "John",
+    "startChapter": 18,
+    "startVerse": 28,
+    "endChapter": 18,
+    "endVerse": 40
+  },
+  {
+    "book": "Mark",
+    "startChapter": 15,
+    "startVerse": 6,
+    "endChapter": 15,
+    "endVerse": 15
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 27,
+    "startVerse": 15,
+    "endChapter": 27,
+    "endVerse": 26
+  },
+  {
+    "book": "Luke",
+    "startChapter": 23,
+    "startVerse": 13,
+    "endChapter": 23,
+    "endVerse": 25
+  },
+  {
+    "book": "John",
+    "startChapter": 19,
+    "startVerse": 1,
+    "endChapter": 19,
+    "endVerse": 16
+  },
+  {
+    "book": "Mark",
+    "startChapter": 15,
+    "startVerse": 16,
+    "endChapter": 15,
+    "endVerse": 20
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 27,
+    "startVerse": 27,
+    "endChapter": 27,
+    "endVerse": 31
+  },
+  {
+    "book": "Mark",
+    "startChapter": 15,
+    "startVerse": 21,
+    "endChapter": 15,
+    "endVerse": 24
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 27,
+    "startVerse": 32,
+    "endChapter": 27,
+    "endVerse": 34
+  },
+  {
+    "book": "Luke",
+    "startChapter": 23,
+    "startVerse": 26,
+    "endChapter": 23,
+    "endVerse": 31
+  },
+  {
+    "book": "John",
+    "startChapter": 19,
+    "startVerse": 17,
+    "endChapter": 19,
+    "endVerse": 17
+  },
+  {
+    "book": "Mark",
+    "startChapter": 15,
+    "startVerse": 25,
+    "endChapter": 15,
+    "endVerse": 32
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 27,
+    "startVerse": 35,
+    "endChapter": 27,
+    "endVerse": 44
+  },
+  {
+    "book": "Luke",
+    "startChapter": 23,
+    "startVerse": 32,
+    "endChapter": 23,
+    "endVerse": 43
+  },
+  {
+    "book": "John",
+    "startChapter": 19,
+    "startVerse": 18,
+    "endChapter": 19,
+    "endVerse": 27
+  },
+  {
+    "book": "Mark",
+    "startChapter": 15,
+    "startVerse": 33,
+    "endChapter": 15,
+    "endVerse": 41
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 27,
+    "startVerse": 45,
+    "endChapter": 27,
+    "endVerse": 56
+  },
+  {
+    "book": "Luke",
+    "startChapter": 23,
+    "startVerse": 44,
+    "endChapter": 23,
+    "endVerse": 49
+  },
+  {
+    "book": "John",
+    "startChapter": 19,
+    "startVerse": 28,
+    "endChapter": 19,
+    "endVerse": 37
+  },
+  {
+    "book": "Mark",
+    "startChapter": 15,
+    "startVerse": 42,
+    "endChapter": 15,
+    "endVerse": 47
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 27,
+    "startVerse": 57,
+    "endChapter": 27,
+    "endVerse": 61
+  },
+  {
+    "book": "Luke",
+    "startChapter": 23,
+    "startVerse": 50,
+    "endChapter": 23,
+    "endVerse": 56
+  },
+  {
+    "book": "John",
+    "startChapter": 19,
+    "startVerse": 38,
+    "endChapter": 19,
+    "endVerse": 42
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 27,
+    "startVerse": 62,
+    "endChapter": 27,
+    "endVerse": 66
+  },
+  {
+    "book": "Mark",
+    "startChapter": 16,
+    "startVerse": 1,
+    "endChapter": 16,
+    "endVerse": 8
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 28,
+    "startVerse": 1,
+    "endChapter": 28,
+    "endVerse": 7
+  },
+  {
+    "book": "Luke",
+    "startChapter": 24,
+    "startVerse": 1,
+    "endChapter": 24,
+    "endVerse": 12
+  },
+  {
+    "book": "Mark",
+    "startChapter": 16,
+    "startVerse": 9,
+    "endChapter": 16,
+    "endVerse": 11
+  },
+  {
+    "book": "John",
+    "startChapter": 20,
+    "startVerse": 1,
+    "endChapter": 20,
+    "endVerse": 18
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 28,
+    "startVerse": 8,
+    "endChapter": 28,
+    "endVerse": 15
+  },
+  {
+    "book": "Luke",
+    "startChapter": 24,
+    "startVerse": 13,
+    "endChapter": 24,
+    "endVerse": 43
+  },
+  {
+    "book": "Mark",
+    "startChapter": 16,
+    "startVerse": 12,
+    "endChapter": 16,
+    "endVerse": 13
+  },
+  {
+    "book": "John",
+    "startChapter": 20,
+    "startVerse": 19,
+    "endChapter": 20,
+    "endVerse": 23
+  },
+  {
+    "book": "Mark",
+    "startChapter": 16,
+    "startVerse": 14,
+    "endChapter": 16,
+    "endVerse": 14
+  },
+  {
+    "book": "John",
+    "startChapter": 20,
+    "startVerse": 24,
+    "endChapter": 21,
+    "endVerse": 25
+  },
+  {
+    "book": "Matthew",
+    "startChapter": 28,
+    "startVerse": 16,
+    "endChapter": 28,
+    "endVerse": 20
+  },
+  {
+    "book": "Mark",
+    "startChapter": 16,
+    "startVerse": 15,
+    "endChapter": 16,
+    "endVerse": 18
+  },
+  {
+    "book": "Luke",
+    "startChapter": 24,
+    "startVerse": 44,
+    "endChapter": 24,
+    "endVerse": 49
+  },
+  {
+    "book": "Mark",
+    "startChapter": 16,
+    "startVerse": 19,
+    "endChapter": 16,
+    "endVerse": 20
+  },
+  {
+    "book": "Luke",
+    "startChapter": 24,
+    "startVerse": 50,
+    "endChapter": 24,
+    "endVerse": 53
+  },
+  {
+    "book": "Acts",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 2,
+    "endVerse": 47
+  },
+  {
+    "book": "Acts",
+    "startChapter": 3,
+    "startVerse": 1,
+    "endChapter": 5,
+    "endVerse": 42
+  },
+  {
+    "book": "Acts",
+    "startChapter": 6,
+    "startVerse": 1,
+    "endChapter": 8,
+    "endVerse": 1
+  },
+  {
+    "book": "Acts",
+    "startChapter": 8,
+    "startVerse": 1,
+    "endChapter": 9,
+    "endVerse": 43
+  },
+  {
+    "book": "Acts",
+    "startChapter": 10,
+    "startVerse": 1,
+    "endChapter": 12,
+    "endVerse": 5
+  },
+  {
+    "book": "Acts",
+    "startChapter": 12,
+    "startVerse": 6,
+    "endChapter": 14,
+    "endVerse": 20
+  },
+  {
+    "book": "Acts",
+    "startChapter": 14,
+    "startVerse": 21,
+    "endChapter": 14,
+    "endVerse": 28
+  },
+  {
+    "book": "Galatians",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 3,
+    "endVerse": 23
+  },
+  {
+    "book": "Galatians",
+    "startChapter": 3,
+    "startVerse": 24,
+    "endChapter": 6,
+    "endVerse": 18
+  },
+  {
+    "book": "Acts",
+    "startChapter": 15,
+    "startVerse": 1,
+    "endChapter": 15,
+    "endVerse": 21
+  },
+  {
+    "book": "Acts",
+    "startChapter": 15,
+    "startVerse": 22,
+    "endChapter": 17,
+    "endVerse": 15
+  },
+  {
+    "book": "Acts",
+    "startChapter": 17,
+    "startVerse": 16,
+    "endChapter": 18,
+    "endVerse": 3
+  },
+  {
+    "book": "1 Thessalonians",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 5,
+    "endVerse": 11
+  },
+  {
+    "book": "1 Thessalonians",
+    "startChapter": 5,
+    "startVerse": 12,
+    "endChapter": 5,
+    "endVerse": 28
+  },
+  {
+    "book": "2 Thessalonians",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 3,
+    "endVerse": 18
+  },
+  {
+    "book": "Acts",
+    "startChapter": 18,
+    "startVerse": 4,
+    "endChapter": 18,
+    "endVerse": 23
+  },
+  {
+    "book": "Acts",
+    "startChapter": 18,
+    "startVerse": 24,
+    "endChapter": 19,
+    "endVerse": 20
+  },
+  {
+    "book": "1 Corinthians",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 3,
+    "endVerse": 23
+  },
+  {
+    "book": "1 Corinthians",
+    "startChapter": 4,
+    "startVerse": 1,
+    "endChapter": 7,
+    "endVerse": 40
+  },
+  {
+    "book": "1 Corinthians",
+    "startChapter": 8,
+    "startVerse": 1,
+    "endChapter": 11,
+    "endVerse": 1
+  },
+  {
+    "book": "1 Corinthians",
+    "startChapter": 11,
+    "startVerse": 2,
+    "endChapter": 13,
+    "endVerse": 13
+  },
+  {
+    "book": "1 Corinthians",
+    "startChapter": 14,
+    "startVerse": 1,
+    "endChapter": 15,
+    "endVerse": 58
+  },
+  {
+    "book": "1 Corinthians",
+    "startChapter": 16,
+    "startVerse": 1,
+    "endChapter": 16,
+    "endVerse": 24
+  },
+  {
+    "book": "Acts",
+    "startChapter": 19,
+    "startVerse": 21,
+    "endChapter": 20,
+    "endVerse": 6
+  },
+  {
+    "book": "Romans",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 1,
+    "endVerse": 32
+  },
+  {
+    "book": "Romans",
+    "startChapter": 2,
+    "startVerse": 1,
+    "endChapter": 4,
+    "endVerse": 25
+  },
+  {
+    "book": "Romans",
+    "startChapter": 5,
+    "startVerse": 1,
+    "endChapter": 8,
+    "endVerse": 17
+  },
+  {
+    "book": "Romans",
+    "startChapter": 8,
+    "startVerse": 18,
+    "endChapter": 10,
+    "endVerse": 21
+  },
+  {
+    "book": "Romans",
+    "startChapter": 11,
+    "startVerse": 1,
+    "endChapter": 14,
+    "endVerse": 23
+  },
+  {
+    "book": "Romans",
+    "startChapter": 15,
+    "startVerse": 1,
+    "endChapter": 16,
+    "endVerse": 27
+  },
+  {
+    "book": "2 Corinthians",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 2,
+    "endVerse": 4
+  },
+  {
+    "book": "2 Corinthians",
+    "startChapter": 2,
+    "startVerse": 5,
+    "endChapter": 6,
+    "endVerse": 13
+  },
+  {
+    "book": "2 Corinthians",
+    "startChapter": 6,
+    "startVerse": 14,
+    "endChapter": 10,
+    "endVerse": 18
+  },
+  {
+    "book": "2 Corinthians",
+    "startChapter": 11,
+    "startVerse": 1,
+    "endChapter": 13,
+    "endVerse": 13
+  },
+  {
+    "book": "Acts",
+    "startChapter": 20,
+    "startVerse": 7,
+    "endChapter": 20,
+    "endVerse": 12
+  },
+  {
+    "book": "Acts",
+    "startChapter": 20,
+    "startVerse": 13,
+    "endChapter": 21,
+    "endVerse": 36
+  },
+  {
+    "book": "Acts",
+    "startChapter": 21,
+    "startVerse": 37,
+    "endChapter": 23,
+    "endVerse": 35
+  },
+  {
+    "book": "Acts",
+    "startChapter": 24,
+    "startVerse": 1,
+    "endChapter": 26,
+    "endVerse": 32
+  },
+  {
+    "book": "Acts",
+    "startChapter": 27,
+    "startVerse": 1,
+    "endChapter": 27,
+    "endVerse": 44
+  },
+  {
+    "book": "Acts",
+    "startChapter": 28,
+    "startVerse": 1,
+    "endChapter": 28,
+    "endVerse": 31
+  },
+  {
+    "book": "Ephesians",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 2,
+    "endVerse": 22
+  },
+  {
+    "book": "Ephesians",
+    "startChapter": 3,
+    "startVerse": 1,
+    "endChapter": 5,
+    "endVerse": 14
+  },
+  {
+    "book": "Ephesians",
+    "startChapter": 5,
+    "startVerse": 15,
+    "endChapter": 6,
+    "endVerse": 23
+  },
+  {
+    "book": "Colossians",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 1,
+    "endVerse": 23
+  },
+  {
+    "book": "Colossians",
+    "startChapter": 1,
+    "startVerse": 24,
+    "endChapter": 4,
+    "endVerse": 18
+  },
+  {
+    "book": "Philemon",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 1,
+    "endVerse": 25
+  },
+  {
+    "book": "Philippians",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 2,
+    "endVerse": 11
+  },
+  {
+    "book": "Philippians",
+    "startChapter": 2,
+    "startVerse": 12,
+    "endChapter": 4,
+    "endVerse": 23
+  },
+  {
+    "book": "James",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 3,
+    "endVerse": 18
+  },
+  {
+    "book": "James",
+    "startChapter": 4,
+    "startVerse": 1,
+    "endChapter": 5,
+    "endVerse": 20
+  },
+  {
+    "book": "1 Timothy",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 2,
+    "endVerse": 15
+  },
+  {
+    "book": "1 Timothy",
+    "startChapter": 3,
+    "startVerse": 1,
+    "endChapter": 6,
+    "endVerse": 10
+  },
+  {
+    "book": "1 Timothy",
+    "startChapter": 6,
+    "startVerse": 11,
+    "endChapter": 6,
+    "endVerse": 21
+  },
+  {
+    "book": "Titus",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 3,
+    "endVerse": 15
+  },
+  {
+    "book": "2 Timothy",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 1,
+    "endVerse": 18
+  },
+  {
+    "book": "2 Timothy",
+    "startChapter": 2,
+    "startVerse": 1,
+    "endChapter": 4,
+    "endVerse": 18
+  },
+  {
+    "book": "2 Timothy",
+    "startChapter": 4,
+    "startVerse": 19,
+    "endChapter": 4,
+    "endVerse": 22
+  },
+  {
+    "book": "Hebrews",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 4,
+    "endVerse": 13
+  },
+  {
+    "book": "Hebrews",
+    "startChapter": 4,
+    "startVerse": 14,
+    "endChapter": 7,
+    "endVerse": 28
+  },
+  {
+    "book": "Hebrews",
+    "startChapter": 8,
+    "startVerse": 1,
+    "endChapter": 10,
+    "endVerse": 39
+  },
+  {
+    "book": "Hebrews",
+    "startChapter": 11,
+    "startVerse": 1,
+    "endChapter": 12,
+    "endVerse": 29
+  },
+  {
+    "book": "Hebrews",
+    "startChapter": 13,
+    "startVerse": 1,
+    "endChapter": 13,
+    "endVerse": 25
+  },
+  {
+    "book": "1 Peter",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 2,
+    "endVerse": 3
+  },
+  {
+    "book": "1 Peter",
+    "startChapter": 2,
+    "startVerse": 4,
+    "endChapter": 5,
+    "endVerse": 11
+  },
+  {
+    "book": "1 Peter",
+    "startChapter": 5,
+    "startVerse": 12,
+    "endChapter": 5,
+    "endVerse": 14
+  },
+  {
+    "book": "2 Peter",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 3,
+    "endVerse": 18
+  },
+  {
+    "book": "1 John",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 4,
+    "endVerse": 6
+  },
+  {
+    "book": "1 John",
+    "startChapter": 4,
+    "startVerse": 7,
+    "endChapter": 5,
+    "endVerse": 21
+  },
+  {
+    "book": "2 John",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 1,
+    "endVerse": 13
+  },
+  {
+    "book": "Jude",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 1,
+    "endVerse": 25
+  },
+  {
+    "book": "Revelation",
+    "startChapter": 1,
+    "startVerse": 1,
+    "endChapter": 2,
+    "endVerse": 29
+  },
+  {
+    "book": "Revelation",
+    "startChapter": 3,
+    "startVerse": 1,
+    "endChapter": 6,
+    "endVerse": 17
+  },
+  {
+    "book": "Revelation",
+    "startChapter": 7,
+    "startVerse": 1,
+    "endChapter": 10,
+    "endVerse": 11
+  },
+  {
+    "book": "Revelation",
+    "startChapter": 11,
+    "startVerse": 1,
+    "endChapter": 14,
+    "endVerse": 20
+  },
+  {
+    "book": "Revelation",
+    "startChapter": 15,
+    "startVerse": 1,
+    "endChapter": 18,
+    "endVerse": 24
+  },
+  {
+    "book": "Revelation",
+    "startChapter": 19,
+    "startVerse": 1,
+    "endChapter": 22,
+    "endVerse": 21
   }
 ]

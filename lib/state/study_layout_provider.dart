@@ -58,8 +58,11 @@ class StudyCardConfig {
 
 class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
   static final List<StudyCardConfig> _defaultLayout = [
-    StudyCardConfig(id: 'your_space', size: CardSize.small),
+    StudyCardConfig(id: 'your_space', size: CardSize.large),
+    StudyCardConfig(id: 'cloud_sync', size: CardSize.large),
     StudyCardConfig(id: 'reading_plan', size: CardSize.large),
+    StudyCardConfig(id: 'bible_stories', size: CardSize.large),
+    StudyCardConfig(id: 'dictionary', size: CardSize.medium),
     StudyCardConfig(id: 'commentary', size: CardSize.large),
   ];
 
@@ -71,7 +74,6 @@ class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
         final List<dynamic> decoded = jsonDecode(prefsJson);
         final loaded = decoded
             .map((e) => StudyCardConfig.fromJson(e as Map<String, dynamic>))
-            .where((c) => c.id != 'saved_verses')
             .toList();
 
         // Ensure all default cards are present (in case of updates)

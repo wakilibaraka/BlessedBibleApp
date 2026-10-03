@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/widget_bg_gradient_dusk"
+    android:padding="16dp">
+
+    <!-- Header: Streak & Fire badge -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/streak_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🔥"
+            android:textSize="22sp"
+            android:layout_marginEnd="8dp" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/streak_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 Days"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:shadowColor="#80000000"
+                android:shadowDx="0"
+                android:shadowDy="1"
+                android:shadowRadius="2" />
+
+            <TextView
+                android:id="@+id/streak_subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Read today!"
+                android:textSize="11sp"
+                android:textColor="#D4D4D8"
+                android:shadowColor="#80000000"
+                android:shadowDx="0"
+                android:shadowDy="1"
+                android:shadowRadius="2" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Subtle divider -->
+    <View
+        android:id="@+id/streak_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="#26FFFFFF" />
+
+    <!-- Word of the Day Section -->
+    <TextView
+        android:id="@+id/wotd_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="WORD OF THE DAY"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.08"
+        android:textColor="#FDE047"
+        android:shadowColor="#80000000"
+        android:shadowDx="0"
+        android:shadowDy="1"
+        android:shadowRadius="2"
+        android:layout_marginBottom="2dp" />
+
+    <TextView
+        android:id="@+id/wotd_word"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Grace (Charis)"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:shadowColor="#80000000"
+        android:shadowDx="0"
+        android:shadowDy="1"
+        android:shadowRadius="2"
+        android:layout_marginBottom="3dp" />
+
+    <TextView
+        android:id="@+id/wotd_snippet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="The unmerited favor and divine love of God bestowed upon humanity."
+        android:textSize="12sp"
+        android:textColor="#D4D4D8"
+        android:maxLines="3"
+        android:ellipsize="end"
+        android:shadowColor="#80000000"
+        android:shadowDx="0"
+        android:shadowDy="1"
+        android:shadowRadius="2" />
+
+</LinearLayout>

@@ -1,78 +1,19 @@
-import 'dart:convert';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/commentary_entry.dart';
+import '../models/study_content_category.dart';
 import '../data/local_storage/preferences_service.dart';
-
-// Parse JSON completely in the background to prevent main thread blocking
-List<CommentaryEntry> _parseCommentaryJsonString(String jsonString) {
-  try {
-    final decoded = jsonDecode(jsonString);
-
-    List<dynamic> entriesList;
-    if (decoded is Map<String, dynamic> && decoded.containsKey('entries')) {
-      entriesList = decoded['entries'] as List<dynamic>;
-    } else if (decoded is List) {
-      entriesList = decoded;
-    } else {
-      return [];
-    }
-
-    return entriesList
-        .map((e) => CommentaryEntry.fromJson(e as Map<String, dynamic>))
-        .toList();
-  } catch (_) {
-    return [];
-  }
-}
-
-class CommentaryBook {
-  final String title;
-  final String author;
-  final String id;
-  final bool isComingSoon;
-
-  const CommentaryBook({
-    required this.title,
-    required this.author,
-    required this.id,
-    this.isComingSoon = false,
-  });
-}
-
-const List<CommentaryBook> kAvailableCommentaries = [
-  CommentaryBook(
-    title: 'Daniel and the Revelation',
-    author: 'Uriah Smith',
-    id: 'daniel_revelation',
-  ),
-  CommentaryBook(
-    title: 'The Epistle to the Hebrews',
-    author: 'M.L. Andreasen',
-    id: 'hebrews',
-  ),
-  CommentaryBook(
-    title: 'The Glad Tidings',
-    author: 'E.J. Waggoner',
-    id: 'glad_tidings',
-    isComingSoon: true,
-  ),
-  CommentaryBook(
-    title: 'The Cross and Its Shadow',
-    author: 'S.N. Haskell',
-    id: 'cross_shadow',
-    isComingSoon: true,
-  ),
-  CommentaryBook(
-    title: 'The Three Angels\' Messages',
-    author: 'J.N. Andrews',
-    id: 'three_angels',
-    isComingSoon: true,
-  ),
-];
+import 'package:flutter/foundation.dart';
+import '../utils/isolate_parsers.dart';
 
 class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
+  List<String> _cachedFormattedVerses = [];
+  Set<String> _cachedVersesWithCommentary = {};
+  Set<String> _cachedVersesWithDevotionals = {};
+  Set<String> _cachedVersesWithNotes = {};
+  Set<String> _cachedChapters = {};
+
   @override
   Future<List<CommentaryEntry>> build() async {
     return _loadCommentary();
@@ -82,13 +23,55 @@ class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
     try {
       final jsonString =
           await rootBundle.loadString('assets/commentary/commentary.json');
-      return await compute(
-          _parseCommentaryJsonString, jsonString);
+      
+      final entries = await compute(parseCommentaryJson, jsonString);
+
+      final verses = <String>{};
+      final vCommSet = <String>{};
+      final vDevoSet = <String>{};
+      final vNoteSet = <String>{};
+      final cSet = <String>{};
+      
+      for (final e in entries) {
+        final b = e.scope.book;
+        final c = e.scope.chapter;
+        final v = e.scope.verse;
+        
+        if (b != null && c != null) {
+          if (e.scope.type == 'chapter') {
+            cSet.add('$b|$c');
+          }
+          if (e.scope.type == 'verse' && v != null) {
+            final key = '$b|$c|$v';
+            if (e.category == StudyContentCategory.devotional) {
+              vDevoSet.add(key);
+            } else if (e.category == StudyContentCategory.studyNote) {
+              vNoteSet.add(key);
+            } else {
+              vCommSet.add(key);
+            }
+            verses.add('$b $c:$v');
+          }
+        }
+      }
+      
+      _cachedChapters = cSet;
+      _cachedVersesWithCommentary = vCommSet;
+      _cachedVersesWithDevotionals = vDevoSet;
+      _cachedVersesWithNotes = vNoteSet;
+      _cachedFormattedVerses = verses.toList()..sort();
+      
+      return entries;
     } catch (e) {
       // If the file is missing or empty, do not crash; return empty list
       return [];
     }
   }
+
+  Set<String> get versesWithCommentarySet => _cachedVersesWithCommentary;
+  Set<String> get versesWithDevotionalsSet => _cachedVersesWithDevotionals;
+  Set<String> get versesWithNotesSet => _cachedVersesWithNotes;
+  Set<String> get chaptersWithCommentarySet => _cachedChapters;
 
   List<CommentaryEntry> commentaryForVerse(
       String book, int chapter, int verse) {
@@ -156,51 +139,7 @@ class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
             e.scope.book?.toLowerCase() == book.toLowerCase()));
   }
 
-  List<String>? _versesCache;
-  Set<String>? _versesSetCache;
-  Set<String>? _chaptersSetCache;
-
-  void _buildCachesIfNeeded() {
-    if (_versesCache != null && _versesSetCache != null && _chaptersSetCache != null) return;
-    
-    final list = state.value ?? [];
-    final versesList = <String>{};
-    final versesSet = <String>{};
-    final chaptersSet = <String>{};
-    
-    for (final e in list) {
-      final b = e.scope.book;
-      final c = e.scope.chapter;
-      final v = e.scope.verse;
-      
-      if (b != null && c != null) {
-        if (e.scope.type == 'chapter') {
-          chaptersSet.add('$b|$c');
-        } else if (e.scope.type == 'verse' && v != null) {
-          versesSet.add('$b|$c|$v');
-          versesList.add('$b $c:$v');
-        }
-      }
-    }
-    _versesCache = versesList.toList()..sort();
-    _versesSetCache = versesSet;
-    _chaptersSetCache = chaptersSet;
-  }
-
-  Set<String> get versesWithCommentarySet {
-    _buildCachesIfNeeded();
-    return _versesSetCache!;
-  }
-
-  Set<String> get chaptersWithCommentarySet {
-    _buildCachesIfNeeded();
-    return _chaptersSetCache!;
-  }
-
-  List<String> get versesWithCommentary {
-    _buildCachesIfNeeded();
-    return _versesCache!;
-  }
+  List<String> get versesWithCommentary => _cachedFormattedVerses;
 }
 
 final commentaryProvider =
@@ -237,3 +176,21 @@ final commentaryBookmarksProvider =
     NotifierProvider<CommentaryBookmarksNotifier, Set<String>>(
   CommentaryBookmarksNotifier.new,
 );
+
+/// Returns true if ANY commentary entry exists for [book]/[chapter].
+/// Widgets can call: ref.watch(commentaryForChapterProvider(('Hebrews', 12)))
+final commentaryForChapterProvider =
+    Provider.family<bool, (String, int)>((ref, args) {
+  final (book, chapter) = args;
+  final notifier = ref.watch(commentaryProvider.notifier);
+  return notifier.hasCommentary(book, chapter, null);
+});
+
+/// Returns the set of books that have ANY commentary — used by Library.
+final commentaryAvailableBooksProvider = Provider<Set<String>>((ref) {
+  final list = ref.watch(commentaryProvider).value ?? [];
+  return list
+      .where((e) => e.scope.book != null)
+      .map((e) => e.scope.book!)
+      .toSet();
+});

@@ -1,77 +1,65 @@
 import 'dart:async';
 import 'dart:ui';
+import '../widgets/strongs_entry_sheet.dart';
+
+import '../widgets/dictionary_entry_sheet.dart';
+import '../sheets/appearance_settings_sheet.dart';
+
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
-import '../widgets/pinch_to_zoom_font_wrapper.dart';
-import '../widgets/typography_controls.dart';
+
 
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'bible_story_reader_screen.dart';
+import '../../state/devotional_provider.dart';
+
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+
+import 'main_nav_screen.dart' show kBottomDockHeight, kBottomDockInset;
 
 import '../../data/models/bible_model.dart';
 import '../../state/bible_provider.dart';
+import '../../state/dictionary_provider.dart';
 
 import '../../state/read_settings_provider.dart';
+import '../../state/surface_style_provider.dart';
 import '../../state/user_data_provider.dart';
 import '../../state/reading_plan_provider.dart';
 import '../../state/streak_provider.dart';
+import '../../state/pericopes_provider.dart';
+
+import '../../models/pericope_entry.dart';
 import '../../state/most_read_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../../data/models/translation_model.dart';
 import '../../state/hints_provider.dart';
-import '../../utils/bible_sections.dart';
 import '../../services/share_service.dart';
 import 'notes_list_screen.dart';
 
 import '../sheets/translation_picker_sheet.dart';
 
 import '../widgets/day_complete_celebration.dart';
+import '../widgets/dynamic_toast.dart';
 import '../../state/theme_provider.dart';
+import '../../state/bbe_substitutions_provider.dart';
 import '../../state/typography_provider.dart';
-import '../../state/chapter_titles_provider.dart';
 import '../../state/immersive_mode_provider.dart';
 import '../../state/read_selection_provider.dart';
 import '../../state/commentary_provider.dart';
-import '../../state/bible_nav_settings_provider.dart';
 import '../../state/read_location_provider.dart';
 import '../widgets/textured_glass_container.dart';
-import '../widgets/bouncy_entrance.dart';
 
 import '../../state/translation_provider.dart';
 import '../../theme/reading_tokens.dart';
 import '../widgets/commentary_view.dart';
 import '../sheets/verse_context_menu_sheet.dart';
-import 'highlights_screen.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
-
-class StrictVerticalScrollPhysics extends ScrollPhysics {
-  final ValueNotifier<bool> isPageSwiping;
-
-  const StrictVerticalScrollPhysics({
-    super.parent,
-    required this.isPageSwiping,
-  });
-
-  @override
-  StrictVerticalScrollPhysics applyTo(ScrollPhysics? ancestor) {
-    return StrictVerticalScrollPhysics(
-      parent: buildParent(ancestor),
-      isPageSwiping: isPageSwiping,
-    );
-  }
-
-  @override
-  bool shouldAcceptUserOffset(ScrollMetrics position) {
-    if (isPageSwiping.value) return false;
-    return super.shouldAcceptUserOffset(position);
-  }
-}
+import '../sheets/book_chapter_selector_sheet.dart';
 
 class ExpandedChipsNotifier extends Notifier<Map<int, String?>> {
   @override
@@ -96,50 +84,20 @@ class ExpandedChipsNotifier extends Notifier<Map<int, String?>> {
   }
 }
 
+/// A callback to open the book/chapter selector from outside ReadScreen (e.g. from FAB).
+class NavMenuTriggerNotifier extends Notifier<VoidCallback?> {
+  @override
+  VoidCallback? build() => null;
+  void set(VoidCallback? callback) => state = callback;
+}
+
+final navMenuTriggerProvider =
+    NotifierProvider<NavMenuTriggerNotifier, VoidCallback?>(
+        NavMenuTriggerNotifier.new);
+
 final expandedChipsProvider =
     NotifierProvider<ExpandedChipsNotifier, Map<int, String?>>(
         ExpandedChipsNotifier.new);
-
-String _getTranslationGlyph(String languageName) {
-  switch (languageName.toLowerCase()) {
-    case 'english':
-      return '英';
-    case 'french':
-      return '法';
-    case 'chinese':
-      return '中';
-    case 'korean':
-      return '韓';
-    case 'russian':
-      return '俄';
-    case 'german':
-      return '德';
-    case 'spanish':
-      return '西';
-    case 'japanese':
-      return '日';
-    case 'arabic':
-      return '阿';
-    case 'hindi':
-      return '印';
-    case 'italian':
-      return '意';
-    case 'portuguese':
-      return '葡';
-    case 'dutch':
-      return '荷';
-    case 'ukrainian':
-      return '烏';
-    case 'polish':
-      return '波';
-    case 'swahili':
-      return '斯';
-    case 'tagalog':
-      return '塔';
-    default:
-      return languageName.isNotEmpty ? languageName[0].toUpperCase() : 'A';
-  }
-}
 
 String _getLanguageAbbr(String languageName) {
   switch (languageName.toLowerCase()) {
@@ -206,50 +164,6 @@ String _getTranslationLabel(
   }
 }
 
-String _getTranslationCombinedLabel(
-    String translationId, List<TranslationInfo> allInstalled,
-    {String? defaultName}) {
-  try {
-    final info =
-        allInstalled.firstWhere((t) => t.translationId == translationId);
-    final label = _getTranslationLabel(translationId, allInstalled);
-    return '${_getTranslationGlyph(info.languageName)} $label';
-  } catch (_) {
-    final name = defaultName ?? translationId;
-    return '${_getTranslationGlyph(name)} ${_getTranslationLabel(translationId, allInstalled, defaultName: defaultName)}';
-  }
-}
-
-String _toHeadingCase(String text) {
-  if (text.isEmpty) return text;
-  final minorWords = {
-    'a',
-    'an',
-    'the',
-    'and',
-    'but',
-    'or',
-    'for',
-    'nor',
-    'on',
-    'at',
-    'to',
-    'from',
-    'by',
-    'in',
-    'of',
-    'with'
-  };
-  final words = text.toLowerCase().split(' ');
-  for (int i = 0; i < words.length; i++) {
-    if (words[i].isEmpty) continue;
-    if (i == 0 || i == words.length - 1 || !minorWords.contains(words[i])) {
-      words[i] = words[i][0].toUpperCase() + words[i].substring(1);
-    }
-  }
-  return words.join(' ');
-}
-
 class ReadScreen extends ConsumerStatefulWidget {
   const ReadScreen({super.key});
 
@@ -264,16 +178,40 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   int _currentPageIndex = 0;
   final Map<int, ItemScrollController> _itemScrollControllers = {};
   final Map<int, ItemPositionsListener> _itemPositionsListeners = {};
+  final Map<String, List<TapGestureRecognizer>> _dictRecognizers = {};
+
+  void _showDictionaryPopover(String normalizedWord) {
+    final style = ref.read(readSettingsProvider).popupStyle;
+    final isFloating = style == PopupStyle.floating;
+    
+    if (isFloating) {
+      showDialog(
+        context: context,
+        builder: (context) => DictionaryEntrySheet(
+          normalizedWord: normalizedWord,
+          isFloating: true,
+        ),
+      );
+    } else {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => DictionaryEntrySheet(
+          normalizedWord: normalizedWord,
+          isFloating: false,
+        ),
+      );
+    }
+  }
+
   int? _navigatedVerseIndex;
   Timer? _scrollDebounceTimer;
   Timer? _visitTimer;
   Timer? _scrollEndTimer;
   Timer? _pageDebounceTimer;
 
-
   final ValueNotifier<bool> _isScrolling = ValueNotifier(false);
-  // True while PageView is mid-swipe; used to freeze vertical child list.
-  final ValueNotifier<bool> _isPageSwiping = ValueNotifier(false);
 
   // ── Hints ────────────────────────────────────────────────────────
   String? _currentHintId;
@@ -307,37 +245,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         Future.microtask(() => _showHint(id, message));
       });
     }
-  }
-  // ────────────────────────────────────────────────────────────────
-
-  // ── Deliberate-drag-to-nav gate ──────────────────────────────────
-  // A fast flick must NOT open navigation. Only a slow, sustained pull
-  // past a distance threshold that has been held for a minimum duration
-  // qualifies as an intentional gesture.
-  //
-  // Thresholds (tuned for feel):
-  //   Distance  : 60 logical pixels of overscroll accumulated
-  //   Hold time : 700 ms — the drag must be held for at least this long
-  //   Max vel   : 250 px/s  — any faster is a flick, not a deliberate drag
-  static const double _kOverscrollDistanceThreshold = 100.0;
-
-  double _overscrollAccum = 0.0; // total negative overscroll pixels seen
-  bool _navTriggeredThisDrag = false;
-  bool _hasFiredArmedHaptic = false;
-
-  double _dragStartY = 0.0;
-  bool _isDragging = false;
-
-  /// Called from the indicator widget to provide the current pull fraction
-  /// (0.0 → 1.0, capped) so a subtle indicator can be drawn.
-  double get _overscrollFraction =>
-      (_overscrollAccum / _kOverscrollDistanceThreshold).clamp(0.0, 1.0);
-
-  void _resetOverscrollGate() {
-    _overscrollAccum = 0.0;
-    _navTriggeredThisDrag = false;
-    _hasFiredArmedHaptic = false;
-    if (mounted) setState(() {});
   }
   // ────────────────────────────────────────────────────────────────
 
@@ -426,10 +333,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           if (!prefs.showReadingTips) return;
 
           final hints = ref.read(hintsProvider);
-          if (!hints.contains('seen_highlight_hint')) {
-            _tryShowHint('seen_highlight_hint',
-                'Long-press a verse to highlight or take notes');
-          } else if (!hints.contains('seen_commentary_hint')) {
+          if (!hints.contains('seen_commentary_hint')) {
             _tryShowHint('seen_commentary_hint',
                 'Tap the bulb icon next to a verse for commentary');
           }
@@ -458,6 +362,13 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     _pageDebounceTimer?.cancel();
 
     _isScrolling.dispose();
+
+    for (final list in _dictRecognizers.values) {
+      for (final r in list) {
+        r.dispose();
+      }
+    }
+    _dictRecognizers.clear();
     _pageController.dispose();
     WidgetsBinding.instance.removeObserver(this);
     WakelockPlus.disable(); // Release wakelock
@@ -493,8 +404,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         final listener = _itemPositionsListeners[targetIndex];
 
         if (controller != null && controller.isAttached) {
-          final versesCount = flatChapters[targetIndex].chapter.verses.length;
-
           controller.scrollTo(
             index: verse - 1,
             duration: const Duration(milliseconds: 600),
@@ -503,34 +412,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           );
 
           if (listener != null) {
-            bool adjusted = false;
-            void checkOverscroll() {
-              if (adjusted || !mounted) return;
-
-              final positions = listener.itemPositions.value;
-              // Footer is at index == versesCount
-              final footerPos =
-                  positions.where((p) => p.index == versesCount).firstOrNull;
-
-              if (footerPos != null && footerPos.itemTrailingEdge < 1.0) {
-                adjusted = true;
-                controller.scrollTo(
-                  index: versesCount,
-                  duration: const Duration(milliseconds: 400),
-                  curve: Curves.easeOutCubic,
-                  alignment: 1.0,
-                );
-              }
-            }
-
-            listener.itemPositions.addListener(checkOverscroll);
-
-            // Clean up the listener after the initial animation is done
-            Future.delayed(const Duration(milliseconds: 650), () {
-              if (mounted) {
-                listener.itemPositions.removeListener(checkOverscroll);
-              }
-            });
+            // Overscroll hack has been removed since we no longer have massive bottom padding.
           }
 
           // Highlight it faintly upon jumping
@@ -560,13 +442,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   }
 
   void _showTypographyBottomSheet() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      useRootNavigator: true,
-      builder: (context) => const _TypographyBottomSheet(),
-    );
+    AppearanceSettingsSheet.show(context, initialTab: AppearanceTab.typography);
   }
 
   void _showSelectorBottomSheet(List<BibleBook> allBooks) {
@@ -578,7 +454,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       useSafeArea: false,
       builder: (context) {
         final loc = ref.read(readLocationProvider);
-        return _BookChapterSelectorSheet(
+        return BookChapterSelectorSheet(
           books: allBooks,
           selectedBookAbbrev: loc.bookAbbrev,
           selectedChapter: loc.chapter,
@@ -613,33 +489,50 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       {required Widget child,
       required ReadingTokens tokens,
       required VoidCallback onTap}) {
+    final surfaceStyle = ref.watch(surfaceStyleProvider);
+    final isEarth = surfaceStyle == SurfaceStyle.flat;
+
     return GestureDetector(
       onTap: onTap,
       child: RepaintBoundary(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
-                  child: const SizedBox.shrink(),
-                ),
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                decoration: BoxDecoration(
-                  color: tokens.readingPaper.withValues(alpha: 0.85),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: tokens.readingBorder.withValues(alpha: 0.3),
-                    width: 1,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: isEarth
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.12),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                : null,
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
+                    child: const SizedBox.shrink(),
                   ),
                 ),
-                child: child,
-              ),
-            ],
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: tokens.readingPaper.withValues(alpha: 0.85),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: tokens.readingBorder.withValues(alpha: 0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: child,
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -668,16 +561,15 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         mainAxisSize: MainAxisSize.min,
         children: [
           Flexible(
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 160),
-                child: Text(
-                  '$currentBookName $currentChapter',
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: tokens.readingInk,
-                  ),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 160),
+              child: Text(
+                '$currentBookName $currentChapter',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: tokens.readingInk,
                 ),
               ),
             ),
@@ -700,14 +592,31 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
             final activeTransId = ref.watch(activeTranslationProvider);
             final installed =
                 ref.watch(availableTranslationsProvider).value ?? [];
-            final activeTransLabel =
+            String activeTransLabel =
                 _getTranslationLabel(activeTransId, installed);
+
+            final readingLayout = ref.watch(readSettingsProvider).readingLayout;
+            final secondaryTransId = ref.watch(secondaryTranslationProvider);
+
+            if (readingLayout != ReadingLayout.single &&
+                readingLayout != ReadingLayout.chips) {
+              if (secondaryTransId != null &&
+                  secondaryTransId != activeTransId) {
+                final secondaryLabel =
+                    _getTranslationLabel(secondaryTransId, installed);
+                if (secondaryLabel != activeTransLabel) {
+                  activeTransLabel = '$activeTransLabel / $secondaryLabel';
+                }
+              }
+            }
 
             return _buildSideButton(
                 context,
                 tokens,
                 Text(
                   activeTransLabel,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w700,
                     color: tokens.readingInk,
@@ -749,11 +658,15 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
             ),
             _showTypographyBottomSheet);
 
-    return SizedBox(
-      height: 48,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(
+        textScaler: MediaQuery.textScalerOf(context).clamp(minScaleFactor: 1.0, maxScaleFactor: 1.3),
+      ),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 48),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
           Align(
             alignment: Alignment.centerLeft,
             child: leadingButton,
@@ -768,29 +681,55 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           ),
         ],
       ),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final mq = MediaQuery.of(context);
+    final double defaultSlop = mq.gestureSettings.touchSlop ?? kTouchSlop;
+    final mqHighSlop = mq.copyWith(
+      gestureSettings: DeviceGestureSettings(touchSlop: defaultSlop * 3.0),
+    );
+    final mqNormalSlop = mq.copyWith(
+      gestureSettings: DeviceGestureSettings(touchSlop: defaultSlop),
+    );
+
     final theme = Theme.of(context);
     final appThemeMode = ref.watch(themeProvider);
     final typography = ref.watch(typographyProvider);
-    final chapterTitles = ref.watch(chapterTitlesProvider);
+    ref.watch(pericopesProvider); // Trigger rebuild on load
+    final pericopesNotifier = ref.read(pericopesProvider.notifier);
     final readSettings = ref.watch(readSettingsProvider);
     final selectedVerses = ref.watch(readSelectionProvider);
 
-    ref.watch(commentaryProvider);
-    final versesWithCommentary = ref.read(commentaryProvider.notifier).versesWithCommentarySet;
-    final chaptersWithCommentary = ref.read(commentaryProvider.notifier).chaptersWithCommentarySet;
+    ref.watch(commentaryProvider); // trigger rebuild on state changes
+    final commentaryNotifier = ref.read(commentaryProvider.notifier);
+    final Set<String> versesWithCommentary =
+        commentaryNotifier.versesWithCommentarySet;
+    final Set<String> versesWithDevotionals =
+        commentaryNotifier.versesWithDevotionalsSet;
+    final Set<String> versesWithNotes =
+        commentaryNotifier.versesWithNotesSet;
+    final Set<String> chaptersWithCommentary =
+        commentaryNotifier.chaptersWithCommentarySet;
 
     final bibleState = ref.watch(bibleProvider);
     final isLoading = bibleState.isLoading;
     final allBooks = bibleState.books;
 
+    // Register the trigger for the FAB
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ref
+            .read(navMenuTriggerProvider.notifier)
+            .set(() => _showSelectorBottomSheet(allBooks));
+      }
+    });
+
     final flatChapters = ref.watch(flatChaptersProvider);
     final loc = ref.watch(readLocationProvider);
-    final bibleNavSettings = ref.watch(bibleNavSettingsProvider);
 
     if (flatChapters.isNotEmpty) {
       final targetIndex = flatChapters.indexWhere((fc) =>
@@ -802,7 +741,14 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         _hasInitialJumped = true;
         _currentPageIndex = safeTarget;
         if (!_pageController.hasClients) {
-          _pageController.dispose();
+      
+    for (final list in _dictRecognizers.values) {
+      for (final r in list) {
+        r.dispose();
+      }
+    }
+    _dictRecognizers.clear();
+    _pageController.dispose();
           _pageController = PageController(initialPage: safeTarget);
         } else {
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -837,11 +783,12 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           }
         }
 
-        if (next.requestedVerse != null) {
-          _scrollToVerse(next.requestedVerse!, next);
+        final reqVerse = next.requestedVerse;
+        if (reqVerse != null) {
+          _scrollToVerse(reqVerse, next);
           ref.read(readLocationProvider.notifier).clearRequestedVerse();
         }
-        if (next.openCommentary && next.requestedVerse != null) {
+        if (next.openCommentary && reqVerse != null) {
           if (!isLoading && allBooks.isNotEmpty) {
             try {
               int bookIdx =
@@ -854,11 +801,11 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                   book.chapters.indexWhere((c) => c.number == next.chapter);
               if (chapIdx == -1) chapIdx = 0;
               final chapter = book.chapters[chapIdx];
-              if (next.requestedVerse! <= chapter.verses.length) {
-                final verseText = chapter.verses[next.requestedVerse! - 1].text;
+              if (reqVerse <= chapter.verses.length) {
+                final verseText = chapter.verses[reqVerse - 1].text;
                 Future.delayed(const Duration(milliseconds: 500), () {
                   if (mounted) {
-                    _showCommentaryBottomSheet(next.requestedVerse!, verseText);
+                    _showCommentaryBottomSheet(reqVerse, verseText);
                   }
                 });
               }
@@ -881,318 +828,229 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     }
 
     final tokens = theme.extension<ReadingTokens>()!;
-    Color getThemeBackgroundColor() {
-      switch (appThemeMode) {
-        case AppThemeMode.dawn:
-          return AppColors.dawnBackground;
-        case AppThemeMode.lilies:
-          return AppColors.liliesBackground;
-        case AppThemeMode.roses:
-          return AppColors.rosesBackground;
-        case AppThemeMode.olives:
-          return AppColors.olivesBackground;
-        case AppThemeMode.dusk:
-          return const Color(0xFF312C51);
-        case AppThemeMode.fresh:
-          return const Color(0xFF132C33);
-        default:
-          return tokens.readingPaper;
-      }
-    }
+    Color getThemeBackgroundColor() { return appThemeMode.is3DTheme ? appThemeMode.backgroundColor : tokens.readingPaper; }
 
     return Scaffold(
       backgroundColor: getThemeBackgroundColor(),
-      body: PinchToZoomFontWrapper(
-        child: Stack(
-          children: [
-            // ── Scripture Content Layer ──────────────────────────────────
-            Positioned.fill(
-              child: Stack(
-                children: [
-                  // Scripture View
-                  Positioned.fill(
-                    child: isLoading
-                        ? Center(
-                            child: CircularProgressIndicator(
-                              color: theme.primaryColor,
-                            ),
-                          )
-                        : flatChapters.isEmpty
-                            ? Center(
-                                child: Text('Passage not found.',
-                                    style: theme.textTheme.bodyLarge),
-                              )
-                            : NotificationListener<ScrollNotification>(
-                                onNotification: (notification) {
-                                  // Axis-lock: freeze the vertical list while PageView is swiping horizontally
-                                  if (notification.metrics.axis ==
-                                      Axis.horizontal) {
-                                    if (notification
-                                        is ScrollStartNotification) {
-                                      _isPageSwiping.value = true;
-                                    } else if (notification
-                                        is ScrollEndNotification) {
-                                      // Give one frame for the page snap to settle before unlocking
-                                      WidgetsBinding.instance
-                                          .addPostFrameCallback((_) {
-                                        if (mounted) {
-                                          _isPageSwiping.value = false;
-                                        }
-                                      });
-                                    }
-                                  }
-                                  return false; // let notifications bubble
-                                },
-                                child: PageView.builder(
-                                  allowImplicitScrolling: true,
-                                  dragStartBehavior: DragStartBehavior.start,
-                                  physics: _isPageSelectionMode
-                                      ? const NeverScrollableScrollPhysics()
-                                      : const PageScrollPhysics(),
-                                  controller: _pageController,
-                                  itemCount: flatChapters.length,
-                                  onPageChanged: (pageIndex) {
-                                    debugPrint(
-                                        'STEP0: onPageChanged gesture started for page $pageIndex');
-                                    setState(() {
-                                      _currentPageIndex = pageIndex;
-                                    });
+      body: Stack(
+        children: [
+          // ── Scripture Content Layer ──────────────────────────────────
+          Positioned.fill(
+            child: Stack(
+              children: [
+                // Scripture View
+                Positioned.fill(
+                  child: isLoading
+                      ? Center(
+                          child: CircularProgressIndicator(
+                            color: theme.primaryColor,
+                          ),
+                        )
+                      : flatChapters.isEmpty
+                          ? Center(
+                              child: Text('Passage not found.',
+                                  style: theme.textTheme.bodyLarge),
+                            )
+                          : MediaQuery(
+                              data: mqHighSlop,
+                              child: PageView.builder(
+                                allowImplicitScrolling: true,
+                                dragStartBehavior: DragStartBehavior.start,
+                                physics: _isPageSelectionMode
+                                    ? const NeverScrollableScrollPhysics()
+                                    : const PageScrollPhysics(),
+                                controller: _pageController,
+                                itemCount: flatChapters.length,
+                                onPageChanged: (pageIndex) {
+                                  setState(() {
+                                    _currentPageIndex = pageIndex;
+                                  });
 
-                                    _pageDebounceTimer?.cancel();
-                                    _pageDebounceTimer = Timer(
-                                        const Duration(milliseconds: 120), () {
-                                      if (!mounted) return;
-                                      final fc = flatChapters[pageIndex];
-                                      final currentLoc =
-                                          ref.read(readLocationProvider);
-                                      if ((currentLoc.bookAbbrev
-                                                      .toLowerCase() !=
-                                                  fc.book.abbreviation
-                                                      .toLowerCase() &&
-                                              currentLoc.bookName
-                                                      .toLowerCase() !=
-                                                  fc.book.name.toLowerCase()) ||
-                                          currentLoc.chapter !=
-                                              fc.chapter.number) {
-                                        ref
-                                            .read(readLocationProvider.notifier)
-                                            .updateLocation(
-                                              bookAbbrev: fc.book.abbreviation,
-                                              bookName: fc.book.name,
-                                              chapter: fc.chapter.number,
-                                            );
-                                      }
-                                    });
-                                    _clearSelection();
-                                  },
-                                  itemBuilder: (context, pageIndex) {
-                                    final buildStartMs =
-                                        DateTime.now().millisecondsSinceEpoch;
+                                  _pageDebounceTimer?.cancel();
+                                  _pageDebounceTimer = Timer(
+                                      const Duration(milliseconds: 120), () {
+                                    if (!mounted) return;
                                     final fc = flatChapters[pageIndex];
-
-                                    WidgetsBinding.instance
-                                        .addPostFrameCallback((_) {
-                                      final paintMs = DateTime.now()
-                                              .millisecondsSinceEpoch -
-                                          buildStartMs;
-                                      debugPrint(
-                                          'STEP0: Chapter ${fc.book.abbreviation} ${fc.chapter.number} painted in $paintMs ms');
-                                    });
-                                    _itemScrollControllers[pageIndex] ??=
-                                        ItemScrollController();
-                                    if (!_itemPositionsListeners
-                                        .containsKey(pageIndex)) {
-                                      final listener =
-                                          ItemPositionsListener.create();
-                                      _itemPositionsListeners[pageIndex] =
-                                          listener;
-                                      listener.itemPositions.addListener(() {
-                                        final positions =
-                                            listener.itemPositions.value;
-                                        if (positions.isNotEmpty) {
-                                          final activeTrans = ref
-                                              .read(activeTranslationProvider);
-                                          final bookNum =
-                                              allBooks.indexOf(fc.book) + 1;
-                                          final currentVersesAsync = ref
-                                              .read(translationChapterProvider((
-                                            translationId: activeTrans,
-                                            bookNumber: bookNum,
-                                            chapterNumber: fc.chapter.number,
-                                          )));
-                                          final currentVerses =
-                                              currentVersesAsync.value ??
-                                                  fc.chapter.verses;
-
-                                          final firstVisible = positions
-                                              .where(
-                                                  (p) => p.itemTrailingEdge > 0)
-                                              .reduce((min, p) =>
-                                                  p.itemLeadingEdge <
-                                                          min.itemLeadingEdge
-                                                      ? p
-                                                      : min);
-                                          if (firstVisible.index <
-                                              currentVerses.length) {
-                                            _scrollDebounceTimer?.cancel();
-                                            _visitTimer?.cancel();
-                                            _scrollDebounceTimer = Timer(
-                                                const Duration(
-                                                    milliseconds: 500), () {
-                                              if (!mounted) return;
-                                              final currentBookName =
-                                                  fc.book.name;
-                                              final currentChapter =
-                                                  fc.chapter.number;
-                                              final currentAbbrev =
-                                                  fc.book.abbreviation;
-                                              final prefs =
-                                                  ref.read(preferencesProvider);
-                                              prefs.saveLastReadLocation(
-                                                bookAbbrev: currentAbbrev,
-                                                bookName: currentBookName,
-                                                chapter: currentChapter,
-                                                verseIndex: firstVisible.index,
-                                              );
-                                              prefs.saveChapterScrollPosition(
-                                                currentAbbrev,
-                                                currentChapter,
-                                                firstVisible.index,
-                                              );
-                                            });
-                                            _visitTimer = Timer(
-                                                const Duration(seconds: 4), () {
-                                              if (!mounted) return;
-                                              ref
-                                                  .read(
-                                                      mostReadProvider.notifier)
-                                                  .incrementVisit(
-                                                    fc.book.abbreviation,
-                                                    fc.book.name,
-                                                    fc.chapter.number,
-                                                    currentVerses[
-                                                            firstVisible.index]
-                                                        .number,
-                                                  );
-                                            });
-                                          }
-                                        }
-                                      });
+                                    final currentLoc =
+                                        ref.read(readLocationProvider);
+                                    if ((currentLoc.bookAbbrev.toLowerCase() !=
+                                                fc.book.abbreviation
+                                                    .toLowerCase() &&
+                                            currentLoc.bookName.toLowerCase() !=
+                                                fc.book.name.toLowerCase()) ||
+                                        currentLoc.chapter !=
+                                            fc.chapter.number) {
+                                      ref
+                                          .read(readLocationProvider.notifier)
+                                          .updateLocation(
+                                            bookAbbrev: fc.book.abbreviation,
+                                            bookName: fc.book.name,
+                                            chapter: fc.chapter.number,
+                                          );
                                     }
+                                  });
+                                  _clearSelection();
+                                },
+                                itemBuilder: (context, pageIndex) {
+                                  final fc = flatChapters[pageIndex];
 
-                                    return Consumer(
-                                      builder: (context, ref, child) {
-                                        final activeTrans = ref
-                                            .watch(activeTranslationProvider);
-                                        final secondaryTrans = ref.watch(
-                                            secondaryTranslationProvider);
-                                        final readingLayout = ref
-                                            .watch(readSettingsProvider)
-                                            .readingLayout;
+                                  _itemScrollControllers[pageIndex] ??=
+                                      ItemScrollController();
+                                  if (!_itemPositionsListeners
+                                      .containsKey(pageIndex)) {
+                                    final listener =
+                                        ItemPositionsListener.create();
+                                    _itemPositionsListeners[pageIndex] =
+                                        listener;
+                                    listener.itemPositions.addListener(() {
+                                      final positions =
+                                          listener.itemPositions.value;
+                                      if (positions.isNotEmpty) {
+                                        final activeTrans =
+                                            ref.read(activeTranslationProvider);
                                         final bookNum =
                                             allBooks.indexOf(fc.book) + 1;
-                                        final chapterData = ref
-                                            .watch(translationChapterProvider((
+                                        final currentVersesAsync = ref
+                                            .read(translationChapterProvider((
                                           translationId: activeTrans,
                                           bookNumber: bookNum,
                                           chapterNumber: fc.chapter.number,
                                         )));
+                                        final currentVerses =
+                                            currentVersesAsync.value ??
+                                                fc.chapter.verses;
 
-                                        List<BibleVerse>? secondaryVerses;
-                                        if (secondaryTrans != null &&
-                                            readingLayout !=
-                                                ReadingLayout.single) {
-                                          final secondaryChapterData =
-                                              ref.watch(
-                                                  translationChapterProvider((
-                                            translationId: secondaryTrans,
-                                            bookNumber: bookNum,
-                                            chapterNumber: fc.chapter.number,
-                                          )));
-                                          secondaryVerses =
-                                              secondaryChapterData.value;
+                                        final firstVisible = positions
+                                            .where(
+                                                (p) => p.itemTrailingEdge > 0)
+                                            .reduce((min, p) =>
+                                                p.itemLeadingEdge <
+                                                        min.itemLeadingEdge
+                                                    ? p
+                                                    : min);
+                                        if (firstVisible.index <
+                                            currentVerses.length) {
+                                          _scrollDebounceTimer?.cancel();
+                                          _visitTimer?.cancel();
+                                          _scrollDebounceTimer = Timer(
+                                              const Duration(milliseconds: 500),
+                                              () {
+                                            if (!mounted) return;
+                                            final currentBookName =
+                                                fc.book.name;
+                                            final currentChapter =
+                                                fc.chapter.number;
+                                            final currentAbbrev =
+                                                fc.book.abbreviation;
+                                            final prefs =
+                                                ref.read(preferencesProvider);
+                                            prefs.saveLastReadLocation(
+                                              bookAbbrev: currentAbbrev,
+                                              bookName: currentBookName,
+                                              chapter: currentChapter,
+                                              verseIndex: firstVisible.index,
+                                            );
+                                            prefs.saveChapterScrollPosition(
+                                              currentAbbrev,
+                                              currentChapter,
+                                              firstVisible.index,
+                                            );
+                                          });
+                                          _visitTimer = Timer(
+                                              const Duration(seconds: 4), () {
+                                            if (!mounted) return;
+                                            ref
+                                                .read(mostReadProvider.notifier)
+                                                .incrementVisit(
+                                                  fc.book.abbreviation,
+                                                  fc.book.name,
+                                                  fc.chapter.number,
+                                                  currentVerses[
+                                                          firstVisible.index]
+                                                      .number,
+                                                );
+                                          });
                                         }
+                                      }
+                                    });
+                                  }
 
-                                        final verses = chapterData.value ??
-                                            fc.chapter.verses;
+                                  return Consumer(
+                                    builder: (context, ref, child) {
+                                      final activeTrans =
+                                          ref.watch(activeTranslationProvider);
+                                      final secondaryTrans = ref
+                                          .watch(secondaryTranslationProvider);
+                                      final readingLayout = ref
+                                          .watch(readSettingsProvider)
+                                          .readingLayout;
+                                      final bookNum =
+                                          allBooks.indexOf(fc.book) + 1;
+                                      final chapterData =
+                                          ref.watch(translationChapterProvider((
+                                        translationId: activeTrans,
+                                        bookNumber: bookNum,
+                                        chapterNumber: fc.chapter.number,
+                                      )));
 
-                                        final secondaryVerseMap =
-                                            <int, BibleVerse>{};
-                                        if (secondaryVerses != null) {
-                                          for (final v in secondaryVerses) {
-                                            secondaryVerseMap[v.number] = v;
-                                          }
+                                      List<BibleVerse>? secondaryVerses;
+                                      if (secondaryTrans != null &&
+                                          readingLayout !=
+                                              ReadingLayout.single) {
+                                        final secondaryChapterData = ref
+                                            .watch(translationChapterProvider((
+                                          translationId: secondaryTrans,
+                                          bookNumber: bookNum,
+                                          chapterNumber: fc.chapter.number,
+                                        )));
+                                        secondaryVerses =
+                                            secondaryChapterData.value;
+                                      }
+
+                                      final verses = chapterData.value ??
+                                          fc.chapter.verses;
+
+                                      final secondaryVerseMap =
+                                          <int, BibleVerse>{};
+                                      if (secondaryVerses != null) {
+                                        for (final v in secondaryVerses) {
+                                          secondaryVerseMap[v.number] = v;
                                         }
+                                      }
 
-                                        return RepaintBoundary(
+                                      return MediaQuery(
+                                        data: mqNormalSlop,
+                                        child: RepaintBoundary(
                                           child: GestureDetector(
                                             onTap: _isPageSelectionMode
                                                 ? null
                                                 : () {
-                                                    if (selectedVerses.isNotEmpty) {
+                                                    if (selectedVerses
+                                                        .isNotEmpty) {
                                                       _clearSelection();
                                                     } else {
-                                                      final mode = ref.read(readSettingsProvider).readingViewMode;
-                                                      if (mode == ReadingViewMode.full || mode == ReadingViewMode.partial) {
-                                                        ref.read(chromeHiddenProvider.notifier).toggle();
+                                                      final mode = ref
+                                                          .read(
+                                                              readSettingsProvider)
+                                                          .readingViewMode;
+                                                      if (mode ==
+                                                              ReadingViewMode
+                                                                  .full ||
+                                                          mode ==
+                                                              ReadingViewMode
+                                                                  .partial) {
+                                                        ref
+                                                            .read(
+                                                                chromeHiddenProvider
+                                                                    .notifier)
+                                                            .toggle();
                                                       }
                                                     }
                                                   },
                                             behavior:
                                                 HitTestBehavior.translucent,
-                                            child: Listener(
-                                              onPointerDown: (e) {
-                                                if (!_isPageSelectionMode && bibleNavSettings.swipeDownToNav) {
-                                                  _dragStartY = e.position.dy;
-                                                  _isDragging = true;
-                                                }
-                                              },
-                                              onPointerMove: (e) {
-                                                if (!_isDragging) return;
-                                                
-                                                bool isAtTop = true;
-                                                final positions = _itemPositionsListeners[_currentPageIndex]?.itemPositions.value;
-                                                if (positions != null && positions.isNotEmpty) {
-                                                  final visible = positions.where((p) => p.itemTrailingEdge > 0).toList();
-                                                  if (visible.isNotEmpty) {
-                                                    visible.sort((a, b) => a.itemLeadingEdge.compareTo(b.itemLeadingEdge));
-                                                    if (visible.first.index > 0 || visible.first.itemLeadingEdge < 0) {
-                                                      isAtTop = false;
-                                                    }
-                                                  }
-                                                }
-                                                if (!isAtTop) return;
-                                                
-                                                final dy = e.position.dy - _dragStartY;
-                                                if (dy < -10) {
-                                                  _isDragging = false;
-                                                  _resetOverscrollGate();
-                                                  return;
-                                                }
-                                                
-                                                if (dy > 0) {
-                                                  _overscrollAccum = dy;
-                                                  if (_overscrollAccum >= _kOverscrollDistanceThreshold && !_hasFiredArmedHaptic) {
-                                                    _hasFiredArmedHaptic = true;
-                                                    HapticFeedback.mediumImpact();
-                                                  }
-                                                  if (mounted) setState(() {});
-                                                }
-                                              },
-                                              onPointerUp: (e) {
-                                                _isDragging = false;
-                                                if (_overscrollAccum >= _kOverscrollDistanceThreshold && !_navTriggeredThisDrag && ModalRoute.of(context)?.isCurrent == true) {
-                                                  _navTriggeredThisDrag = true;
-                                                  _showSelectorBottomSheet(allBooks);
-                                                }
-                                                _resetOverscrollGate();
-                                              },
-                                              onPointerCancel: (e) {
-                                                _isDragging = false;
-                                                _resetOverscrollGate();
-                                              },
-                                              child: NotificationListener<
-                                                  ScrollNotification>(
+                                            child: NotificationListener<
+                                                ScrollNotification>(
                                               onNotification: (notification) {
                                                 if (notification
                                                         is ScrollStartNotification ||
@@ -1216,88 +1074,102 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                   });
                                                 }
 
-                                                // (Swipe down gesture is now handled by Listener above)
-                                                if (notification is UserScrollNotification) {
-                                                  if (notification.metrics.axis != Axis.vertical) {
+                                                // ── Deliberate-drag gate for navigation ──
+                                                if (_isPageSelectionMode) {
+                                                  return false;
+                                                }
+
+                                                if (notification
+                                                    is UserScrollNotification) {
+                                                  if (notification
+                                                          .metrics.axis !=
+                                                      Axis.vertical) {
                                                     return false;
                                                   }
-                                                  final mode = ref.read(readSettingsProvider).readingViewMode;
-                                                  final isImmersive = mode == ReadingViewMode.full || mode == ReadingViewMode.partial;
+                                                  final mode = ref
+                                                      .read(
+                                                          readSettingsProvider)
+                                                      .readingViewMode;
+                                                  final isImmersive = mode ==
+                                                          ReadingViewMode
+                                                              .full ||
+                                                      mode ==
+                                                          ReadingViewMode
+                                                              .partial;
                                                   if (isImmersive && mounted) {
-                                                    if (notification.direction != ScrollDirection.idle) {
-                                                      ref.read(chromeHiddenProvider.notifier).set(true);
+                                                    if (notification
+                                                            .direction !=
+                                                        ScrollDirection.idle) {
+                                                      ref
+                                                          .read(
+                                                              chromeHiddenProvider
+                                                                  .notifier)
+                                                          .set(true);
                                                     }
                                                   }
-                                                } else if (notification is ScrollEndNotification) {
+                                                } else if (notification
+                                                    is ScrollEndNotification) {
                                                   // No longer need to cancel timers
                                                 }
                                                 return false;
                                               },
-                                              child: Directionality(
-                                                textDirection: () {
-                                                  final availableTrans = ref
-                                                          .watch(
-                                                              availableTranslationsProvider)
-                                                          .value ??
-                                                      [];
-                                                  final activeTransId = ref.watch(
-                                                      activeTranslationProvider);
-                                                  final transInfo =
-                                                      availableTrans.firstWhere(
-                                                          (t) =>
-                                                              t.translationId ==
-                                                              activeTransId,
-                                                          orElse: () => availableTrans
-                                                                  .isNotEmpty
-                                                              ? availableTrans
-                                                                  .first
-                                                              : throw Exception(
-                                                                  'No translation'));
-                                                  final isRtl = [
-                                                    'ar',
-                                                    'he',
-                                                    'fa',
-                                                    'ur'
-                                                  ].contains(
-                                                      transInfo.languageCode);
-                                                  return isRtl
-                                                      ? TextDirection.rtl
-                                                      : TextDirection.ltr;
-                                                }(),
-                                                child: Center(
+                                              child: Builder(
+                                                builder: (context) {
+                                                  final availableTrans = ref.watch(availableTranslationsProvider).value ?? [];
+                                                  final activeTransId = ref.watch(activeTranslationProvider);
+                                                  final transInfo = availableTrans.firstWhere(
+                                                    (t) => t.translationId == activeTransId,
+                                                    orElse: () => availableTrans.isNotEmpty
+                                                        ? availableTrans.first
+                                                        : TranslationInfo(
+                                                            translationId: 'kjv',
+                                                            languageCode: 'en',
+                                                            languageName: 'English',
+                                                            translationName: 'King James Version',
+                                                            abbreviation: 'KJV',
+                                                            license: 'Public Domain',
+                                                            isComplete: true,
+                                                          ));
+                                                  final isRtl = ['ar', 'he', 'fa', 'ur'].contains(transInfo.languageCode);
+                                                  
+                                                  return Directionality(
+                                                    textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
+                                                    child: Center(
                                                   child: ConstrainedBox(
                                                     constraints:
                                                         const BoxConstraints(
                                                             maxWidth: 800),
                                                     child: Builder(
                                                         builder: (context) {
+                                                      final double chromeScale = MediaQuery.textScalerOf(context).clamp(minScaleFactor: 1.0, maxScaleFactor: 1.3).scale(1.0);
+                                                      final double dynamicTopBarHeight = 48.0 * chromeScale;
+                                                      final double dynamicBottomDockHeight = kBottomDockHeight * chromeScale;
+                                                      
                                                       final listPadding = EdgeInsets.only(
-                                                          top:
-                                                              MediaQuery.of(context).padding.top +
-                                                                  80.0,
+                                                          top: MediaQuery.viewPaddingOf(context).top + dynamicTopBarHeight + 32.0,
                                                           left: math.max(
-                                                              MediaQuery.of(context)
-                                                                  .padding
-                                                                  .left,
-                                                              MediaQuery.of(context)
-                                                                      .size
-                                                                      .width *
-                                                                  (typography.marginPercent /
-                                                                      100.0)),
+                                                              MediaQuery.viewPaddingOf(context).left,
+                                                              MediaQuery.sizeOf(context).width * (typography.marginPercent / 100.0)),
                                                           right: math.max(
-                                                              MediaQuery.of(context)
-                                                                  .padding
-                                                                  .right,
-                                                              MediaQuery.of(context)
-                                                                      .size
-                                                                      .width *
-                                                                  (typography.marginPercent /
-                                                                      100.0)),
-                                                          bottom: MediaQuery.of(context).padding.bottom + 80.0);
+                                                              MediaQuery.viewPaddingOf(context).right,
+                                                              MediaQuery.sizeOf(context).width * (typography.marginPercent / 100.0)),
+                                                          bottom: MediaQuery.viewPaddingOf(context).bottom + dynamicBottomDockHeight + kBottomDockInset + 24.0);
 
                                                       Widget buildVerseItem(
                                                           BuildContext context,
                                                           int index) {
+                                                        final isEnglish = transInfo.languageCode == 'en';
+                                                        final chapterDictMap = ref.watch(
+                                                          chapterUnderlineMapProvider(
+                                                            ChapterUnderlineArgs(
+                                                              bookNumber: allBooks.indexOf(fc.book) + 1,
+                                                              chapterNumber: fc.chapter.number,
+                                                              verses: verses,
+                                                              isEnglish: isEnglish,
+                                                              translationId: transInfo.translationId,
+                                                            )
+                                                          )
+                                                        );
                                                         if (index ==
                                                             verses.length) {
                                                           bool
@@ -1321,37 +1193,53 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                             selectedVerses
                                                                 .isNotEmpty;
 
-                                                        final bookData =
-                                                            chapterTitles[
-                                                                fc.book.name];
-                                                        final chapterTitle =
-                                                            bookData?[fc
-                                                                .chapter.number
-                                                                .toString()];
+                                                        final activeTransId =
+                                                            ref.watch(
+                                                                activeTranslationProvider);
+                                                        final chapterPericopes =
+                                                            pericopesNotifier
+                                                                .getPericopesForChapter(
+                                                                    fc.book
+                                                                        .name,
+                                                                    fc.chapter
+                                                                        .number,
+                                                                    translationId:
+                                                                        activeTransId);
+                                                        PericopeEntry?
+                                                            pericopeHeading;
+                                                        for (final p
+                                                            in chapterPericopes) {
+                                                          if (p.startVerse ==
+                                                              verse.number) {
+                                                            pericopeHeading = p;
+                                                            break;
+                                                          }
+                                                        }
+
+                                                        final finalHeadingText =
+                                                            pericopeHeading
+                                                                ?.title;
 
                                                         return Column(
                                                           crossAxisAlignment:
                                                               CrossAxisAlignment
                                                                   .stretch,
                                                           children: [
-                                                            if (index == 0 &&
-                                                                chapterTitle !=
-                                                                    null) ...[
+                                                            if (finalHeadingText !=
+                                                                    null &&
+                                                                finalHeadingText
+                                                                    .isNotEmpty) ...[
                                                               Padding(
                                                                 padding:
                                                                     const EdgeInsets
                                                                         .only(
-                                                                        top:
-                                                                            16.0,
-                                                                        bottom:
-                                                                            8.0,
-                                                                        left:
-                                                                            15.0,
-                                                                        right:
-                                                                            12.0),
+                                                                  top: 16.0,
+                                                                  bottom: 8.0,
+                                                                  left: 15.0,
+                                                                  right: 12.0,
+                                                                ),
                                                                 child: Text(
-                                                                  _toHeadingCase(
-                                                                      chapterTitle),
+                                                                  finalHeadingText,
                                                                   style: theme
                                                                       .textTheme
                                                                       .titleSmall
@@ -1360,15 +1248,18 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                         .primaryColor,
                                                                     fontSize:
                                                                         typography.fontSize *
-                                                                            1.25,
+                                                                            1.05,
                                                                     fontFamily:
                                                                         typography
                                                                             .fontFamily,
                                                                     fontWeight:
                                                                         FontWeight
-                                                                            .w700,
+                                                                            .w600,
+                                                                    fontStyle:
+                                                                        FontStyle
+                                                                            .italic,
                                                                     letterSpacing:
-                                                                        0.2,
+                                                                        0.1,
                                                                   ),
                                                                   textAlign:
                                                                       TextAlign
@@ -1394,11 +1285,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                       (context,
                                                                           itemRef,
                                                                           _) {
-                                                                bool
-                                                                    hasCommentary =
-                                                                    versesWithCommentary
-                                                                        .contains(
-                                                                            '${fc.book.name}|${fc.chapter.number}|${verse.number}');
+                                                                final verseKey = '${fc.book.name}|${fc.chapter.number}|${verse.number}';
+                                                                bool hasCommentary = versesWithCommentary.contains(verseKey);
+                                                                bool hasDevotional = versesWithDevotionals.contains(verseKey);
+                                                                bool hasStudyNote = versesWithNotes.contains(verseKey);
 
                                                                 final highlights =
                                                                     itemRef.watch(
@@ -1438,19 +1328,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                           .scaffoldBackgroundColor);
                                                                 }
 
-                                                                if (kHighlightDebug) {
-                                                                  debugPrint(
-                                                                      '[HIGHLIGHT_DEBUG] RENDER verse key=$refStr found=${highlights.containsKey(refStr)} color=$savedColorIndex highlightColor=$highlightColor isBookmarked=$isBookmarked timestamp=${DateTime.now().millisecondsSinceEpoch}');
-                                                                }
-
-                                                                if (kHighlightDebug &&
-                                                                    (isBookmarked ||
-                                                                        highlightColor !=
-                                                                            null)) {
-                                                                  debugPrint(
-                                                                      'DEBUG RENDER: $refStr isBookmarked=$isBookmarked, highlightColor=$highlightColor');
-                                                                }
-
                                                                 final verseWidget =
                                                                     _buildReadingLayoutVerse(
                                                                   context,
@@ -1471,7 +1348,29 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                   appThemeMode,
                                                                   hasCommentary:
                                                                       hasCommentary,
+                                                                  hasDevotional: hasDevotional,
+                                                                  hasStudyNote: hasStudyNote,
                                                                   onCommentaryTap: () =>
+                                                                      _showCommentaryBottomSheet(
+                                                                          verse
+                                                                              .number,
+                                                                          verse
+                                                                              .text),
+                                                                  onDevotionalTap: () async {
+                                                                    HapticFeedback.selectionClick();
+                                                                    final refStr = '${fc.book.name} ${fc.chapter.number}:${verse.number}';
+                                                                    final service = ref.read(devotionalServiceProvider);
+                                                                    await service.loadAllStoryRefs();
+                                                                    final story = service.storyByKeyVerse[refStr];
+                                                                    if (story != null && context.mounted) {
+                                                                      Navigator.of(context).push(MaterialPageRoute(
+                                                                        builder: (_) => BibleStoryReaderScreen(initialStory: story),
+                                                                      ));
+                                                                    } else {
+                                                                      _showCommentaryBottomSheet(verse.number, verse.text);
+                                                                    }
+                                                                  },
+                                                                  onStudyNoteTap: () =>
                                                                       _showCommentaryBottomSheet(
                                                                           verse
                                                                               .number,
@@ -1484,6 +1383,14 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                           .isRedLetterEnabled,
                                                                   isSelectionMode:
                                                                       _isPageSelectionMode,
+                                                                  dictTokens:
+                                                                      chapterDictMap[
+                                                                          verse
+                                                                              .number],
+                                                                  onDictTap:
+                                                                      _isPageSelectionMode
+                                                                          ? null
+                                                                          : _showDictionaryPopover,
                                                                 );
 
                                                                 return GestureDetector(
@@ -1499,15 +1406,16 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                                 verse.number
                                                                               ]);
                                                                             },
-                                                                  onTap: _isPageSelectionMode
-                                                                      ? null
-                                                                      : () {
-                                                                          if (ref.read(chromeHiddenProvider)) {
-                                                                            ref.read(chromeHiddenProvider.notifier).set(false);
-                                                                          } else {
-                                                                            _toggleVerseSelection(verse.number);
-                                                                          }
-                                                                        },
+                                                                  onTap:
+                                                                      _isPageSelectionMode
+                                                                          ? null
+                                                                          : () {
+                                                                              if (ref.read(chromeHiddenProvider)) {
+                                                                                ref.read(chromeHiddenProvider.notifier).set(false);
+                                                                              } else {
+                                                                                _toggleVerseSelection(verse.number);
+                                                                              }
+                                                                            },
                                                                   onLongPress:
                                                                       _isPageSelectionMode
                                                                           ? null
@@ -1521,6 +1429,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                                   verseNumber: verse.number,
                                                                                   bookName: fc.book.name,
                                                                                   chapterNum: fc.chapter.number,
+                                                                                  bookNumber: allBooks.indexOf(fc.book) + 1,
                                                                                   onCustomSelection: _enterPageSelection,
                                                                                 ),
                                                                               );
@@ -1545,8 +1454,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                         decoration:
                                                                             BoxDecoration(
                                                                           color: isSelected
-                                                                              ? (highlightColor ?? theme.primaryColor.withValues(alpha: 0.15))
-                                                                              : (_navigatedVerseIndex == index ? theme.primaryColor.withValues(alpha: 0.15) : (highlightColor ?? Colors.transparent)),
+                                                                              ? (highlightColor != null ? highlightColor.withValues(alpha: 0.35) : theme.primaryColor.withValues(alpha: 0.15))
+                                                                              : (_navigatedVerseIndex == index ? theme.primaryColor.withValues(alpha: 0.15) : (highlightColor != null ? highlightColor.withValues(alpha: 0.35) : Colors.transparent)),
                                                                           borderRadius:
                                                                               BorderRadius.circular(12),
                                                                           border: (isSelected && highlightColor != null)
@@ -1567,7 +1476,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
                                                       final ScrollPhysics
                                                           basePhysics =
-                                                          const BouncingScrollPhysics();
+                                                          const AlwaysScrollableScrollPhysics();
 
                                                       Widget listWidget;
                                                       if (_isPageSelectionMode) {
@@ -1591,11 +1500,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                           dragStartBehavior:
                                                               DragStartBehavior
                                                                   .down,
-                                                          physics: StrictVerticalScrollPhysics(
-                                                                  isPageSwiping:
-                                                                      _isPageSwiping)
-                                                              .applyTo(
-                                                                  basePhysics),
+                                                          physics: basePhysics,
                                                           child: SelectionArea(
                                                             child: Column(
                                                               crossAxisAlignment:
@@ -1648,208 +1553,140 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                               verses.length + 1,
                                                           itemBuilder:
                                                               buildVerseItem,
-                                                          physics: StrictVerticalScrollPhysics(
-                                                                  isPageSwiping:
-                                                                      _isPageSwiping)
-                                                              .applyTo(
-                                                                  basePhysics),
+                                                          physics: basePhysics,
                                                         );
                                                       }
                                                       return listWidget;
                                                     }), // end Builder
                                                   ), // end ConstrainedBox
                                                 ), // end Center
-                                              ), // end Directionality
+                                              ); // end Directionality
+                                              }), // end outer Builder
                                             ), // end NotificationListener
-                                            ), // end Listener
                                           ), // end GestureDetector
-                                        ); // end RepaintBoundary
-                                      }, // end Consumer's builder
-                                    );
-                                  },
-                                ),
-                              ), // end NotificationListener (axis-lock)
-                  ),
-                  // Top Navigation Bar Layer (Floating pills allowing text to flow behind)
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    child: Builder(builder: (context) {
-                      final isHidden = ref.watch(chromeHiddenProvider);
-                      final mode = ref.watch(readSettingsProvider).readingViewMode;
-                      final hideTopNav = isHidden && mode == ReadingViewMode.full;
-                      return AnimatedSlide(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeOutCubic,
-                        offset: hideTopNav ? const Offset(0, -1.0) : Offset.zero,
-                        child: AnimatedOpacity(
-                          duration: const Duration(milliseconds: 300),
-                          opacity: hideTopNav ? 0.0 : 1.0,
-                          child: Padding(
-                            padding: EdgeInsets.only(
-                              top: MediaQuery.of(context).padding.top + 8.0,
-                              left: 24.0,
-                              right: 24.0,
-                            ),
-                            child: _buildTopRow(
-                              context,
-                              ref,
-                              theme,
-                              currentBookName,
-                              currentChapter,
-                              allBooks,
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
-                  ),
-
-                  // ── Pull-to-navigate progressive indicator ──────────────────────
-                  // Fades in and grows as the user sustains a deliberate downward
-                  // drag from the top edge. Vanishes if they release early.
-                  if (bibleNavSettings.swipeDownToNav &&
-                      _overscrollFraction > 0.01)
-                    Positioned(
-                      top: MediaQuery.of(context).padding.top +
-                          65, // Positioned in the gap between header and chapter title
-                      left: 0,
-                      right: 0,
-                      child: IgnorePointer(
-                        child: AnimatedOpacity(
-                          duration: const Duration(milliseconds: 200),
-                          opacity: _overscrollFraction,
-                          alwaysIncludeSemantics: true,
-                          child: Center(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: theme.primaryColor.withValues(
-                                      alpha: 0.12 + 0.18 * _overscrollFraction),
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
-                                    color: theme.primaryColor.withValues(
-                                        alpha: 0.25 * _overscrollFraction),
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons.menu_book_outlined,
-                                      size: 16,
-                                      color: theme.primaryColor.withValues(
-                                          alpha:
-                                              0.4 + 0.6 * _overscrollFraction),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      _overscrollFraction >= 1.0
-                                          ? 'Release to navigate'
-                                          : 'Pull to navigate',
-                                      style:
-                                          theme.textTheme.labelLarge?.copyWith(
-                                        color: theme.primaryColor.withValues(
-                                            alpha: 0.5 +
-                                                0.5 * _overscrollFraction),
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.w500,
-                                        letterSpacing: 0.2,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                        ), // end RepaintBoundary
+                                      ); // end MediaQuery
+                                    }, // end Consumer's builder
+                                  );
+                                },
                               ),
                             ),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                  // ── Hints UI ──────────────────────────────────────────────────
-                  if (_currentHintMessage != null)
-                    Positioned(
-                      bottom: 80,
-                      left: 20,
-                      right: 20,
+                ),
+                // Top Navigation Bar Layer (Floating pills allowing text to flow behind)
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: Builder(builder: (context) {
+                    final isHidden = ref.watch(chromeHiddenProvider);
+                    final mode =
+                        ref.watch(readSettingsProvider).readingViewMode;
+                    final hideTopNav = isHidden && mode == ReadingViewMode.full;
+                    return AnimatedSlide(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeOutCubic,
+                      offset: hideTopNav ? const Offset(0, -1.0) : Offset.zero,
                       child: AnimatedOpacity(
-                        opacity: _currentHintMessage != null ? 1.0 : 0.0,
                         duration: const Duration(milliseconds: 300),
-                        alwaysIncludeSemantics: true,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.surface,
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.1),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              )
-                            ],
+                        opacity: hideTopNav ? 0.0 : 1.0,
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            top: MediaQuery.of(context).padding.top + 8.0,
+                            left: 24.0,
+                            right: 24.0,
                           ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.lightbulb_rounded,
-                                  color: AppColors.goldAccent, size: 18),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  _currentHintMessage!,
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: theme.colorScheme.onSurface,
-                                    fontWeight: FontWeight.w600,
+                          child: _buildTopRow(
+                            context,
+                            ref,
+                            theme,
+                            currentBookName,
+                            currentChapter,
+                            allBooks,
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+
+                // ── Hints UI ──────────────────────────────────────────────────
+                if (_currentHintMessage != null)
+                  Positioned.fill(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: AnimatedOpacity(
+                          opacity: _currentHintMessage != null ? 1.0 : 0.0,
+                          duration: const Duration(milliseconds: 300),
+                          alwaysIncludeSemantics: true,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surface,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                )
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.lightbulb_rounded,
+                                    color: AppColors.goldAccent, size: 18),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    _currentHintMessage!,
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: theme.colorScheme.onSurface,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              IconButton(
-                                icon: Icon(Icons.close_rounded,
-                                    size: 16,
-                                    color: theme.colorScheme.onSurface
-                                        .withValues(alpha: 0.6)),
-                                onPressed: _dismissHint,
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  if (_isPageSelectionMode)
-                    Positioned(
-                      bottom: 80,
-                      left: 0,
-                      right: 0,
-                      child: Center(
-                        child: FilledButton.icon(
-                          onPressed: _exitPageSelection,
-                          icon: const Icon(Icons.check, size: 20),
-                          label: const Text('Done'),
-                          style: FilledButton.styleFrom(
-                            backgroundColor: theme.primaryColor,
-                            foregroundColor: theme.colorScheme.onPrimary,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 24, vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
+                                IconButton(
+                                  icon: Icon(Icons.close_rounded,
+                                      size: 16,
+                                      color: theme.colorScheme.onSurface
+                                          .withValues(alpha: 0.6)),
+                                  onPressed: _dismissHint,
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                ),
+                              ],
                             ),
-                            elevation: 8,
                           ),
                         ),
                       ),
                     ),
-                ],
-              ),
+                  ),
+                if (_isPageSelectionMode)
+                  Positioned.fill(
+                    child: Center(
+                      child: FilledButton.icon(
+                        onPressed: _exitPageSelection,
+                        icon: const Icon(Icons.check, size: 20),
+                        label: const Text('Done'),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: theme.primaryColor,
+                          foregroundColor: theme.colorScheme.onPrimary,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          elevation: 8,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -1878,20 +1715,41 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       TypographyState typography,
       AppThemeMode appThemeMode,
       {bool hasCommentary = false,
+      bool hasDevotional = false,
+      bool hasStudyNote = false,
       VoidCallback? onCommentaryTap,
+      VoidCallback? onDevotionalTap,
+      VoidCallback? onStudyNoteTap,
       bool isBookmarked = false,
       bool isRedLetterEnabled = true,
-      bool isSelectionMode = false}) {
-    final primary = _buildNormalVerse(
+      bool isSelectionMode = false,
+      Set<int>? dictTokens,
+      void Function(String word)? onDictTap}) {
+    final activeTrans = ref.read(activeTranslationProvider);
+    final secondaryTrans = ref.read(secondaryTranslationProvider);
+    final showStrongs = ref.watch(readSettingsProvider.select((s) => s.showStrongsNumbers));
+    final strongsStyle = ref.watch(readSettingsProvider.select((s) => s.strongsIndicatorStyle));
+
+    final primary = _buildNormalVerse(context, 
       primaryVerse,
       theme,
       typography,
       appThemeMode,
       hasCommentary: hasCommentary,
+      hasDevotional: hasDevotional,
+      hasStudyNote: hasStudyNote,
       onCommentaryTap: onCommentaryTap,
+      onDevotionalTap: onDevotionalTap,
+      onStudyNoteTap: onStudyNoteTap,
       isBookmarked: isBookmarked,
       isRedLetterEnabled: isRedLetterEnabled,
       isSelectionMode: isSelectionMode,
+      translationId: activeTrans,
+      bookNumber: bookNumber,
+      chapterNumber: chapterNumber,
+      showStrongsNumbers: showStrongs, strongsIndicatorStyle: strongsStyle,
+      dictTokens: dictTokens,
+      onDictTap: onDictTap,
     );
 
     if (secondaryVerse == null || layout == ReadingLayout.single) {
@@ -1899,16 +1757,15 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     }
 
     if (layout == ReadingLayout.interleaved) {
-      final tokens = theme.extension<ReadingTokens>()!;
-      final secondaryColor = tokens.readingInk.withValues(alpha: 0.65);
+      final tokens = theme.extension<ReadingTokens>();
+      final secondaryColor = tokens?.readingInk.withValues(alpha: 0.65) ??
+          Colors.black.withValues(alpha: 0.65);
 
       final secondaryTypography = typography.copyWith(
         fontSize: typography.fontSize * 0.95,
       );
 
-
-
-      final secondary = _buildNormalVerse(
+      final secondary = _buildNormalVerse(context, 
         secondaryVerse,
         theme,
         secondaryTypography,
@@ -1919,6 +1776,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         overrideColor: secondaryColor,
         hideVerseNumber: true,
         isSelectionMode: isSelectionMode,
+        translationId: secondaryTrans,
+        bookNumber: bookNumber,
+        chapterNumber: chapterNumber,
+        showStrongsNumbers: showStrongs, strongsIndicatorStyle: strongsStyle,
       );
 
       return Column(
@@ -1931,7 +1792,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
                 secondary,
               ],
             ),
@@ -1941,15 +1801,15 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     }
 
     if (layout == ReadingLayout.sideBySide) {
-      final tokens = theme.extension<ReadingTokens>()!;
-      final secondaryColor = tokens.readingInk.withValues(alpha: 0.75);
+      final tokens = theme.extension<ReadingTokens>();
+      final secondaryColor = tokens?.readingInk.withValues(alpha: 0.75) ??
+          Colors.black.withValues(alpha: 0.75);
 
       final secondaryTypography = typography.copyWith(
         fontSize: typography.fontSize * 0.95,
       );
 
-
-      final secondary = _buildNormalVerse(
+      final secondary = _buildNormalVerse(context, 
         secondaryVerse,
         theme,
         secondaryTypography,
@@ -1960,6 +1820,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         overrideColor: secondaryColor,
         hideVerseNumber: true,
         isSelectionMode: isSelectionMode,
+        translationId: secondaryTrans,
+        bookNumber: bookNumber,
+        chapterNumber: chapterNumber,
+        showStrongsNumbers: showStrongs, strongsIndicatorStyle: strongsStyle,
       );
 
       return Row(
@@ -1971,7 +1835,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
                 secondary,
               ],
             ),
@@ -1984,42 +1847,40 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       final expandedChipsMap = ref.watch(expandedChipsProvider);
       final activeChipId = expandedChipsMap[primaryVerse.number];
 
-      final tokens = theme.extension<ReadingTokens>()!;
-      final secondaryColor = tokens.readingInk.withValues(alpha: 0.75);
+      final tokens = theme.extension<ReadingTokens>();
+      final secondaryColor = tokens?.readingInk.withValues(alpha: 0.75) ??
+          Colors.black.withValues(alpha: 0.75);
 
       final secondaryTypography = typography.copyWith(
         fontSize: typography.fontSize * 0.95,
       );
 
-      final targetLanguages = {
-        'English': 'EN',
-        'Swahili': 'SW',
-        'French': 'FR',
-        'Italian': 'IT',
-        'Spanish': 'ES',
-        'Tagalog': 'TL',
-      };
-
       final installedTranslations =
           ref.watch(availableTranslationsProvider).value ?? [];
-      final activeTransId = ref.read(activeTranslationProvider);
-      
-      final availableChips = <String, String>{};
+      final activeTransId = ref.watch(activeTranslationProvider);
+
+      final targetLanguages = <String, String>{};
       for (final t in installedTranslations) {
-        if (targetLanguages.containsKey(t.languageName)) {
-          final label = targetLanguages[t.languageName]!;
-          
-          // Skip the active translation to prevent showing it twice
-          // (e.g. if KJV is active, the EN chip will show WEB instead)
-          if (t.translationId == activeTransId) {
-            continue;
-          }
-          
-          if (!availableChips.containsKey(label)) {
-            availableChips[label] = t.translationId;
-          }
+        if (!targetLanguages.containsKey(t.languageName)) {
+          targetLanguages[t.languageName] = _getLanguageAbbr(t.languageName);
         }
       }
+
+      final availableChips = <String, String>{};
+      String? activeLanguageLabel;
+      for (final t in installedTranslations) {
+        final label = targetLanguages[t.languageName]!;
+        if (!availableChips.containsKey(label)) {
+          availableChips[label] = t.translationId;
+        }
+        if (t.translationId == activeTransId) {
+          activeLanguageLabel = label;
+        }
+      }
+
+      final chipsToRender = targetLanguages.entries
+          .where((e) => e.value != activeLanguageLabel)
+          .toList();
 
       Widget? activeTranslationWidget;
       if (activeChipId != null) {
@@ -2033,7 +1894,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         activeTranslationWidget = verseAsync.when(
           data: (verse) {
             if (verse == null) return const SizedBox.shrink();
-            return _buildNormalVerse(
+            return _buildNormalVerse(context, 
               verse,
               theme,
               secondaryTypography,
@@ -2044,6 +1905,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
               overrideColor: secondaryColor,
               hideVerseNumber: true,
               isSelectionMode: isSelectionMode,
+              translationId: activeChipId,
+              bookNumber: bookNumber,
+              chapterNumber: chapterNumber,
+              showStrongsNumbers: showStrongs, strongsIndicatorStyle: strongsStyle,
             );
           },
           loading: () => Padding(
@@ -2064,20 +1929,21 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         children: [
           primary,
           const SizedBox(height: 8),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                for (final langEntry in targetLanguages.entries)
-                  Builder(builder: (context) {
-                    final isInstalled =
-                        availableChips.containsKey(langEntry.value);
-                    final translationId = availableChips[langEntry.value];
-                    final isSelected = activeChipId == translationId;
+          Row(
+            children: [
+              for (int i = 0; i < chipsToRender.length; i++)
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                        right: i == chipsToRender.length - 1 ? 0.0 : 6.0),
+                    child: Builder(builder: (context) {
+                      final langEntry = chipsToRender[i];
+                      final isInstalled =
+                          availableChips.containsKey(langEntry.value);
+                      final translationId = availableChips[langEntry.value];
+                      final isSelected = activeChipId == translationId;
 
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: Material(
+                      return Material(
                         color: isSelected
                             ? theme.primaryColor.withValues(alpha: 0.15)
                             : theme.colorScheme.surface,
@@ -2099,10 +1965,12 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                     .read(expandedChipsProvider.notifier)
                                     .clear(primaryVerse.number);
                               } else {
-                                ref
-                                    .read(expandedChipsProvider.notifier)
-                                    .setLanguage(
-                                        primaryVerse.number, translationId!);
+                                if (translationId != null) {
+                                  ref
+                                      .read(expandedChipsProvider.notifier)
+                                      .setLanguage(
+                                          primaryVerse.number, translationId);
+                                }
                               }
                             } else {
                               // Uninstalled: Prompt download by opening picker
@@ -2116,32 +1984,51 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                               );
                             }
                           },
+                          onLongPress: () {
+                            if (isInstalled && translationId != null) {
+                              final currentPrimary =
+                                  ref.read(activeTranslationProvider);
+                              ref
+                                  .read(activeTranslationProvider.notifier)
+                                  .setTranslation(translationId);
+                              ref
+                                  .read(expandedChipsProvider.notifier)
+                                  .setLanguage(
+                                      primaryVerse.number, currentPrimary);
+                            }
+                          },
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 12.0, vertical: 6.0),
+                                horizontal: 4.0, vertical: 6.0),
                             child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(
-                                  _getTranslationCombinedLabel(
-                                      isInstalled
-                                          ? translationId!
-                                          : langEntry.value,
-                                      installedTranslations,
-                                      defaultName: langEntry.key),
-                                  style: theme.textTheme.labelMedium?.copyWith(
-                                    color: isSelected
-                                        ? theme.primaryColor
-                                        : theme.colorScheme.onSurface
-                                            .withValues(
-                                                alpha: isInstalled ? 0.7 : 0.3),
-                                    fontWeight: FontWeight.w600,
+                                Flexible(
+                                  child: Text(
+                                    _getTranslationLabel(
+                                        isInstalled
+                                            ? (translationId ?? langEntry.value)
+                                            : langEntry.value,
+                                        installedTranslations,
+                                        defaultName: langEntry.key),
+                                    overflow: TextOverflow.ellipsis,
+                                    style:
+                                        theme.textTheme.labelMedium?.copyWith(
+                                      color: isSelected
+                                          ? theme.primaryColor
+                                          : theme.colorScheme.onSurface
+                                              .withValues(
+                                                  alpha:
+                                                      isInstalled ? 0.7 : 0.3),
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                 ),
                                 if (!isInstalled) ...[
-                                  const SizedBox(width: 4),
+                                  const SizedBox(width: 2),
                                   Icon(Icons.download_rounded,
-                                      size: 12,
+                                      size: 10,
                                       color: theme.colorScheme.onSurface
                                           .withValues(alpha: 0.3)),
                                 ]
@@ -2149,11 +2036,11 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                             ),
                           ),
                         ),
-                      ),
-                    );
-                  }),
-              ],
-            ),
+                      );
+                    }),
+                  ),
+                ),
+            ],
           ),
           if (activeTranslationWidget != null) ...[
             const SizedBox(height: 12),
@@ -2167,22 +2054,34 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     return primary;
   }
 
-  Widget _buildNormalVerse(BibleVerse verse, ThemeData theme,
+  Widget _buildNormalVerse(BuildContext context, BibleVerse verse, ThemeData theme,
       TypographyState typography, AppThemeMode appThemeMode,
       {bool hasCommentary = false,
+      bool hasDevotional = false,
+      bool hasStudyNote = false,
       VoidCallback? onCommentaryTap,
+      VoidCallback? onDevotionalTap,
+      VoidCallback? onStudyNoteTap,
       bool isBookmarked = false,
       bool isRedLetterEnabled = true,
       Color? overrideColor,
       bool hideVerseNumber = false,
-      bool isSelectionMode = false}) {
-    final tokens = theme.extension<ReadingTokens>()!;
+      bool isSelectionMode = false,
+      String? translationId,
+      int? bookNumber,
+      int? chapterNumber,
+      bool showStrongsNumbers = false, StrongsIndicatorStyle strongsIndicatorStyle = StrongsIndicatorStyle.asterisk,
+      Set<int>? dictTokens,
+      void Function(String word)? onDictTap}) {
+    final tokens = theme.extension<ReadingTokens>();
     final fontStyle = theme.textTheme.bodyMedium?.copyWith(
           fontFamily: typography.fontFamily,
+          fontStyle: typography.fontStyle,
+          fontWeight: typography.fontWeight,
           fontSize: typography.fontSize,
           height: typography.lineHeight,
           letterSpacing: 0.15,
-          color: overrideColor ?? tokens.readingInk,
+          color: overrideColor ?? tokens?.readingInk ?? Colors.black,
           decoration: isBookmarked ? TextDecoration.underline : null,
           decorationColor: isBookmarked ? theme.primaryColor : null,
           decorationStyle: isBookmarked ? TextDecorationStyle.solid : null,
@@ -2219,36 +2118,149 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     }
 
     final redLetterStyle = fontStyle.copyWith(color: redLetterColor);
-    List<TextSpan> textSpans = [];
+    List<InlineSpan> textSpans = [];
+    
     String text = verse.text;
+    
+    // If not showing strongs, simply strip the tags
+    if (!showStrongsNumbers) {
+      text = text.replaceAll(RegExp(r'\[[HG]\d+\]'), '');
+    }
+    
     int currentIndex = 0;
+    int globalTokenIndex = 0;
+    
+    final String verseKey = '${bookNumber}_${chapterNumber}_${verse.number}';
+    final List<TapGestureRecognizer> localRecognizers = [];
+
+    void processChunk(String chunk, TextStyle style) {
+      if (!showStrongsNumbers && (dictTokens == null || dictTokens.isEmpty)) {
+        textSpans.add(TextSpan(text: chunk, style: style));
+        final matches = RegExp(r'[a-zA-Z]+').allMatches(chunk);
+        globalTokenIndex += matches.length;
+        return;
+      }
+
+      final regex = showStrongsNumbers 
+          ? RegExp(r'\[[HG]\d+\]|[a-zA-Z]+')
+          : RegExp(r'[a-zA-Z]+');
+      final matches = regex.allMatches(chunk);
+      int lastMatchEnd = 0;
+      
+      for (final match in matches) {
+        if (match.start > lastMatchEnd) {
+          textSpans.add(TextSpan(text: chunk.substring(lastMatchEnd, match.start), style: style));
+        }
+        
+        final word = match.group(0)!;
+        
+        if (word.startsWith('[') && word.endsWith(']')) {
+          final strongsId = word.substring(1, word.length - 1);
+          final tapGesture = TapGestureRecognizer()..onTap = () {
+            showStrongsEntrySheet(context, strongsId);
+          };
+          localRecognizers.add(tapGesture);
+
+          InlineSpan strongsSpan;
+          if (strongsIndicatorStyle == StrongsIndicatorStyle.asterisk) {
+            strongsSpan = TextSpan(
+              text: '*',
+              style: style.copyWith(
+                color: theme.colorScheme.primary.withOpacity(0.8),
+                fontWeight: FontWeight.bold,
+              ),
+              recognizer: tapGesture,
+            );
+          } else if (strongsIndicatorStyle == StrongsIndicatorStyle.number) {
+            strongsSpan = TextSpan(
+              text: strongsId,
+              style: style.copyWith(
+                fontSize: (style.fontSize ?? 16) * 0.7,
+                color: theme.colorScheme.primary.withOpacity(0.9),
+                fontWeight: FontWeight.bold,
+              ),
+              recognizer: tapGesture,
+            );
+          } else {
+            strongsSpan = WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
+              child: GestureDetector(
+                onTap: () => showStrongsEntrySheet(context, strongsId),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 1.0),
+                  child: Icon(
+                    Icons.link,
+                    size: (style.fontSize ?? 16) * 0.85,
+                    color: theme.colorScheme.primary.withOpacity(0.7),
+                  ),
+                ),
+              ),
+            );
+          }
+          textSpans.add(strongsSpan);
+        } else {
+          final isUnderlined = dictTokens?.contains(globalTokenIndex) ?? false;
+          
+          if (isUnderlined) {
+            final tapGesture = TapGestureRecognizer()..onTap = () {
+              onDictTap?.call(word.toLowerCase());
+            };
+            localRecognizers.add(tapGesture);
+            
+            textSpans.add(TextSpan(
+              text: word,
+              style: style.copyWith(
+                decoration: TextDecoration.underline,
+                decorationStyle: TextDecorationStyle.dotted,
+                decorationColor: theme.primaryColor,
+              ),
+              recognizer: tapGesture,
+            ));
+          } else {
+            textSpans.add(TextSpan(text: word, style: style));
+          }
+          globalTokenIndex++;
+        }
+        
+        lastMatchEnd = match.end;
+      }
+      
+      if (lastMatchEnd < chunk.length) {
+        textSpans.add(TextSpan(text: chunk.substring(lastMatchEnd), style: style));
+      }
+    }
 
     while (currentIndex < text.length) {
       int startIndex = text.indexOf('‹', currentIndex);
       if (startIndex == -1) {
-        textSpans.add(
-            TextSpan(text: text.substring(currentIndex), style: fontStyle));
+        processChunk(text.substring(currentIndex), fontStyle);
         break;
       }
 
       if (startIndex > currentIndex) {
-        textSpans.add(TextSpan(
-            text: text.substring(currentIndex, startIndex), style: fontStyle));
+        processChunk(text.substring(currentIndex, startIndex), fontStyle);
       }
 
       int endIndex = text.indexOf('›', startIndex + 1);
       if (endIndex == -1) {
-        textSpans.add(TextSpan(
-            text: text.substring(startIndex + 1),
-            style: isRedLetterEnabled ? redLetterStyle : fontStyle));
+        processChunk(text.substring(startIndex + 1), isRedLetterEnabled ? redLetterStyle : fontStyle);
         break;
       }
 
-      textSpans.add(TextSpan(
-          text: text.substring(startIndex + 1, endIndex),
-          style: isRedLetterEnabled ? redLetterStyle : fontStyle));
-
+      processChunk(text.substring(startIndex + 1, endIndex), isRedLetterEnabled ? redLetterStyle : fontStyle);
       currentIndex = endIndex + 1;
+    }
+
+    if (localRecognizers.isNotEmpty) {
+      final oldRecognizers = _dictRecognizers[verseKey];
+      if (oldRecognizers != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          for (final r in oldRecognizers) {
+            r.dispose();
+          }
+        });
+      }
+      _dictRecognizers[verseKey] = localRecognizers;
     }
 
     final textAlign = () {
@@ -2264,6 +2276,16 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       }
     }();
 
+    bool isBbeSubstituted = false;
+    if (translationId == 'bbe' &&
+        bookNumber != null &&
+        chapterNumber != null &&
+        true) {
+      final subs = ref.read(bbeSubstitutionsProvider).value ?? {};
+      isBbeSubstituted =
+          subs.contains('${bookNumber}_${chapterNumber}_${verse.number}');
+    }
+
     final textSpan = TextSpan(
       style: fontStyle,
       children: [
@@ -2272,27 +2294,79 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           TextSpan(
             text: '${verse.number}  ',
             style: theme.textTheme.titleMedium?.copyWith(
-              color: tokens.readingAccent,
+              color: tokens?.readingAccent ?? theme.primaryColor,
               fontWeight: FontWeight.bold,
               fontSize: typography.fontSize * 0.75, // Scale number down
             ),
           ),
         ...textSpans,
+        if (hasDevotional && !isSelectionMode)
+          WidgetSpan(
+            alignment: PlaceholderAlignment.middle,
+            child: GestureDetector(
+              onTap: onDevotionalTap,
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
+                child: Icon(
+                  Icons.favorite_rounded,
+                  color: tokens?.readingAccent ?? theme.primaryColor,
+                  size: typography.fontSize * 0.85,
+                ),
+              ),
+            ),
+          ),
+        if (hasStudyNote && !isSelectionMode)
+          WidgetSpan(
+            alignment: PlaceholderAlignment.middle,
+            child: GestureDetector(
+              onTap: onStudyNoteTap,
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
+                child: Icon(
+                  Icons.edit_note_rounded,
+                  color: starColor,
+                  size: typography.fontSize * 0.85,
+                ),
+              ),
+            ),
+          ),
         if (hasCommentary && !isSelectionMode)
           WidgetSpan(
-            alignment: PlaceholderAlignment.top,
+            alignment: PlaceholderAlignment.middle,
             child: GestureDetector(
               onTap: onCommentaryTap,
               behavior: HitTestBehavior.opaque,
               child: Padding(
-                // Generous padding increases the invisible tap target area for all finger sizes
-                padding: const EdgeInsets.only(
-                    left: 4.0, right: 8.0, top: 2.0, bottom: 8.0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
                 child: Icon(
-                  Icons.star_rounded,
+                  Icons.library_books_rounded,
                   color: starColor,
-                  size: typography.fontSize *
-                      0.85, // Slightly larger star for visibility
+                  size: typography.fontSize * 0.85,
+                ),
+              ),
+            ),
+          ),
+        if (isBbeSubstituted && !isSelectionMode)
+          WidgetSpan(
+            alignment: PlaceholderAlignment.top,
+            child: Container(
+              margin: const EdgeInsets.only(left: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                'WEB',
+                style: TextStyle(
+                  fontSize: typography.fontSize * 0.45,
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
             ),
@@ -2300,10 +2374,11 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       ],
     );
 
-    if (isSelectionMode) {
-      return Text.rich(textSpan, textAlign: textAlign);
-    }
-    return RichText(textAlign: textAlign, text: textSpan);
+    final Widget textWidget = isSelectionMode
+        ? Text.rich(textSpan, textAlign: textAlign)
+        : RichText(textAlign: textAlign, text: textSpan);
+
+    return textWidget;
   }
 
   Widget _buildEndOfChapterBlock(FlatChapter fc, int pageIndex, ThemeData theme,
@@ -2311,18 +2386,20 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     final flatChapters = ref.read(flatChaptersProvider);
     final hasPrevious = pageIndex > 0;
     final hasNext = pageIndex < flatChapters.length - 1;
-    final tokens = theme.extension<ReadingTokens>()!;
+    final tokens = theme.extension<ReadingTokens>();
 
     return Padding(
-      padding:
-          const EdgeInsets.only(top: 80.0, bottom: 160.0), // Above nav pill
+      padding: const EdgeInsets.only(top: 80.0, bottom: 32.0), // Above nav pill
       child: Column(
         children: [
           // Divider
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(width: 40, height: 1, color: tokens.readingBorder),
+              Container(
+                  width: 40,
+                  height: 1,
+                  color: tokens?.readingBorder ?? theme.dividerColor),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Text(
@@ -2356,20 +2433,21 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                 : null,
             icon: Icon(Icons.school_rounded,
                 color: hasChapterCommentary
-                    ? tokens.readingAccent
+                    ? (tokens?.readingAccent ?? theme.primaryColor)
                     : theme.disabledColor),
             label: Text(
               'Read commentary on this chapter',
               style: theme.textTheme.titleSmall?.copyWith(
                 color: hasChapterCommentary
-                    ? tokens.readingInk
+                    ? (tokens?.readingInk ?? Colors.black)
                     : theme.disabledColor,
                 fontWeight: FontWeight.w600,
               ),
             ),
             style: TextButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              backgroundColor: tokens.readingInk.withValues(alpha: 0.05),
+              backgroundColor:
+                  (tokens?.readingInk ?? Colors.black).withValues(alpha: 0.05),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16)),
             ),
@@ -2392,8 +2470,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                         horizontal: 20, vertical: 12),
                   ),
                   child: Text('‹ Previous',
-                      style: theme.textTheme.titleMedium
-                          ?.copyWith(color: tokens.readingAccent)),
+                      style: theme.textTheme.titleMedium?.copyWith(
+                          color: tokens?.readingAccent ?? theme.primaryColor)),
                 )
               else
                 const SizedBox(width: 100),
@@ -2410,8 +2488,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                         horizontal: 20, vertical: 12),
                   ),
                   child: Text('Next ›',
-                      style: theme.textTheme.titleMedium
-                          ?.copyWith(color: tokens.readingAccent)),
+                      style: theme.textTheme.titleMedium?.copyWith(
+                          color: tokens?.readingAccent ?? theme.primaryColor)),
                 )
               else
                 const SizedBox(width: 100),
@@ -2454,7 +2532,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
               return Padding(
                 padding: const EdgeInsets.only(top: 32.0, bottom: 16.0),
                 child: TexturedGlassContainer(
-                  isScrollable: true,
                   borderRadius: BorderRadius.circular(24),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -2537,19 +2614,22 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                     break;
                                                   }
                                                 }
-                                                firstUnread ??=
-                                                    nextDayTarget.chapters.last;
+                                                if (firstUnread == null) {
+                                                  return;
+                                                }
+                                                final targetUnread =
+                                                    firstUnread;
                                                 final fcList = ref
                                                     .read(flatChaptersProvider);
                                                 final match = fcList
                                                     .where((c) =>
                                                         c.book.name
                                                                 .toLowerCase() ==
-                                                            firstUnread!
+                                                            targetUnread
                                                                 .bookName
                                                                 .toLowerCase() &&
                                                         c.chapter.number ==
-                                                            firstUnread
+                                                            targetUnread
                                                                 .chapterNum)
                                                     .toList();
                                                 if (match.isNotEmpty) {
@@ -2578,14 +2658,15 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                 }
                               }
                               if (nextUnread != null) {
+                                final targetUnread = nextUnread;
                                 final fcList = ref.read(flatChaptersProvider);
                                 final match = fcList
                                     .where((c) =>
                                         c.book.name.toLowerCase() ==
-                                            nextUnread!.bookName
+                                            targetUnread.bookName
                                                 .toLowerCase() &&
                                         c.chapter.number ==
-                                            nextUnread.chapterNum)
+                                            targetUnread.chapterNum)
                                     .toList();
                                 if (match.isNotEmpty) {
                                   ref
@@ -2619,720 +2700,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
               );
             },
           ),
-            // ── Pull to Search Indicator ──────────────────────────────────
-            AnimatedPositioned(
-              duration: const Duration(milliseconds: 100),
-              curve: Curves.easeOut,
-              top: _overscrollAccum > 0
-                  ? MediaQuery.of(context).padding.top +
-                      8.0 +
-                      (_overscrollAccum * 0.4).clamp(0.0, 40.0)
-                  : -100.0,
-              left: 16.0,
-              right: 16.0,
-              child: Opacity(
-                opacity: (_overscrollAccum / _kOverscrollDistanceThreshold)
-                    .clamp(0.0, 1.0),
-                child: TexturedGlassContainer(
-                  borderRadius: BorderRadius.circular(100),
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.search_rounded,
-                          color: theme.colorScheme.onSurface
-                              .withValues(alpha: 0.7),
-                          size: 20),
-                      const SizedBox(width: 12),
-                      Text(
-                        _overscrollAccum >= _kOverscrollDistanceThreshold
-                            ? 'Release to Search'
-                            : 'Pull to Search',
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: theme.colorScheme.onSurface
-                              .withValues(alpha: 0.85),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-    );
-  }
-}
-
-enum SelectionMode { testament, book, chapter, verse }
-
-/// Modal Bottom Sheet for selecting Book, Chapter, and Verse
-
-class _SheetState {
-  final BibleBook? book;
-  final int chapter;
-  final int? verse;
-  final SelectionMode mode;
-  final bool isOldTestament;
-
-  const _SheetState({
-    this.book,
-    this.chapter = 1,
-    this.verse,
-    this.mode = SelectionMode.book,
-    this.isOldTestament = true,
-  });
-
-  _SheetState copyWith({
-    BibleBook? book,
-    int? chapter,
-    int? verse,
-    SelectionMode? mode,
-    bool? isOldTestament,
-    bool clearVerse = false,
-  }) {
-    return _SheetState(
-      book: book ?? this.book,
-      chapter: chapter ?? this.chapter,
-      verse: clearVerse ? null : (verse ?? this.verse),
-      mode: mode ?? this.mode,
-      isOldTestament: isOldTestament ?? this.isOldTestament,
-    );
-  }
-}
-
-class _SheetNotifier extends Notifier<_SheetState> {
-  @override
-  _SheetState build() => const _SheetState();
-
-  void init(
-      BibleBook book, int chapter, bool isOldTestament, SelectionMode mode) {
-    state = _SheetState(
-        book: book,
-        chapter: chapter,
-        isOldTestament: isOldTestament,
-        mode: mode);
-  }
-
-  void setTestament(bool isOld) {
-    state = state.copyWith(isOldTestament: isOld, mode: SelectionMode.book);
-  }
-
-  void setBook(BibleBook book) {
-    state = state.copyWith(
-        book: book, chapter: 1, clearVerse: true, mode: SelectionMode.chapter);
-  }
-
-  void setChapter(int chapter, bool advanceToVerse) {
-    state = state.copyWith(
-        chapter: chapter,
-        verse: 1,
-        mode: advanceToVerse ? SelectionMode.verse : state.mode);
-  }
-
-  void setVerse(int verse) {
-    state = state.copyWith(verse: verse);
-  }
-
-  void setMode(SelectionMode mode) {
-    state = state.copyWith(mode: mode);
-  }
-}
-
-final _sheetStateProvider =
-    NotifierProvider.autoDispose<_SheetNotifier, _SheetState>(
-        _SheetNotifier.new);
-
-class _BookChapterSelectorSheet extends ConsumerStatefulWidget {
-  final List<BibleBook> books;
-  final String selectedBookAbbrev;
-  final int selectedChapter;
-  final void Function(String abbrev, String name, int chapter, int? verse,
-      {bool autoClose}) onSelectionChanged;
-
-  const _BookChapterSelectorSheet({
-    required this.books,
-    required this.selectedBookAbbrev,
-    required this.selectedChapter,
-    required this.onSelectionChanged,
-  });
-
-  @override
-  ConsumerState<_BookChapterSelectorSheet> createState() =>
-      __BookChapterSelectorSheetState();
-}
-
-class __BookChapterSelectorSheetState
-    extends ConsumerState<_BookChapterSelectorSheet> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.books.isEmpty) return;
-      int bookIndex = widget.books
-          .indexWhere((b) => b.abbreviation == widget.selectedBookAbbrev);
-      if (bookIndex == -1) bookIndex = 0;
-      final initialBook = widget.books[bookIndex];
-      final isOldTestament = bookIndex < 39;
-      final settings = ref.read(bibleNavSettingsProvider);
-      final mode = settings.depth == NavigationDepth.fourPart
-          ? SelectionMode.testament
-          : SelectionMode.book;
-
-      ref
-          .read(_sheetStateProvider.notifier)
-          .init(initialBook, widget.selectedChapter, isOldTestament, mode);
-    });
-  }
-
-  void _onTestamentSelected(bool isOld) {
-    ref.read(_sheetStateProvider.notifier).setTestament(isOld);
-  }
-
-  void _onBookSelected(BibleBook book, BibleNavSettingsState settings) {
-    ref.read(_sheetStateProvider.notifier).setBook(book);
-    ref.read(_sheetStateProvider.notifier).setMode(SelectionMode.chapter);
-  }
-
-  void _onChapterSelected(int chapter, BibleNavSettingsState settings) {
-    if (settings.depth == NavigationDepth.twoPart) {
-      ref.read(_sheetStateProvider.notifier).setChapter(chapter, false);
-      final book = ref.read(_sheetStateProvider).book!;
-      widget.onSelectionChanged(
-        book.abbreviation,
-        book.name,
-        chapter,
-        1,
-        autoClose: true,
-      );
-    } else {
-      ref.read(_sheetStateProvider.notifier).setChapter(chapter, true);
-    }
-  }
-
-  void _onVerseSelected(int verse, BibleNavSettingsState settings) {
-    ref.read(_sheetStateProvider.notifier).setVerse(verse);
-    final sheetState = ref.read(_sheetStateProvider);
-    widget.onSelectionChanged(
-      sheetState.book!.abbreviation,
-      sheetState.book!.name,
-      sheetState.chapter,
-      verse,
-      autoClose: settings.autoCloseOnFinalSelection,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final settings = ref.watch(bibleNavSettingsProvider);
-    final isInitialized =
-        ref.watch(_sheetStateProvider.select((s) => s.book != null));
-
-    if (!isInitialized) {
-      return const SizedBox.shrink();
-    }
-
-    return Material(
-      color: Colors.transparent,
-      child: FractionallySizedBox(
-        heightFactor: 0.75,
-        child: TexturedGlassContainer(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-          padding: EdgeInsets.zero,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                _buildBreadcrumbs(theme, settings),
-                const SizedBox(height: 16),
-                Expanded(
-                  child: _buildSelectionView(theme, settings),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBreadcrumbs(ThemeData theme, BibleNavSettingsState settings) {
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: Row(
-        children: [
-          if (settings.depth == NavigationDepth.fourPart)
-            Consumer(builder: (context, ref, _) {
-              final isOld = ref
-                  .watch(_sheetStateProvider.select((s) => s.isOldTestament));
-              final mode = ref.watch(_sheetStateProvider.select((s) => s.mode));
-              return _buildBreadcrumbSegment('Testament', isOld ? 'OT' : 'NT',
-                  SelectionMode.testament, mode, theme);
-            }),
-          Consumer(builder: (context, ref, _) {
-            final bookName =
-                ref.watch(_sheetStateProvider.select((s) => s.book!.name));
-            final mode = ref.watch(_sheetStateProvider.select((s) => s.mode));
-            return _buildBreadcrumbSegment(
-                'Book', bookName, SelectionMode.book, mode, theme);
-          }),
-          Consumer(builder: (context, ref, _) {
-            final chapter =
-                ref.watch(_sheetStateProvider.select((s) => s.chapter));
-            final mode = ref.watch(_sheetStateProvider.select((s) => s.mode));
-            return _buildBreadcrumbSegment(
-                'Chapter', '$chapter', SelectionMode.chapter, mode, theme);
-          }),
-          if (settings.depth != NavigationDepth.twoPart)
-            Consumer(builder: (context, ref, _) {
-              final verse =
-                  ref.watch(_sheetStateProvider.select((s) => s.verse));
-              final mode = ref.watch(_sheetStateProvider.select((s) => s.mode));
-              return _buildBreadcrumbSegment(
-                  'Verse',
-                  verse != null ? '$verse' : '1',
-                  SelectionMode.verse,
-                  mode,
-                  theme);
-            }),
         ],
-      ),
-    );
-  }
-
-  Widget _buildBreadcrumbSegment(String label, String value,
-      SelectionMode targetMode, SelectionMode currentMode, ThemeData theme) {
-    final isSelected = currentMode == targetMode;
-    return Expanded(
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () => ref.read(_sheetStateProvider.notifier).setMode(targetMode),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          decoration: BoxDecoration(
-            color: isSelected ? theme.primaryColor : Colors.transparent,
-            borderRadius: BorderRadius.circular(30),
-            boxShadow: isSelected
-                ? [
-                    BoxShadow(
-                        color: theme.primaryColor.withValues(alpha: 0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2))
-                  ]
-                : [],
-          ),
-          child: Column(
-            children: [
-              Text(
-                label.toUpperCase(),
-                style: theme.textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1,
-                  fontFamily: theme.textTheme.bodyMedium?.fontFamily,
-                  color: isSelected
-                      ? Colors.white.withValues(alpha: 0.8)
-                      : theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: theme.textTheme.labelMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontFamily: theme.textTheme.bodyMedium?.fontFamily,
-                  color: isSelected
-                      ? Colors.white
-                      : theme.colorScheme.onSurface.withValues(alpha: 0.8),
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSelectionView(ThemeData theme, BibleNavSettingsState settings) {
-    final mode = ref.watch(_sheetStateProvider.select((s) => s.mode));
-    switch (mode) {
-      case SelectionMode.testament:
-        return _buildTestamentSelection(theme);
-      case SelectionMode.book:
-        return _buildBookSelection(theme, settings);
-      case SelectionMode.chapter:
-        return _buildChapterSelection(theme, settings);
-      case SelectionMode.verse:
-        return _buildVerseSelection(theme, settings);
-    }
-  }
-
-  Widget _buildTestamentSelection(ThemeData theme) {
-    final isOldTestament =
-        ref.watch(_sheetStateProvider.select((s) => s.isOldTestament));
-    return Row(
-      children: [
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: _buildGridTile(
-              text: 'Old\nTestament',
-              isSelected: isOldTestament,
-              onTap: () => _onTestamentSelected(true),
-              theme: theme,
-            ),
-          ),
-        ),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: _buildGridTile(
-              text: 'New\nTestament',
-              isSelected: !isOldTestament,
-              onTap: () => _onTestamentSelected(false),
-              theme: theme,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBookSelection(ThemeData theme, BibleNavSettingsState settings) {
-    final oldTestamentBooks = widget.books.take(39).toList();
-    final newTestamentBooks = widget.books.skip(39).toList();
-
-    if (settings.depth == NavigationDepth.fourPart) {
-      final isOldTestament =
-          ref.watch(_sheetStateProvider.select((s) => s.isOldTestament));
-      final displayedBooks =
-          isOldTestament ? oldTestamentBooks : newTestamentBooks;
-      return Consumer(builder: (context, ref, _) {
-        final selectedBookAbbrev =
-            ref.watch(_sheetStateProvider.select((s) => s.book!.abbreviation));
-        return GridView.builder(
-          padding: const EdgeInsets.only(bottom: 4),
-          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 200,
-            mainAxisExtent: 48,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-          ),
-          itemCount: displayedBooks.length,
-          itemBuilder: (context, index) {
-            final book = displayedBooks[index];
-            final isSel = book.abbreviation == selectedBookAbbrev;
-            return _buildGridTile(
-              text: book.name,
-              isSelected: isSel,
-              onTap: () => _onBookSelected(book, settings),
-              theme: theme,
-              backgroundColor: getSectionColor(
-                  book.name, theme.brightness == Brightness.dark),
-            );
-          },
-        );
-      });
-    }
-
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            children: [
-              Text('Old Testament',
-                  style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color:
-                          theme.colorScheme.onSurface.withValues(alpha: 0.5))),
-              const SizedBox(height: 12),
-              Expanded(
-                child: Consumer(builder: (context, ref, _) {
-                  final selectedBookAbbrev = ref.watch(
-                      _sheetStateProvider.select((s) => s.book!.abbreviation));
-                  return ListView.builder(
-                    padding: EdgeInsets.only(
-                        bottom: MediaQuery.of(context).padding.bottom + 4),
-                    itemCount: oldTestamentBooks.length,
-                    itemExtent: 50,
-                    itemBuilder: (context, index) {
-                      final book = oldTestamentBooks[index];
-                      final isSel = book.abbreviation == selectedBookAbbrev;
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 6.0, right: 4.0),
-                        child: _buildGridTile(
-                            text: book.name,
-                            isSelected: isSel,
-                            onTap: () => _onBookSelected(book, settings),
-                            theme: theme,
-                            backgroundColor: getSectionColor(book.name,
-                                theme.brightness == Brightness.dark)),
-                      );
-                    },
-                  );
-                }),
-              ),
-            ],
-          ),
-        ),
-        Container(
-            width: 1,
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-            margin: const EdgeInsets.symmetric(horizontal: 8)),
-        Expanded(
-          child: Column(
-            children: [
-              Text('New Testament',
-                  style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color:
-                          theme.colorScheme.onSurface.withValues(alpha: 0.5))),
-              const SizedBox(height: 12),
-              Expanded(
-                child: Consumer(builder: (context, ref, _) {
-                  final selectedBookAbbrev = ref.watch(
-                      _sheetStateProvider.select((s) => s.book!.abbreviation));
-                  return ListView.builder(
-                    padding: EdgeInsets.only(
-                        bottom: MediaQuery.of(context).padding.bottom + 4),
-                    itemCount: newTestamentBooks.length,
-                    itemExtent: 50,
-                    itemBuilder: (context, index) {
-                      final book = newTestamentBooks[index];
-                      final isSel = book.abbreviation == selectedBookAbbrev;
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 6.0, left: 4.0),
-                        child: _buildGridTile(
-                            text: book.name,
-                            isSelected: isSel,
-                            onTap: () => _onBookSelected(book, settings),
-                            theme: theme,
-                            backgroundColor: getSectionColor(book.name,
-                                theme.brightness == Brightness.dark)),
-                      );
-                    },
-                  );
-                }),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildChapterSelection(
-      ThemeData theme, BibleNavSettingsState settings) {
-    final book = ref.read(_sheetStateProvider).book!;
-    final chapters = book.chapters.length;
-
-    return Consumer(builder: (context, ref, _) {
-      final selectedChapter =
-          ref.watch(_sheetStateProvider.select((s) => s.chapter));
-      return GridView.builder(
-        padding:
-            EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 24),
-        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 64,
-          mainAxisExtent: 64,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-        ),
-        itemCount: chapters,
-        itemBuilder: (context, index) {
-          final chapter = index + 1;
-          final isSel = chapter == selectedChapter;
-          return _buildGridTile(
-            text: '$chapter',
-            isSelected: isSel,
-            onTap: () => _onChapterSelected(chapter, settings),
-            theme: theme,
-          );
-        },
-      );
-    });
-  }
-
-  Widget _buildVerseSelection(ThemeData theme, BibleNavSettingsState settings) {
-    final book = ref.read(_sheetStateProvider).book!;
-    final selectedChapter = ref.read(_sheetStateProvider).chapter;
-
-    if (book.chapters.isEmpty) return const SizedBox.shrink();
-    int chapIdx = book.chapters.indexWhere((c) => c.number == selectedChapter);
-    if (chapIdx == -1) chapIdx = 0;
-    final chapterData = book.chapters[chapIdx];
-    final verses = chapterData.verses.length;
-
-    return Consumer(builder: (context, ref, _) {
-      final selectedVerse =
-          ref.watch(_sheetStateProvider.select((s) => s.verse));
-      return GridView.builder(
-        padding:
-            EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 24),
-        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 64,
-          mainAxisExtent: 64,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-        ),
-        itemCount: verses,
-        itemBuilder: (context, index) {
-          final verse = index + 1;
-          final isSel = verse == selectedVerse;
-          return _buildGridTile(
-            text: '$verse',
-            isSelected: isSel,
-            onTap: () => _onVerseSelected(verse, settings),
-            theme: theme,
-          );
-        },
-      );
-    });
-  }
-
-  Widget _buildGridTile(
-      {required String text,
-      required bool isSelected,
-      required VoidCallback onTap,
-      required ThemeData theme,
-      Color? backgroundColor}) {
-    // Determine if it's a book name (contains letters) to apply serif font consistency
-    final isBook = text.contains(RegExp(r'[a-zA-Z]'));
-
-    final textStyle = theme.textTheme.titleMedium?.copyWith(
-      fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-      fontFamily: isBook
-          ? theme.textTheme.bodyMedium?.fontFamily
-          : null, // Font consistency for books
-      color: isSelected
-          ? Colors.white
-          : theme.colorScheme.onSurface.withValues(alpha: 0.8),
-    );
-
-    final textWidget = Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: FittedBox(
-        fit: BoxFit.scaleDown,
-        child: Text(
-          text,
-          style: textStyle,
-          maxLines: 1,
-          textAlign: TextAlign.center,
-        ),
-      ),
-    );
-
-    if (!isSelected) {
-      return GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: onTap,
-        child: Container(
-          decoration: BoxDecoration(
-            color: backgroundColor ??
-                theme.colorScheme.surface.withValues(alpha: 0.8),
-            borderRadius: BorderRadius.circular(30),
-            border: Border.all(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-              width: 1,
-            ),
-          ),
-          child: Center(
-            child: textWidget,
-          ),
-        ),
-      );
-    }
-
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: theme.primaryColor,
-          borderRadius: BorderRadius.circular(30),
-          boxShadow: [
-            BoxShadow(
-                color: theme.primaryColor.withValues(alpha: 0.4),
-                blurRadius: 8,
-                offset: const Offset(0, 3))
-          ],
-        ),
-        child: textWidget,
-      ),
-    );
-  }
-}
-
-class _TypographyBottomSheet extends ConsumerWidget {
-  const _TypographyBottomSheet();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final handlebarColor = theme.colorScheme.onSurface.withValues(alpha: 0.2);
-
-    return BouncyEntrance(
-      delay: const Duration(milliseconds: 50),
-      child: FractionallySizedBox(
-        heightFactor: 0.75,
-        child: TexturedGlassContainer(
-          sigmaX: 45.0,
-          sigmaY: 45.0,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-          padding: EdgeInsets.zero,
-          child: SafeArea(
-            top: false,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(20.0, 16.0, 20.0, 16.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 36,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: handlebarColor,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  Text(
-                    'Typography',
-                    style: theme.textTheme.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
-                  const TypographyControls(),
-                ],
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }
@@ -3341,28 +2709,8 @@ class _TypographyBottomSheet extends ConsumerWidget {
 
 class VerseActionLogic {
   static void _showFeedback(
-      BuildContext context, ThemeData theme, String message, {VoidCallback? onAction, String? actionLabel}) {
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message,
-            style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onInverseSurface,
-                fontWeight: FontWeight.bold)),
-        backgroundColor: theme.colorScheme.inverseSurface,
-        action: onAction != null && actionLabel != null
-            ? SnackBarAction(
-                label: actionLabel,
-                textColor: theme.colorScheme.onInverseSurface,
-                onPressed: onAction,
-              )
-            : null,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.only(left: 24, right: 24, bottom: 120),
-        duration: const Duration(seconds: 2),
-      ),
-    );
+      BuildContext context, ThemeData theme, String message, {IconData? icon}) {
+    DynamicToast.show(context, message, icon: icon);
   }
 
   static void showHighlightPaletteModal(
@@ -3394,6 +2742,7 @@ class VerseActionLogic {
                   // Clear highlight button
                   GestureDetector(
                     onTap: () {
+                      HapticFeedback.lightImpact();
                       for (var v in targetVerses) {
                         final refStr =
                             generateVerseKey(bookAbbrev, chapterNum, v);
@@ -3444,6 +2793,7 @@ class VerseActionLogic {
                         theme.scaffoldBackgroundColor);
                     return GestureDetector(
                       onTap: () {
+                        HapticFeedback.lightImpact();
                         ref
                             .read(readSettingsProvider.notifier)
                             .setActiveHighlightColorIndex(i);
@@ -3501,22 +2851,8 @@ class VerseActionLogic {
     required bool isLongPress,
     required VoidCallback onClearSelection,
   }) {
-    final primaryIndex =
-        ref.read(readSettingsProvider).primaryHighlightColorIndex;
-
-    if (primaryIndex == -1 || isLongPress) {
-      showHighlightPaletteModal(context, theme, ref, bookAbbrev, chapterNum,
-          targetVerses, onClearSelection);
-    } else {
-      // Guard against invalid array accesses for primaryIndex if it somehow became out of bounds (but not -1)
-      final safeIndex =
-          (primaryIndex >= 0 && primaryIndex < highlightPalette.length)
-              ? primaryIndex
-              : 0;
-      handleHighlight(
-          context, theme, ref, bookAbbrev, chapterNum, targetVerses, safeIndex);
-      onClearSelection();
-    }
+    showHighlightPaletteModal(context, theme, ref, bookAbbrev, chapterNum,
+        targetVerses, onClearSelection);
   }
 
   static void handleHighlight(
@@ -3527,10 +2863,6 @@ class VerseActionLogic {
       int chapterNum,
       List<int> targetVerses,
       int activeIndex) {
-    if (kHighlightDebug) {
-      debugPrint(
-          '[HIGHLIGHT_DEBUG] WRITE handleHighlight: bookAbbrev=$bookAbbrev, chapterNum=$chapterNum, targetVerses=$targetVerses, activeIndex=$activeIndex');
-    }
     bool isRemoving = targetVerses.every((v) {
       final refStr = generateVerseKey(bookAbbrev, chapterNum, v);
       return ref.read(highlightsProvider)[refStr] == activeIndex;
@@ -3538,17 +2870,12 @@ class VerseActionLogic {
 
     for (var v in targetVerses) {
       final refStr = generateVerseKey(bookAbbrev, chapterNum, v);
-      if (kHighlightDebug) {
-        debugPrint('[HIGHLIGHT_DEBUG] WRITE key=$refStr color=$activeIndex');
-      }
+      if (kHighlightDebug) {}
       ref
           .read(highlightsProvider.notifier)
           .toggleHighlight(refStr, activeIndex);
     }
-    if (kHighlightDebug) {
-      debugPrint(
-          '[HIGHLIGHT_DEBUG] MAP after write: ${ref.read(highlightsProvider)}');
-    }
+    if (kHighlightDebug) {}
     final count = targetVerses.length;
     _showFeedback(
         context,
@@ -3556,10 +2883,7 @@ class VerseActionLogic {
         isRemoving
             ? '$count Highlight(s) removed'
             : '$count verse(s) highlighted',
-        actionLabel: isRemoving ? null : 'View',
-        onAction: isRemoving ? null : () {
-          Navigator.of(context).push(CupertinoPageRoute(builder: (_) => const HighlightsScreen()));
-        });
+        icon: isRemoving ? Icons.format_paint_outlined : Icons.format_paint_rounded);
   }
 
   static void handleBookmark(
@@ -3585,7 +2909,8 @@ class VerseActionLogic {
         theme,
         isAllBookmarked
             ? '${targetVerses.length} verse(s) removed from bookmarks'
-            : '${targetVerses.length} verse(s) bookmarked!');
+            : '${targetVerses.length} verse(s) bookmarked!',
+        icon: isAllBookmarked ? Icons.bookmark_outline_rounded : Icons.bookmark_rounded);
   }
 
   static Future<void> handleNote(

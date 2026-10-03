@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import '../../state/theme_provider.dart';
 import '../../state/surface_style_provider.dart';
 import '../../theme/app_colors.dart';
-import '../widgets/animated_segmented_tile.dart';
 
 import '../widgets/textured_glass_container.dart';
 import '../../state/read_settings_provider.dart';
@@ -19,6 +18,7 @@ class ThemePickerSheet extends ConsumerStatefulWidget {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      enableDrag: true,
       backgroundColor: Colors.transparent,
       builder: (context) => const ThemePickerSheet(),
     );
@@ -29,36 +29,20 @@ class ThemePickerSheet extends ConsumerStatefulWidget {
 }
 
 class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
-  bool _showAdvanced = false;
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final currentMode = ref.watch(themeProvider);
 
-    final engineMode = ref.watch(engineModeProvider);
-
     final readSettings = ref.watch(readSettingsProvider);
 
-    return PopScope(
-      canPop: !_showAdvanced,
-      onPopInvokedWithResult: (didPop, result) {
-        if (!didPop) {
-          setState(() {
-            _showAdvanced = false;
-          });
-        }
-      },
-      child: GestureDetector(
+    return GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onHorizontalDragEnd: (details) {
-          if (details.primaryVelocity == null) return;
-          if (details.primaryVelocity! < -300 && !_showAdvanced) {
-            HapticFeedback.selectionClick();
-            setState(() => _showAdvanced = true);
-          } else if (details.primaryVelocity! > 300 && _showAdvanced) {
-            HapticFeedback.selectionClick();
-            setState(() => _showAdvanced = false);
+        onVerticalDragEnd: (details) {
+          // Swipe down quickly → dismiss the sheet
+          if ((details.primaryVelocity ?? 0) > 400) {
+            HapticFeedback.lightImpact();
+            Navigator.of(context).pop();
           }
         },
         child: Container(
@@ -94,111 +78,46 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        if (_showAdvanced) ...[
-                          IconButton(
-                            icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                                size: 18),
-                            onPressed: () =>
-                                setState(() => _showAdvanced = false),
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                          ),
-                          const SizedBox(width: 12),
-                        ],
-                        Text(
-                          _showAdvanced ? 'Advanced Appearance' : 'Appearance',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (!_showAdvanced)
-                      IconButton(
-                        icon: Icon(Icons.tune_rounded,
-                            size: 20, color: theme.colorScheme.onSurface),
-                        onPressed: () {
-                          HapticFeedback.selectionClick();
-                          setState(() {
-                            _showAdvanced = true;
-                          });
-                        },
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                      ),
-                  ],
+                Text(
+                  'Appearance',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 16),
-                const SizedBox(height: 16),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(minHeight: 520.0),
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 250),
-                    child: _showAdvanced
-                        ? _buildAdvancedContent(theme, readSettings, engineMode)
-                        : Container(
-                            key: const ValueKey('appearance_main'),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Consumer(builder: (context, ref, _) {
-                                  final surfaceStyle =
-                                      ref.watch(earthHeavenStyleProvider);
-                                  return Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      AnimatedSegmentedTile<EarthHeavenStyle>(
-                                        title: 'Surface Style',
-                                        subtitle:
-                                            'Visual depth and material styling',
-                                        selectedValue: surfaceStyle,
-                                        options: const [
-                                          MapEntry(
-                                              EarthHeavenStyle.earth, 'Earth'),
-                                          MapEntry(EarthHeavenStyle.heaven,
-                                              'Heaven'),
-                                          MapEntry(EarthHeavenStyle.threeD,
-                                              '3D'),
-                                        ],
-                                        onChanged: (val) {
-                                          HapticFeedback.selectionClick();
-                                          ref
-                                              .read(earthHeavenStyleProvider
-                                                  .notifier)
-                                              .setStyle(val);
-                                        },
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                            top: 4.0, left: 2.0),
-                                        child: Text(
-                                          surfaceStyle ==
-                                                  EarthHeavenStyle.threeD
-                                              ? 'Modern 3D depth'
-                                              : surfaceStyle ==
-                                                      EarthHeavenStyle.heaven
-                                                  ? 'Layered depth'
-                                                  : 'Flat surfaces',
-                                          style: theme.textTheme.labelSmall
-                                              ?.copyWith(
-                                            color: theme.colorScheme.onSurface
-                                                .withValues(alpha: 0.5),
-                                            fontSize: 10,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                }),
-                                const SizedBox(height: 12),
-                                const SizedBox(height: 12),
+                Container(
+                  key: const ValueKey('appearance_main'),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                              Consumer(builder: (context, ref, _) {
+                                final surfaceStyle = ref.watch(earthHeavenStyleProvider);
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    _SurfaceStyleGrid(
+                                      selectedStyle: surfaceStyle,
+                                      onChanged: (val) {
+                                        HapticFeedback.selectionClick();
+                                        ref.read(earthHeavenStyleProvider.notifier).setStyle(val);
+                                      },
+                                    ),
+                                    const SizedBox(height: 8),
+                                    SwitchListTile(
+                                      contentPadding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+                                      title: const Text('Enable Background Glow', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                                      subtitle: const Text('Renders a subtle animated light behind the reader', style: TextStyle(fontSize: 12)),
+                                      value: readSettings.isGlowEnabled,
+                                      onChanged: (value) {
+                                        HapticFeedback.selectionClick();
+                                        ref.read(readSettingsProvider.notifier).setGlowEnabled(value);
+                                      },
+                                    ),
+                                  ],
+                                );
+                              }),
+                              const SizedBox(height: 24),
                                 Text(
                                   'FOUNDATIONS',
                                   style: theme.textTheme.labelSmall?.copyWith(
@@ -424,192 +343,105 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 16),
                               ],
                             ),
                           ),
-                  ),
-                ),
               ],
             ),
           ),
         ),
       ),
-      ),
     );
   }
 
-  Widget _buildAdvancedContent(ThemeData theme, ReadSettingsState readSettings,
-      ThemeEngineMode engineMode) {
-    return Container(
-      key: const ValueKey('advanced_main'),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'THEME MODE',
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.primaryColor,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
-            ),
-          ),
-          const SizedBox(height: 12),
-          GestureDetector(
-            onTap: () {
-              HapticFeedback.selectionClick();
-              final newMode = engineMode == ThemeEngineMode.locked
-                  ? ThemeEngineMode.timeBased
-                  : ThemeEngineMode.locked;
-              ref.read(themeProvider.notifier).setEngineMode(newMode);
-            },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.1)),
+
+}
+
+/// Public widget rendering theme-picker content without sheet chrome.
+/// Embedded in [AppearanceSettingsSheet]'s Theme tab.
+class ThemePickerBody extends ConsumerStatefulWidget {
+  const ThemePickerBody({super.key});
+
+  @override
+  ConsumerState<ThemePickerBody> createState() => _ThemePickerBodyState();
+}
+
+class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final currentMode = ref.watch(themeProvider);
+    final readSettings = ref.watch(readSettingsProvider);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Consumer(builder: (context, ref, _) {
+          final surfaceStyle = ref.watch(earthHeavenStyleProvider);
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _SurfaceStyleGrid(
+                selectedStyle: surfaceStyle,
+                onChanged: (val) {
+                  HapticFeedback.selectionClick();
+                  ref.read(earthHeavenStyleProvider.notifier).setStyle(val);
+                },
               ),
-              child: Row(
-                children: [
-                  Icon(
-                      engineMode == ThemeEngineMode.locked
-                          ? Icons.lock_rounded
-                          : Icons.schedule_rounded,
-                      size: 16,
-                      color: theme.colorScheme.onSurface),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      engineMode == ThemeEngineMode.locked
-                          ? 'Locked Theme'
-                          : 'Time-Based',
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 13),
-                    ),
-                  ),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Text(
-                      engineMode == ThemeEngineMode.locked ? 'Locked' : 'Auto',
-                      style: const TextStyle(
-                          fontSize: 11, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
+              const SizedBox(height: 8),
+              SwitchListTile(
+                contentPadding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+                title: const Text('Enable Background Glow', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                subtitle: const Text('Renders a subtle animated light behind the reader', style: TextStyle(fontSize: 12)),
+                value: readSettings.isGlowEnabled,
+                onChanged: (value) { HapticFeedback.selectionClick(); ref.read(readSettingsProvider.notifier).setGlowEnabled(value); },
               ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'FINE-TUNING',
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.primaryColor,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text('Brightness', style: TextStyle(fontWeight: FontWeight.w500)),
-                    Text('${(readSettings.displayBrightness * 100).toInt()}%'),
-                  ],
-                ),
-                Slider(
-                  value: readSettings.displayBrightness,
-                  onChanged: (val) {
-                    ref.read(readSettingsProvider.notifier).setDisplayBrightness(val);
-                  },
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text('Sepia Warmth', style: TextStyle(fontWeight: FontWeight.w500)),
-                    Text('${(readSettings.sepiaWarmth * 100).toInt()}%'),
-                  ],
-                ),
-                Slider(
-                  value: readSettings.sepiaWarmth,
-                  activeColor: Colors.orange.shade300,
-                  onChanged: (val) {
-                    ref.read(readSettingsProvider.notifier).setSepiaWarmth(val);
-                  },
-                ),
-              ],
-            ),
-          ),
-          const Divider(height: 16, indent: 16),
-          SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            title: const Text('Enable Background Glow',
-                style: TextStyle(fontSize: 14)),
-            subtitle: const Text(
-                'Renders a subtle animated light behind the reader in 3D surface style',
-                style: TextStyle(fontSize: 12)),
-            value: readSettings.isGlowEnabled,
-            onChanged: (value) {
-              HapticFeedback.selectionClick();
-              ref.read(readSettingsProvider.notifier).setGlowEnabled(value);
-            },
-          ),
-          if (readSettings.isGlowEnabled) ...[
-            const SizedBox(height: 16),
-            AnimatedSegmentedTile<BackgroundGlowStyle>(
-              title: 'Glow Position',
-              subtitle: 'Where the glow originates on the screen',
-              selectedValue: readSettings.backgroundGlowStyle,
-              options: const [
-                MapEntry(BackgroundGlowStyle.top, 'Top'),
-                MapEntry(BackgroundGlowStyle.full, 'Full'),
-              ],
-              onChanged: (val) {
-                HapticFeedback.selectionClick();
-                ref
-                    .read(readSettingsProvider.notifier)
-                    .setBackgroundGlowStyle(val);
-              },
-            ),
-            const SizedBox(height: 16),
-            AnimatedSegmentedTile<double>(
-              title: 'Glow Intensity',
-              subtitle: 'Brightness of the animated light',
-              selectedValue: readSettings.glowIntensity,
-              options: const [
-                MapEntry(0.5, 'Subtle'),
-                MapEntry(0.75, 'Normal'),
-                MapEntry(1.0, 'Bright'),
-              ],
-              onChanged: (val) {
-                HapticFeedback.selectionClick();
-                ref.read(readSettingsProvider.notifier).setGlowIntensity(val);
-              },
-            ),
-          ],
-          const SizedBox(height: 16),
-        ],
-      ),
+            ],
+          );
+        }),
+        const SizedBox(height: 24),
+        Text('FOUNDATIONS', style: theme.textTheme.labelSmall?.copyWith(color: theme.primaryColor, letterSpacing: 1.2, fontWeight: FontWeight.bold, fontSize: 10)),
+        const SizedBox(height: 8),
+        Row(children: [
+          Expanded(child: _ThemePill(label: 'Dawn',  mode: AppThemeMode.light, currentMode: currentMode, fillColor: AppColors.lightBackground, textColor: AppColors.lightTextPrimary, swatchColors: const [AppColors.lightBackground, AppColors.lightSurface, AppColors.lightAccent])),
+          const SizedBox(width: 8),
+          Expanded(child: _ThemePill(label: 'Fresh', mode: AppThemeMode.sepia, currentMode: currentMode, fillColor: AppColors.sepiaBackground, textColor: AppColors.sepiaTextPrimary, swatchColors: const [AppColors.sepiaBackground, AppColors.sepiaSurface, AppColors.sepiaTextPrimary])),
+          const SizedBox(width: 8),
+          Expanded(child: _DarkThemePill(currentMode: currentMode)),
+        ]),
+        const SizedBox(height: 16),
+        Text('FIRMAMENT', style: theme.textTheme.labelSmall?.copyWith(color: theme.primaryColor, letterSpacing: 1.2, fontWeight: FontWeight.bold, fontSize: 10)),
+        const SizedBox(height: 8),
+        Row(children: [
+          Expanded(child: _ThemePill(label: 'Sun',   mode: AppThemeMode.dawn,  currentMode: currentMode, fillColor: AppColors.dawnBackground,  textColor: AppColors.dawnTextPrimary,  swatchColors: const [AppColors.dawnPrimary,   AppColors.dawnAccent,   AppColors.dawnBackground])),
+          const SizedBox(width: 8),
+          Expanded(child: _ThemePill(label: 'Moon',  mode: AppThemeMode.fresh, currentMode: currentMode, fillColor: AppColors.freshBackground, textColor: AppColors.freshTextPrimary, swatchColors: const [AppColors.freshPrimary,  AppColors.freshAccent,  AppColors.freshBackground])),
+          const SizedBox(width: 8),
+          Expanded(child: _ThemePill(label: 'Stars', mode: AppThemeMode.dusk,  currentMode: currentMode, fillColor: AppColors.duskBackground,  textColor: AppColors.duskTextPrimary,  swatchColors: const [AppColors.duskPrimary,   AppColors.duskAccent,   AppColors.duskBackground])),
+        ]),
+        const SizedBox(height: 16),
+        Text('EDEN', style: theme.textTheme.labelSmall?.copyWith(color: theme.primaryColor, letterSpacing: 1.2, fontWeight: FontWeight.bold, fontSize: 10)),
+        const SizedBox(height: 8),
+        Row(children: [
+          Expanded(child: _ThemePill(label: 'Lilies', mode: AppThemeMode.lilies, currentMode: currentMode, fillColor: AppColors.liliesBackground, textColor: AppColors.liliesTextPrimary, swatchColors: const [AppColors.liliesPrimary, AppColors.liliesAccent, AppColors.liliesBackground])),
+          const SizedBox(width: 8),
+          Expanded(child: _ThemePill(label: 'Roses',  mode: AppThemeMode.roses,  currentMode: currentMode, fillColor: AppColors.rosesBackground,  textColor: AppColors.rosesTextPrimary,  swatchColors: const [AppColors.rosesPrimary,  AppColors.rosesAccent,  AppColors.rosesBackground])),
+          const SizedBox(width: 8),
+          Expanded(child: _ThemePill(label: 'Olives', mode: AppThemeMode.olives, currentMode: currentMode, fillColor: AppColors.olivesBackground, textColor: AppColors.olivesTextPrimary, swatchColors: const [AppColors.olivesPrimary, AppColors.olivesAccent, AppColors.olivesBackground])),
+        ]),
+        const SizedBox(height: 16),
+        Text('SANCTUARY', style: theme.textTheme.labelSmall?.copyWith(color: theme.primaryColor, letterSpacing: 1.2, fontWeight: FontWeight.bold, fontSize: 10)),
+        const SizedBox(height: 8),
+        Row(children: [
+          Expanded(child: _ThemePill(label: 'Priestly\nPurple', mode: AppThemeMode.priestlyPurple, currentMode: currentMode, fillColor: AppColors.lightBackground, textColor: const Color(0xFF673AB7), swatchColors: const [Color(0xFF673AB7), Color(0xFF9575CD), AppColors.lightBackground])),
+          const SizedBox(width: 8),
+          Expanded(child: _ThemePill(label: 'Galilee\nBlue',    mode: AppThemeMode.galileeBlue,    currentMode: currentMode, fillColor: AppColors.lightBackground, textColor: const Color(0xFF2196F3), swatchColors: const [Color(0xFF2196F3), Color(0xFF64B5F6), AppColors.lightBackground])),
+          const SizedBox(width: 8),
+          Expanded(child: _ThemePill(label: 'Scarlet\nRed',     mode: AppThemeMode.scarletRed,     currentMode: currentMode, fillColor: AppColors.lightBackground, textColor: const Color(0xFFE53935), swatchColors: const [Color(0xFFE53935), Color(0xFFEF5350), AppColors.lightBackground])),
+        ]),
+      ],
     );
   }
 }
@@ -1072,4 +904,187 @@ class _SparkleSpec {
   final double dirY;
 
   const _SparkleSpec(this.relX, this.relY, this.dirX, this.dirY);
+}
+
+// ── Surface Style Grid ──────────────────────────────────────────────────────
+
+/// 7-item tactile grid selector for surface rendering styles.
+class _SurfaceStyleGrid extends StatelessWidget {
+  final EarthHeavenStyle selectedStyle;
+  final ValueChanged<EarthHeavenStyle> onChanged;
+
+  const _SurfaceStyleGrid({
+    required this.selectedStyle,
+    required this.onChanged,
+  });
+
+  static const _kTiles = [
+    _StyleMeta(
+      style: EarthHeavenStyle.earth,
+      label: 'Earth',
+      subtitle: 'Flat surface',
+      icon: Icons.layers_outlined,
+    ),
+    _StyleMeta(
+      style: EarthHeavenStyle.heaven,
+      label: 'Heaven',
+      subtitle: 'Frosted depth',
+      icon: Icons.blur_on_rounded,
+    ),
+    _StyleMeta(
+      style: EarthHeavenStyle.paperlike,
+      label: 'Paper',
+      subtitle: 'Warm e-reader',
+      icon: Icons.menu_book_rounded,
+    ),
+    _StyleMeta(
+      style: EarthHeavenStyle.claymorphic,
+      label: 'Clay',
+      subtitle: 'Pillowy 3-D',
+      icon: Icons.interests_rounded,
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Surface Style',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.primaryColor,
+              letterSpacing: 1.2,
+              fontWeight: FontWeight.bold,
+              fontSize: 10,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Visual depth and material rendering',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
+              fontSize: 11,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              for (int i = 0; i < _kTiles.length; i++) ...[
+                if (i > 0) const SizedBox(width: 8),
+                Expanded(
+                  child: _SurfaceStyleTile(
+                    meta: _kTiles[i],
+                    isSelected: selectedStyle == _kTiles[i].style,
+                    onTap: () => onChanged(_kTiles[i].style),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+@immutable
+class _StyleMeta {
+  final EarthHeavenStyle style;
+  final String label;
+  final String subtitle;
+  final IconData icon;
+
+  const _StyleMeta({
+    required this.style,
+    required this.label,
+    required this.subtitle,
+    required this.icon,
+  });
+}
+
+class _SurfaceStyleTile extends StatelessWidget {
+  final _StyleMeta meta;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _SurfaceStyleTile({
+    required this.meta,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final primary = theme.primaryColor;
+    final onSurface = theme.colorScheme.onSurface;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? primary.withValues(alpha: 0.10)
+              : onSurface.withValues(alpha: 0.04),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected
+                ? primary.withValues(alpha: 0.75)
+                : onSurface.withValues(alpha: 0.10),
+            width: isSelected ? 1.5 : 0.8,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: primary.withValues(alpha: 0.18),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : [],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              meta.icon,
+              size: 20,
+              color: isSelected ? primary : onSurface.withValues(alpha: 0.55),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              meta.label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 10.5,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                color: isSelected ? primary : onSurface.withValues(alpha: 0.80),
+                height: 1.1,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              meta.subtitle,
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 8.5,
+                fontWeight: FontWeight.w400,
+                color: onSurface.withValues(alpha: 0.45),
+                height: 1.1,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

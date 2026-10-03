@@ -6,17 +6,26 @@ import '../widgets/shared_top_header.dart';
 import '../../state/theme_provider.dart';
 import '../widgets/animated_background.dart';
 import '../widgets/glass_container.dart';
-import '../../state/reading_plan_provider.dart';
 import '../../state/notes_provider.dart';
 import '../../state/streak_provider.dart';
 import '../../state/nav_provider.dart';
+import 'dart:math' as math;
+import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
-import 'reading_plan_browser.dart';
-import 'highlights_screen.dart';
-import 'bookmarks_screen.dart';
-import 'votd_archive_screen.dart';
+import 'your_space_screen.dart';
 import 'notes_list_screen.dart';
-import '../widgets/textured_glass_container.dart';
+
+import 'plans_hub_v2_screen.dart';
+import '../widgets/continue_reading_card.dart';
+import '../widgets/reminder_settings_card.dart';
+
+import 'commentary_hub_screen.dart';
+import 'main_nav_screen.dart';
+import '../../state/read_location_provider.dart';
+import '../../state/bible_provider.dart';
+import '../../state/study_provider.dart';
+import '../../state/commentary_provider.dart';
+import 'votd_archive_screen.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TODAY SCREEN — static scaffold (Stage 1: design / no data wiring)
@@ -30,11 +39,24 @@ import '../widgets/textured_glass_container.dart';
 //   • Quick Actions     → navProvider.setIndex() + Navigator.push
 // ─────────────────────────────────────────────────────────────────────────────
 
-class TodayScreen extends ConsumerWidget {
+class TodayScreen extends ConsumerStatefulWidget {
   const TodayScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TodayScreen> createState() => _TodayScreenState();
+}
+
+class _TodayScreenState extends ConsumerState<TodayScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(streakProvider.notifier).markAppOpenedToday();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final mq = MediaQuery.of(context);
     final now = DateTime.now();
@@ -64,23 +86,20 @@ class TodayScreen extends ConsumerWidget {
     final dayLabel =
         '${weekdays[now.weekday - 1]} · ${months[now.month - 1]} ${now.day}';
 
-    final greetings = ['Good morning', 'Good afternoon', 'Good evening'];
-    final hour = now.hour;
-    final greeting = hour < 4
-        ? 'Good night'
-        : hour < 12
-            ? greetings[0]
-            : hour < 17
-                ? greetings[1]
-                : greetings[2];
+    final streak = ref.watch(streakProvider);
+    final showNudge = !streak.readToday && streak.count > 0;
 
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) {
-        if (didPop) return;
-        Navigator.of(context).pop();
-      },
-      child: GestureDetector(
+    final greetings = ['Good morning', 'Good afternoon', 'Good evening', 'Good night'];
+    final hour = now.hour;
+    final greeting = hour < 12
+        ? greetings[0]
+        : hour < 17
+            ? greetings[1]
+            : hour < 21
+                ? greetings[2]
+                : greetings[3];
+
+    return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onHorizontalDragEnd: (details) {
         if (details.primaryVelocity != null && details.primaryVelocity! > 300) {
@@ -98,7 +117,16 @@ class TodayScreen extends ConsumerWidget {
           ),
           SafeArea(
             bottom: false,
-            child: CustomScrollView(
+            child: RefreshIndicator.adaptive(
+              color: theme.primaryColor,
+              backgroundColor: theme.colorScheme.surface,
+              onRefresh: () async {
+                // CMS: fetch remote content here in future
+                await Future.delayed(const Duration(milliseconds: 500));
+                ref.invalidate(streakProvider);
+                ref.invalidate(notesProvider);
+              },
+              child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
                 SliverToBoxAdapter(
@@ -119,7 +147,40 @@ class TodayScreen extends ConsumerWidget {
                                 minWidth: 44, minHeight: 44),
                             onPressed: () => Navigator.of(context).pop(),
                           ),
-                          trailing: const SizedBox.shrink(),
+                          trailing: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(showNudge
+                                      ? 'Read today to save your streak!'
+                                      : 'Notifications coming soon!'),
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12)),
+                                ),
+                              );
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 8.0, top: 8.0, bottom: 8.0, left: 8.0),
+                              child: Stack(
+                                alignment: Alignment.topRight,
+                                children: [
+                                  Icon(Icons.notifications_none_rounded,
+                                      size: 26, color: theme.colorScheme.onSurface),
+                                  if (showNudge)
+                                    Container(
+                                      margin: const EdgeInsets.only(top: 2, right: 2),
+                                      width: 8,
+                                      height: 8,
+                                      decoration: const BoxDecoration(
+                                          color: Colors.red,
+                                          shape: BoxShape.circle),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ),
                           centerContent: Text(
                             dayLabel,
                             textAlign: TextAlign.center,
@@ -137,24 +198,30 @@ class TodayScreen extends ConsumerWidget {
                         // ═══════════════════════════════════════════════════════
                         _GreetingHeader(greeting: greeting, theme: theme),
 
-                        const SizedBox(height: 16),
-                        const _StreakHeroWidget(),
-
                         const SizedBox(height: 20),
 
-                        // Verse of the Day removed from expanded hub view
-
                         // ═══════════════════════════════════════════════════════
-                        // 3. TODAY'S READING
+                        // 1B. CONTINUE READING
                         // ═══════════════════════════════════════════════════════
-                        _HeroReadingPill(theme: theme),
+                        _SectionLabel(label: 'RESUME', theme: theme),
+                        const SizedBox(height: 8),
+                        ContinueReadingCard(theme: theme),
 
                         const SizedBox(height: 20),
 
                         // ═══════════════════════════════════════════════════════
-                        // 3b. VOTD ARCHIVE
+                        // 2. READING STREAK
                         // ═══════════════════════════════════════════════════════
-                        _VotdArchiveCard(theme: theme),
+                        _SectionLabel(label: 'READING STREAK', theme: theme),
+                        const SizedBox(height: 8),
+                        _StreakProgressCard(theme: theme),
+
+                        const SizedBox(height: 20),
+
+                        // ═══════════════════════════════════════════════════════
+                        // 3. VOTD ARCHIVE
+                        // ═══════════════════════════════════════════════════════
+                        _VotdArchiveBanner(theme: theme),
 
                         const SizedBox(height: 20),
 
@@ -168,39 +235,21 @@ class TodayScreen extends ConsumerWidget {
                         const SizedBox(height: 20),
 
                         // ═══════════════════════════════════════════════════════
-                        // 5. STREAK / PROGRESS
-                        // ═══════════════════════════════════════════════════════
-                        _SectionLabel(label: 'READING STREAK', theme: theme),
-                        const SizedBox(height: 8),
-                        _StreakProgressCard(theme: theme),
-
-                        const SizedBox(height: 20),
-
-                        // ═══════════════════════════════════════════════════════
-                        // 6. QUICK ACTIONS
+                        // 5. QUICK ACTIONS
                         // ═══════════════════════════════════════════════════════
                         _SectionLabel(label: 'QUICK ACTIONS', theme: theme),
                         const SizedBox(height: 8),
                         _QuickActionsRow(theme: theme),
 
-                        const SizedBox(height: 40),
-                        Center(
-                          child: TextButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            style: TextButton.styleFrom(
-                              minimumSize: const Size(88, 44),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 24, vertical: 12),
-                            ),
-                            child: Text(
-                              'Done',
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                color: theme.colorScheme.onSurface,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
+                        const SizedBox(height: 20),
+
+                        // ═══════════════════════════════════════════════════════
+                        // 6. DAILY REMINDERS
+                        // ═══════════════════════════════════════════════════════
+                        _SectionLabel(label: 'DAILY REMINDERS', theme: theme),
+                        const SizedBox(height: 8),
+                        ReminderSettingsCard(theme: theme),
+
                         // Bottom padding: clears the floating bottom nav
                         SizedBox(height: mq.padding.bottom + 40),
                       ],
@@ -209,11 +258,11 @@ class TodayScreen extends ConsumerWidget {
                 ),
               ],
             ),
+            ),
           ),
         ],
       ),
       ),
-    ),
     );
   }
 }
@@ -252,8 +301,11 @@ class _GreetingHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TexturedGlassContainer(
-      isScrollable: true,
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(24),
+      ),
       padding: const EdgeInsets.all(20),
       child: Row(
         children: [
@@ -263,11 +315,11 @@ class _GreetingHeader extends StatelessWidget {
             height: 48,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.goldAccent.withValues(alpha: 0.12),
+              color: theme.colorScheme.primary.withValues(alpha: 0.12),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.wb_sunny_outlined,
-              color: AppColors.goldAccent,
+              color: theme.colorScheme.primary,
               size: 24,
             ),
           ),
@@ -279,6 +331,7 @@ class _GreetingHeader extends StatelessWidget {
                 Text(
                   greeting,
                   style: theme.textTheme.headlineSmall?.copyWith(
+                    color: theme.colorScheme.onSurface,
                     fontWeight: FontWeight.w700,
                     height: 1.15,
                   ),
@@ -299,150 +352,6 @@ class _GreetingHeader extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// 3. Today's Reading card
-// ─────────────────────────────────────────────────────────────────────────────
-class _HeroReadingPill extends ConsumerWidget {
-  final ThemeData theme;
-  const _HeroReadingPill({required this.theme});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final activePlanIds = ref.watch(activePlanIdsProvider);
-    final primaryPlanId = activePlanIds.isNotEmpty ? activePlanIds.first : 'chronological_1yr';
-    final planState = ref.watch(readingPlanProvider(primaryPlanId));
-    final totalDays = planState.planData.length;
-    final currentDay = planState.currentDay;
-    
-    final progress = totalDays > 0 ? currentDay / totalDays.toDouble() : 0.0;
-    final todayData = (totalDays > 0 && currentDay > 0 && currentDay <= totalDays) ? planState.planData[currentDay - 1] : null;
-    final subHeadline = todayData?.title ?? 'Start your journey';
-
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(40),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.goldAccent.withValues(alpha: 0.15),
-            blurRadius: 40,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Text(
-                      'Chronological Bible in a Year',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        height: 1.2,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: AppColors.goldAccent.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      'Day $currentDay / $totalDays',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: AppColors.goldAccent,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              Text(
-                subHeadline,
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  fontFamily: 'EB Garamond',
-                  height: 1.1,
-                  color: theme.primaryColor,
-                ),
-              ),
-              const SizedBox(height: 32),
-              // Thick capsule progress bar
-              Container(
-                height: 12,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: theme.dividerColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: FractionallySizedBox(
-                  alignment: Alignment.centerLeft,
-                  widthFactor: progress.clamp(0.0, 1.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      gradient: LinearGradient(
-                        colors: [
-                          AppColors.goldAccent.withValues(alpha: 0.7),
-                          AppColors.goldAccent,
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          // Floating start button
-          Positioned(
-            right: -8,
-            bottom: -16,
-            child: Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.goldAccent.withValues(alpha: 0.4),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-                child: FloatingActionButton(
-                heroTag: 'hero_reading_play_btn',
-                onPressed: () {
-                  final activePlanIds = ref.read(activePlanIdsProvider);
-                  final planId = activePlanIds.isNotEmpty
-                      ? activePlanIds.first
-                      : 'chronological_1yr';
-                   Navigator.of(context).push(CupertinoPageRoute(
-                     builder: (_) => ReadingPlanBrowser(planId: planId),
-                   ));
-                },
-                backgroundColor: AppColors.goldAccent,
-                elevation: 0,
-                child: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 32),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 4. Latest Note card
@@ -460,8 +369,7 @@ class _LatestNoteCard extends ConsumerWidget {
         hasNote ? notes.first.content : 'Write your first note to see it here.';
     final noteDate = hasNote ? notes.first.date : '';
 
-    return TexturedGlassContainer(
-      isScrollable: true,
+    return GlassContainer(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -504,8 +412,9 @@ class _LatestNoteCard extends ConsumerWidget {
             alignment: Alignment.centerRight,
             child: TextButton.icon(
               onPressed: () {
-                Navigator.of(context).push(
-                  CupertinoPageRoute(builder: (_) => const NotesListScreen()),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const NotesListScreen()),
                 );
               },
               icon: const Icon(Icons.arrow_forward_rounded, size: 14),
@@ -534,64 +443,70 @@ class _StreakProgressCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final activePlanIds = ref.watch(activePlanIdsProvider);
-    final primaryPlanId =
-        activePlanIds.isNotEmpty ? activePlanIds.first : 'chronological_1yr';
-    final planState = ref.watch(readingPlanProvider(primaryPlanId));
-    final streakDays = ref.watch(streakProvider).count;
-    final totalDays = planState.planData.length;
-    final totalCompleted = planState.currentDay > 1 && totalDays > 0
-        ? planState.currentDay - 1
-        : 0;
+    final streak = ref.watch(streakProvider);
+    final streakDays = streak.count;
+    
+    final now = DateTime.now();
+    final year = now.year;
+    final isLeapYear = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+    final daysInYear = isLeapYear ? 366 : 365;
+    
+    final startOfYear = DateTime(year, 1, 1);
+    final dayOfYear = now.difference(startOfYear).inDays + 1;
+    final progress = dayOfYear / daysInYear;
+    final daysRemaining = daysInYear - dayOfYear;
 
-    return TexturedGlassContainer(
-      isScrollable: true,
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(24),
+      ),
       padding: const EdgeInsets.all(20),
       child: Row(
         children: [
-          // Flame / streak icon
+          // Left Side: Flame + Label
           Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Container(
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.orange.withValues(alpha: 0.12),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.12),
                 ),
-                child: const Icon(Icons.local_fire_department_rounded,
-                    color: Colors.orange, size: 28),
+                child: Icon(Icons.local_fire_department_rounded,
+                    color: theme.colorScheme.primary, size: 28),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 8),
               Text(
-                '$streakDays days',
+                streakDays == 1 ? '1 day streak' : '$streakDays days streak',
                 style: theme.textTheme.labelSmall?.copyWith(
-                  color: Colors.orange,
+                  color: theme.colorScheme.primary,
                   fontWeight: FontWeight.w700,
                 ),
-              ),
-              Text(
-                'streak',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.45),
-                  fontSize: 10,
-                ),
+                textAlign: TextAlign.center,
               ),
             ],
           ),
 
           const SizedBox(width: 20),
-          const VerticalDivider(width: 1),
+          Container(
+            width: 1,
+            height: 80,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+          ),
           const SizedBox(width: 20),
 
-          // Chapters done
+          // Right Side: Progress
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '$totalCompleted / $totalDays days complete',
+                  'Day $dayOfYear of $daysInYear',
                   style: theme.textTheme.titleSmall?.copyWith(
+                    color: theme.colorScheme.onSurface,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -599,17 +514,17 @@ class _StreakProgressCard extends ConsumerWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(4),
                   child: LinearProgressIndicator(
-                    value: totalDays > 0 ? totalCompleted / totalDays : 0.0,
+                    value: progress,
                     minHeight: 7,
                     backgroundColor:
-                        AppColors.goldAccent.withValues(alpha: 0.14),
-                    valueColor: const AlwaysStoppedAnimation<Color>(
-                        AppColors.goldAccent),
+                        theme.colorScheme.primary.withValues(alpha: 0.14),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                        theme.colorScheme.primary),
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '${totalDays - totalCompleted} days remaining in the plan.',
+                  '$daysRemaining days of year remaining.',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.50),
                   ),
@@ -636,41 +551,92 @@ class _QuickActionsRow extends ConsumerWidget {
       (
         icon: Icons.menu_book_rounded,
         label: 'Read',
-        color: const Color(0xFF4A90D9),
-        onTap: () => ref.read(navProvider.notifier).setIndex(1),
+        color: theme.colorScheme.primary,
+        onTap: () {
+          Navigator.of(context).pop();
+          ref.read(navProvider.notifier).setIndex(1);
+        },
       ),
       (
-        icon: Icons.search_rounded,
-        label: 'Search',
-        color: const Color(0xFF9B59B6),
-        onTap: () => ref.read(navProvider.notifier).setIndex(3),
+        icon: Icons.casino_rounded,
+        label: 'Surprise Me',
+        color: theme.colorScheme.primary,
+        onTap: () {
+          final availableVerses =
+              ref.read(commentaryProvider.notifier).versesWithCommentary;
+          if (availableVerses.isNotEmpty) {
+            final randomVerse =
+                availableVerses[math.Random().nextInt(availableVerses.length)];
+            final lastSpaceIdx = randomVerse.lastIndexOf(' ');
+            final bookName = randomVerse.substring(0, lastSpaceIdx);
+            final refParts = randomVerse.substring(lastSpaceIdx + 1).split(':');
+            final chapter = int.parse(refParts[0]);
+            final verseNum = int.parse(refParts[1]);
+
+            final flatChapters = ref.read(flatChaptersProvider);
+            try {
+              final fc = flatChapters.firstWhere((c) =>
+                  c.book.name == bookName && c.chapter.number == chapter);
+
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) => const CastingLotsDialog(),
+              ).then((_) {
+                if (!context.mounted) return;
+
+                HapticFeedback.selectionClick();
+                ref.read(readLocationProvider.notifier).updateLocation(
+                      bookAbbrev: fc.book.abbreviation,
+                      bookName: bookName,
+                      chapter: chapter,
+                      verse: verseNum,
+                    );
+                ref
+                    .read(activeStudyVerseProvider.notifier)
+                    .setVerse('$bookName $chapter:$verseNum');
+
+                Navigator.of(context).push(CupertinoPageRoute(
+                    builder: (_) => CommentaryHubScreen(
+                          book: bookName,
+                          chapter: chapter,
+                          verse: verseNum,
+                          verseText: fc.chapter.verses[verseNum - 1].text,
+                        )));
+              });
+            } catch (_) {}
+          }
+        },
       ),
       (
-        icon: Icons.self_improvement_rounded,
-        label: 'Highlights',
-        color: const Color(0xFF27AE60),
+        icon: Icons.calendar_today_rounded,
+        label: 'Reading Plan',
+        color: theme.colorScheme.primary,
         onTap: () {
           Navigator.of(context).push(
             CupertinoPageRoute(
-                builder: (_) => const HighlightsScreen()),
+                builder: (_) => const PlansHubV2Screen()),
           );
         },
       ),
       (
-        icon: Icons.bookmark_border_rounded,
-        label: 'Bookmarks',
-        color: const Color(0xFFE67E22),
+        icon: Icons.self_improvement_rounded,
+        label: 'Your Space',
+        color: theme.colorScheme.primary,
         onTap: () {
           Navigator.of(context).push(
             CupertinoPageRoute(
-                builder: (_) => const BookmarksScreen()),
+                builder: (_) => const YourSpaceScreen(initialTab: 0)),
           );
         },
       ),
     ];
 
-    return TexturedGlassContainer(
-      isScrollable: true,
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(24),
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -725,6 +691,7 @@ class _QuickActionButton extends StatelessWidget {
           Text(
             label,
             style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurface,
               fontWeight: FontWeight.w600,
               fontSize: 11,
             ),
@@ -735,139 +702,75 @@ class _QuickActionButton extends StatelessWidget {
   }
 }
 
-class _StreakHeroWidget extends ConsumerWidget {
-  const _StreakHeroWidget();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final streak = ref.watch(streakProvider);
-    final isLit = streak.readToday;
-    final count = streak.count;
-
-    if (count == 0 && !isLit) {
-      return const SizedBox.shrink(); // Hide if no streak and haven't read
-    }
-
-    final Color glowColor =
-        isLit ? AppColors.goldAccent : Colors.grey.withValues(alpha: 0.5);
-    final String countText =
-        count > 0 ? '$count Day Streak' : 'Read today to start streak!';
-
-    return Center(
-      child: GlassContainer(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        borderRadius: BorderRadius.circular(30),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              isLit
-                  ? Icons.local_fire_department_rounded
-                  : Icons.local_fire_department_outlined,
-              color: glowColor,
-              size: 24,
-              shadows: isLit
-                  ? [
-                      Shadow(
-                        color: glowColor.withValues(alpha: 0.6),
-                        blurRadius: 10 + (count.clamp(0, 10).toDouble()),
-                      )
-                    ]
-                  : null,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              countText,
-              style: theme.textTheme.labelLarge?.copyWith(
-                color: isLit
-                    ? theme.colorScheme.onSurface
-                    : theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// 7. VOTD Archive Card
-// ─────────────────────────────────────────────────────────────────────────────
-class _VotdArchiveCard extends StatelessWidget {
+class _VotdArchiveBanner extends StatelessWidget {
   final ThemeData theme;
-  const _VotdArchiveCard({required this.theme});
+  const _VotdArchiveBanner({required this.theme});
 
   @override
   Widget build(BuildContext context) {
-    return TexturedGlassContainer(
-      borderRadius: BorderRadius.circular(20),
-      padding: EdgeInsets.zero,
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(24),
+      ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(24),
           onTap: () {
             Navigator.of(context).push(
               CupertinoPageRoute(builder: (_) => const VotdArchiveScreen()),
             );
           },
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: theme.colorScheme.surface.withValues(alpha: 0.3),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.history_rounded, color: theme.primaryColor, size: 24),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Verse of the Day Archive',
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.history_rounded, color: theme.primaryColor, size: 24),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Verse of the Day Archive',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
                             ),
-                            Text(
-                              'Catch up on verses from days you missed.',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.textTheme.bodySmall?.color),
-                            ),
-                          ],
-                        ),
+                          ),
+                          Text(
+                            'Catch up on verses from days you missed.',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                          ),
+                        ],
                       ),
-                      Icon(Icons.keyboard_arrow_right_rounded, color: theme.primaryColor),
+                    ),
+                    Icon(Icons.keyboard_arrow_right_rounded, color: theme.primaryColor),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.auto_awesome,
+                          color: theme.primaryColor.withValues(alpha: 0.7), size: 16),
+                      const SizedBox(width: 8),
+                      Text('Explore your past daily verses',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.7))),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.auto_awesome, color: theme.primaryColor.withValues(alpha: 0.7), size: 16),
-                        const SizedBox(width: 8),
-                        Text('Explore your past daily verses',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                                color: theme.colorScheme.onSurface.withValues(alpha: 0.7))),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -875,3 +778,4 @@ class _VotdArchiveCard extends StatelessWidget {
     );
   }
 }
+

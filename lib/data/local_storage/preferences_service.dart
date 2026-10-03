@@ -9,13 +9,16 @@ class PreferencesService {
   PreferencesService(this.prefs);
 
   static const String _searchHistoryKey = 'search_history';
+  static const String _searchQueriesKey = 'recent_search_queries';
   static const String _bookmarksKey = 'bookmarks';
+  static const String _bookmarksV2Key = 'bookmarks_v2';
   static const String _commentaryBookmarksKey = 'commentary_bookmarks';
   static const String _favoritesKey = 'favorites';
   static const String _highlightsKey = 'highlights';
   static const String _lastTabKey = 'last_tab';
   static const String _lastReadLocKey = 'last_read_loc';
   static const String _studyLayoutKey = 'study_layout';
+  static const String _useNewPlansHubKey = 'use_new_plans_hub';
   static const String _readingPlanStateKey = 'reading_plan_state';
   static const String _bentoPresetKey = 'bento_preset';
 
@@ -37,6 +40,10 @@ class PreferencesService {
   static const String _defaultStartTabKey = 'default_start_tab';
   static const String _activeTranslationKey = 'active_translation';
   static const String _secondaryTranslationKey = 'secondary_translation';
+
+  // Saved items display
+  static const String _syncSavedItemsLanguageKey = 'sync_saved_items_language';
+  static const String _showChipsOnSavedItemsKey = 'show_chips_on_saved_items';
 
   // Reading tips
   static const String _showReadingTipsKey = 'show_reading_tips';
@@ -96,12 +103,40 @@ class PreferencesService {
     return [];
   }
 
+  List<String> getRecentSearchQueries() {
+    return prefs.getStringList(_searchQueriesKey) ?? [];
+  }
+
+  Future<void> saveRecentSearchQueries(List<String> queries) async {
+    await prefs.setStringList(_searchQueriesKey, queries);
+  }
+
+  bool getUseNewPlansHub() {
+    return prefs.getBool(_useNewPlansHubKey) ?? false;
+  }
+
+  Future<void> setUseNewPlansHub(bool useNew) async {
+    await prefs.setBool(_useNewPlansHubKey, useNew);
+  }
+
   void saveBookmarks(List<String> bookmarks) {
     prefs.setStringList(_bookmarksKey, bookmarks);
   }
 
   List<String> getBookmarks() {
     return prefs.getStringList(_bookmarksKey) ?? [];
+  }
+
+  void saveBookmarksV2(String json) {
+    prefs.setString(_bookmarksV2Key, json);
+  }
+
+  String? getBookmarksV2() {
+    return prefs.getString(_bookmarksV2Key);
+  }
+
+  void removeBookmarksV2() {
+    prefs.remove(_bookmarksV2Key);
   }
 
   void saveCommentaryBookmarks(List<String> bookmarks) {
@@ -147,6 +182,22 @@ class PreferencesService {
 
   void saveDefaultStartTab(int index) {
     prefs.setInt(_defaultStartTabKey, index);
+  }
+
+  bool getSyncSavedItemsLanguage() {
+    return prefs.getBool(_syncSavedItemsLanguageKey) ?? true;
+  }
+
+  Future<void> setSyncSavedItemsLanguage(bool value) async {
+    await prefs.setBool(_syncSavedItemsLanguageKey, value);
+  }
+
+  bool getShowChipsOnSavedItems() {
+    return prefs.getBool(_showChipsOnSavedItemsKey) ?? false;
+  }
+
+  Future<void> setShowChipsOnSavedItems(bool value) async {
+    await prefs.setBool(_showChipsOnSavedItemsKey, value);
   }
 
   int getDefaultStartTab() {
@@ -198,8 +249,20 @@ class PreferencesService {
     return prefs.getStringList(_activePlanIdsKey) ?? [];
   }
 
+  void saveHiddenPlanIds(List<String> planIds) {
+    prefs.setStringList('hidden_plan_ids', planIds);
+  }
+
+  List<String> getHiddenPlanIds() {
+    return prefs.getStringList('hidden_plan_ids') ?? [];
+  }
+
   void saveReadingPlanState(String planId, Map<String, dynamic> state) {
     prefs.setString('${_readingPlanStateKey}_$planId', jsonEncode(state));
+  }
+
+  void deleteReadingPlanState(String planId) {
+    prefs.remove('${_readingPlanStateKey}_$planId');
   }
 
   Map<String, dynamic>? getReadingPlanState(String planId) {
@@ -267,12 +330,17 @@ class PreferencesService {
   }
 
   /// Returns the persisted rest-day preference (Sunday-first, 1=Sun … 7=Sat).
-  /// Default is 7 (Saturday / Sabbath).
-  int getReadingPlanRestDay() => prefs.getInt(_readingPlanRestDayKey) ?? 7;
+  /// Default is null (No Rest Day).
+  int? getReadingPlanRestDay() => prefs.getInt(_readingPlanRestDayKey);
 
-  /// Persists the rest-day preference. [value] must be 1–7 (Sunday-first).
-  void setReadingPlanRestDay(int value) =>
+  /// Persists the rest-day preference. [value] must be 1–7 (Sunday-first) or null.
+  void setReadingPlanRestDay(int? value) {
+    if (value == null) {
+      prefs.remove(_readingPlanRestDayKey);
+    } else {
       prefs.setInt(_readingPlanRestDayKey, value);
+    }
+  }
 
   void saveVotdViewedDays(List<String> days) {
     prefs.setStringList(_votdViewedDaysKey, days);
@@ -349,6 +417,25 @@ class PreferencesService {
   void setSabbathLocationName(String val) =>
       prefs.setString(_sabbathLocationNameKey, val);
 
+
+  // Prayer
+  static const _prayerReminderEnabledKey = "prayer_reminder_enabled";
+  static const _prayerReminderHourKey = "prayer_reminder_hour";
+  static const _prayerReminderMinuteKey = "prayer_reminder_minute";
+
+  bool getPrayerReminderEnabled() =>
+      prefs.getBool(_prayerReminderEnabledKey) ?? false;
+  void setPrayerReminderEnabled(bool val) =>
+      prefs.setBool(_prayerReminderEnabledKey, val);
+
+  int getPrayerReminderHour() => prefs.getInt(_prayerReminderHourKey) ?? 7;
+  void setPrayerReminderHour(int val) =>
+      prefs.setInt(_prayerReminderHourKey, val);
+
+  int getPrayerReminderMinute() => prefs.getInt(_prayerReminderMinuteKey) ?? 40;
+  void setPrayerReminderMinute(int val) =>
+      prefs.setInt(_prayerReminderMinuteKey, val);
+
   bool getDailyReminderEnabled() =>
       prefs.getBool(_dailyReminderEnabledKey) ?? false;
   void setDailyReminderEnabled(bool val) =>
@@ -398,6 +485,16 @@ class PreferencesService {
   }
 
   // --- Streak Tracking ---
+
+  static const String _appUsageDatesKey = 'app_usage_dates';
+
+  void saveAppUsageDates(List<String> dates) {
+    prefs.setStringList(_appUsageDatesKey, dates);
+  }
+
+  List<String> getAppUsageDates() {
+    return prefs.getStringList(_appUsageDatesKey) ?? [];
+  }
 
   void saveStreakCount(int count) {
     prefs.setInt(_streakCountKey, count);
@@ -449,6 +546,29 @@ class PreferencesService {
 
   void setOnboardingComplete(bool value) {
     prefs.setBool(_onboardingCompleteKey, value);
+  }
+
+  /// Clears all study and progress data associated with a user account.
+  Future<void> clearAllUserData() async {
+    final keys = [
+      _bookmarksKey,
+      _bookmarksV2Key,
+      _commentaryBookmarksKey,
+      _favoritesKey,
+      _highlightsKey,
+      _readingPlanStateKey,
+      _readingPlanRestDayKey,
+      'custom_plans', // explicitly referenced in codebase
+      _streakCountKey,
+      _lastReadDateKey,
+      _votdViewedDaysKey,
+      _searchHistoryKey,
+      _searchQueriesKey,
+      _lastReadLocKey,
+    ];
+    for (final key in keys) {
+      await prefs.remove(key);
+    }
   }
 }
 

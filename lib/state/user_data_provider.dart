@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:convert';
+import '../data/models/bookmark_model.dart';
 import '../data/local_storage/preferences_service.dart';
 
 /// Canonical key for persistent verse data (bookmarks, highlights, etc.).
@@ -33,27 +35,164 @@ const List<String> highlightPaletteNames = [
   'Red',
 ];
 
-class BookmarksNotifier extends Notifier<Set<String>> {
+class BookmarkDataNotifier extends Notifier<BookmarkData> {
   @override
-  Set<String> build() {
+  BookmarkData build() {
     final prefs = ref.watch(preferencesProvider);
+    final jsonStr = prefs.getBookmarksV2();
+
+    if (jsonStr != null && jsonStr.isNotEmpty) {
+      try {
+        final decoded = jsonDecode(jsonStr);
+        return BookmarkData.fromJson(decoded);
+      } catch (e) {
+        debugPrint('Error parsing bookmarks_v2: $e');
+      }
+    }
+
+    // Migration
     final b = prefs.getBookmarks().toSet();
     final f = prefs.getFavorites().toSet();
-    final merged = {...b, ...f};
+    final legacyMerged = {...b, ...f};
 
-    if (merged.length > b.length) {
-      Future.microtask(() => prefs.saveBookmarks(merged.toList()));
+    final nodes = <String, BookmarkNode>{};
+    final now = DateTime.now();
+    for (final ref in legacyMerged) {
+      nodes[ref] = BookmarkNode(
+        reference: ref,
+        createdAt: now,
+        folderId: null,
+      );
     }
-    return merged;
+
+    final folders = [
+      BookmarkFolder(id: 'folder_sermon', name: 'Sermon prep'),
+      BookmarkFolder(id: 'folder_memorize', name: 'Memorize'),
+      BookmarkFolder(id: 'folder_comfort', name: 'Comfort'),
+      BookmarkFolder(id: 'folder_study', name: 'Study'),
+    ];
+
+    final newData = BookmarkData(folders: folders, nodes: nodes);
+
+    // Initial migration save with read-back verification
+    if (jsonStr == null || jsonStr.isEmpty) {
+      Future.microtask(() {
+        prefs.saveBookmarksV2(jsonEncode(newData.toJson()));
+
+        // Read back check
+        final readBackStr = prefs.getBookmarksV2();
+        bool verificationPassed = false;
+        if (readBackStr != null) {
+          try {
+            final readBack = BookmarkData.fromJson(jsonDecode(readBackStr));
+            if (readBack.nodes.length == legacyMerged.length) {
+              verificationPassed = true;
+            }
+          } catch (e) {
+            debugPrint('Migration verification failed parsing: $e');
+          }
+        }
+
+        if (!verificationPassed) {
+          prefs.removeBookmarksV2();
+          debugPrint('MIGRATION READ-BACK FAILED. Legacy data untouched. Migration reverted.');
+        } else {
+          debugPrint('MIGRATION SUCCESS: Read-back verified ${nodes.length} bookmarks.');
+        }
+      });
+    }
+
+    return newData;
   }
 
   void toggle(String reference) {
-    if (state.contains(reference)) {
-      state = {...state}..remove(reference);
+    final currentNodes = Map<String, BookmarkNode>.from(state.nodes);
+
+    if (currentNodes.containsKey(reference)) {
+      currentNodes.remove(reference);
     } else {
-      state = {...state, reference};
+      currentNodes[reference] = BookmarkNode(
+        reference: reference,
+        createdAt: DateTime.now(),
+        folderId: null,
+      );
     }
-    ref.read(preferencesProvider).saveBookmarks(state.toList());
+
+    final newData = BookmarkData(folders: state.folders, nodes: currentNodes);
+    state = newData;
+    ref.read(preferencesProvider).saveBookmarksV2(jsonEncode(newData.toJson()));
+  }
+
+  void addFolder(String name) {
+    final id = 'folder_${DateTime.now().millisecondsSinceEpoch}';
+    final newFolder = BookmarkFolder(id: id, name: name);
+    final newFolders = List<BookmarkFolder>.from(state.folders)..add(newFolder);
+    final newData = BookmarkData(folders: newFolders, nodes: state.nodes);
+    state = newData;
+    ref.read(preferencesProvider).saveBookmarksV2(jsonEncode(newData.toJson()));
+  }
+
+  void renameFolder(String id, String newName) {
+    final newFolders = state.folders.map((f) {
+      if (f.id == id) {
+        return BookmarkFolder(id: f.id, name: newName);
+      }
+      return f;
+    }).toList();
+    final newData = BookmarkData(folders: newFolders, nodes: state.nodes);
+    state = newData;
+    ref.read(preferencesProvider).saveBookmarksV2(jsonEncode(newData.toJson()));
+  }
+
+  void deleteFolder(String id) {
+    // Remove the folder
+    final newFolders = state.folders.where((f) => f.id != id).toList();
+    
+    // Move all bookmarks in this folder to Unfiled (folderId = null)
+    final newNodes = Map<String, BookmarkNode>.from(state.nodes);
+    for (final entry in newNodes.entries) {
+      if (entry.value.folderId == id) {
+        newNodes[entry.key] = BookmarkNode(
+          reference: entry.value.reference,
+          createdAt: entry.value.createdAt,
+          folderId: null,
+        );
+      }
+    }
+    
+    final newData = BookmarkData(folders: newFolders, nodes: newNodes);
+    state = newData;
+    ref.read(preferencesProvider).saveBookmarksV2(jsonEncode(newData.toJson()));
+  }
+
+  void moveBookmark(String reference, String? newFolderId) {
+    final newNodes = Map<String, BookmarkNode>.from(state.nodes);
+    final existing = newNodes[reference];
+    if (existing != null) {
+      newNodes[reference] = BookmarkNode(
+        reference: existing.reference,
+        createdAt: existing.createdAt,
+        folderId: newFolderId,
+      );
+      final newData = BookmarkData(folders: state.folders, nodes: newNodes);
+      state = newData;
+      ref.read(preferencesProvider).saveBookmarksV2(jsonEncode(newData.toJson()));
+    }
+  }
+}
+
+final bookmarkDataProvider =
+    NotifierProvider<BookmarkDataNotifier, BookmarkData>(BookmarkDataNotifier.new);
+
+class BookmarksNotifier extends Notifier<Set<String>> {
+  @override
+  Set<String> build() {
+    final data = ref.watch(bookmarkDataProvider);
+    return data.nodes.keys.toSet();
+  }
+
+  void toggle(String reference) {
+    ref.read(bookmarkDataProvider.notifier).toggle(reference);
   }
 }
 
@@ -85,53 +224,26 @@ class HighlightsNotifier extends Notifier<Map<String, int>> {
       Future.microtask(() => prefs.saveHighlights(data));
     }
 
-    if (kHighlightDebug) {
-      debugPrint(
-          '[HIGHLIGHT_DEBUG] NOTIFIER init: loaded ${data.length} highlights');
-    }
     return data;
   }
 
   void toggleHighlight(String reference, int colorIndex) {
-    if (kHighlightDebug) {
-      debugPrint(
-          '[HIGHLIGHT_DEBUG] NOTIFIER toggleHighlight called: ref=$reference, color=$colorIndex');
-    }
     final current = Map<String, int>.from(state);
     if (current.containsKey(reference) && current[reference] == colorIndex) {
       current.remove(reference);
-      if (kHighlightDebug) {
-        debugPrint(
-            '[HIGHLIGHT_DEBUG] NOTIFIER removing highlight for $reference');
-      }
     } else {
       current[reference] = colorIndex;
-      if (kHighlightDebug) {
-        debugPrint(
-            '[HIGHLIGHT_DEBUG] NOTIFIER adding highlight for $reference -> $colorIndex');
-      }
     }
     state = current;
     ref.read(preferencesProvider).saveHighlights(current);
-    if (kHighlightDebug) {
-      debugPrint('[HIGHLIGHT_DEBUG] NOTIFIER map after write: $current');
-    }
   }
 
   void removeHighlight(String reference) {
-    if (kHighlightDebug) {
-      debugPrint(
-          '[HIGHLIGHT_DEBUG] NOTIFIER removeHighlight called: ref=$reference');
-    }
     final current = Map<String, int>.from(state);
     if (current.containsKey(reference)) {
       current.remove(reference);
       state = current;
       ref.read(preferencesProvider).saveHighlights(current);
-      if (kHighlightDebug) {
-        debugPrint(
-            '[HIGHLIGHT_DEBUG] NOTIFIER map after remove write: $current');
-      }
     }
   }
 }

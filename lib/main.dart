@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'firebase_options.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:io' as dart_io;
 
 import 'state/theme_provider.dart';
+import 'state/surface_style_provider.dart';
 import 'theme/app_theme.dart';
 import 'ui/screens/main_nav_screen.dart';
 
@@ -16,6 +20,7 @@ import 'package:flutter/foundation.dart';
 import 'ui/widgets/app_error_fallback.dart';
 
 import 'utils/startup_stopwatch.dart';
+import 'services/widget_update_service.dart';
 
 void main() async {
   // Global Flutter framework error handling
@@ -55,16 +60,14 @@ void main() async {
   };
 
   if (kStartupTrace) {
-    debugPrint('App start: ${startupStopwatch.elapsedMilliseconds} ms');
   }
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await GoogleSignIn.instance.initialize();
   if (kStartupTrace) {
-    debugPrint(
-        'FlutterBinding initialized: ${startupStopwatch.elapsedMilliseconds} ms');
   }
   final prefs = await SharedPreferences.getInstance();
   if (kStartupTrace) {
-    debugPrint('Prefs loaded: ${startupStopwatch.elapsedMilliseconds} ms');
   }
 
   runApp(
@@ -90,15 +93,16 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (kStartupTrace) {
-        debugPrint(
-            'First frame rendered: ${startupStopwatch.elapsedMilliseconds} ms');
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(widgetUpdateServiceProvider); // Initialize widget background sync
+    
     final themeMode = ref.watch(themeProvider);
+    final surfaceStyle = ref.watch(surfaceStyleProvider);
     final isBibleLoading = ref.watch(bibleProvider.select((s) => s.isLoading));
 
     ThemeData lightBase = themeMode == AppThemeMode.lilies
@@ -115,7 +119,9 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
                             ? AppTheme.scarletRedTheme(14.0)
                             : themeMode == AppThemeMode.sepia
                                 ? AppTheme.sepiaTheme(14.0)
-                                : AppTheme.lightTheme(14.0);
+                                : themeMode == AppThemeMode.automatic
+                                    ? AppTheme.freshTheme(14.0)
+                                    : AppTheme.lightTheme(14.0);
 
     ThemeData darkBase = themeMode == AppThemeMode.dawn
         ? AppTheme.dawnTheme(14.0)
@@ -123,17 +129,34 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
             ? AppTheme.duskTheme(14.0)
             : themeMode == AppThemeMode.fresh
                 ? AppTheme.freshTheme(14.0)
-                : AppTheme.darkTheme(14.0,
-                    isAmoled: themeMode == AppThemeMode.oled);
+                : themeMode == AppThemeMode.automatic
+                    ? AppTheme.duskTheme(14.0)
+                    : AppTheme.darkTheme(14.0,
+                        isAmoled: themeMode == AppThemeMode.oled);
 
     final prefsService = ref.watch(preferencesProvider);
+    final hasExplicitSurface = prefsService.prefs.containsKey('app_surface_style');
+    final applyPaperlikeToLight = surfaceStyle == SurfaceStyle.paperlike;
+    final applyPaperlikeToDark = surfaceStyle == SurfaceStyle.paperlike || 
+                                (themeMode == AppThemeMode.automatic && !hasExplicitSurface);
+
+    if (applyPaperlikeToLight) {
+      lightBase = lightBase.applyPaperlike();
+    }
+    
+    if (applyPaperlikeToDark) {
+      darkBase = themeMode == AppThemeMode.fresh
+          ? darkBase.applyFreshPaperlike()
+          : darkBase.applyPaperlike();
+    }
+
     final hasCompletedOnboarding = prefsService.hasCompletedOnboarding();
 
     return MaterialApp(
       title: 'The Blessed Bible',
       debugShowCheckedModeBanner: false,
-      themeAnimationDuration: const Duration(milliseconds: 300),
-      themeAnimationCurve: Curves.easeOut,
+      themeAnimationDuration: const Duration(milliseconds: 600),
+      themeAnimationCurve: Curves.easeInOut,
       themeMode: switch (themeMode) {
         AppThemeMode.automatic => ThemeMode.system,
         AppThemeMode.light => ThemeMode.light,

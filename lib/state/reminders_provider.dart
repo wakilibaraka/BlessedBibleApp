@@ -17,6 +17,10 @@ class RemindersState {
   final int customWeeklyHour;
   final int customWeeklyMinute;
 
+  final bool prayerEnabled;
+  final int prayerHour;
+  final int prayerMinute;
+
   RemindersState({
     required this.sabbathEnabled,
     this.sabbathLat,
@@ -29,6 +33,9 @@ class RemindersState {
     required this.customWeeklyDay,
     required this.customWeeklyHour,
     required this.customWeeklyMinute,
+    required this.prayerEnabled,
+    required this.prayerHour,
+    required this.prayerMinute,
   });
 
   RemindersState copyWith({
@@ -43,6 +50,9 @@ class RemindersState {
     int? customWeeklyDay,
     int? customWeeklyHour,
     int? customWeeklyMinute,
+    bool? prayerEnabled,
+    int? prayerHour,
+    int? prayerMinute,
   }) {
     return RemindersState(
       sabbathEnabled: sabbathEnabled ?? this.sabbathEnabled,
@@ -56,6 +66,9 @@ class RemindersState {
       customWeeklyDay: customWeeklyDay ?? this.customWeeklyDay,
       customWeeklyHour: customWeeklyHour ?? this.customWeeklyHour,
       customWeeklyMinute: customWeeklyMinute ?? this.customWeeklyMinute,
+      prayerEnabled: prayerEnabled ?? this.prayerEnabled,
+      prayerHour: prayerHour ?? this.prayerHour,
+      prayerMinute: prayerMinute ?? this.prayerMinute,
     );
   }
 }
@@ -80,6 +93,10 @@ class RemindersNotifier extends Notifier<RemindersState> {
       customWeeklyDay: prefs.getCustomWeeklyDay(),
       customWeeklyHour: prefs.getCustomWeeklyHour(),
       customWeeklyMinute: prefs.getCustomWeeklyMinute(),
+      // Use fallback defaults for prayer if missing in prefs
+      prayerEnabled: prefs.getPrayerReminderEnabled(),
+      prayerHour: prefs.getPrayerReminderHour(),
+      prayerMinute: prefs.getPrayerReminderMinute(),
     );
   }
 
@@ -158,6 +175,28 @@ class RemindersNotifier extends Notifier<RemindersState> {
           state.customWeeklyMinute);
     } else {
       ns.cancelWeeklyReminder();
+    }
+  }
+
+  void togglePrayer(bool value) {
+    state = state.copyWith(prayerEnabled: value);
+    ref.read(preferencesProvider).setPrayerReminderEnabled(value);
+    _syncPrayerSchedule();
+  }
+
+  void setPrayerTime(int hour, int minute) {
+    state = state.copyWith(prayerHour: hour, prayerMinute: minute);
+    ref.read(preferencesProvider).setPrayerReminderHour(hour);
+    ref.read(preferencesProvider).setPrayerReminderMinute(minute);
+    _syncPrayerSchedule();
+  }
+
+  void _syncPrayerSchedule() {
+    final ns = ref.read(notificationServiceProvider);
+    if (state.prayerEnabled) {
+      ns.schedulePrayerReminder(state.prayerHour, state.prayerMinute);
+    } else {
+      ns.cancelPrayerReminder();
     }
   }
 }

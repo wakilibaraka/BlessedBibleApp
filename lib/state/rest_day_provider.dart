@@ -52,12 +52,12 @@ int appWeekday(DateTime date) => (date.weekday % 7) + 1;
 // ---------------------------------------------------------------------------
 
 /// Holds the user's chosen rest day in the Sunday-first convention.
-/// Valid range: 1 (Sunday) … 7 (Saturday). Default: 7 (Saturday / Sabbath).
+/// Valid range: 1 (Sunday) … 7 (Saturday). Default: null (No rest day).
 class RestDayState {
-  /// The chosen rest day in the app's Sunday-first numbering (1=Sun … 7=Sat).
-  final int restDay;
+  /// The chosen rest day in the app's Sunday-first numbering (1=Sun … 7=Sat). Null if none.
+  final int? restDay;
 
-  const RestDayState({required this.restDay});
+  const RestDayState({this.restDay});
 }
 
 // ---------------------------------------------------------------------------
@@ -73,18 +73,20 @@ class RestDayNotifier extends Notifier<RestDayState> {
     return RestDayState(restDay: prefs.getReadingPlanRestDay());
   }
 
-  /// Returns the current rest day (1=Sunday … 7=Saturday, Sunday-first).
-  int get restDay => state.restDay;
+  /// Returns the current rest day (1=Sunday … 7=Saturday, Sunday-first), or null if none.
+  int? get restDay => state.restDay;
 
   /// Persists the chosen rest day.
   ///
-  /// [day] must be 1–7 (Sunday-first convention). Call only from callbacks
+  /// [day] must be 1–7 (Sunday-first convention) or null. Call only from callbacks
   /// (tap handlers, settings toggles) — never from build/initState.
   ///
   /// Step 2 will react to this change for streak-grace, notification
   /// suppression, and rest-day card copy.
-  void setRestDay(int day) {
-    assert(day >= 1 && day <= 7, 'restDay must be 1–7 (Sunday-first)');
+  void setRestDay(int? day) {
+    if (day != null) {
+      assert(day >= 1 && day <= 7, 'restDay must be 1–7 (Sunday-first)');
+    }
     ref.read(preferencesProvider).setReadingPlanRestDay(day);
     state = RestDayState(restDay: day);
   }

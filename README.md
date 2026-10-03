@@ -1,68 +1,52 @@
 # 📖 The Blessed Bible
 
-A premium, modern Bible & Historicist Commentary application for iOS and Android, crafted with Flutter. Built with a fluid **Liquid Glass** aesthetic inspired by modern iOS UI principles, featuring intelligent Spotlight-style search, custom typography controls, and verse-by-verse prophetic commentary.
+A clean, fast, offline-first KJV Bible study app built with Flutter — designed for distraction-free reading, multi-language study, and verse-by-verse historicist commentary.
 
----
+The Blessed Bible focuses on the reading experience: legible typography, a wide range of themes, side-by-side translations, and study tools that stay out of your way until you need them.
 
-## ✨ Key Features
+## ✨ Features
 
-### 💧 Liquid Glass UI & Design
-- **Frosted Glass Containers**: Dynamic translucency and backdrop blurring tailored for modern mobile interfaces.
-- **Theme-Adaptive Palettes**: Full support for **Light**, **Dark**, and **Sepia** reader modes with natural color mapping.
-- **Floating Glass Controls**: Floating search bar pill, breadcrumb navigation, and pill toggles for seamless ergonomics.
+### Reading
 
-### 🔍 Spotlight-Inspired Search Engine
-- **Fuzzy Search & Fast Indexing**: Instant queries across all 66 books of the Bible.
-- **Integrated Commentary Search**: Search through verse commentary, notes, and historical references simultaneously.
-- **Conjoined Filter Pills**: Easily isolate results between **Bible Verses** and **Historicist Commentary**.
-- **Recent Places**: Siri/Spotlight-inspired memory pills for quick access to your recent study locations.
+- **King James Version** with clean, native-feeling scrolling and swipe-to-change-chapter navigation.
+- **Multi-language translations** — read in your primary language with an optional secondary translation shown alongside, and quick per-verse translation chips.
+- **12+ themes** across light, dark, sepia, and OLED modes, with live recoloring.
+- **Custom typography** — multiple reading fonts (Lora, Literata, EB Garamond, Bitter, Source Sans 3, and more), adjustable size, and layout options.
 
-### 📚 Interactive Navigation & Reader
-- **Dynamic Breadcrumbs**: Smooth `[ Book ] [ Chapter ] [ Verse ]` breadcrumb header with auto-advancing 5-column selection grid.
-- **Testament Toggles**: Instant switching between Old Testament (39 books) and New Testament (27 books).
-- **Custom Reader Typography**: Adjustable font sizes, font families (Lora, Gentium Book Plus), line spacing, and margin padding.
+### Study
 
-### 📜 Verse Analysis & Historicist Commentary
-- **In-Depth Commentary Sheet**: Liquid glass modal bottom sheet displaying verse-by-verse historical and prophetic insights (e.g., Uriah Smith).
-- **Cross-References & Notes**: Quick actions to append personal study notes or share verses.
+- **Historicist commentary** — verse- and chapter-level insights for Genesis, Daniel, Hebrews, and Revelation, drawn from classic sources (Ellen G. White, Uriah Smith).
+- **Fast local search** across scripture, commentary, and your own notes, with filters and recent searches.
+- **Reading plans** — calendar-based daily reading with a dedicated plan reader.
 
----
+### Personal
 
-## 🛠️ Tech Stack & Architecture
+- **Bookmarks with folders** — organize saved verses into custom or preset collections, with smart auto-groups by date and book.
+- **Highlights & notes** — editable notes with quick verse insertion, all shown in your chosen translation.
+- **Today hub** — a daily verse, reading streak, and quick access to your study.
 
-- **Framework**: [Flutter](https://flutter.dev/) (Dart)
-- **State Management**: [Riverpod](https://riverpod.dev/) (`flutter_riverpod`)
-- **Typography & Styling**: `google_fonts` (Lora, Gentium Book Plus, Outfit), Custom Backdrop Filters
-- **Platform Support**: iOS & Android
+## 🛠️ Tech Stack
 
----
+- **Framework:** Flutter (Dart)
+- **State management:** Riverpod
+- **Storage:** Local SQLite (bundled Bible database) + SharedPreferences — fully offline, no account required.
+- **Platforms:** Android (iOS planned)
 
 ## 🚀 Getting Started
 
-### Prerequisites
-- [Flutter SDK](https://docs.flutter.dev/get-started/install) (3.x or higher)
-- Xcode / CocoaPods (for iOS) or Android Studio (for Android)
+```bash
+git clone https://github.com/Baraka254/BlessedBibleApp.git
+cd BlessedBibleApp
+flutter pub get
+flutter run
+```
 
-### Run Locally
+**Requirements:** Flutter SDK (stable), Android Studio (Android) or Xcode (iOS).
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/Baraka254/the_blessed_bible.git
-   cd the_blessed_bible
-   ```
+## 📌 Status
 
-2. **Install dependencies:**
-   ```bash
-   flutter pub get
-   ```
-
-3. **Launch Application:**
-   ```bash
-   flutter run
-   ```
-
----
+Early beta. Actively developed — expect ongoing changes.
 
 ## 🔒 License
 
-Private Repository. All rights reserved.
+Private repository. All rights reserved.

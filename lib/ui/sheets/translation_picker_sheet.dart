@@ -57,17 +57,14 @@ class _TranslationPickerSheetState
         ? ref.watch(secondaryTranslationProvider)
         : ref.watch(activeTranslationProvider);
 
+    final otherTranslationId = _isSelectingSecondary
+        ? ref.watch(activeTranslationProvider)
+        : ref.watch(secondaryTranslationProvider);
+
     final availableTranslations = ref.watch(availableTranslationsProvider);
 
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onVerticalDragEnd: (details) {
-        if (details.primaryVelocity != null && details.primaryVelocity! > 300) {
-          Navigator.of(context).pop();
-        }
-      },
-      child: FractionallySizedBox(
-          heightFactor: 0.75,
+    return FractionallySizedBox(
+        heightFactor: 0.75,
           child: TexturedGlassContainer(
           borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
           padding: EdgeInsets.only(
@@ -159,34 +156,24 @@ class _TranslationPickerSheetState
                 const SizedBox(height: 16),
               ],
               Expanded(
-                child: NotificationListener<ScrollUpdateNotification>(
-                  onNotification: (notification) {
-                    if (notification.metrics.pixels < -60) {
-                      Navigator.of(context).pop();
-                      return true;
-                    }
-                    return false;
-                  },
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    child: availableTranslations.when(
-                      data: (installed) => _buildTranslationList(
-                          context, ref, theme, activeTranslationId, installed),
-                      loading: () => const Center(
-                          child: Padding(
-                              padding: EdgeInsets.all(32),
-                              child: CircularProgressIndicator())),
-                      error: (e, st) =>
-                          Center(child: Text('Error loading translations: $e')),
-                    ),
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: availableTranslations.when(
+                    data: (installed) => _buildTranslationList(
+                        context, ref, theme, activeTranslationId, otherTranslationId, installed),
+                    loading: () => const Center(
+                        child: Padding(
+                            padding: EdgeInsets.all(32),
+                            child: CircularProgressIndicator())),
+                    error: (e, st) =>
+                        Center(child: Text('Error loading translations: $e')),
                   ),
                 ),
               ),
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 
   Widget _buildTabButton(
@@ -224,13 +211,17 @@ class _TranslationPickerSheetState
     WidgetRef ref,
     ThemeData theme,
     String? activeTranslationId,
+    String? otherTranslationId,
     List<TranslationInfo> installed,
   ) {
     // Combine installed and downloadable
     final allTranslations = <String,
         List<dynamic>>{}; // map of langName -> list of (TranslationInfo OR Map)
 
-    // First add installed
+    // 1. Beta Feature Flag: Set to true to re-enable downloadable translations
+    bool kEnableDownloads = false;
+
+    // First add installed (they are guaranteed local because they are in the DB)
     for (final t in installed) {
       final lang = t.languageName;
       allTranslations[lang] = allTranslations[lang] ?? [];
@@ -238,13 +229,16 @@ class _TranslationPickerSheetState
     }
 
     // Then add downloadable (if not installed)
-    final installedIds = installed.map((t) => t.translationId).toSet();
-    for (final t in TranslationDownloader.downloadableTranslations) {
-      final tid = t['db_id'] ?? t['id'];
-      if (!installedIds.contains(tid)) {
-        final lang = t['langName'] as String;
-        allTranslations[lang] = allTranslations[lang] ?? [];
-        allTranslations[lang]!.add(t);
+    // ignore: dead_code
+    if (kEnableDownloads) {
+      final installedIds = installed.map((t) => t.translationId).toSet();
+      for (final t in TranslationDownloader.downloadableTranslations) {
+        final tid = t['db_id'] ?? t['id'];
+        if (!installedIds.contains(tid)) {
+          final lang = t['langName'] as String;
+          allTranslations[lang] = allTranslations[lang] ?? [];
+          allTranslations[lang]!.add(t);
+        }
       }
     }
 
@@ -278,17 +272,20 @@ class _TranslationPickerSheetState
         if (item is TranslationInfo) {
           // Installed
           final isSelected = item.translationId == activeTranslationId;
+          final isOtherSelected = ref.read(readSettingsProvider).readingLayout != ReadingLayout.single && item.translationId == otherTranslationId;
           children.add(
             Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
-              child: Material(
-                color: isSelected
-                    ? theme.primaryColor.withValues(alpha: 0.1)
-                    : theme.colorScheme.surface,
+              child: Opacity(
+                opacity: isOtherSelected ? 0.4 : 1.0,
+                child: Material(
+                  color: isSelected
+                      ? theme.primaryColor.withValues(alpha: 0.1)
+                      : theme.colorScheme.surface,
                 borderRadius: BorderRadius.circular(16),
                 child: InkWell(
                   borderRadius: BorderRadius.circular(16),
-                  onTap: () {
+                  onTap: isOtherSelected ? null : () {
                     if (_isSelectingSecondary) {
                       ref
                           .read(secondaryTranslationProvider.notifier)
@@ -354,6 +351,7 @@ class _TranslationPickerSheetState
                           ),
                       ],
                     ),
+                  ),
                   ),
                 ),
               ),

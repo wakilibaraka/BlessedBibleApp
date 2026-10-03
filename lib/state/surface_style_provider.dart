@@ -2,26 +2,35 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'theme_provider.dart';
 
-enum EarthHeavenStyle { earth, heaven, threeD }
+enum EarthHeavenStyle { 
+  earth, 
+  heaven, 
+  paperlike, 
+  claymorphic, 
+}
 
-enum SurfaceStyle { flat, frosted, threeDimensional, depth3D }
+enum SurfaceStyle { 
+  flat, 
+  frosted, 
+  threeDimensional, 
+  paperlike, 
+  claymorphic, 
+  frutigerAero, 
+  skeuomorphic 
+}
 
-const Map<AppThemeMode, SurfaceStyle> _kEarthSurfaceMap = {
-  AppThemeMode.dawn: SurfaceStyle.flat,
-  AppThemeMode.fresh: SurfaceStyle.flat,
-};
-
-SurfaceStyle resolveEarthSurface(AppThemeMode theme) =>
-    _kEarthSurfaceMap[theme] ?? SurfaceStyle.frosted;
+// Earth is now uniformly flat for ALL 14 themes.
+// SurfaceStyle.frosted is currently unrouted, kept in codebase per request.
+SurfaceStyle resolveEarthSurface(AppThemeMode theme) => SurfaceStyle.flat;
 
 class EarthHeavenStyleNotifier extends Notifier<EarthHeavenStyle> {
   static const _surfaceStyleKey = 'app_surface_style';
-  static const _migrationKey = 'surface_migrated_v1';
+  static const _migrationKey = 'surface_migrated_v3';
 
   @override
   EarthHeavenStyle build() {
     _loadState();
-    return EarthHeavenStyle.heaven;
+    return EarthHeavenStyle.earth;
   }
 
   Future<void> _loadState() async {
@@ -30,9 +39,12 @@ class EarthHeavenStyleNotifier extends Notifier<EarthHeavenStyle> {
     final migrated = prefs.getBool(_migrationKey) ?? false;
     if (!migrated) {
       final savedIndex = prefs.getInt(_surfaceStyleKey);
-      if (savedIndex == 2) {
-        state = EarthHeavenStyle.heaven;
-      } else if (savedIndex == 0 || savedIndex == 1) {
+      if (savedIndex != null &&
+          savedIndex >= 0 &&
+          savedIndex < EarthHeavenStyle.values.length) {
+        state = EarthHeavenStyle.values[savedIndex];
+      } else {
+        // Fallback for previous Aero (4) or Physical (5) to Earth
         state = EarthHeavenStyle.earth;
       }
       await prefs.setBool(_migrationKey, true);
@@ -42,6 +54,8 @@ class EarthHeavenStyleNotifier extends Notifier<EarthHeavenStyle> {
           savedIndex >= 0 &&
           savedIndex < EarthHeavenStyle.values.length) {
         state = EarthHeavenStyle.values[savedIndex];
+      } else {
+        state = EarthHeavenStyle.earth;
       }
     }
   }
@@ -62,8 +76,19 @@ final surfaceStyleProvider = Provider<SurfaceStyle>((ref) {
   if (eh == EarthHeavenStyle.heaven) {
     return SurfaceStyle.threeDimensional;
   }
-  if (eh == EarthHeavenStyle.threeD) {
-    return SurfaceStyle.depth3D;
+  if (eh == EarthHeavenStyle.paperlike) {
+    final theme = ref.watch(themeProvider);
+    final resolved = theme.resolve();
+    if (resolved.isFirmamentTheme) {
+      return SurfaceStyle.skeuomorphic;
+    }
+    if (resolved.isSanctuaryTheme) {
+      return SurfaceStyle.frutigerAero;
+    }
+    return SurfaceStyle.paperlike;
+  }
+  if (eh == EarthHeavenStyle.claymorphic) {
+    return SurfaceStyle.claymorphic;
   }
   final theme = ref.watch(themeProvider);
   return resolveEarthSurface(theme);

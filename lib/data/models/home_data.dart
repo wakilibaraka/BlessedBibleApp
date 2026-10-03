@@ -1,3 +1,5 @@
+import 'package:uuid/uuid.dart';
+
 class HomeData {
   final VerseOfTheDay verseOfTheDay;
   final StudyProgress? activeStudy;
@@ -21,7 +23,18 @@ class VerseOfTheDay {
   final String reference;
   final String text;
   final String? commentarySnippet;
-  VerseOfTheDay(this.reference, this.text, {this.commentarySnippet});
+  final String? author;
+  final String? sourceTitle;
+  final bool isDevotional;
+
+  VerseOfTheDay(
+    this.reference,
+    this.text, {
+    this.commentarySnippet,
+    this.author,
+    this.sourceTitle,
+    this.isDevotional = false,
+  });
 }
 
 class StudyProgress {
@@ -32,14 +45,16 @@ class StudyProgress {
 }
 
 class PersonalNote {
+  final String id;
   final String title;
   final String content;
   final String date;
   final String? reference;
 
-  PersonalNote(this.title, this.content, this.date, {this.reference});
+  PersonalNote(this.id, this.title, this.content, this.date, {this.reference});
 
   Map<String, dynamic> toJson() => {
+        'id': id,
         'title': title,
         'content': content,
         'date': date,
@@ -47,6 +62,7 @@ class PersonalNote {
       };
 
   factory PersonalNote.fromJson(Map<String, dynamic> json) => PersonalNote(
+        json['id'] as String? ?? const Uuid().v4(),
         json['title'] as String,
         json['content'] as String,
         json['date'] as String,
@@ -54,22 +70,6 @@ class PersonalNote {
       );
 }
 
-class JournalEntry {
-  final String content;
-  final String date;
-
-  JournalEntry(this.content, this.date);
-
-  Map<String, dynamic> toJson() => {
-        'content': content,
-        'date': date,
-      };
-
-  factory JournalEntry.fromJson(Map<String, dynamic> json) => JournalEntry(
-        json['content'] as String,
-        json['date'] as String,
-      );
-}
 
 class MostReadVerse {
   final String reference;
