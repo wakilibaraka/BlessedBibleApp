@@ -47,56 +47,64 @@ class _AnimatedMeshGradientState extends State<AnimatedMeshGradient>
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(widget.borderRadius),
+      // The background layers are all Positioned.fill; the non-positioned
+      // child (last, painted on top) is what sizes the Stack. A Stack whose
+      // only non-positioned child has no size throws in unbounded (scrollable)
+      // layouts, so a null child falls back to a fixed-height box.
       child: Stack(
         children: [
-          Container(
-            color: theme.colorScheme.surface,
+          Positioned.fill(
+            child: Container(
+              color: theme.colorScheme.surface,
+            ),
           ),
-          AnimatedBuilder(
-            animation: _controller,
-            builder: (context, _) {
-              final val = _controller.value;
-              return Stack(
-                children: [
-                  Positioned(
-                    top: -100 + 50 * math.sin(val * 2 * math.pi),
-                    left: -50 + 50 * math.cos(val * 2 * math.pi),
-                    width: 300,
-                    height: 300,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: color1,
+          Positioned.fill(
+            child: AnimatedBuilder(
+              animation: _controller,
+              builder: (context, _) {
+                final val = _controller.value;
+                return Stack(
+                  children: [
+                    Positioned(
+                      top: -100 + 50 * math.sin(val * 2 * math.pi),
+                      left: -50 + 50 * math.cos(val * 2 * math.pi),
+                      width: 300,
+                      height: 300,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: color1,
+                        ),
                       ),
                     ),
-                  ),
-                  Positioned(
-                    bottom: -150 + 50 * math.cos(val * 2 * math.pi),
-                    right: -50 + 50 * math.sin(val * 2 * math.pi),
-                    width: 350,
-                    height: 350,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: color2,
+                    Positioned(
+                      bottom: -150 + 50 * math.cos(val * 2 * math.pi),
+                      right: -50 + 50 * math.sin(val * 2 * math.pi),
+                      width: 350,
+                      height: 350,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: color2,
+                        ),
                       ),
                     ),
-                  ),
-                  Positioned(
-                    top: 50 + 30 * math.sin(val * 2 * math.pi + math.pi),
-                    right: -100 + 60 * math.cos(val * 2 * math.pi),
-                    width: 250,
-                    height: 250,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: color3,
+                    Positioned(
+                      top: 50 + 30 * math.sin(val * 2 * math.pi + math.pi),
+                      right: -100 + 60 * math.cos(val * 2 * math.pi),
+                      width: 250,
+                      height: 250,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: color3,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              );
-            },
+                  ],
+                );
+              },
+            ),
           ),
           // Heavy blur to melt the colors together
           Positioned.fill(
@@ -108,7 +116,9 @@ class _AnimatedMeshGradientState extends State<AnimatedMeshGradient>
             ),
           ),
           if (widget.child != null)
-            Positioned.fill(child: widget.child!),
+            widget.child!
+          else
+            const SizedBox(width: double.infinity, height: 120),
         ],
       ),
     );

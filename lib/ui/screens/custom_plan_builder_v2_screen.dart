@@ -76,7 +76,15 @@ class _TrackDraftV2 {
 /// - clamp results rewrite the title honestly (`… in N days`);
 /// - overlapping tracks warn instead of silently double-counting.
 class CustomPlanBuilderV2Screen extends ConsumerStatefulWidget {
-  const CustomPlanBuilderV2Screen({super.key});
+  /// Optional preset: open the builder with a duration already set.
+  final int? initialDays;
+
+  /// Optional preset: pre-fill one track spanning the whole Bible
+  /// (used by the paced-generator shortcut).
+  final bool wholeBible;
+
+  const CustomPlanBuilderV2Screen(
+      {super.key, this.initialDays, this.wholeBible = false});
 
   @override
   ConsumerState<CustomPlanBuilderV2Screen> createState() =>
@@ -106,6 +114,10 @@ class _CustomPlanBuilderV2ScreenState
   @override
   void initState() {
     super.initState();
+    if (widget.initialDays != null) {
+      _days = widget.initialDays!.clamp(1, 730).toDouble();
+      _daysController.text = _days.toInt().toString();
+    }
     _initGenerator();
   }
 
@@ -124,11 +136,25 @@ class _CustomPlanBuilderV2ScreenState
           await rootBundle.loadString('assets/data/pericopes.json');
       final allPericopes = await compute(parsePericopesJson, pJson);
       if (!mounted) return;
+      final allBooks = ref.read(bibleProvider).books;
       setState(() {
         _generator =
             PlanGenerator(wordCountService: wcs, allPericopes: allPericopes);
         _isLoading = false;
-        _drafts.add(_TrackDraftV2());
+        if (widget.wholeBible && allBooks.length > 1) {
+          // Paced-generator shortcut: one track across the whole canon.
+          final first = allBooks.first;
+          final last = allBooks.last;
+          _drafts.add(_TrackDraftV2()
+            ..startBook = first
+            ..startChapter = 1
+            ..startVerse = 1
+            ..endBook = last
+            ..endChapter = last.chapters.last.number
+            ..endVerse = last.chapters.last.verses.length);
+        } else {
+          _drafts.add(_TrackDraftV2());
+        }
       });
       _schedulePreview();
     } catch (e) {

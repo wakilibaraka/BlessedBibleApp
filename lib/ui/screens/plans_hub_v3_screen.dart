@@ -65,6 +65,15 @@ class _PlansHubV3ScreenState extends ConsumerState<PlansHubV3Screen>
 
   Future<void> _startPlan(PlanMetadata meta) async {
     HapticFeedback.selectionClick();
+    // Start-wipe guard: an already-active plan must never go through
+    // startPlan (it resets completedReadings). Just open it.
+    final existing =
+        ref.read(readingPlanProvider(meta.id));
+    if (existing.isActive) {
+      _tabs.animateTo(1);
+      _openDetail(meta.id);
+      return;
+    }
     final added =
         ref.read(activePlanIdsProvider.notifier).addPlan(meta.id);
     if (!added) {
@@ -86,7 +95,7 @@ class _PlansHubV3ScreenState extends ConsumerState<PlansHubV3Screen>
           startDate: DateTime.now(),
         );
     if (!mounted) return;
-    _tabs.animateTo(0);
+    _tabs.animateTo(1);
     _openDetail(meta.id);
   }
 
@@ -132,20 +141,30 @@ class _PlansHubV3ScreenState extends ConsumerState<PlansHubV3Screen>
                     ref
                         .read(activePlanIdsProvider.notifier)
                         .removePlan(id);
+                    Navigator.of(ctx).pop();
                   } else {
+                    // Resume keeps progress; the detail screen's catch-up
+                    // card offers "Rebase to today" when behind.
                     final ok = ref
                         .read(activePlanIdsProvider.notifier)
                         .addPlan(id);
-                    if (!ok && context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('All 3 slots are in use.'),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
+                    Navigator.of(ctx).pop();
+                    if (!ok) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                                'All 3 slots are in use.'),
+                            behavior:
+                                SnackBarBehavior.floating,
+                          ),
+                        );
+                      }
+                    } else {
+                      _openDetail(id);
                     }
                   }
-                  Navigator.of(ctx).pop();
                 },
               ),
               ListTile(
@@ -283,8 +302,8 @@ class _PlansHubV3ScreenState extends ConsumerState<PlansHubV3Screen>
                       V2PillTabs(
                         controller: _tabs,
                         tabs: [
-                          'My Plans (${activeIds.length})',
                           'Library',
+                          'My Plans (${activeIds.length})',
                         ],
                       ),
                     ],
@@ -294,11 +313,6 @@ class _PlansHubV3ScreenState extends ConsumerState<PlansHubV3Screen>
                   child: TabBarView(
                     controller: _tabs,
                     children: [
-                      _MyPlansTab(
-                        onOpen: _openDetail,
-                        onManage: (id, title) =>
-                            _showManage(id, title, false),
-                      ),
                       _LibraryTab(
                         query: _query,
                         category: _category,
@@ -311,6 +325,11 @@ class _PlansHubV3ScreenState extends ConsumerState<PlansHubV3Screen>
                         onManage: (id, title) =>
                             _showManage(id, title, false),
                         atCapacity: activeIds.length >= 3,
+                      ),
+                      _MyPlansTab(
+                        onOpen: _openDetail,
+                        onManage: (id, title) =>
+                            _showManage(id, title, false),
                       ),
                     ],
                   ),
@@ -520,12 +539,61 @@ class _LibraryTab extends ConsumerWidget {
     required this.atCapacity,
   });
 
+  /// Paced-generator shortcut: whole Bible in N days. Opens the custom
+  /// builder pre-filled (whole-canon track + duration) so the user sees
+  /// the daily load preview before committing.
+  void _showPacedDialog(BuildContext context, WidgetRef ref) {
+    final controller = TextEditingController(text: '120');
+    showDialog(
+      context: context,
+      builder: (d) => AlertDialog(
+        title: const Text('Whole Bible in N days'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+                'Opens the builder with the whole canon pre-loaded. Check the daily-load preview, then save.'),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Days',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(d).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              final days =
+                  int.tryParse(controller.text)?.clamp(7, 730) ?? 120;
+              Navigator.of(d).pop();
+              Navigator.of(context).push(CupertinoPageRoute(
+                builder: (_) => CustomPlanBuilderV2Screen(
+                  initialDays: days,
+                  wholeBible: true,
+                ),
+              ));
+            },
+            child: const Text('Continue →'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final activeIds = ref.watch(activePlanIdsProvider);
     final hiddenIds = ref.watch(hiddenPlanIdsProvider);
-
     final visible = availablePlans.where((p) {
       if (hiddenIds.contains(p.id)) return false;
       if (category != 'All' && p.category != category) return false;
@@ -589,6 +657,15 @@ class _LibraryTab extends ConsumerWidget {
                 },
                 icon: const Icon(Icons.tune_rounded, size: 18),
                 label: const Text('Build custom plan'),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: () =>
+                    _showPacedDialog(context, ref),
+                icon: const Icon(Icons.timer_outlined, size: 18),
+                label: const Text('Paced Bible-in-N'),
               ),
             ),
           ],
@@ -663,7 +740,7 @@ class _LibraryTab extends ConsumerWidget {
                         const SizedBox(width: 8),
                         OutlinedButton(
                           onPressed: () => onOpen(meta.id),
-                          child: const Text('Preview'),
+                          child: const Text('Details'),
                         ),
                       ],
                     ],

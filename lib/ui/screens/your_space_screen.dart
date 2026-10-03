@@ -199,12 +199,12 @@ class _SegmentTab extends StatelessWidget {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.goldAccent.withValues(alpha: 0.15)
+              ? theme.primaryColor.withValues(alpha: 0.15)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isSelected
-                ? AppColors.goldAccent.withValues(alpha: 0.5)
+                ? theme.primaryColor.withValues(alpha: 0.5)
                 : Colors.transparent,
           ),
         ),
@@ -213,7 +213,7 @@ class _SegmentTab extends StatelessWidget {
           style: theme.textTheme.labelMedium?.copyWith(
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
             color: isSelected
-                ? AppColors.goldAccent
+                ? theme.primaryColor
                 : theme.colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),

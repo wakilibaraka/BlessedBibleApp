@@ -168,11 +168,18 @@ class PlanGenerator {
     }
   }
 
+  /// Pericope-aware chunks for [range] with EXACT coverage.
+  ///
+  /// Raw pericope entries overlap each other and leave gaps, so naively
+  /// emitting one chunk per intersecting pericope double-counts verses and
+  /// drops others (later plan days then falsely read as "fully completed"
+  /// during pace remaps). Instead: expand the range to verses, sweep them
+  /// into runs that break at pericope boundaries, and emit one chunk per
+  /// run. Union of chunks == range exactly once.
   List<_Chunk> _getPericopeChunks(PlanRange range) {
-    int startRef = _ref(range.startChapter, range.startVerse);
-    int endRef = _ref(range.endChapter, range.endVerse);
-
-    final bookPericopes = allPericopes.where((p) => p.book == range.book && p.isPlanBreak).toList();
+    final bookPericopes = allPericopes
+        .where((p) => p.book == range.book && p.isPlanBreak)
+        .toList();
     if (bookPericopes.isEmpty) {
       return [
         _Chunk(range.book, range.startChapter, range.startVerse,
@@ -182,31 +189,66 @@ class PlanGenerator {
       ];
     }
 
-    List<_Chunk> chunks = [];
-    for (final p in bookPericopes) {
-      int pStartRef = _ref(p.startChapter, p.startVerse);
-      int pEndRef = _ref(p.endChapter, p.endVerse);
-
-      if (startRef <= pEndRef && endRef >= pStartRef) {
-        // Clamp to range
-        bool startsBefore = pStartRef < startRef;
-        int cStartCh = startsBefore ? range.startChapter : p.startChapter;
-        int cStartV = startsBefore ? range.startVerse : p.startVerse;
-
-        bool endsAfter = pEndRef > endRef;
-        int cEndCh = endsAfter ? range.endChapter : p.endChapter;
-        int cEndV = endsAfter ? range.endVerse : p.endVerse;
-
-        int words = wordCountService.wordsInRange(
-            range.book, cStartCh, cStartV, cEndCh, cEndV);
-        
-        // It ends on a pericope boundary if we didn't clamp the end
-        bool endsOnPericope = !endsAfter;
-        bool endsOnChapter = cEndV == wordCountService.maxVerseInChapter(range.book, cEndCh);
-
-        chunks.add(_Chunk(range.book, cStartCh, cStartV, cEndCh, cEndV, words, endsOnPericope: endsOnPericope, endsOnChapter: endsOnChapter));
+    // Expand range to verses.
+    final chs = <int>[];
+    final vs = <int>[];
+    for (int ch = range.startChapter; ch <= range.endChapter; ch++) {
+      final sV = (ch == range.startChapter) ? range.startVerse : 1;
+      final maxV = wordCountService.maxVerseInChapter(range.book, ch);
+      if (maxV <= 0) continue;
+      final eV = (ch == range.endChapter) ? range.endVerse : maxV;
+      for (int v = sV; v <= eV; v++) {
+        chs.add(ch);
+        vs.add(v);
       }
     }
+    if (chs.isEmpty) return [];
+
+    // Cover key per verse: sorted ids of intersecting pericopes ('-' = gap).
+    String keyFor(int i) {
+      final r = _ref(chs[i], vs[i]);
+      final ids = <int>[];
+      for (var k = 0; k < bookPericopes.length; k++) {
+        final p = bookPericopes[k];
+        if (r >= _ref(p.startChapter, p.startVerse) &&
+            r <= _ref(p.endChapter, p.endVerse)) {
+          ids.add(k);
+        }
+      }
+      return ids.isEmpty ? '-' : ids.join(',');
+    }
+
+    bool pericopeEndsAt(int i) {
+      final r = _ref(chs[i], vs[i]);
+      for (final p in bookPericopes) {
+        if (r == _ref(p.endChapter, p.endVerse)) return true;
+      }
+      return false;
+    }
+
+    final chunks = <_Chunk>[];
+    var runStart = 0;
+    var runKey = keyFor(0);
+    void emitRun(int end) {
+      final words = wordCountService.wordsInRange(range.book, chs[runStart],
+          vs[runStart], chs[end], vs[end]);
+      chunks.add(_Chunk(
+        range.book, chs[runStart], vs[runStart], chs[end], vs[end], words,
+        endsOnPericope: pericopeEndsAt(end),
+        endsOnChapter:
+            vs[end] == wordCountService.maxVerseInChapter(range.book, chs[end]),
+      ));
+    }
+
+    for (var i = 1; i < chs.length; i++) {
+      final k = keyFor(i);
+      if (k != runKey) {
+        emitRun(i - 1);
+        runStart = i;
+        runKey = k;
+      }
+    }
+    emitRun(chs.length - 1);
     return chunks;
   }
 
@@ -246,6 +288,15 @@ class PlanGenerator {
     return [c];
   }
 
+  /// True when (ch2:v2) is exactly the verse after (ch1:v1).
+  bool _isNextVerse(String book, int ch1, int v1, int ch2, int v2) {
+    if (ch2 == ch1) return v2 == v1 + 1;
+    if (ch2 == ch1 + 1 && v2 == 1) {
+      return v1 == wordCountService.maxVerseInChapter(book, ch1);
+    }
+    return false;
+  }
+
   void _finalizeDay(PlanDay day, List<_Chunk> chunks) {
     if (chunks.isEmpty) return;
 
@@ -258,33 +309,58 @@ class PlanGenerator {
       final book = entry.key;
       final bookChunks = entry.value;
 
-      int startCh = bookChunks.first.startCh;
-      int startV = bookChunks.first.startV;
-      int endCh = bookChunks.last.endCh;
-      int endV = bookChunks.last.endV;
-      int totalWords = bookChunks.fold(0, (sum, c) => sum + c.words);
+      // Merge contiguous runs only. Merging first→last across a gap would
+      // silently double-count the gap (the root cause of remap tests
+      // seeing "fully completed" days that were never read).
+      var runStart = 0;
+      void emitRun(int runEnd) {
+        final first = bookChunks[runStart];
+        final last = bookChunks[runEnd];
+        int totalWords = 0;
+        for (var i = runStart; i <= runEnd; i++) {
+          totalWords += bookChunks[i].words;
+        }
+        _addPortion(day, book, first.startCh, first.startV, last.endCh,
+            last.endV, totalWords);
+      }
 
-      int startRef = _ref(startCh, startV);
-      int endRef = _ref(endCh, endV);
-
-      final titles = allPericopes.where((p) {
-        if (p.book != book || !p.isPlanBreak) return false;
-        int pStart = _ref(p.startChapter, p.startVerse);
-        int pEnd = _ref(p.endChapter, p.endVerse);
-        return startRef <= pEnd && endRef >= pStart;
-      }).map((p) => p.title).toSet().toList();
-
-      day.portions.add(PlanPortion(
-        book: book,
-        startChapter: startCh,
-        startVerse: startV,
-        endChapter: endCh,
-        endVerse: endV,
-        wordCount: totalWords,
-        pericopeTitles: titles,
-      ));
-      
-      day.totalWords += totalWords;
+      for (var i = 1; i < bookChunks.length; i++) {
+        final prev = bookChunks[i - 1];
+        final cur = bookChunks[i];
+        final contiguous = _isNextVerse(
+                book, prev.endCh, prev.endV, cur.startCh, cur.startV) ||
+            _ref(cur.startCh, cur.startV) <= _ref(prev.endCh, prev.endV);
+        if (!contiguous) {
+          emitRun(i - 1);
+          runStart = i;
+        }
+      }
+      emitRun(bookChunks.length - 1);
     }
+  }
+
+  void _addPortion(PlanDay day, String book, int startCh, int startV,
+      int endCh, int endV, int totalWords) {
+    int startRef = _ref(startCh, startV);
+    int endRef = _ref(endCh, endV);
+
+    final titles = allPericopes.where((p) {
+      if (p.book != book || !p.isPlanBreak) return false;
+      int pStart = _ref(p.startChapter, p.startVerse);
+      int pEnd = _ref(p.endChapter, p.endVerse);
+      return startRef <= pEnd && endRef >= pStart;
+    }).map((p) => p.title).toSet().toList();
+
+    day.portions.add(PlanPortion(
+      book: book,
+      startChapter: startCh,
+      startVerse: startV,
+      endChapter: endCh,
+      endVerse: endV,
+      wordCount: totalWords,
+      pericopeTitles: titles,
+    ));
+
+    day.totalWords += totalWords;
   }
 }

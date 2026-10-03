@@ -335,7 +335,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       if (mounted) {
         ref.read(streakProvider.notifier).markReadToday();
 
-        Future.delayed(const Duration(seconds: 2), () {
+        // Cancellable (not Future.delayed) so tests disposing the tree
+        // don't trip on a pending timer — and so it never fires post-dispose.
+        _hintTimer = Timer(const Duration(seconds: 2), () {
           if (!mounted) return;
           final prefs = ref.read(preferencesProvider);
           if (!prefs.showReadingTips) return;
@@ -364,6 +366,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
   @override
   void dispose() {
+    _hintTimer?.cancel();
     _scrollDebounceTimer?.cancel();
     _visitTimer?.cancel();
     _scrollEndTimer?.cancel();

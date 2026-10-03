@@ -233,11 +233,25 @@ class NotificationService {
     await cancelDailyReminder();
   }
 
-  Future<void> syncReadingPlanReminder(
-      bool enabled, int hour, int minute, int? restDay) async {
-    // Cancel all previously scheduled reading plan reminders (IDs 100-107)
+  /// Per-plan reading reminder.
+  ///
+  /// IDs are derived from [planId] so concurrent plans never overwrite each
+  /// other (the old shared 100-107 range meant only the last-synced plan
+  /// notified; those legacy IDs are cancelled once on every sync).
+  /// [restDay] uses the app convention (1=Sunday..7=Saturday) and is
+  /// converted to the plugin's Dart-weekday convention before scheduling —
+  /// comparing them directly skipped the wrong day.
+  Future<void> syncReadingPlanReminder(bool enabled, int hour, int minute,
+      int? restDay, {String? planId}) async {
+    // One-time cleanup of the legacy shared range.
     for (int i = 100; i <= 107; i++) {
       await _flutterLocalNotificationsPlugin.cancel(id: i);
+    }
+
+    // Stable per-plan base: daily uses base, weekly uses base+dartWeekday.
+    final base = 1000 + ((planId ?? 'default').hashCode.abs() % 20000);
+    for (int i = 0; i <= 7; i++) {
+      await _flutterLocalNotificationsPlugin.cancel(id: base + i);
     }
 
     if (!enabled) return;
@@ -245,7 +259,13 @@ class NotificationService {
 
     final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
 
-    if (restDay == null || restDay == -1) {
+    // App weekday (Sun=1..Sat=7) -> Dart weekday (Mon=1..Sun=7).
+    int? restDart;
+    if (restDay != null && restDay != -1) {
+      restDart = ((restDay + 5) % 7) + 1;
+    }
+
+    if (restDart == null) {
       // Schedule daily reminder
       tz.TZDateTime scheduledDate =
           tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
@@ -254,7 +274,7 @@ class NotificationService {
       }
 
       await _flutterLocalNotificationsPlugin.zonedSchedule(
-        id: 100,
+        id: base,
         title: 'Time to Read',
         body: 'Take a moment to read your daily passage.',
         scheduledDate: scheduledDate,
@@ -267,9 +287,9 @@ class NotificationService {
         matchDateTimeComponents: DateTimeComponents.time,
       );
     } else {
-      // Schedule weekly reminder for the 6 non-rest days
+      // Schedule weekly reminder for the 6 non-rest days (Dart weekdays).
       for (int i = 1; i <= 7; i++) {
-        if (i == restDay) continue;
+        if (i == restDart) continue;
         tz.TZDateTime scheduledDate =
             tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
         while (scheduledDate.weekday != i) {
@@ -280,7 +300,7 @@ class NotificationService {
         }
 
         await _flutterLocalNotificationsPlugin.zonedSchedule(
-          id: 100 + i,
+          id: base + i,
           title: 'Time to Read',
           body: 'Take a moment to read your daily passage.',
           scheduledDate: scheduledDate,

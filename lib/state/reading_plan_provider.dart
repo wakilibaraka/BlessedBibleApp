@@ -392,7 +392,9 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
       planId: planId ?? _planId,
       planStartedOn: startDate ?? DateTime.now(),
       paceMode: paceMode,
-      restDay: restDay,
+      // Normalize through the -1 sentinel so an explicit null rest day
+      // actually clears a previously stored one (see setRestDayOrNone).
+      restDay: restDay ?? -1,
       completedReadings: {},
       planData: customPlanData,
     );
@@ -402,7 +404,8 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
         next.reminderEnabled,
         next.reminderTimeHour,
         next.reminderTimeMinute,
-        next.restDay);
+        next.restDay,
+        planId: next.planId);
   }
 
   void markReadingComplete(int day) {
@@ -433,8 +436,15 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
         next.reminderEnabled,
         next.reminderTimeHour,
         next.reminderTimeMinute,
-        next.restDay);
+        next.restDay,
+        planId: next.planId);
   }
+
+  /// Null-safe rest-day setter. NOTE: `copyWith(restDay: null)` silently
+  /// keeps the old value (Dart can't distinguish "absent" from null), so
+  /// "no rest day" must be expressed as -1 (converted to null in copyWith).
+  /// Always use this helper instead of setRestDay(null).
+  void setRestDayOrNone(int? day) => setRestDay(day ?? -1);
 
 
   void setStartDate(DateTime startDate) {
@@ -465,7 +475,8 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
     _saveToPrefs(next);
     ref
         .read(notificationServiceProvider)
-        .syncReadingPlanReminder(enabled, hour, minute, next.restDay);
+        .syncReadingPlanReminder(enabled, hour, minute, next.restDay,
+            planId: next.planId);
   }
 
   void jumpToDay(int day) {}

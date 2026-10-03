@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
@@ -54,12 +53,9 @@ class StudyScreen extends ConsumerStatefulWidget {
 }
 
 class _StudyScreenState extends ConsumerState<StudyScreen> with SingleTickerProviderStateMixin {
-  int _currentAuthorIndex = 0;
-  final List<String> _commentaryAuthors = ['Uriah Smith'];
-  Timer? _timer;
   bool _isEditing = false;
   bool _hasFiredArmedHaptic = false;
-  
+
   late AnimationController _pulseController;
 
   @override
@@ -69,20 +65,10 @@ class _StudyScreenState extends ConsumerState<StudyScreen> with SingleTickerProv
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     )..repeat(reverse: true);
-    
-    _timer = Timer.periodic(const Duration(seconds: 4), (timer) {
-      if (mounted) {
-        setState(() {
-          _currentAuthorIndex =
-              (_currentAuthorIndex + 1) % _commentaryAuthors.length;
-        });
-      }
-    });
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
     _pulseController.dispose();
     super.dispose();
   }

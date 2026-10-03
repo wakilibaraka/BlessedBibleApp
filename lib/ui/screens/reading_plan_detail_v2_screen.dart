@@ -8,6 +8,7 @@ import '../../state/theme_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../widgets/shared_app_bar.dart';
 import '../widgets/study_v2_widgets.dart';
+import 'journey_map_screen.dart';
 import 'plans_hub_v2_screen.dart' show availablePlans;
 import 'study_reader_screen.dart';
 
@@ -265,6 +266,19 @@ class _ReadingPlanDetailV2ScreenState
                                   CrossAxisAlignment.start,
                               children: [
                                 Text(
+                                  'SCHEDULE',
+                                  style: theme
+                                      .textTheme.labelSmall
+                                      ?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 1.4,
+                                    fontSize: 10,
+                                    color: theme
+                                        .colorScheme.onSurface
+                                        .withValues(alpha: 0.55),
+                                  ),
+                                ),
+                                Text(
                                   total == 0
                                       ? 'No readings'
                                       : 'Day $current of $total',
@@ -276,13 +290,22 @@ class _ReadingPlanDetailV2ScreenState
                                 const SizedBox(height: 6),
                                 V2ProgressBar(
                                     fraction: plan.percentComplete),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '${(plan.percentComplete * 100).round()}% complete',
+                                  style: theme.textTheme.labelSmall
+                                      ?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    color: theme
+                                        .colorScheme.onSurface
+                                        .withValues(alpha: 0.6),
+                                  ),
+                                ),
                                 const SizedBox(height: 8),
                                 Wrap(
                                   spacing: 6,
                                   runSpacing: 6,
                                   children: [
-                                    V2Badge(
-                                        '${(plan.percentComplete * 100).round()}%'),
                                     V2MetaChip(plan.paceMode == 'flexible'
                                         ? 'Flexible'
                                         : 'Scheduled'),
@@ -446,6 +469,22 @@ class _ReadingPlanDetailV2ScreenState
                                     _visibleMonth.year,
                                     _visibleMonth.month - 1);
                               }),
+                            ),
+                            IconButton(
+                              visualDensity: VisualDensity.compact,
+                              icon:
+                                  const Icon(Icons.map_rounded),
+                              tooltip: 'Journey map view',
+                              onPressed: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        JourneyMapScreen(
+                                            planId:
+                                                widget.planId),
+                                  ),
+                                );
+                              },
                             ),
                             IconButton(
                               visualDensity: VisualDensity.compact,
@@ -962,7 +1001,7 @@ class _DayDetailCardState extends ConsumerState<_DayDetailCard> {
             const V2Eyebrow('Rest & reflect'),
             const SizedBox(height: 6),
             Text(
-              'A day of rest — no reading assigned. Rest days are neutral: they never break your streak.',
+              'A day of rest — no reading assigned. Rest days carry no reading.',
               style: theme.textTheme.bodyMedium,
             ),
           ],
