@@ -17,13 +17,22 @@ Map<String, List<PericopeEntry>> _parsePericopes(String jsonString) {
 }
 
 class PericopesNotifier extends Notifier<Map<String, List<PericopeEntry>>> {
+  /// Last load failure, if any. Pericopes are a non-blocking enhancement
+  /// (chapter headings); consumers degrade gracefully, but the failure is
+  /// recorded here instead of vanishing — see [retry].
+  String? loadError;
+
   @override
   Map<String, List<PericopeEntry>> build() {
     _loadData();
     return {};
   }
 
+  /// Reloads bundled (+ cached web) pericopes after a failure.
+  Future<void> retry() => _loadData();
+
   Future<void> _loadData() async {
+    loadError = null;
     try {
       final jsonString = await rootBundle.loadString('assets/data/pericopes.json');
       final data = await compute(_parsePericopes, jsonString);
@@ -44,6 +53,7 @@ class PericopesNotifier extends Notifier<Map<String, List<PericopeEntry>>> {
       state = data;
     } catch (e) {
       debugPrint('Failed to load pericopes: $e');
+      loadError = 'Could not load pericopes ($e).';
     }
   }
 

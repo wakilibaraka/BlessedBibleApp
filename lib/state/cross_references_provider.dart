@@ -52,7 +52,8 @@ final crossReferencesProvider =
               votes: r['votes'] as int? ?? 0,
             ))
         .toList();
-  } catch (_) {
-    return [];
+  } catch (e) {
+    // Never fail silently: the sheet renders an honest error + retry.
+    throw StateError('Could not load cross-references ($e).');
   }
 });

@@ -1,46 +1,55 @@
 import 'dart:convert';
+import '../data/bible_books.dart';
 import '../data/models/bible_model.dart';
 import '../models/commentary_entry.dart';
 import '../models/pericope_entry.dart';
 
-/// Top-level function to parse Bible JSON on a background isolate
-List<BibleBook> parseBibleJson(String jsonString) {
-  final Map<String, dynamic> jsonMap = jsonDecode(jsonString);
-  final List<dynamic> versesList = jsonMap['verses'];
+/// Builds the in-memory KJV backbone from database rows (offline-first).
+///
+/// Rows come from `verses WHERE translation_id = 'kjv'` as maps with
+/// `book_number`, `chapter`, `verse`, `text` ordered by book/chapter/verse.
+/// Book names come from [kBibleBookNames] (index + 1 == book_number). Same
+/// paragraph-marker stripping and abbreviation behavior as [parseBibleJson];
+/// replaces `assets/data/kjvbible.json` (deleted).
+List<BibleBook> parseBibleRows(List<Map<String, dynamic>> rows) {
+  final books = <BibleBook>[];
+  var currentBookNum = -1;
+  var currentChapterNum = -1;
+  BibleBook? book;
+  BibleChapter? chapter;
 
-  final Map<String, BibleBook> booksMap = {};
-
-  for (var v in versesList) {
-    final bookName = v['book_name'] as String;
-    final chapterNum = v['chapter'] as int;
-    final verseNum = v['verse'] as int;
-    String text = v['text'] as String;
+  for (final r in rows) {
+    final bookNum = (r['book_number'] as num).toInt();
+    final chapterNum = (r['chapter'] as num).toInt();
+    final verseNum = (r['verse'] as num).toInt();
+    String text = r['text'] as String;
 
     // Strip paragraph markers, preserve bracketed words
     text = text.replaceAll('¶ ', '').replaceAll('¶', '');
 
-    booksMap.putIfAbsent(
-        bookName,
-        () => BibleBook(
-              name: bookName,
-              abbreviation:
-                  bookName, // Fixed from substring(0, 3) to prevent collisions
-              chapters: [],
-            ));
-
-    final book = booksMap[bookName]!;
-
-    // Ensure chapter exists
-    while (book.chapters.length < chapterNum) {
-      book.chapters
-          .add(BibleChapter(number: book.chapters.length + 1, verses: []));
+    if (bookNum != currentBookNum) {
+      final name = (bookNum >= 1 && bookNum <= kBibleBookNames.length)
+          ? kBibleBookNames[bookNum - 1]
+          : 'Book $bookNum';
+      book = BibleBook(
+        name: name,
+        abbreviation:
+            name, // Fixed from substring(0, 3) to prevent collisions
+        chapters: [],
+      );
+      books.add(book);
+      currentBookNum = bookNum;
+      currentChapterNum = -1;
     }
-
-    final chapter = book.chapters[chapterNum - 1];
-    chapter.verses.add(BibleVerse(number: verseNum, text: text));
+    if (chapterNum != currentChapterNum) {
+      chapter = BibleChapter(number: chapterNum, verses: []);
+      book!.chapters.add(chapter);
+      currentChapterNum = chapterNum;
+    }
+    chapter!.verses.add(BibleVerse(number: verseNum, text: text));
   }
 
-  return booksMap.values.toList();
+  return books;
 }
 
 /// Top-level function to parse Commentary JSON on a background isolate

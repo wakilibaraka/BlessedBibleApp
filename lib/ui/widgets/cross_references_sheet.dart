@@ -141,7 +141,22 @@ class CrossReferencesSheet extends ConsumerWidget {
               ),
               error: (e, _) => Padding(
                 padding: const EdgeInsets.all(24),
-                child: Text('Error: $e'),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Could not load cross-references.\n$e',
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+                    TextButton.icon(
+                      onPressed: () => ref.invalidate(
+                          crossReferencesProvider(key)),
+                      icon: const Icon(Icons.refresh_rounded),
+                      label: const Text('Retry'),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

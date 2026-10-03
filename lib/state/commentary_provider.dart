@@ -63,8 +63,10 @@ class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
       
       return entries;
     } catch (e) {
-      // If the file is missing or empty, do not crash; return empty list
-      return [];
+      // Never fail silently: providers surface the error so screens render
+      // an honest error + retry instead of a permanently blank library.
+      debugPrint('commentaryProvider failed to load bundled commentary: $e');
+      throw StateError('Could not load commentary ($e).');
     }
   }
 

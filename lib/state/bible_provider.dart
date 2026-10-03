@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/models/bible_model.dart';
 import '../utils/isolate_parsers.dart';
@@ -39,20 +38,16 @@ class BibleNotifier extends Notifier<BibleState> {
 
   Future<void> _loadBible() async {
     try {
-      final jsonString =
-          await rootBundle.loadString('assets/data/kjvbible.json');
+      // KJV backbone loads from the offline database (never JSON, never
+      // network). The query below also drives DB install/verify/repair, so
+      // the splash screen stays active until content is fully ready.
+      final rows = await bibleDbService.getAllVerses('kjv');
       if (kStartupTrace) {
       }
 
-      final booksList = await compute(parseBibleJson, jsonString);
+      final booksList = await compute(parseBibleRows, rows);
       if (kStartupTrace) {
       }
-
-      // Await DB copy/initialization so the splash screen stays active until DB is fully ready
-      await bibleDbService.database;
-      if (kStartupTrace) {
-      }
-      
 
       state = state.copyWith(isLoading: false, books: booksList);
     } catch (e) {

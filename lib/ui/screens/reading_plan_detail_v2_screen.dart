@@ -130,6 +130,37 @@ class _ReadingPlanDetailV2ScreenState
       );
     }
 
+    final loadError = plan.error;
+    if (loadError != null) {
+      return V2PageShell(
+        appThemeMode: appThemeMode,
+        page: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: const SharedAppBar(title: Text('Plan')),
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    loadError,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  FilledButton.tonal(
+                    onPressed: () => ref.invalidate(
+                        readingPlanProvider(widget.planId)),
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     final total = plan.planData.length;
 
     // ── Not started: Begin card ───────────────────────────────

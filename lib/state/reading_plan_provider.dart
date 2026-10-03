@@ -84,6 +84,10 @@ class ReadingPlanState {
   final Set<int> completedReadings; // Set of day numbers
   final List<PlanDayData> planData;
 
+  /// Load failure (e.g. bundled plan asset missing). Null when healthy;
+  /// screens must render an honest error + retry instead of an empty plan.
+  final String? error;
+
   // Additional legacy state preserved so UI compiles during step 1
   final bool reminderEnabled;
   final int reminderTimeHour;
@@ -97,6 +101,7 @@ class ReadingPlanState {
     this.restDay,
     this.completedReadings = const {},
     this.planData = const [],
+    this.error,
     this.reminderEnabled = false,
     this.reminderTimeHour = 8,
     this.reminderTimeMinute = 0,
@@ -167,6 +172,8 @@ class ReadingPlanState {
     return missed;
   }
 
+  static const _keepError = Object();
+
   ReadingPlanState copyWith({
     bool? isLoading,
     String? planId,
@@ -175,6 +182,8 @@ class ReadingPlanState {
     int? restDay,
     Set<int>? completedReadings,
     List<PlanDayData>? planData,
+    // Sentinel so callers can explicitly clear with error: null.
+    Object? error = _keepError,
     bool? reminderEnabled,
     int? reminderTimeHour,
     int? reminderTimeMinute,
@@ -187,6 +196,8 @@ class ReadingPlanState {
       restDay: restDay == -1 ? null : (restDay ?? this.restDay),
       completedReadings: completedReadings ?? this.completedReadings,
       planData: planData ?? this.planData,
+      error:
+          identical(error, _keepError) ? this.error : error as String?,
       reminderEnabled: reminderEnabled ?? this.reminderEnabled,
       reminderTimeHour: reminderTimeHour ?? this.reminderTimeHour,
       reminderTimeMinute: reminderTimeMinute ?? this.reminderTimeMinute,
@@ -357,9 +368,14 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
         reminderEnabled: reminderEnabled,
         reminderTimeHour: reminderTimeHour,
         reminderTimeMinute: reminderTimeMinute,
+        error: null,
       );
     } catch (e) {
-      state = state.copyWith(isLoading: false);
+      // Never a silent empty plan: surface the failure for retry UI.
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Could not load this plan ($e).',
+      );
     }
   }
 

@@ -102,7 +102,22 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
             loading: () => const SliverFillRemaining(
                 child: Center(child: CircularProgressIndicator())),
             error: (e, st) => SliverFillRemaining(
-                child: Center(child: Text('Error loading data'))),
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('Could not load commentary.\n$e',
+                          textAlign: TextAlign.center),
+                      const SizedBox(height: 12),
+                      TextButton.icon(
+                        onPressed: () =>
+                            ref.invalidate(commentaryProvider),
+                        icon: const Icon(Icons.refresh_rounded),
+                        label: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                )),
             data: (entries) {
               // Filter data based on context and selected chips
               final filtered = entries.where((e) {

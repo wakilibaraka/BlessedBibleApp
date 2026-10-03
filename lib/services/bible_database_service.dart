@@ -532,6 +532,8 @@ class BibleDatabaseService {
       columns: ['book_number', 'chapter', 'verse', 'text'],
       where: 'translation_id = ?',
       whereArgs: [translationId],
+      // Canonical order: required by parseBibleRows (KJV backbone build).
+      orderBy: 'book_number ASC, chapter ASC, verse ASC',
     );
   }
 
