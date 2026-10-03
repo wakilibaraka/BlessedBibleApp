@@ -102,24 +102,6 @@
     }
   },
   "upload_packs": {
-    "bbe": {
-      "file": "bbe.db",
-      "bytes": 5382144,
-      "sizeMB": 5.13,
-      "sha256": "b022b832d381127df1ff52bc81de386d36b0f8fa23aea2b69a0ad6053d4cc541",
-      "id": "bbe",
-      "verses": 31102,
-      "meta": {
-        "translation_id": "bbe",
-        "language_code": "en",
-        "language_name": "English",
-        "translation_name": "Bible in Basic English",
-        "abbreviation": "BBE",
-        "license": "Public Domain",
-        "is_complete": 1,
-        "is_downloaded": 1
-      }
-    },
     "web": {
       "file": "web.db",
       "bytes": 5218304,
@@ -205,6 +187,24 @@
         "language_name": "Spanish",
         "translation_name": "Reina Valera 1909",
         "abbreviation": "RV1909",
+        "license": "Public Domain",
+        "is_complete": 1,
+        "is_downloaded": 1
+      }
+    },
+    "kjv_strongs": {
+      "file": "kjv_strongs.db",
+      "bytes": 8114176,
+      "sizeMB": 7.74,
+      "sha256": "1adece5cf1de520059216e1aaef8cd94ea268966570353e776546d8034425cfa",
+      "id": "kjv_strongs",
+      "verses": 31102,
+      "meta": {
+        "translation_id": "kjv_strongs",
+        "language_code": "en",
+        "language_name": "English",
+        "translation_name": "KJV with Strongs",
+        "abbreviation": "KJVS",
         "license": "Public Domain",
         "is_complete": 1,
         "is_downloaded": 1

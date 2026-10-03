@@ -29,8 +29,10 @@ class BibleDatabaseService {
   /// on-disk layout change. Any mismatch (upgrade, downgrade, test APK,
   /// corruption repair) converges by re-materializing from asset.
   ///
-  /// History: 1 = single-file layout (P0); 2 = core + translation packs.
-  static const int contentVersion = 2;
+  /// History: 1 = single-file layout (P0); 2 = core + translation packs
+  /// (KJV + KJV-Strong's backbone); 3 = BBE joins the backbone in core,
+  /// KJV-Strong's becomes a downloadable pack.
+  static const int contentVersion = 3;
   static const String _contentVersionKey = 'content_version';
   static const String _repairAttemptsKey = 'content_repair_attempts';
   static const int _maxRepairAttempts = 2;
@@ -106,9 +108,20 @@ class BibleDatabaseService {
 
     final dbFile = File(dbPath);
     if (!await dbFile.exists() || stored < contentVersion) {
-      if (stored == 1 && await dbFile.exists()) {
+      if (stored == 2 && await dbFile.exists()) {
+        // V2 -> V3 layout migration: KJV-Strong's leaves the core for a
+        // pack file, BBE joins the core backbone (from the user's pack
+        // file, or from the bundled core asset as fallback).
+        try {
+          await _migrateV2ToV3(dbPath, prefs);
+        } catch (e) {
+          stderr.writeln('DB v2->v3 migration failed, reinstalling: $e');
+          await _installFromAsset(dbPath, prefs, preservePacks: true);
+        }
+      } else if (stored == 1 && await dbFile.exists()) {
         // P2 layout migration: extract translations into pack files
         // in place (preserves bundled + downloaded translations).
+        // (With current backbone ids this lands directly on v3.)
         try {
           await _migrateToPacks(dbPath, prefs);
         } catch (e) {
@@ -230,6 +243,11 @@ class BibleDatabaseService {
         skipIds: await _packStore.deletedPackIds(),
         onProgress: (p) => _emitProgress(0.8 + 0.15 * p),
       );
+      // Backbone translations live in the core DB only: drop any stale
+      // pack files for them so there is never a duplicate copy.
+      for (final id in TranslationPackStore.coreIds) {
+        await _packStore.forgetPack(id);
+      }
     } catch (e) {
       stderr.writeln('DB install error: $e');
       if (!copyOk) {
@@ -327,13 +345,18 @@ class BibleDatabaseService {
       if (!tables.contains('verses') || !tables.contains('translations')) {
         return problems;
       }
-      try {
-        final kjv = await db.rawQuery(
-            "SELECT COUNT(*) AS c FROM verses WHERE translation_id = 'kjv'");
-        final count = (kjv.first['c'] as num?)?.toInt() ?? 0;
-        if (count == 0) problems.add('KJV backbone has no verses');
-      } catch (e) {
-        problems.add('KJV backbone unreadable: $e');
+      // Both backbone translations must be present and readable.
+      for (final entry in {'kjv': 'KJV', 'bbe': 'BBE'}.entries) {
+        try {
+          final rows = await db.rawQuery(
+              "SELECT COUNT(*) AS c FROM verses WHERE translation_id = '${entry.key}'");
+          final count = (rows.first['c'] as num?)?.toInt() ?? 0;
+          if (count == 0) {
+            problems.add('${entry.value} backbone has no verses');
+          }
+        } catch (e) {
+          problems.add('${entry.value} backbone unreadable: $e');
+        }
       }
     } catch (e) {
       problems.add('probe error: $e');
@@ -417,6 +440,133 @@ class BibleDatabaseService {
     await prefs.setInt(_contentVersionKey, contentVersion);
     await prefs.setInt('db_version', _legacyRequiredDbVersion);
     _emitProgress(1.0);
+  }
+
+  /// V2 -> V3 layout migration, run once per device:
+  /// 1. KJV-Strong's rows leave the core for a standalone pack file, so
+  ///    the translation becomes downloadable/deletable like the rest.
+  /// 2. BBE joins the core backbone: merged in from the user's BBE pack
+  ///    file when present, otherwise seeded from the bundled core asset
+  ///    (written to a temp file, attached, then removed).
+  /// Idempotent: every step checks current state first. Throws on failure
+  /// (caller falls back to a fresh install which salvages packs).
+  Future<void> _migrateV2ToV3(String dbPath, SharedPreferences prefs) async {
+    var changed = false;
+    Database? db;
+    try {
+      db = await _openGuarded(dbPath);
+
+      // Step 1: move KJV-Strong's out of the core into its pack file.
+      final packFile =
+          File(join(dirname(dbPath), 'packs', 'kjv_strongs.db'));
+      final coreIds = await db
+          .query('translations', columns: ['translation_id']);
+      final inCore = {
+        for (final r in coreIds) r['translation_id'] as String
+      };
+      if (inCore.contains('kjv_strongs') && !await packFile.exists()) {
+        await _packStore.extractFromDatabase(
+          db,
+          shouldExtract: (id) => id == 'kjv_strongs',
+        );
+        await db.execute(
+            "DELETE FROM verses WHERE translation_id = 'kjv_strongs'");
+        await db.execute(
+            "DELETE FROM translations WHERE translation_id = 'kjv_strongs'");
+        changed = true;
+      }
+
+      // Step 2: ensure BBE lives in the core.
+      if (!inCore.contains('bbe') ||
+          (await db.rawQuery(
+                  "SELECT COUNT(*) AS c FROM verses WHERE translation_id = 'bbe'"))
+                  .first['c'] ==
+              0) {
+        await _seedBbeIntoCore(db, dbPath);
+        changed = true;
+      }
+
+      if (changed) {
+        // One-time compaction after the row moves.
+        await db.execute('VACUUM');
+      }
+    } finally {
+      try {
+        await db?.close();
+      } catch (_) {}
+    }
+    // Re-verify before publishing the version stamp.
+    final check = await _openGuarded(dbPath);
+    try {
+      final problems = await _probeCore(check);
+      if (problems.isNotEmpty) {
+        throw StateError(
+            'Migrated database failed verification: ${problems.join('; ')}');
+      }
+    } finally {
+      try {
+        await check.close();
+      } catch (_) {}
+    }
+    await prefs.setInt(_contentVersionKey, contentVersion);
+    await prefs.setInt('db_version', _legacyRequiredDbVersion);
+    _emitProgress(1.0);
+  }
+
+  /// Copies BBE verses + catalog row into the core database: from the
+  /// user's installed BBE pack file when present, otherwise from the
+  /// bundled core asset (materialized to a temp file first, then removed).
+  Future<void> _seedBbeIntoCore(Database db, String dbPath) async {
+    final packFile = File(join(dirname(dbPath), 'packs', 'bbe.db'));
+    File? tmpAsset;
+    try {
+      String seedPath;
+      if (await packFile.exists()) {
+        seedPath = packFile.path;
+      } else {
+        final data = await rootBundle.load('assets/bible/$_dbName');
+        final bytes = data.buffer
+            .asUint8List(data.offsetInBytes, data.lengthInBytes);
+        tmpAsset = File(join(dirname(dbPath), 'bbe_seed.tmp.db'));
+        await tmpAsset.writeAsBytes(bytes, flush: true);
+        seedPath = tmpAsset.path;
+      }
+      final escaped = seedPath.replaceAll("'", "''");
+      await db.execute("ATTACH DATABASE '$escaped' AS bbeseed;");
+      try {
+        final cols = await db.rawQuery('PRAGMA table_info(translations)');
+        final names = {for (final c in cols) c['name'] as String};
+        final extra =
+            names.contains('is_downloaded') ? ', is_downloaded' : '';
+        // Idempotent: clear first so re-runs never duplicate verses.
+        await db.execute("DELETE FROM verses WHERE translation_id = 'bbe'");
+        await db.execute(
+            'INSERT INTO verses SELECT translation_id, language_code, '
+            'book_number, chapter, verse, text FROM bbeseed.verses '
+            "WHERE translation_id = 'bbe'");
+        await db.execute(
+            'INSERT OR REPLACE INTO translations (translation_id, '
+            'language_code, language_name, translation_name, abbreviation, '
+            'license, is_complete$extra) '
+            'SELECT translation_id, language_code, language_name, '
+            'translation_name, abbreviation, license, is_complete$extra '
+            'FROM bbeseed.translations '
+            "WHERE translation_id = 'bbe'");
+      } finally {
+        try {
+          await db.execute('DETACH DATABASE bbeseed;');
+        } catch (_) {}
+      }
+      // BBE now lives in the core: drop the redundant pack file (if any)
+      // so there is exactly one copy. Not recorded as user-deleted.
+      await _packStore.forgetPack('bbe');
+    } finally {
+      try {
+        if (tmpAsset != null && await tmpAsset.exists()) {
+          await tmpAsset.delete();
+        }
+      } catch (_) {}
+    }
   }
 
   /// True when the core database still holds legacy (non-backbone)

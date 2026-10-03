@@ -6,6 +6,7 @@ import '../../state/read_settings_provider.dart';
 import '../../data/models/translation_model.dart';
 import '../../services/bible_database_service.dart';
 import '../../services/translation_downloader.dart';
+import '../../services/translation_pack_store.dart';
 import '../widgets/animated_segmented_tile.dart';
 import '../widgets/textured_glass_container.dart';
 
@@ -207,7 +208,8 @@ class _TranslationPickerSheetState
     );
   }
 
-  /// Deletes an installed translation. KJV is the undeletable backbone.
+  /// Deletes an installed translation. Backbone translations (KJV + BBE)
+  /// live in the core database and cannot be deleted.
   /// Falls back to KJV first so Read never points at a missing translation.
   Future<void> _deleteTranslation(
     BuildContext context,
@@ -215,7 +217,7 @@ class _TranslationPickerSheetState
     TranslationInfo item,
   ) async {
     final id = item.translationId;
-    if (id == 'kjv') return;
+    if (TranslationPackStore.isCoreId(id)) return;
     if (ref.read(activeTranslationProvider) == id) {
       await ref.read(activeTranslationProvider.notifier).setTranslation('kjv');
     }
@@ -310,8 +312,11 @@ class _TranslationPickerSheetState
         // Installed
         final isSelected = item.translationId == activeTranslationId;
         final isOtherSelected = ref.read(readSettingsProvider).readingLayout != ReadingLayout.single && item.translationId == otherTranslationId;
-        // Only KJV is locked: everything else can be deleted to slim the app.
-        final isLocked = item.translationId == 'kjv';
+        // Backbone (KJV + BBE) lives in the core database and cannot be
+        // deleted; everything else can be removed to slim the app.
+        final isLocked =
+            TranslationPackStore.isCoreId(item.translationId);
+        final isKjv = item.translationId == 'kjv';
         children.add(
           Padding(
             padding: const EdgeInsets.only(bottom: 8.0),
@@ -364,7 +369,7 @@ class _TranslationPickerSheetState
                               ),
                             ),
                             Builder(builder: (_) {
-                              final subtitle = isLocked
+                              final subtitle = isKjv
                                   ? 'Always available · app backbone'
                                   : item.license;
                               if (subtitle.isEmpty) {
@@ -513,12 +518,23 @@ class _DownloadableTileState extends ConsumerState<_DownloadableTile> {
       }
     } catch (e) {
       if (mounted) {
+        // Offline (or otherwise unreachable network) gets a clean message
+        // instead of a raw socket exception.
+        final text = '$e';
+        final offline = text.contains('SocketException') ||
+            text.contains('Failed host lookup') ||
+            text.contains('Network is unreachable') ||
+            text.contains('Connection refused') ||
+            text.contains('Connection reset');
+        final message = offline
+            ? 'No internet connection — try again when online.'
+            : (_isRestore ? 'Restore failed ($e).' : 'Download failed ($e).');
         setState(() {
           _isDownloading = false;
           _error = _isRestore ? 'Restore failed' : 'Download failed';
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to add: $e')),
+          SnackBar(content: Text(message)),
         );
       }
     }

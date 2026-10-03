@@ -126,15 +126,15 @@ class TranslationDownloader {
     // content_packs/manifest.json for sha256). Upload once with:
     // gsutil cp content_packs/<id>.db gs://blessedbibleapp.firebasestorage.app/packs/
     ..._storagePack(
-      id: 'bbe',
+      id: 'kjv_strongs',
       lang: 'en',
       langName: 'English',
-      name: 'Bible in Basic English',
-      abbr: 'BBE',
+      name: "KJV with Strong's",
+      abbr: 'KJVS',
       license: 'Public Domain',
-      sizeMB: 5.1,
+      sizeMB: 7.7,
       sha256:
-          'b022b832d381127df1ff52bc81de386d36b0f8fa23aea2b69a0ad6053d4cc541',
+          '1adece5cf1de520059216e1aaef8cd94ea268966570353e776546d8034425cfa',
     ),
     ..._storagePack(
       id: 'web',

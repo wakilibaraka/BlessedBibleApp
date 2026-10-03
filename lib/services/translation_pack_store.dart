@@ -79,8 +79,9 @@ class PackMeta {
 /// - Pack files carry the same `verses`/`translations` table shapes as the
 ///   core database, so all verse queries work unchanged once routed.
 class TranslationPackStore {
-  /// Backbone translations: live in the core database, never deletable.
-  static const List<String> coreIds = ['kjv', 'kjv_strongs'];
+  /// Backbone translations: live in the core database, never deletable,
+  /// always on device (KJV + BBE). Everything else is a standalone pack.
+  static const List<String> coreIds = ['kjv', 'bbe'];
 
   /// Packs shipped inside the APK (restorable offline).
   static const List<String> bundledPackIds = [
@@ -295,6 +296,22 @@ class TranslationPackStore {
     } finally {
       await db.close();
     }
+  }
+
+  /// Removes all traces of a pack (open handle, file, catalog entry)
+  /// without backbone guards or delete bookkeeping. Used when a pack's
+  /// content moves into the core database (no duplicate copies).
+  Future<void> forgetPack(String id) async {
+    final handle = _open.remove(id);
+    try {
+      await handle?.close();
+    } catch (_) {}
+    final file = await _packFile(id);
+    try {
+      if (await file.exists()) await file.delete();
+    } catch (_) {}
+    final catalog = await readCatalog();
+    if (catalog.remove(id) != null) await _writeCatalog(catalog);
   }
 
   /// Deletes a non-backbone translation. Frees its storage immediately

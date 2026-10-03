@@ -9,6 +9,8 @@ import '../../state/typography_provider.dart';
 import '../../state/search_settings_provider.dart';
 import '../../state/study_design_provider.dart';
 import '../../state/plans_design_provider.dart';
+import '../../state/translation_provider.dart';
+import '../sheets/translation_picker_sheet.dart';
 import '../../state/read_settings_provider.dart';
 import '../../state/bbe_substitutions_provider.dart';
 import '../../services/backup_service.dart';
@@ -411,7 +413,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 readSettingsProvider.select((s) => s.showStrongsNumbers));
             final strongsStyle = ref.watch(
                 readSettingsProvider.select((s) => s.strongsIndicatorStyle));
-            
+            // Strong's numbers live in the downloadable "KJV with Strong's"
+            // pack — without it the toggle has nothing to display. Only
+            // claim "missing" once the list actually loads (no flash,
+            // no duplicate error surface).
+            final hasStrongsPack =
+                ref.watch(availableTranslationsProvider).when(
+                      data: (list) => list.any(
+                          (t) => t.translationId == 'kjv_strongs'),
+                      loading: () => true,
+                      error: (_, __) => true,
+                    );
+
             return Column(
               children: [
                 SwitchListTile(
@@ -426,6 +439,43 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                         .setShowStrongsNumbers(val);
                   },
                 ),
+                if (!hasStrongsPack)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            "Requires the “KJV with Strong's” pack "
+                            '(7.7 MB download).',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.6),
+                                ),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            HapticFeedback.selectionClick();
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              useRootNavigator: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (ctx) =>
+                                  const TranslationPickerSheet(),
+                            );
+                          },
+                          child: const Text('Get it'),
+                        ),
+                      ],
+                    ),
+                  ),
                 if (showStrongs)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),

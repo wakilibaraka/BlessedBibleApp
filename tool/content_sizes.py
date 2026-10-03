@@ -47,7 +47,7 @@ def main():
     rows = []  # (label, mb, note)
 
     core = ROOT / "assets" / "bible" / "bible.db"
-    rows.append(("Bible core DB (KJV + KJV-Strong's + xrefs + dictionary + Strong's lexicon)", mb(core), "bundled, never deletable"))
+    rows.append(("Bible core DB (KJV + BBE + xrefs + dictionary + Strong's lexicon)", mb(core), "bundled, never deletable"))
 
     packs_dir = ROOT / "assets" / "packs"
     if packs_dir.exists():

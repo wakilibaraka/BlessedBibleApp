@@ -32,18 +32,18 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-FULL_DB = ROOT / "assets" / "bible" / "bible.db"
-CORE_IDS = ("kjv", "kjv_strongs")
+# Legacy full 9-translation source DB (pre-split). It no longer lives in the
+# tree; to rebuild from scratch, materialize it from git history (LFS) and
+# pass --full-source <path>. Day-to-day verification uses --check-only.
+CORE_IDS = ("kjv", "bbe")
 BUNDLED_PACK_IDS = ("swh_ulb", "ita_dio", "fra_lsg", "ron_btf", "tgl_ulb")
-HOSTED_PACK_SOURCES = {
-    # pack_id: source db path (full source covers bbe/web)
-    "bbe": FULL_DB,
-    "web": FULL_DB,
-    "deu_l12": ROOT / "assets" / "bible" / "bible_deu_l12.db",
-    "nld_": ROOT / "assets" / "bible" / "bible_nld_.db",
-    "por_blj": ROOT / "assets" / "bible" / "bible_por_blj.db",
-    "spa_r09": ROOT / "assets" / "bible" / "bible_spa_r09.db",
-}
+# Upload packs rebuildable from a legacy full source DB.
+FULL_SOURCE_PACKS = ("web", "kjv_strongs")
+# Upload packs whose only durable source is their content_packs file itself
+# (original stray DBs were removed after extraction).
+SELF_SOURCED_PACKS = ("deu_l12", "nld_", "por_blj", "spa_r09")
+EXPECTED_UPLOAD_IDS = ("web", "kjv_strongs",
+                       "deu_l12", "nld_", "por_blj", "spa_r09")
 PACKS_DIR = ROOT / "assets" / "packs"
 UPLOAD_DIR = ROOT / "content_packs"
 
@@ -227,15 +227,32 @@ def check_only():
     try:
         tids = [r[0] for r in con.execute(
             "SELECT translation_id FROM translations ORDER BY 1")]
-        assert tids == ["kjv", "kjv_strongs"], f"core translations: {tids}"
+        assert tids == ["bbe", "kjv"], f"core translations: {tids}"
         assert count(con, "SELECT COUNT(*) FROM verses") == 62204, \
             "core verse count"
+        assert count(con, "SELECT COUNT(*) FROM verses WHERE"
+                          " translation_id='bbe'") == 31102
     finally:
         con.close()
     for tid in BUNDLED_PACK_IDS:
         p = PACKS_DIR / f"{tid}.db"
         assert p.exists(), f"missing pack {tid}"
         quick_check(p)
+    manifest_path = UPLOAD_DIR / "manifest.json"
+    assert manifest_path.exists(), "upload manifest missing"
+    manifest = json.loads(manifest_path.read_text())
+    assert sorted(manifest["upload_packs"].keys()) == sorted(
+        EXPECTED_UPLOAD_IDS), f"upload ids: {sorted(manifest['upload_packs'].keys())}"
+    for tid in EXPECTED_UPLOAD_IDS:
+        p = UPLOAD_DIR / f"{tid}.db"
+        assert p.exists(), f"missing upload pack {tid}"
+        quick_check(p)
+        c = sqlite3.connect(f"file:{p}?mode=ro", uri=True)
+        try:
+            n = count(c, "SELECT COUNT(*) FROM verses")
+        finally:
+            c.close()
+        assert n > 30000, f"{tid}: only {n} verses"
     print(f"core: {mb(core):.1f} MB")
     total = mb(core)
     for tid in BUNDLED_PACK_IDS:
@@ -250,50 +267,74 @@ def main():
     if "--check-only" in sys.argv:
         return check_only()
 
-    # Sanity on the source before touching anything.
-    src = sqlite3.connect(f"file:{FULL_DB}?mode=ro", uri=True)
+    args = sys.argv[1:]
+    if "--refresh-manifest" in args:
+        return refresh_upload_manifest()
+    full_source = None
+    for a in args:
+        if a.startswith("--full-source="):
+            full_source = Path(a.split("=", 1)[1])
+    if full_source is None:
+        print("usage:")
+        print("  python3 tool/build_content.py --check-only")
+        print("  python3 tool/build_content.py --refresh-manifest")
+        print("  python3 tool/build_content.py --full-source=/tmp/full.db")
+        print("      (rebuilds web + kjv_strongs upload packs from a legacy")
+        print("       9-translation source DB; materialize from git history)")
+        return 1
+
+    # Sanity on the legacy source before touching anything.
+    assert full_source.exists(), f"missing full source: {full_source}"
+    src = sqlite3.connect(f"file:{full_source}?mode=ro", uri=True)
     try:
         tids = sorted(r[0] for r in src.execute(
             "SELECT translation_id FROM translations"))
-        need = sorted([*CORE_IDS, *BUNDLED_PACK_IDS, "bbe", "web"])
-        assert tids == need, f"source translations: {tids}"
+        for need in ("web", "kjv_strongs"):
+            assert need in tids, f"full source lacks {need}: {tids}"
     finally:
         src.close()
 
-    PACKS_DIR.mkdir(parents=True, exist_ok=True)
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-    manifest = {"core": {}, "packs": {}, "upload_packs": {}}
+    manifest_path = UPLOAD_DIR / "manifest.json"
+    manifest = json.loads(manifest_path.read_text())
 
-    print("== bundled packs ==")
-    for tid in BUNDLED_PACK_IDS:
-        out = PACKS_DIR / f"{tid}.db"
-        info = build_pack(FULL_DB, tid, out, downloaded=False)
-        manifest["packs"][tid] = manifest_entry(out, info)
-        print(f"  {tid}: {info['verses']} verses, "
-              f"{mb(out):.2f} MB  sha256={manifest['packs'][tid]['sha256'][:12]}…")
-
-    print("== upload packs ==")
-    for tid, source in HOSTED_PACK_SOURCES.items():
-        assert source.exists(), f"missing source for {tid}: {source}"
+    print("== upload packs from full source ==")
+    for tid in FULL_SOURCE_PACKS:
         out = UPLOAD_DIR / f"{tid}.db"
-        info = build_pack(source, tid, out, downloaded=True)
+        info = build_pack(full_source, tid, out, downloaded=True)
         manifest["upload_packs"][tid] = manifest_entry(out, info)
         print(f"  {tid}: {info['verses']} verses, "
               f"{mb(out):.2f} MB  sha256={manifest['upload_packs'][tid]['sha256'][:12]}…")
 
-    print("== core ==")
-    build_core(FULL_DB, ROOT / "assets" / "bible" / "bible.db")
-    core = ROOT / "assets" / "bible" / "bible.db"
-    manifest["core"] = manifest_entry(core, {"translations": list(CORE_IDS)})
-
-    (UPLOAD_DIR / "manifest.json").write_text(
+    manifest_path.write_text(
         json.dumps(manifest, indent=2, ensure_ascii=False), encoding="utf-8")
+    print("BUILD OK — re-upload changed packs, then update the sha256 in")
+    print("TranslationDownloader._storagePack entries to match.")
 
-    total = mb(core) + sum(mb(PACKS_DIR / f"{t}.db") for t in BUNDLED_PACK_IDS)
-    print(f"core: {mb(core):.1f} MB; bundled packs total: "
-          f"{total - mb(core):.1f} MB; grand total: {total:.1f} MB")
-    print("BUILD OK — verify, then delete the replaced full-size asset only")
-    print("via P2 code review (row counts above are the acceptance check).")
+
+def refresh_upload_manifest():
+    """Recompute size/sha/counts for content_packs from the files on disk
+    (preserves stored translation metadata)."""
+    manifest_path = UPLOAD_DIR / "manifest.json"
+    manifest = json.loads(manifest_path.read_text())
+    for tid in EXPECTED_UPLOAD_IDS:
+        out = UPLOAD_DIR / f"{tid}.db"
+        assert out.exists(), f"missing upload pack {tid}"
+        quick_check(out)
+        con = sqlite3.connect(f"file:{out}?mode=ro", uri=True)
+        try:
+            n = count(con, "SELECT COUNT(*) FROM verses")
+        finally:
+            con.close()
+        assert n > 30000, f"{tid}: only {n} verses"
+        entry = manifest["upload_packs"].get(tid, {})
+        meta = entry.get("meta", {})
+        manifest["upload_packs"][tid] = manifest_entry(
+            out, {"id": tid, "verses": n, "meta": meta})
+        print(f"  {tid}: {n} verses, {mb(out):.2f} MB")
+    manifest_path.write_text(
+        json.dumps(manifest, indent=2, ensure_ascii=False), encoding="utf-8")
+    print("MANIFEST REFRESHED")
 
 
 if __name__ == "__main__":
