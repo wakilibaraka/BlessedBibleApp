@@ -1,6 +1,8 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import '../../state/theme_provider.dart';
 import '../../theme/reading_tokens.dart';
+import 'animated_background.dart';
 
 /// Shared presentation primitives for the redesigned (V2) Study screens.
 ///
@@ -11,6 +13,70 @@ import '../../theme/reading_tokens.dart';
 
 ReadingTokens _tokens(BuildContext context) =>
     Theme.of(context).extension<ReadingTokens>()!;
+
+/// Page shell for pushed V2 routes.
+///
+/// Tab screens (Home/Read/Study/Search) sit inside MainNavScreen's Stack,
+/// which already paints [AnimatedBackground] behind them. Pushed routes are
+/// opaque — nothing beneath them paints — so a transparent Scaffold would
+/// show the black window void (dark app-bar titles become invisible, dim
+/// labels unreadable). This shell repaints the exact same themed background
+/// behind the page. `tabIndex` stays null so the glow never wrongly
+/// deactivates with tab switches.
+class V2PageShell extends StatelessWidget {
+  final AppThemeMode appThemeMode;
+  final Widget page;
+  const V2PageShell(
+      {super.key, required this.appThemeMode, required this.page});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: AnimatedBackground(appThemeMode: appThemeMode),
+        ),
+        page,
+      ],
+    );
+  }
+}
+
+/// Inverted pill tab bar: surface container with a visible border, selected
+/// pill uses on-surface bg + surface text so it reads on light AND dark
+/// backgrounds. (onSurface-at-low-alpha containers vanish on black.)
+class V2PillTabs extends StatelessWidget {
+  final TabController controller;
+  final List<String> tabs;
+  const V2PillTabs(
+      {super.key, required this.controller, required this.tabs});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: theme.dividerColor),
+      ),
+      child: TabBar(
+        controller: controller,
+        dividerColor: Colors.transparent,
+        indicator: BoxDecoration(
+          color: theme.colorScheme.onSurface,
+          borderRadius: BorderRadius.circular(999),
+        ),
+        indicatorSize: TabBarIndicatorSize.tab,
+        labelColor: theme.colorScheme.surface,
+        labelStyle: const TextStyle(fontWeight: FontWeight.w800),
+        unselectedLabelColor:
+            theme.colorScheme.onSurface.withValues(alpha: 0.7),
+        tabs: [for (final t in tabs) Tab(text: t)],
+      ),
+    );
+  }
+}
 
 /// Small uppercase section eyebrow, e.g. "ACTIVE PLAN · M'CHEYNE 1-YEAR".
 class V2Eyebrow extends StatelessWidget {
@@ -45,7 +111,7 @@ class V2SectionLabel extends StatelessWidget {
         style: theme.textTheme.labelSmall?.copyWith(
           fontWeight: FontWeight.w800,
           letterSpacing: 1.5,
-          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.65),
         ),
       ),
     );

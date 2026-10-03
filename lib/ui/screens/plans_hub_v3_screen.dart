@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../state/reading_plan_provider.dart';
+import '../../state/theme_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../widgets/shared_app_bar.dart';
 import '../widgets/study_v2_widgets.dart';
@@ -228,8 +229,11 @@ class _PlansHubV3ScreenState extends ConsumerState<PlansHubV3Screen>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final activeIds = ref.watch(activePlanIdsProvider);
+    final appThemeMode = ref.watch(themeProvider);
 
-    return Scaffold(
+    return V2PageShell(
+      appThemeMode: appThemeMode,
+      page: Scaffold(
       backgroundColor: Colors.transparent,
       appBar: const SharedAppBar(title: Text('Reading Plans')),
       body: SafeArea(
@@ -276,29 +280,12 @@ class _PlansHubV3ScreenState extends ConsumerState<PlansHubV3Screen>
                         ),
                       ),
                       const SizedBox(height: 10),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.onSurface
-                              .withValues(alpha: 0.06),
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                        child: TabBar(
-                          controller: _tabs,
-                          dividerColor: Colors.transparent,
-                          indicator: BoxDecoration(
-                            color: theme.colorScheme.surface,
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                          indicatorSize: TabBarIndicatorSize.tab,
-                          labelColor:
-                              theme.colorScheme.onSurface,
-                          unselectedLabelColor: theme.colorScheme.onSurface
-                              .withValues(alpha: 0.55),
-                          tabs: [
-                            Tab(text: 'My Plans (${activeIds.length})'),
-                            const Tab(text: 'Library'),
-                          ],
-                        ),
+                      V2PillTabs(
+                        controller: _tabs,
+                        tabs: [
+                          'My Plans (${activeIds.length})',
+                          'Library',
+                        ],
                       ),
                     ],
                   ),
@@ -332,6 +319,7 @@ class _PlansHubV3ScreenState extends ConsumerState<PlansHubV3Screen>
             ),
           ),
         ),
+      ),
       ),
     );
   }

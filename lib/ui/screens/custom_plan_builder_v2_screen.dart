@@ -12,6 +12,7 @@ import '../../utils/isolate_parsers.dart';
 import '../../data/models/bible_model.dart';
 import '../../state/auth_provider.dart';
 import '../../state/bible_provider.dart';
+import '../../state/theme_provider.dart';
 import '../../state/reading_plan_provider.dart'
     show readingPlanProvider, activePlanIdsProvider, appWeekday;
 import '../../data/local_storage/preferences_service.dart';
@@ -370,9 +371,13 @@ class _CustomPlanBuilderV2ScreenState
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: const SharedAppBar(title: Text('Custom Plan Builder')),
+    final appThemeMode = ref.watch(themeProvider);
+    return V2PageShell(
+      appThemeMode: appThemeMode,
+      page: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar:
+            const SharedAppBar(title: Text('Custom Plan Builder')),
       body: SafeArea(
         bottom: false,
         child: _isLoading
@@ -715,6 +720,7 @@ class _CustomPlanBuilderV2ScreenState
                         ),
                     ],
                   ),
+      ),
       ),
     );
   }

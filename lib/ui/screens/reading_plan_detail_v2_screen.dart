@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../state/reading_plan_provider.dart'
     show readingPlanProvider, appWeekday;
+import '../../state/theme_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../widgets/shared_app_bar.dart';
 import '../widgets/study_v2_widgets.dart';
@@ -114,12 +115,17 @@ class _ReadingPlanDetailV2ScreenState
     final plan = ref.watch(readingPlanProvider(widget.planId));
     final notifier =
         ref.read(readingPlanProvider(widget.planId).notifier);
+    final appThemeMode = ref.watch(themeProvider);
 
     if (plan.isLoading) {
-      return Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: const SharedAppBar(title: Text('Plan')),
-        body: const Center(child: CircularProgressIndicator()),
+      return V2PageShell(
+        appThemeMode: appThemeMode,
+        page: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: const SharedAppBar(title: Text('Plan')),
+          body:
+              const Center(child: CircularProgressIndicator()),
+        ),
       );
     }
 
@@ -128,10 +134,12 @@ class _ReadingPlanDetailV2ScreenState
     // ── Not started: Begin card ───────────────────────────────
     if (plan.planStartedOn == null) {
       final start = _pendingStartDate ?? DateTime.now();
-      return Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: const SharedAppBar(title: Text('Plan')),
-        body: SafeArea(
+      return V2PageShell(
+        appThemeMode: appThemeMode,
+        page: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: const SharedAppBar(title: Text('Plan')),
+          body: SafeArea(
           child: ListView(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 60),
             children: [
@@ -208,6 +216,7 @@ class _ReadingPlanDetailV2ScreenState
             ],
           ),
         ),
+        ),
       );
     }
 
@@ -218,10 +227,12 @@ class _ReadingPlanDetailV2ScreenState
     final dateForSelected = dateMap[selected];
     final isRestSelected = dateForSelected == null && selected > 0;
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: SharedAppBar(
-        title: Text(_title()),
+    return V2PageShell(
+      appThemeMode: appThemeMode,
+      page: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: SharedAppBar(
+          title: Text(_title()),
         actions: [
           IconButton(
             icon: const Icon(Icons.more_horiz_rounded),
@@ -293,9 +304,11 @@ class _ReadingPlanDetailV2ScreenState
                       // Pace segmented control
                       Container(
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.onSurface
-                              .withValues(alpha: 0.06),
-                          borderRadius: BorderRadius.circular(999),
+                          color: theme.colorScheme.surface,
+                          borderRadius:
+                              BorderRadius.circular(999),
+                          border: Border.all(
+                              color: theme.dividerColor),
                         ),
                         child: Row(
                           children: ['scheduled', 'flexible'].map((m) {
@@ -311,7 +324,8 @@ class _ReadingPlanDetailV2ScreenState
                                       vertical: 10),
                                   decoration: BoxDecoration(
                                     color: on
-                                        ? theme.colorScheme.surface
+                                        ? theme
+                                            .colorScheme.onSurface
                                         : Colors.transparent,
                                     borderRadius:
                                         BorderRadius.circular(999),
@@ -325,9 +339,12 @@ class _ReadingPlanDetailV2ScreenState
                                         ?.copyWith(
                                       fontWeight: FontWeight.w800,
                                       color: on
-                                          ? theme.colorScheme.onSurface
-                                          : theme.colorScheme.onSurface
-                                              .withValues(alpha: 0.55),
+                                          ? theme
+                                              .colorScheme.surface
+                                          : theme
+                                              .colorScheme.onSurface
+                                              .withValues(
+                                                  alpha: 0.7),
                                     ),
                                   ),
                                 ),
@@ -601,6 +618,7 @@ class _ReadingPlanDetailV2ScreenState
           ),
         ),
       ),
+      ),
     );
   }
 
@@ -768,7 +786,7 @@ class _Dow extends StatelessWidget {
               color: Theme.of(context)
                   .colorScheme
                   .onSurface
-                  .withValues(alpha: 0.5),
+                  .withValues(alpha: 0.65),
             ),
       ),
     );
@@ -850,7 +868,7 @@ class _DayCell extends StatelessWidget {
                 ? theme.colorScheme.surface
                 : cell.isRest
                     ? theme.colorScheme.onSurface
-                        .withValues(alpha: 0.45)
+                        .withValues(alpha: 0.6)
                     : null,
           ),
         ),

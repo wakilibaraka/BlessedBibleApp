@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/dictionary_provider.dart';
 import '../../state/dictionary_search_provider.dart';
 import '../../state/notes_provider.dart';
+import '../../state/theme_provider.dart';
 import '../../state/user_data_provider.dart'
     show bookmarksProvider, highlightsProvider, highlightPaletteSwatches;
 import '../../theme/app_colors.dart';
@@ -61,68 +62,54 @@ class _StudyToolsV2ScreenState extends ConsumerState<StudyToolsV2Screen>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: const SharedAppBar(title: Text('Study Tools')),
-      body: SafeArea(
-        bottom: false,
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 800),
-            child: Column(
-              children: [
-                Padding(
-                  padding:
-                      const EdgeInsets.fromLTRB(20, 12, 20, 0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.onSurface
-                          .withValues(alpha: 0.06),
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    child: TabBar(
+    final appThemeMode = ref.watch(themeProvider);
+    return V2PageShell(
+      appThemeMode: appThemeMode,
+      page: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: const SharedAppBar(title: Text('Study Tools')),
+        body: SafeArea(
+          bottom: false,
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 800),
+              child: Column(
+                children: [
+                  Padding(
+                    padding:
+                        const EdgeInsets.fromLTRB(20, 12, 20, 0),
+                    child: V2PillTabs(
                       controller: _tabs,
-                      dividerColor: Colors.transparent,
-                      indicator: BoxDecoration(
-                        color: theme.colorScheme.surface,
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      indicatorSize: TabBarIndicatorSize.tab,
-                      labelColor: theme.colorScheme.onSurface,
-                      unselectedLabelColor: theme
-                          .colorScheme.onSurface
-                          .withValues(alpha: 0.55),
                       tabs: const [
-                        Tab(text: 'Dictionary'),
-                        Tab(text: 'Bookmarks'),
-                        Tab(text: 'Marks & Notes'),
+                        'Dictionary',
+                        'Bookmarks',
+                        'Marks & Notes',
                       ],
                     ),
                   ),
-                ),
-                Expanded(
-                  child: TabBarView(
-                    controller: _tabs,
-                    children: [
-                      _DictionaryTab(
-                        query: _query,
-                        source: _source,
-                        savedOnly: _savedOnly,
-                        onQuery: (v) =>
-                            setState(() => _query = v),
-                        onSource: (v) =>
-                            setState(() => _source = v),
-                        onSavedOnly: (v) =>
-                            setState(() => _savedOnly = v),
-                        onOpen: _openEntry,
-                      ),
-                      const _BookmarksTab(),
-                      const _MarksNotesTab(),
-                    ],
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tabs,
+                      children: [
+                        _DictionaryTab(
+                          query: _query,
+                          source: _source,
+                          savedOnly: _savedOnly,
+                          onQuery: (v) =>
+                              setState(() => _query = v),
+                          onSource: (v) =>
+                              setState(() => _source = v),
+                          onSavedOnly: (v) =>
+                              setState(() => _savedOnly = v),
+                          onOpen: _openEntry,
+                        ),
+                        const _BookmarksTab(),
+                        const _MarksNotesTab(),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -238,7 +225,7 @@ class _DictionaryTab extends ConsumerWidget {
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface
-                        .withValues(alpha: 0.6),
+                        .withValues(alpha: 0.75),
                   ),
                 ),
               );
@@ -371,7 +358,7 @@ class _BookmarksTab extends ConsumerWidget {
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurface
-                  .withValues(alpha: 0.6),
+                  .withValues(alpha: 0.75),
             ),
           ),
         ],
@@ -440,7 +427,7 @@ class _MarksNotesTab extends ConsumerWidget {
               'No highlights yet. Long-press a verse in Read to highlight it.',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurface
-                    .withValues(alpha: 0.6),
+                    .withValues(alpha: 0.75),
               ),
             ),
           )
@@ -492,7 +479,7 @@ class _MarksNotesTab extends ConsumerWidget {
               'No notes yet. Notes you write in Read appear here.',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurface
-                    .withValues(alpha: 0.6),
+                    .withValues(alpha: 0.75),
               ),
             ),
           )

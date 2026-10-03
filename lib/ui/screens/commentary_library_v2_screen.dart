@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/commentary_entry.dart';
 import '../../models/study_content_category.dart';
 import '../../state/commentary_provider.dart';
+import '../../state/theme_provider.dart';
 import '../widgets/shared_app_bar.dart';
 import '../widgets/study_v2_widgets.dart';
 
@@ -114,10 +115,14 @@ class _CommentaryLibraryV2ScreenState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final asyncEntries = ref.watch(commentaryProvider);
+    final appThemeMode = ref.watch(themeProvider);
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: const SharedAppBar(title: Text('Commentary Library')),
+    return V2PageShell(
+      appThemeMode: appThemeMode,
+      page: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar:
+            const SharedAppBar(title: Text('Commentary Library')),
       body: SafeArea(
         bottom: false,
         child: Center(
@@ -310,6 +315,7 @@ class _CommentaryLibraryV2ScreenState
           ),
         ),
       ),
+      ),
     );
   }
 }
@@ -348,11 +354,14 @@ class _CommentaryHubV2ScreenState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final asyncEntries = ref.watch(commentaryProvider);
+    final appThemeMode = ref.watch(themeProvider);
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: SharedAppBar(
-          title: Text('${widget.book} ${widget.chapter}')),
+    return V2PageShell(
+      appThemeMode: appThemeMode,
+      page: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: SharedAppBar(
+            title: Text('${widget.book} ${widget.chapter}')),
       body: SafeArea(
         bottom: false,
         child: Center(
@@ -515,7 +524,7 @@ class _CommentaryHubV2ScreenState
                                   ?.copyWith(
                                 color: theme
                                     .colorScheme.onSurface
-                                    .withValues(alpha: 0.6),
+                                    .withValues(alpha: 0.7),
                               ),
                             ),
                           ),
@@ -535,6 +544,7 @@ class _CommentaryHubV2ScreenState
             ),
           ),
         ),
+      ),
       ),
     );
   }
