@@ -104,9 +104,8 @@ class AppleNotesController extends TextEditingController {
 
 class NoteEditorScreen extends ConsumerStatefulWidget {
   final PersonalNote? initialNote;
-  final int? noteIndex;
 
-  const NoteEditorScreen({super.key, this.initialNote, this.noteIndex});
+  const NoteEditorScreen({super.key, this.initialNote});
 
   @override
   ConsumerState<NoteEditorScreen> createState() => _NoteEditorScreenState();
@@ -156,9 +155,9 @@ class _NoteEditorScreenState extends ConsumerState<NoteEditorScreen> {
 
   void _saveNote() {
     final text = _controller.text.trim();
-    if (text.isEmpty && widget.noteIndex == null) return;
-    if (text.isEmpty && widget.noteIndex != null) {
-       ref.read(notesProvider.notifier).remove(widget.noteIndex!);
+    if (text.isEmpty && widget.initialNote?.id == null) return;
+    if (text.isEmpty && widget.initialNote?.id != null) {
+       ref.read(notesProvider.notifier).remove(widget.initialNote!.id);
        return;
     }
 
@@ -166,10 +165,10 @@ class _NoteEditorScreenState extends ConsumerState<NoteEditorScreen> {
     final title = lines.isNotEmpty ? lines.first.trim() : '';
     final content = lines.length > 1 ? lines.skip(1).join('\n').trim() : '';
 
-    final note = PersonalNote(title, content, _dateStamp, reference: widget.initialNote?.reference);
+    final note = PersonalNote(widget.initialNote?.id ?? DateTime.now().millisecondsSinceEpoch.toString(), title, content, _dateStamp, reference: widget.initialNote?.reference);
 
-    if (widget.noteIndex != null) {
-      ref.read(notesProvider.notifier).update(widget.noteIndex!, note);
+    if (widget.initialNote?.id != null) {
+      ref.read(notesProvider.notifier).update(widget.initialNote!.id, note);
     } else {
       ref.read(notesProvider.notifier).add(note);
     }

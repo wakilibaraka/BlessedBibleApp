@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:the_blessed_bible/data/models/bible_model.dart';
 import 'package:the_blessed_bible/models/commentary_entry.dart';
+import 'package:the_blessed_bible/models/study_content_category.dart';
 import 'package:the_blessed_bible/data/models/home_data.dart';
 import 'package:the_blessed_bible/state/search_engine.dart';
 
@@ -34,13 +35,14 @@ void main() {
       )
     ];
 
-    final commentary = [
+    final commentary = <CommentaryEntry>[
       CommentaryEntry(
         id: 'uriah',
         author: 'Uriah Smith',
         source: 'Daniel and the Revelation',
         scope: CommentaryScope(type: 'verse', book: 'Daniel', chapter: 1, verse: 1),
         text: 'This is a test commentary by Uriah.',
+        category: StudyContentCategory.commentary,
       ),
       CommentaryEntry(
         id: 'egw',
@@ -48,6 +50,7 @@ void main() {
         source: 'Unknown',
         scope: CommentaryScope(type: 'verse', book: 'Daniel', chapter: 1, verse: 1),
         text: 'This should also be indexed.',
+        category: StudyContentCategory.commentary,
       ),
       CommentaryEntry(
         id: 'new',
@@ -55,6 +58,7 @@ void main() {
         source: 'Simulated',
         scope: CommentaryScope(type: 'verse', book: 'Daniel', chapter: 1, verse: 1),
         text: 'Simulated new commentary entry.',
+        category: StudyContentCategory.commentary,
       ),
     ];
 

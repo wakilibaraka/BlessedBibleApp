@@ -78,7 +78,7 @@ Widget _buildBookmarkCard(BuildContext context, WidgetRef ref, String refStr,
         borderRadius: BorderRadius.circular(16),
         onTap: () {
           // Open editor for this bookmark!
-          final initialNote = PersonalNote('', '', '', reference: refStr);
+          final initialNote = PersonalNote('', '', '', '', reference: refStr);
           Navigator.of(context).push(CupertinoPageRoute(
             builder: (_) => NoteEditorScreen(
               initialNote: initialNote,
