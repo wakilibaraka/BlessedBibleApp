@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../state/reading_plan_provider.dart'
-    show readingPlanProvider, appWeekday;
+    show readingPlanProvider, appWeekday, ReadingPlanState;
 import '../../state/theme_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../widgets/shared_app_bar.dart';
@@ -69,20 +69,33 @@ class _ReadingPlanDetailV2ScreenState
 
   /// Maps reading-day number -> calendar date, skipping the rest weekday.
   Map<int, DateTime> _dateMap(
-      DateTime start, int? restDay, int total) {
+      DateTime start, bool Function(int appWeekday) isRest, int total) {
     final map = <int, DateTime>{};
     var date = DateTime(start.year, start.month, start.day);
     var day = 1;
     var guard = 0;
     while (day <= total && guard < total + 370) {
       guard++;
-      if (restDay == null || appWeekday(date) != restDay) {
+      if (!isRest(appWeekday(date))) {
         map[day] = date;
         day++;
       }
       date = date.add(const Duration(days: 1));
     }
     return map;
+  }
+
+  /// "Rest Sun, Wed" for a set, "Rest Sun" for the legacy single day,
+  /// '' when there are no rest days.
+  String _restChipLabel(Set<int> days, int? single) {
+    if (days.isNotEmpty) {
+      // Order Monday-first for stable display.
+      final ordered = days.toList()
+        ..sort((a, b) => ((a + 6) % 7).compareTo((b + 6) % 7));
+      return 'Rest ${ordered.map(_weekdayName).join(', ')}';
+    }
+    if (single == null) return '';
+    return 'Rest ${_weekdayName(single)}';
   }
 
   DateTime? _restDateForSelected(
@@ -271,7 +284,8 @@ class _ReadingPlanDetailV2ScreenState
     final current = plan.todayReadingDay ?? total;
     final behind = plan.missedDays.length;
     final selected = _selectedDay ?? current;
-    final dateMap = _dateMap(plan.planStartedOn!, plan.restDay, total);
+    final dateMap =
+        _dateMap(plan.planStartedOn!, plan.isRestWeekday, total);
     final dateForSelected = dateMap[selected];
     final isRestSelected = dateForSelected == null && selected > 0;
 
@@ -356,9 +370,11 @@ class _ReadingPlanDetailV2ScreenState
                                     V2MetaChip(plan.paceMode == 'flexible'
                                         ? 'Flexible'
                                         : 'Scheduled'),
-                                    if (plan.restDay != null)
-                                      V2MetaChip(
-                                          'Rest ${_weekdayName(plan.restDay!)}'),
+                                    if (plan.restDay != null ||
+                                        plan.restDays.isNotEmpty)
+                                      V2MetaChip(_restChipLabel(
+                                          plan.restDays,
+                                          plan.restDay)),
                                     if (behind > 0)
                                       V2MetaChip('⚠ $behind behind')
                                     else
@@ -744,6 +760,72 @@ class _ReadingPlanDetailV2ScreenState
     return (appDay >= 1 && appDay <= 7) ? names[appDay] : '';
   }
 
+  /// 'None' or 'Sun, Wed' for the settings row.
+  String _restSummary(ReadingPlanState plan) {
+    if (plan.restDays.isNotEmpty) {
+      final ordered = plan.restDays.toList()
+        ..sort((a, b) => ((a + 6) % 7).compareTo((b + 6) % 7));
+      return ordered.map(_weekdayName).join(', ');
+    }
+    return plan.restDay == null ? 'None' : _weekdayName(plan.restDay!);
+  }
+
+  /// Multi-select rest weekdays (app convention 1=Sun..7=Sat).
+  /// Returns null when cancelled.
+  Future<Set<int>?> _pickRestDays(
+      BuildContext context, ReadingPlanState plan) async {
+    final Set<int> selected = Set<int>.from(plan.restDays.isNotEmpty
+        ? plan.restDays
+        : {if (plan.restDay != null) plan.restDay!});
+    return showDialog<Set<int>>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text('Rest days'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (var d = 1; d <= 7; d++)
+                  StatefulBuilder(builder: (ctx, setRowState) {
+                    return CheckboxListTile(
+                      dense: true,
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(_weekdayName(d)),
+                      value: selected.contains(d),
+                      onChanged: (v) {
+                        setRowState(() {
+                          if (v == true) {
+                            selected.add(d);
+                          } else {
+                            selected.remove(d);
+                          }
+                        });
+                      },
+                    );
+                  }),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(null),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                HapticFeedback.selectionClick();
+                Navigator.of(ctx).pop(Set<int>.from(selected));
+              },
+              child: Text(
+                  selected.isEmpty ? 'No rest days' : 'Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   String _fmtTime(int h, int m) {
     final hh = h % 12 == 0 ? 12 : h % 12;
     final ap = h < 12 ? 'AM' : 'PM';
@@ -788,17 +870,14 @@ class _ReadingPlanDetailV2ScreenState
               ),
               ListTile(
                 leading: const Icon(Icons.bedtime_rounded),
-                title: Text(
-                    'Rest day: ${p.restDay == null ? 'None' : _weekdayName(p.restDay!)}'),
+                title: Text('Rest days: ${_restSummary(p)}'),
                 subtitle:
-                    const Text('Tap to cycle None → Sun → … → Sat'),
-                onTap: () {
-                  // copyWith uses -1 as the null sentinel.
-                  final next = p.restDay == null
-                      ? 1
-                      : (p.restDay! >= 7 ? -1 : p.restDay! + 1);
-                  notifier.setRestDay(next);
+                    const Text('Tap to choose any weekdays'),
+                onTap: () async {
+                  final picked = await _pickRestDays(context, p);
+                  if (!ctx.mounted) return;
                   Navigator.of(ctx).pop();
+                  if (picked != null) notifier.setRestDays(picked);
                 },
               ),
               ListTile(

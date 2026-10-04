@@ -96,6 +96,20 @@ void main() {
         endVerse: 26,
       );
 
+  ReadingPlan generate(int wpm, int days, String id) => PlanGenerator(
+        wordCountService: wordCountService,
+        allPericopes: allPericopes,
+        wpm: wpm,
+      ).generatePlan(
+        id: id,
+        title: 'Genesis pace test',
+        tracks: [
+          [genesis()]
+        ],
+        days: days,
+        cadence: 7,
+      );
+
   test('single track covers the input range exactly once', () {
     final plan = generator.generatePlan(
       id: 'gen30',
@@ -186,6 +200,35 @@ void main() {
       expect(day.portions, isNotEmpty);
     }
     expect(unionOf(canon, plan), expandRange(canon, genesis()));
+  });
+
+  test('wpm scales estimates without changing coverage', () {
+    final slow = generate(100, 30, 'wpm-slow');
+    final fast = generate(200, 30, 'wpm-fast');
+    // Same content distribution...
+    expect(unionOf(canon, slow), unionOf(canon, fast));
+    // ...but fewer minutes per day for the faster reader.
+    var strictlyLess = 0;
+    for (var i = 0; i < slow.schedule.length; i++) {
+      expect(fast.schedule[i].estimatedMinutes,
+          lessThanOrEqualTo(slow.schedule[i].estimatedMinutes));
+      if (fast.schedule[i].estimatedMinutes <
+          slow.schedule[i].estimatedMinutes) {
+        strictlyLess++;
+      }
+    }
+    expect(strictlyLess, greaterThan(0));
+  });
+
+  test('wpm moves the clamp ceiling', () {
+    final slow = generate(100, 5000, 'wpm-clamp-slow');
+    final fast = generate(400, 5000, 'wpm-clamp-fast');
+    expect(slow.wasClamped, isTrue);
+    expect(fast.wasClamped, isTrue);
+    // Higher wpm -> lower minimum-words floor -> fewer max days.
+    expect(fast.schedule.length, lessThan(slow.schedule.length));
+    // Coverage preserved under clamping for both.
+    expect(unionOf(canon, fast), expandRange(canon, genesis()));
   });
 
   test('multi-track days stay disjoint and jointly complete', () {

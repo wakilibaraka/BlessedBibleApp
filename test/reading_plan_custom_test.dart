@@ -3,10 +3,16 @@
 // before the state assignment), throwing on the uninitialized provider and
 // leaving the plan stuck on isLoading forever (detail-screen spinner).
 
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:the_blessed_bible/data/local_storage/preferences_service.dart';
+import 'package:the_blessed_bible/models/pericope_entry.dart';
+import 'package:the_blessed_bible/models/reading_plan.dart';
+import 'package:the_blessed_bible/services/plan_generator.dart';
+import 'package:the_blessed_bible/services/word_count_service.dart';
 import 'package:the_blessed_bible/state/reading_plan_provider.dart';
 
 Map<String, dynamic> testCustomPlan() => {
@@ -184,6 +190,42 @@ void main() {
     expect(bare.isDayComplete(1), isFalse);
   });
 
+  test('rest-day set rule with legacy fallback', () async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    final container = ProviderContainer(
+      overrides: [
+        preferencesProvider.overrideWithValue(PreferencesService(prefs)),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    container.read(preferencesProvider).saveCustomPlan(
+          'custom-1',
+          testCustomPlan(),
+        );
+    container.read(readingPlanProvider('custom-1'));
+    await Future.delayed(const Duration(milliseconds: 200));
+
+    final notifier =
+        container.read(readingPlanProvider('custom-1').notifier);
+    // Legacy single day still works when the set is empty.
+    var state = container.read(readingPlanProvider('custom-1'));
+    expect(state.isRestWeekday(1), isFalse);
+
+    notifier.setRestDays({1, 7}); // Sun + Sat
+    state = container.read(readingPlanProvider('custom-1'));
+    expect(state.isRestWeekday(1), isTrue);
+    expect(state.isRestWeekday(7), isTrue);
+    expect(state.isRestWeekday(2), isFalse);
+    expect(state.restDay, isNull);
+
+    // Clearing the set restores no-rest behavior.
+    notifier.setRestDays({});
+    state = container.read(readingPlanProvider('custom-1'));
+    expect(state.isRestWeekday(1), isFalse);
+  });
+
   test('markAllPreviousRead completes every day before the given day',
       () async {
     SharedPreferences.setMockInitialValues({});
@@ -209,5 +251,94 @@ void main() {
     final state = container.read(readingPlanProvider('custom-1'));
     expect(state.completedReadings, contains(1));
     expect(state.completedReadings, isNot(contains(2)));
+  });
+
+  testWidgets('adjustPace loses no recorded content (atom lossless)',
+      (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    final container = ProviderContainer(
+      overrides: [
+        preferencesProvider.overrideWithValue(PreferencesService(prefs)),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    // Everything touching compute/rootBundle runs under real async
+    // (FakeAsync stalls isolates). File reads are sync and hermetic.
+    late ReadingPlan built;
+    await tester.runAsync(() async {
+      final wcs = WordCountService();
+      await wcs.initFromJson(
+          File('assets/data/word_counts.json').readAsStringSync());
+      final pericopes = (jsonDecode(
+              File('assets/data/pericopes.json').readAsStringSync()) as List)
+          .map((j) => PericopeEntry.fromJson(j))
+          .toList();
+      final generator =
+          PlanGenerator(wordCountService: wcs, allPericopes: pericopes);
+      built = generator.generatePlan(
+        id: 'pace-test',
+        title: 'Genesis pace test',
+        tracks: [
+          [
+            PlanRange(
+                book: 'Genesis',
+                startChapter: 1,
+                startVerse: 1,
+                endChapter: 50,
+                endVerse: 26),
+          ],
+        ],
+        days: 30,
+        cadence: 7,
+      );
+    });
+    container.read(preferencesProvider).saveCustomPlan(
+          'pace-test',
+          built.toJson(),
+        );
+
+    // Load and complete 2 days.
+    await tester.runAsync(() async {
+      container.read(readingPlanProvider('pace-test'));
+      for (var i = 0; i < 100; i++) {
+        final s = container.read(readingPlanProvider('pace-test'));
+        if (!s.isLoading) break;
+        await Future.delayed(const Duration(milliseconds: 100));
+      }
+    });
+    var state = container.read(readingPlanProvider('pace-test'));
+    expect(state.error, isNull);
+    expect(state.planData.length, 30);
+    container
+        .read(readingPlanProvider('pace-test').notifier)
+        .markReadingComplete(1);
+    container
+        .read(readingPlanProvider('pace-test').notifier)
+        .markReadingComplete(2);
+    state = container.read(readingPlanProvider('pace-test'));
+    final before =
+        Set<String>.from(state.completedAtomIds);
+    expect(before, isNotEmpty);
+
+    // Repace 30 -> 15 days.
+    String? err;
+    await tester.runAsync(() async {
+      err = await container
+          .read(readingPlanProvider('pace-test').notifier)
+          .adjustPace(15);
+      for (var i = 0; i < 100; i++) {
+        final s = container.read(readingPlanProvider('pace-test'));
+        if (!s.isLoading) break;
+        await Future.delayed(const Duration(milliseconds: 100));
+      }
+    });
+    expect(err, isNull);
+    state = container.read(readingPlanProvider('pace-test'));
+    expect(state.error, isNull);
+    expect(state.planData.length, 15);
+    // Lossless: every previously recorded atom is still recorded.
+    expect(state.completedAtomIds, containsAll(before));
   });
 }

@@ -21,11 +21,27 @@ const int kSlowReaderWpm = 130;
 const int kMinDailyReadingMinutes = 1;
 const int minWordsPerDay = kSlowReaderWpm * kMinDailyReadingMinutes;
 
+/// Reading-speed presets (words per minute) for pace estimates.
+const int kRelaxedWpm = 100;
+const int kStandardWpm = 130;
+const int kBriskWpm = 200;
+
 class PlanGenerator {
   final WordCountService wordCountService;
   final List<PericopeEntry> allPericopes;
 
-  PlanGenerator({required this.wordCountService, required this.allPericopes});
+  /// Words per minute used for time estimates and the minimum-words
+  /// floor. Defaults to the historic constant (behavior unchanged
+  /// unless a setting is passed).
+  final int wpm;
+
+  PlanGenerator({
+    required this.wordCountService,
+    required this.allPericopes,
+    this.wpm = kSlowReaderWpm,
+  });
+
+  int get minWordsForDay => wpm * kMinDailyReadingMinutes;
 
   int _ref(int ch, int v) => ch * 1000 + v;
 
@@ -55,7 +71,7 @@ class PlanGenerator {
     int effectiveReadingDays = (days * cadence / 7).round();
     if (effectiveReadingDays < 1) effectiveReadingDays = 1;
 
-    int maxDays = (totalPlanWords / minWordsPerDay).floor();
+    int maxDays = (totalPlanWords / minWordsForDay).floor();
     if (maxDays < 1) maxDays = 1;
 
     bool wasClamped = false;
@@ -80,7 +96,7 @@ class PlanGenerator {
 
     // Compute estimated reading times for each finalized day
     final finalizedSchedule = schedule.map((day) {
-      int minutes = (day.totalWords / kSlowReaderWpm).round();
+      int minutes = (day.totalWords / wpm).round();
       String display = minutes < 1 ? '<1 min' : '$minutes min';
       return PlanDay(
         dayNumber: day.dayNumber,

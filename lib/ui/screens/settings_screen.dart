@@ -509,6 +509,49 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               ],
             );
           }),
+          Consumer(builder: (context, ref, _) {
+            final wpm = ref.watch(
+                readSettingsProvider.select((s) => s.readingWpm));
+            return Column(
+              children: [
+                ListTile(
+                  title: const Text('Reading speed'),
+                  subtitle: const Text(
+                      'Pace estimates for plans (words per minute)'),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 8.0),
+                  child: SegmentedButton<int>(
+                    segments: const [
+                      ButtonSegment(
+                        value: 100,
+                        label: Text('Relaxed'),
+                      ),
+                      ButtonSegment(
+                        value: 130,
+                        label: Text('Standard'),
+                      ),
+                      ButtonSegment(
+                        value: 200,
+                        label: Text('Brisk'),
+                      ),
+                    ],
+                    selected: {wpm},
+                    onSelectionChanged: (set) {
+                      HapticFeedback.selectionClick();
+                      ref
+                          .read(readSettingsProvider.notifier)
+                          .setReadingWpm(set.first);
+                    },
+                    style: ButtonStyle(
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }),
         ],
       ),
 

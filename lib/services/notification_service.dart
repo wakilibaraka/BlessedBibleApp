@@ -242,7 +242,7 @@ class NotificationService {
   /// converted to the plugin's Dart-weekday convention before scheduling —
   /// comparing them directly skipped the wrong day.
   Future<void> syncReadingPlanReminder(bool enabled, int hour, int minute,
-      int? restDay, {String? planId}) async {
+      int? restDay, {Set<int>? restDays, String? planId}) async {
     // One-time cleanup of the legacy shared range.
     for (int i = 100; i <= 107; i++) {
       await _flutterLocalNotificationsPlugin.cancel(id: i);
@@ -260,12 +260,17 @@ class NotificationService {
     final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
 
     // App weekday (Sun=1..Sat=7) -> Dart weekday (Mon=1..Sun=7).
-    int? restDart;
-    if (restDay != null && restDay != -1) {
-      restDart = ((restDay + 5) % 7) + 1;
+    // The rest-day set wins when non-empty; otherwise the legacy single day.
+    final restDartDays = <int>{};
+    if (restDays != null && restDays.isNotEmpty) {
+      for (final d in restDays) {
+        if (d >= 1 && d <= 7) restDartDays.add(((d + 5) % 7) + 1);
+      }
+    } else if (restDay != null && restDay != -1) {
+      restDartDays.add(((restDay + 5) % 7) + 1);
     }
 
-    if (restDart == null) {
+    if (restDartDays.isEmpty) {
       // Schedule daily reminder
       tz.TZDateTime scheduledDate =
           tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
@@ -287,9 +292,9 @@ class NotificationService {
         matchDateTimeComponents: DateTimeComponents.time,
       );
     } else {
-      // Schedule weekly reminder for the 6 non-rest days (Dart weekdays).
+      // Schedule weekly reminders for the non-rest days (Dart weekdays).
       for (int i = 1; i <= 7; i++) {
-        if (i == restDart) continue;
+        if (restDartDays.contains(i)) continue;
         tz.TZDateTime scheduledDate =
             tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
         while (scheduledDate.weekday != i) {

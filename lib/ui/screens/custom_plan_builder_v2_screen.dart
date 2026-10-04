@@ -12,6 +12,7 @@ import '../../utils/isolate_parsers.dart';
 import '../../data/models/bible_model.dart';
 import '../../state/auth_provider.dart';
 import '../../state/bible_provider.dart';
+import '../../state/read_settings_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../state/reading_plan_provider.dart'
     show readingPlanProvider, activePlanIdsProvider, appWeekday;
@@ -156,8 +157,11 @@ class _CustomPlanBuilderV2ScreenState
       if (!mounted) return;
       final allBooks = ref.read(bibleProvider).books;
       setState(() {
-        _generator =
-            PlanGenerator(wordCountService: wcs, allPericopes: allPericopes);
+        _generator = PlanGenerator(
+          wordCountService: wcs,
+          allPericopes: allPericopes,
+          wpm: ref.read(readSettingsProvider).readingWpm,
+        );
         _isLoading = false;
         if (widget.wholeBible && allBooks.length > 1) {
           // Paced-generator shortcut: one track across the whole canon.

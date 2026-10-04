@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/notification_service.dart';
 import '../data/local_storage/preferences_service.dart';
+import 'read_settings_provider.dart';
 import '../models/plan_spec.dart';
 import '../models/reading_plan.dart';
 import '../services/pace_remap_service.dart';
@@ -81,7 +82,10 @@ class ReadingPlanState {
   final String planId;
   final DateTime? planStartedOn;
   final String paceMode; // 'scheduled' | 'flexible'
-  final int? restDay; // 1=Sun .. 7=Sat, null = no rest
+  final int? restDay; // 1=Sun .. 7=Sat, null = no rest (legacy single)
+  /// Rest weekdays (app convention 1=Sun..7=Sat). When non-empty this set
+  /// wins over [restDay]; empty + null restDay means no rest days.
+  final Set<int> restDays;
   final Set<int> completedReadings; // Set of day numbers (legacy)
   final List<PlanDayData> planData;
 
@@ -111,6 +115,7 @@ class ReadingPlanState {
     this.planStartedOn,
     this.paceMode = 'scheduled',
     this.restDay,
+    this.restDays = const {},
     this.completedReadings = const {},
     this.planData = const [],
     this.completedAtomIds = const {},
@@ -122,6 +127,11 @@ class ReadingPlanState {
   });
 
   bool get isActive => planStartedOn != null;
+
+  /// Rest-day rule (app weekday 1=Sun..7=Sat): the set wins when non-empty,
+  /// otherwise the legacy single day; nothing set means no rest days.
+  bool isRestWeekday(int appWeekday) =>
+      restDays.isNotEmpty ? restDays.contains(appWeekday) : restDay == appWeekday;
 
   /// Effective day completion: the atom rule when atoms exist for the
   /// day (and any atom is recorded at all), otherwise the legacy
@@ -203,7 +213,7 @@ class ReadingPlanState {
       int elapsedReadingDays = 0;
       DateTime current = s;
       while (!current.isAfter(t)) {
-        if (restDay == null || appWeekday(current) != restDay) {
+        if (!isRestWeekday(appWeekday(current))) {
           elapsedReadingDays++;
         }
         current = current.add(const Duration(days: 1));
@@ -242,6 +252,7 @@ class ReadingPlanState {
     DateTime? planStartedOn,
     String? paceMode,
     int? restDay,
+    Set<int>? restDays,
     Set<int>? completedReadings,
     List<PlanDayData>? planData,
     Set<String>? completedAtomIds,
@@ -258,6 +269,7 @@ class ReadingPlanState {
       planStartedOn: planStartedOn ?? this.planStartedOn,
       paceMode: paceMode ?? this.paceMode,
       restDay: restDay == -1 ? null : (restDay ?? this.restDay),
+      restDays: restDays ?? this.restDays,
       completedReadings: completedReadings ?? this.completedReadings,
       planData: planData ?? this.planData,
       completedAtomIds: completedAtomIds ?? this.completedAtomIds,
@@ -331,6 +343,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
       DateTime? planStartedOn;
       String paceMode = 'scheduled';
       int? restDay;
+      Set<int> restDays = {};
       Set<int> completedReadings = {};
       Set<String> completedAtoms = {};
       bool reminderEnabled = false;
@@ -355,6 +368,10 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
         }
         if (prefsState.containsKey('restDay')) {
           restDay = prefsState['restDay'] as int?;
+        }
+        if (prefsState.containsKey('restDays')) {
+          final list = prefsState['restDays'] as List;
+          restDays = list.map((e) => e as int).toSet();
         }
         if (prefsState['planId'] != null) {
           planId = prefsState['planId'] as String;
@@ -453,6 +470,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
         planStartedOn: planStartedOn,
         paceMode: paceMode,
         restDay: restDay,
+        restDays: restDays,
         completedReadings: completedReadings,
         completedAtomIds: completedAtoms,
         dayAtoms: dayAtoms,
@@ -543,6 +561,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
       'planStartedOn': s.planStartedOn?.toIso8601String(),
       'paceMode': s.paceMode,
       'restDay': s.restDay,
+      'restDays': s.restDays.toList(),
       'completedReadings': s.completedReadings.toList(),
       'completedAtoms': s.completedAtomIds.toList(),
       'reminderEnabled': s.reminderEnabled,
@@ -576,12 +595,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
     );
     state = next;
     _saveToPrefs(next);
-    ref.read(notificationServiceProvider).syncReadingPlanReminder(
-        next.reminderEnabled,
-        next.reminderTimeHour,
-        next.reminderTimeMinute,
-        next.restDay,
-        planId: next.planId);
+    _syncReminder(next);
   }
 
   void markReadingComplete(int day) {
@@ -628,15 +642,38 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
   }
 
   void setRestDay(int? day) {
-    final next = state.copyWith(restDay: day);
+    final next = state.copyWith(restDay: day, restDays: {});
     state = next;
     _saveToPrefs(next);
-    ref.read(notificationServiceProvider).syncReadingPlanReminder(
-        next.reminderEnabled,
-        next.reminderTimeHour,
-        next.reminderTimeMinute,
-        next.restDay,
-        planId: next.planId);
+    _syncReminder(next);
+  }
+
+  /// Sets the rest-weekday set (app convention 1=Sun..7=Sat, empty = none).
+  /// Clears the legacy single day so the set is unambiguous.
+  void setRestDays(Set<int> days) {
+    // -1 sentinel: copyWith(null) would silently keep the old single day.
+    final next = state.copyWith(restDay: -1, restDays: days);
+    state = next;
+    _saveToPrefs(next);
+    _syncReminder(next);
+  }
+
+  /// Best-effort reminder sync: a notification failure must never break
+  /// plan state writes (or unit tests without platform channels). Async
+  /// with an awaited call so failures land in this try/catch instead of
+  /// escaping through an async gap.
+  Future<void> _syncReminder(ReadingPlanState next) async {
+    try {
+      await ref.read(notificationServiceProvider).syncReadingPlanReminder(
+          next.reminderEnabled,
+          next.reminderTimeHour,
+          next.reminderTimeMinute,
+          next.restDay,
+          restDays: next.restDays,
+          planId: next.planId);
+    } catch (e) {
+      debugPrint('plan reminder sync failed (non-fatal): $e');
+    }
   }
 
   /// Null-safe rest-day setter. NOTE: `copyWith(restDay: null)` silently
@@ -673,10 +710,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
     );
     state = next;
     _saveToPrefs(next);
-    ref
-        .read(notificationServiceProvider)
-        .syncReadingPlanReminder(enabled, hour, minute, next.restDay,
-            planId: next.planId);
+    _syncReminder(next);
   }
 
   void jumpToDay(int day) {}
@@ -713,11 +747,17 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
       final remapSvc = PaceRemapService(
         wordCountService: wcs,
         allPericopes: allPericopes,
+        wpm: ref.read(readSettingsProvider).readingWpm,
       );
 
+      // Atom-first remap: content-keyed completion survives re-partitioning
+      // exactly (including partial-day progress); falls back to day numbers
+      // when no atoms were recorded yet.
       final result = remapSvc.remap(
         oldPlan: oldPlan,
         oldCompleted: state.completedReadings,
+        completedAtoms:
+            state.completedAtomIds.isEmpty ? null : state.completedAtomIds,
         newDayCount: newDayCount,
       );
 

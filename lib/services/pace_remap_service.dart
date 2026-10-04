@@ -38,9 +38,13 @@ class PaceRemapService {
   final WordCountService wordCountService;
   final List<PericopeEntry> allPericopes;
 
+  /// Words per minute for regenerated time estimates (default = standard).
+  final int wpm;
+
   PaceRemapService({
     required this.wordCountService,
     required this.allPericopes,
+    this.wpm = kSlowReaderWpm,
   });
 
   /// Returns null if pace adjustment is available, or the reason it is not.
@@ -55,9 +59,15 @@ class PaceRemapService {
   ///
   /// Returns the new plan and new completed-readings set.
   /// Throws [ArgumentError] if the plan has no tracks.
+  ///
+  /// When [completedAtoms] (content ids `Book|sc|sv|ec|ev`) is provided and
+  /// non-empty, the completed verse set is built from atoms directly, so
+  /// partial-day progress survives re-partitioning exactly. Otherwise the
+  /// legacy day-number expansion applies.
   PaceRemapResult remap({
     required ReadingPlan oldPlan,
     required Set<int> oldCompleted,
+    Set<String>? completedAtoms,
     required int newDayCount,
   }) {
     if (oldPlan.tracks == null || oldPlan.tracks!.isEmpty) {
@@ -65,15 +75,21 @@ class PaceRemapService {
     }
 
     // ── Step 1: compute completed verse set ──────────────────────────────────
-    final completedVerseIndices = _buildCompletedVerseSet(
-      oldPlan.schedule,
-      oldCompleted,
-    );
+    final Set<int> completedVerseIndices;
+    if (completedAtoms != null && completedAtoms.isNotEmpty) {
+      completedVerseIndices = buildVerseSetFromAtomsPublic(completedAtoms);
+    } else {
+      completedVerseIndices = _buildCompletedVerseSet(
+        oldPlan.schedule,
+        oldCompleted,
+      );
+    }
 
     // ── Step 2: regenerate plan ──────────────────────────────────────────────
     final generator = PlanGenerator(
       wordCountService: wordCountService,
       allPericopes: allPericopes,
+      wpm: wpm,
     );
     final newPlan = generator.generatePlan(
       id: oldPlan.id,
@@ -105,6 +121,24 @@ class PaceRemapService {
     List<PlanDay> schedule,
     Set<int> completedDayNumbers,
   ) => buildCompletedVerseSetPublic(schedule, completedDayNumbers);
+
+  /// Expands content atom ids (`Book|sc|sv|ec|ev`) to absolute verse
+  /// indices. Malformed atoms are skipped, never thrown.
+  Set<int> buildVerseSetFromAtomsPublic(Set<String> atoms) {
+    final result = <int>{};
+    for (final atom in atoms) {
+      try {
+        final parts = atom.split('|');
+        if (parts.length != 5) continue;
+        final sc = int.parse(parts[1]);
+        final sv = int.parse(parts[2]);
+        final ec = int.parse(parts[3]);
+        final ev = int.parse(parts[4]);
+        _addVerseRange(result, parts[0], sc, sv, ec, ev);
+      } catch (_) {}
+    }
+    return result;
+  }
 
   /// Public alias for testing.
   Set<int> buildCompletedVerseSetPublic(

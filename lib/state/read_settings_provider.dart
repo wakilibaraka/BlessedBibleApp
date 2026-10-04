@@ -38,6 +38,10 @@ class ReadSettingsState {
   final StrongsIndicatorStyle strongsIndicatorStyle;
   final PopupStyle popupStyle;
 
+  /// Reading speed for plan pace estimates (words per minute).
+  /// 100 = relaxed, 130 = standard, 200 = brisk.
+  final int readingWpm;
+
   const ReadSettingsState({
     this.readingViewMode = ReadingViewMode.pinned,
     this.isGlowEnabled = true,
@@ -61,6 +65,7 @@ class ReadSettingsState {
     this.showStrongsNumbers = false,
     this.strongsIndicatorStyle = StrongsIndicatorStyle.asterisk,
     this.popupStyle = PopupStyle.floating,
+    this.readingWpm = 130,
   });
 
   ReadSettingsState copyWith({
@@ -84,6 +89,7 @@ class ReadSettingsState {
     bool? showStrongsNumbers,
     StrongsIndicatorStyle? strongsIndicatorStyle,
     PopupStyle? popupStyle,
+    int? readingWpm,
   }) {
     return ReadSettingsState(
       readingViewMode: readingViewMode ?? this.readingViewMode,
@@ -107,6 +113,7 @@ class ReadSettingsState {
       showStrongsNumbers: showStrongsNumbers ?? this.showStrongsNumbers,
       strongsIndicatorStyle: strongsIndicatorStyle ?? this.strongsIndicatorStyle,
       popupStyle: popupStyle ?? this.popupStyle,
+      readingWpm: readingWpm ?? this.readingWpm,
     );
   }
 }
@@ -120,6 +127,7 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
   static const _isManualNavHiddenKey = 'read_settings_is_manual_nav_hidden';
   static const _readingLayoutKey = 'read_settings_reading_layout';
   static const _selectorHeightKey = 'read_settings_selector_height';
+  static const _readingWpmKey = 'read_settings_reading_wpm';
 
   @override
   ReadSettingsState build() {
@@ -228,6 +236,7 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
       showStrongsNumbers: showStrongsNumbers,
       strongsIndicatorStyle: strongsStyle,
       popupStyle: popupStyle,
+      readingWpm: prefs.getInt(_readingWpmKey) ?? 130,
     );
   }
 
@@ -359,6 +368,14 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     state = state.copyWith(showStrongsNumbers: value);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('show_strongs_numbers', value);
+  }
+
+  /// Reading speed preset for plan pace estimates. Clamped to 60..300 wpm.
+  Future<void> setReadingWpm(int value) async {
+    final wpm = value.clamp(60, 300);
+    state = state.copyWith(readingWpm: wpm);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_readingWpmKey, wpm);
   }
 }
 
