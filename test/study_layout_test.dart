@@ -1,5 +1,6 @@
-// Hub card sizes: v4 uniform-Large migration, defaults, and the
-// Large / Extra Large / Half picker persistence.
+// Hub card sizes: v5 default view (Stories+Dictionary and VOTD+Streak
+// pairs, Commentary full), the Large / Extra Large / Half picker
+// persistence, and Move up/down reorder.
 
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,33 +20,77 @@ void main() {
     );
   }
 
-  test('defaults are all Large (full, not expanded)', () async {
+  test('v5 default view: order + half pairs', () async {
     final container = await makeContainer();
     addTearDown(container.dispose);
 
-    for (final c in StudyLayoutNotifier.defaultLayoutV2()) {
-      expect(c.span, CardSpan.full, reason: c.id);
-      expect(c.expanded, isFalse, reason: c.id);
+    final layout = StudyLayoutNotifier.defaultLayoutV2();
+    expect([for (final c in layout) c.id], [
+      'your_space',
+      'plans_live',
+      'bible_stories',
+      'dictionary',
+      'commentary',
+      'votd_archive',
+      'streak',
+    ]);
+    final byId = {for (final c in layout) c.id: c};
+    for (final id in ['your_space', 'plans_live', 'commentary']) {
+      expect(byId[id]!.span, CardSpan.full, reason: id);
+      expect(byId[id]!.expanded, isFalse, reason: id);
+    }
+    for (final id in
+        ['bible_stories', 'dictionary', 'votd_archive', 'streak']) {
+      expect(byId[id]!.span, CardSpan.half, reason: id);
     }
   });
 
-  test('v3 stored layout migrates to uniform Large', () async {
+  test('v4 stored layout migrates to the v5 default view', () async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
     final svc = PreferencesService(prefs);
     svc.saveStudyLayout(jsonEncode([
-      {
-        'id': 'dictionary',
-        'size': 'medium',
-        'span': 'half',
-        'version': 3,
-      },
-      {
-        'id': 'commentary',
-        'size': 'medium',
-        'span': 'quarter',
-        'version': 3,
-      },
+      for (final id in [
+        'your_space',
+        'plans_live',
+        'bible_stories',
+        'dictionary',
+        'commentary',
+        'votd_archive',
+        'streak',
+      ])
+        {'id': id, 'size': 'large', 'span': 'full', 'version': 4},
+    ]));
+    final container = ProviderContainer(
+      overrides: [
+        preferencesProvider.overrideWithValue(svc),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final layout = container.read(studyLayoutProvider);
+    expect([for (final c in layout) c.id], [
+      'your_space',
+      'plans_live',
+      'bible_stories',
+      'dictionary',
+      'commentary',
+      'votd_archive',
+      'streak',
+    ]);
+    final byId = {for (final c in layout) c.id: c};
+    expect(byId['dictionary']!.span, CardSpan.half);
+    expect(byId['streak']!.span, CardSpan.half);
+    expect(byId['commentary']!.span, CardSpan.full);
+  });
+
+  test('v5 migration preserves user half customs', () async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    final svc = PreferencesService(prefs);
+    svc.saveStudyLayout(jsonEncode([
+      {'id': 'commentary', 'size': 'half', 'span': 'half', 'version': 4},
+      {'id': 'your_space', 'size': 'large', 'span': 'full', 'version': 4},
     ]));
     final container = ProviderContainer(
       overrides: [
@@ -56,19 +101,12 @@ void main() {
 
     final layout = container.read(studyLayoutProvider);
     final byId = {for (final c in layout) c.id: c};
-    // Stored customs reset to Large once...
-    expect(byId['dictionary']!.span, CardSpan.full);
-    expect(byId['dictionary']!.expanded, isFalse);
-    expect(byId['commentary']!.span, CardSpan.full);
-    // ...and stored cards survive alongside defaults.
-    // (plans_live itself is appended by the hub's _orderedCards merge,
-    // covered by the hub widget test.)
-    for (final id in ['your_space', 'dictionary', 'commentary']) {
-      expect(byId.containsKey(id), isTrue, reason: id);
-    }
+    // Untouched customs survive; everything else follows the default.
+    expect(byId['commentary']!.span, CardSpan.half);
+    expect(byId['dictionary']!.span, CardSpan.half);
   });
 
-  test('setCardSize persists span + expanded at version 4', () async {
+  test('setCardSize persists span + expanded at version 5', () async {
     final container = await makeContainer();
     addTearDown(container.dispose);
 
@@ -95,11 +133,39 @@ void main() {
     byId = {for (final c in layout) c.id: c};
     expect(byId['commentary']!.span, CardSpan.full);
 
-    // Persisted JSON carries version 4.
+    // Persisted JSON carries version 5.
     final prefs = container.read(preferencesProvider);
     final decoded =
         jsonDecode(prefs.getStudyLayout()!) as List;
     expect(
-        decoded.every((e) => (e as Map)['version'] == 4), isTrue);
+        decoded.every((e) => (e as Map)['version'] == 5), isTrue);
+  });
+
+  test('move swaps cards and persists the order', () async {
+    final container = await makeContainer();
+    addTearDown(container.dispose);
+
+    container.read(studyLayoutProvider);
+    container
+        .read(studyLayoutProvider.notifier)
+        .move('streak', 'votd_archive');
+
+    var layout = container.read(studyLayoutProvider);
+    var ids = [for (final c in layout) c.id];
+    expect(ids.indexOf('streak'), ids.indexOf('votd_archive') - 1);
+
+    // Unknown ids are no-ops.
+    container
+        .read(studyLayoutProvider.notifier)
+        .move('your_space', 'nope');
+    layout = container.read(studyLayoutProvider);
+    ids = [for (final c in layout) c.id];
+    expect(ids.first, 'your_space');
+
+    // Order round-trips through storage.
+    final prefs = container.read(preferencesProvider);
+    final decoded = jsonDecode(prefs.getStudyLayout()!) as List;
+    expect(
+        [for (final e in decoded) (e as Map)['id']], ids);
   });
 }

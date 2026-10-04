@@ -34,8 +34,11 @@ void main() {
 
     expect(find.text('Peace be with you.'), findsOneWidget);
     expect(find.byType(AccountAvatar), findsOneWidget);
-    // Streak pill is gone (no flame icon, no day counter in header).
-    expect(find.byIcon(Icons.local_fire_department_rounded), findsNothing);
+    // Streak lives as a hub card (flame icon + progress CTA), not a
+    // header pill.
+    expect(find.byIcon(Icons.local_fire_department_rounded),
+        findsOneWidget);
+    expect(find.text('Start your streak'), findsOneWidget);
     // Cards render (Your Space banner + tool cards + merged plans).
     expect(find.text('Bookmarks, highlights, notes & journal'),
         findsOneWidget);

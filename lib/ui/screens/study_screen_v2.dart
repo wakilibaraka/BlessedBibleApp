@@ -7,7 +7,11 @@ import '../../state/journal_provider.dart';
 import '../../state/notes_provider.dart';
 import '../../state/reading_plan_provider.dart';
 import '../../state/plans_design_provider.dart';
+import '../../state/streak_provider.dart';
 import '../../state/study_layout_provider.dart';
+import '../../state/wotd_provider.dart';
+import 'today_screen.dart';
+import 'votd_archive_screen.dart';
 import '../../state/theme_provider.dart';
 import '../../state/user_data_provider.dart'
     show bookmarksProvider, highlightsProvider;
@@ -26,7 +30,10 @@ import 'plans_hub_v2_screen.dart' show availablePlans;
 /// Redesigned Study hub (V2): Large by default, every card the same
 /// size.
 ///
-/// - Card order + per-card size persist via [studyLayoutProvider].
+/// - Card order + per-card size persist via [studyLayoutProvider];
+///   long-press any card for the size + Move up/down sheet. The v5
+///   default view is Your Space, Plans live (both full), Stories +
+///   Dictionary (halves), Commentary (full), VOTD + Streak (halves).
 /// - Long-press a card to pick Large / Extra Large / Half. No persistent
 ///   resize dots, no edit mode.
 /// - No Continue Reading card (resume lives in the plan snapshot + Read
@@ -44,9 +51,11 @@ class StudyScreenV2 extends ConsumerStatefulWidget {
 const _v2CardIds = [
   'your_space',
   'plans_live',
-  'commentary',
-  'dictionary',
   'bible_stories',
+  'dictionary',
+  'commentary',
+  'votd_archive',
+  'streak',
 ];
 
 List<StudyCardConfig> _orderedCards(List<StudyCardConfig> stored) {
@@ -110,14 +119,18 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
     }
   }
 
-  /// Long-press size picker: Large (default), Extra Large, Half.
+  /// Long-press card sheet: size (Large, Extra Large, Half) + reorder.
   /// The only customization UI — no persistent handles, no edit mode.
-  void _showCardSize(StudyCardConfig card) {
+  void _showCardSize(
+      StudyCardConfig card, List<StudyCardConfig> cards) {
     final isLarge =
         card.span == CardSpan.full && !card.expanded;
     final isXLarge =
         card.span == CardSpan.full && card.expanded;
     final isHalf = card.span == CardSpan.half;
+    final index = cards.indexWhere((c) => c.id == card.id);
+    final canUp = index > 0;
+    final canDown = index >= 0 && index < cards.length - 1;
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -209,6 +222,30 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                     .setCardSize(card.id,
                         span: CardSpan.half, expanded: false),
               ),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
+                child: V2Eyebrow('Position'),
+              ),
+              if (canUp)
+                option(
+                  label: 'Move up',
+                  hint: 'Swap with the card above',
+                  icon: Icons.arrow_upward_rounded,
+                  selected: false,
+                  onPick: () => ref
+                      .read(studyLayoutProvider.notifier)
+                      .move(card.id, cards[index - 1].id),
+                ),
+              if (canDown)
+                option(
+                  label: 'Move down',
+                  hint: 'Swap with the card below',
+                  icon: Icons.arrow_downward_rounded,
+                  selected: false,
+                  onPick: () => ref
+                      .read(studyLayoutProvider.notifier)
+                      .move(card.id, cards[index + 1].id),
+                ),
             ],
           ),
         );
@@ -299,7 +336,7 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                         behavior: HitTestBehavior.translucent,
                         onLongPress: () {
                           HapticFeedback.mediumImpact();
-                          _showCardSize(card);
+                          _showCardSize(card, cards);
                         },
                         child: Padding(
                           padding:
@@ -339,16 +376,18 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                             Padding(
                               padding: const EdgeInsets.only(
                                   bottom: 12),
-                              child: Row(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(
-                                      child: cardBox(row[0])),
-                                  const SizedBox(width: gap),
-                                  Expanded(
-                                      child: cardBox(row[1])),
-                                ],
+                              child: IntrinsicHeight(
+                                child: Row(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    Expanded(
+                                        child: cardBox(row[0])),
+                                    const SizedBox(width: gap),
+                                    Expanded(
+                                        child: cardBox(row[1])),
+                                  ],
+                                ),
                               ),
                             )
                           else if (row[0].span == CardSpan.half)
@@ -439,6 +478,12 @@ class _CardBody extends ConsumerWidget {
           onTap: () =>
               onOpen(const BibleStoriesScreen()),
         );
+      case 'votd_archive':
+        return _VotdArchiveCard(
+            span: span, expanded: expanded, onOpen: onOpen);
+      case 'streak':
+        return _StreakCard(
+            span: span, expanded: expanded, onOpen: onOpen);
       default:
         return const SizedBox.shrink();
     }
@@ -910,6 +955,199 @@ class _ToolCard extends StatelessWidget {
           ],
           const SizedBox(height: 6),
           Text('$cta →',
+              style: theme.textTheme.labelSmall?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: theme.primaryColor,
+              )),
+        ],
+      ),
+    );
+  }
+}
+
+/// Word-of-the-day card: today's word with an archive entry point.
+/// Mirrors the _ToolCard half/full structure for row symmetry.
+class _VotdArchiveCard extends ConsumerWidget {
+  final CardSpan span;
+  final bool expanded;
+  final void Function(Widget page) onOpen;
+  const _VotdArchiveCard({
+    required this.span,
+    this.expanded = false,
+    required this.onOpen,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final wotdAsync = ref.watch(wordOfTheDayProvider);
+    void open() => onOpen(const VotdArchiveScreen());
+
+    Widget body(String title, String? snippet, {bool showSnippet = true}) {
+      final iconBox = expanded ? 52.0 : 34.0;
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: iconBox,
+            height: iconBox,
+            decoration: BoxDecoration(
+              color: theme.primaryColor.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(11),
+              border: Border.all(
+                color: theme.primaryColor.withValues(alpha: 0.3),
+              ),
+            ),
+            child: Icon(Icons.spellcheck_rounded,
+                size: expanded ? 24 : 18,
+                color: theme.primaryColor),
+          ),
+          const SizedBox(height: 8),
+          const V2Eyebrow('Word of the day'),
+          const SizedBox(height: 2),
+          Text(title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: (expanded
+                      ? theme.textTheme.titleMedium
+                      : theme.textTheme.titleSmall)
+                  ?.copyWith(
+                fontWeight: FontWeight.bold,
+              )),
+          if (showSnippet && snippet != null && snippet.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(snippet,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  fontStyle: FontStyle.italic,
+                  color: theme.colorScheme.onSurface
+                      .withValues(alpha: 0.6),
+                )),
+          ],
+          const SizedBox(height: 6),
+          Text('Archive →',
+              style: theme.textTheme.labelSmall?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: theme.primaryColor,
+              )),
+        ],
+      );
+    }
+
+    return wotdAsync.when(
+      data: (wotd) {
+        if (wotd == null) {
+          return V2Card(
+            featured: span == CardSpan.full,
+            onTap: open,
+            padding: EdgeInsets.all(expanded ? 20 : 15),
+            child: body('Word of the day', null,
+                showSnippet: false),
+          );
+        }
+        return V2Card(
+          featured: span == CardSpan.full,
+          onTap: open,
+          padding: EdgeInsets.all(expanded ? 20 : 15),
+          child: body(wotd.word, wotd.snippet,
+              showSnippet:
+                  span == CardSpan.full || expanded),
+        );
+      },
+      loading: () => V2Card(
+        featured: span == CardSpan.full,
+        padding: const EdgeInsets.all(15),
+        child: Text('Loading…',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurface
+                  .withValues(alpha: 0.6),
+            )),
+      ),
+      error: (_, __) => V2Card(
+        featured: span == CardSpan.full,
+        onTap: open,
+        padding: const EdgeInsets.all(15),
+        child: body('Word of the day', 'Unavailable right now',
+            showSnippet: false),
+      ),
+    );
+  }
+}
+
+/// Reading-streak card: flame count with a TodayScreen entry point.
+/// Mirrors the _ToolCard half/full structure for row symmetry.
+class _StreakCard extends ConsumerWidget {
+  final CardSpan span;
+  final bool expanded;
+  final void Function(Widget page) onOpen;
+  const _StreakCard({
+    required this.span,
+    this.expanded = false,
+    required this.onOpen,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final streak = ref.watch(streakProvider);
+    final count = streak.count;
+    final iconBox = expanded ? 52.0 : 34.0;
+    return V2Card(
+      featured: span == CardSpan.full,
+      onTap: () => onOpen(const TodayScreen()),
+      padding: EdgeInsets.all(expanded ? 20 : 15),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: iconBox,
+            height: iconBox,
+            decoration: BoxDecoration(
+              color: theme.primaryColor.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(11),
+              border: Border.all(
+                color: theme.primaryColor.withValues(alpha: 0.3),
+              ),
+            ),
+            child: Icon(Icons.local_fire_department_rounded,
+                size: expanded ? 24 : 18,
+                color: count > 0
+                    ? theme.primaryColor
+                    : theme.colorScheme.onSurface
+                        .withValues(alpha: 0.4)),
+          ),
+          const SizedBox(height: 8),
+          const V2Eyebrow('Reading streak'),
+          const SizedBox(height: 2),
+          Text(
+              count == 0
+                  ? 'Start your streak'
+                  : '$count day${count == 1 ? '' : 's'}',
+              style: (expanded
+                      ? theme.textTheme.titleMedium
+                      : theme.textTheme.titleSmall)
+                  ?.copyWith(
+                fontWeight: FontWeight.bold,
+              )),
+          if (span == CardSpan.full || expanded) ...[
+            const SizedBox(height: 4),
+            Text(
+                count > 0
+                    ? 'Open daily to grow it.'
+                    : 'Complete a reading each day.',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  fontStyle: FontStyle.italic,
+                  color: theme.colorScheme.onSurface
+                      .withValues(alpha: 0.6),
+                )),
+          ],
+          const SizedBox(height: 6),
+          Text('View progress →',
               style: theme.textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.w800,
                 color: theme.primaryColor,

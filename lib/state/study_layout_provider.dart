@@ -44,7 +44,7 @@ class StudyCardConfig {
         'size': size.name,
         'span': span.name,
         'expanded': expanded,
-        'version': 4,
+        'version': 5,
       };
 
   factory StudyCardConfig.fromJson(Map<String, dynamic> json) {
@@ -111,14 +111,6 @@ class StudyCardConfig {
 }
 
 class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
-  static final List<StudyCardConfig> _defaultLayout = [
-    StudyCardConfig(id: 'your_space', size: CardSize.large),
-    StudyCardConfig(id: 'cloud_sync', size: CardSize.large),
-    StudyCardConfig(id: 'reading_plan', size: CardSize.large),
-    StudyCardConfig(id: 'bible_stories', size: CardSize.large),
-    StudyCardConfig(id: 'dictionary', size: CardSize.medium),
-    StudyCardConfig(id: 'commentary', size: CardSize.large),
-  ];
 
   @override
   List<StudyCardConfig> build() {
@@ -130,19 +122,45 @@ class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
             .map((e) => StudyCardConfig.fromJson(e as Map<String, dynamic>))
             .toList();
 
+        // Version 5: reset to the default view once (order + sizes:
+        // stories+dictionary pair, commentary full, votd+streak pair).
+        // Recomputed idempotently on every launch until a v5 save lands,
+        // so no write is needed here. Unknown future ids are preserved.
+        final needsReset = decoded.any((e) =>
+            ((e as Map<String, dynamic>)['version'] as int? ?? 1) < 5);
+        if (needsReset) {
+          final byId = {for (final c in loaded) c.id: c};
+          final defaults = {
+            for (final d in defaultLayoutV2()) d.id: d
+          };
+          final ordered = <StudyCardConfig>[];
+          for (final def in defaultLayoutV2()) {
+            ordered.add(byId.containsKey(def.id) &&
+                    (byId[def.id]!.span != CardSpan.full ||
+                        byId[def.id]!.expanded)
+                ? byId.remove(def.id)!
+                : def);
+          }
+          // Unknown future ids go last, untouched.
+          for (final c in byId.values) {
+            if (!defaults.containsKey(c.id)) ordered.add(c);
+          }
+          return ordered;
+        }
+
         // Ensure all default cards are present (in case of updates)
         final loadedIds = loaded.map((c) => c.id).toSet();
-        for (final defCard in _defaultLayout) {
+        for (final defCard in defaultLayoutV2()) {
           if (!loadedIds.contains(defCard.id)) {
             loaded.add(defCard);
           }
         }
         return loaded;
       } catch (e) {
-        return List.from(_defaultLayout);
+        return defaultLayoutV2();
       }
     }
-    return List.from(_defaultLayout);
+    return defaultLayoutV2();
   }
 
   void _save() {
@@ -210,9 +228,10 @@ class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
     _save();
   }
 
-  /// Layout-v2 default order and sizes: every widget Large (full
-  /// width, same size). Users can pick Extra Large or Half per card
-  /// via long-press. Plans live in the single merged plans_live card.
+  /// Layout-v2 default order and sizes: full-width banners up top,
+  /// stories + dictionary share a row, commentary full, then the VOTD
+  /// archive + streak pair. Users can pick Extra Large or Half per card
+  /// via long-press and reorder via the same sheet.
   static List<StudyCardConfig> defaultLayoutV2() => [
         StudyCardConfig(
             id: 'your_space',
@@ -223,17 +242,25 @@ class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
             size: CardSize.large,
             span: CardSpan.full),
         StudyCardConfig(
+            id: 'bible_stories',
+            size: CardSize.medium,
+            span: CardSpan.half),
+        StudyCardConfig(
+            id: 'dictionary',
+            size: CardSize.medium,
+            span: CardSpan.half),
+        StudyCardConfig(
             id: 'commentary',
             size: CardSize.large,
             span: CardSpan.full),
         StudyCardConfig(
-            id: 'dictionary',
-            size: CardSize.large,
-            span: CardSpan.full),
+            id: 'votd_archive',
+            size: CardSize.medium,
+            span: CardSpan.half),
         StudyCardConfig(
-            id: 'bible_stories',
-            size: CardSize.large,
-            span: CardSpan.full),
+            id: 'streak',
+            size: CardSize.medium,
+            span: CardSpan.half),
       ];
 }
 
