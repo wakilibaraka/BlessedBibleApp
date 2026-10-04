@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import '../theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -146,6 +148,17 @@ class ThemeNotifier extends Notifier<AppThemeMode> {
     final saved = prefs.getInt(_themeKey) ?? prefs.getInt(_lockedThemeKey);
     if (saved != null && saved >= 0 && saved < AppThemeMode.values.length) {
       state = AppThemeMode.values[saved];
+    } else if (prefs.getInt(_themeKey) == null &&
+        prefs.getInt(_lockedThemeKey) == null) {
+      // Fresh install: deal a random theme so day one feels personal.
+      // Runs once — the pick is persisted like any manual choice.
+      final pool = AppThemeMode.values
+          .where((m) => m != AppThemeMode.automatic)
+          .toList();
+      final pick = pool[Random().nextInt(pool.length)];
+      state = pick;
+      await prefs.setInt(_themeKey, pick.index);
+      await prefs.setInt(_lockedThemeKey, pick.index);
     } else {
       state = AppThemeMode.automatic;
     }
@@ -156,6 +169,17 @@ class ThemeNotifier extends Notifier<AppThemeMode> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_themeKey, mode.index);
     await prefs.setInt(_lockedThemeKey, mode.index); // Keep updated for backwards safety if ever downgraded
+  }
+
+  /// Surprise me: random theme (anything but automatic), persisted.
+  Future<AppThemeMode> shuffleTheme() async {
+    final pool = AppThemeMode.values
+        .where((m) => m != AppThemeMode.automatic && m != state)
+        .toList();
+    final pick =
+        pool.isEmpty ? state : pool[Random().nextInt(pool.length)];
+    await setTheme(pick);
+    return pick;
   }
 }
 

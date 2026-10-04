@@ -377,6 +377,27 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: () {
+              HapticFeedback.mediumImpact();
+              ref.read(themeProvider.notifier).shuffleTheme();
+              ref
+                  .read(earthHeavenStyleProvider.notifier)
+                  .shuffleStyle();
+            },
+            icon: const Icon(Icons.shuffle_rounded, size: 18),
+            label: const Text('Surprise me'),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size.fromHeight(48),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
         Consumer(builder: (context, ref, _) {
           final surfaceStyle = ref.watch(earthHeavenStyleProvider);
           return Column(

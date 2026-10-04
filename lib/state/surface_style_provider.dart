@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'theme_provider.dart';
@@ -36,6 +38,18 @@ class EarthHeavenStyleNotifier extends Notifier<EarthHeavenStyle> {
   Future<void> _loadState() async {
     final prefs = await SharedPreferences.getInstance();
 
+    // Fresh install: deal a random surface so day one feels personal.
+    // Runs once — the pick is persisted like any manual choice.
+    if (prefs.getInt(_surfaceStyleKey) == null &&
+        !(prefs.getBool(_migrationKey) ?? false)) {
+      final pick = EarthHeavenStyle
+          .values[Random().nextInt(EarthHeavenStyle.values.length)];
+      state = pick;
+      await prefs.setInt(_surfaceStyleKey, pick.index);
+      await prefs.setBool(_migrationKey, true);
+      return;
+    }
+
     final migrated = prefs.getBool(_migrationKey) ?? false;
     if (!migrated) {
       final savedIndex = prefs.getInt(_surfaceStyleKey);
@@ -64,6 +78,16 @@ class EarthHeavenStyleNotifier extends Notifier<EarthHeavenStyle> {
     state = style;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_surfaceStyleKey, style.index);
+  }
+
+  /// Surprise me: random surface (different from current), persisted.
+  Future<EarthHeavenStyle> shuffleStyle() async {
+    final pool =
+        EarthHeavenStyle.values.where((s) => s != state).toList();
+    final pick =
+        pool.isEmpty ? state : pool[Random().nextInt(pool.length)];
+    await setStyle(pick);
+    return pick;
   }
 }
 
