@@ -6,6 +6,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../data/local_storage/preferences_service.dart';
+import '../services/bible_database_service.dart';
+import '../services/translation_pack_store.dart';
 import '../state/user_data_provider.dart';
 import '../state/notes_provider.dart';
 import '../state/reading_plan_provider.dart';
@@ -32,9 +34,22 @@ class BackupService {
         data[key] = prefs.get(key);
       }
 
+      // Installed downloadable packs (ids only — pack files themselves
+      // are re-downloaded after restore, not backed up).
+      List<String> packIds = [];
+      try {
+        final installed = await bibleDbService.getTranslations();
+        packIds = [
+          for (final t in installed)
+            if (!TranslationPackStore.isCoreId(t.translationId))
+              t.translationId,
+        ];
+      } catch (_) {}
+
       final backup = {
         'version': currentVersion,
         'timestamp': DateTime.now().toIso8601String(),
+        'packs': packIds,
         'data': data,
       };
 
@@ -72,6 +87,11 @@ class BackupService {
           !decoded.containsKey('data')) {
         throw const FormatException('Invalid backup file format');
       }
+      final backupVersion = decoded['version'] as int? ?? 0;
+      if (backupVersion > currentVersion) {
+        throw FormatException(
+            'Backup is from a newer app version (v$backupVersion). Update the app first.');
+      }
 
       final data = decoded['data'];
       if (data is! Map) {
@@ -105,20 +125,31 @@ class BackupService {
       final prefs = ref.read(preferencesProvider).prefs;
       await prefs.clear();
 
+      // Restore per key so one corrupt value can't abort the whole
+      // restore; skipped keys are reported, not fatal.
+      var skippedKeys = 0;
       for (final entry in data.entries) {
         final key = entry.key;
         final value = entry.value;
-
-        if (value is String) {
-          await prefs.setString(key, value);
-        } else if (value is int) {
-          await prefs.setInt(key, value);
-        } else if (value is double) {
-          await prefs.setDouble(key, value);
-        } else if (value is bool) {
-          await prefs.setBool(key, value);
-        } else if (value is List) {
-          await prefs.setStringList(key, List<String>.from(value));
+        try {
+          if (value is String) {
+            await prefs.setString(key, value);
+          } else if (value is int) {
+            await prefs.setInt(key, value);
+          } else if (value is double) {
+            await prefs.setDouble(key, value);
+          } else if (value is bool) {
+            await prefs.setBool(key, value);
+          } else if (value is List) {
+            await prefs.setStringList(
+                key, [for (final e in value) e.toString()]);
+          } else if (value == null) {
+            await prefs.remove(key);
+          } else {
+            skippedKeys++;
+          }
+        } catch (_) {
+          skippedKeys++;
         }
       }
 
@@ -144,9 +175,29 @@ class BackupService {
       ref.invalidate(earthHeavenStyleProvider);
       ref.invalidate(surfaceStyleProvider);
 
+      // Downloaded packs are not in the backup: tell the user which
+      // ones to re-download from the translation picker.
+      Set<String> installedIds = {};
+      try {
+        final installed = await bibleDbService.getTranslations();
+        installedIds = {for (final t in installed) t.translationId};
+      } catch (_) {}
+      final backedPacks = [
+        for (final e in (decoded['packs'] as List? ?? const []))
+          e.toString()
+      ].where((id) => !installedIds.contains(id)).toList();
+
       if (context.mounted) {
+        final details = [
+          if (skippedKeys > 0) '$skippedKeys value(s) skipped',
+          if (backedPacks.isNotEmpty)
+            're-download ${backedPacks.length} translation(s): ${backedPacks.join(', ')}',
+        ].join('. ');
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Backup restored successfully')),
+          SnackBar(
+              content: Text(details.isEmpty
+                  ? 'Backup restored successfully'
+                  : 'Backup restored ($details)')),
         );
       }
     } catch (e) {
