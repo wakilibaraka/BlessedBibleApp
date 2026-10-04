@@ -43,10 +43,20 @@ class AccountAvatar extends ConsumerWidget {
         ),
       );
     } else {
-      fallback = Icon(
-        Icons.person_outline_rounded,
-        size: size * 0.6,
-        color: theme.colorScheme.onSurface,
+      // Guest: same filled-circle footprint as the signed-in initial,
+      // so the header never shows a naked outline icon.
+      fallback = Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: theme.colorScheme.primaryContainer.withValues(alpha: 0.45),
+        ),
+        child: Icon(
+          Icons.person_outline_rounded,
+          size: size * 0.55,
+          color: theme.colorScheme.onPrimaryContainer,
+        ),
       );
     }
 

@@ -32,7 +32,9 @@ void main() {
       (tester) async {
     await pumpHub(tester);
 
-    expect(find.text('Peace be with you.'), findsOneWidget);
+    // Contextual greeting header (title + subtitle rotate daily).
+    expect(find.byKey(const Key('studyGreetingTitle')), findsOneWidget);
+    expect(find.byKey(const Key('studyGreetingSubtitle')), findsOneWidget);
     expect(find.byType(AccountAvatar), findsOneWidget);
     // Streak lives as a hub card (flame icon + progress CTA), not a
     // header pill.

@@ -12,7 +12,7 @@ import '../../state/study_layout_provider.dart';
 import '../../state/wotd_provider.dart';
 import 'today_screen.dart';
 import 'votd_archive_screen.dart';
-import '../../state/theme_provider.dart';
+import '../../data/study_greetings.dart';
 import '../../state/user_data_provider.dart'
     show bookmarksProvider, highlightsProvider;
 import '../../data/local_storage/preferences_service.dart';
@@ -260,8 +260,13 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final appThemeMode = ref.watch(themeProvider);
-    final subGreeting = appThemeMode.resolve(context).subGreeting;
+    final streak = ref.watch(streakProvider);
+    final now = DateTime.now();
+    final greeting = greetingFor(
+      now: now,
+      streakCount: streak.count,
+      distinctDaysThisYear: streak.distinctDaysThisYear,
+    );
     final layout = ref.watch(studyLayoutProvider);
     final cards = _orderedCards(layout);
 
@@ -275,23 +280,29 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(20, 32, 20, 180),
               children: [
-                // Greeting + account.
+                // Greeting + account: eyebrow/title/subtitle rhythm
+                // mirrors the cards below; avatar centers on the block.
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
+                          V2Eyebrow(greetingEyebrow(now)),
+                          const SizedBox(height: 2),
                           Text(
-                            'Peace be with you.',
+                            greeting.title,
+                            key: const Key('studyGreetingTitle'),
                             style: theme.textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            subGreeting,
+                            greeting.subtitle,
+                            key: const Key('studyGreetingSubtitle'),
                             style: theme.textTheme.labelMedium?.copyWith(
                               color: theme.colorScheme.onSurface
                                   .withValues(alpha: 0.6),
