@@ -163,142 +163,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               },
             );
           }),
-          const Divider(height: 1, indent: 16),
-          Consumer(builder: (context, ref, _) {
-            final selectorHeight =
-                ref.watch(readSettingsProvider.select((s) => s.selectorHeight));
-            return AnimatedSegmentedTile<SelectorHeight>(
-              title: 'Book selector height',
-              subtitle: 'Control how far up the book/chapter sheet opens',
-              selectedValue: selectorHeight,
-              options: const [
-                MapEntry(SelectorHeight.quarter, 'Half'),
-                MapEntry(SelectorHeight.half, '3/4'),
-                MapEntry(SelectorHeight.full, 'Full'),
-              ],
-              onChanged: (val) {
-                HapticFeedback.selectionClick();
-                ref.read(readSettingsProvider.notifier).setSelectorHeight(val);
-              },
-            );
-          }),
+
 
         ],
       ),
-      SettingsPillCard(
-        children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
-            child: Text('Search', style: TextStyle(fontSize: 16)),
-          ),
-          Consumer(builder: (context, ref, _) {
-            final autoOpen = ref.watch(searchSettingsProvider
-                .select((s) => s.autoOpenSingleSearchResult));
-            return SwitchListTile(
-              title: const Text('Auto-open single search result'),
-              subtitle: const Text(
-                  'Automatically navigate when a search returns exactly one result'),
-              value: autoOpen,
-              onChanged: (value) {
-                HapticFeedback.selectionClick();
-                ref.read(searchSettingsProvider.notifier).toggleAutoOpen(value);
-              },
-            );
-          }),
-          const Divider(height: 1, indent: 16),
-          Consumer(builder: (context, ref, _) {
-            final includeNotes = ref.watch(
-                searchSettingsProvider.select((s) => s.includeNotesInSearch));
-            return SwitchListTile(
-              title: const Text('Include personal notes in search'),
-              subtitle: const Text(
-                  'Allow search to look through your personal notes'),
-              value: includeNotes,
-              onChanged: (value) {
-                HapticFeedback.selectionClick();
-                ref
-                    .read(searchSettingsProvider.notifier)
-                    .toggleIncludeNotes(value);
-              },
-            );
-          }),
-          const Divider(height: 1, indent: 16),
-          Consumer(builder: (context, ref, _) {
-            final matchWholeWords = ref
-                .watch(searchSettingsProvider.select((s) => s.matchWholeWords));
-            return SwitchListTile(
-              title: const Text('Match whole words only'),
-              subtitle: const Text(
-                  'Only find exact word matches (disables partial/prefix matching)'),
-              value: matchWholeWords,
-              onChanged: (value) {
-                HapticFeedback.selectionClick();
-                ref
-                    .read(searchSettingsProvider.notifier)
-                    .toggleMatchWholeWords(value);
-              },
-            );
-          }),
-          const Divider(height: 1, indent: 16),
-          Consumer(builder: (context, ref, _) {
-            final defaultOt = ref
-                .watch(searchSettingsProvider.select((s) => s.defaultSearchOt));
-            final defaultNt = ref
-                .watch(searchSettingsProvider.select((s) => s.defaultSearchNt));
-            final defaultComm = ref.watch(searchSettingsProvider
-                .select((s) => s.defaultSearchCommentary));
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
-                  child: Text('Default Search Scopes',
-                      style: TextStyle(fontSize: 14)),
-                ),
-                CheckboxListTile(
-                  title: const Text('Old Testament'),
-                  value: defaultOt,
-                  onChanged: (value) {
-                    if (value != null) {
-                      ref
-                          .read(searchSettingsProvider.notifier)
-                          .toggleDefaultOt(value);
-                    }
-                  },
-                  dense: true,
-                  visualDensity: VisualDensity.compact,
-                ),
-                CheckboxListTile(
-                  title: const Text('New Testament'),
-                  value: defaultNt,
-                  onChanged: (value) {
-                    if (value != null) {
-                      ref
-                          .read(searchSettingsProvider.notifier)
-                          .toggleDefaultNt(value);
-                    }
-                  },
-                  dense: true,
-                  visualDensity: VisualDensity.compact,
-                ),
-                CheckboxListTile(
-                  title: const Text('Commentary'),
-                  value: defaultComm,
-                  onChanged: (value) {
-                    if (value != null) {
-                      ref
-                          .read(searchSettingsProvider.notifier)
-                          .toggleDefaultCommentary(value);
-                    }
-                  },
-                  dense: true,
-                  visualDensity: VisualDensity.compact,
-                ),
-              ],
-            );
-          }),
-        ],
-      ),
+
       SettingsPillCard(
         children: [
           Consumer(builder: (context, ref, _) {
@@ -673,26 +542,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               },
             );
           }),
-          const Divider(height: 1, indent: 16),
-          Consumer(builder: (context, ref, _) {
-            final prefs = ref.watch(preferencesProvider);
-            return StatefulBuilder(builder: (context, setState) {
-              return SwitchListTile(
-                title: const Text('Show reading tips'),
-                subtitle: const Text(
-                    'Show guided hints for reading actions like highlighting and swiping'),
-                value: prefs.showReadingTips,
-                onChanged: (val) {
-                  HapticFeedback.selectionClick();
-                  prefs.setShowReadingTips(val);
-                  setState(() {});
-                  if (val) {
-                    ref.read(hintsProvider.notifier).resetHints();
-                  }
-                },
-              );
-            });
-          }),
+
         ],
       ),
       SettingsPillCard(
@@ -944,6 +794,29 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           ],
         );
       }),
+      SettingsPillCard(
+        children: [
+          Consumer(builder: (context, ref, _) {
+            final prefs = ref.watch(preferencesProvider);
+            return StatefulBuilder(builder: (context, setState) {
+              return SwitchListTile(
+                title: const Text('Show reading tips'),
+                subtitle: const Text(
+                    'Show guided hints for reading actions like highlighting and swiping'),
+                value: prefs.showReadingTips,
+                onChanged: (val) {
+                  HapticFeedback.selectionClick();
+                  prefs.setShowReadingTips(val);
+                  setState(() {});
+                  if (val) {
+                    ref.read(hintsProvider.notifier).resetHints();
+                  }
+                },
+              );
+            });
+          }),
+        ],
+      ),
     ]);
   }
 
@@ -1010,6 +883,136 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 HapticFeedback.selectionClick();
                 ref.read(bibleNavSettingsProvider.notifier).setAutoClose(value);
               },
+            );
+          }),
+        ],
+      ),
+      SettingsPillCard(
+        children: [
+          Consumer(builder: (context, ref, _) {
+            final selectorHeight =
+                ref.watch(readSettingsProvider.select((s) => s.selectorHeight));
+            return AnimatedSegmentedTile<SelectorHeight>(
+              title: 'Book selector height',
+              subtitle: 'Control how far up the book/chapter sheet opens',
+              selectedValue: selectorHeight,
+              options: const [
+                MapEntry(SelectorHeight.quarter, 'Half'),
+                MapEntry(SelectorHeight.half, '3/4'),
+                MapEntry(SelectorHeight.full, 'Full'),
+              ],
+              onChanged: (val) {
+                HapticFeedback.selectionClick();
+                ref.read(readSettingsProvider.notifier).setSelectorHeight(val);
+              },
+            );
+          }),
+        ],
+      ),
+      SettingsPillCard(
+        children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
+            child: Text('Search', style: TextStyle(fontSize: 16)),
+          ),
+          Consumer(builder: (context, ref, _) {
+            final autoOpen = ref.watch(searchSettingsProvider
+                .select((s) => s.autoOpenSingleSearchResult));
+            return SwitchListTile(
+              title: const Text('Auto-open single search result'),
+              subtitle: const Text(
+                  'Automatically navigate when a search returns exactly one result'),
+              value: autoOpen,
+              onChanged: (value) {
+                HapticFeedback.selectionClick();
+                ref.read(searchSettingsProvider.notifier).toggleAutoOpen(value);
+              },
+            );
+          }),
+          const Divider(height: 1, indent: 16),
+          Consumer(builder: (context, ref, _) {
+            final includeNotes = ref.watch(
+                searchSettingsProvider.select((s) => s.includeNotesInSearch));
+            return SwitchListTile(
+              title: const Text('Include personal notes in search'),
+              subtitle: const Text(
+                  'Allow search to look through your personal notes'),
+              value: includeNotes,
+              onChanged: (value) {
+                HapticFeedback.selectionClick();
+                ref
+                    .read(searchSettingsProvider.notifier)
+                    .toggleIncludeNotes(value);
+              },
+            );
+          }),
+          const Divider(height: 1, indent: 16),
+          Consumer(builder: (context, ref, _) {
+            final matchWholeWords = ref
+                .watch(searchSettingsProvider.select((s) => s.matchWholeWords));
+            return SwitchListTile(
+              title: const Text('Match whole words only'),
+              subtitle: const Text(
+                  'Only find exact word matches (disables partial/prefix matching)'),
+              value: matchWholeWords,
+              onChanged: (value) {
+                HapticFeedback.selectionClick();
+                ref
+                    .read(searchSettingsProvider.notifier)
+                    .toggleMatchWholeWords(value);
+              },
+            );
+          }),
+          const Divider(height: 1, indent: 16),
+          Consumer(builder: (context, ref, _) {
+            final defaultOt = ref
+                .watch(searchSettingsProvider.select((s) => s.defaultSearchOt));
+            final defaultNt = ref
+                .watch(searchSettingsProvider.select((s) => s.defaultSearchNt));
+            final defaultComm = ref.watch(searchSettingsProvider
+                .select((s) => s.defaultSearchCommentary));
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
+                  child: Text('Default Search Scopes',
+                      style: TextStyle(fontSize: 14)),
+                ),
+                SwitchListTile(
+                  title: const Text('Old Testament'),
+                  value: defaultOt,
+                  dense: true,
+                  onChanged: (value) {
+                    HapticFeedback.selectionClick();
+                    ref
+                        .read(searchSettingsProvider.notifier)
+                        .toggleDefaultOt(value);
+                  },
+                ),
+                SwitchListTile(
+                  title: const Text('New Testament'),
+                  value: defaultNt,
+                  dense: true,
+                  onChanged: (value) {
+                    HapticFeedback.selectionClick();
+                    ref
+                        .read(searchSettingsProvider.notifier)
+                        .toggleDefaultNt(value);
+                  },
+                ),
+                SwitchListTile(
+                  title: const Text('Commentary'),
+                  value: defaultComm,
+                  dense: true,
+                  onChanged: (value) {
+                    HapticFeedback.selectionClick();
+                    ref
+                        .read(searchSettingsProvider.notifier)
+                        .toggleDefaultCommentary(value);
+                  },
+                ),
+              ],
             );
           }),
         ],
