@@ -1,6 +1,8 @@
-# 📖 The Blessed Bible
+# 📖 Bible (The Blessed Bible)
 
-A clean, fast, offline-first KJV Bible study app built with Flutter — designed for distraction-free reading, multi-language study, and verse-by-verse historicist commentary.
+A clean, fast, offline-first Bible study app built with Flutter — designed for distraction-free reading, multi-language study, and verse-by-verse historicist commentary. Listed on-device as **Bible**.
+
+> ⬇️ Get the latest APK from [Releases](https://github.com/wakilibaraka/BlessedBibleApp/releases).
 
 The Blessed Bible focuses on the reading experience: legible typography, a wide range of themes, side-by-side translations, and study tools that stay out of your way until you need them.
 
@@ -10,7 +12,7 @@ The Blessed Bible focuses on the reading experience: legible typography, a wide 
 
 - **King James Version** with clean, native-feeling scrolling and swipe-to-change-chapter navigation.
 - **Multi-language translations** — read in your primary language with an optional secondary translation shown alongside, and quick per-verse translation chips.
-- **12+ themes** across light, dark, sepia, and OLED modes, with live recoloring.
+- **14 themes** across light, dark, sepia, and OLED modes, with live recoloring, surface styles, and shuffle.
 - **Custom typography** — multiple reading fonts (Lora, Literata, EB Garamond, Bitter, Source Sans 3, and more), adjustable size, and layout options.
 
 ### Study
@@ -29,7 +31,8 @@ The Blessed Bible focuses on the reading experience: legible typography, a wide 
 
 - **Framework:** Flutter (Dart)
 - **State management:** Riverpod
-- **Storage:** Local SQLite (bundled Bible database) + SharedPreferences — fully offline, no account required.
+- **Storage:** Local SQLite (bundled Bible database) + SharedPreferences — fully offline, no account required. Optional sign-in (Google/Apple) unlocks cloud backup.
+- **Cloud (optional):** Firebase Auth + cloud backup of personal data.
 - **Platforms:** Android (iOS planned)
 
 ## 🚀 Getting Started
@@ -49,4 +52,4 @@ Early beta. Actively developed — expect ongoing changes.
 
 ## 🔒 License
 
-Private repository. All rights reserved.
+Public repository. All rights reserved.

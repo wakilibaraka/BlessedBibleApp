@@ -1,8 +1,8 @@
 name: the_blessed_bible
-description: "A new Flutter project for The Blessed Bible."
+description: "An offline-first Flutter Bible study app with historicist commentaries, multi-language packs, and dynamic themes."
 publish_to: 'none'
 
-version: 1.0.1+8
+version: 1.0.2+9
 
 environment:
   sdk: '>=3.2.0 <4.0.0'
