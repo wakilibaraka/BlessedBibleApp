@@ -120,7 +120,7 @@ class PlanRefSpec {
     // Single-chapter book with "A-B" form: always verses A..B.
     if (v1s == null && cendS != null && chapters.length == 1) {
       final only = chapters.keys.single;
-      final hi = int.parse(cendS!);
+      final hi = int.parse(cendS);
       checkVerse(only, c1);
       checkVerse(only, hi);
       if (c1 > hi) throw FormatException('reversed range: $raw');
