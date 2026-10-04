@@ -120,7 +120,10 @@ class LibraryCalendarRailState extends State<LibraryCalendarRail> {
               _visibleWeekStart.subtract(const Duration(days: 7))),
         ),
         Expanded(
-          child: V2Card(
+          // Deliberately flat: this is header chrome in a fixed-height
+            // rail, and the surface container's 300ms fade would fight
+            // page snapping.
+            child: V2Card(
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
             child: SizedBox(
               height: 64,

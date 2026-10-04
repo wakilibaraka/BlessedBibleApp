@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../state/theme_provider.dart';
 import '../../theme/reading_tokens.dart';
 import 'animated_background.dart';
+import 'textured_glass_container.dart';
 
 /// Shared presentation primitives for the redesigned (V2) Study screens.
 ///
@@ -120,27 +121,79 @@ class V2SectionLabel extends StatelessWidget {
 
 /// Card shell used by every V2 screen: surface bg, 1px themed border,
 /// 24px radius. Optional accent border for featured/hero cards.
+/// Card primitive for the V2 screens.
+///
+/// Two modes, chosen per call site:
+/// - default: flat theme fill + hairline border (cheap, used in long
+///   scrolling lists).
+/// - [textured]: routed through [TexturedGlassContainer] so the card
+///   honours the user's surface style (Earth/Heaven/Paperlike/
+///   Claymorphic/Aero/Skeuomorphic). Opt-in because that container adds
+///   shadows, rims and (for frosted/aero) a BackdropFilter — fine for a
+///   handful of hub cards, too costly for every row of an infinite list.
 class V2Card extends StatelessWidget {
   final Widget child;
   final bool featured;
   final EdgeInsetsGeometry padding;
   final VoidCallback? onTap;
+
+  /// Opt into the active surface style (see class docs).
+  final bool textured;
+
   const V2Card({
     super.key,
     required this.child,
     this.featured = false,
     this.padding = const EdgeInsets.all(18),
     this.onTap,
+    this.textured = false,
   });
+
+  static const _radius = 24.0;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final tokens = _tokens(context);
+    final radius = BorderRadius.circular(_radius);
+
+    if (textured) {
+      // Featured keeps its primary accent as a wrapper border so the
+      // emphasis survives every surface style; the container supplies
+      // fill, rim, grain and shadow.
+      final content = TexturedGlassContainer(
+        borderRadius: radius,
+        padding: padding,
+        isScrollable: false,
+        child: child,
+      );
+      final wrapped = featured
+          ? Container(
+              decoration: BoxDecoration(
+                borderRadius: radius,
+                border: Border.all(
+                  color: theme.primaryColor.withValues(alpha: 0.45),
+                  width: 1.5,
+                ),
+              ),
+              child: content,
+            )
+          : content;
+      if (onTap == null) return wrapped;
+      return Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: radius,
+          onTap: onTap,
+          child: wrapped,
+        ),
+      );
+    }
+
     final card = Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: radius,
         border: Border.all(
           color: featured
               ? theme.primaryColor.withValues(alpha: 0.35)
@@ -154,7 +207,7 @@ class V2Card extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: radius,
         onTap: onTap,
         child: card,
       ),

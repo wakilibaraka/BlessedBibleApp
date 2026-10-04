@@ -312,6 +312,7 @@ class _ReadingPlanDetailV2ScreenState
               children: [
                 // ── Progress hero ─────────────────────────────
                 V2Card(
+                  textured: true,
                   featured: true,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

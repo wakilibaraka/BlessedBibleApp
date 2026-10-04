@@ -592,6 +592,7 @@ class _YourSpaceCard extends ConsumerWidget {
     ];
 
     return V2Card(
+      textured: true,
       featured: true,
       onTap: () => go(0),
       padding: EdgeInsets.all(expanded ? 22 : 18),
@@ -806,6 +807,7 @@ class _PlansLiveCardState extends ConsumerState<_PlansLiveCard> {
     }
 
     return V2Card(
+      textured: true,
       featured: widget.span == CardSpan.full,
       onTap: handleTap,
       padding: EdgeInsets.all(widget.expanded ? 22 : 18),
@@ -936,6 +938,7 @@ class _ToolCard extends StatelessWidget {
     final theme = Theme.of(context);
     final iconBox = expanded ? 52.0 : 34.0;
     return V2Card(
+      textured: true,
       featured: span == CardSpan.full,
       onTap: onTap,
       padding: EdgeInsets.all(expanded ? 20 : 15),
@@ -1065,6 +1068,7 @@ class _VotdArchiveCard extends ConsumerWidget {
       data: (wotd) {
         if (wotd == null) {
           return V2Card(
+            textured: true,
             featured: span == CardSpan.full,
             onTap: open,
             padding: EdgeInsets.all(expanded ? 20 : 15),
@@ -1073,6 +1077,7 @@ class _VotdArchiveCard extends ConsumerWidget {
           );
         }
         return V2Card(
+          textured: true,
           featured: span == CardSpan.full,
           onTap: open,
           padding: EdgeInsets.all(expanded ? 20 : 15),
@@ -1082,6 +1087,7 @@ class _VotdArchiveCard extends ConsumerWidget {
         );
       },
       loading: () => V2Card(
+        textured: true,
         featured: span == CardSpan.full,
         padding: const EdgeInsets.all(15),
         child: Text('Loading…',
@@ -1091,6 +1097,7 @@ class _VotdArchiveCard extends ConsumerWidget {
             )),
       ),
       error: (_, __) => V2Card(
+        textured: true,
         featured: span == CardSpan.full,
         onTap: open,
         padding: const EdgeInsets.all(15),
@@ -1120,6 +1127,7 @@ class _StreakCard extends ConsumerWidget {
     final count = streak.count;
     final iconBox = expanded ? 52.0 : 34.0;
     return V2Card(
+      textured: true,
       featured: span == CardSpan.full,
       onTap: () => onOpen(const TodayScreen()),
       padding: EdgeInsets.all(expanded ? 20 : 15),
