@@ -10,7 +10,7 @@ import '../widgets/shared_app_bar.dart';
 import '../widgets/study_v2_widgets.dart';
 import 'custom_plan_builder_v2_screen.dart';
 import 'reading_plan_detail_v2_screen.dart';
-import 'plans_hub_v2_screen.dart' show availablePlans, PlanMetadata;
+import '../../data/curated_plans.dart';
 
 /// Redesigned reading-plans hub (V3). Shown when the study-design flag is on.
 ///

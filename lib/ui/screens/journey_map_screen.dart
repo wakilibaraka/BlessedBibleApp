@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/reading_plan_provider.dart';
 import '../../theme/app_colors.dart';
-import 'reading_plan_browser.dart';
+import 'reading_plan_detail_v2_screen.dart';
 
 class JourneyMapScreen extends ConsumerStatefulWidget {
   final String planId;
@@ -145,10 +145,11 @@ class _WeeklyJourneyPath extends StatelessWidget {
     
     return GestureDetector(
       onTap: () {
+        // The per-day screen shipped with the retired plan browser; the
+        // V2 plan detail is the live equivalent for this plan.
         Navigator.of(context).push(CupertinoPageRoute(
-          builder: (_) => Scaffold(
-            body: DayView(planId: planId, dayNum: dayData.day),
-          ),
+          builder: (_) =>
+              ReadingPlanDetailV2Screen(planId: planId),
         ));
       },
       child: Stack(

@@ -7,10 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:the_blessed_bible/data/local_storage/preferences_service.dart';
 import 'package:the_blessed_bible/state/bible_nav_settings_provider.dart';
-import 'package:the_blessed_bible/state/plans_design_provider.dart';
 import 'package:the_blessed_bible/state/read_settings_provider.dart';
 import 'package:the_blessed_bible/state/search_settings_provider.dart';
-import 'package:the_blessed_bible/state/study_design_provider.dart';
 
 Future<ProviderContainer> freshContainer() async {
   SharedPreferences.setMockInitialValues({});
@@ -88,27 +86,6 @@ void main() {
     final reloadedAuto = await reloaded(
         (c) => c.read(searchSettingsProvider).autoOpenSingleSearchResult);
     expect(reloadedAuto, isTrue);
-  });
-
-  test('design flags default to new designs and toggle', () async {
-    final c = await freshContainer();
-    addTearDown(c.dispose);
-
-    // Defaults on (fresh install, no stored choice).
-    expect(c.read(studyDesignProvider), isTrue);
-    expect(c.read(plansDesignProvider), isTrue);
-
-    await c.read(studyDesignProvider.notifier).setEnabled(false);
-    await c.read(plansDesignProvider.notifier).setEnabled(false);
-    expect(c.read(studyDesignProvider), isFalse);
-    expect(c.read(plansDesignProvider), isFalse);
-
-    final reloadedStudy =
-        await reloaded((c) => c.read(studyDesignProvider));
-    expect(reloadedStudy, isFalse);
-    final reloadedPlans =
-        await reloaded((c) => c.read(plansDesignProvider));
-    expect(reloadedPlans, isFalse);
   });
 
   test('removed toggles are gone from the state surface', () {

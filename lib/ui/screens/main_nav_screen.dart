@@ -13,7 +13,6 @@ import '../../state/theme_provider.dart';
 import 'home_screen.dart';
 import 'read_screen.dart';
 import 'search_screen.dart';
-import 'study_screen.dart';
 import 'study_screen_v2.dart';
 import 'settings_screen.dart';
 import '../sheets/search_settings_sheet.dart';
@@ -28,7 +27,6 @@ import '../../state/read_location_provider.dart';
 import '../../state/bible_provider.dart';
 import '../../state/read_settings_provider.dart';
 import '../../state/study_provider.dart';
-import '../../state/study_design_provider.dart';
 import '../../state/commentary_provider.dart';
 import '../widgets/commentary_view.dart';
 
@@ -46,15 +44,11 @@ class MainNavScreen extends ConsumerWidget {
     final isNavHidden = !isNavVisible;
     final selectedVerses = ref.watch(readSelectionProvider);
     final readLoc = ref.watch(readLocationProvider);
-    // Dual-design rollout: V2 Study hub when the testing flag is on,
-    // original V1 screen stays as fallback.
-    final useStudyRedesign = ref.watch(studyDesignProvider);
-
     final screens = [
       const HomeScreen(),
       const ReadScreen(),
       const SearchScreen(),
-      useStudyRedesign ? const StudyScreenV2() : const StudyScreen(),
+      const StudyScreenV2(),
       const SettingsScreen(),
     ];
 

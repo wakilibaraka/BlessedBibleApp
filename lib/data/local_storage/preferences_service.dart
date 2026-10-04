@@ -18,8 +18,6 @@ class PreferencesService {
   static const String _lastTabKey = 'last_tab';
   static const String _lastReadLocKey = 'last_read_loc';
   static const String _studyLayoutKey = 'study_layout';
-  static const String _useNewPlansHubKey = 'use_new_plans_hub';
-  static const String _studyRedesignKey = 'study_redesign_enabled';
   static const String _readingPlanStateKey = 'reading_plan_state';
   static const String _bentoPresetKey = 'bento_preset';
 
@@ -112,39 +110,7 @@ class PreferencesService {
     await prefs.setStringList(_searchQueriesKey, queries);
   }
 
-  bool getUseNewPlansHub() {
-    return prefs.getBool(_useNewPlansHubKey) ?? false;
-  }
 
-  Future<void> setUseNewPlansHub(bool useNew) async {
-    await prefs.setBool(_useNewPlansHubKey, useNew);
-  }
-
-  /// Dual-design rollout flag: when true, Study tab + study flows use the
-  /// redesigned V2 screens. Default ON — V1 remains as the fallback
-  /// (turn the Settings switch off to use the classic layout). An
-  /// explicit stored choice always wins over the default.
-  bool getStudyRedesign() {
-    return prefs.getBool(_studyRedesignKey) ?? true;
-  }
-
-  Future<void> setStudyRedesign(bool enabled) async {
-    await prefs.setBool(_studyRedesignKey, enabled);
-  }
-
-  static const String _plansRedesignKey = 'plans_library_redesign_enabled';
-
-  /// Plans Library redesign flag: when true, plan entry points open the new
-  /// Reading/Books/My Plans library. Default ON — the previous hub remains
-  /// as the fallback (turn the Settings switch off to use it). An explicit
-  /// stored choice always wins over the default.
-  bool getPlansRedesign() {
-    return prefs.getBool(_plansRedesignKey) ?? true;
-  }
-
-  Future<void> setPlansRedesign(bool enabled) async {
-    await prefs.setBool(_plansRedesignKey, enabled);
-  }
 
   void saveBookmarks(List<String> bookmarks) {
     prefs.setStringList(_bookmarksKey, bookmarks);

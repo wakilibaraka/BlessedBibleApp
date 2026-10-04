@@ -8,6 +8,7 @@ import '../widgets/animated_background.dart';
 import '../widgets/glass_container.dart';
 import '../../state/notes_provider.dart';
 import '../../state/streak_provider.dart';
+import 'plans_library_screen.dart';
 import '../../state/nav_provider.dart';
 import 'dart:math' as math;
 import 'package:flutter/services.dart';
@@ -15,7 +16,7 @@ import 'package:flutter/cupertino.dart';
 import 'your_space_screen.dart';
 import 'notes_list_screen.dart';
 
-import 'plans_hub_v2_screen.dart';
+import '../../data/curated_plans.dart';
 import '../widgets/continue_reading_card.dart';
 import '../widgets/reminder_settings_card.dart';
 
@@ -615,7 +616,7 @@ class _QuickActionsRow extends ConsumerWidget {
         onTap: () {
           Navigator.of(context).push(
             CupertinoPageRoute(
-                builder: (_) => const PlansHubV2Screen()),
+                builder: (_) => const PlansLibraryScreen()),
           );
         },
       ),

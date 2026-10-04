@@ -7,8 +7,6 @@ import '../../state/hints_provider.dart';
 import '../../state/bible_nav_settings_provider.dart';
 import '../../state/typography_provider.dart';
 import '../../state/search_settings_provider.dart';
-import '../../state/study_design_provider.dart';
-import '../../state/plans_design_provider.dart';
 import '../../state/translation_provider.dart';
 import '../sheets/translation_picker_sheet.dart';
 import '../../state/read_settings_provider.dart';
@@ -672,62 +670,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                                 fontWeight: FontWeight.bold)),
                       ),
                     ],
-                  ),
-                );
-              },
-            );
-          }),
-        ],
-      ),
-      SettingsPillCard(
-        children: [
-          Consumer(builder: (context, ref, _) {
-            final useRedesign = ref.watch(studyDesignProvider);
-            final theme = Theme.of(context);
-            return SwitchListTile(
-              title: const Text('New Study design'),
-              subtitle: const Text(
-                  'On by default — the redesigned Study hub, plans, commentary and tools. Turn off to use the classic design (fallback). Your plans, notes and progress are shared — nothing is lost either way.'),
-              secondary: Icon(Icons.science_outlined,
-                  color: theme.primaryColor),
-              value: useRedesign,
-              onChanged: (val) {
-                HapticFeedback.selectionClick();
-                ref
-                    .read(studyDesignProvider.notifier)
-                    .setEnabled(val);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(val
-                        ? 'New Study design on — open the Study tab to see it.'
-                        : 'Classic Study design on (fallback).'),
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
-              },
-            );
-          }),
-          Consumer(builder: (context, ref, _) {
-            final useNewLibrary = ref.watch(plansDesignProvider);
-            final theme = Theme.of(context);
-            return SwitchListTile(
-              title: const Text('New Plans Library'),
-              subtitle: const Text(
-                  'On by default — Reading, Books and My Plans in one calm library. Turn off to use the previous plans hub (fallback). Your plans and progress are shared — nothing is lost either way.'),
-              secondary: Icon(Icons.auto_stories_outlined,
-                  color: theme.primaryColor),
-              value: useNewLibrary,
-              onChanged: (val) {
-                HapticFeedback.selectionClick();
-                ref
-                    .read(plansDesignProvider.notifier)
-                    .setEnabled(val);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(val
-                        ? 'New Plans Library on — open the Study tab to see it.'
-                        : 'Previous plans hub on (fallback).'),
-                    behavior: SnackBarBehavior.floating,
                   ),
                 );
               },

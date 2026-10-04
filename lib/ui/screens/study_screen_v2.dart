@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/journal_provider.dart';
 import '../../state/notes_provider.dart';
 import '../../state/reading_plan_provider.dart';
-import '../../state/plans_design_provider.dart';
 import '../../state/streak_provider.dart';
 import '../../state/study_layout_provider.dart';
 import '../../state/wotd_provider.dart';
@@ -26,7 +25,7 @@ import 'plans_hub_v3_screen.dart';
 import 'plans_library_screen.dart';
 import 'reading_plan_detail_v2_screen.dart';
 import 'your_space_screen.dart';
-import 'plans_hub_v2_screen.dart' show availablePlans;
+import '../../data/curated_plans.dart';
 
 /// Redesigned Study hub (V2): Large by default, every card the same
 /// size.
@@ -671,10 +670,7 @@ class _PlansLiveCardState extends ConsumerState<_PlansLiveCard> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final activeIds = ref.watch(activePlanIdsProvider);
-    final useNewLibrary = ref.watch(plansDesignProvider);
-    void openLibrary() => widget.onOpen(useNewLibrary
-        ? const PlansLibraryScreen()
-        : const PlansHubV3Screen());
+    void openLibrary() => widget.onOpen(const PlansLibraryScreen());
     void openDetail(String id) =>
         widget.onOpen(ReadingPlanDetailV2Screen(planId: id));
 

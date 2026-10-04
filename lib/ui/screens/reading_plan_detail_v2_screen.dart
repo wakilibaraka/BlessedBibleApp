@@ -9,7 +9,7 @@ import '../../data/local_storage/preferences_service.dart';
 import '../widgets/shared_app_bar.dart';
 import '../widgets/study_v2_widgets.dart';
 import 'journey_map_screen.dart';
-import 'plans_hub_v2_screen.dart' show availablePlans, PlanMetadata;
+import '../../data/curated_plans.dart';
 import 'study_reader_screen.dart';
 
 /// Rebuilt plan detail (V2). Shown from [PlansHubV3Screen] / [StudyScreenV2].

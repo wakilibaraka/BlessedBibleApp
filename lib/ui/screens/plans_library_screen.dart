@@ -17,7 +17,7 @@ import '../widgets/study_v2_widgets.dart';
 import '../widgets/plans_library_widgets.dart';
 import '../widgets/library_calendar_rail.dart';
 import 'custom_plan_builder_v2_screen.dart';
-import 'plans_hub_v2_screen.dart' show availablePlans, PlanMetadata;
+import '../../data/curated_plans.dart';
 import 'reading_plan_detail_v2_screen.dart';
 import 'bible_story_reader_screen.dart';
 
