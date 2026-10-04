@@ -115,6 +115,29 @@ class DevotionalService {
     return out;
   }
 
+  /// Deterministic artwork pick for a calendar day: one Doré plate (public
+  /// domain, already bundled) plus the book prefix that owns it, so callers
+  /// can open the matching story. Same day always yields the same plate.
+  Future<StoryPlate?> plateForDay(DateTime day) async {
+    await _ensureArtLoaded();
+    if (_artByPrefix.isEmpty) return null;
+    final entries = _artByPrefix.entries.toList()
+      ..sort((a, b) => a.key.compareTo(b.key));
+    final dayOfYear = day.difference(DateTime(day.year)).inDays;
+    final entry = entries[dayOfYear % entries.length];
+    return StoryPlate(
+      prefix: entry.key,
+      slug: entry.value,
+      caption: _artCaptionBySlug[entry.value] ?? '',
+    );
+  }
+
+  /// First story of the book that owns [slug] (opens the plate's reader).
+  Future<DevotionalStory?> firstStoryForPrefix(String prefix) async {
+    final stories = await loadBook(prefix);
+    return stories.isEmpty ? null : stories.first;
+  }
+
   /// Finds the previous/next story in global chronological order.
   Future<DevotionalStory?> neighborOf(DevotionalStory story, {required bool next}) async {
     final all = await loadAllStoryRefs();
@@ -134,4 +157,19 @@ class DevotionalService {
     }
     return sum;
   }
+}
+
+/// A bundled artwork plate plus its caption and owning book prefix.
+class StoryPlate {
+  final String prefix;
+  final String slug;
+  final String caption;
+
+  const StoryPlate({
+    required this.prefix,
+    required this.slug,
+    required this.caption,
+  });
+
+  String get assetPath => 'assets/devotional/art/$slug.webp';
 }

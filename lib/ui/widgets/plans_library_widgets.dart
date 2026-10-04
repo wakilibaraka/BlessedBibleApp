@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../services/devotional_service.dart';
+import '../../state/devotional_provider.dart';
 
 /// Presentation widgets for the Plans Library redesign.
 ///
@@ -14,13 +18,24 @@ const List<String> _monthNames = [
 String libraryDateHeader(DateTime day) =>
     '${_monthNames[day.month - 1]} ${day.day}, ${day.year}';
 
-/// Greeting row: "Hello," + name + "Let's Read" pill + mascot placeholder.
+/// Greeting row: "Hello," + name on the left, a year-progress / verse
+/// button on the right. Both blocks share a baseline so the row reads as
+/// two balanced halves (the old three-part row drifted out of alignment).
 class LibraryGreetingHeader extends StatelessWidget {
   final String name;
+
+  /// Day-of-year progress, e.g. "Day 277 of 365".
+  final String progressLabel;
+
+  /// Remaining days, e.g. "89 days left".
+  final String remainingLabel;
+
   final VoidCallback onReadPressed;
   const LibraryGreetingHeader({
     super.key,
     required this.name,
+    required this.progressLabel,
+    required this.remainingLabel,
     required this.onReadPressed,
   });
 
@@ -28,49 +43,75 @@ class LibraryGreetingHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 'Hello,',
-                style: theme.textTheme.headlineMedium?.copyWith(
+                style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w800,
+                  height: 1.1,
                 ),
               ),
               Text(
                 name,
-                style: theme.textTheme.headlineMedium?.copyWith(
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w800,
+                  height: 1.1,
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
                 ),
               ),
             ],
           ),
         ),
-        GestureDetector(
-          onTap: onReadPressed,
-          child: Container(
-            margin: const EdgeInsets.only(top: 6),
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surface,
-              borderRadius: BorderRadius.circular(999),
-              border: Border.all(color: theme.dividerColor),
-            ),
-            child: Text(
-              "Let's Read",
-              style: theme.textTheme.labelLarge?.copyWith(
-                fontWeight: FontWeight.w700,
+        const SizedBox(width: 12),
+        // 44pt min target, two lines of context, no magic offsets.
+        ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 44),
+          child: Material(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(16),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: onReadPressed,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: theme.dividerColor),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      progressLabel,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: theme.primaryColor,
+                      ),
+                    ),
+                    const SizedBox(height: 1),
+                    Text(
+                      remainingLabel,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onSurface
+                            .withValues(alpha: 0.6),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         ),
-        const SizedBox(width: 10),
-        const MascotPlaceholder(size: 64),
       ],
     );
   }
@@ -252,3 +293,109 @@ String planInitials(String title) {
   }
   return (words[0][0] + words[1][0]).toUpperCase();
 }
+
+/// Full-width artwork band: one bundled public-domain Doré plate for
+/// today, with its caption as an eyebrow. Replaces the old mascot
+/// placeholder, which made the header row lopsided.
+///
+/// The band is decorative-but-tappable: it opens the plate's story.
+class LibraryPlateBand extends ConsumerWidget {
+  final DateTime day;
+  final Future<void> Function(StoryPlate plate) onOpen;
+  final double height;
+
+  const LibraryPlateBand({
+    super.key,
+    required this.day,
+    required this.onOpen,
+    this.height = 96,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final plate = ref.watch(_dailyPlateProvider(day));
+
+    return plate.when(
+      loading: () => SizedBox(height: height),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (p) {
+        if (p == null) return const SizedBox.shrink();
+        return Semantics(
+          button: true,
+          label: 'Open story: ${p.caption}',
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () => onOpen(p),
+            child: SizedBox(
+              height: height,
+              width: double.infinity,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.asset(
+                      p.assetPath,
+                      fit: BoxFit.cover,
+                      // A missing plate must not break the header.
+                      errorBuilder: (_, __, ___) =>
+                          Container(color: theme.colorScheme.surface),
+                    ),
+                    // Scrim so the caption stays legible on light plates.
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Colors.black.withValues(alpha: 0.62),
+                            Colors.black.withValues(alpha: 0.12),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            'Bible story',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: Colors.white.withValues(alpha: 0.75),
+                              letterSpacing: 1.6,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            p.caption,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Cached per-day plate lookup (service already caches the artwork map).
+final _dailyPlateProvider =
+    FutureProvider.family<StoryPlate?, DateTime>((ref, day) async {
+  return ref.watch(devotionalServiceProvider).plateForDay(day);
+});

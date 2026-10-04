@@ -4,7 +4,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/local_storage/preferences_service.dart';
+import '../../data/let_read.dart';
+import '../../data/models/home_data.dart';
+import '../../services/devotional_service.dart';
 import '../../state/auth_provider.dart';
+import '../../state/devotional_provider.dart';
+import '../../state/home_provider.dart';
 import '../../state/reading_plan_provider.dart';
 import '../../state/theme_provider.dart';
 import '../widgets/shared_app_bar.dart';
@@ -14,6 +19,7 @@ import '../widgets/library_calendar_rail.dart';
 import 'custom_plan_builder_v2_screen.dart';
 import 'plans_hub_v2_screen.dart' show availablePlans, PlanMetadata;
 import 'reading_plan_detail_v2_screen.dart';
+import 'bible_story_reader_screen.dart';
 
 /// Preset book plans for the Books tab: a title, an inclusive book range
 /// (matched by book name) and a day count. Tapping one opens the custom
@@ -203,6 +209,39 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
     _railKey.currentState?.scrollToDate(picked);
   }
 
+  /// "Let's Read": year progress plus today's shared verse of the day.
+  void _openLetRead() {
+    final now = DateTime.now();
+    HapticFeedback.selectionClick();
+    final verse = verseForDay(ref.read(votdPoolProvider), now);
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => _LetReadSheet(
+        dayLabel: YearProgress.label(now),
+        remainingLabel: YearProgress.remainingLabel(now),
+        verse: verse,
+        onRead: () {
+          Navigator.of(ctx).pop();
+          _openToday();
+        },
+      ),
+    );
+  }
+
+  /// Opens the story that owns the day's artwork plate.
+  Future<void> _openPlate(StoryPlate plate) async {
+    HapticFeedback.selectionClick();
+    final story = await ref
+        .read(devotionalServiceProvider)
+        .firstStoryForPrefix(plate.prefix);
+    if (story == null || !mounted) return;
+    await Navigator.of(context).push(CupertinoPageRoute(
+      builder: (_) => BibleStoryReaderScreen(initialStory: story),
+    ));
+  }
+
   void _openToday() {
     final activeIds = ref.read(activePlanIdsProvider);
     if (activeIds.isEmpty) {
@@ -278,14 +317,18 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
                     const SizedBox(height: 12),
                     LibraryGreetingHeader(
                       name: name,
-                      onReadPressed: _openToday,
+                      progressLabel: YearProgress.label(now),
+                      remainingLabel: YearProgress.remainingLabel(now),
+                      onReadPressed: _openLetRead,
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 12),
                     LibraryCalendarRail(
                       key: _railKey,
                       today: now,
                       plan: activePlan,
                     ),
+                    const SizedBox(height: 12),
+                    LibraryPlateBand(day: now, onOpen: _openPlate),
                     const SizedBox(height: 14),
                     V2PillTabs(
                       controller: _tabs,
@@ -687,6 +730,123 @@ class _MyPlansTab extends ConsumerWidget {
             );
           }),
       ],
+    );
+  }
+}
+
+/// "Let's Read" sheet: year progress + today's verse of the day.
+/// Uses the shared VOTD pool, so Home and Plans always show the same
+/// verse on the same day.
+class _LetReadSheet extends StatelessWidget {
+  final String dayLabel;
+  final String remainingLabel;
+  final VerseOfTheDay verse;
+  final VoidCallback onRead;
+
+  const _LetReadSheet({
+    required this.dayLabel,
+    required this.remainingLabel,
+    required this.verse,
+    required this.onRead,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return SafeArea(
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: theme.dividerColor),
+        ),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 36,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
+                  borderRadius: BorderRadius.circular(3),
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
+            const V2Eyebrow('Let\'s read'),
+            const SizedBox(height: 6),
+            Text(
+              dayLabel,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            Text(
+              remainingLabel,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Year progress bar: proportional share of the year read.
+            LayoutBuilder(
+              builder: (context, c) {
+                final parts = dayLabel.split(' ');
+                final day = int.tryParse(parts.length > 1 ? parts[1] : '') ?? 0;
+                final total = int.tryParse(parts.length > 3 ? parts[3] : '') ?? 365;
+                final fraction = total == 0 ? 0.0 : day / total;
+                return ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: fraction.clamp(0.0, 1.0),
+                    minHeight: 6,
+                    backgroundColor: theme.colorScheme.onSurface
+                        .withValues(alpha: 0.08),
+                    valueColor:
+                        AlwaysStoppedAnimation(theme.primaryColor),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 18),
+            const V2Eyebrow('Verse of the day'),
+            const SizedBox(height: 6),
+            Text(
+              '"${verse.text}"',
+              style: theme.textTheme.bodyLarge?.copyWith(
+                fontStyle: FontStyle.italic,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '— ${verse.reference}',
+              style: theme.textTheme.labelMedium?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: theme.primaryColor,
+              ),
+            ),
+            const SizedBox(height: 18),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: onRead,
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size.fromHeight(50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: const Text('Open today\'s reading'),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
