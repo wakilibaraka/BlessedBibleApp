@@ -40,6 +40,7 @@ import '../../data/local_storage/preferences_service.dart';
 import '../../data/models/translation_model.dart';
 import '../../state/hints_provider.dart';
 import '../../services/share_service.dart';
+import '../widgets/share_card.dart';
 import 'notes_list_screen.dart';
 
 import '../sheets/translation_picker_sheet.dart';
@@ -2999,15 +3000,37 @@ class VerseActionLogic {
     return null;
   }
 
-  static void handleCopy(BuildContext context, WidgetRef ref, String bookName,
-      int chapterNum, List<int> targetVerses) {
+  /// Primary verse texts for a selection, from the loaded chapter.
+  static List<String> primaryShareTexts(
+      WidgetRef ref, String bookName, int chapterNum, List<int> sorted) {
     final chapterData = getChapterData(ref, bookName, chapterNum);
-    final text = ShareService.formatVerses(
-        bookName: bookName,
-        chapterNumber: chapterNum,
-        verseNumbers: targetVerses,
-        chapterData: chapterData);
-    ShareService.copyText(context, text);
+    final verses = chapterData?.verses as List? ?? [];
+    return [
+      for (final v in sorted)
+        if (v - 1 >= 0 && v - 1 < verses.length)
+          (verses[v - 1].text as String? ?? ''),
+    ];
+  }
+
+  static Future<void> handleCopy(BuildContext context, WidgetRef ref,
+      String bookName, int chapterNum, List<int> targetVerses) async {
+    final sorted = targetVerses.toList()..sort();
+    final share = await ShareService.collectVerseShare(
+      ref,
+      bookName: bookName,
+      chapterNum: chapterNum,
+      targetVerses: sorted,
+      texts: primaryShareTexts(ref, bookName, chapterNum, sorted),
+    );
+    final text = ShareService.formatVerse(
+      texts: share.texts,
+      reference: share.reference,
+      translationTag: share.tag,
+      secondaryTexts: share.secondaryTexts,
+      secondaryReference: share.reference,
+      secondaryTag: share.secondaryTag,
+    );
+    await ShareService.copyText(context, text);
   }
 
   static void handleCommentary(
@@ -3029,12 +3052,70 @@ class VerseActionLogic {
 
   static Future<void> handleShare(BuildContext context, WidgetRef ref,
       String bookName, int chapterNum, List<int> targetVerses) async {
-    final chapterData = getChapterData(ref, bookName, chapterNum);
-    final text = ShareService.formatVerses(
-        bookName: bookName,
-        chapterNumber: chapterNum,
-        verseNumbers: targetVerses,
-        chapterData: chapterData);
+    final sorted = targetVerses.toList()..sort();
+    final share = await ShareService.collectVerseShare(
+      ref,
+      bookName: bookName,
+      chapterNum: chapterNum,
+      targetVerses: sorted,
+      texts: primaryShareTexts(ref, bookName, chapterNum, sorted),
+    );
+    final text = ShareService.formatVerse(
+      texts: share.texts,
+      reference: share.reference,
+      translationTag: share.tag,
+      secondaryTexts: share.secondaryTexts,
+      secondaryReference: share.reference,
+      secondaryTag: share.secondaryTag,
+      whatsapp: true,
+    );
     await ShareService.shareText(body: text);
+  }
+
+  /// Verse share options sheet: copy / share text / image card.
+  static Future<void> handleShareOptions(BuildContext context, WidgetRef ref,
+      String bookName, int chapterNum, List<int> targetVerses) async {
+    final sorted = targetVerses.toList()..sort();
+    final share = await ShareService.collectVerseShare(
+      ref,
+      bookName: bookName,
+      chapterNum: chapterNum,
+      targetVerses: sorted,
+      texts: primaryShareTexts(ref, bookName, chapterNum, sorted),
+    );
+    if (!context.mounted) return;
+    final copyBody = ShareService.formatVerse(
+      texts: share.texts,
+      reference: share.reference,
+      translationTag: share.tag,
+      secondaryTexts: share.secondaryTexts,
+      secondaryReference: share.reference,
+      secondaryTag: share.secondaryTag,
+    );
+    final shareBody = ShareService.formatVerse(
+      texts: share.texts,
+      reference: share.reference,
+      translationTag: share.tag,
+      secondaryTexts: share.secondaryTexts,
+      secondaryReference: share.reference,
+      secondaryTag: share.secondaryTag,
+      whatsapp: true,
+    );
+    final slug = share.reference
+        .toLowerCase()
+        .replaceAll(RegExp(r'[^a-z0-9]+'), '-')
+        .replaceAll(RegExp(r'^-|-$'), '');
+    await showShareOptionsSheet(
+      context: context,
+      copyText: copyBody,
+      shareText: shareBody,
+      imageFilename: 'verse-$slug',
+      buildCard: (backdrop) => ShareCard.verse(
+        reference: share.reference,
+        body: share.texts.map(ShareService.cleanVerseText).join(' '),
+        translationTag: share.tag,
+        backdrop: backdrop,
+      ),
+    );
   }
 }

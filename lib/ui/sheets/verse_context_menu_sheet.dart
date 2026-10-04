@@ -116,7 +116,7 @@ class _VerseContextMenuSheetState extends ConsumerState<VerseContextMenuSheet> {
                             label: 'Share',
                             onTap: () {
                               Navigator.of(context).pop();
-                              VerseActionLogic.handleShare(
+                              VerseActionLogic.handleShareOptions(
                                 context,
                                 ref,
                                 widget.bookName,

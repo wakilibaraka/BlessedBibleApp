@@ -2,9 +2,10 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:share_plus/share_plus.dart';
 import '../../state/dictionary_provider.dart';
 import '../../state/typography_provider.dart';
+import '../../services/share_service.dart';
+import 'share_card.dart';
 import '../dialogs/verse_preview_dialog.dart';
 
 class DictionaryEntrySheet extends ConsumerWidget {
@@ -83,13 +84,35 @@ class DictionaryEntrySheet extends ConsumerWidget {
                       IconButton(
                         onPressed: () {
                           final defs = definitionsAsync.asData?.value;
-                          if (defs != null && defs.isNotEmpty) {
-                            final displayWord = defs.first.displayHeadword;
-                            final textToShare = "$displayWord\n\n" + defs.map((d) {
-                              return "${_formatSourceName(d.source).toUpperCase()}:\n${d.definition.trim()}";
-                            }).join('\n\n');
-                            Share.share(textToShare);
-                          }
+                          if (defs == null || defs.isEmpty) return;
+                          final displayWord = defs.first.displayHeadword;
+                          // Caps word + source per the shared format;
+                          // all entries stack for the text flavor, first
+                          // entry drives the image card.
+                          final text = ShareService.formatWord(
+                            word: displayWord,
+                            definition: defs.first.definition,
+                            sourceName: _formatSourceName(defs.first.source),
+                          );
+                          final full = defs.length > 1
+                              ? '$text\n\n' +
+                                  defs.skip(1).map((d) {
+                                    return "${_formatSourceName(d.source).toUpperCase()}:\n${d.definition.trim()}";
+                                  }).join('\n\n')
+                              : text;
+                          showShareOptionsSheet(
+                            context: context,
+                            copyText: full,
+                            shareText: full,
+                            imageFilename: 'word',
+                            buildCard: (backdrop) => ShareCard.word(
+                              eyebrow: 'DICTIONARY',
+                              word: displayWord,
+                              definition: defs.first.definition,
+                              source: _formatSourceName(defs.first.source),
+                              backdrop: backdrop,
+                            ),
+                          );
                         },
                         icon: Icon(Icons.ios_share_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.4), size: 24),
                       ),

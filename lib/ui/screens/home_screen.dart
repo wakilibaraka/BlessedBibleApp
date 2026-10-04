@@ -19,6 +19,7 @@ import '../widgets/bouncy_entrance.dart';
 import '../widgets/commentary_view.dart';
 import '../../state/commentary_provider.dart';
 import '../../services/share_service.dart';
+import '../widgets/share_card.dart';
 
 class StrictHorizontalDragGestureRecognizer
     extends HorizontalDragGestureRecognizer {
@@ -408,9 +409,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           label: 'Share',
                           filled: false,
                           onPressed: () {
-                            ShareService.shareText(
-                                body:
-                                    '"${data.verseOfTheDay.text}" — ${data.verseOfTheDay.reference}');
+                            final votd = data.verseOfTheDay;
+                            HapticFeedback.selectionClick();
+                            showShareOptionsSheet(
+                              context: context,
+                              copyText: ShareService.formatVerse(
+                                texts: [votd.text],
+                                reference: votd.reference,
+                                translationTag: 'KJV',
+                              ),
+                              shareText: ShareService.formatVerse(
+                                texts: [votd.text],
+                                reference: votd.reference,
+                                translationTag: 'KJV',
+                                whatsapp: true,
+                              ),
+                              imageFilename: 'votd',
+                              buildCard: (backdrop) => ShareCard.verse(
+                                reference: votd.reference,
+                                body: ShareService.cleanVerseText(votd.text),
+                                translationTag: 'KJV',
+                                backdrop: backdrop,
+                              ),
+                            );
                           },
                         ),
                       ),
@@ -562,17 +583,55 @@ class WordOfTheDaySection extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: 14),
-                    _PillButton(
-                      label: 'Read Full Definition',
-                      filled: true,
-                      onPressed: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (context) => DictionaryEntrySheet(normalizedWord: wotd.normalized),
-                        );
-                      },
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _PillButton(
+                            label: 'Read Full Definition',
+                            filled: true,
+                            onPressed: () {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                builder: (context) => DictionaryEntrySheet(
+                                    normalizedWord: wotd.normalized),
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: _PillButton(
+                            label: 'Share',
+                            filled: false,
+                            onPressed: () {
+                              HapticFeedback.selectionClick();
+                              showShareOptionsSheet(
+                                context: context,
+                                copyText: ShareService.formatWord(
+                                  word: wotd.word,
+                                  definition: wotd.snippet,
+                                  sourceName: 'Word of the day',
+                                ),
+                                shareText: ShareService.formatWord(
+                                  word: wotd.word,
+                                  definition: wotd.snippet,
+                                  sourceName: 'Word of the day',
+                                ),
+                                imageFilename: 'wotd',
+                                buildCard: (backdrop) => ShareCard.word(
+                                  eyebrow: 'Word of the day',
+                                  word: wotd.word,
+                                  definition: wotd.snippet,
+                                  source: 'Word of the day',
+                                  backdrop: backdrop,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
