@@ -90,7 +90,14 @@ void main() {
       expect(find.textContaining('My Plans'), findsOneWidget);
       // Curated plan cards on the Reading tab.
       expect(find.text("M'Cheyne 1-Year Plan"), findsOneWidget);
-      expect(find.text('New readings'), findsWidgets);
+      // Status line now varies per plan (no four identical "New
+      // readings" labels), and unstarted plans read in words.
+      expect(find.text('Not started'), findsWidgets);
+      expect(find.text('New readings'), findsNothing);
+      expect(find.text('Not started') , findsWidgets);
+      // Year progress + calendar rail are in the header.
+      expect(find.textContaining('Day '), findsWidgets);
+
     });
 
     testWidgets('Books tab shows presets, My Plans shows empty state',

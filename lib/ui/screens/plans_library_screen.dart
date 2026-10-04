@@ -406,9 +406,13 @@ class _LibraryCard extends StatelessWidget {
         padding: const EdgeInsets.all(14),
         child: Row(
           children: [
+            // Square cover keeps rows even and shortens the list, so
+            // more plans sit above the fold.
             PlanCoverPlaceholder(
               seed: seed,
               initials: planInitials(title),
+              width: 56,
+              height: 56,
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -432,7 +436,7 @@ class _LibraryCard extends StatelessWidget {
                       color: theme.primaryColor,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   Row(
                     children: [
                       Expanded(
@@ -440,9 +444,12 @@ class _LibraryCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        '${(fraction.clamp(0.0, 1.0) * 100).round()}%',
+                        // Words read better than a bare "0%".
+                        fraction <= 0
+                            ? 'Not started'
+                            : '${(fraction.clamp(0.0, 1.0) * 100).round()}% done',
                         style: theme.textTheme.labelSmall?.copyWith(
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w700,
                           color: theme.colorScheme.onSurface
                               .withValues(alpha: 0.6),
                         ),
@@ -452,13 +459,19 @@ class _LibraryCard extends StatelessWidget {
                 ],
               ),
             ),
-            PopupMenuButton<String>(
-              icon: Icon(
-                Icons.more_vert_rounded,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+            // 44pt target, icon centred.
+            SizedBox(
+              width: 44,
+              height: 44,
+              child: PopupMenuButton<String>(
+                padding: EdgeInsets.zero,
+                icon: Icon(
+                  Icons.more_vert_rounded,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                ),
+                onSelected: onMenu,
+                itemBuilder: menuBuilder,
               ),
-              onSelected: onMenu,
-              itemBuilder: menuBuilder,
             ),
           ],
         ),
@@ -500,9 +513,23 @@ class _ReadingTab extends ConsumerWidget {
             final current = started
                 ? (st.todayReadingDay ?? total)
                 : 0;
-            final status = started
-                ? (total > 0 ? 'Day $current of $total' : 'Started')
-                : 'New readings';
+            final behind = st.missedDays.length;
+            final pct = started ? st.percentComplete : 0.0;
+            final String status;
+            if (!started) {
+              status = hasProgress ? 'Paused' : 'Not started';
+            } else if (total <= 0) {
+              status = 'Started';
+            } else if (behind > 0) {
+              status = '$behind day${behind == 1 ? '' : 's'} behind';
+            } else if (current < total && st.isDayComplete(current)) {
+              status = 'Caught up';
+            } else if (pct >= 1.0) {
+              status = 'Complete';
+            } else {
+              final left = total - current;
+              status = 'Day $current of $total · $left left';
+            }
             return _LibraryCard(
               seed: meta.id,
               title: meta.title,
