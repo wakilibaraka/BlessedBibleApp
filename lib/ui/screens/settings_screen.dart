@@ -443,6 +443,135 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                     ref.read(readSettingsProvider.notifier).setDictionaryScope(val);
                   },
                 ),
+                _buildDictScopeTile(
+                  context,
+                  title: 'Difficult words only',
+                  subtitle:
+                      'Archaic, misleading and contested words — easy words like god and son stay unmarked',
+                  value: DictionaryScope.difficult,
+                  groupValue: scope,
+                  onTap: (val) {
+                    HapticFeedback.selectionClick();
+                    ref.read(readSettingsProvider.notifier).setDictionaryScope(val);
+                  },
+                ),
+                _buildDictScopeTile(
+                  context,
+                  title: 'Difficult + names',
+                  subtitle:
+                      'Adds people and places (e.g., David, Jerusalem) to difficult words',
+                  value: DictionaryScope.difficultAndNames,
+                  groupValue: scope,
+                  onTap: (val) {
+                    HapticFeedback.selectionClick();
+                    ref.read(readSettingsProvider.notifier).setDictionaryScope(val);
+                  },
+                ),
+              ],
+            );
+          }),
+          const Divider(height: 1, indent: 16),
+          Consumer(builder: (context, ref, _) {
+            final mode = ref.watch(
+                readSettingsProvider.select((s) => s.nonKjvDictionaryMode));
+            final isEnabled = ref.watch(
+                readSettingsProvider.select((s) => s.dictionaryUnderlinesEnabled));
+
+            if (!isEnabled) return const SizedBox.shrink();
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
+                  child: Text('Other English versions',
+                      style: TextStyle(fontSize: 16)),
+                ),
+                _buildRadioTile<NonKjvDictionaryMode>(
+                  context,
+                  title: 'Contested words only',
+                  subtitle:
+                      'BBE, WEB and other English versions mark disputed words (e.g., hell, baptism)',
+                  value: NonKjvDictionaryMode.contestedOnly,
+                  groupValue: mode,
+                  onTap: (val) {
+                    HapticFeedback.selectionClick();
+                    ref
+                        .read(readSettingsProvider.notifier)
+                        .setNonKjvDictionaryMode(val);
+                  },
+                ),
+                _buildRadioTile<NonKjvDictionaryMode>(
+                  context,
+                  title: 'Follow underline scope',
+                  subtitle:
+                      'Same marking as KJV in every English version',
+                  value: NonKjvDictionaryMode.followScope,
+                  groupValue: mode,
+                  onTap: (val) {
+                    HapticFeedback.selectionClick();
+                    ref
+                        .read(readSettingsProvider.notifier)
+                        .setNonKjvDictionaryMode(val);
+                  },
+                ),
+                _buildRadioTile<NonKjvDictionaryMode>(
+                  context,
+                  title: 'No underlines',
+                  subtitle: 'Other English versions show no dictionary marks',
+                  value: NonKjvDictionaryMode.off,
+                  groupValue: mode,
+                  onTap: (val) {
+                    HapticFeedback.selectionClick();
+                    ref
+                        .read(readSettingsProvider.notifier)
+                        .setNonKjvDictionaryMode(val);
+                  },
+                ),
+              ],
+            );
+          }),
+          const Divider(height: 1, indent: 16),
+          Consumer(builder: (context, ref, _) {
+            final defineAny = ref.watch(
+                readSettingsProvider.select((s) => s.defineAnyWord));
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
+                  child: Text('Word lookup',
+                      style: TextStyle(fontSize: 16)),
+                ),
+                _buildRadioTile<bool>(
+                  context,
+                  title: 'Marked words only',
+                  subtitle:
+                      'Tap an underlined word to define it (default)',
+                  value: false,
+                  groupValue: defineAny,
+                  onTap: (val) {
+                    HapticFeedback.selectionClick();
+                    ref
+                        .read(readSettingsProvider.notifier)
+                        .setDefineAnyWord(val);
+                  },
+                ),
+                _buildRadioTile<bool>(
+                  context,
+                  title: 'Any word (long-press)',
+                  subtitle:
+                      'Long-press any word to define it, marked or not',
+                  value: true,
+                  groupValue: defineAny,
+                  onTap: (val) {
+                    HapticFeedback.selectionClick();
+                    ref
+                        .read(readSettingsProvider.notifier)
+                        .setDefineAnyWord(val);
+                  },
+                ),
               ],
             );
           }),
@@ -1462,6 +1591,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
     required DictionaryScope value,
     required DictionaryScope groupValue,
     required ValueChanged<DictionaryScope> onTap,
+  }) {
+    return _buildRadioTile<DictionaryScope>(
+      context,
+      title: title,
+      subtitle: subtitle,
+      value: value,
+      groupValue: groupValue,
+      onTap: onTap,
+    );
+  }
+
+  /// Generic radio row shared by dictionary scope, non-KJV mode, and
+  /// word-lookup choice. Matches the existing dictionary tile visuals.
+  Widget _buildRadioTile<T>(
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required T value,
+    required T groupValue,
+    required ValueChanged<T> onTap,
   }) {
     final theme = Theme.of(context);
     final isSelected = value == groupValue;

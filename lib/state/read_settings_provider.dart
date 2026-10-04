@@ -10,7 +10,13 @@ enum ReadingLayout { single, interleaved, sideBySide, chips }
 
 enum SelectorHeight { quarter, half, full }
 
-enum DictionaryScope { term, termAndTricky, everything }
+enum DictionaryScope { term, termAndTricky, everything, difficult, difficultAndNames }
+
+/// Underline behavior for non-KJV English versions (BBE, WEB, ...).
+/// KJV always follows [DictionaryScope]; other English versions default
+/// to contested words only (BBE's Basic-English vocabulary needs almost
+/// no archaic-word marking).
+enum NonKjvDictionaryMode { followScope, contestedOnly, off }
 
 enum StrongsIndicatorStyle { asterisk, chain, number }
 
@@ -33,6 +39,11 @@ class ReadSettingsState {
   final bool showChipsOnSavedItems;
   final bool dictionaryUnderlinesEnabled;
   final DictionaryScope dictionaryScope;
+  final NonKjvDictionaryMode nonKjvDictionaryMode;
+
+  /// When true, long-pressing any word looks it up (Olive-Tree-style).
+  /// When false (default), only underlined words are tappable.
+  final bool defineAnyWord;
   final bool showStrongsNumbers;
   final StrongsIndicatorStyle strongsIndicatorStyle;
   final PopupStyle popupStyle;
@@ -58,6 +69,8 @@ class ReadSettingsState {
     this.showChipsOnSavedItems = false,
     this.dictionaryUnderlinesEnabled = true,
     this.dictionaryScope = DictionaryScope.termAndTricky,
+    this.nonKjvDictionaryMode = NonKjvDictionaryMode.contestedOnly,
+    this.defineAnyWord = false,
     this.showStrongsNumbers = false,
     this.strongsIndicatorStyle = StrongsIndicatorStyle.asterisk,
     this.popupStyle = PopupStyle.floating,
@@ -79,6 +92,8 @@ class ReadSettingsState {
     bool? showChipsOnSavedItems,
     bool? dictionaryUnderlinesEnabled,
     DictionaryScope? dictionaryScope,
+    NonKjvDictionaryMode? nonKjvDictionaryMode,
+    bool? defineAnyWord,
     bool? showStrongsNumbers,
     StrongsIndicatorStyle? strongsIndicatorStyle,
     PopupStyle? popupStyle,
@@ -100,6 +115,8 @@ class ReadSettingsState {
       showChipsOnSavedItems: showChipsOnSavedItems ?? this.showChipsOnSavedItems,
       dictionaryUnderlinesEnabled: dictionaryUnderlinesEnabled ?? this.dictionaryUnderlinesEnabled,
       dictionaryScope: dictionaryScope ?? this.dictionaryScope,
+      nonKjvDictionaryMode: nonKjvDictionaryMode ?? this.nonKjvDictionaryMode,
+      defineAnyWord: defineAnyWord ?? this.defineAnyWord,
       showStrongsNumbers: showStrongsNumbers ?? this.showStrongsNumbers,
       strongsIndicatorStyle: strongsIndicatorStyle ?? this.strongsIndicatorStyle,
       popupStyle: popupStyle ?? this.popupStyle,
@@ -149,6 +166,15 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
         orElse: () => DictionaryScope.termAndTricky,
       );
     }
+    NonKjvDictionaryMode nonKjvMode = NonKjvDictionaryMode.contestedOnly;
+    final nonKjvString = prefs.getString('nonKjvDictionaryMode');
+    if (nonKjvString != null) {
+      nonKjvMode = NonKjvDictionaryMode.values.firstWhere(
+        (e) => e.name == nonKjvString,
+        orElse: () => NonKjvDictionaryMode.contestedOnly,
+      );
+    }
+    final defineAnyWord = prefs.getBool('defineAnyWord') ?? false;
 
     ReadingViewMode mode = ReadingViewMode.pinned;
     if (modeString != null) {
@@ -217,6 +243,8 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
       showChipsOnSavedItems: showChipsOnSavedItems,
       dictionaryUnderlinesEnabled: dictionaryUnderlinesEnabled,
       dictionaryScope: dictScope,
+      nonKjvDictionaryMode: nonKjvMode,
+      defineAnyWord: defineAnyWord,
       showStrongsNumbers: showStrongsNumbers,
       strongsIndicatorStyle: strongsStyle,
       popupStyle: popupStyle,
@@ -318,6 +346,18 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('dictionaryScope', scope.name);
     state = state.copyWith(dictionaryScope: scope);
+  }
+
+  Future<void> setNonKjvDictionaryMode(NonKjvDictionaryMode mode) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('nonKjvDictionaryMode', mode.name);
+    state = state.copyWith(nonKjvDictionaryMode: mode);
+  }
+
+  Future<void> setDefineAnyWord(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('defineAnyWord', value);
+    state = state.copyWith(defineAnyWord: value);
   }
 
   Future<void> setShowChipsOnSavedItems(bool value) async {
