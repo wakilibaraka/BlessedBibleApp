@@ -21,31 +21,42 @@ class RadialLayout {
   /// radius: distance from the anchor to each item's centre.
   /// [anchor] is in global/local screen coordinates.
   /// [count] is the number of actions.
+  ///
+  /// Items are evenly spaced on a full circle, then each centre is
+  /// clamped inside the viewport (with [margin] to spare), so a press
+  /// near an edge can never push an action off-screen. The radius is
+  /// honoured exactly when the anchor has room all round.
   static RadialLayout around({
     required Offset anchor,
     required int count,
     required Size viewport,
     double radius = 78,
+    double margin = 34,
   }) {
     if (count <= 0) {
       return const RadialLayout(centres: [], startAngle: 0);
     }
 
-    // Point away from the closest edge so nothing clips off-screen.
-    final left = anchor.dx;
-    final right = viewport.width - anchor.dx;
-    final top = anchor.dy;
-    final bottom = viewport.height - anchor.dy;
-    // Direction of greatest room, as a vector from the anchor toward the
-    // screen centre weighted by the horizontal/vertical gaps.
-    final angleToCentre = atan2((top - bottom) / 2, (right - left) / 2);
-
-    // Even spacing, centred on the roomiest direction.
     final step = 2 * pi / count;
+    // Bias the ring so the densest run of items faces the roomiest side;
+    // clamping below guarantees visibility regardless.
+    final angleToCentre = atan2(
+      (anchor.dy - (viewport.height - anchor.dy)) / 2,
+      (anchor.dx - (viewport.width - anchor.dx)) / 2,
+    );
+
     final centres = <Offset>[];
     for (var i = 0; i < count; i++) {
       final a = angleToCentre + (i - (count - 1) / 2) * step;
-      centres.add(Offset(cos(a) * radius, sin(a) * radius));
+      var p = Offset(cos(a) * radius, sin(a) * radius);
+      // Clamp into the viewport so no target clips off-screen.
+      final x = anchor.dx + p.dx;
+      final y = anchor.dy + p.dy;
+      p = Offset(
+        (x.clamp(margin, viewport.width - margin) - anchor.dx),
+        (y.clamp(margin, viewport.height - margin) - anchor.dy),
+      );
+      centres.add(p);
     }
     return RadialLayout(centres: centres, startAngle: angleToCentre);
   }

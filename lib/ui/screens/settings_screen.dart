@@ -21,6 +21,7 @@ import '../sheets/appearance_settings_sheet.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'privacy_policy_screen.dart';
+import 'storage_screen.dart';
 import 'onboarding_screen.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../sheets/widget_settings_sheet.dart';
@@ -1319,22 +1320,32 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           }),
           const Divider(height: 1, indent: 16),
           ListTile(
-            title: const Text('Storage used'),
+            title: const Text('Storage & downloads'),
             subtitle: const Text(
-                'Offline Bible database and downloaded translations'),
+                'Cache, downloaded translations and what can be freed'),
             trailing: FutureBuilder<int>(
               future: bibleDbService.contentBytesUsed(),
               builder: (context, snapshot) {
                 final mb = (snapshot.data ?? 0) / (1024 * 1024);
-                return Text(
-                  snapshot.hasData ? '${mb.toStringAsFixed(1)} MB' : '…',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withValues(alpha: 0.6)),
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      snapshot.hasData ? '${mb.toStringAsFixed(1)} MB' : '…',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.6)),
+                    ),
+                    const SizedBox(width: 6),
+                    const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+                  ],
                 );
               },
+            ),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const StorageScreen()),
             ),
           ),
           const Divider(height: 1, indent: 16),

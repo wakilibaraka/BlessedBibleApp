@@ -24,12 +24,12 @@ const double kVerseSheetMaxHeightFactor = 0.26;
 const double kDockClearance = 84.0;
 
 /// One action in the sheet row.
-class _SheetAction {
+class SheetAction {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
   final bool active;
-  const _SheetAction({
+  const SheetAction({
     required this.icon,
     required this.label,
     required this.onTap,
@@ -57,11 +57,12 @@ Future<bool> showVerseActionSheet(BuildContext context, WidgetRef ref) async {
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     barrierColor: Colors.black.withValues(alpha: 0.32),
-    builder: (ctx) => _VerseActionSheet(
-      contextLabel: _contextLabel(readLoc.bookName, readLoc.chapter, verses),
+    builder: (ctx) => VerseActionSheet(
+      contextLabel: verseSelectionContextLabel(
+          readLoc.bookName, readLoc.chapter, verses),
       actionCount: verses.length,
       actions: [
-        _SheetAction(
+        SheetAction(
           icon: allBookmarked
               ? Icons.bookmark_rounded
               : Icons.bookmark_border_rounded,
@@ -72,26 +73,26 @@ Future<bool> showVerseActionSheet(BuildContext context, WidgetRef ref) async {
                 readLoc.bookName, readLoc.chapter, verses);
           },
         ),
-        _SheetAction(
+        SheetAction(
           icon: Icons.color_lens_rounded,
           label: 'Highlight',
           onTap: () =>
               ref.read(readSettingsProvider.notifier).cycleHighlightColor(),
         ),
-        _SheetAction(
+        SheetAction(
           icon: Icons.note_add_outlined,
           label: 'Note',
           onTap: () => VerseActionLogic.handleNote(
               ctx, ref, theme, readLoc.bookName, readLoc.chapter, verses),
         ),
-        _SheetAction(
+        SheetAction(
           icon: Icons.menu_book_rounded,
           label: 'Study',
           onTap: () => VerseActionLogic.handleCommentary(
               ctx, ref, readLoc.bookName, readLoc.chapter, verses.first,
               verses),
         ),
-        _SheetAction(
+        SheetAction(
           icon: Icons.ios_share_rounded,
           label: 'Share',
           onTap: () async {
@@ -110,15 +111,28 @@ Future<bool> showVerseActionSheet(BuildContext context, WidgetRef ref) async {
   return true;
 }
 
-String _contextLabel(String book, int chapter, List<int> verses) {
-  final count = verses.length;
+/// "3 verses selected · John 3:16-18" (any contiguous run becomes a
+/// range; non-contiguous selections fall back to the chapter).
+String verseSelectionContextLabel(String book, int chapter, List<int> verses) {
+  final sorted = verses.toList()..sort();
+  final count = sorted.length;
   final noun = count == 1 ? 'verse' : 'verses';
-  final range = count == 1
-      ? '$book $chapter:${verses.first}'
-      : (verses.length == 2 && verses[1] == verses[0] + 1
-          ? '$book $chapter:${verses.first}-${verses.last}'
-          : '$book $chapter');
-  return '$count $noun selected · $range';
+  String where;
+  if (count == 1) {
+    where = '$book $chapter:${sorted.first}';
+  } else {
+    var contiguous = true;
+    for (var i = 0; i < count - 1; i++) {
+      if (sorted[i + 1] - sorted[i] != 1) {
+        contiguous = false;
+        break;
+      }
+    }
+    where = contiguous
+        ? '$book $chapter:${sorted.first}-${sorted.last}'
+        : '$book $chapter';
+  }
+  return '$count $noun selected · $where';
 }
 
 String _bookAbbrev(WidgetRef ref, String bookName) {
@@ -131,16 +145,40 @@ String _bookAbbrev(WidgetRef ref, String bookName) {
   return bookName.length >= 3 ? bookName.substring(0, 3) : bookName;
 }
 
-class _VerseActionSheet extends StatelessWidget {
+class VerseActionSheet extends StatelessWidget {
   final String contextLabel;
   final int actionCount;
-  final List<_SheetAction> actions;
+  final List<SheetAction> actions;
 
-  const _VerseActionSheet({
+  const VerseActionSheet({
+    super.key,
     required this.contextLabel,
     required this.actionCount,
     required this.actions,
   });
+
+  /// Pure presentation: opens the sheet with pre-built actions (used by
+  /// tests and any caller that already has its data).
+  static Future<bool> show(
+    BuildContext context, {
+    required String contextLabel,
+    required int actionCount,
+    required List<SheetAction> actions,
+  }) async {
+    HapticFeedback.lightImpact();
+    final keepOpen = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withValues(alpha: 0.32),
+      builder: (ctx) => VerseActionSheet(
+        contextLabel: contextLabel,
+        actionCount: actionCount,
+        actions: actions,
+      ),
+    );
+    return keepOpen == true;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -149,14 +187,17 @@ class _VerseActionSheet extends StatelessWidget {
         kVerseSheetMaxHeightFactor;
 
     return Container(
-      constraints: BoxConstraints(maxHeight: maxHeight),
+      // The cap applies to the card itself; the dock clearance is added
+      // below it, so the content never gets squeezed into the clearance.
       padding: EdgeInsets.only(
         left: 12,
         right: 12,
         // Clears the nav dock + FAB so neither is ever covered.
         bottom: kDockClearance + MediaQuery.paddingOf(context).bottom,
       ),
-      child: TexturedGlassContainer(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: maxHeight),
+        child: TexturedGlassContainer(
         borderRadius: BorderRadius.circular(22),
         padding: const EdgeInsets.fromLTRB(8, 10, 8, 12),
         child: Column(
@@ -198,7 +239,8 @@ class _VerseActionSheet extends StatelessWidget {
                 ],
               ),
             ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -206,7 +248,7 @@ class _VerseActionSheet extends StatelessWidget {
 }
 
 class _SheetActionButton extends StatelessWidget {
-  final _SheetAction action;
+  final SheetAction action;
   const _SheetActionButton({required this.action});
 
   @override

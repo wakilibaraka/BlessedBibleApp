@@ -15,6 +15,10 @@ import '../../state/translation_provider.dart';
 import '../../state/read_settings_provider.dart';
 import '../../data/models/bookmark_model.dart';
 import '../widgets/journal_segment.dart';
+import '../widgets/item_context_sheet.dart';
+import '../widgets/share_card.dart';
+import 'package:flutter/services.dart';
+import '../../data/models/home_data.dart';
 
 class YourSpaceScreen extends ConsumerStatefulWidget {
   final int initialTab; // 0=Highlights, 1=Bookmarks, 2=Notes
@@ -738,6 +742,8 @@ class _NotesSegment extends ConsumerWidget {
                               editingId: note.id,
                             );
                           },
+                          onLongPress: () => _showNoteContext(
+                              context, ref, theme, note),
                           child: Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Column(
@@ -903,6 +909,8 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
           Navigator.of(context).pop(); // dismiss your space screen
           ref.read(navProvider.notifier).setIndex(1);
         },
+        onLongPress: () => _showVerseItemContext(context, ref, theme,
+            refStr, formattedRef, data, highlightColorIndex, isBookmarked),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -929,53 +937,17 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                             color: highlightColor, shape: BoxShape.circle),
                       ),
                     ),
-                  PopupMenuButton<int>(
+                  // Same sheet as long-press: one behaviour for
+                  // highlights and bookmarks.
+                  IconButton(
+                    tooltip: 'More',
                     icon: Icon(Icons.more_vert_rounded,
                         size: 20,
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
-                    onSelected: (value) {
-                      switch (value) {
-                        case 0:
-                          ref.read(readLocationProvider.notifier).updateLocation(
-                                bookAbbrev: data.bookAbbrev,
-                                bookName: data.bookName,
-                                chapter: data.chapter,
-                                verse: data.verseNum,
-                              );
-                          Navigator.of(context).pop();
-                          ref.read(navProvider.notifier).setIndex(1);
-                          break;
-                        case 1:
-                          showAddNoteSheet(context, ref, theme, initialReference: formattedRef);
-                          break;
-                        case 2:
-                          // We use fallbackText for sharing from Your Space for simplicity, unless we await the translation.
-                          // To keep it sync, we'll just share the fallback text.
-                          ShareService.shareText(body: '"${data.fallbackText}" — $formattedRef');
-                          break;
-                        case 3:
-                          if (isBookmarked) {
-                            ref.read(bookmarksProvider.notifier).toggle(refStr);
-                          } else if (highlightColorIndex != null) {
-                            ref.read(highlightsProvider.notifier).toggleHighlight(refStr, highlightColorIndex);
-                          }
-                          break;
-                        case 4:
-                          _showMoveToFolderSheet(context, ref, refStr, theme);
-                          break;
-                      }
-                    },
-                    itemBuilder: (context) => [
-                      const PopupMenuItem(value: 0, child: Text('Open in Read')),
-                      const PopupMenuItem(value: 1, child: Text('Add Note')),
-                      const PopupMenuItem(value: 2, child: Text('Share')),
-                      if (isBookmarked)
-                        const PopupMenuItem(value: 4, child: Text('Move to folder')),
-                      PopupMenuItem(
-                          value: 3,
-                          child: Text(isBookmarked ? 'Remove Bookmark' : 'Remove Highlight',
-                              style: const TextStyle(color: Colors.redAccent))),
-                    ],
+                        color: theme.colorScheme.onSurface
+                            .withValues(alpha: 0.5)),
+                    onPressed: () => _showVerseItemContext(context, ref,
+                        theme, refStr, formattedRef, data,
+                        highlightColorIndex, isBookmarked),
                   ),
                 ],
               ),
@@ -1184,3 +1156,254 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
   );
 }
 
+
+/// Long-press context sheet for a note: Edit, Copy, Share, Delete.
+/// Tap already opens the editor, so this is purely additive.
+void _showNoteContext(
+  BuildContext context,
+  WidgetRef ref,
+  ThemeData theme,
+  PersonalNote note,
+) {
+  final text = note.content.trim();
+  ItemContextSheet.show(
+    context,
+    title: note.title.isEmpty ? 'Note' : note.title,
+    subtitle: note.reference ?? note.date,
+    actions: [
+      ItemAction(
+        icon: Icons.edit_outlined,
+        label: 'Edit',
+        onTap: () => showAddNoteSheet(
+          context,
+          ref,
+          theme,
+          editingNote: note,
+          editingId: note.id,
+        ),
+      ),
+      ItemAction(
+        icon: Icons.copy_rounded,
+        label: 'Copy text',
+        onTap: () => ShareService.copyText(
+            context,
+            text.isEmpty
+                ? note.title
+                : '${note.title}\n\n$text'
+                    '${note.reference != null ? "\n— ${note.reference}" : ""}'),
+      ),
+      ItemAction(
+        icon: Icons.ios_share_rounded,
+        label: 'Share',
+        onTap: () => ShareService.shareText(
+          body: text.isEmpty
+              ? '${note.title}${note.reference != null ? " — ${note.reference}" : ""}'
+              : '"$text"${note.reference != null ? " — ${note.reference}" : ""}',
+        ),
+      ),
+      ItemAction(
+        icon: Icons.delete_outline_rounded,
+        label: 'Delete',
+        destructive: true,
+        onTap: () async {
+          final ok = await confirmDestructive(
+            context,
+            title: 'Delete note?',
+            message: '"${note.title.isEmpty ? "Untitled" : note.title}" will be removed permanently.',
+          );
+          if (ok) ref.read(notesProvider.notifier).remove(note.id);
+        },
+      ),
+    ],
+  );
+}
+
+/// Long-press context sheet for a highlight or bookmark: Open, Note,
+/// Copy, Share (text or image card), colour, folder, Remove.
+void _showVerseItemContext(
+  BuildContext context,
+  WidgetRef ref,
+  ThemeData theme,
+  String refKey,
+  String formattedRef,
+  _ParsedVerseData data,
+  int? highlightColorIndex,
+  bool isBookmarked,
+) {
+  void openInRead() {
+    ref.read(readLocationProvider.notifier).updateLocation(
+          bookAbbrev: data.bookAbbrev,
+          bookName: data.bookName,
+          chapter: data.chapter,
+          verse: data.verseNum,
+        );
+    Navigator.of(context).pop();
+    ref.read(navProvider.notifier).setIndex(1);
+  }
+
+  void shareVerse() {
+    final refParts = formattedRef.split(' ');
+    final bookName =
+        refParts.isNotEmpty ? refParts.sublist(0, refParts.length - 1).join(' ') : '';
+    final chapterVerse = refParts.isNotEmpty ? refParts.last : '1:1';
+    final cv = chapterVerse.split(':');
+    showShareOptionsSheet(
+      context: context,
+      copyText: ShareService.formatVerse(
+        texts: [data.fallbackText],
+        reference: formattedRef,
+        translationTag: 'KJV',
+      ),
+      shareText: ShareService.formatVerse(
+        texts: [data.fallbackText],
+        reference: formattedRef,
+        translationTag: 'KJV',
+        whatsapp: true,
+      ),
+      imageFilename: 'highlight',
+      buildCard: (backdrop, style) => ShareCard.verse(
+        reference: formattedRef,
+        body: ShareService.cleanVerseText(data.fallbackText),
+        translationTag: 'KJV',
+        backdrop: backdrop,
+        style: style,
+      ),
+    );
+  }
+
+  ItemContextSheet.show(
+    context,
+    title: formattedRef,
+    subtitle: isBookmarked ? 'Bookmarked verse' : 'Highlighted verse',
+    actions: [
+      ItemAction(
+        icon: Icons.menu_book_rounded,
+        label: 'Open in Read',
+        onTap: openInRead,
+      ),
+      ItemAction(
+        icon: Icons.note_add_outlined,
+        label: 'Add note',
+        onTap: () => showAddNoteSheet(context, ref, theme,
+            initialReference: formattedRef),
+      ),
+      ItemAction(
+        icon: Icons.copy_rounded,
+        label: 'Copy verse',
+        onTap: () => ShareService.copyText(
+          context,
+          ShareService.formatVerse(
+            texts: [data.fallbackText],
+            reference: formattedRef,
+            translationTag: 'KJV',
+          ),
+        ),
+      ),
+      ItemAction(
+        icon: Icons.ios_share_rounded,
+        label: 'Share verse',
+        onTap: shareVerse,
+      ),
+      if (!isBookmarked)
+        ItemAction(
+          icon: Icons.color_lens_rounded,
+          label: 'Change colour',
+          onTap: () => _showHighlightColorSheet(
+              context, ref, theme, refKey, highlightColorIndex),
+        ),
+      if (isBookmarked)
+        ItemAction(
+          icon: Icons.folder_copy_outlined,
+          label: 'Move to folder',
+          onTap: () => _showMoveToFolderSheet(context, ref, refKey, theme),
+        ),
+      ItemAction(
+        icon: Icons.delete_outline_rounded,
+        label: isBookmarked ? 'Remove bookmark' : 'Remove highlight',
+        destructive: true,
+        onTap: () async {
+          if (isBookmarked) {
+            ref.read(bookmarksProvider.notifier).toggle(refKey);
+          } else if (highlightColorIndex != null) {
+            ref.read(highlightsProvider.notifier).removeHighlight(refKey);
+          }
+        },
+      ),
+    ],
+  );
+}
+
+/// Colour swatch grid for a highlight (same palette as the reader).
+void _showHighlightColorSheet(
+  BuildContext context,
+  WidgetRef ref,
+  ThemeData theme,
+  String refKey,
+  int? currentIndex,
+) {
+  HapticFeedback.mediumImpact();
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.transparent,
+    builder: (ctx) => SafeArea(
+      top: false,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 10),
+        padding: const EdgeInsets.fromLTRB(18, 16, 18, 20),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: theme.dividerColor),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Highlight colour',
+                style: theme.textTheme.titleSmall
+                    ?.copyWith(fontWeight: FontWeight.w800)),
+            const SizedBox(height: 14),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: [
+                for (var i = 0; i < highlightPalette.length; i++)
+                  Semantics(
+                    button: true,
+                    selected: currentIndex == i,
+                    label: 'Colour ${i + 1}',
+                    child: GestureDetector(
+                      onTap: () {
+                        HapticFeedback.selectionClick();
+                        Navigator.of(ctx).pop();
+                        ref
+                            .read(highlightsProvider.notifier)
+                            .toggleHighlight(refKey, i);
+                      },
+                      child: Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.getRenderedHighlightColor(
+                              highlightPalette[i],
+                              theme.brightness,
+                              theme.scaffoldBackgroundColor),
+                          border: Border.all(
+                            color: currentIndex == i
+                                ? theme.primaryColor
+                                : theme.dividerColor,
+                            width: currentIndex == i ? 3 : 1,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
