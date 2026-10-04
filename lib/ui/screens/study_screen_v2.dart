@@ -20,6 +20,7 @@ import '../widgets/account_menu.dart';
 import '../widgets/study_v2_widgets.dart';
 import 'bible_stories_screen.dart';
 import 'commentary_library_v2_screen.dart';
+import 'concordance_screen.dart';
 import 'dictionary_v2_screen.dart';
 import 'plans_hub_v3_screen.dart';
 import 'plans_library_screen.dart';
@@ -53,6 +54,7 @@ const _v2CardIds = [
   'plans_live',
   'bible_stories',
   'dictionary',
+  'concordance',
   'commentary',
   'votd_archive',
   'streak',
@@ -477,6 +479,18 @@ class _CardBody extends ConsumerWidget {
           cta: 'Read stories',
           onTap: () =>
               onOpen(const BibleStoriesScreen()),
+        );
+      case 'concordance':
+        return _ToolCard(
+          span: span,
+          expanded: expanded,
+          icon: Icons.find_in_page_rounded,
+          eyebrow: 'Concordance',
+          title: 'Every occurrence',
+          snippet: 'Find each verse where a word appears.',
+          cta: 'Search words',
+          onTap: () =>
+              onOpen(const ConcordanceScreen()),
         );
       case 'votd_archive':
         return _VotdArchiveCard(

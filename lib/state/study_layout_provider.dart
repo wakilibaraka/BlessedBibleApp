@@ -250,6 +250,10 @@ class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
             size: CardSize.medium,
             span: CardSpan.half),
         StudyCardConfig(
+            id: 'concordance',
+            size: CardSize.large,
+            span: CardSpan.full),
+        StudyCardConfig(
             id: 'commentary',
             size: CardSize.large,
             span: CardSpan.full),

@@ -30,12 +30,14 @@ void main() {
       'plans_live',
       'bible_stories',
       'dictionary',
+      'concordance',
       'commentary',
       'votd_archive',
       'streak',
     ]);
     final byId = {for (final c in layout) c.id: c};
-    for (final id in ['your_space', 'plans_live', 'commentary']) {
+    for (final id in
+        ['your_space', 'plans_live', 'concordance', 'commentary']) {
       expect(byId[id]!.span, CardSpan.full, reason: id);
       expect(byId[id]!.expanded, isFalse, reason: id);
     }
@@ -61,6 +63,10 @@ void main() {
       ])
         {'id': id, 'size': 'large', 'span': 'full', 'version': 4},
     ]));
+    // NOTE: the v4->v5 reset rebuilds from the current defaults, so the
+    // concordance card lands in canonical position (after Dictionary).
+    // Layouts already stored at v5 instead get it appended at the end
+    // via the missing-default backfill (no reset churn).
     final container = ProviderContainer(
       overrides: [
         preferencesProvider.overrideWithValue(svc),
@@ -74,6 +80,7 @@ void main() {
       'plans_live',
       'bible_stories',
       'dictionary',
+      'concordance',
       'commentary',
       'votd_archive',
       'streak',
@@ -82,6 +89,7 @@ void main() {
     expect(byId['dictionary']!.span, CardSpan.half);
     expect(byId['streak']!.span, CardSpan.half);
     expect(byId['commentary']!.span, CardSpan.full);
+    expect(byId['concordance']!.span, CardSpan.full);
   });
 
   test('v5 migration preserves user half customs', () async {
@@ -104,6 +112,43 @@ void main() {
     // Untouched customs survive; everything else follows the default.
     expect(byId['commentary']!.span, CardSpan.half);
     expect(byId['dictionary']!.span, CardSpan.half);
+  });
+
+  test('v5 stored layout gains concordance at the end, customs kept',
+      () async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    final svc = PreferencesService(prefs);
+    svc.saveStudyLayout(jsonEncode([
+      for (final id in [
+        'your_space',
+        'plans_live',
+        'bible_stories',
+        'dictionary',
+        'commentary',
+        'votd_archive',
+        'streak',
+      ])
+        {
+          'id': id,
+          'size': 'large',
+          'span': id == 'dictionary' ? 'half' : 'full',
+          'version': 5,
+        },
+    ]));
+    final container = ProviderContainer(
+      overrides: [
+        preferencesProvider.overrideWithValue(svc),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final layout = container.read(studyLayoutProvider);
+    final ids = [for (final c in layout) c.id];
+    expect(ids.last, 'concordance');
+    final byId = {for (final c in layout) c.id: c};
+    expect(byId['dictionary']!.span, CardSpan.half);
+    expect(byId['concordance']!.span, CardSpan.full);
   });
 
   test('setCardSize persists span + expanded at version 5', () async {
