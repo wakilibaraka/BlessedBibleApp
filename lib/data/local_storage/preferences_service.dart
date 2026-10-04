@@ -112,6 +112,13 @@ class PreferencesService {
 
 
 
+  /// Share-card typography/alignment overrides (JSON string).
+  String? getShareCardStyleJson() => prefs.getString('share_card_style');
+
+  Future<void> saveShareCardStyleJson(String json) async {
+    await prefs.setString('share_card_style', json);
+  }
+
   void saveBookmarks(List<String> bookmarks) {
     prefs.setStringList(_bookmarksKey, bookmarks);
   }

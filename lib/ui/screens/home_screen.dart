@@ -19,6 +19,8 @@ import '../widgets/bouncy_entrance.dart';
 import '../widgets/commentary_view.dart';
 import '../../state/commentary_provider.dart';
 import '../../services/share_service.dart';
+import '../../services/devotional_service.dart';
+import '../../state/devotional_provider.dart';
 import '../widgets/share_card.dart';
 
 class StrictHorizontalDragGestureRecognizer
@@ -95,6 +97,38 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     _verseController.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  /// Verse-of-the-day share: text flavors plus an image card whose
+  /// artwork option reuses today's bundled Doré plate.
+  Future<void> _shareVotd(VerseOfTheDay votd) async {
+    HapticFeedback.selectionClick();
+    final plate =
+        await ref.read(devotionalServiceProvider).plateForDay(DateTime.now());
+    if (!mounted) return;
+    await showShareOptionsSheet(
+      context: context,
+      copyText: ShareService.formatVerse(
+        texts: [votd.text],
+        reference: votd.reference,
+        translationTag: 'KJV',
+      ),
+      shareText: ShareService.formatVerse(
+        texts: [votd.text],
+        reference: votd.reference,
+        translationTag: 'KJV',
+        whatsapp: true,
+      ),
+      imageFilename: 'votd',
+      buildCard: (backdrop, style) => ShareCard.verse(
+        reference: votd.reference,
+        body: ShareService.cleanVerseText(votd.text),
+        translationTag: 'KJV',
+        backdrop: backdrop,
+        style: style,
+        artworkPath: plate?.assetPath,
+      ),
+    );
   }
 
   @override
@@ -408,31 +442,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         child: _PillButton(
                           label: 'Share',
                           filled: false,
-                          onPressed: () {
-                            final votd = data.verseOfTheDay;
-                            HapticFeedback.selectionClick();
-                            showShareOptionsSheet(
-                              context: context,
-                              copyText: ShareService.formatVerse(
-                                texts: [votd.text],
-                                reference: votd.reference,
-                                translationTag: 'KJV',
-                              ),
-                              shareText: ShareService.formatVerse(
-                                texts: [votd.text],
-                                reference: votd.reference,
-                                translationTag: 'KJV',
-                                whatsapp: true,
-                              ),
-                              imageFilename: 'votd',
-                              buildCard: (backdrop) => ShareCard.verse(
-                                reference: votd.reference,
-                                body: ShareService.cleanVerseText(votd.text),
-                                translationTag: 'KJV',
-                                backdrop: backdrop,
-                              ),
-                            );
-                          },
+                          onPressed: () => _shareVotd(data.verseOfTheDay),
                         ),
                       ),
 
@@ -620,12 +630,14 @@ class WordOfTheDaySection extends ConsumerWidget {
                                   sourceName: 'Word of the day',
                                 ),
                                 imageFilename: 'wotd',
-                                buildCard: (backdrop) => ShareCard.word(
+                                buildCard: (backdrop, style) =>
+                                    ShareCard.word(
                                   eyebrow: 'Word of the day',
                                   word: wotd.word,
                                   definition: wotd.snippet,
                                   source: 'Word of the day',
                                   backdrop: backdrop,
+                                  style: style,
                                 ),
                               );
                             },

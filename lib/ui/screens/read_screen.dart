@@ -40,6 +40,8 @@ import '../../data/local_storage/preferences_service.dart';
 import '../../data/models/translation_model.dart';
 import '../../state/hints_provider.dart';
 import '../../services/share_service.dart';
+import '../../services/devotional_service.dart';
+import '../../state/devotional_provider.dart';
 import '../widgets/share_card.dart';
 import 'notes_list_screen.dart';
 
@@ -3045,16 +3047,22 @@ class VerseActionLogic {
         .toLowerCase()
         .replaceAll(RegExp(r'[^a-z0-9]+'), '-')
         .replaceAll(RegExp(r'^-|-$'), '');
+    // Optional artwork backdrop: today's bundled Doré plate.
+    final plate =
+        await ref.read(devotionalServiceProvider).plateForDay(DateTime.now());
+    if (!context.mounted) return;
     await showShareOptionsSheet(
       context: context,
       copyText: copyBody,
       shareText: shareBody,
       imageFilename: 'verse-$slug',
-      buildCard: (backdrop) => ShareCard.verse(
+      buildCard: (backdrop, style) => ShareCard.verse(
         reference: share.reference,
         body: share.texts.map(ShareService.cleanVerseText).join(' '),
         translationTag: share.tag,
         backdrop: backdrop,
+        style: style,
+        artworkPath: plate?.assetPath,
       ),
     );
   }

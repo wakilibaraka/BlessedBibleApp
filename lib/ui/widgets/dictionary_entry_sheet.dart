@@ -105,12 +105,13 @@ class DictionaryEntrySheet extends ConsumerWidget {
                             copyText: full,
                             shareText: full,
                             imageFilename: 'word',
-                            buildCard: (backdrop) => ShareCard.word(
+                            buildCard: (backdrop, style) => ShareCard.word(
                               eyebrow: 'DICTIONARY',
                               word: displayWord,
                               definition: defs.first.definition,
                               source: _formatSourceName(defs.first.source),
                               backdrop: backdrop,
+                              style: style,
                             ),
                           );
                         },
