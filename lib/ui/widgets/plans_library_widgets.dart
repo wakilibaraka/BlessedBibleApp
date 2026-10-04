@@ -11,18 +11,8 @@ const List<String> _monthNames = [
   'January', 'February', 'March', 'April', 'May', 'June', 'July',
   'August', 'September', 'October', 'November', 'December',
 ];
-const List<String> _weekdayNames = [
-  'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN',
-];
-
 String libraryDateHeader(DateTime day) =>
     '${_monthNames[day.month - 1]} ${day.day}, ${day.year}';
-
-/// Monday-first week containing the given `day`.
-List<DateTime> libraryWeekDays(DateTime day) {
-  final monday = day.subtract(Duration(days: day.weekday - 1));
-  return List.generate(7, (i) => monday.add(Duration(days: i)));
-}
 
 /// Greeting row: "Hello," + name + "Let's Read" pill + mascot placeholder.
 class LibraryGreetingHeader extends StatelessWidget {
@@ -81,57 +71,6 @@ class LibraryGreetingHeader extends StatelessWidget {
         ),
         const SizedBox(width: 10),
         const MascotPlaceholder(size: 64),
-      ],
-    );
-  }
-}
-
-/// Week strip: day numbers over MON..SUN labels, today in accent.
-class LibraryWeekStrip extends StatelessWidget {
-  final DateTime today;
-  const LibraryWeekStrip({super.key, required this.today});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final days = libraryWeekDays(today);
-    return Row(
-      children: [
-        for (var i = 0; i < 7; i++)
-          Expanded(
-            child: Builder(builder: (_) {
-              final d = days[i];
-              final isToday = d.year == today.year &&
-                  d.month == today.month &&
-                  d.day == today.day;
-              final color = isToday
-                  ? theme.primaryColor
-                  : theme.colorScheme.onSurface.withValues(alpha: 0.45);
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    '${d.day}',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight:
-                          isToday ? FontWeight.w800 : FontWeight.w600,
-                      color: color,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    _weekdayNames[i],
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      fontWeight:
-                          isToday ? FontWeight.w800 : FontWeight.w500,
-                      letterSpacing: 0.6,
-                      color: color,
-                    ),
-                  ),
-                ],
-              );
-            }),
-          ),
       ],
     );
   }

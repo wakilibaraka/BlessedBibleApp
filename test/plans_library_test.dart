@@ -10,6 +10,7 @@ import 'package:the_blessed_bible/data/local_storage/preferences_service.dart';
 import 'package:the_blessed_bible/theme/app_theme.dart';
 import 'package:the_blessed_bible/ui/screens/plans_library_screen.dart';
 import 'package:the_blessed_bible/ui/widgets/plans_library_widgets.dart';
+import 'package:the_blessed_bible/ui/widgets/library_calendar_rail.dart';
 
 void main() {
   group('plans library helpers', () {
@@ -20,7 +21,7 @@ void main() {
       );
     });
 
-    test('week strip is Monday-first with 7 days containing today', () {
+    test('calendar week is Monday-first with 7 days containing today', () {
       // 2025-11-10 is a Monday.
       final days = libraryWeekDays(DateTime(2025, 11, 12));
       expect(days.length, 7);

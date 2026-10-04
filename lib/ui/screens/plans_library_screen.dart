@@ -10,6 +10,7 @@ import '../../state/theme_provider.dart';
 import '../widgets/shared_app_bar.dart';
 import '../widgets/study_v2_widgets.dart';
 import '../widgets/plans_library_widgets.dart';
+import '../widgets/library_calendar_rail.dart';
 import 'custom_plan_builder_v2_screen.dart';
 import 'plans_hub_v2_screen.dart' show availablePlans, PlanMetadata;
 import 'reading_plan_detail_v2_screen.dart';
@@ -82,6 +83,8 @@ class PlansLibraryScreen extends ConsumerStatefulWidget {
 class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabs;
+  final GlobalKey<LibraryCalendarRailState> _railKey =
+      GlobalKey<LibraryCalendarRailState>();
 
   @override
   void initState() {
@@ -186,6 +189,20 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
     ));
   }
 
+  /// Header date tap: pick any date, then slide the rail to that week.
+  Future<void> _pickDateAndScroll() async {
+    HapticFeedback.selectionClick();
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: now,
+      firstDate: now.subtract(const Duration(days: 365)),
+      lastDate: now.add(const Duration(days: 730)),
+    );
+    if (picked == null) return;
+    _railKey.currentState?.scrollToDate(picked);
+  }
+
   void _openToday() {
     final activeIds = ref.read(activePlanIdsProvider);
     if (activeIds.isEmpty) {
@@ -210,7 +227,13 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
         ref.watch(authStateProvider).value?.displayName?.trim() ?? '';
     final name =
         rawName.isEmpty ? 'Friend' : rawName.split(RegExp(r'\s+')).first;
-    final activeCount = ref.watch(activePlanIdsProvider).length;
+    final activeIds = ref.watch(activePlanIdsProvider);
+    final activeCount = activeIds.length;
+    // First active plan drives the calendar's completion dots.
+    // readingPlanProvider is a Notifier (not Async): it exposes
+    // isLoading/error inline, and planData is empty until built.
+    final activePlan =
+        activeIds.isEmpty ? null : ref.watch(readingPlanProvider(activeIds.first));
 
     return V2PageShell(
       appThemeMode: appThemeMode,
@@ -227,10 +250,29 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
                 child: Column(
                   children: [
                     const SizedBox(height: 8),
-                    Text(
-                      libraryDateHeader(now),
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
+                    // Date header doubles as a picker: choosing a date
+                    // scrolls the calendar rail to that week.
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: _pickDateAndScroll,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              libraryDateHeader(now),
+                              style:
+                                  theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Icon(Icons.edit_calendar_outlined,
+                              size: 16,
+                              color: theme.colorScheme.onSurface
+                                  .withValues(alpha: 0.45)),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -239,7 +281,11 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
                       onReadPressed: _openToday,
                     ),
                     const SizedBox(height: 14),
-                    LibraryWeekStrip(today: now),
+                    LibraryCalendarRail(
+                      key: _railKey,
+                      today: now,
+                      plan: activePlan,
+                    ),
                     const SizedBox(height: 14),
                     V2PillTabs(
                       controller: _tabs,
