@@ -89,7 +89,7 @@ List<String> expandRef(
     // ("Philemon 4-7", "Jude 1-25").
     final only = chapters.keys.single;
     final vs = chapters[only]!;
-    final hi = int.parse(cendS!);
+    final hi = int.parse(cendS);
     if (c1 < 1 || hi > vs.last || c1 > hi) {
       throw FormatException('verse out of range: $r');
     }
