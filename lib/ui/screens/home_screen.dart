@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,9 +16,8 @@ import '../sheets/appearance_settings_sheet.dart';
 import '../widgets/shared_top_header.dart';
 import '../widgets/glass_container.dart';
 import '../widgets/bouncy_entrance.dart';
-import 'commentary_hub_screen.dart';
+import '../widgets/commentary_view.dart';
 import '../../state/commentary_provider.dart';
-import 'today_screen.dart';
 import '../../services/share_service.dart';
 
 class StrictHorizontalDragGestureRecognizer
@@ -247,41 +245,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             ),
           ),
 
-          // ── Temporary "Today" preview entry point ─────────────────────
-          // REMOVE IN STAGE 2 once Today is wired as a real tab/destination.
-          const SizedBox(height: 10),
-          GestureDetector(
-            onTap: () => Navigator.of(context).push(
-              CupertinoPageRoute(builder: (_) => const TodayScreen()),
-            ),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: const Color(0xFFC9A227).withValues(alpha: 0.12),
-                border: Border.all(
-                  color: const Color(0xFFC9A227).withValues(alpha: 0.35),
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.wb_sunny_outlined,
-                      size: 14, color: Color(0xFFC9A227)),
-                  const SizedBox(width: 6),
-                  Text(
-                    'Preview Today Hub  ✦',
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: const Color(0xFFC9A227),
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
           // ── Spacer pushes verse downward to balance the layout ────────────
           const SizedBox(height: 56),
 
@@ -428,13 +391,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                   ? int.tryParse(refParts[1])
                                   : null;
 
-                              Navigator.of(context).push(CupertinoPageRoute(
-                                  builder: (_) => CommentaryHubScreen(
-                                        book: bookName,
-                                        chapter: chapterNum,
-                                        verse: verseNum,
-                                        verseText: data.verseOfTheDay.text,
-                                      )));
+                              showCommentaryBottomSheet(
+                                context,
+                                book: bookName,
+                                chapter: chapterNum,
+                                verse: verseNum,
+                                verseText: data.verseOfTheDay.text,
+                              );
                             },
                           ),
                         ),
