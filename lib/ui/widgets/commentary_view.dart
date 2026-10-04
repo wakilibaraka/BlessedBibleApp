@@ -16,6 +16,7 @@ import '../../models/study_content_category.dart';
 
 import '../screens/commentary_hub_screen.dart';
 import '../../state/read_location_provider.dart';
+import 'verse_link_text.dart';
 
 class CommentaryView extends ConsumerStatefulWidget {
   final String book;
@@ -580,29 +581,6 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
     );
   }
 
-  List<TextSpan> _parseMarkdown(String text, TextStyle? baseStyle) {
-    final spans = <TextSpan>[];
-    final RegExp exp = RegExp(r'\*\*(.*?)\*\*');
-    int start = 0;
-    
-    for (final match in exp.allMatches(text)) {
-      if (match.start > start) {
-        spans.add(TextSpan(text: text.substring(start, match.start)));
-      }
-      spans.add(TextSpan(
-        text: match.group(1),
-        style: const TextStyle(fontWeight: FontWeight.bold),
-      ));
-      start = match.end;
-    }
-    
-    if (start < text.length) {
-      spans.add(TextSpan(text: text.substring(start)));
-    }
-    
-    return spans;
-  }
-
   Widget _buildEntryContent(ThemeData theme, ReadingTokens tokens,
       CommentaryEntry entry, TypographyState typography) {
     final paragraphs = entry.text.split('\n\n');
@@ -651,10 +629,22 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
           const SizedBox(height: 16),
           ...paragraphs.map((p) => Padding(
                 padding: const EdgeInsets.only(bottom: 16.0),
-                child: RichText(
-                  text: TextSpan(
-                    style: baseStyle,
-                    children: _parseMarkdown(p.trim(), baseStyle),
+                child: VerseLinkText(
+                  text: p.trim(),
+                  parseBold: true,
+                  defaultStyle: baseStyle,
+                  // Whole reference in the reading accent; numbers only
+                  // carry the solid underline (dictionary keeps its
+                  // dotted underline elsewhere — the two never collide).
+                  referenceStyle: baseStyle?.copyWith(
+                    color: tokens.readingAccent,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  numberStyle: baseStyle?.copyWith(
+                    color: tokens.readingAccent,
+                    fontWeight: FontWeight.w700,
+                    decoration: TextDecoration.underline,
+                    decorationStyle: TextDecorationStyle.solid,
                   ),
                 ),
               )),

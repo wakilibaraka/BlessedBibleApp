@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/devotional_story.dart';
 import '../../state/devotional_provider.dart';
+import '../widgets/verse_link_text.dart' show splitBoldSegments;
 import '../../theme/app_colors.dart';
 import 'bible_stories_screen.dart';
 
@@ -331,12 +332,24 @@ class _PassageText extends StatelessWidget {
         for (final line in lines)
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
-            child: Text(
-              line,
-              style: theme.textTheme.bodyLarge?.copyWith(
-                fontFamily: 'Cormorant Garamond',
-                fontSize: 19,
-                height: 1.55,
+            // Shared bold parser: hides ** markers, bolds the text.
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  for (final segment in splitBoldSegments(line))
+                    TextSpan(
+                      text: segment.text,
+                      style:
+                          theme.textTheme.bodyLarge?.copyWith(
+                        fontFamily: 'Cormorant Garamond',
+                        fontSize: 19,
+                        height: 1.55,
+                        fontWeight: segment.bold
+                            ? FontWeight.bold
+                            : null,
+                      ),
+                    ),
+                ],
               ),
             ),
           ),

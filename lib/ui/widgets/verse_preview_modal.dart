@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/bible_provider.dart';
 import '../../state/typography_provider.dart';
+import '../../state/read_location_provider.dart';
 import '../../data/models/bible_model.dart';
 import 'textured_glass_container.dart';
 
@@ -12,6 +13,13 @@ class VersePreviewModal extends ConsumerWidget {
   final int startVerse;
   final int? endVerse;
 
+  /// Last chapter for cross-chapter ranges (Genesis 1:1-3:24).
+  /// Defaults to [chapter] (single-chapter range or single verse).
+  final int? endChapter;
+
+  /// Whole-chapter reference ("Genesis 1"): shows every verse.
+  final bool wholeChapter;
+
   const VersePreviewModal({
     super.key,
     required this.reference,
@@ -19,6 +27,8 @@ class VersePreviewModal extends ConsumerWidget {
     required this.chapter,
     required this.startVerse,
     this.endVerse,
+    this.endChapter,
+    this.wholeChapter = false,
   });
 
   @override
@@ -36,18 +46,28 @@ class VersePreviewModal extends ConsumerWidget {
           );
 
       if (book != null && chapter > 0 && chapter <= book.chapters.length) {
-        final chapterData = book.chapters[chapter - 1];
-
+        final lastChapter =
+            (endChapter ?? chapter).clamp(chapter, book.chapters.length);
         final texts = <String>[];
-        final end = endVerse ?? startVerse;
-
-        for (int i = startVerse; i <= end; i++) {
-          final verse = chapterData.verses.cast<BibleVerse?>().firstWhere(
-                (v) => v?.number == i,
-                orElse: () => null,
-              );
-          if (verse != null) {
-            texts.add('${verse.number} ${verse.text}');
+        for (var ch = chapter; ch <= lastChapter; ch++) {
+          final chapterData = book.chapters[ch - 1];
+          final firstV = ch == chapter ? startVerse : 1;
+          final lastV = ch == lastChapter
+              ? (wholeChapter
+                  ? chapterData.verses.length
+                  : (endVerse ?? startVerse))
+              : chapterData.verses.length;
+          for (int i = firstV; i <= lastV; i++) {
+            final verse = chapterData.verses.cast<BibleVerse?>().firstWhere(
+                  (v) => v?.number == i,
+                  orElse: () => null,
+                );
+            if (verse != null) {
+              final label = lastChapter == chapter
+                  ? '${verse.number}'
+                  : '$ch:${verse.number}';
+              texts.add('$label ${verse.text}');
+            }
           }
         }
 
@@ -115,6 +135,28 @@ class VersePreviewModal extends ConsumerWidget {
                     height: 1.6,
                     color: theme.textTheme.bodyLarge?.color,
                   ),
+                ),
+              ),
+            ),
+
+            // Open in Read: dismiss the sheet, then jump the reader to
+            // the verse (dismissing first keeps the user in context).
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+              child: SizedBox(
+                width: double.infinity,
+                child: FilledButton.tonalIcon(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    openReaderAtVerse(
+                      ref,
+                      bookName: bookName,
+                      chapter: chapter,
+                      verse: startVerse,
+                    );
+                  },
+                  icon: const Icon(Icons.menu_book_rounded),
+                  label: const Text('Open in Read'),
                 ),
               ),
             ),

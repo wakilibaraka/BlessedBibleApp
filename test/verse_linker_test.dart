@@ -47,5 +47,30 @@ void main() {
       expect((spans[1] as TextSpan).toPlainText(), "Genesis 1:1");
       expect((spans[3] as TextSpan).toPlainText(), "Revelation 22:21");
     });
+
+    test('parses chapter-only references', () {
+      final spans = VerseLinker.parse("Read Genesis 1 today.");
+      expect(spans.length, 3);
+      expect((spans[1] as TextSpan).toPlainText(), "Genesis 1");
+      // Book and numbers stay in separate child spans for split styling.
+      final ref = spans[1] as TextSpan;
+      expect(ref.children!.length, 3);
+      expect((ref.children![0] as TextSpan).text, "Genesis");
+      expect((ref.children![2] as TextSpan).text, "1");
+    });
+
+    test('parses cross-chapter ranges whole', () {
+      final spans = VerseLinker.parse("See Genesis 1:1-3:24 for context.");
+      expect(spans.length, 3);
+      expect((spans[1] as TextSpan).toPlainText(), "Genesis 1:1-3:24");
+    });
+
+    test('chapter-only does not swallow surrounding text', () {
+      final spans = VerseLinker.parse("Psalm 23 is beloved.");
+      // No leading span when the text starts with the reference.
+      expect(spans.length, 2);
+      expect((spans[0] as TextSpan).toPlainText(), "Psalm 23");
+      expect((spans[1] as TextSpan).text, " is beloved.");
+    });
   });
 }

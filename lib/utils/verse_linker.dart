@@ -76,8 +76,11 @@ class VerseLinker {
   static final RegExp _regex = () {
     final booksPattern = _books.join('|');
     // Group 1: Book name
-    // Group 2: Numbers (e.g., 1:1 or 13:4-8)
-    return RegExp(r'\b(' + booksPattern + r')\s+(\d+:\d+(?:-\d+)?)\b');
+    // Group 2: Numbers — chapter only ("Genesis 1"), verse ("John 3:16"),
+    //   same-chapter range ("John 3:16-18") or cross-chapter range
+    //   ("Genesis 1:1-3:24").
+    return RegExp(
+        r'\b(' + booksPattern + r')\s+(\d+(?::\d+(?:-\d+(?::\d+)?)?)?)\b');
   }();
 
   /// Parses a string and returns a list of TextSpans, separating normal text from Bible references.
@@ -103,15 +106,19 @@ class VerseLinker {
       final bookName = match.group(1)!;
       final numbers = match.group(2)!;
 
+      // NOTE: the recognizer must live on the leaf spans, not the parent:
+      // Flutter's hit test only consults the deepest span under the
+      // pointer, so a parent-only recognizer never fires.
+      final recognizer = recognizerBuilder?.call(reference);
       spans.add(TextSpan(
         style: referenceStyle ?? defaultStyle,
-        recognizer: recognizerBuilder?.call(reference),
         children: [
-          TextSpan(text: bookName),
-          const TextSpan(text: ' '),
+          TextSpan(text: bookName, recognizer: recognizer),
+          TextSpan(text: ' ', recognizer: recognizer),
           TextSpan(
             text: numbers,
             style: numberStyle,
+            recognizer: recognizer,
           ),
         ],
       ));
