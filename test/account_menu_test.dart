@@ -36,10 +36,12 @@ void main() {
     expect(find.byType(AccountAvatar), findsOneWidget);
     // Streak pill is gone (no flame icon, no day counter in header).
     expect(find.byIcon(Icons.local_fire_department_rounded), findsNothing);
-    // Cards render (Your Space banner + tool cards).
+    // Cards render (Your Space banner + tool cards + merged plans).
     expect(find.text('Bookmarks, highlights, notes & journal'),
         findsOneWidget);
     expect(find.text('Words defined'), findsOneWidget);
+    // Merged plans_live card (no active plans -> start CTA page).
+    expect(find.text('Start a reading plan'), findsOneWidget);
   });
 
   testWidgets('avatar opens the account menu with data rows',

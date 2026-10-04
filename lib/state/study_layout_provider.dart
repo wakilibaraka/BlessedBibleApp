@@ -5,9 +5,11 @@ import '../data/local_storage/preferences_service.dart';
 enum CardSize { small, medium, large }
 
 /// Layout-v2 span: how many grid columns a Study hub card occupies.
-/// full = full-width row, half = 2-across, quarter = 4-across compact tile.
-/// V1 keeps reading [CardSize]; V2 reads [span] + list order from the same
-/// persisted JSON (version 3 migrates size → span).
+/// full = full-width row, half = 2-across. Quarter tiles were retired:
+/// every card defaults to Large (full). [expanded] marks Extra Large
+/// (full width + roomier content). V1 keeps reading [CardSize]; V2 reads
+/// [span] + [expanded] + list order from the persisted JSON
+/// (version 4 resets all cards to Large once).
 enum CardSpan { quarter, half, full }
 
 CardSpan _spanFromSize(CardSize size) {
@@ -26,14 +28,23 @@ class StudyCardConfig {
   final CardSize size;
   final CardSpan span;
 
-  StudyCardConfig({required this.id, required this.size, CardSpan? span})
+  /// Extra Large: full width with expanded content. Only meaningful
+  /// with [span] == full (the size sheet enforces this).
+  final bool expanded;
+
+  StudyCardConfig(
+      {required this.id,
+      required this.size,
+      CardSpan? span,
+      this.expanded = false})
       : span = span ?? _spanFromSize(size);
 
   Map<String, dynamic> toJson() => {
         'id': id,
         'size': size.name,
         'span': span.name,
-        'version': 3,
+        'expanded': expanded,
+        'version': 4,
       };
 
   factory StudyCardConfig.fromJson(Map<String, dynamic> json) {
@@ -68,20 +79,33 @@ class StudyCardConfig {
       );
     }
 
+    // Version 4: uniform Large default. Anything stored before v4
+    // (quarters, halves, customs) resets to full width once so every
+    // widget renders the same size; users re-customize afterwards.
+    if (version < 4) {
+      return StudyCardConfig(
+        id: json['id'] as String,
+        size: CardSize.large,
+        span: CardSpan.full,
+      );
+    }
+
     // Span: explicit since v3, otherwise derived from size.
     CardSpan span = _spanFromSize(size);
     final spanStr = json['span'] as String?;
-    if (version >= 3 && spanStr != null) {
+    if (spanStr != null) {
       span = CardSpan.values.firstWhere(
         (e) => e.name == spanStr,
         orElse: () => span,
       );
     }
+    if (span == CardSpan.quarter) span = CardSpan.full;
 
     return StudyCardConfig(
       id: json['id'] as String,
       size: size,
       span: span,
+      expanded: json['expanded'] as bool? ?? false,
     );
   }
 }
@@ -163,17 +187,22 @@ class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
     _save();
   }
 
-  /// Layout-v2 resize. Keeps the V1 [size] in sync (large for full,
-  /// medium otherwise) so the fallback hub keeps rendering sanely.
-  void setSpan(String id, CardSpan newSpan) {
+  /// Layout-v2 resize (Large / Extra Large / Half). Keeps the V1 [size]
+  /// in sync (large for full, medium otherwise) so the fallback hub
+  /// keeps rendering sanely. Extra Large is full width + expanded.
+  void setCardSize(String id,
+      {required CardSpan span, required bool expanded}) {
+    final safeSpan = span == CardSpan.quarter ? CardSpan.full : span;
+    final safeExpanded = expanded && safeSpan == CardSpan.full;
     state = state.map((card) {
       if (card.id == id) {
         return StudyCardConfig(
           id: card.id,
-          size: newSpan == CardSpan.full
+          size: safeSpan == CardSpan.full
               ? CardSize.large
               : CardSize.medium,
-          span: newSpan,
+          span: safeSpan,
+          expanded: safeExpanded,
         );
       }
       return card;
@@ -181,32 +210,30 @@ class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
     _save();
   }
 
-  /// Layout-v2 default order: Your Space banner first, plan second.
+  /// Layout-v2 default order and sizes: every widget Large (full
+  /// width, same size). Users can pick Extra Large or Half per card
+  /// via long-press. Plans live in the single merged plans_live card.
   static List<StudyCardConfig> defaultLayoutV2() => [
         StudyCardConfig(
             id: 'your_space',
             size: CardSize.large,
             span: CardSpan.full),
         StudyCardConfig(
-            id: 'reading_plan',
+            id: 'plans_live',
             size: CardSize.large,
             span: CardSpan.full),
         StudyCardConfig(
             id: 'commentary',
-            size: CardSize.medium,
-            span: CardSpan.half),
-        StudyCardConfig(
-            id: 'plans',
-            size: CardSize.medium,
-            span: CardSpan.half),
+            size: CardSize.large,
+            span: CardSpan.full),
         StudyCardConfig(
             id: 'dictionary',
-            size: CardSize.medium,
-            span: CardSpan.half),
+            size: CardSize.large,
+            span: CardSpan.full),
         StudyCardConfig(
             id: 'bible_stories',
-            size: CardSize.medium,
-            span: CardSpan.half),
+            size: CardSize.large,
+            span: CardSpan.full),
       ];
 }
 

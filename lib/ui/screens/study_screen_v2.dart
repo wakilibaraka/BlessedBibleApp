@@ -23,10 +23,12 @@ import 'reading_plan_detail_v2_screen.dart';
 import 'your_space_screen.dart';
 import 'plans_hub_v2_screen.dart' show availablePlans;
 
-/// Redesigned Study hub (V2): single column, every card full width.
+/// Redesigned Study hub (V2): Large by default, every card the same
+/// size.
 ///
-/// - Card order persists via [studyLayoutProvider]; every card always
-///   renders full width (no resize, no edit mode, no reorder UI).
+/// - Card order + per-card size persist via [studyLayoutProvider].
+/// - Long-press a card to pick Large / Extra Large / Half. No persistent
+///   resize dots, no edit mode.
 /// - No Continue Reading card (resume lives in the plan snapshot + Read
 ///   tab).
 /// - Top banner is Your Space: live bookmark/highlight/note/journal counts.
@@ -41,21 +43,41 @@ class StudyScreenV2 extends ConsumerStatefulWidget {
 
 const _v2CardIds = [
   'your_space',
-  'reading_plan',
+  'plans_live',
   'commentary',
-  'plans',
   'dictionary',
   'bible_stories',
 ];
 
 List<StudyCardConfig> _orderedCards(List<StudyCardConfig> stored) {
-  final byId = {for (final c in stored) c.id: c};
   final out = <StudyCardConfig>[];
+  var plansLiveAdded = false;
   for (final c in stored) {
-    if (_v2CardIds.contains(c.id)) out.add(c);
+    // Merged widget: the old reading_plan + plans cards become one
+    // plans_live card at the first of their positions.
+    final id = (c.id == 'reading_plan' || c.id == 'plans')
+        ? 'plans_live'
+        : c.id;
+    if (!_v2CardIds.contains(id)) continue;
+    if (id == 'plans_live') {
+      if (plansLiveAdded) continue;
+      plansLiveAdded = true;
+      out.add(StudyCardConfig(
+        id: id,
+        size: c.size,
+        span: c.span == CardSpan.quarter ? CardSpan.full : c.span,
+        expanded: c.expanded,
+      ));
+      continue;
+    }
+    out.add(c);
   }
+  // Missing defaults are appended — checked against the merged list
+  // (not the raw stored ids) so the reading_plan/plans -> plans_live
+  // mapping above never yields a duplicate card.
+  final present = {for (final c in out) c.id};
   for (final def in StudyLayoutNotifier.defaultLayoutV2()) {
-    if (!byId.containsKey(def.id)) out.add(def);
+    if (!present.contains(def.id)) out.add(def);
   }
   return out;
 }
@@ -86,6 +108,112 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
         ),
       );
     }
+  }
+
+  /// Long-press size picker: Large (default), Extra Large, Half.
+  /// The only customization UI — no persistent handles, no edit mode.
+  void _showCardSize(StudyCardConfig card) {
+    final isLarge =
+        card.span == CardSpan.full && !card.expanded;
+    final isXLarge =
+        card.span == CardSpan.full && card.expanded;
+    final isHalf = card.span == CardSpan.half;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        final theme = Theme.of(ctx);
+        Widget option({
+          required String label,
+          required String hint,
+          required IconData icon,
+          required bool selected,
+          required VoidCallback onPick,
+        }) {
+          return ListTile(
+            leading: Icon(
+              icon,
+              color: selected
+                  ? theme.primaryColor
+                  : theme.colorScheme.onSurface
+                      .withValues(alpha: 0.5),
+            ),
+            title: Text(label),
+            subtitle: Text(hint),
+            trailing: selected
+                ? Icon(Icons.check_rounded,
+                    color: theme.primaryColor)
+                : null,
+            onTap: () {
+              HapticFeedback.selectionClick();
+              onPick();
+              Navigator.of(ctx).pop();
+            },
+          );
+        }
+
+        return Container(
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          padding: const EdgeInsets.fromLTRB(8, 8, 8, 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 5,
+                  margin: const EdgeInsets.only(top: 6, bottom: 2),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.onSurface
+                        .withValues(alpha: 0.25),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
+                child: V2Eyebrow('Card size'),
+              ),
+              option(
+                label: 'Large',
+                hint: 'Full width, same size as everything',
+                icon: Icons.crop_landscape_rounded,
+                selected: isLarge,
+                onPick: () => ref
+                    .read(studyLayoutProvider.notifier)
+                    .setCardSize(card.id,
+                        span: CardSpan.full, expanded: false),
+              ),
+              option(
+                label: 'Extra Large',
+                hint: 'Full width, roomier content',
+                icon: Icons.aspect_ratio_rounded,
+                selected: isXLarge,
+                onPick: () => ref
+                    .read(studyLayoutProvider.notifier)
+                    .setCardSize(card.id,
+                        span: CardSpan.full, expanded: true),
+              ),
+              option(
+                label: 'Half',
+                hint: 'Compact, two per row',
+                icon: Icons.splitscreen_rounded,
+                selected: isHalf,
+                onPick: () => ref
+                    .read(studyLayoutProvider.notifier)
+                    .setCardSize(card.id,
+                        span: CardSpan.half, expanded: false),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
 
@@ -148,20 +276,94 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                   ],
                 ),
                 const SizedBox(height: 14),
-                // Cards (single column, full width).
-                Column(
-                  children: [
-                    for (final card in cards)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: _CardBody(
-                          id: card.id,
-                          span: CardSpan.full,
-                          planTitle: _planTitle,
-                          onOpen: _push,
+                // Cards (Large default; halves pair up).
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    const gap = 12.0;
+                    final halfW =
+                        (constraints.maxWidth - gap) / 2;
+
+                    Widget cardBox(StudyCardConfig card,
+                        {double? width}) {
+                      final body = _CardBody(
+                        id: card.id,
+                        span: card.span,
+                        expanded: card.expanded,
+                        planTitle: _planTitle,
+                        onOpen: _push,
+                      );
+                      final framed = width == null
+                          ? body
+                          : SizedBox(width: width, child: body);
+                      return GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        onLongPress: () {
+                          HapticFeedback.mediumImpact();
+                          _showCardSize(card);
+                        },
+                        child: Padding(
+                          padding:
+                              const EdgeInsets.only(bottom: 12),
+                          child: framed,
                         ),
-                      ),
-                  ],
+                      );
+                    }
+
+                    // Pack halves into pairs; full cards own rows.
+                    final rows = <List<StudyCardConfig>>[];
+                    StudyCardConfig? pendingHalf;
+                    for (final card in cards) {
+                      if (card.span == CardSpan.half) {
+                        if (pendingHalf == null) {
+                          pendingHalf = card;
+                        } else {
+                          rows.add([pendingHalf, card]);
+                          pendingHalf = null;
+                        }
+                      } else {
+                        if (pendingHalf != null) {
+                          rows.add([pendingHalf]);
+                          pendingHalf = null;
+                        }
+                        rows.add([card]);
+                      }
+                    }
+                    if (pendingHalf != null) {
+                      rows.add([pendingHalf]);
+                    }
+
+                    return Column(
+                      children: [
+                        for (final row in rows)
+                          if (row.length == 2)
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  bottom: 12),
+                              child: Row(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                      child: cardBox(row[0])),
+                                  const SizedBox(width: gap),
+                                  Expanded(
+                                      child: cardBox(row[1])),
+                                ],
+                              ),
+                            )
+                          else if (row[0].span == CardSpan.half)
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: SizedBox(
+                                width: halfW,
+                                child: cardBox(row[0]),
+                              ),
+                            )
+                          else
+                            cardBox(row[0]),
+                      ],
+                    );
+                  },
                 ),
               ],
             ),
@@ -172,31 +374,38 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
   }
 }
 
-/// Renders one hub card, always full width.
+/// Renders one hub card. Large = full width, Half = compact half
+/// width, Extra Large = full width with expanded content.
 class _CardBody extends ConsumerWidget {
   final String id;
   final CardSpan span;
+  final bool expanded;
   final String Function(String id) planTitle;
   final void Function(Widget page) onOpen;
   const _CardBody({
     required this.id,
     required this.span,
+    this.expanded = false,
     required this.planTitle,
     required this.onOpen,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final useNewLibrary = ref.watch(plansDesignProvider);
     switch (id) {
       case 'your_space':
-        return _YourSpaceCard(span: span, onOpen: onOpen);
-      case 'reading_plan':
-        return _PlanSnapshotCard(
-            span: span, planTitle: planTitle, onOpen: onOpen);
+        return _YourSpaceCard(
+            span: span, expanded: expanded, onOpen: onOpen);
+      case 'plans_live':
+        return _PlansLiveCard(
+            span: span,
+            expanded: expanded,
+            planTitle: planTitle,
+            onOpen: onOpen);
       case 'commentary':
         return _ToolCard(
           span: span,
+          expanded: expanded,
           icon: Icons.library_books_rounded,
           eyebrow: 'Commentary',
           title: 'Verse-by-verse insight',
@@ -206,22 +415,10 @@ class _CardBody extends ConsumerWidget {
           onTap: () => onOpen(
               const CommentaryLibraryV2Screen()),
         );
-      case 'plans':
-        return _ToolCard(
-          span: span,
-          icon: Icons.manage_search_rounded,
-          eyebrow: 'Plans',
-          title: 'Guided reading',
-          snippet:
-              'Curated, paced and custom plans with catch-up.',
-          cta: 'Browse plans',
-          onTap: () => onOpen(useNewLibrary
-              ? const PlansLibraryScreen()
-              : const PlansHubV3Screen()),
-        );
       case 'dictionary':
         return _ToolCard(
           span: span,
+          expanded: expanded,
           icon: Icons.book_outlined,
           eyebrow: 'Dictionary',
           title: 'Words defined',
@@ -233,6 +430,7 @@ class _CardBody extends ConsumerWidget {
       case 'bible_stories':
         return _ToolCard(
           span: span,
+          expanded: expanded,
           icon: Icons.auto_stories_rounded,
           eyebrow: 'Bible stories',
           title: 'Narratives retold',
@@ -250,9 +448,10 @@ class _CardBody extends ConsumerWidget {
 /// Your Space banner: live counts → deep-link into YourSpaceScreen tabs.
 class _YourSpaceCard extends ConsumerWidget {
   final CardSpan span;
+  final bool expanded;
   final void Function(Widget page) onOpen;
   const _YourSpaceCard(
-      {required this.span, required this.onOpen});
+      {required this.span, this.expanded = false, required this.onOpen});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -285,31 +484,6 @@ class _YourSpaceCard extends ConsumerWidget {
     ];
     void go(int tab) =>
         onOpen(YourSpaceScreen(initialTab: tab));
-
-    if (span == CardSpan.quarter) {
-      final total = counts.fold<int>(0, (s, c) => s + c.$3);
-      return V2Card(
-        onTap: () => go(0),
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.folder_special_rounded,
-                color: theme.primaryColor, size: 22),
-            const SizedBox(height: 6),
-            Text('$total',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                )),
-            Text('Your Space',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: theme.colorScheme.onSurface
-                      .withValues(alpha: 0.65),
-                )),
-          ],
-        ),
-      );
-    }
 
     final tiles = [
       for (final c in counts)
@@ -350,6 +524,7 @@ class _YourSpaceCard extends ConsumerWidget {
     return V2Card(
       featured: true,
       onTap: () => go(0),
+      padding: EdgeInsets.all(expanded ? 22 : 18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -393,28 +568,57 @@ class _YourSpaceCard extends ConsumerWidget {
 }
 
 /// Active-plan snapshot (full + half variants).
-class _PlanSnapshotCard extends ConsumerWidget {
+/// Merged plans widget: a swipeable live snapshot (page 1) plus a
+/// browse entry (page 2). Replaces the old reading-plan + plans cards.
+class _PlansLiveCard extends ConsumerStatefulWidget {
   final CardSpan span;
+  final bool expanded;
   final String Function(String id) planTitle;
   final void Function(Widget page) onOpen;
-  const _PlanSnapshotCard({
+  const _PlansLiveCard({
     required this.span,
+    this.expanded = false,
     required this.planTitle,
     required this.onOpen,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_PlansLiveCard> createState() => _PlansLiveCardState();
+}
+
+class _PlansLiveCardState extends ConsumerState<_PlansLiveCard> {
+  late final PageController _pages = PageController();
+  int _page = 0;
+
+  @override
+  void dispose() {
+    _pages.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final activeIds = ref.watch(activePlanIdsProvider);
     final useNewLibrary = ref.watch(plansDesignProvider);
+    void openLibrary() => widget.onOpen(useNewLibrary
+        ? const PlansLibraryScreen()
+        : const PlansHubV3Screen());
+    void openDetail(String id) =>
+        widget.onOpen(ReadingPlanDetailV2Screen(planId: id));
 
-    if (activeIds.isEmpty) {
-      return V2Card(
-        onTap: () => onOpen(useNewLibrary
-            ? const PlansLibraryScreen()
-            : const PlansHubV3Screen()),
-        child: Row(
+    final hasActive = activeIds.isNotEmpty;
+    final planId = hasActive ? activeIds.first : null;
+    final plan = planId == null
+        ? null
+        : ref.watch(readingPlanProvider(planId));
+    final total = plan?.planData.length ?? 0;
+    final current = plan?.todayReadingDay ?? total;
+    final behind = plan?.missedDays.length ?? 0;
+
+    Widget livePage() {
+      if (!hasActive) {
+        return Row(
           children: [
             Icon(Icons.menu_book_rounded,
                 size: 32, color: theme.primaryColor),
@@ -422,6 +626,7 @@ class _PlanSnapshotCard extends ConsumerWidget {
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   const V2Eyebrow('Reading plan'),
                   const SizedBox(height: 2),
@@ -434,101 +639,144 @@ class _PlanSnapshotCard extends ConsumerWidget {
             ),
             const Icon(Icons.chevron_right_rounded),
           ],
-        ),
-      );
-    }
-
-    final planId = activeIds.first;
-    final plan = ref.watch(readingPlanProvider(planId));
-    final total = plan.planData.length;
-    final current = plan.todayReadingDay ?? total;
-    final behind = plan.missedDays.length;
-    void open() => onOpen(
-        ReadingPlanDetailV2Screen(planId: planId));
-
-    if (span == CardSpan.quarter) {
-      return V2Card(
-        onTap: open,
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            V2ProgressRing(
-                fraction: plan.percentComplete, size: 44),
-            const SizedBox(height: 6),
-            Text('Day $current/$total',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                )),
-          ],
-        ),
-      );
-    }
-
-    final ringSize = span == CardSpan.full ? 64.0 : 52.0;
-    return V2Card(
-      featured: span == CardSpan.full,
-      onTap: open,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        );
+      }
+      return Row(
         children: [
-          const V2Eyebrow('Active plan'),
-          const SizedBox(height: 4),
-          Text(
-            planTitle(planId),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              V2ProgressRing(
-                  fraction: plan.percentComplete,
-                  size: ringSize),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
+          V2ProgressRing(
+              fraction: plan!.percentComplete,
+              size: widget.span == CardSpan.full ? 56.0 : 48.0),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const V2Eyebrow('Active plan'),
+                const SizedBox(height: 2),
+                Text(
+                  widget.planTitle(planId!),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Row(
                   children: [
+                    Expanded(
+                      child: V2ProgressBar(
+                          fraction: plan.percentComplete),
+                    ),
+                    const SizedBox(width: 8),
                     Text(
                       total == 0
-                          ? 'Loading…'
+                          ? '…'
                           : 'Day $current of $total',
-                      style: theme.textTheme.titleSmall?.copyWith(
+                      style: theme.textTheme.labelSmall?.copyWith(
                         fontWeight: FontWeight.w800,
+                        color: theme.colorScheme.onSurface
+                            .withValues(alpha: 0.6),
                       ),
-                    ),
-                    const SizedBox(height: 6),
-                    V2ProgressBar(
-                        fraction: plan.percentComplete),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
-                      children: [
-                        V2Badge(
-                            '${(plan.percentComplete * 100).round()}% complete'),
-                        if (behind > 0)
-                          V2MetaChip('$behind behind')
-                        else
-                          const V2MetaChip('On track ✓'),
-                      ],
                     ),
                   ],
                 ),
-              ),
+                if (behind > 0) ...[
+                  const SizedBox(height: 4),
+                  V2MetaChip('$behind behind'),
+                ],
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+
+    Widget browsePage() {
+      return Row(
+        children: [
+          Icon(Icons.manage_search_rounded,
+              size: 32, color: theme.primaryColor),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const V2Eyebrow('Plans'),
+                const SizedBox(height: 2),
+                Text('Guided reading',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    )),
+                const SizedBox(height: 2),
+                Text('Curated, paced and custom',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontStyle: FontStyle.italic,
+                      color: theme.colorScheme.onSurface
+                          .withValues(alpha: 0.6),
+                    )),
+              ],
+            ),
+          ),
+          const Icon(Icons.chevron_right_rounded),
+        ],
+      );
+    }
+
+    void handleTap() {
+      if (_page == 1 || !hasActive) {
+        openLibrary();
+      } else {
+        openDetail(planId!);
+      }
+    }
+
+    return V2Card(
+      featured: widget.span == CardSpan.full,
+      onTap: handleTap,
+      padding: EdgeInsets.all(widget.expanded ? 22 : 18),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            height: 132,
+            child: PageView(
+              controller: _pages,
+              onPageChanged: (i) => setState(() => _page = i),
+              children: [
+                Center(child: livePage()),
+                Center(child: browsePage()),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              for (var i = 0; i < 2; i++)
+                Container(
+                  width: 6,
+                  height: 6,
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 3),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: i == _page
+                        ? theme.primaryColor
+                        : theme.colorScheme.onSurface
+                            .withValues(alpha: 0.25),
+                  ),
+                ),
             ],
           ),
-          if (span == CardSpan.full) ...[
+          if (widget.expanded && hasActive && total > 0) ...[
             const SizedBox(height: 12),
             _TodayRow(
-                planId: planId,
-                current: current,
-                total: total),
+                planId: planId!, current: current, total: total),
           ],
         ],
       ),
@@ -595,6 +843,7 @@ class _TodayRow extends ConsumerWidget {
 
 class _ToolCard extends StatelessWidget {
   final CardSpan span;
+  final bool expanded;
   final IconData icon;
   final String eyebrow;
   final String title;
@@ -603,6 +852,7 @@ class _ToolCard extends StatelessWidget {
   final VoidCallback onTap;
   const _ToolCard({
     required this.span,
+    this.expanded = false,
     required this.icon,
     required this.eyebrow,
     required this.title,
@@ -614,37 +864,18 @@ class _ToolCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    if (span == CardSpan.quarter) {
-      return V2Card(
-        onTap: onTap,
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: theme.primaryColor, size: 22),
-            const SizedBox(height: 6),
-            Text(title,
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                )),
-          ],
-        ),
-      );
-    }
+    final iconBox = expanded ? 52.0 : 34.0;
     return V2Card(
       featured: span == CardSpan.full,
       onTap: onTap,
-      padding: const EdgeInsets.all(15),
+      padding: EdgeInsets.all(expanded ? 20 : 15),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 34,
-            height: 34,
+            width: iconBox,
+            height: iconBox,
             decoration: BoxDecoration(
               color: theme.primaryColor.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(11),
@@ -652,17 +883,21 @@ class _ToolCard extends StatelessWidget {
                 color: theme.primaryColor.withValues(alpha: 0.3),
               ),
             ),
-            child:
-                Icon(icon, size: 18, color: theme.primaryColor),
+            child: Icon(icon,
+                size: expanded ? 24 : 18,
+                color: theme.primaryColor),
           ),
           const SizedBox(height: 8),
           V2Eyebrow(eyebrow),
           const SizedBox(height: 2),
           Text(title,
-              style: theme.textTheme.titleSmall?.copyWith(
+              style: (expanded
+                      ? theme.textTheme.titleMedium
+                      : theme.textTheme.titleSmall)
+                  ?.copyWith(
                 fontWeight: FontWeight.bold,
               )),
-          if (span == CardSpan.full) ...[
+          if (span == CardSpan.full || expanded) ...[
             const SizedBox(height: 4),
             Text(snippet,
                 maxLines: 2,

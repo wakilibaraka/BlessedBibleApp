@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/devotional_story.dart';
@@ -32,7 +33,6 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
     final stories = ref.watch(filteredDevotionalStoriesProvider);
     final totalAsync = ref.watch(devotionalStoriesProvider);
     final filter = ref.watch(devotionalFilterProvider);
-    final groupings = ref.watch(devotionalGroupingsProvider);
     final books = ref.watch(devotionalBooksProvider);
 
     return Scaffold(
@@ -117,61 +117,58 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  // Testament segmented control
-                  SegmentedButton<TestamentFilter>(
-                    segments: const [
-                      ButtonSegment(value: TestamentFilter.all, label: Text('All')),
-                      ButtonSegment(value: TestamentFilter.ot, label: Text('Old Testament')),
-                      ButtonSegment(value: TestamentFilter.nt, label: Text('New Testament')),
-                    ],
-                    selected: {filter.testament},
-                    showSelectedIcon: false,
-                    style: ButtonStyle(
-                      visualDensity: VisualDensity.compact,
-                      textStyle: WidgetStatePropertyAll(
-                        theme.textTheme.labelMedium,
-                      ),
-                    ),
-                    onSelectionChanged: (sel) => ref
-                        .read(devotionalFilterProvider.notifier)
-                        .setTestament(sel.first),
-                  ),
-                  const SizedBox(height: 10),
-                  // Grouping chips
-                  SizedBox(
-                    height: 38,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      children: [
-                        _chip(context, 'All groups', null,
-                            filter.grouping == null, (g) => ref
-                                .read(devotionalFilterProvider.notifier)
-                                .setGrouping(g)),
-                        for (final g in groupings)
-                          _chip(context, g, g, filter.grouping == g, (gg) => ref
+                  // Testament + books control: All | OT | NT | Books▾.
+                  // Books opens a dropdown sheet instead of a chip row.
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _FilterPill(
+                          label: 'All',
+                          selected:
+                              filter.testament == TestamentFilter.all &&
+                                  filter.bookPrefix == null,
+                          onTap: () => ref
                               .read(devotionalFilterProvider.notifier)
-                              .setGrouping(gg)),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  // Book chips
-                  SizedBox(
-                    height: 38,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      children: [
-                        _chip(context, 'All books', null,
-                            filter.bookPrefix == null, (b) => ref
-                                .read(devotionalFilterProvider.notifier)
-                                .setBook(b)),
-                        for (final b in books)
-                          _chip(context, b.book, b.prefix,
-                              filter.bookPrefix == b.prefix, (bp) => ref
-                                  .read(devotionalFilterProvider.notifier)
-                                  .setBook(bp)),
-                      ],
-                    ),
+                              .setTestament(TestamentFilter.all),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _FilterPill(
+                          label: 'OT',
+                          selected:
+                              filter.testament == TestamentFilter.ot &&
+                                  filter.bookPrefix == null,
+                          onTap: () => ref
+                              .read(devotionalFilterProvider.notifier)
+                              .setTestament(TestamentFilter.ot),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _FilterPill(
+                          label: 'NT',
+                          selected:
+                              filter.testament == TestamentFilter.nt &&
+                                  filter.bookPrefix == null,
+                          onTap: () => ref
+                              .read(devotionalFilterProvider.notifier)
+                              .setTestament(TestamentFilter.nt),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _FilterPill(
+                          label: _bookLabel(books, filter.bookPrefix),
+                          selected: filter.bookPrefix != null,
+                          trailing: const Icon(
+                            Icons.arrow_drop_down_rounded,
+                            size: 18,
+                          ),
+                          onTap: () => _openBookPicker(books),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 4),
                   Row(
@@ -218,8 +215,17 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                   textAlign: TextAlign.center)),
             ),
             data: (_) => stories.isEmpty
-                ? const SliverFillRemaining(
-                    child: Center(child: Text('No stories match these filters.')),
+                ? SliverFillRemaining(
+                    child: Center(
+                      child: _EmptyStories(
+                        onClearFilters: () => ref
+                            .read(devotionalFilterProvider.notifier)
+                            .reset(),
+                        onShowRead: () => ref
+                            .read(devotionalFilterProvider.notifier)
+                            .toggleUnreadOnly(),
+                      ),
+                    ),
                   )
                 : _StoryGrid(stories: stories),
           ),
@@ -234,43 +240,130 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
     );
   }
 
-  Widget _chip(
-    BuildContext context,
-    String label,
-    String? value,
-    bool selected,
-    void Function(String?) onTap,
-  ) {
+  /// App-bar tune icon: jump straight to the book picker.
+  void _openFilters(BuildContext context) {
+    _openBookPicker(ref.read(devotionalBooksProvider));
+  }
+
+  /// Display label for the Books pill: the chosen book, else "Books".
+  String _bookLabel(
+      List<DevotionalBookInfo> books, String? prefix) {
+    if (prefix == null) return 'Books';
+    for (final b in books) {
+      if (b.prefix == prefix) return b.book;
+    }
+    return 'Books';
+  }
+
+  /// Book dropdown: search + scoped book list + All-books reset.
+  void _openBookPicker(List<DevotionalBookInfo> books) {
     final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.only(right: 8),
-      child: GestureDetector(
-        onTap: () => onTap(value),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+    final query = TextEditingController();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) {
+        return Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(ctx).size.height * 0.7,
+          ),
           decoration: BoxDecoration(
-            color: selected
-                ? theme.primaryColor.withValues(alpha: 0.15)
-                : theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(19),
-            border: Border.all(
-              color: selected
-                  ? theme.primaryColor
-                  : theme.dividerColor.withValues(alpha: 0.5),
-            ),
+            color: theme.colorScheme.surface,
+            borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(24)),
           ),
-          child: Text(
-            label,
-            style: theme.textTheme.labelMedium?.copyWith(
-              color: selected
-                  ? theme.primaryColor
-                  : theme.colorScheme.onSurface.withValues(alpha: 0.75),
-              fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-            ),
+          padding: const EdgeInsets.fromLTRB(8, 8, 8, 32),
+          child: StatefulBuilder(
+            builder: (ctx, setSheetState) {
+              final q = query.text.trim().toLowerCase();
+              final visible = q.isEmpty
+                  ? books
+                  : books
+                      .where((b) =>
+                          b.book.toLowerCase().contains(q))
+                      .toList();
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 36,
+                      height: 5,
+                      margin: const EdgeInsets.only(top: 6, bottom: 10),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.onSurface
+                            .withValues(alpha: 0.25),
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12),
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Search books…',
+                        prefixIcon:
+                            const Icon(Icons.search_rounded),
+                        isDense: true,
+                        filled: true,
+                        fillColor: theme.colorScheme.surface,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      onChanged: (_) => setSheetState(() {}),
+                    ),
+                  ),
+                  Flexible(
+                    child: ListView(
+                      shrinkWrap: true,
+                      children: [
+                        ListTile(
+                          leading: const Icon(
+                              Icons.menu_book_outlined),
+                          title: const Text('All books'),
+                          onTap: () {
+                            ref
+                                .read(devotionalFilterProvider
+                                    .notifier)
+                                .setBook(null);
+                            Navigator.of(ctx).pop();
+                          },
+                        ),
+                        for (final b in visible)
+                          ListTile(
+                            title: Text(b.book),
+                            trailing: Text(
+                              '${b.count}',
+                              style: theme.textTheme.labelSmall
+                                  ?.copyWith(
+                                color: theme
+                                    .colorScheme.onSurface
+                                    .withValues(alpha: 0.5),
+                              ),
+                            ),
+                            onTap: () {
+                              ref
+                                  .read(
+                                      devotionalFilterProvider
+                                          .notifier)
+                                  .setBook(b.prefix);
+                              Navigator.of(ctx).pop();
+                            },
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
-        ),
-      ),
-    );
+        );
+      },
+    ).then((_) => query.dispose());
   }
 
   Widget _filterToggleButton(
@@ -309,8 +402,148 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
     );
   }
 
-  void _openFilters(BuildContext context) {
-    // Placeholder for a richer filter sheet; chips above cover the basics.
+}
+
+/// One segment of the All | OT | NT | Books control.
+class _FilterPill extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final Widget? trailing;
+  final VoidCallback onTap;
+  const _FilterPill({
+    required this.label,
+    required this.selected,
+    this.trailing,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Container(
+        padding:
+            const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+        decoration: BoxDecoration(
+          color: selected
+              ? theme.primaryColor.withValues(alpha: 0.15)
+              : theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(
+            color: selected
+                ? theme.primaryColor
+                : theme.dividerColor.withValues(alpha: 0.5),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: selected
+                      ? theme.primaryColor
+                      : theme.colorScheme.onSurface
+                          .withValues(alpha: 0.75),
+                  fontWeight:
+                      selected ? FontWeight.w600 : FontWeight.w400,
+                ),
+              ),
+            ),
+            if (trailing != null) trailing!,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Empty state that says WHY nothing matches: an empty favorites
+/// shelf, an exhausted unread queue, or an over-narrow filter combo —
+/// each with a one-tap way out (instead of a dead end).
+class _EmptyStories extends ConsumerWidget {
+  final VoidCallback onClearFilters;
+  final VoidCallback onShowRead;
+  const _EmptyStories({
+    required this.onClearFilters,
+    required this.onShowRead,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final filter = ref.watch(devotionalFilterProvider);
+    final favorites = ref.watch(devotionalFavoritesProvider);
+
+    String title = 'No stories match these filters.';
+    String? actionLabel;
+    VoidCallback? action;
+
+    if (filter.favoritesOnly && favorites.isEmpty) {
+      title = 'No favorites yet.';
+      actionLabel = 'Browse all stories';
+      action = onClearFilters;
+    } else if (filter.unreadOnly) {
+      title = "You're all caught up.";
+      actionLabel = 'Show read stories';
+      action = onShowRead;
+    } else if (filter.query.isNotEmpty ||
+        filter.bookPrefix != null ||
+        filter.testament != TestamentFilter.all) {
+      actionLabel = 'Clear filters';
+      action = onClearFilters;
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 32),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            filter.favoritesOnly && favorites.isEmpty
+                ? Icons.favorite_outline_rounded
+                : Icons.search_off_rounded,
+            size: 40,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          if (filter.favoritesOnly && favorites.isEmpty) ...[
+            const SizedBox(height: 4),
+            Text(
+              'Tap ♥ on any story to save it here.',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
+            ),
+          ],
+          if (actionLabel != null) ...[
+            const SizedBox(height: 16),
+            FilledButton.tonal(
+              onPressed: () {
+                HapticFeedback.selectionClick();
+                action!();
+              },
+              child: Text(actionLabel),
+            ),
+          ],
+        ],
+      ),
+    );
   }
 }
 
