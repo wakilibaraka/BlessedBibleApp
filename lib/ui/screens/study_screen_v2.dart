@@ -6,14 +6,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/journal_provider.dart';
 import '../../state/notes_provider.dart';
 import '../../state/reading_plan_provider.dart';
-import '../../state/streak_provider.dart';
 import '../../state/plans_design_provider.dart';
 import '../../state/study_layout_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../state/user_data_provider.dart'
     show bookmarksProvider, highlightsProvider;
 import '../../data/local_storage/preferences_service.dart';
-import '../widgets/jiggle_animator.dart';
+import '../widgets/account_menu.dart';
 import '../widgets/study_v2_widgets.dart';
 import 'bible_stories_screen.dart';
 import 'commentary_library_v2_screen.dart';
@@ -24,14 +23,15 @@ import 'reading_plan_detail_v2_screen.dart';
 import 'your_space_screen.dart';
 import 'plans_hub_v2_screen.dart' show availablePlans;
 
-/// Redesigned Study hub (V2) with layout-v2: resizable, reorderable cards.
+/// Redesigned Study hub (V2): single column, every card full width.
 ///
-/// - Order + span (quarter/half/full) persist via [studyLayoutProvider].
-/// - Long-press a card to enter edit mode (jiggle + drag + resize);
-///   the ••• resize handle shows on each card only while editing.
-/// - No persistent Edit button. No Continue Reading card (resume lives in
-///   the plan snapshot + Read tab).
+/// - Card order persists via [studyLayoutProvider]; every card always
+///   renders full width (no resize, no edit mode, no reorder UI).
+/// - No Continue Reading card (resume lives in the plan snapshot + Read
+///   tab).
 /// - Top banner is Your Space: live bookmark/highlight/note/journal counts.
+/// - Header avatar opens the account menu (login, settings, backup,
+///   restore, reset).
 class StudyScreenV2 extends ConsumerStatefulWidget {
   const StudyScreenV2({super.key});
 
@@ -48,12 +48,6 @@ const _v2CardIds = [
   'bible_stories',
 ];
 
-/// Minimum span per card (quarters would be unusable for these).
-const _minSpan = {
-  'your_space': CardSpan.half,
-  'reading_plan': CardSpan.half,
-};
-
 List<StudyCardConfig> _orderedCards(List<StudyCardConfig> stored) {
   final byId = {for (final c in stored) c.id: c};
   final out = <StudyCardConfig>[];
@@ -67,8 +61,6 @@ List<StudyCardConfig> _orderedCards(List<StudyCardConfig> stored) {
 }
 
 class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
-  bool _editing = false;
-
   String _planTitle(String id) {
     for (final p in availablePlans) {
       if (p.id == id) return p.title;
@@ -96,87 +88,13 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
     }
   }
 
-  void _showResize(String id, CardSpan current) {
-    final min = _minSpan[id] ?? CardSpan.quarter;
-    final options = CardSpan.values
-        .where((s) => s.index >= min.index)
-        .toList();
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) {
-        final theme = Theme.of(ctx);
-        return Container(
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surface,
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          padding: const EdgeInsets.fromLTRB(8, 8, 8, 32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // iOS-style grabber for the bottom sheet.
-              Center(
-                child: Container(
-                  width: 36,
-                  height: 5,
-                  margin: const EdgeInsets.only(top: 6, bottom: 2),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.onSurface
-                        .withValues(alpha: 0.25),
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                ),
-              ),
-              const Padding(
-                padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
-                child: V2Eyebrow('Card size'),
-              ),
-              for (final s in options)
-                ListTile(
-                  leading: Icon(
-                    s == CardSpan.full
-                        ? Icons.crop_landscape_rounded
-                        : s == CardSpan.half
-                            ? Icons.splitscreen_rounded
-                            : Icons.grid_view_rounded,
-                    color: s == current
-                        ? theme.primaryColor
-                        : theme.colorScheme.onSurface
-                            .withValues(alpha: 0.5),
-                  ),
-                  title: Text(
-                      s == CardSpan.full
-                          ? 'Full width'
-                          : s == CardSpan.half
-                              ? 'Half (split row)'
-                              : 'Quarter (4-across)'),
-                  trailing: s == current
-                      ? Icon(Icons.check_rounded,
-                          color: theme.primaryColor)
-                      : null,
-                  onTap: () {
-                    ref
-                        .read(studyLayoutProvider.notifier)
-                        .setSpan(id, s);
-                    Navigator.of(ctx).pop();
-                  },
-                ),
-            ],
-          ),
-        );
-      },
-    );
-  }
 
+  @override
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final appThemeMode = ref.watch(themeProvider);
     final subGreeting = appThemeMode.resolve(context).subGreeting;
-    final streak = ref.watch(streakProvider);
     final layout = ref.watch(studyLayoutProvider);
     final cards = _orderedCards(layout);
 
@@ -187,286 +105,64 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 800),
-            child: Stack(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(20, 32, 20, 180),
               children: [
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    const gap = 12.0;
-                    final maxW = constraints.maxWidth - 40;
-                    double spanWidth(CardSpan s) {
-                      switch (s) {
-                        case CardSpan.full:
-                          return maxW;
-                        case CardSpan.half:
-                          return (maxW - gap) / 2;
-                        case CardSpan.quarter:
-                          return (maxW - gap * 3) / 4;
-                      }
-                    }
-
-                    return ListView(
-                      padding:
-                          const EdgeInsets.fromLTRB(20, 32, 20, 180),
-                      children: [
-                        // ── Greeting + streak ───────────────
-                        Row(
-                          crossAxisAlignment:
-                              CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Peace be with you.',
-                                    style: theme
-                                        .textTheme.titleLarge
-                                        ?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    subGreeting,
-                                    style: theme
-                                        .textTheme.labelMedium
-                                        ?.copyWith(
-                                      color: theme
-                                          .colorScheme.onSurface
-                                          .withValues(alpha: 0.6),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                HapticFeedback.selectionClick();
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      streak.count > 0
-                                          ? '${streak.count}-day streak. Open daily to grow it.'
-                                          : 'Complete a reading each day to start a streak.',
-                                    ),
-                                    behavior:
-                                        SnackBarBehavior.floating,
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                padding:
-                                    const EdgeInsets.symmetric(
-                                        horizontal: 13,
-                                        vertical: 8),
-                                decoration: BoxDecoration(
-                                  color:
-                                      theme.colorScheme.surface,
-                                  borderRadius:
-                                      BorderRadius.circular(999),
-                                  border: Border.all(
-                                      color: theme.dividerColor),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons
-                                          .local_fire_department_rounded,
-                                      size: 18,
-                                      color: streak.count > 0
-                                          ? theme.primaryColor
-                                          : theme.colorScheme
-                                              .onSurface
-                                              .withValues(
-                                                  alpha: 0.4),
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      '${streak.count}',
-                                      style: theme
-                                          .textTheme.titleSmall
-                                          ?.copyWith(
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      streak.count == 1
-                                          ? 'day'
-                                          : 'days',
-                                      style: theme
-                                          .textTheme.labelSmall
-                                          ?.copyWith(
-                                        color: theme
-                                            .colorScheme.onSurface
-                                            .withValues(
-                                                alpha: 0.6),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        if (_editing)
-                          Padding(
-                            padding:
-                                const EdgeInsets.only(top: 8),
-                            child: Text(
-                              'Edit mode — drag cards to reorder, tap ••• to resize.',
-                              style: theme.textTheme.labelSmall
-                                  ?.copyWith(
-                                color: theme
-                                    .colorScheme.onSurface
-                                    .withValues(alpha: 0.65),
-                              ),
+                // Greeting + account.
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Peace be with you.',
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                        const SizedBox(height: 14),
-                        // ── Span grid ───────────────────────
-                        Wrap(
-                          spacing: gap,
-                          runSpacing: gap,
-                          children: [
-                            for (final card in cards)
-                              SizedBox(
-                                width: spanWidth(card.span),
-                                child: DragTarget<String>(
-                                  onWillAcceptWithDetails:
-                                      (d) =>
-                                          d.data != card.id,
-                                  onAcceptWithDetails: (d) {
-                                    ref
-                                        .read(studyLayoutProvider
-                                            .notifier)
-                                        .move(
-                                            d.data, card.id);
-                                  },
-                                  builder: (context, _, __) {
-                                    final inner = _CardBody(
-                                      id: card.id,
-                                      span: card.span,
-                                      planTitle: _planTitle,
-                                      onOpen: _push,
-                                      onResize: () => _showResize(
-                                          card.id, card.span),
-                                    );
-                                    // passthrough: the card gets the
-                                    // slot's tight width so every card
-                                    // fills its span (no shrink-wrap).
-                                    final framed = Stack(
-                                      fit: StackFit.passthrough,
-                                      children: [
-                                        inner,
-                                        if (_editing)
-                                          Positioned(
-                                            top: 0,
-                                            right: 0,
-                                            child:
-                                                GestureDetector(
-                                              behavior:
-                                                  HitTestBehavior
-                                                      .opaque,
-                                              onTap: () =>
-                                                  _showResize(
-                                                      card.id,
-                                                      card.span),
-                                              // 10px hit padding + 6px
-                                              // visual padding + 16px
-                                              // icon = 48pt target.
-                                              child:
-                                                  const Padding(
-                                                padding:
-                                                    EdgeInsets
-                                                        .all(10),
-                                                child: _ResizeDots(),
-                                              ),
-                                            ),
-                                          ),
-                                      ],
-                                    );
-                                    return JiggleAnimator(
-                                      isJiggling: _editing,
-                                      child: LongPressDraggable<
-                                          String>(
-                                        data: card.id,
-                                        onDragStarted: () {
-                                          HapticFeedback
-                                              .mediumImpact();
-                                          if (!_editing) {
-                                            setState(() =>
-                                                _editing =
-                                                    true);
-                                          }
-                                        },
-                                        feedback: Material(
-                                          color:
-                                              Colors.transparent,
-                                          child: SizedBox(
-                                            width: spanWidth(
-                                                card.span),
-                                            child: Opacity(
-                                              opacity: 0.9,
-                                              child: inner,
-                                            ),
-                                          ),
-                                        ),
-                                        childWhenDragging:
-                                            Opacity(
-                                          opacity: 0.35,
-                                          child: framed,
-                                        ),
-                                        child: framed,
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                          ],
-                        ),
-                      ],
-                    );
-                  },
-                ),
-                // ── Done chip (edit mode only) ──────────────
-                if (_editing)
-                  Positioned(
-                    bottom: 100,
-                    left: 0,
-                    right: 0,
-                    child: Center(
-                      child: GestureDetector(
-                        onTap: () =>
-                            setState(() => _editing = false),
-                        child: Container(
-                          padding:
-                              const EdgeInsets.symmetric(
-                                  horizontal: 20,
-                                  vertical: 12),
-                          decoration: BoxDecoration(
-                            color:
-                                theme.colorScheme.onSurface,
-                            borderRadius:
-                                BorderRadius.circular(999),
-                          ),
-                          child: Text(
-                            '✓ Done',
-                            style: theme.textTheme
-                                .labelLarge
-                                ?.copyWith(
-                              fontWeight: FontWeight.w800,
-                              color:
-                                  theme.colorScheme.surface,
+                          const SizedBox(height: 4),
+                          Text(
+                            subGreeting,
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              color: theme.colorScheme.onSurface
+                                  .withValues(alpha: 0.6),
                             ),
                           ),
-                        ),
+                        ],
                       ),
                     ),
-                  ),
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        HapticFeedback.selectionClick();
+                        showAccountMenu(context);
+                      },
+                      child: const Padding(
+                        padding: EdgeInsets.all(2),
+                        // 40 avatar + 2x2 padding = 44pt target.
+                        child: AccountAvatar(size: 40),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                // Cards (single column, full width).
+                Column(
+                  children: [
+                    for (final card in cards)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: _CardBody(
+                          id: card.id,
+                          span: CardSpan.full,
+                          planTitle: _planTitle,
+                          onOpen: _push,
+                        ),
+                      ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -476,19 +172,17 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
   }
 }
 
-/// Renders one hub card at a given span.
+/// Renders one hub card, always full width.
 class _CardBody extends ConsumerWidget {
   final String id;
   final CardSpan span;
   final String Function(String id) planTitle;
   final void Function(Widget page) onOpen;
-  final VoidCallback onResize;
   const _CardBody({
     required this.id,
     required this.span,
     required this.planTitle,
     required this.onOpen,
-    required this.onResize,
   });
 
   @override
@@ -894,29 +588,6 @@ class _TodayRow extends ConsumerWidget {
                 : 'Read'),
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// Circular ••• resize affordance on hub cards (edit mode only).
-class _ResizeDots extends StatelessWidget {
-  const _ResizeDots();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.all(6),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface.withValues(alpha: 0.9),
-        shape: BoxShape.circle,
-        border: Border.all(color: theme.dividerColor),
-      ),
-      child: Icon(
-        Icons.more_horiz_rounded,
-        size: 16,
-        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
       ),
     );
   }
