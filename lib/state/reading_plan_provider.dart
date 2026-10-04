@@ -16,21 +16,35 @@ int appWeekday(DateTime date) {
   return (date.weekday % 7) + 1;
 }
 
+/// Verse range with completion flag for chapter-coverage checks.
+class _CoverRange {
+  final int lo;
+  final int hi;
+  final bool done;
+  const _CoverRange(this.lo, this.hi, this.done);
+}
+
 // --- LEGACY FOR UI ---
 enum PlanStartMode { startToday, calendarYear }
 
 class PlanChapter {
-  final String id = '';
+  final String id;
   final String bookName;
   final int chapterNum;
-  PlanChapter({this.bookName = '', this.chapterNum = 1});
+  PlanChapter({this.bookName = '', this.chapterNum = 1, String? id})
+      : id = id ?? (bookName.isEmpty ? '' : '${bookName}_$chapterNum');
 }
 // ---------------------
 
 class PlanPassage {
   final String label;
   final List<String> refs;
-  PlanPassage({required this.label, required this.refs});
+
+  /// Parsed bounds attached at load (in-memory only; never persisted).
+  /// Empty when the label/refs were unparseable.
+  final List<PlanRefSpec> parsedRefs;
+  PlanPassage(
+      {required this.label, required this.refs, this.parsedRefs = const []});
   factory PlanPassage.fromJson(Map<String, dynamic> json) {
     return PlanPassage(
       label: json['label'] as String,
@@ -73,7 +87,25 @@ class PlanDayData {
       };
 
   // --- LEGACY FOR UI ---
-  List<PlanChapter> get chapters => [];
+  /// Chapters covered by this day's passages (from load-time parsed
+  /// bounds). Powers the read-screen end-of-chapter prompt.
+  List<PlanChapter> get chapters {
+    final out = <PlanChapter>[];
+    final seen = <String>{};
+    for (final p in passages) {
+      for (final r in p.parsedRefs) {
+        for (var ch = r.startChapter; ch <= r.endChapter; ch++) {
+          final id = '${r.book}_$ch';
+          if (seen.add(id)) {
+            out.add(PlanChapter(
+                bookName: r.book, chapterNum: ch, id: id));
+          }
+        }
+      }
+    }
+    return out;
+  }
+
   List<String> get readings => [];
 }
 
@@ -286,7 +318,64 @@ class ReadingPlanState {
   // --- LEGACY ALIASES FOR UI TO COMPILE ---
   int get currentDay => todayReadingDay ?? planData.length;
   DateTime get startDate => planStartedOn ?? DateTime.now();
-  Set<String> get completedChapters => {};
+
+  /// Chapters fully covered by completed atoms (derived, not stored).
+  /// Powers the read-screen end-of-chapter prompt and first-unread lookup.
+  Set<String> get completedChapters {
+    final out = <String>{};
+    if (completedAtomIds.isEmpty) return out;
+    // (1) Chapters of fully complete days.
+    for (var d = 1; d <= planData.length; d++) {
+      if (!isDayComplete(d)) continue;
+      for (final c in planData[d - 1].chapters) {
+        out.add(c.id);
+      }
+    }
+    // (2) Standalone-covered chapters: every single-chapter atom
+    // touching the chapter is recorded and they jointly cover it within
+    // plan scope. Exact without canon data; multi-chapter atoms are
+    // covered by rule (1) (their day must complete).
+    final Map<String, List<_CoverRange>> touching = {};
+    for (final atoms in dayAtoms.values) {
+      for (final a in atoms) {
+        final parts = a.split('|');
+        if (parts.length != 5) continue;
+        final sc = int.tryParse(parts[1]);
+        final sv = int.tryParse(parts[2]);
+        final ec = int.tryParse(parts[3]);
+        final ev = int.tryParse(parts[4]);
+        if (sc == null || sv == null || ec == null || ev == null) continue;
+        if (sc != ec) continue;
+        touching.putIfAbsent('${parts[0]}|$sc', () => []).add(
+            _CoverRange(sv, ev, completedAtomIds.contains(a)));
+      }
+    }
+    touching.forEach((key, ranges) {
+      var planMax = 0;
+      for (final r in ranges) {
+        if (r.hi > planMax) planMax = r.hi;
+      }
+      final sorted = ranges.toList()
+        ..sort((a, b) => a.lo.compareTo(b.lo));
+      var covered = 1;
+      var complete = false;
+      for (final r in sorted) {
+        if (!r.done) continue;
+        if (r.lo > covered) break;
+        if (r.hi >= covered) covered = r.hi + 1;
+        if (covered > planMax) {
+          complete = true;
+          break;
+        }
+      }
+      if (complete) {
+        final bar = key.indexOf('|');
+        out.add('${key.substring(0, bar)}_${key.substring(bar + 1)}');
+      }
+    });
+    return out;
+  }
+
   double get completionPercentage => percentComplete;
   bool get isPlanComplete => isComplete;
   PlanStartMode get startMode => PlanStartMode.startToday;
@@ -451,10 +540,30 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
         }
       }
 
-      // Content atoms for every day (drives the atom completion rule).
-      // Parse failures degrade to the legacy day-number rule per day —
-      // they must never break loading.
-      final dayAtoms = await _buildDayAtoms(finalPlanData);
+      // Parse every passage once (drives chapters + content atoms).
+      // Unparseable passages keep empty parsedRefs and degrade to the
+      // legacy day-number rule — they must never break loading.
+      CanonIndex? canon;
+      try {
+        canon = await _canonIndex();
+      } catch (e) {
+        debugPrint('plan refs: canon unavailable ($e)');
+      }
+      var parsedPlanData = finalPlanData;
+      if (canon != null) {
+        parsedPlanData = [
+          for (final day in finalPlanData)
+            PlanDayData(
+              day: day.day,
+              week: day.week,
+              title: day.title,
+              passages: [
+                for (final p in day.passages) _parsePassage(p, canon),
+              ],
+            ),
+        ];
+      }
+      final dayAtoms = _dayAtomsFromParsed(parsedPlanData);
       if (completedAtoms.isEmpty && completedReadings.isNotEmpty) {
         // One-time backfill: expand legacy day numbers to atoms.
         for (final d in completedReadings) {
@@ -465,7 +574,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
 
       state = state.copyWith(
         isLoading: false,
-        planData: finalPlanData,
+        planData: parsedPlanData,
         planId: planId,
         planStartedOn: planStartedOn,
         paceMode: paceMode,
@@ -513,44 +622,38 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
     return _canonCache = canon;
   }
 
-  /// Parses every passage label into content atom ids, keyed by 1-based
-  /// day. Unparseable passages are skipped (legacy rule covers the day).
-  Future<Map<int, List<String>>> _buildDayAtoms(
-      List<PlanDayData> planData) async {
-    final out = <int, List<String>>{};
-    CanonIndex? canon;
+  /// Attaches parsed bounds to one passage (label first, then refs).
+  /// Returns the passage unchanged when nothing parses.
+  PlanPassage _parsePassage(PlanPassage passage, CanonIndex canon) {
+    PlanRefSpec? parsed;
     try {
-      canon = await _canonIndex();
-    } catch (e) {
-      debugPrint('plan atoms: canon unavailable ($e)');
-      return {};
-    }
-    for (var i = 0; i < planData.length; i++) {
-      final atoms = <String>[];
-      for (final passage in planData[i].passages) {
+      parsed = PlanRefSpec.parse(passage.label, canon);
+    } catch (_) {
+      for (final alt in passage.refs) {
         try {
-          final ref = PlanRefSpec.parse(passage.label, canon);
-          atoms.add(
-              '${ref.book}|${ref.startChapter}|${ref.startVerse}|${ref.endChapter}|${ref.endVerse}');
-        } catch (_) {
-          // Fall back to refs entries, then give up on this passage.
-          var parsed = false;
-          for (final alt in passage.refs) {
-            try {
-              final ref = PlanRefSpec.parse(alt, canon);
-              atoms.add(
-                  '${ref.book}|${ref.startChapter}|${ref.startVerse}|${ref.endChapter}|${ref.endVerse}');
-              parsed = true;
-              break;
-            } catch (_) {}
-          }
-          if (!parsed) {
-            debugPrint(
-                'plan atoms: unparseable passage "${passage.label}"');
-          }
-        }
+          parsed = PlanRefSpec.parse(alt, canon);
+          break;
+        } catch (_) {}
       }
-      out[i + 1] = atoms;
+    }
+    if (parsed == null) {
+      debugPrint('plan refs: unparseable passage "${passage.label}"');
+      return passage;
+    }
+    return PlanPassage(
+        label: passage.label, refs: passage.refs, parsedRefs: [parsed]);
+  }
+
+  /// Content atom ids per 1-based day from already-parsed passages.
+  Map<int, List<String>> _dayAtomsFromParsed(
+      List<PlanDayData> planData) {
+    final out = <int, List<String>>{};
+    for (var i = 0; i < planData.length; i++) {
+      out[i + 1] = [
+        for (final p in planData[i].passages)
+          for (final r in p.parsedRefs)
+            '${r.book}|${r.startChapter}|${r.startVerse}|${r.endChapter}|${r.endVerse}',
+      ];
     }
     return out;
   }
@@ -718,7 +821,40 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
   int? findDayForPassage(String book, int chapter) => 1;
   void markDayComplete(int day) => markReadingComplete(day);
   void markDayIncomplete(int day) => markReadingIncomplete(day);
-  void markChapterComplete(PlanChapter c) {}
+
+  /// Marks one chapter read at atom precision: every recorded atom fully
+  /// inside (book, chapter) is added, then day numbers are recomputed so
+  /// partially-covered days stay honestly incomplete. Multi-chapter atoms
+  /// spanning beyond the chapter are (correctly) left alone.
+  void markChapterComplete(PlanChapter c) {
+    if (c.bookName.isEmpty) return;
+    final newAtoms = Set<String>.from(state.completedAtomIds);
+    for (final atoms in state.dayAtoms.values) {
+      for (final a in atoms) {
+        final parts = a.split('|');
+        if (parts.length != 5 || parts[0] != c.bookName) continue;
+        final sc = int.tryParse(parts[1]);
+        final ec = int.tryParse(parts[3]);
+        if (sc == null || ec == null) continue;
+        if (sc >= c.chapterNum && ec <= c.chapterNum) newAtoms.add(a);
+      }
+    }
+    final newCompleted = <int>{};
+    for (var d = 1; d <= state.planData.length; d++) {
+      final atoms = state.dayAtoms[d];
+      if (atoms != null &&
+          atoms.isNotEmpty &&
+          atoms.every(newAtoms.contains)) {
+        newCompleted.add(d);
+      } else if (state.completedReadings.contains(d)) {
+        newCompleted.add(d);
+      }
+    }
+    final next = state.copyWith(
+        completedReadings: newCompleted, completedAtomIds: newAtoms);
+    state = next;
+    _saveToPrefs(next);
+  }
 
   /// Adjust the day count of this custom plan and remap existing progress by
   /// content position. Persists both the new plan definition and new progress.

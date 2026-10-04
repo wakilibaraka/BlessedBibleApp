@@ -253,6 +253,70 @@ void main() {
     expect(state.completedReadings, isNot(contains(2)));
   });
 
+  test('day chapters populate from parsed refs', () async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    final container = ProviderContainer(
+      overrides: [
+        preferencesProvider.overrideWithValue(PreferencesService(prefs)),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    container.read(readingPlanProvider('chronological_1yr'));
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    final state = container.read(readingPlanProvider('chronological_1yr'));
+    expect(state.error, isNull);
+    expect(state.planData.length, 365);
+    // Day 1 reads Genesis 1-3: three chapter entries for the prompt.
+    final ids =
+        state.planData.first.chapters.map((c) => c.id).toSet();
+    expect(ids.contains('Genesis_1'), isTrue);
+    expect(ids.contains('Genesis_2'), isTrue);
+    expect(ids.contains('Genesis_3'), isTrue);
+  });
+
+  test('markChapterComplete composes to day completion', () async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    final container = ProviderContainer(
+      overrides: [
+        preferencesProvider.overrideWithValue(PreferencesService(prefs)),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    // Single-atom day: marking its chapter completes the day.
+    container.read(preferencesProvider).saveCustomPlan(
+          'custom-1',
+          testCustomPlan(),
+        );
+    container.read(readingPlanProvider('custom-1'));
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    var notifier =
+        container.read(readingPlanProvider('custom-1').notifier);
+    notifier.markChapterComplete(
+        PlanChapter(bookName: 'Genesis', chapterNum: 1));
+    var state = container.read(readingPlanProvider('custom-1'));
+    expect(state.isDayComplete(1), isTrue);
+    expect(state.completedChapters, contains('Genesis_1'));
+
+    // Partial multi-chapter day: marking one chapter stays honest —
+    // atoms spanning beyond the chapter are correctly left alone.
+    container.read(readingPlanProvider('chronological_1yr'));
+    await Future.delayed(const Duration(milliseconds: 800));
+    notifier = container
+        .read(readingPlanProvider('chronological_1yr').notifier);
+    notifier.markChapterComplete(
+        PlanChapter(bookName: 'Genesis', chapterNum: 1));
+    state = container.read(readingPlanProvider('chronological_1yr'));
+    expect(state.isDayComplete(1), isFalse);
+    // Genesis_1 is NOT claimed: its atom (1:1-3:24) extends beyond it.
+    expect(state.completedChapters, isNot(contains('Genesis_1')));
+  });
+
   testWidgets('adjustPace loses no recorded content (atom lossless)',
       (tester) async {
     SharedPreferences.setMockInitialValues({});
