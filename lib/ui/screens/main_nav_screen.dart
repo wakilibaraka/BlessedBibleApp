@@ -19,6 +19,7 @@ import 'settings_screen.dart';
 import '../sheets/search_settings_sheet.dart';
 import '../widgets/animated_background.dart';
 import '../widgets/bouncy_entrance.dart';
+import '../widgets/crossed_swords_icon.dart';
 import '../widgets/textured_glass_container.dart';
 import '../widgets/action_icon.dart';
 import '../../state/immersive_mode_provider.dart';
@@ -586,8 +587,9 @@ class MainNavScreen extends ConsumerWidget {
         key: ValueKey('settings_entry'),
       );
     } else if (currentIndex == 4) {
-      return const Icon(Icons.arrow_back_ios_new_rounded,
-          size: 28, key: ValueKey('settings_close'));
+      // Crossed swords: the way out of Settings, drawn (not an asset)
+      // so it follows the theme's primary color and animates once.
+      return const CrossedSwordsIcon(key: ValueKey('settings_close'));
     }
 
     IconData iconData;
