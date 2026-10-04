@@ -49,6 +49,7 @@ import '../../state/theme_provider.dart';
 import '../../state/bbe_substitutions_provider.dart';
 import '../../state/typography_provider.dart';
 import '../../state/immersive_mode_provider.dart';
+import '../../state/bible_nav_settings_provider.dart';
 import '../../state/read_selection_provider.dart';
 import '../../state/commentary_provider.dart';
 import '../../state/read_location_provider.dart';
@@ -217,6 +218,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   Timer? _scrollDebounceTimer;
   Timer? _visitTimer;
   Timer? _scrollEndTimer;
+
+  /// Base font size captured at pinch start (pinch-to-zoom preview).
+  double? _pinchBaseSize;
   Timer? _pageDebounceTimer;
 
   final ValueNotifier<bool> _isScrolling = ValueNotifier(false);
@@ -1058,6 +1062,45 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                       }
                                                     }
                                                   },
+                                            // Pinch-to-zoom reading font
+                                            // (off by default; single-finger
+                                            // scroll and taps unaffected).
+                                            onScaleStart: (_) {
+                                              if (!ref.read(
+                                                  bibleNavSettingsProvider)
+                                                  .pinchToZoomFont) {
+                                                return;
+                                              }
+                                              _pinchBaseSize = ref
+                                                  .read(typographyProvider)
+                                                  .fontSize;
+                                            },
+                                            onScaleUpdate: (details) {
+                                              final base = _pinchBaseSize;
+                                              if (base == null ||
+                                                  !ref.read(
+                                                      bibleNavSettingsProvider)
+                                                      .pinchToZoomFont) {
+                                                return;
+                                              }
+                                              ref
+                                                  .read(typographyProvider
+                                                      .notifier)
+                                                  .previewFontSize(
+                                                      (base * details.scale)
+                                                          .clamp(12.0, 30.0));
+                                            },
+                                            onScaleEnd: (_) {
+                                              final base = _pinchBaseSize;
+                                              _pinchBaseSize = null;
+                                              if (base == null) return;
+                                              final size = ref.read(
+                                                  typographyProvider).fontSize;
+                                              ref
+                                                  .read(typographyProvider
+                                                      .notifier)
+                                                  .setFontSize(size);
+                                            },
                                             behavior:
                                                 HitTestBehavior.translucent,
                                             child: NotificationListener<

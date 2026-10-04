@@ -11,7 +11,9 @@ import '../../state/home_provider.dart';
 import '../../state/votd_tracker_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../state/nav_provider.dart';
+import '../../state/bible_nav_settings_provider.dart';
 import '../../state/read_location_provider.dart';
+import '../sheets/appearance_settings_sheet.dart';
 import '../widgets/shared_top_header.dart';
 import '../widgets/glass_container.dart';
 import '../widgets/bouncy_entrance.dart';
@@ -138,8 +140,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               },
               onPointerUp: (e) {
                 _isDragging = false;
-                if (_overscrollAccum >= _kOverscrollThreshold) {
-                  ref.read(navProvider.notifier).setIndex(4); // 4 = Settings
+                if (_overscrollAccum >= _kOverscrollThreshold &&
+                    ref.read(bibleNavSettingsProvider).homePullDownEnabled) {
+                  HapticFeedback.mediumImpact();
+                  if (ref
+                          .read(bibleNavSettingsProvider)
+                          .homePullDownTarget ==
+                      HomePullDownTarget.appearance) {
+                    AppearanceSettingsSheet.show(context,
+                        initialTab: AppearanceTab.typography);
+                  } else {
+                    ref.read(navProvider.notifier).setIndex(4); // Settings
+                  }
                 }
                 _overscrollAccum = 0.0;
                 _hasFiredArmedHaptic = false;
@@ -163,8 +175,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         ..onUpdate = (details) {}
                         ..onEnd = (details) {
                           if (details.primaryVelocity == null) return;
-                          // Swipe Left → go to Read tab
-                          if (details.primaryVelocity! < -300) {
+                          // Swipe Left → go to Read tab (configurable)
+                          if (details.primaryVelocity! < -300 &&
+                              ref
+                                  .read(bibleNavSettingsProvider)
+                                  .homeSwipeLeftEnabled) {
                             HapticFeedback.selectionClick();
                             ref.read(navProvider.notifier).setIndex(1);
                           }

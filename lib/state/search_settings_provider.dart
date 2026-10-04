@@ -11,6 +11,9 @@ class SearchSettingsState {
   final bool includeNotesInSearch;
   final bool matchWholeWords;
 
+  /// Typo-tolerant fallback (edit distance <= 2). Off by default.
+  final bool fuzzySearch;
+
   const SearchSettingsState({
     this.autoOpenSingleSearchResult = false,
     this.defaultSearchOt = true,
@@ -20,7 +23,22 @@ class SearchSettingsState {
     this.defaultSearchDictionary = true,
     this.includeNotesInSearch = false,
     this.matchWholeWords = false,
+    this.fuzzySearch = false,
   });
+
+  SearchSettingsState copyWith({bool? fuzzySearch}) {
+    return SearchSettingsState(
+      autoOpenSingleSearchResult: autoOpenSingleSearchResult,
+      defaultSearchOt: defaultSearchOt,
+      defaultSearchNt: defaultSearchNt,
+      defaultSearchCommentary: defaultSearchCommentary,
+      defaultSearchNotes: defaultSearchNotes,
+      defaultSearchDictionary: defaultSearchDictionary,
+      includeNotesInSearch: includeNotesInSearch,
+      matchWholeWords: matchWholeWords,
+      fuzzySearch: fuzzySearch ?? this.fuzzySearch,
+    );
+  }
 }
 
 class SearchSettingsNotifier extends Notifier<SearchSettingsState> {
@@ -32,6 +50,7 @@ class SearchSettingsNotifier extends Notifier<SearchSettingsState> {
   static const _defaultDictKey = 'search_default_dict';
   static const _includeNotesKey = 'search_include_notes';
   static const _matchWholeWordsKey = 'search_match_whole_words';
+  static const _fuzzySearchKey = 'search_fuzzy';
 
   @override
   SearchSettingsState build() {
@@ -50,6 +69,7 @@ class SearchSettingsNotifier extends Notifier<SearchSettingsState> {
       defaultSearchDictionary: prefs.getBool(_defaultDictKey) ?? true,
       includeNotesInSearch: prefs.getBool(_includeNotesKey) ?? false,
       matchWholeWords: prefs.getBool(_matchWholeWordsKey) ?? false,
+      fuzzySearch: prefs.getBool(_fuzzySearchKey) ?? false,
     );
   }
 
@@ -156,6 +176,12 @@ class SearchSettingsNotifier extends Notifier<SearchSettingsState> {
     );
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_matchWholeWordsKey, value);
+  }
+
+  Future<void> toggleFuzzySearch(bool value) async {
+    state = state.copyWith(fuzzySearch: value);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_fuzzySearchKey, value);
   }
 
   Future<void> toggleDefaultDictionary(bool value) async {

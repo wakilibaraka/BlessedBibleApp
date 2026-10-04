@@ -62,6 +62,26 @@ class BibleDatabaseService {
   /// repair). Emits nothing while idle.
   Stream<double> get installProgress => _installProgressController.stream;
 
+  /// Bytes used on device by the core database, journals and installed
+  /// translation packs. Powers the Storage row in Settings.
+  Future<int> contentBytesUsed() async {
+    var total = 0;
+    try {
+      final dbDir = await getApplicationSupportDirectory();
+      await for (final entry in Directory(dbDir.path).list(recursive: true)) {
+        if (entry is File &&
+            (entry.path.endsWith('.db') ||
+                entry.path.endsWith('.db-wal') ||
+                entry.path.endsWith('.db-shm'))) {
+          try {
+            total += await entry.length();
+          } catch (_) {}
+        }
+      }
+    } catch (_) {}
+    return total;
+  }
+
   Future<Database> get database async {
     if (_db != null) return _db!;
     _installing ??= _initDB();

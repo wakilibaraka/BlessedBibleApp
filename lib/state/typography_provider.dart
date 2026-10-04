@@ -132,6 +132,12 @@ class TypographyNotifier extends Notifier<TypographyState> {
     await prefs.setDouble(_fontSizeKey, size);
   }
 
+  /// Transient preview during pinch-zoom (not persisted; call
+  /// [setFontSize] on gesture end to keep the final size).
+  void previewFontSize(double size) {
+    state = state.copyWith(fontSize: size);
+  }
+
   Future<void> setLineHeight(double height) async {
     state = state.copyWith(lineHeight: height);
     final prefs = await SharedPreferences.getInstance();

@@ -198,6 +198,7 @@ class SearchNotifier extends Notifier<SearchState> {
       includeNotes: state.filterNotes && settings.includeNotesInSearch,
       exactMatch: state.exactMatch,
       filterBook: state.filterBook,
+      fuzzyMatch: settings.fuzzySearch,
     );
 
     Future<List<SearchResult>> dictFuture = Future.value([]);

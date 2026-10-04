@@ -99,6 +99,9 @@ class SearchQueryArgs {
   final bool exactMatch;
   final String? filterBook;
 
+  /// Typo tolerance (edit distance <= 2 fallback). Off by default.
+  final bool fuzzyMatch;
+
   SearchQueryArgs(
     this.query,
     this.indexData,
@@ -110,8 +113,34 @@ class SearchQueryArgs {
     this.includeCommentary,
     this.includeNotes,
     this.exactMatch,
-    this.filterBook,
-  );
+    this.filterBook, [
+    this.fuzzyMatch = false,
+  ]);
+}
+
+/// Levenshtein edit distance (two-row DP). Used by the fuzzy fallback.
+int _levenshtein(String a, String b) {
+  if (a == b) return 0;
+  if (a.isEmpty) return b.length;
+  if (b.isEmpty) return a.length;
+  var prev = List<int>.generate(b.length + 1, (i) => i);
+  var curr = List<int>.filled(b.length + 1, 0);
+  for (var i = 1; i <= a.length; i++) {
+    curr[0] = i;
+    for (var j = 1; j <= b.length; j++) {
+      final cost = a.codeUnitAt(i - 1) == b.codeUnitAt(j - 1) ? 0 : 1;
+      var v = prev[j] + 1;
+      final ins = curr[j - 1] + 1;
+      if (ins < v) v = ins;
+      final sub = prev[j - 1] + cost;
+      if (sub < v) v = sub;
+      curr[j] = v;
+    }
+    final tmp = prev;
+    prev = curr;
+    curr = tmp;
+  }
+  return prev[b.length];
 }
 
 List<String> _tokenize(String text) {
@@ -468,6 +497,33 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
             }
           }
         }
+
+        // Fuzzy fallback: typo tolerance (off by default). Only when
+        // exact+prefix found nothing for this token. Bounded scan:
+        // same first letter, length within 2, edit distance <= 2,
+        // first 30 candidate keys. Scores below prefix hits.
+        if (currentTokenMatches.isEmpty &&
+            args.fuzzyMatch &&
+            !args.exactMatch &&
+            token.length >= 4) {
+          var found = 0;
+          for (final key in sortedKeys) {
+            if (found >= 30) break;
+            if (key.isEmpty ||
+                key[0] != token[0] ||
+                (key.length - token.length).abs() > 2 ||
+                key == token) {
+              continue;
+            }
+            if (_levenshtein(key, token) <= 2) {
+              for (final id in index[key]!) {
+                currentTokenMatches.add(id);
+                matchQuality[id] = (matchQuality[id] ?? 0) + 2;
+              }
+              found++;
+            }
+          }
+        }
       }
     }
 
@@ -556,6 +612,7 @@ class SearchEngine {
     bool includeNotes = true,
     bool exactMatch = false,
     String? filterBook,
+    bool fuzzyMatch = false,
   }) async {
     final indexData = await baseIndexFuture;
 
@@ -573,6 +630,7 @@ class SearchEngine {
         includeNotes,
         exactMatch,
         filterBook,
+        fuzzyMatch,
       ),
     );
   }

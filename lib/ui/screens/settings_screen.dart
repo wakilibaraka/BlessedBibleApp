@@ -14,10 +14,12 @@ import '../sheets/translation_picker_sheet.dart';
 import '../../state/read_settings_provider.dart';
 import '../../state/bbe_substitutions_provider.dart';
 import '../../services/backup_service.dart';
+import '../../services/bible_database_service.dart';
 import '../../state/reminders_provider.dart';
 import '../widgets/shared_app_bar.dart';
 import '../widgets/animated_segmented_tile.dart';
 import '../widgets/settings_pill_card.dart';
+import '../sheets/appearance_settings_sheet.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'privacy_policy_screen.dart';
@@ -648,6 +650,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           }),
         ],
       ),
+      SettingsPillCard(
+        children: [
+          ListTile(
+            leading: Icon(
+              Icons.palette_outlined,
+              color: Theme.of(context).primaryColor,
+            ),
+            title: const Text('Appearance & text'),
+            subtitle: const Text(
+                'Theme, fonts, sizes and reading colors'),
+            trailing: const Icon(Icons.chevron_right_rounded),
+            onTap: () {
+              HapticFeedback.selectionClick();
+              AppearanceSettingsSheet.show(context,
+                  initialTab: AppearanceTab.typography);
+            },
+          ),
+        ],
+      ),
     ]);
   }
 
@@ -846,32 +867,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           }),
           const Divider(height: 1, indent: 16),
           Consumer(builder: (context, ref, _) {
-            final fabLongPress = ref
-                .watch(readSettingsProvider.select((s) => s.fabLongPressToNav));
-            return SwitchListTile(
-              title: Text(
-                'Long-press button to open navigation',
-                style: Theme.of(context)
-                    .textTheme
-                    .titleSmall
-                    ?.copyWith(fontWeight: FontWeight.bold),
-              ),
-              subtitle: Text(
-                'Long-press the bottom-right button to quickly open the Book/Chapter selector.',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-              value: fabLongPress,
-              activeTrackColor: Theme.of(context).primaryColor,
-              onChanged: (val) {
-                HapticFeedback.selectionClick();
-                ref
-                    .read(readSettingsProvider.notifier)
-                    .setFabLongPressToNav(val);
-              },
-            );
-          }),
-          const Divider(height: 1, indent: 16),
-          Consumer(builder: (context, ref, _) {
             final autoClose = ref.watch(bibleNavSettingsProvider
                 .select((s) => s.autoCloseOnFinalSelection));
             return SwitchListTile(
@@ -965,6 +960,23 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           }),
           const Divider(height: 1, indent: 16),
           Consumer(builder: (context, ref, _) {
+            final fuzzy = ref.watch(
+                searchSettingsProvider.select((s) => s.fuzzySearch));
+            return SwitchListTile(
+              title: const Text('Forgiving search'),
+              subtitle: const Text(
+                  'Also show close matches for typos (e.g. Jhon finds John)'),
+              value: fuzzy,
+              onChanged: (value) {
+                HapticFeedback.selectionClick();
+                ref
+                    .read(searchSettingsProvider.notifier)
+                    .toggleFuzzySearch(value);
+              },
+            );
+          }),
+          const Divider(height: 1, indent: 16),
+          Consumer(builder: (context, ref, _) {
             final defaultOt = ref
                 .watch(searchSettingsProvider.select((s) => s.defaultSearchOt));
             final defaultNt = ref
@@ -1013,6 +1025,108 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                   },
                 ),
               ],
+            );
+          }),
+        ],
+      ),
+      SettingsPillCard(
+        children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
+            child: Text('Gestures', style: TextStyle(fontSize: 16)),
+          ),
+          Consumer(builder: (context, ref, _) {
+            final pullDown = ref.watch(bibleNavSettingsProvider
+                .select((s) => s.homePullDownEnabled));
+            return SwitchListTile(
+              title: const Text('Pull down on Home'),
+              subtitle: const Text(
+                  'Pull down past the top to open Settings or Appearance'),
+              value: pullDown,
+              onChanged: (value) {
+                HapticFeedback.selectionClick();
+                ref
+                    .read(bibleNavSettingsProvider.notifier)
+                    .setHomePullDown(value);
+              },
+            );
+          }),
+          Consumer(builder: (context, ref, _) {
+            final target = ref.watch(bibleNavSettingsProvider
+                .select((s) => s.homePullDownTarget));
+            return AnimatedSegmentedTile<HomePullDownTarget>(
+              title: 'Pull-down opens',
+              subtitle: 'Destination of the Home pull-down gesture',
+              selectedValue: target,
+              options: const [
+                MapEntry(HomePullDownTarget.settings, 'Settings'),
+                MapEntry(HomePullDownTarget.appearance, 'Appearance'),
+              ],
+              onChanged: (val) {
+                HapticFeedback.selectionClick();
+                ref
+                    .read(bibleNavSettingsProvider.notifier)
+                    .setHomePullDownTarget(val);
+              },
+            );
+          }),
+          const Divider(height: 1, indent: 16),
+          Consumer(builder: (context, ref, _) {
+            final swipeLeft = ref.watch(bibleNavSettingsProvider
+                .select((s) => s.homeSwipeLeftEnabled));
+            return SwitchListTile(
+              title: const Text('Swipe left on Home'),
+              subtitle: const Text('Swipe left to jump to the Read tab'),
+              value: swipeLeft,
+              onChanged: (value) {
+                HapticFeedback.selectionClick();
+                ref
+                    .read(bibleNavSettingsProvider.notifier)
+                    .setHomeSwipeLeft(value);
+              },
+            );
+          }),
+          const Divider(height: 1, indent: 16),
+          Consumer(builder: (context, ref, _) {
+            final pinch = ref.watch(bibleNavSettingsProvider
+                .select((s) => s.pinchToZoomFont));
+            return SwitchListTile(
+              title: const Text('Pinch to zoom text'),
+              subtitle: const Text(
+                  'Pinch in Read to change the text size (off by default)'),
+              value: pinch,
+              onChanged: (value) {
+                HapticFeedback.selectionClick();
+                ref
+                    .read(bibleNavSettingsProvider.notifier)
+                    .setPinchToZoomFont(value);
+              },
+            );
+          }),
+          const Divider(height: 1, indent: 16),
+          Consumer(builder: (context, ref, _) {
+            final fabLongPress = ref
+                .watch(readSettingsProvider.select((s) => s.fabLongPressToNav));
+            return SwitchListTile(
+              title: Text(
+                'Long-press button to open navigation',
+                style: Theme.of(context)
+                    .textTheme
+                    .titleSmall
+                    ?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(
+                'Long-press the bottom-right button to quickly open the Book/Chapter selector.',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              value: fabLongPress,
+              activeTrackColor: Theme.of(context).primaryColor,
+              onChanged: (val) {
+                HapticFeedback.selectionClick();
+                ref
+                    .read(readSettingsProvider.notifier)
+                    .setFabLongPressToNav(val);
+              },
             );
           }),
         ],
@@ -1191,6 +1305,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               ),
             );
           }),
+          const Divider(height: 1, indent: 16),
+          ListTile(
+            title: const Text('Storage used'),
+            subtitle: const Text(
+                'Offline Bible database and downloaded translations'),
+            trailing: FutureBuilder<int>(
+              future: bibleDbService.contentBytesUsed(),
+              builder: (context, snapshot) {
+                final mb = (snapshot.data ?? 0) / (1024 * 1024);
+                return Text(
+                  snapshot.hasData ? '${mb.toStringAsFixed(1)} MB' : '…',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.6)),
+                );
+              },
+            ),
+          ),
           const Divider(height: 1, indent: 16),
           ListTile(
             title: const Text('Send Feedback'),
