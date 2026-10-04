@@ -3,7 +3,7 @@ import 'dart:ui';
 import '../widgets/strongs_entry_sheet.dart';
 
 import '../widgets/dictionary_entry_sheet.dart';
-import '../widgets/definable_verse_text.dart';
+
 import '../sheets/appearance_settings_sheet.dart';
 
 import 'dart:math' as math;
@@ -183,14 +183,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   final Map<int, ItemPositionsListener> _itemPositionsListeners = {};
   final Map<String, List<TapGestureRecognizer>> _dictRecognizers = {};
 
-  // Pull-down-to-search gesture state
-  static const double _kOverscrollDistanceThreshold = 80.0;
-  double _dragStartY = 0.0;
-  bool _isDragging = false;
-  double _overscrollAccum = 0.0;
-  bool _hasFiredArmedHaptic = false;
-  bool _navTriggeredThisDrag = false;
-
   void _showDictionaryPopover(String normalizedWord) {
     final style = ref.read(readSettingsProvider).popupStyle;
     final isFloating = style == PopupStyle.floating;
@@ -221,8 +213,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   Timer? _visitTimer;
   Timer? _scrollEndTimer;
 
-  /// Base font size captured at pinch start (pinch-to-zoom preview).
-  double? _pinchBaseSize;
   Timer? _pageDebounceTimer;
 
   final ValueNotifier<bool> _isScrolling = ValueNotifier(false);
@@ -1064,45 +1054,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                       }
                                                     }
                                                   },
-                                            // Pinch-to-zoom reading font
-                                            // (off by default; single-finger
-                                            // scroll and taps unaffected).
-                                            onScaleStart: (_) {
-                                              if (!ref.read(
-                                                  bibleNavSettingsProvider)
-                                                  .pinchToZoomFont) {
-                                                return;
-                                              }
-                                              _pinchBaseSize = ref
-                                                  .read(typographyProvider)
-                                                  .fontSize;
-                                            },
-                                            onScaleUpdate: (details) {
-                                              final base = _pinchBaseSize;
-                                              if (base == null ||
-                                                  !ref.read(
-                                                      bibleNavSettingsProvider)
-                                                      .pinchToZoomFont) {
-                                                return;
-                                              }
-                                              ref
-                                                  .read(typographyProvider
-                                                      .notifier)
-                                                  .previewFontSize(
-                                                      (base * details.scale)
-                                                          .clamp(12.0, 30.0));
-                                            },
-                                            onScaleEnd: (_) {
-                                              final base = _pinchBaseSize;
-                                              _pinchBaseSize = null;
-                                              if (base == null) return;
-                                              final size = ref.read(
-                                                  typographyProvider).fontSize;
-                                              ref
-                                                  .read(typographyProvider
-                                                      .notifier)
-                                                  .setFontSize(size);
-                                            },
                                             behavior:
                                                 HitTestBehavior.translucent,
                                             child: NotificationListener<
@@ -2424,20 +2375,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         ? Text.rich(textSpan, textAlign: textAlign)
         : RichText(textAlign: textAlign, text: textSpan);
 
-    // Long-press any word to define it (settings-gated, default off).
-    // Tap behavior is untouched: underlined words still define on tap,
-    // verse tap still selects.
-    final defineAny = !isSelectionMode &&
-        onDictTap != null &&
-        ref.watch(readSettingsProvider.select((s) => s.defineAnyWord));
-    if (!defineAny) return textWidget;
-
-    return DefinableVerseText(
-      textSpan: textSpan,
-      textAlign: textAlign,
-      // Sound: defineAny is only true when onDictTap != null above.
-      onWordLongPress: (word) => onDictTap(word),
-    );
+    // No wrapper gesture layer here on purpose: the reader's gesture
+    // surface is chapter drag + verse tap + verse long-press only.
+    return textWidget;
   }
 
   Widget _buildEndOfChapterBlock(FlatChapter fc, int pageIndex, ThemeData theme,

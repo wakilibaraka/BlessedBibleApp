@@ -533,50 +533,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           }),
           const Divider(height: 1, indent: 16),
           Consumer(builder: (context, ref, _) {
-            final defineAny = ref.watch(
-                readSettingsProvider.select((s) => s.defineAnyWord));
-
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
-                  child: Text('Word lookup',
-                      style: TextStyle(fontSize: 16)),
-                ),
-                _buildRadioTile<bool>(
-                  context,
-                  title: 'Marked words only',
-                  subtitle:
-                      'Tap an underlined word to define it (default)',
-                  value: false,
-                  groupValue: defineAny,
-                  onTap: (val) {
-                    HapticFeedback.selectionClick();
-                    ref
-                        .read(readSettingsProvider.notifier)
-                        .setDefineAnyWord(val);
-                  },
-                ),
-                _buildRadioTile<bool>(
-                  context,
-                  title: 'Any word (long-press)',
-                  subtitle:
-                      'Long-press any word to define it, marked or not',
-                  value: true,
-                  groupValue: defineAny,
-                  onTap: (val) {
-                    HapticFeedback.selectionClick();
-                    ref
-                        .read(readSettingsProvider.notifier)
-                        .setDefineAnyWord(val);
-                  },
-                ),
-              ],
-            );
-          }),
-          const Divider(height: 1, indent: 16),
-          Consumer(builder: (context, ref, _) {
             final popupStyle = ref.watch(
                 readSettingsProvider.select((s) => s.popupStyle));
             return AnimatedSegmentedTile<PopupStyle>(
@@ -1188,8 +1144,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               subtitle: 'Destination of the Home pull-down gesture',
               selectedValue: target,
               options: const [
-                MapEntry(HomePullDownTarget.settings, 'Settings'),
                 MapEntry(HomePullDownTarget.appearance, 'Appearance'),
+                MapEntry(HomePullDownTarget.settings, 'Settings'),
               ],
               onChanged: (val) {
                 HapticFeedback.selectionClick();
@@ -1212,23 +1168,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 ref
                     .read(bibleNavSettingsProvider.notifier)
                     .setHomeSwipeLeft(value);
-              },
-            );
-          }),
-          const Divider(height: 1, indent: 16),
-          Consumer(builder: (context, ref, _) {
-            final pinch = ref.watch(bibleNavSettingsProvider
-                .select((s) => s.pinchToZoomFont));
-            return SwitchListTile(
-              title: const Text('Pinch to zoom text'),
-              subtitle: const Text(
-                  'Pinch in Read to change the text size (off by default)'),
-              value: pinch,
-              onChanged: (value) {
-                HapticFeedback.selectionClick();
-                ref
-                    .read(bibleNavSettingsProvider.notifier)
-                    .setPinchToZoomFont(value);
               },
             );
           }),

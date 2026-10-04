@@ -3,34 +3,31 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 enum NavigationDepth { twoPart, threePart, fourPart }
 
-/// Destination of the Home pull-down gesture.
-enum HomePullDownTarget { settings, appearance }
+/// Destination of the Home pull-down gesture. Appearance is first so it
+/// is both the enum default and the stored-index default.
+enum HomePullDownTarget { appearance, settings }
 
 class BibleNavSettingsState {
   final NavigationDepth depth;
   final bool autoCloseOnFinalSelection;
   final bool swipeDownToNav;
 
-  /// Home overscroll pull-down → pull target (default Settings).
+  /// Home overscroll pull-down enabled.
   final bool homePullDownEnabled;
 
-  /// Where the Home pull-down goes.
+  /// Where the Home pull-down goes (default Appearance).
   final HomePullDownTarget homePullDownTarget;
 
   /// Home swipe-left → Read tab.
   final bool homeSwipeLeftEnabled;
-
-  /// Pinch-to-zoom reading font in Read (off by default).
-  final bool pinchToZoomFont;
 
   const BibleNavSettingsState({
     this.depth = NavigationDepth.threePart,
     this.autoCloseOnFinalSelection = true,
     this.swipeDownToNav = true,
     this.homePullDownEnabled = true,
-    this.homePullDownTarget = HomePullDownTarget.settings,
+    this.homePullDownTarget = HomePullDownTarget.appearance,
     this.homeSwipeLeftEnabled = true,
-    this.pinchToZoomFont = false,
   });
 
   BibleNavSettingsState copyWith({
@@ -40,7 +37,6 @@ class BibleNavSettingsState {
     bool? homePullDownEnabled,
     HomePullDownTarget? homePullDownTarget,
     bool? homeSwipeLeftEnabled,
-    bool? pinchToZoomFont,
   }) {
     return BibleNavSettingsState(
       depth: depth ?? this.depth,
@@ -51,7 +47,6 @@ class BibleNavSettingsState {
       homePullDownTarget: homePullDownTarget ?? this.homePullDownTarget,
       homeSwipeLeftEnabled:
           homeSwipeLeftEnabled ?? this.homeSwipeLeftEnabled,
-      pinchToZoomFont: pinchToZoomFont ?? this.pinchToZoomFont,
     );
   }
 }
@@ -63,7 +58,6 @@ class BibleNavSettingsNotifier extends Notifier<BibleNavSettingsState> {
   static const _homePullDownKey = 'bible_nav_home_pull_down';
   static const _homePullTargetKey = 'bible_nav_home_pull_target';
   static const _homeSwipeLeftKey = 'bible_nav_home_swipe_left';
-  static const _pinchZoomKey = 'bible_nav_pinch_zoom_font';
 
   @override
   BibleNavSettingsState build() {
@@ -80,8 +74,9 @@ class BibleNavSettingsNotifier extends Notifier<BibleNavSettingsState> {
     final swipeDown = prefs.getBool(_swipeDownKey) ?? true;
     final homePull = prefs.getBool(_homePullDownKey) ?? true;
     final homeSwipe = prefs.getBool(_homeSwipeLeftKey) ?? true;
-    final pinchZoom = prefs.getBool(_pinchZoomKey) ?? false;
-    final pullTargetIndex = prefs.getInt(_homePullTargetKey) ?? 0;
+    // No stored value -> Appearance (enum index 0).
+    final pullTargetIndex =
+        prefs.getInt(_homePullTargetKey) ?? HomePullDownTarget.appearance.index;
 
     state = state.copyWith(
       depth: NavigationDepth
@@ -92,7 +87,6 @@ class BibleNavSettingsNotifier extends Notifier<BibleNavSettingsState> {
       homePullDownTarget: HomePullDownTarget
           .values[pullTargetIndex.clamp(0, HomePullDownTarget.values.length - 1)],
       homeSwipeLeftEnabled: homeSwipe,
-      pinchToZoomFont: pinchZoom,
     );
   }
 
@@ -130,12 +124,6 @@ class BibleNavSettingsNotifier extends Notifier<BibleNavSettingsState> {
     state = state.copyWith(homeSwipeLeftEnabled: enabled);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_homeSwipeLeftKey, enabled);
-  }
-
-  Future<void> setPinchToZoomFont(bool enabled) async {
-    state = state.copyWith(pinchToZoomFont: enabled);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_pinchZoomKey, enabled);
   }
 }
 

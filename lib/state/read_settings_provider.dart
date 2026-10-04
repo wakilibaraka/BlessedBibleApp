@@ -41,9 +41,6 @@ class ReadSettingsState {
   final DictionaryScope dictionaryScope;
   final NonKjvDictionaryMode nonKjvDictionaryMode;
 
-  /// When true, long-pressing any word looks it up (Olive-Tree-style).
-  /// When false (default), only underlined words are tappable.
-  final bool defineAnyWord;
   final bool showStrongsNumbers;
   final StrongsIndicatorStyle strongsIndicatorStyle;
   final PopupStyle popupStyle;
@@ -70,7 +67,6 @@ class ReadSettingsState {
     this.dictionaryUnderlinesEnabled = true,
     this.dictionaryScope = DictionaryScope.termAndTricky,
     this.nonKjvDictionaryMode = NonKjvDictionaryMode.contestedOnly,
-    this.defineAnyWord = false,
     this.showStrongsNumbers = false,
     this.strongsIndicatorStyle = StrongsIndicatorStyle.asterisk,
     this.popupStyle = PopupStyle.floating,
@@ -93,7 +89,6 @@ class ReadSettingsState {
     bool? dictionaryUnderlinesEnabled,
     DictionaryScope? dictionaryScope,
     NonKjvDictionaryMode? nonKjvDictionaryMode,
-    bool? defineAnyWord,
     bool? showStrongsNumbers,
     StrongsIndicatorStyle? strongsIndicatorStyle,
     PopupStyle? popupStyle,
@@ -116,7 +111,6 @@ class ReadSettingsState {
       dictionaryUnderlinesEnabled: dictionaryUnderlinesEnabled ?? this.dictionaryUnderlinesEnabled,
       dictionaryScope: dictionaryScope ?? this.dictionaryScope,
       nonKjvDictionaryMode: nonKjvDictionaryMode ?? this.nonKjvDictionaryMode,
-      defineAnyWord: defineAnyWord ?? this.defineAnyWord,
       showStrongsNumbers: showStrongsNumbers ?? this.showStrongsNumbers,
       strongsIndicatorStyle: strongsIndicatorStyle ?? this.strongsIndicatorStyle,
       popupStyle: popupStyle ?? this.popupStyle,
@@ -174,7 +168,6 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
         orElse: () => NonKjvDictionaryMode.contestedOnly,
       );
     }
-    final defineAnyWord = prefs.getBool('defineAnyWord') ?? false;
 
     ReadingViewMode mode = ReadingViewMode.pinned;
     if (modeString != null) {
@@ -244,7 +237,6 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
       dictionaryUnderlinesEnabled: dictionaryUnderlinesEnabled,
       dictionaryScope: dictScope,
       nonKjvDictionaryMode: nonKjvMode,
-      defineAnyWord: defineAnyWord,
       showStrongsNumbers: showStrongsNumbers,
       strongsIndicatorStyle: strongsStyle,
       popupStyle: popupStyle,
@@ -354,11 +346,6 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     state = state.copyWith(nonKjvDictionaryMode: mode);
   }
 
-  Future<void> setDefineAnyWord(bool value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('defineAnyWord', value);
-    state = state.copyWith(defineAnyWord: value);
-  }
 
   Future<void> setShowChipsOnSavedItems(bool value) async {
     state = state.copyWith(showChipsOnSavedItems: value);
