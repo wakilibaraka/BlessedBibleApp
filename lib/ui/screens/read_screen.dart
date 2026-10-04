@@ -3,6 +3,7 @@ import 'dart:ui';
 import '../widgets/strongs_entry_sheet.dart';
 
 import '../widgets/dictionary_entry_sheet.dart';
+import '../widgets/definable_verse_text.dart';
 import '../sheets/appearance_settings_sheet.dart';
 
 import 'dart:math' as math;
@@ -2422,7 +2423,20 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         ? Text.rich(textSpan, textAlign: textAlign)
         : RichText(textAlign: textAlign, text: textSpan);
 
-    return textWidget;
+    // Long-press any word to define it (settings-gated, default off).
+    // Tap behavior is untouched: underlined words still define on tap,
+    // verse tap still selects.
+    final defineAny = !isSelectionMode &&
+        onDictTap != null &&
+        ref.watch(readSettingsProvider.select((s) => s.defineAnyWord));
+    if (!defineAny) return textWidget;
+
+    return DefinableVerseText(
+      textSpan: textSpan,
+      textAlign: textAlign,
+      // Sound: defineAny is only true when onDictTap != null above.
+      onWordLongPress: (word) => onDictTap(word),
+    );
   }
 
   Widget _buildEndOfChapterBlock(FlatChapter fc, int pageIndex, ThemeData theme,
