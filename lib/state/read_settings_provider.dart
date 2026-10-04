@@ -22,8 +22,8 @@ class ReadSettingsState {
   final VerseActionStyle verseActionStyle;
   final int activeHighlightColorIndex;
   final bool isManualNavHidden;
-  final bool isRedLetterEnabled;
-  final bool showVerseNumbers;
+  // Words of Jesus always render in red; verse numbers always show;
+  // cross-references are always available (toggles removed).
   final bool keepScreenAwake;
   final int defaultStartTab; // 0=Home, 1=Read, 2=Search, 3=Study
   final ReadingLayout readingLayout;
@@ -33,7 +33,6 @@ class ReadSettingsState {
   final bool showChipsOnSavedItems;
   final bool dictionaryUnderlinesEnabled;
   final DictionaryScope dictionaryScope;
-  final bool showCrossReferences;
   final bool showStrongsNumbers;
   final StrongsIndicatorStyle strongsIndicatorStyle;
   final PopupStyle popupStyle;
@@ -48,8 +47,6 @@ class ReadSettingsState {
     this.verseActionStyle = VerseActionStyle.horizontal,
     this.activeHighlightColorIndex = 2,
     this.isManualNavHidden = false,
-    this.isRedLetterEnabled = true,
-    this.showVerseNumbers = true,
     this.keepScreenAwake = false,
     this.defaultStartTab = 0,
     this.readingLayout = ReadingLayout.single,
@@ -61,7 +58,6 @@ class ReadSettingsState {
     this.showChipsOnSavedItems = false,
     this.dictionaryUnderlinesEnabled = true,
     this.dictionaryScope = DictionaryScope.termAndTricky,
-    this.showCrossReferences = false,
     this.showStrongsNumbers = false,
     this.strongsIndicatorStyle = StrongsIndicatorStyle.asterisk,
     this.popupStyle = PopupStyle.floating,
@@ -74,8 +70,6 @@ class ReadSettingsState {
     VerseActionStyle? verseActionStyle,
     int? activeHighlightColorIndex,
     bool? isManualNavHidden,
-    bool? isRedLetterEnabled,
-    bool? showVerseNumbers,
     bool? keepScreenAwake,
     int? defaultStartTab,
     ReadingLayout? readingLayout,
@@ -85,7 +79,6 @@ class ReadSettingsState {
     bool? showChipsOnSavedItems,
     bool? dictionaryUnderlinesEnabled,
     DictionaryScope? dictionaryScope,
-    bool? showCrossReferences,
     bool? showStrongsNumbers,
     StrongsIndicatorStyle? strongsIndicatorStyle,
     PopupStyle? popupStyle,
@@ -98,8 +91,6 @@ class ReadSettingsState {
       activeHighlightColorIndex:
           activeHighlightColorIndex ?? this.activeHighlightColorIndex,
       isManualNavHidden: isManualNavHidden ?? this.isManualNavHidden,
-      isRedLetterEnabled: isRedLetterEnabled ?? this.isRedLetterEnabled,
-      showVerseNumbers: showVerseNumbers ?? this.showVerseNumbers,
       keepScreenAwake: keepScreenAwake ?? this.keepScreenAwake,
       defaultStartTab: defaultStartTab ?? this.defaultStartTab,
       readingLayout: readingLayout ?? this.readingLayout,
@@ -109,7 +100,6 @@ class ReadSettingsState {
       showChipsOnSavedItems: showChipsOnSavedItems ?? this.showChipsOnSavedItems,
       dictionaryUnderlinesEnabled: dictionaryUnderlinesEnabled ?? this.dictionaryUnderlinesEnabled,
       dictionaryScope: dictionaryScope ?? this.dictionaryScope,
-      showCrossReferences: showCrossReferences ?? this.showCrossReferences,
       showStrongsNumbers: showStrongsNumbers ?? this.showStrongsNumbers,
       strongsIndicatorStyle: strongsIndicatorStyle ?? this.strongsIndicatorStyle,
       popupStyle: popupStyle ?? this.popupStyle,
@@ -142,8 +132,6 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     final verseStyleString = prefs.getString(_verseActionStyleKey);
     final activeHighlightIndex = prefs.getInt(_activeHighlightColorIndexKey);
     final isManualNavHidden = prefs.getBool(_isManualNavHiddenKey) ?? false;
-    final isRedLetterEnabled = true;
-    final showVerseNumbers = true;
     final keepScreenAwake = prefs.getBool('keep_screen_awake') ?? false;
     final defaultStartTab = prefs.getInt('default_start_tab') ?? 0;
     final layoutString = prefs.getString(_readingLayoutKey);
@@ -153,7 +141,6 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     final showChipsOnSavedItems = prefs.getBool('show_chips_on_saved_items') ?? false;
     final dictionaryUnderlinesEnabled = prefs.getBool('dictionaryUnderlinesEnabled') ?? true;
     final dictScopeString = prefs.getString('dictionaryScope');
-    final showCrossReferences = prefs.getBool('show_cross_references') ?? false;
     final showStrongsNumbers = prefs.getBool('show_strongs_numbers') ?? false;
     DictionaryScope dictScope = DictionaryScope.termAndTricky;
     if (dictScopeString != null) {
@@ -221,8 +208,6 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
       verseActionStyle: verseStyle,
       activeHighlightColorIndex: activeHighlightIndex ?? 2,
       isManualNavHidden: isManualNavHidden,
-      isRedLetterEnabled: isRedLetterEnabled,
-      showVerseNumbers: showVerseNumbers,
       keepScreenAwake: keepScreenAwake,
       defaultStartTab: defaultStartTab,
       readingLayout: layout,
@@ -232,7 +217,6 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
       showChipsOnSavedItems: showChipsOnSavedItems,
       dictionaryUnderlinesEnabled: dictionaryUnderlinesEnabled,
       dictionaryScope: dictScope,
-      showCrossReferences: showCrossReferences,
       showStrongsNumbers: showStrongsNumbers,
       strongsIndicatorStyle: strongsStyle,
       popupStyle: popupStyle,
@@ -297,17 +281,7 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     await prefs.setBool(_isManualNavHiddenKey, isHidden);
   }
 
-  Future<void> setRedLetterEnabled(bool isEnabled) async {
-    state = state.copyWith(isRedLetterEnabled: isEnabled);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('red_letter_enabled', isEnabled);
-  }
 
-  Future<void> setShowVerseNumbers(bool val) async {
-    state = state.copyWith(showVerseNumbers: val);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('show_verse_numbers', val);
-  }
 
   Future<void> setKeepScreenAwake(bool value) async {
     state = state.copyWith(keepScreenAwake: value);
@@ -350,12 +324,6 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     state = state.copyWith(showChipsOnSavedItems: value);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('show_chips_on_saved_items', value);
-  }
-
-  Future<void> setShowCrossReferences(bool value) async {
-    state = state.copyWith(showCrossReferences: value);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('show_cross_references', value);
   }
 
   Future<void> setStrongsIndicatorStyle(StrongsIndicatorStyle style) async {

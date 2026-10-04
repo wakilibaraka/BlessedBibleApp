@@ -23,7 +23,6 @@ import '../../data/models/bible_model.dart';
 import '../../state/bible_provider.dart';
 import '../../state/reading_plan_provider.dart';
 import '../../state/translation_provider.dart';
-import '../../state/read_settings_provider.dart';
 import '../widgets/textured_glass_container.dart';
 import '../../state/typography_provider.dart';
 import '../../state/user_data_provider.dart';
@@ -350,7 +349,6 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
     final theme = Theme.of(context);
     final gold = AppColors.goldAccent;
     final typography = ref.watch(typographyProvider);
-    final readSettings = ref.watch(readSettingsProvider);
     final appThemeMode = ref.watch(themeProvider);
     final surfaceStyle = ref.watch(surfaceStyleProvider);
     ref.watch(pericopesProvider);
@@ -790,16 +788,12 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                                   if (e == -1) {
                                     spans.add(TextSpan(
                                         text: text.substring(s + 1),
-                                        style: readSettings.isRedLetterEnabled
-                                            ? redStyle
-                                            : fontStyle));
+                                        style: redStyle));
                                     break;
                                   }
                                   spans.add(TextSpan(
                                       text: text.substring(s + 1, e),
-                                      style: readSettings.isRedLetterEnabled
-                                          ? redStyle
-                                          : fontStyle));
+                                      style: redStyle));
                                   cur = e + 1;
                                 }
 
@@ -807,8 +801,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                                   text: TextSpan(
                                     style: fontStyle,
                                     children: [
-                                      if (readSettings.showVerseNumbers)
-                                        TextSpan(
+                                      TextSpan(
                                           text: '${verse.number}  ',
                                           style: fontStyle.copyWith(
                                             color: theme.primaryColor,

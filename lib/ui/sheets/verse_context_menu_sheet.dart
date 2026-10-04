@@ -8,7 +8,6 @@ import '../../state/bible_provider.dart';
 import 'package:flutter/cupertino.dart';
 import '../screens/commentary_hub_screen.dart';
 import '../../state/commentary_provider.dart';
-import '../../state/read_settings_provider.dart';
 import '../widgets/cross_references_sheet.dart';
 
 class VerseContextMenuSheet extends ConsumerStatefulWidget {
@@ -127,9 +126,7 @@ class _VerseContextMenuSheetState extends ConsumerState<VerseContextMenuSheet> {
                             },
                           ),
                         ),
-                        if (ref.watch(readSettingsProvider
-                            .select((s) => s.showCrossReferences)))
-                          Expanded(
+                        Expanded(
                             child: _MenuButton(
                               icon: const Icon(Icons.link_rounded, size: 24),
                               label: 'Related',

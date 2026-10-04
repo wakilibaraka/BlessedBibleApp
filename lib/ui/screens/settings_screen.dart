@@ -360,55 +360,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
       SettingsPillCard(
         children: [
           Consumer(builder: (context, ref, _) {
-            final isRedLetter = ref.watch(
-                readSettingsProvider.select((s) => s.isRedLetterEnabled));
-            return SwitchListTile(
-              title: const Text('Words of Jesus in Red'),
-              subtitle: const Text('Render words spoken by Jesus in red'),
-              value: isRedLetter,
-              onChanged: (val) {
-                HapticFeedback.selectionClick();
-                ref
-                    .read(readSettingsProvider.notifier)
-                    .setRedLetterEnabled(val);
-              },
-            );
-          }),
-          const Divider(height: 1, indent: 16),
-          Consumer(builder: (context, ref, _) {
-            final showNumbers = ref
-                .watch(readSettingsProvider.select((s) => s.showVerseNumbers));
-            return SwitchListTile(
-              title: const Text('Show Verse Numbers'),
-              subtitle: const Text('Display verse numbers in the text'),
-              value: showNumbers,
-              onChanged: (val) {
-                HapticFeedback.selectionClick();
-                ref
-                    .read(readSettingsProvider.notifier)
-                    .setShowVerseNumbers(val);
-              },
-            );
-          }),
-          const Divider(height: 1, indent: 16),
-          Consumer(builder: (context, ref, _) {
-            final showCrossRefs = ref.watch(
-                readSettingsProvider.select((s) => s.showCrossReferences));
-            return SwitchListTile(
-              title: const Text('Show Cross-References'),
-              subtitle: const Text(
-                  'Adds a "Related" button when you long-press any verse, showing thematically linked verses'),
-              value: showCrossRefs,
-              onChanged: (val) {
-                HapticFeedback.selectionClick();
-                ref
-                    .read(readSettingsProvider.notifier)
-                    .setShowCrossReferences(val);
-              },
-            );
-          }),
-          const Divider(height: 1, indent: 16),
-          Consumer(builder: (context, ref, _) {
             final showStrongs = ref.watch(
                 readSettingsProvider.select((s) => s.showStrongsNumbers));
             final strongsStyle = ref.watch(
@@ -634,7 +585,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               selectedValue: popupStyle,
               options: const [
                 MapEntry(PopupStyle.floating, 'Floating'),
-                MapEntry(PopupStyle.bottomSheet, 'Sheet'),
+                MapEntry(PopupStyle.bottomSheet, 'Bottom sheet'),
               ],
               onChanged: (val) {
                 HapticFeedback.selectionClick();
@@ -1152,7 +1103,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           ListTile(
             leading: Icon(Icons.restore_rounded,
                 color: Theme.of(context).colorScheme.error),
-            title: Text('Reset to Default',
+            title: Text('Reset settings',
                 style: TextStyle(color: Theme.of(context).colorScheme.error)),
             subtitle:
                 const Text('Restore original app settings (content is kept)'),

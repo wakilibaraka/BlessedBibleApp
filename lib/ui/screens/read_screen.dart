@@ -1389,9 +1389,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                               .text),
                                                                   isBookmarked:
                                                                       isBookmarked,
-                                                                  isRedLetterEnabled:
-                                                                      readSettings
-                                                                          .isRedLetterEnabled,
                                                                   isSelectionMode:
                                                                       _isPageSelectionMode,
                                                                   dictTokens:
@@ -1732,7 +1729,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       VoidCallback? onDevotionalTap,
       VoidCallback? onStudyNoteTap,
       bool isBookmarked = false,
-      bool isRedLetterEnabled = true,
       bool isSelectionMode = false,
       Set<int>? dictTokens,
       void Function(String word)? onDictTap}) {
@@ -1753,7 +1749,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       onDevotionalTap: onDevotionalTap,
       onStudyNoteTap: onStudyNoteTap,
       isBookmarked: isBookmarked,
-      isRedLetterEnabled: isRedLetterEnabled,
       isSelectionMode: isSelectionMode,
       translationId: activeTrans,
       bookNumber: bookNumber,
@@ -1783,7 +1778,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         appThemeMode,
         hasCommentary: false,
         isBookmarked: false,
-        isRedLetterEnabled: isRedLetterEnabled,
         overrideColor: secondaryColor,
         hideVerseNumber: true,
         isSelectionMode: isSelectionMode,
@@ -1827,7 +1821,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         appThemeMode,
         hasCommentary: false,
         isBookmarked: false,
-        isRedLetterEnabled: isRedLetterEnabled,
         overrideColor: secondaryColor,
         hideVerseNumber: true,
         isSelectionMode: isSelectionMode,
@@ -1912,8 +1905,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
               appThemeMode,
               hasCommentary: false,
               isBookmarked: false,
-              isRedLetterEnabled: isRedLetterEnabled,
-              overrideColor: secondaryColor,
+                    overrideColor: secondaryColor,
               hideVerseNumber: true,
               isSelectionMode: isSelectionMode,
               translationId: activeChipId,
@@ -2074,7 +2066,6 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       VoidCallback? onDevotionalTap,
       VoidCallback? onStudyNoteTap,
       bool isBookmarked = false,
-      bool isRedLetterEnabled = true,
       Color? overrideColor,
       bool hideVerseNumber = false,
       bool isSelectionMode = false,
@@ -2254,11 +2245,11 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
       int endIndex = text.indexOf('›', startIndex + 1);
       if (endIndex == -1) {
-        processChunk(text.substring(startIndex + 1), isRedLetterEnabled ? redLetterStyle : fontStyle);
+        processChunk(text.substring(startIndex + 1), redLetterStyle);
         break;
       }
 
-      processChunk(text.substring(startIndex + 1, endIndex), isRedLetterEnabled ? redLetterStyle : fontStyle);
+      processChunk(text.substring(startIndex + 1, endIndex), redLetterStyle);
       currentIndex = endIndex + 1;
     }
 
@@ -2300,8 +2291,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     final textSpan = TextSpan(
       style: fontStyle,
       children: [
-        if (ref.watch(readSettingsProvider).showVerseNumbers &&
-            !hideVerseNumber)
+        if (!hideVerseNumber)
           TextSpan(
             text: '${verse.number}  ',
             style: theme.textTheme.titleMedium?.copyWith(
