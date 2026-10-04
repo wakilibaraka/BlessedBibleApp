@@ -43,6 +43,8 @@ import '../../services/share_service.dart';
 import '../../services/devotional_service.dart';
 import '../../state/devotional_provider.dart';
 import '../widgets/share_card.dart';
+import '../widgets/radial_action_menu.dart';
+import '../widgets/cross_references_sheet.dart';
 import 'notes_list_screen.dart';
 
 import '../sheets/translation_picker_sheet.dart';
@@ -208,6 +210,90 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         ),
       );
     }
+  }
+
+  /// Global press point captured by onLongPressStart, used to anchor the
+  /// radial menu (a plain onLongPress has no position).
+  Offset? _pendingLongPressPosition;
+
+  /// Verse long-press: the radial ring when that style is selected,
+  /// otherwise the classic context sheet. Both come from one place so the
+  /// gesture contract stays identical.
+  void _handleVerseLongPress(
+    Offset? globalPosition,
+    int verseNumber,
+    String bookName,
+    int chapterNumber,
+    int bookNumber,
+  ) {
+    final radial =
+        ref.read(readSettingsProvider.select((s) => s.verseActionStyle)) ==
+            VerseActionStyle.radial;
+    if (radial && globalPosition != null) {
+      final theme = Theme.of(context);
+      RadialActionMenu.show(
+        context,
+        anchor: globalPosition,
+        actions: [
+          RadialAction(
+            icon: Icons.copy_rounded,
+            label: 'Copy',
+            onTap: () => VerseActionLogic.handleCopy(
+                context, ref, bookName, chapterNumber, [verseNumber]),
+          ),
+          RadialAction(
+            icon: Icons.bookmark_border_rounded,
+            label: 'Bookmark',
+            onTap: () => VerseActionLogic.handleBookmark(context, theme, ref,
+                bookName, chapterNumber, [verseNumber]),
+          ),
+          RadialAction(
+            icon: Icons.note_add_outlined,
+            label: 'Note',
+            onTap: () => VerseActionLogic.handleNote(
+                context, ref, theme, bookName, chapterNumber, [verseNumber]),
+          ),
+          RadialAction(
+            icon: Icons.menu_book_rounded,
+            label: 'Commentary',
+            onTap: () => VerseActionLogic.handleCommentary(context, ref,
+                bookName, chapterNumber, verseNumber, [verseNumber]),
+          ),
+          RadialAction(
+            icon: Icons.link_rounded,
+            label: 'Related',
+            onTap: () => showCrossReferencesSheet(
+              context,
+              bookNumber: bookNumber,
+              chapter: chapterNumber,
+              verse: verseNumber,
+              bookName: bookName,
+            ),
+          ),
+          RadialAction(
+            icon: Icons.ios_share_rounded,
+            label: 'Share',
+            onTap: () => VerseActionLogic.handleShareOptions(
+                context, ref, bookName, chapterNumber, [verseNumber]),
+          ),
+        ],
+      );
+      return;
+    }
+
+    HapticFeedback.mediumImpact();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      useRootNavigator: true,
+      builder: (ctx) => VerseContextMenuSheet(
+        verseNumber: verseNumber,
+        bookName: bookName,
+        chapterNum: chapterNumber,
+        bookNumber: bookNumber,
+        onCustomSelection: _enterPageSelection,
+      ),
+    );
   }
 
   int? _navigatedVerseIndex;
@@ -1422,24 +1508,22 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                                 _toggleVerseSelection(verse.number);
                                                                               }
                                                                             },
+                                                                  onLongPressStart:
+                                                                      _isPageSelectionMode
+                                                                          ? null
+                                                                          : (d) => _pendingLongPressPosition =
+                                                                              d.globalPosition,
                                                                   onLongPress:
                                                                       _isPageSelectionMode
                                                                           ? null
-                                                                          : () {
-                                                                              HapticFeedback.mediumImpact();
-                                                                              showModalBottomSheet(
-                                                                                context: context,
-                                                                                backgroundColor: Colors.transparent,
-                                                                                useRootNavigator: true,
-                                                                                builder: (ctx) => VerseContextMenuSheet(
-                                                                                  verseNumber: verse.number,
-                                                                                  bookName: fc.book.name,
-                                                                                  chapterNum: fc.chapter.number,
-                                                                                  bookNumber: allBooks.indexOf(fc.book) + 1,
-                                                                                  onCustomSelection: _enterPageSelection,
-                                                                                ),
-                                                                              );
-                                                                            },
+                                                                          : () => _handleVerseLongPress(
+                                                                                _pendingLongPressPosition,
+                                                                                verse.number,
+                                                                                fc.book.name,
+                                                                                fc.chapter.number,
+                                                                                allBooks.indexOf(fc.book) +
+                                                                                    1,
+                                                                              ),
                                                                   child: Stack(
                                                                     children: [
                                                                       AnimatedContainer(

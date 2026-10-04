@@ -594,12 +594,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             return AnimatedSegmentedTile<VerseActionStyle>(
               title: 'Verse Action Style',
               subtitle:
-                  'Layout for highlight & action controls when a verse is selected',
+                  'Sheet (compact) or Classic (tall dock) when verses are selected; Radial moves the long-press menu to a circular ring',
               selectedValue: actionStyle,
               options: const [
-                MapEntry(VerseActionStyle.classic, 'Classic'),
+                MapEntry(VerseActionStyle.classic, 'Sheet'),
+                MapEntry(VerseActionStyle.classicInline, 'Classic'),
                 MapEntry(VerseActionStyle.horizontal, 'Minimal'),
                 MapEntry(VerseActionStyle.raindrop, 'Raindrop'),
+                MapEntry(VerseActionStyle.radial, 'Radial'),
               ],
               onChanged: (val) {
                 HapticFeedback.selectionClick();

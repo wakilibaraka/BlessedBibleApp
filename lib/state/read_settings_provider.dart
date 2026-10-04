@@ -4,7 +4,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 enum ReadingViewMode { full, partial, pinned }
 
 
-enum VerseActionStyle { classic, detached, horizontal, raindrop }
+/// Layout for verse actions when verses are selected.
+/// - [classic]: compact Apple-style bottom sheet (dock stays 64pt).
+/// - [classicInline]: the previous tall in-dock stack (400pt), kept as an
+///   option for anyone who preferred the original behaviour.
+/// - [horizontal]: minimal single row (default).
+/// - [raindrop]: vertical pill beside the FAB.
+/// - [radial]: long-press opens a circular ring of actions.
+enum VerseActionStyle { classic, classicInline, horizontal, raindrop, radial }
 
 enum ReadingLayout { single, interleaved, sideBySide, chips }
 
@@ -287,6 +294,14 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     state = state.copyWith(verseActionStyle: style);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_verseActionStyleKey, style.name);
+  }
+
+  /// Steps to the next highlight colour (wraps). Used by the compact
+  /// verse-action sheet, which has no room for a full swatch strip.
+  Future<void> cycleHighlightColor() async {
+    const count = 5;
+    final next = (state.activeHighlightColorIndex + 1) % count;
+    await setActiveHighlightColorIndex(next);
   }
 
   Future<void> setActiveHighlightColorIndex(int index) async {

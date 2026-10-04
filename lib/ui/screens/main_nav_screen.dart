@@ -19,6 +19,7 @@ import '../sheets/search_settings_sheet.dart';
 import '../widgets/animated_background.dart';
 import '../widgets/bouncy_entrance.dart';
 import '../widgets/crossed_swords_icon.dart';
+import '../widgets/verse_action_sheet.dart';
 import '../widgets/textured_glass_container.dart';
 import '../widgets/action_icon.dart';
 import '../../state/immersive_mode_provider.dart';
@@ -53,6 +54,22 @@ class MainNavScreen extends ConsumerWidget {
     ];
 
     final appThemeMode = ref.watch(themeProvider);
+
+    // Sheet style: a fresh selection pops the compact action sheet. The
+    // reader owns the selection state, so we listen rather than poll.
+    ref.listen<int>(readSelectionProvider.select((s) => s.length),
+        (prev, next) {
+      if (next > 0 && (prev ?? 0) == 0) {
+        final style =
+            ref.read(readSettingsProvider.select((s) => s.verseActionStyle));
+        if (style == VerseActionStyle.classic && currentIndex == 1) {
+          // Post-frame: the selection rebuild must land first.
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (context.mounted) showVerseActionSheet(context, ref);
+          });
+        }
+      }
+    });
 
     return PopScope(
         canPop: false,
@@ -140,6 +157,10 @@ class MainNavScreen extends ConsumerWidget {
                 final isMinimalAction = currentIndex == 1 &&
                     selectedVerses.isNotEmpty &&
                     style == VerseActionStyle.horizontal;
+                // Compact sheet: actions live in a short sheet, not the dock.
+                final usesActionSheet = currentIndex == 1 &&
+                    selectedVerses.isNotEmpty &&
+                    style == VerseActionStyle.classic;
                 final isRaindropAction = currentIndex == 1 &&
                     selectedVerses.isNotEmpty &&
                     style == VerseActionStyle.raindrop;
@@ -155,9 +176,11 @@ class MainNavScreen extends ConsumerWidget {
                     math.max(20.0, (availableWidth - totalExpandedWidth) / 2);
                 final double clampedScale = MediaQuery.textScalerOf(context).clamp(minScaleFactor: 1.0, maxScaleFactor: 1.3).scale(1.0);
                 final double dynamicDockHeight = kBottomDockHeight * clampedScale;
+                // Only the inline classic expands the dock; the compact
+                // sheet and the radial menu leave it at its normal height.
                 final double height = (currentIndex == 1 &&
                         selectedVerses.isNotEmpty &&
-                        style != VerseActionStyle.horizontal)
+                        style == VerseActionStyle.classicInline)
                     ? 420.0
                     : dynamicDockHeight;
 
@@ -260,7 +283,7 @@ class MainNavScreen extends ConsumerWidget {
                                 final bool isClassicAction =
                                     currentIndex == 1 &&
                                         selectedVerses.isNotEmpty &&
-                                        style == VerseActionStyle.classic;
+                                        style == VerseActionStyle.classicInline;
                                 final bool isRaindropAction =
                                     currentIndex == 1 &&
                                         selectedVerses.isNotEmpty &&
