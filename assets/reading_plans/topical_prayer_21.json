@@ -1,0 +1,3057 @@
+{
+  "title": "A Life of Prayer — 21 Days",
+  "id": "topical_prayer_21",
+  "description": "Twenty-one days of Scripture on prayer: asking, intercession, patience and praise, drawn from Nave and Torrey.",
+  "category": "Topical",
+  "badge": "21 days",
+  "totalDays": 21,
+  "attribution": "References from Nave's Topical Bible (1896) and Torrey's New Topical Textbook (1897), public domain; normalized via j86schroeder/topical-bible-search (MIT).",
+  "license": "Public domain sources (US); plan arrangement original.",
+  "readings": [
+    {
+      "day": 1,
+      "week": 1,
+      "title": "Genesis 4:13-15 (+9 more)",
+      "passages": [
+        {
+          "label": "Genesis 4:13-15",
+          "refs": [
+            "Genesis 4:13-15"
+          ]
+        },
+        {
+          "label": "Genesis 12:5",
+          "refs": [
+            "Genesis 12:5"
+          ]
+        },
+        {
+          "label": "Genesis 12:8",
+          "refs": [
+            "Genesis 12:8"
+          ]
+        },
+        {
+          "label": "Genesis 15",
+          "refs": [
+            "Genesis 15"
+          ]
+        },
+        {
+          "label": "Genesis 16:7-13",
+          "refs": [
+            "Genesis 16:7-13"
+          ]
+        },
+        {
+          "label": "Genesis 17:20",
+          "refs": [
+            "Genesis 17:20"
+          ]
+        },
+        {
+          "label": "Genesis 18:23-33",
+          "refs": [
+            "Genesis 18:23-33"
+          ]
+        },
+        {
+          "label": "Genesis 19:20",
+          "refs": [
+            "Genesis 19:20"
+          ]
+        },
+        {
+          "label": "Genesis 20:17",
+          "refs": [
+            "Genesis 20:17"
+          ]
+        },
+        {
+          "label": "Genesis 24:12-52",
+          "refs": [
+            "Genesis 24:12-52"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 2,
+      "week": 1,
+      "title": "Genesis 24:63 (+9 more)",
+      "passages": [
+        {
+          "label": "Genesis 24:63",
+          "refs": [
+            "Genesis 24:63"
+          ]
+        },
+        {
+          "label": "Genesis 25:22-23",
+          "refs": [
+            "Genesis 25:22-23"
+          ]
+        },
+        {
+          "label": "Genesis 28:20",
+          "refs": [
+            "Genesis 28:20"
+          ]
+        },
+        {
+          "label": "Genesis 32:9-32",
+          "refs": [
+            "Genesis 32:9-32"
+          ]
+        },
+        {
+          "label": "Genesis 33:1-17",
+          "refs": [
+            "Genesis 33:1-17"
+          ]
+        },
+        {
+          "label": "Genesis 35:3",
+          "refs": [
+            "Genesis 35:3"
+          ]
+        },
+        {
+          "label": "Exodus 2:23-25",
+          "refs": [
+            "Exodus 2:23-25"
+          ]
+        },
+        {
+          "label": "Exodus 3:7-10",
+          "refs": [
+            "Exodus 3:7-10"
+          ]
+        },
+        {
+          "label": "Exodus 6:5",
+          "refs": [
+            "Exodus 6:5"
+          ]
+        },
+        {
+          "label": "Exodus 14:10-30",
+          "refs": [
+            "Exodus 14:10-30"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 3,
+      "week": 1,
+      "title": "Exodus 15:25 (+12 more)",
+      "passages": [
+        {
+          "label": "Exodus 15:25",
+          "refs": [
+            "Exodus 15:25"
+          ]
+        },
+        {
+          "label": "Exodus 17:4-6",
+          "refs": [
+            "Exodus 17:4-6"
+          ]
+        },
+        {
+          "label": "Exodus 17:8-14",
+          "refs": [
+            "Exodus 17:8-14"
+          ]
+        },
+        {
+          "label": "Exodus 22:23",
+          "refs": [
+            "Exodus 22:23"
+          ]
+        },
+        {
+          "label": "Exodus 22:27",
+          "refs": [
+            "Exodus 22:27"
+          ]
+        },
+        {
+          "label": "Exodus 32:11-13",
+          "refs": [
+            "Exodus 32:11-13"
+          ]
+        },
+        {
+          "label": "Exodus 32:32",
+          "refs": [
+            "Exodus 32:32"
+          ]
+        },
+        {
+          "label": "Exodus 33:12-20",
+          "refs": [
+            "Exodus 33:12-20"
+          ]
+        },
+        {
+          "label": "Exodus 34:9",
+          "refs": [
+            "Exodus 34:9"
+          ]
+        },
+        {
+          "label": "Leviticus 5:5",
+          "refs": [
+            "Leviticus 5:5"
+          ]
+        },
+        {
+          "label": "Leviticus 26:40",
+          "refs": [
+            "Leviticus 26:40"
+          ]
+        },
+        {
+          "label": "Numbers 5:5-7",
+          "refs": [
+            "Numbers 5:5-7"
+          ]
+        },
+        {
+          "label": "Numbers 11:11-35",
+          "refs": [
+            "Numbers 11:11-35"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 4,
+      "week": 1,
+      "title": "Numbers 12:13-15 (+25 more)",
+      "passages": [
+        {
+          "label": "Numbers 12:13-15",
+          "refs": [
+            "Numbers 12:13-15"
+          ]
+        },
+        {
+          "label": "Numbers 14:13-18",
+          "refs": [
+            "Numbers 14:13-18"
+          ]
+        },
+        {
+          "label": "Numbers 16:15",
+          "refs": [
+            "Numbers 16:15"
+          ]
+        },
+        {
+          "label": "Numbers 16:22",
+          "refs": [
+            "Numbers 16:22"
+          ]
+        },
+        {
+          "label": "Numbers 22:6-11",
+          "refs": [
+            "Numbers 22:6-11"
+          ]
+        },
+        {
+          "label": "Numbers 23:7-8",
+          "refs": [
+            "Numbers 23:7-8"
+          ]
+        },
+        {
+          "label": "Numbers 24:9-10",
+          "refs": [
+            "Numbers 24:9-10"
+          ]
+        },
+        {
+          "label": "Deuteronomy 1:45",
+          "refs": [
+            "Deuteronomy 1:45"
+          ]
+        },
+        {
+          "label": "Deuteronomy 3:23-27",
+          "refs": [
+            "Deuteronomy 3:23-27"
+          ]
+        },
+        {
+          "label": "Deuteronomy 4:7",
+          "refs": [
+            "Deuteronomy 4:7"
+          ]
+        },
+        {
+          "label": "Deuteronomy 4:29-31",
+          "refs": [
+            "Deuteronomy 4:29-31"
+          ]
+        },
+        {
+          "label": "Deuteronomy 9:18",
+          "refs": [
+            "Deuteronomy 9:18"
+          ]
+        },
+        {
+          "label": "Deuteronomy 9:25-29",
+          "refs": [
+            "Deuteronomy 9:25-29"
+          ]
+        },
+        {
+          "label": "Deuteronomy 11:29-30",
+          "refs": [
+            "Deuteronomy 11:29-30"
+          ]
+        },
+        {
+          "label": "Deuteronomy 23:5",
+          "refs": [
+            "Deuteronomy 23:5"
+          ]
+        },
+        {
+          "label": "Deuteronomy 27:11-13",
+          "refs": [
+            "Deuteronomy 27:11-13"
+          ]
+        },
+        {
+          "label": "Deuteronomy 33:11",
+          "refs": [
+            "Deuteronomy 33:11"
+          ]
+        },
+        {
+          "label": "Joshua 5:14",
+          "refs": [
+            "Joshua 5:14"
+          ]
+        },
+        {
+          "label": "Joshua 7:8-10",
+          "refs": [
+            "Joshua 7:8-10"
+          ]
+        },
+        {
+          "label": "Joshua 8:33-34",
+          "refs": [
+            "Joshua 8:33-34"
+          ]
+        },
+        {
+          "label": "Joshua 9:14",
+          "refs": [
+            "Joshua 9:14"
+          ]
+        },
+        {
+          "label": "Joshua 24:10",
+          "refs": [
+            "Joshua 24:10"
+          ]
+        },
+        {
+          "label": "Judges 3:9",
+          "refs": [
+            "Judges 3:9"
+          ]
+        },
+        {
+          "label": "Judges 3:15",
+          "refs": [
+            "Judges 3:15"
+          ]
+        },
+        {
+          "label": "Judges 4:3",
+          "refs": [
+            "Judges 4:3"
+          ]
+        },
+        {
+          "label": "Judges 4:23-24",
+          "refs": [
+            "Judges 4:23-24"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 5,
+      "week": 1,
+      "title": "Judges 6:22 (+5 more)",
+      "passages": [
+        {
+          "label": "Judges 6:22",
+          "refs": [
+            "Judges 6:22"
+          ]
+        },
+        {
+          "label": "Judges 6:36-40",
+          "refs": [
+            "Judges 6:36-40"
+          ]
+        },
+        {
+          "label": "Judges 10:6-18",
+          "refs": [
+            "Judges 10:6-18"
+          ]
+        },
+        {
+          "label": "Judges 11:1-33",
+          "refs": [
+            "Judges 11:1-33"
+          ]
+        },
+        {
+          "label": "Judges 13:8-9",
+          "refs": [
+            "Judges 13:8-9"
+          ]
+        },
+        {
+          "label": "Judges 16:28-30",
+          "refs": [
+            "Judges 16:28-30"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 6,
+      "week": 1,
+      "title": "1 Samuel 1:10-17 (+12 more)",
+      "passages": [
+        {
+          "label": "1 Samuel 1:10-17",
+          "refs": [
+            "1 Samuel 1:10-17"
+          ]
+        },
+        {
+          "label": "1 Samuel 1:19-20",
+          "refs": [
+            "1 Samuel 1:19-20"
+          ]
+        },
+        {
+          "label": "1 Samuel 9:13",
+          "refs": [
+            "1 Samuel 9:13"
+          ]
+        },
+        {
+          "label": "1 Samuel 12:9-11",
+          "refs": [
+            "1 Samuel 12:9-11"
+          ]
+        },
+        {
+          "label": "1 Samuel 12:23",
+          "refs": [
+            "1 Samuel 12:23"
+          ]
+        },
+        {
+          "label": "1 Samuel 23:10-12",
+          "refs": [
+            "1 Samuel 23:10-12"
+          ]
+        },
+        {
+          "label": "1 Samuel 30:8",
+          "refs": [
+            "1 Samuel 30:8"
+          ]
+        },
+        {
+          "label": "2 Samuel 2:1",
+          "refs": [
+            "2 Samuel 2:1"
+          ]
+        },
+        {
+          "label": "2 Samuel 5:19-25",
+          "refs": [
+            "2 Samuel 5:19-25"
+          ]
+        },
+        {
+          "label": "2 Samuel 7:18-29",
+          "refs": [
+            "2 Samuel 7:18-29"
+          ]
+        },
+        {
+          "label": "2 Samuel 12:22-23",
+          "refs": [
+            "2 Samuel 12:22-23"
+          ]
+        },
+        {
+          "label": "2 Samuel 16:10-12",
+          "refs": [
+            "2 Samuel 16:10-12"
+          ]
+        },
+        {
+          "label": "1 Kings 3:1-14",
+          "refs": [
+            "1 Kings 3:1-14"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 7,
+      "week": 1,
+      "title": "1 Kings 8:22-30 (+12 more)",
+      "passages": [
+        {
+          "label": "1 Kings 8:22-30",
+          "refs": [
+            "1 Kings 8:22-30"
+          ]
+        },
+        {
+          "label": "1 Kings 8:33",
+          "refs": [
+            "1 Kings 8:33"
+          ]
+        },
+        {
+          "label": "1 Kings 8:47",
+          "refs": [
+            "1 Kings 8:47"
+          ]
+        },
+        {
+          "label": "1 Kings 8:53",
+          "refs": [
+            "1 Kings 8:53"
+          ]
+        },
+        {
+          "label": "1 Kings 8:59-60",
+          "refs": [
+            "1 Kings 8:59-60"
+          ]
+        },
+        {
+          "label": "1 Kings 9:2-3",
+          "refs": [
+            "1 Kings 9:2-3"
+          ]
+        },
+        {
+          "label": "1 Kings 17:1",
+          "refs": [
+            "1 Kings 17:1"
+          ]
+        },
+        {
+          "label": "1 Kings 17:22",
+          "refs": [
+            "1 Kings 17:22"
+          ]
+        },
+        {
+          "label": "1 Kings 18:1",
+          "refs": [
+            "1 Kings 18:1"
+          ]
+        },
+        {
+          "label": "1 Kings 18:22-45",
+          "refs": [
+            "1 Kings 18:22-45"
+          ]
+        },
+        {
+          "label": "2 Kings 6:17-20",
+          "refs": [
+            "2 Kings 6:17-20"
+          ]
+        },
+        {
+          "label": "2 Kings 13:4",
+          "refs": [
+            "2 Kings 13:4"
+          ]
+        },
+        {
+          "label": "2 Kings 19:14-20",
+          "refs": [
+            "2 Kings 19:14-20"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 8,
+      "week": 2,
+      "title": "2 Kings 20:1-7 (+15 more)",
+      "passages": [
+        {
+          "label": "2 Kings 20:1-7",
+          "refs": [
+            "2 Kings 20:1-7"
+          ]
+        },
+        {
+          "label": "2 Kings 20:11",
+          "refs": [
+            "2 Kings 20:11"
+          ]
+        },
+        {
+          "label": "1 Chronicles 4:10",
+          "refs": [
+            "1 Chronicles 4:10"
+          ]
+        },
+        {
+          "label": "1 Chronicles 5:20",
+          "refs": [
+            "1 Chronicles 5:20"
+          ]
+        },
+        {
+          "label": "1 Chronicles 16:11",
+          "refs": [
+            "1 Chronicles 16:11"
+          ]
+        },
+        {
+          "label": "1 Chronicles 16:35",
+          "refs": [
+            "1 Chronicles 16:35"
+          ]
+        },
+        {
+          "label": "1 Chronicles 21:16",
+          "refs": [
+            "1 Chronicles 21:16"
+          ]
+        },
+        {
+          "label": "1 Chronicles 28:9",
+          "refs": [
+            "1 Chronicles 28:9"
+          ]
+        },
+        {
+          "label": "2 Chronicles 1:10-12",
+          "refs": [
+            "2 Chronicles 1:10-12"
+          ]
+        },
+        {
+          "label": "2 Chronicles 6:13",
+          "refs": [
+            "2 Chronicles 6:13"
+          ]
+        },
+        {
+          "label": "2 Chronicles 7:13-15",
+          "refs": [
+            "2 Chronicles 7:13-15"
+          ]
+        },
+        {
+          "label": "2 Chronicles 13:14-18",
+          "refs": [
+            "2 Chronicles 13:14-18"
+          ]
+        },
+        {
+          "label": "2 Chronicles 14:11-15",
+          "refs": [
+            "2 Chronicles 14:11-15"
+          ]
+        },
+        {
+          "label": "2 Chronicles 15:1-15",
+          "refs": [
+            "2 Chronicles 15:1-15"
+          ]
+        },
+        {
+          "label": "2 Chronicles 18:31",
+          "refs": [
+            "2 Chronicles 18:31"
+          ]
+        },
+        {
+          "label": "2 Chronicles 20:6-27",
+          "refs": [
+            "2 Chronicles 20:6-27"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 9,
+      "week": 2,
+      "title": "2 Chronicles 30:27 (+31 more)",
+      "passages": [
+        {
+          "label": "2 Chronicles 30:27",
+          "refs": [
+            "2 Chronicles 30:27"
+          ]
+        },
+        {
+          "label": "2 Chronicles 32:20-24",
+          "refs": [
+            "2 Chronicles 32:20-24"
+          ]
+        },
+        {
+          "label": "2 Chronicles 33:12-13",
+          "refs": [
+            "2 Chronicles 33:12-13"
+          ]
+        },
+        {
+          "label": "2 Chronicles 33:18-19",
+          "refs": [
+            "2 Chronicles 33:18-19"
+          ]
+        },
+        {
+          "label": "Ezra 8:21",
+          "refs": [
+            "Ezra 8:21"
+          ]
+        },
+        {
+          "label": "Ezra 8:23",
+          "refs": [
+            "Ezra 8:23"
+          ]
+        },
+        {
+          "label": "Ezra 9:5-6",
+          "refs": [
+            "Ezra 9:5-6"
+          ]
+        },
+        {
+          "label": "Ezra 9:15",
+          "refs": [
+            "Ezra 9:15"
+          ]
+        },
+        {
+          "label": "Ezra 10:1",
+          "refs": [
+            "Ezra 10:1"
+          ]
+        },
+        {
+          "label": "Nehemiah 1:4-9",
+          "refs": [
+            "Nehemiah 1:4-9"
+          ]
+        },
+        {
+          "label": "Nehemiah 2:4",
+          "refs": [
+            "Nehemiah 2:4"
+          ]
+        },
+        {
+          "label": "Nehemiah 4:4-5",
+          "refs": [
+            "Nehemiah 4:4-5"
+          ]
+        },
+        {
+          "label": "Nehemiah 4:9",
+          "refs": [
+            "Nehemiah 4:9"
+          ]
+        },
+        {
+          "label": "Nehemiah 5:13",
+          "refs": [
+            "Nehemiah 5:13"
+          ]
+        },
+        {
+          "label": "Nehemiah 9:2",
+          "refs": [
+            "Nehemiah 9:2"
+          ]
+        },
+        {
+          "label": "Nehemiah 9:27",
+          "refs": [
+            "Nehemiah 9:27"
+          ]
+        },
+        {
+          "label": "Nehemiah 9:32-35",
+          "refs": [
+            "Nehemiah 9:32-35"
+          ]
+        },
+        {
+          "label": "Job 1:20-21",
+          "refs": [
+            "Job 1:20-21"
+          ]
+        },
+        {
+          "label": "Job 3:1-10",
+          "refs": [
+            "Job 3:1-10"
+          ]
+        },
+        {
+          "label": "Job 7:20",
+          "refs": [
+            "Job 7:20"
+          ]
+        },
+        {
+          "label": "Job 8:5-6",
+          "refs": [
+            "Job 8:5-6"
+          ]
+        },
+        {
+          "label": "Job 11:13",
+          "refs": [
+            "Job 11:13"
+          ]
+        },
+        {
+          "label": "Job 12:4",
+          "refs": [
+            "Job 12:4"
+          ]
+        },
+        {
+          "label": "Job 21:15",
+          "refs": [
+            "Job 21:15"
+          ]
+        },
+        {
+          "label": "Job 22:27",
+          "refs": [
+            "Job 22:27"
+          ]
+        },
+        {
+          "label": "Job 27:7",
+          "refs": [
+            "Job 27:7"
+          ]
+        },
+        {
+          "label": "Job 30:20",
+          "refs": [
+            "Job 30:20"
+          ]
+        },
+        {
+          "label": "Job 33:26",
+          "refs": [
+            "Job 33:26"
+          ]
+        },
+        {
+          "label": "Job 34:28",
+          "refs": [
+            "Job 34:28"
+          ]
+        },
+        {
+          "label": "Job 40:4-5",
+          "refs": [
+            "Job 40:4-5"
+          ]
+        },
+        {
+          "label": "Psalms 3:4",
+          "refs": [
+            "Psalms 3:4"
+          ]
+        },
+        {
+          "label": "Psalms 4:1",
+          "refs": [
+            "Psalms 4:1"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 10,
+      "week": 2,
+      "title": "Psalms 5:1-3 (+50 more)",
+      "passages": [
+        {
+          "label": "Psalms 5:1-3",
+          "refs": [
+            "Psalms 5:1-3"
+          ]
+        },
+        {
+          "label": "Psalms 5:10",
+          "refs": [
+            "Psalms 5:10"
+          ]
+        },
+        {
+          "label": "Psalms 6:8-10",
+          "refs": [
+            "Psalms 6:8-10"
+          ]
+        },
+        {
+          "label": "Psalms 9:10",
+          "refs": [
+            "Psalms 9:10"
+          ]
+        },
+        {
+          "label": "Psalms 9:12",
+          "refs": [
+            "Psalms 9:12"
+          ]
+        },
+        {
+          "label": "Psalms 9:19-20",
+          "refs": [
+            "Psalms 9:19-20"
+          ]
+        },
+        {
+          "label": "Psalms 10:2",
+          "refs": [
+            "Psalms 10:2"
+          ]
+        },
+        {
+          "label": "Psalms 10:15",
+          "refs": [
+            "Psalms 10:15"
+          ]
+        },
+        {
+          "label": "Psalms 10:17",
+          "refs": [
+            "Psalms 10:17"
+          ]
+        },
+        {
+          "label": "Psalms 17:1",
+          "refs": [
+            "Psalms 17:1"
+          ]
+        },
+        {
+          "label": "Psalms 17:6",
+          "refs": [
+            "Psalms 17:6"
+          ]
+        },
+        {
+          "label": "Psalms 18:3",
+          "refs": [
+            "Psalms 18:3"
+          ]
+        },
+        {
+          "label": "Psalms 18:6",
+          "refs": [
+            "Psalms 18:6"
+          ]
+        },
+        {
+          "label": "Psalms 21:2",
+          "refs": [
+            "Psalms 21:2"
+          ]
+        },
+        {
+          "label": "Psalms 21:4",
+          "refs": [
+            "Psalms 21:4"
+          ]
+        },
+        {
+          "label": "Psalms 22:1-2",
+          "refs": [
+            "Psalms 22:1-2"
+          ]
+        },
+        {
+          "label": "Psalms 22:4-5",
+          "refs": [
+            "Psalms 22:4-5"
+          ]
+        },
+        {
+          "label": "Psalms 22:19",
+          "refs": [
+            "Psalms 22:19"
+          ]
+        },
+        {
+          "label": "Psalms 22:24",
+          "refs": [
+            "Psalms 22:24"
+          ]
+        },
+        {
+          "label": "Psalms 25:1",
+          "refs": [
+            "Psalms 25:1"
+          ]
+        },
+        {
+          "label": "Psalms 25:3",
+          "refs": [
+            "Psalms 25:3"
+          ]
+        },
+        {
+          "label": "Psalms 25:6",
+          "refs": [
+            "Psalms 25:6"
+          ]
+        },
+        {
+          "label": "Psalms 27:7-9",
+          "refs": [
+            "Psalms 27:7-9"
+          ]
+        },
+        {
+          "label": "Psalms 28:1-2",
+          "refs": [
+            "Psalms 28:1-2"
+          ]
+        },
+        {
+          "label": "Psalms 28:4",
+          "refs": [
+            "Psalms 28:4"
+          ]
+        },
+        {
+          "label": "Psalms 28:6",
+          "refs": [
+            "Psalms 28:6"
+          ]
+        },
+        {
+          "label": "Psalms 30:2-3",
+          "refs": [
+            "Psalms 30:2-3"
+          ]
+        },
+        {
+          "label": "Psalms 31:3",
+          "refs": [
+            "Psalms 31:3"
+          ]
+        },
+        {
+          "label": "Psalms 31:10",
+          "refs": [
+            "Psalms 31:10"
+          ]
+        },
+        {
+          "label": "Psalms 31:17-18",
+          "refs": [
+            "Psalms 31:17-18"
+          ]
+        },
+        {
+          "label": "Psalms 31:22",
+          "refs": [
+            "Psalms 31:22"
+          ]
+        },
+        {
+          "label": "Psalms 32:3",
+          "refs": [
+            "Psalms 32:3"
+          ]
+        },
+        {
+          "label": "Psalms 32:5-6",
+          "refs": [
+            "Psalms 32:5-6"
+          ]
+        },
+        {
+          "label": "Psalms 34:4-6",
+          "refs": [
+            "Psalms 34:4-6"
+          ]
+        },
+        {
+          "label": "Psalms 34:15",
+          "refs": [
+            "Psalms 34:15"
+          ]
+        },
+        {
+          "label": "Psalms 34:17",
+          "refs": [
+            "Psalms 34:17"
+          ]
+        },
+        {
+          "label": "Psalms 35:4",
+          "refs": [
+            "Psalms 35:4"
+          ]
+        },
+        {
+          "label": "Psalms 35:8",
+          "refs": [
+            "Psalms 35:8"
+          ]
+        },
+        {
+          "label": "Psalms 35:22-23",
+          "refs": [
+            "Psalms 35:22-23"
+          ]
+        },
+        {
+          "label": "Psalms 35:26",
+          "refs": [
+            "Psalms 35:26"
+          ]
+        },
+        {
+          "label": "Psalms 37:4-5",
+          "refs": [
+            "Psalms 37:4-5"
+          ]
+        },
+        {
+          "label": "Psalms 38:4-8",
+          "refs": [
+            "Psalms 38:4-8"
+          ]
+        },
+        {
+          "label": "Psalms 38:10",
+          "refs": [
+            "Psalms 38:10"
+          ]
+        },
+        {
+          "label": "Psalms 38:15-16",
+          "refs": [
+            "Psalms 38:15-16"
+          ]
+        },
+        {
+          "label": "Psalms 38:18",
+          "refs": [
+            "Psalms 38:18"
+          ]
+        },
+        {
+          "label": "Psalms 40:1",
+          "refs": [
+            "Psalms 40:1"
+          ]
+        },
+        {
+          "label": "Psalms 40:12",
+          "refs": [
+            "Psalms 40:12"
+          ]
+        },
+        {
+          "label": "Psalms 40:14-15",
+          "refs": [
+            "Psalms 40:14-15"
+          ]
+        },
+        {
+          "label": "Psalms 42:4",
+          "refs": [
+            "Psalms 42:4"
+          ]
+        },
+        {
+          "label": "Psalms 50:14-15",
+          "refs": [
+            "Psalms 50:14-15"
+          ]
+        },
+        {
+          "label": "Psalms 51:1-17",
+          "refs": [
+            "Psalms 51:1-17"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 11,
+      "week": 2,
+      "title": "Psalms 54:5 (+48 more)",
+      "passages": [
+        {
+          "label": "Psalms 54:5",
+          "refs": [
+            "Psalms 54:5"
+          ]
+        },
+        {
+          "label": "Psalms 55:1-2",
+          "refs": [
+            "Psalms 55:1-2"
+          ]
+        },
+        {
+          "label": "Psalms 55:9",
+          "refs": [
+            "Psalms 55:9"
+          ]
+        },
+        {
+          "label": "Psalms 55:15-17",
+          "refs": [
+            "Psalms 55:15-17"
+          ]
+        },
+        {
+          "label": "Psalms 56:7",
+          "refs": [
+            "Psalms 56:7"
+          ]
+        },
+        {
+          "label": "Psalms 56:9",
+          "refs": [
+            "Psalms 56:9"
+          ]
+        },
+        {
+          "label": "Psalms 57:2",
+          "refs": [
+            "Psalms 57:2"
+          ]
+        },
+        {
+          "label": "Psalms 58:7",
+          "refs": [
+            "Psalms 58:7"
+          ]
+        },
+        {
+          "label": "Psalms 59:5",
+          "refs": [
+            "Psalms 59:5"
+          ]
+        },
+        {
+          "label": "Psalms 59:11",
+          "refs": [
+            "Psalms 59:11"
+          ]
+        },
+        {
+          "label": "Psalms 59:15",
+          "refs": [
+            "Psalms 59:15"
+          ]
+        },
+        {
+          "label": "Psalms 61:1-2",
+          "refs": [
+            "Psalms 61:1-2"
+          ]
+        },
+        {
+          "label": "Psalms 62:8",
+          "refs": [
+            "Psalms 62:8"
+          ]
+        },
+        {
+          "label": "Psalms 65:2",
+          "refs": [
+            "Psalms 65:2"
+          ]
+        },
+        {
+          "label": "Psalms 65:5",
+          "refs": [
+            "Psalms 65:5"
+          ]
+        },
+        {
+          "label": "Psalms 66:17",
+          "refs": [
+            "Psalms 66:17"
+          ]
+        },
+        {
+          "label": "Psalms 66:19-20",
+          "refs": [
+            "Psalms 66:19-20"
+          ]
+        },
+        {
+          "label": "Psalms 68:1-2",
+          "refs": [
+            "Psalms 68:1-2"
+          ]
+        },
+        {
+          "label": "Psalms 69:5-6",
+          "refs": [
+            "Psalms 69:5-6"
+          ]
+        },
+        {
+          "label": "Psalms 69:13",
+          "refs": [
+            "Psalms 69:13"
+          ]
+        },
+        {
+          "label": "Psalms 69:16",
+          "refs": [
+            "Psalms 69:16"
+          ]
+        },
+        {
+          "label": "Psalms 69:23-24",
+          "refs": [
+            "Psalms 69:23-24"
+          ]
+        },
+        {
+          "label": "Psalms 69:27-28",
+          "refs": [
+            "Psalms 69:27-28"
+          ]
+        },
+        {
+          "label": "Psalms 69:33",
+          "refs": [
+            "Psalms 69:33"
+          ]
+        },
+        {
+          "label": "Psalms 70:2-3",
+          "refs": [
+            "Psalms 70:2-3"
+          ]
+        },
+        {
+          "label": "Psalms 70:5",
+          "refs": [
+            "Psalms 70:5"
+          ]
+        },
+        {
+          "label": "Psalms 71:13",
+          "refs": [
+            "Psalms 71:13"
+          ]
+        },
+        {
+          "label": "Psalms 71:18",
+          "refs": [
+            "Psalms 71:18"
+          ]
+        },
+        {
+          "label": "Psalms 73:28",
+          "refs": [
+            "Psalms 73:28"
+          ]
+        },
+        {
+          "label": "Psalms 74:10-11",
+          "refs": [
+            "Psalms 74:10-11"
+          ]
+        },
+        {
+          "label": "Psalms 74:18-23",
+          "refs": [
+            "Psalms 74:18-23"
+          ]
+        },
+        {
+          "label": "Psalms 77:1-2",
+          "refs": [
+            "Psalms 77:1-2"
+          ]
+        },
+        {
+          "label": "Psalms 79:10-12",
+          "refs": [
+            "Psalms 79:10-12"
+          ]
+        },
+        {
+          "label": "Psalms 80:4",
+          "refs": [
+            "Psalms 80:4"
+          ]
+        },
+        {
+          "label": "Psalms 80:18",
+          "refs": [
+            "Psalms 80:18"
+          ]
+        },
+        {
+          "label": "Psalms 81:7",
+          "refs": [
+            "Psalms 81:7"
+          ]
+        },
+        {
+          "label": "Psalms 81:10",
+          "refs": [
+            "Psalms 81:10"
+          ]
+        },
+        {
+          "label": "Psalms 83:1-2",
+          "refs": [
+            "Psalms 83:1-2"
+          ]
+        },
+        {
+          "label": "Psalms 83:13-18",
+          "refs": [
+            "Psalms 83:13-18"
+          ]
+        },
+        {
+          "label": "Psalms 86:1-7",
+          "refs": [
+            "Psalms 86:1-7"
+          ]
+        },
+        {
+          "label": "Psalms 86:17",
+          "refs": [
+            "Psalms 86:17"
+          ]
+        },
+        {
+          "label": "Psalms 88:1-2",
+          "refs": [
+            "Psalms 88:1-2"
+          ]
+        },
+        {
+          "label": "Psalms 88:9",
+          "refs": [
+            "Psalms 88:9"
+          ]
+        },
+        {
+          "label": "Psalms 88:13-14",
+          "refs": [
+            "Psalms 88:13-14"
+          ]
+        },
+        {
+          "label": "Psalms 89:49-51",
+          "refs": [
+            "Psalms 89:49-51"
+          ]
+        },
+        {
+          "label": "Psalms 91:15",
+          "refs": [
+            "Psalms 91:15"
+          ]
+        },
+        {
+          "label": "Psalms 94:2",
+          "refs": [
+            "Psalms 94:2"
+          ]
+        },
+        {
+          "label": "Psalms 95:6",
+          "refs": [
+            "Psalms 95:6"
+          ]
+        },
+        {
+          "label": "Psalms 99:6-8",
+          "refs": [
+            "Psalms 99:6-8"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 12,
+      "week": 2,
+      "title": "Psalms 102:1-2 (+51 more)",
+      "passages": [
+        {
+          "label": "Psalms 102:1-2",
+          "refs": [
+            "Psalms 102:1-2"
+          ]
+        },
+        {
+          "label": "Psalms 102:17-20",
+          "refs": [
+            "Psalms 102:17-20"
+          ]
+        },
+        {
+          "label": "Psalms 105:3-4",
+          "refs": [
+            "Psalms 105:3-4"
+          ]
+        },
+        {
+          "label": "Psalms 106:6-7",
+          "refs": [
+            "Psalms 106:6-7"
+          ]
+        },
+        {
+          "label": "Psalms 106:14-15",
+          "refs": [
+            "Psalms 106:14-15"
+          ]
+        },
+        {
+          "label": "Psalms 106:44",
+          "refs": [
+            "Psalms 106:44"
+          ]
+        },
+        {
+          "label": "Psalms 106:47",
+          "refs": [
+            "Psalms 106:47"
+          ]
+        },
+        {
+          "label": "Psalms 107:6-7",
+          "refs": [
+            "Psalms 107:6-7"
+          ]
+        },
+        {
+          "label": "Psalms 107:13-20",
+          "refs": [
+            "Psalms 107:13-20"
+          ]
+        },
+        {
+          "label": "Psalms 108:6",
+          "refs": [
+            "Psalms 108:6"
+          ]
+        },
+        {
+          "label": "Psalms 109:7",
+          "refs": [
+            "Psalms 109:7"
+          ]
+        },
+        {
+          "label": "Psalms 109:9-29",
+          "refs": [
+            "Psalms 109:9-29"
+          ]
+        },
+        {
+          "label": "Psalms 112:2",
+          "refs": [
+            "Psalms 112:2"
+          ]
+        },
+        {
+          "label": "Psalms 115:1-2",
+          "refs": [
+            "Psalms 115:1-2"
+          ]
+        },
+        {
+          "label": "Psalms 116:1-2",
+          "refs": [
+            "Psalms 116:1-2"
+          ]
+        },
+        {
+          "label": "Psalms 116:4",
+          "refs": [
+            "Psalms 116:4"
+          ]
+        },
+        {
+          "label": "Psalms 118:5",
+          "refs": [
+            "Psalms 118:5"
+          ]
+        },
+        {
+          "label": "Psalms 118:21",
+          "refs": [
+            "Psalms 118:21"
+          ]
+        },
+        {
+          "label": "Psalms 119:26",
+          "refs": [
+            "Psalms 119:26"
+          ]
+        },
+        {
+          "label": "Psalms 119:38",
+          "refs": [
+            "Psalms 119:38"
+          ]
+        },
+        {
+          "label": "Psalms 119:42-43",
+          "refs": [
+            "Psalms 119:42-43"
+          ]
+        },
+        {
+          "label": "Psalms 119:49",
+          "refs": [
+            "Psalms 119:49"
+          ]
+        },
+        {
+          "label": "Psalms 119:58",
+          "refs": [
+            "Psalms 119:58"
+          ]
+        },
+        {
+          "label": "Psalms 119:73",
+          "refs": [
+            "Psalms 119:73"
+          ]
+        },
+        {
+          "label": "Psalms 119:78",
+          "refs": [
+            "Psalms 119:78"
+          ]
+        },
+        {
+          "label": "Psalms 119:84",
+          "refs": [
+            "Psalms 119:84"
+          ]
+        },
+        {
+          "label": "Psalms 119:94",
+          "refs": [
+            "Psalms 119:94"
+          ]
+        },
+        {
+          "label": "Psalms 119:116",
+          "refs": [
+            "Psalms 119:116"
+          ]
+        },
+        {
+          "label": "Psalms 119:124",
+          "refs": [
+            "Psalms 119:124"
+          ]
+        },
+        {
+          "label": "Psalms 119:145-147",
+          "refs": [
+            "Psalms 119:145-147"
+          ]
+        },
+        {
+          "label": "Psalms 119:149",
+          "refs": [
+            "Psalms 119:149"
+          ]
+        },
+        {
+          "label": "Psalms 119:153",
+          "refs": [
+            "Psalms 119:153"
+          ]
+        },
+        {
+          "label": "Psalms 119:173",
+          "refs": [
+            "Psalms 119:173"
+          ]
+        },
+        {
+          "label": "Psalms 119:176",
+          "refs": [
+            "Psalms 119:176"
+          ]
+        },
+        {
+          "label": "Psalms 120:1",
+          "refs": [
+            "Psalms 120:1"
+          ]
+        },
+        {
+          "label": "Psalms 129:5",
+          "refs": [
+            "Psalms 129:5"
+          ]
+        },
+        {
+          "label": "Psalms 130:1-3",
+          "refs": [
+            "Psalms 130:1-3"
+          ]
+        },
+        {
+          "label": "Psalms 138:3",
+          "refs": [
+            "Psalms 138:3"
+          ]
+        },
+        {
+          "label": "Psalms 140:9-10",
+          "refs": [
+            "Psalms 140:9-10"
+          ]
+        },
+        {
+          "label": "Psalms 141:1-2",
+          "refs": [
+            "Psalms 141:1-2"
+          ]
+        },
+        {
+          "label": "Psalms 142:1-2",
+          "refs": [
+            "Psalms 142:1-2"
+          ]
+        },
+        {
+          "label": "Psalms 143:1",
+          "refs": [
+            "Psalms 143:1"
+          ]
+        },
+        {
+          "label": "Psalms 143:8",
+          "refs": [
+            "Psalms 143:8"
+          ]
+        },
+        {
+          "label": "Psalms 143:12",
+          "refs": [
+            "Psalms 143:12"
+          ]
+        },
+        {
+          "label": "Psalms 144:6",
+          "refs": [
+            "Psalms 144:6"
+          ]
+        },
+        {
+          "label": "Psalms 145:18-19",
+          "refs": [
+            "Psalms 145:18-19"
+          ]
+        },
+        {
+          "label": "Proverbs 2:3",
+          "refs": [
+            "Proverbs 2:3"
+          ]
+        },
+        {
+          "label": "Proverbs 2:5",
+          "refs": [
+            "Proverbs 2:5"
+          ]
+        },
+        {
+          "label": "Proverbs 3:6",
+          "refs": [
+            "Proverbs 3:6"
+          ]
+        },
+        {
+          "label": "Proverbs 10:24",
+          "refs": [
+            "Proverbs 10:24"
+          ]
+        },
+        {
+          "label": "Proverbs 15:8",
+          "refs": [
+            "Proverbs 15:8"
+          ]
+        },
+        {
+          "label": "Proverbs 15:29",
+          "refs": [
+            "Proverbs 15:29"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 13,
+      "week": 2,
+      "title": "Proverbs 16:1 (+34 more)",
+      "passages": [
+        {
+          "label": "Proverbs 16:1",
+          "refs": [
+            "Proverbs 16:1"
+          ]
+        },
+        {
+          "label": "Proverbs 28:13",
+          "refs": [
+            "Proverbs 28:13"
+          ]
+        },
+        {
+          "label": "Proverbs 30:8",
+          "refs": [
+            "Proverbs 30:8"
+          ]
+        },
+        {
+          "label": "Ecclesiastes 5:2",
+          "refs": [
+            "Ecclesiastes 5:2"
+          ]
+        },
+        {
+          "label": "Isaiah 1:15",
+          "refs": [
+            "Isaiah 1:15"
+          ]
+        },
+        {
+          "label": "Isaiah 6:5",
+          "refs": [
+            "Isaiah 6:5"
+          ]
+        },
+        {
+          "label": "Isaiah 19:20",
+          "refs": [
+            "Isaiah 19:20"
+          ]
+        },
+        {
+          "label": "Isaiah 26:16",
+          "refs": [
+            "Isaiah 26:16"
+          ]
+        },
+        {
+          "label": "Isaiah 30:19",
+          "refs": [
+            "Isaiah 30:19"
+          ]
+        },
+        {
+          "label": "Isaiah 33:2",
+          "refs": [
+            "Isaiah 33:2"
+          ]
+        },
+        {
+          "label": "Isaiah 37:15-20",
+          "refs": [
+            "Isaiah 37:15-20"
+          ]
+        },
+        {
+          "label": "Isaiah 38:2-3",
+          "refs": [
+            "Isaiah 38:2-3"
+          ]
+        },
+        {
+          "label": "Isaiah 55:6",
+          "refs": [
+            "Isaiah 55:6"
+          ]
+        },
+        {
+          "label": "Isaiah 58:9",
+          "refs": [
+            "Isaiah 58:9"
+          ]
+        },
+        {
+          "label": "Isaiah 59:12-13",
+          "refs": [
+            "Isaiah 59:12-13"
+          ]
+        },
+        {
+          "label": "Isaiah 62:7",
+          "refs": [
+            "Isaiah 62:7"
+          ]
+        },
+        {
+          "label": "Isaiah 63:17-19",
+          "refs": [
+            "Isaiah 63:17-19"
+          ]
+        },
+        {
+          "label": "Isaiah 64:12",
+          "refs": [
+            "Isaiah 64:12"
+          ]
+        },
+        {
+          "label": "Isaiah 65:24",
+          "refs": [
+            "Isaiah 65:24"
+          ]
+        },
+        {
+          "label": "Jeremiah 3:13",
+          "refs": [
+            "Jeremiah 3:13"
+          ]
+        },
+        {
+          "label": "Jeremiah 3:25",
+          "refs": [
+            "Jeremiah 3:25"
+          ]
+        },
+        {
+          "label": "Jeremiah 11:20",
+          "refs": [
+            "Jeremiah 11:20"
+          ]
+        },
+        {
+          "label": "Jeremiah 12:3",
+          "refs": [
+            "Jeremiah 12:3"
+          ]
+        },
+        {
+          "label": "Jeremiah 14:7",
+          "refs": [
+            "Jeremiah 14:7"
+          ]
+        },
+        {
+          "label": "Jeremiah 14:20-21",
+          "refs": [
+            "Jeremiah 14:20-21"
+          ]
+        },
+        {
+          "label": "Jeremiah 15:15",
+          "refs": [
+            "Jeremiah 15:15"
+          ]
+        },
+        {
+          "label": "Jeremiah 17:18",
+          "refs": [
+            "Jeremiah 17:18"
+          ]
+        },
+        {
+          "label": "Jeremiah 18:20-23",
+          "refs": [
+            "Jeremiah 18:20-23"
+          ]
+        },
+        {
+          "label": "Jeremiah 20:12",
+          "refs": [
+            "Jeremiah 20:12"
+          ]
+        },
+        {
+          "label": "Jeremiah 26:19",
+          "refs": [
+            "Jeremiah 26:19"
+          ]
+        },
+        {
+          "label": "Jeremiah 29:12-13",
+          "refs": [
+            "Jeremiah 29:12-13"
+          ]
+        },
+        {
+          "label": "Jeremiah 31:9",
+          "refs": [
+            "Jeremiah 31:9"
+          ]
+        },
+        {
+          "label": "Jeremiah 32:16-25",
+          "refs": [
+            "Jeremiah 32:16-25"
+          ]
+        },
+        {
+          "label": "Jeremiah 33:3",
+          "refs": [
+            "Jeremiah 33:3"
+          ]
+        },
+        {
+          "label": "Jeremiah 36:7",
+          "refs": [
+            "Jeremiah 36:7"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 14,
+      "week": 2,
+      "title": "Jeremiah 42:7 (+18 more)",
+      "passages": [
+        {
+          "label": "Jeremiah 42:7",
+          "refs": [
+            "Jeremiah 42:7"
+          ]
+        },
+        {
+          "label": "Lamentations 1:18",
+          "refs": [
+            "Lamentations 1:18"
+          ]
+        },
+        {
+          "label": "Lamentations 1:22",
+          "refs": [
+            "Lamentations 1:22"
+          ]
+        },
+        {
+          "label": "Lamentations 2:19",
+          "refs": [
+            "Lamentations 2:19"
+          ]
+        },
+        {
+          "label": "Lamentations 3:25",
+          "refs": [
+            "Lamentations 3:25"
+          ]
+        },
+        {
+          "label": "Lamentations 3:41-42",
+          "refs": [
+            "Lamentations 3:41-42"
+          ]
+        },
+        {
+          "label": "Lamentations 3:56-66",
+          "refs": [
+            "Lamentations 3:56-66"
+          ]
+        },
+        {
+          "label": "Lamentations 5:16",
+          "refs": [
+            "Lamentations 5:16"
+          ]
+        },
+        {
+          "label": "Ezekiel 4:12-15",
+          "refs": [
+            "Ezekiel 4:12-15"
+          ]
+        },
+        {
+          "label": "Ezekiel 36:37",
+          "refs": [
+            "Ezekiel 36:37"
+          ]
+        },
+        {
+          "label": "Daniel 2:19-23",
+          "refs": [
+            "Daniel 2:19-23"
+          ]
+        },
+        {
+          "label": "Daniel 6:10",
+          "refs": [
+            "Daniel 6:10"
+          ]
+        },
+        {
+          "label": "Daniel 9:3-23",
+          "refs": [
+            "Daniel 9:3-23"
+          ]
+        },
+        {
+          "label": "Daniel 10:12",
+          "refs": [
+            "Daniel 10:12"
+          ]
+        },
+        {
+          "label": "Hosea 12:4",
+          "refs": [
+            "Hosea 12:4"
+          ]
+        },
+        {
+          "label": "Joel 2:17-19",
+          "refs": [
+            "Joel 2:17-19"
+          ]
+        },
+        {
+          "label": "Joel 2:32",
+          "refs": [
+            "Joel 2:32"
+          ]
+        },
+        {
+          "label": "Amos 5:4-6",
+          "refs": [
+            "Amos 5:4-6"
+          ]
+        },
+        {
+          "label": "Jonah 1:14",
+          "refs": [
+            "Jonah 1:14"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 15,
+      "week": 3,
+      "title": "Jonah 2:1-2 (+27 more)",
+      "passages": [
+        {
+          "label": "Jonah 2:1-2",
+          "refs": [
+            "Jonah 2:1-2"
+          ]
+        },
+        {
+          "label": "Jonah 2:7",
+          "refs": [
+            "Jonah 2:7"
+          ]
+        },
+        {
+          "label": "Habakkuk 1:2",
+          "refs": [
+            "Habakkuk 1:2"
+          ]
+        },
+        {
+          "label": "Zephaniah 2:3",
+          "refs": [
+            "Zephaniah 2:3"
+          ]
+        },
+        {
+          "label": "Zechariah 10:1",
+          "refs": [
+            "Zechariah 10:1"
+          ]
+        },
+        {
+          "label": "Zechariah 10:6",
+          "refs": [
+            "Zechariah 10:6"
+          ]
+        },
+        {
+          "label": "Zechariah 12:10",
+          "refs": [
+            "Zechariah 12:10"
+          ]
+        },
+        {
+          "label": "Zechariah 13:9",
+          "refs": [
+            "Zechariah 13:9"
+          ]
+        },
+        {
+          "label": "Matthew 4:10",
+          "refs": [
+            "Matthew 4:10"
+          ]
+        },
+        {
+          "label": "Matthew 6:5-13",
+          "refs": [
+            "Matthew 6:5-13"
+          ]
+        },
+        {
+          "label": "Matthew 6:33",
+          "refs": [
+            "Matthew 6:33"
+          ]
+        },
+        {
+          "label": "Matthew 7:7-11",
+          "refs": [
+            "Matthew 7:7-11"
+          ]
+        },
+        {
+          "label": "Matthew 8:2-3",
+          "refs": [
+            "Matthew 8:2-3"
+          ]
+        },
+        {
+          "label": "Matthew 8:5-13",
+          "refs": [
+            "Matthew 8:5-13"
+          ]
+        },
+        {
+          "label": "Matthew 14:19",
+          "refs": [
+            "Matthew 14:19"
+          ]
+        },
+        {
+          "label": "Matthew 14:23",
+          "refs": [
+            "Matthew 14:23"
+          ]
+        },
+        {
+          "label": "Matthew 15:22-28",
+          "refs": [
+            "Matthew 15:22-28"
+          ]
+        },
+        {
+          "label": "Matthew 15:36",
+          "refs": [
+            "Matthew 15:36"
+          ]
+        },
+        {
+          "label": "Matthew 18:19-20",
+          "refs": [
+            "Matthew 18:19-20"
+          ]
+        },
+        {
+          "label": "Matthew 20:30-31",
+          "refs": [
+            "Matthew 20:30-31"
+          ]
+        },
+        {
+          "label": "Matthew 21:22",
+          "refs": [
+            "Matthew 21:22"
+          ]
+        },
+        {
+          "label": "Matthew 23:14",
+          "refs": [
+            "Matthew 23:14"
+          ]
+        },
+        {
+          "label": "Matthew 26:26-27",
+          "refs": [
+            "Matthew 26:26-27"
+          ]
+        },
+        {
+          "label": "Matthew 26:36",
+          "refs": [
+            "Matthew 26:36"
+          ]
+        },
+        {
+          "label": "Matthew 26:39",
+          "refs": [
+            "Matthew 26:39"
+          ]
+        },
+        {
+          "label": "Matthew 26:42",
+          "refs": [
+            "Matthew 26:42"
+          ]
+        },
+        {
+          "label": "Matthew 26:44",
+          "refs": [
+            "Matthew 26:44"
+          ]
+        },
+        {
+          "label": "Matthew 27",
+          "refs": [
+            "Matthew 27"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 16,
+      "week": 3,
+      "title": "Mark 1:35 (+29 more)",
+      "passages": [
+        {
+          "label": "Mark 1:35",
+          "refs": [
+            "Mark 1:35"
+          ]
+        },
+        {
+          "label": "Mark 1:40-43",
+          "refs": [
+            "Mark 1:40-43"
+          ]
+        },
+        {
+          "label": "Mark 6:41",
+          "refs": [
+            "Mark 6:41"
+          ]
+        },
+        {
+          "label": "Mark 6:46",
+          "refs": [
+            "Mark 6:46"
+          ]
+        },
+        {
+          "label": "Mark 7:25-30",
+          "refs": [
+            "Mark 7:25-30"
+          ]
+        },
+        {
+          "label": "Mark 8:6-7",
+          "refs": [
+            "Mark 8:6-7"
+          ]
+        },
+        {
+          "label": "Mark 9:28-29",
+          "refs": [
+            "Mark 9:28-29"
+          ]
+        },
+        {
+          "label": "Mark 10:48",
+          "refs": [
+            "Mark 10:48"
+          ]
+        },
+        {
+          "label": "Mark 11:24-25",
+          "refs": [
+            "Mark 11:24-25"
+          ]
+        },
+        {
+          "label": "Mark 12:40",
+          "refs": [
+            "Mark 12:40"
+          ]
+        },
+        {
+          "label": "Mark 14:22-23",
+          "refs": [
+            "Mark 14:22-23"
+          ]
+        },
+        {
+          "label": "Mark 14:32",
+          "refs": [
+            "Mark 14:32"
+          ]
+        },
+        {
+          "label": "Mark 14:36",
+          "refs": [
+            "Mark 14:36"
+          ]
+        },
+        {
+          "label": "Luke 1:13",
+          "refs": [
+            "Luke 1:13"
+          ]
+        },
+        {
+          "label": "Luke 2:37",
+          "refs": [
+            "Luke 2:37"
+          ]
+        },
+        {
+          "label": "Luke 5:12-13",
+          "refs": [
+            "Luke 5:12-13"
+          ]
+        },
+        {
+          "label": "Luke 5:16",
+          "refs": [
+            "Luke 5:16"
+          ]
+        },
+        {
+          "label": "Luke 6:12",
+          "refs": [
+            "Luke 6:12"
+          ]
+        },
+        {
+          "label": "Luke 7:3-10",
+          "refs": [
+            "Luke 7:3-10"
+          ]
+        },
+        {
+          "label": "Luke 9:16",
+          "refs": [
+            "Luke 9:16"
+          ]
+        },
+        {
+          "label": "Luke 9:18",
+          "refs": [
+            "Luke 9:18"
+          ]
+        },
+        {
+          "label": "Luke 9:28-29",
+          "refs": [
+            "Luke 9:28-29"
+          ]
+        },
+        {
+          "label": "Luke 11:1-13",
+          "refs": [
+            "Luke 11:1-13"
+          ]
+        },
+        {
+          "label": "Luke 18:1-8",
+          "refs": [
+            "Luke 18:1-8"
+          ]
+        },
+        {
+          "label": "Luke 18:13",
+          "refs": [
+            "Luke 18:13"
+          ]
+        },
+        {
+          "label": "Luke 18:39",
+          "refs": [
+            "Luke 18:39"
+          ]
+        },
+        {
+          "label": "Luke 20:47",
+          "refs": [
+            "Luke 20:47"
+          ]
+        },
+        {
+          "label": "Luke 21:36",
+          "refs": [
+            "Luke 21:36"
+          ]
+        },
+        {
+          "label": "Luke 22:19",
+          "refs": [
+            "Luke 22:19"
+          ]
+        },
+        {
+          "label": "Luke 22:31-32",
+          "refs": [
+            "Luke 22:31-32"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 17,
+      "week": 3,
+      "title": "Luke 22:41-42 (+15 more)",
+      "passages": [
+        {
+          "label": "Luke 22:41-42",
+          "refs": [
+            "Luke 22:41-42"
+          ]
+        },
+        {
+          "label": "Luke 22:44-45",
+          "refs": [
+            "Luke 22:44-45"
+          ]
+        },
+        {
+          "label": "Luke 23:42-43",
+          "refs": [
+            "Luke 23:42-43"
+          ]
+        },
+        {
+          "label": "John 4:10",
+          "refs": [
+            "John 4:10"
+          ]
+        },
+        {
+          "label": "John 4:22-24",
+          "refs": [
+            "John 4:22-24"
+          ]
+        },
+        {
+          "label": "John 4:50-51",
+          "refs": [
+            "John 4:50-51"
+          ]
+        },
+        {
+          "label": "John 6:11",
+          "refs": [
+            "John 6:11"
+          ]
+        },
+        {
+          "label": "John 6:23",
+          "refs": [
+            "John 6:23"
+          ]
+        },
+        {
+          "label": "John 9:31",
+          "refs": [
+            "John 9:31"
+          ]
+        },
+        {
+          "label": "John 11",
+          "refs": [
+            "John 11"
+          ]
+        },
+        {
+          "label": "John 12:27",
+          "refs": [
+            "John 12:27"
+          ]
+        },
+        {
+          "label": "John 14:13-14",
+          "refs": [
+            "John 14:13-14"
+          ]
+        },
+        {
+          "label": "John 14:16",
+          "refs": [
+            "John 14:16"
+          ]
+        },
+        {
+          "label": "John 15:7",
+          "refs": [
+            "John 15:7"
+          ]
+        },
+        {
+          "label": "John 15:16",
+          "refs": [
+            "John 15:16"
+          ]
+        },
+        {
+          "label": "John 16:23-24",
+          "refs": [
+            "John 16:23-24"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 18,
+      "week": 3,
+      "title": "John 16:26-27 (+23 more)",
+      "passages": [
+        {
+          "label": "John 16:26-27",
+          "refs": [
+            "John 16:26-27"
+          ]
+        },
+        {
+          "label": "John 17",
+          "refs": [
+            "John 17"
+          ]
+        },
+        {
+          "label": "Acts 1:13-14",
+          "refs": [
+            "Acts 1:13-14"
+          ]
+        },
+        {
+          "label": "Acts 1:24-25",
+          "refs": [
+            "Acts 1:24-25"
+          ]
+        },
+        {
+          "label": "Acts 2:46",
+          "refs": [
+            "Acts 2:46"
+          ]
+        },
+        {
+          "label": "Acts 3:1",
+          "refs": [
+            "Acts 3:1"
+          ]
+        },
+        {
+          "label": "Acts 4:31",
+          "refs": [
+            "Acts 4:31"
+          ]
+        },
+        {
+          "label": "Acts 7:34",
+          "refs": [
+            "Acts 7:34"
+          ]
+        },
+        {
+          "label": "Acts 7:59",
+          "refs": [
+            "Acts 7:59"
+          ]
+        },
+        {
+          "label": "Acts 9:11",
+          "refs": [
+            "Acts 9:11"
+          ]
+        },
+        {
+          "label": "Acts 9:40",
+          "refs": [
+            "Acts 9:40"
+          ]
+        },
+        {
+          "label": "Acts 10:2",
+          "refs": [
+            "Acts 10:2"
+          ]
+        },
+        {
+          "label": "Acts 10:9",
+          "refs": [
+            "Acts 10:9"
+          ]
+        },
+        {
+          "label": "Acts 10:30",
+          "refs": [
+            "Acts 10:30"
+          ]
+        },
+        {
+          "label": "Acts 12:5-17",
+          "refs": [
+            "Acts 12:5-17"
+          ]
+        },
+        {
+          "label": "Acts 13:3",
+          "refs": [
+            "Acts 13:3"
+          ]
+        },
+        {
+          "label": "Acts 16:25",
+          "refs": [
+            "Acts 16:25"
+          ]
+        },
+        {
+          "label": "Acts 20:36",
+          "refs": [
+            "Acts 20:36"
+          ]
+        },
+        {
+          "label": "Acts 21:5",
+          "refs": [
+            "Acts 21:5"
+          ]
+        },
+        {
+          "label": "Acts 22:16",
+          "refs": [
+            "Acts 22:16"
+          ]
+        },
+        {
+          "label": "Acts 27:35",
+          "refs": [
+            "Acts 27:35"
+          ]
+        },
+        {
+          "label": "Romans 8:15",
+          "refs": [
+            "Romans 8:15"
+          ]
+        },
+        {
+          "label": "Romans 8:26",
+          "refs": [
+            "Romans 8:26"
+          ]
+        },
+        {
+          "label": "Romans 10:12-13",
+          "refs": [
+            "Romans 10:12-13"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 19,
+      "week": 3,
+      "title": "Romans 12:12 (+37 more)",
+      "passages": [
+        {
+          "label": "Romans 12:12",
+          "refs": [
+            "Romans 12:12"
+          ]
+        },
+        {
+          "label": "Romans 14:6",
+          "refs": [
+            "Romans 14:6"
+          ]
+        },
+        {
+          "label": "1 Corinthians 10:30-31",
+          "refs": [
+            "1 Corinthians 10:30-31"
+          ]
+        },
+        {
+          "label": "1 Corinthians 11:24",
+          "refs": [
+            "1 Corinthians 11:24"
+          ]
+        },
+        {
+          "label": "1 Corinthians 14:15",
+          "refs": [
+            "1 Corinthians 14:15"
+          ]
+        },
+        {
+          "label": "2 Corinthians 1:9-11",
+          "refs": [
+            "2 Corinthians 1:9-11"
+          ]
+        },
+        {
+          "label": "2 Corinthians 12:8-9",
+          "refs": [
+            "2 Corinthians 12:8-9"
+          ]
+        },
+        {
+          "label": "Galatians 1:8-9",
+          "refs": [
+            "Galatians 1:8-9"
+          ]
+        },
+        {
+          "label": "Galatians 4:6",
+          "refs": [
+            "Galatians 4:6"
+          ]
+        },
+        {
+          "label": "Ephesians 2:18",
+          "refs": [
+            "Ephesians 2:18"
+          ]
+        },
+        {
+          "label": "Ephesians 3:11-12",
+          "refs": [
+            "Ephesians 3:11-12"
+          ]
+        },
+        {
+          "label": "Ephesians 3:14",
+          "refs": [
+            "Ephesians 3:14"
+          ]
+        },
+        {
+          "label": "Ephesians 3:20",
+          "refs": [
+            "Ephesians 3:20"
+          ]
+        },
+        {
+          "label": "Ephesians 6:18-19",
+          "refs": [
+            "Ephesians 6:18-19"
+          ]
+        },
+        {
+          "label": "Philippians 4:6",
+          "refs": [
+            "Philippians 4:6"
+          ]
+        },
+        {
+          "label": "Colossians 4:2",
+          "refs": [
+            "Colossians 4:2"
+          ]
+        },
+        {
+          "label": "1 Thessalonians 3:10",
+          "refs": [
+            "1 Thessalonians 3:10"
+          ]
+        },
+        {
+          "label": "1 Thessalonians 5:17-18",
+          "refs": [
+            "1 Thessalonians 5:17-18"
+          ]
+        },
+        {
+          "label": "2 Thessalonians 3:5",
+          "refs": [
+            "2 Thessalonians 3:5"
+          ]
+        },
+        {
+          "label": "1 Timothy 2:8",
+          "refs": [
+            "1 Timothy 2:8"
+          ]
+        },
+        {
+          "label": "1 Timothy 4:3-5",
+          "refs": [
+            "1 Timothy 4:3-5"
+          ]
+        },
+        {
+          "label": "1 Timothy 5:5",
+          "refs": [
+            "1 Timothy 5:5"
+          ]
+        },
+        {
+          "label": "2 Timothy 4:14-15",
+          "refs": [
+            "2 Timothy 4:14-15"
+          ]
+        },
+        {
+          "label": "Hebrews 4:16",
+          "refs": [
+            "Hebrews 4:16"
+          ]
+        },
+        {
+          "label": "Hebrews 5:7",
+          "refs": [
+            "Hebrews 5:7"
+          ]
+        },
+        {
+          "label": "Hebrews 10:19",
+          "refs": [
+            "Hebrews 10:19"
+          ]
+        },
+        {
+          "label": "Hebrews 10:22-23",
+          "refs": [
+            "Hebrews 10:22-23"
+          ]
+        },
+        {
+          "label": "Hebrews 11:6",
+          "refs": [
+            "Hebrews 11:6"
+          ]
+        },
+        {
+          "label": "James 1:5-7",
+          "refs": [
+            "James 1:5-7"
+          ]
+        },
+        {
+          "label": "James 4:8",
+          "refs": [
+            "James 4:8"
+          ]
+        },
+        {
+          "label": "James 4:10",
+          "refs": [
+            "James 4:10"
+          ]
+        },
+        {
+          "label": "James 5:13",
+          "refs": [
+            "James 5:13"
+          ]
+        },
+        {
+          "label": "James 5:16-18",
+          "refs": [
+            "James 5:16-18"
+          ]
+        },
+        {
+          "label": "1 Peter 3:7",
+          "refs": [
+            "1 Peter 3:7"
+          ]
+        },
+        {
+          "label": "1 Peter 4:7",
+          "refs": [
+            "1 Peter 4:7"
+          ]
+        },
+        {
+          "label": "1 John 3:22",
+          "refs": [
+            "1 John 3:22"
+          ]
+        },
+        {
+          "label": "1 John 5:14-15",
+          "refs": [
+            "1 John 5:14-15"
+          ]
+        },
+        {
+          "label": "Jude 1:20",
+          "refs": [
+            "Jude 1:20"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 20,
+      "week": 3,
+      "title": "Revelation 5:8",
+      "passages": [
+        {
+          "label": "Revelation 5:8",
+          "refs": [
+            "Revelation 5:8"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 21,
+      "week": 3,
+      "title": "Revelation 8:3-4",
+      "passages": [
+        {
+          "label": "Revelation 8:3-4",
+          "refs": [
+            "Revelation 8:3-4"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -18,6 +18,10 @@ const _assets = [
   'esv_pentateuch_and_history',
   'esv_chronicles_and_prophets',
   'heartlight_ot_nt',
+  'topical_prayer_21',
+  'topical_faith_21',
+  'topical_praise_14',
+  'topical_covenant_7',
 ];
 
 /// Order-insensitive deep equality for decoded JSON.
@@ -103,7 +107,7 @@ void main() {
   });
 
   group('curated asset round-trip', () {
-    test('all 10 assets convert and reproduce exactly', () {
+    test('all assets convert and reproduce exactly', () {
       for (final id in _assets) {
         final source = jsonDecode(
                 File('assets/reading_plans/$id.json').readAsStringSync())
@@ -111,9 +115,9 @@ void main() {
         final spec =
             PlanSpec.fromCuratedJson(source, canon: canon);
         expect(spec.id, id);
-        expect(spec.days.length, 365);
+        expect(spec.days.length, (source['readings'] as List).length);
         expect(spec.tracks.isNotEmpty, isTrue);
-        expect(spec.cadenceDays, 365);
+        expect(spec.cadenceDays, (source['readings'] as List).length);
         expect(spec.sourceDigest, isNotNull);
         final roundTripped = spec.toCuratedJson();
         expect(deepEquals(roundTripped, source), isTrue,

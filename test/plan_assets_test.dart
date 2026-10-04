@@ -155,6 +155,10 @@ const _assets = [
   'esv_pentateuch_and_history',
   'esv_chronicles_and_prophets',
   'heartlight_ot_nt',
+  'topical_prayer_21',
+  'topical_faith_21',
+  'topical_praise_14',
+  'topical_covenant_7',
 ];
 
 void main() {

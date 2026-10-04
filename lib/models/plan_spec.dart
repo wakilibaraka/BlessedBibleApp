@@ -354,6 +354,8 @@ class PlanSpec {
       badge: json['badge'] as String?,
       totalDays: json['totalDays'] as int?,
       origin: PlanOrigin.bundled,
+      attribution: json['attribution'] as String?,
+      license: json['license'] as String?,
       tracks: [
         for (final t in trackIds)
           PlanTrack(
@@ -380,6 +382,8 @@ class PlanSpec {
     if (category != null) map['category'] = category;
     if (badge != null) map['badge'] = badge;
     if (totalDays != null) map['totalDays'] = totalDays;
+    if (attribution != null) map['attribution'] = attribution;
+    if (license != null) map['license'] = license;
     map['readings'] = [for (final d in days) d.toJson()];
     return map;
   }

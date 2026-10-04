@@ -1,0 +1,559 @@
+{
+  "title": "The Covenant Story — 7 Days",
+  "id": "topical_covenant_7",
+  "description": "One week tracing God's covenants from Noah to the new covenant, drawn from Nave and Torrey.",
+  "category": "Topical",
+  "badge": "7 days",
+  "totalDays": 7,
+  "attribution": "References from Nave's Topical Bible (1896) and Torrey's New Topical Textbook (1897), public domain; normalized via j86schroeder/topical-bible-search (MIT).",
+  "license": "Public domain sources (US); plan arrangement original.",
+  "readings": [
+    {
+      "day": 1,
+      "week": 1,
+      "title": "Genesis 2:16-17 (+6 more)",
+      "passages": [
+        {
+          "label": "Genesis 2:16-17",
+          "refs": [
+            "Genesis 2:16-17"
+          ]
+        },
+        {
+          "label": "Genesis 8:16",
+          "refs": [
+            "Genesis 8:16"
+          ]
+        },
+        {
+          "label": "Genesis 8:20-22",
+          "refs": [
+            "Genesis 8:20-22"
+          ]
+        },
+        {
+          "label": "Genesis 9:1-17",
+          "refs": [
+            "Genesis 9:1-17"
+          ]
+        },
+        {
+          "label": "Genesis 12:1-3",
+          "refs": [
+            "Genesis 12:1-3"
+          ]
+        },
+        {
+          "label": "Genesis 15",
+          "refs": [
+            "Genesis 15"
+          ]
+        },
+        {
+          "label": "Genesis 17:1-22",
+          "refs": [
+            "Genesis 17:1-22"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 2,
+      "week": 1,
+      "title": "Genesis 21:22-32 (+13 more)",
+      "passages": [
+        {
+          "label": "Genesis 21:22-32",
+          "refs": [
+            "Genesis 21:22-32"
+          ]
+        },
+        {
+          "label": "Genesis 22:16",
+          "refs": [
+            "Genesis 22:16"
+          ]
+        },
+        {
+          "label": "Genesis 26:3",
+          "refs": [
+            "Genesis 26:3"
+          ]
+        },
+        {
+          "label": "Genesis 26:26-31",
+          "refs": [
+            "Genesis 26:26-31"
+          ]
+        },
+        {
+          "label": "Genesis 28:13-15",
+          "refs": [
+            "Genesis 28:13-15"
+          ]
+        },
+        {
+          "label": "Genesis 28:20-22",
+          "refs": [
+            "Genesis 28:20-22"
+          ]
+        },
+        {
+          "label": "Genesis 31:44-54",
+          "refs": [
+            "Genesis 31:44-54"
+          ]
+        },
+        {
+          "label": "Genesis 50:24",
+          "refs": [
+            "Genesis 50:24"
+          ]
+        },
+        {
+          "label": "Exodus 6:4-8",
+          "refs": [
+            "Exodus 6:4-8"
+          ]
+        },
+        {
+          "label": "Exodus 24:7-8",
+          "refs": [
+            "Exodus 24:7-8"
+          ]
+        },
+        {
+          "label": "Exodus 31:16",
+          "refs": [
+            "Exodus 31:16"
+          ]
+        },
+        {
+          "label": "Exodus 34:28",
+          "refs": [
+            "Exodus 34:28"
+          ]
+        },
+        {
+          "label": "Leviticus 2:13",
+          "refs": [
+            "Leviticus 2:13"
+          ]
+        },
+        {
+          "label": "Leviticus 26",
+          "refs": [
+            "Leviticus 26"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 3,
+      "week": 1,
+      "title": "Numbers 18:19 (+16 more)",
+      "passages": [
+        {
+          "label": "Numbers 18:19",
+          "refs": [
+            "Numbers 18:19"
+          ]
+        },
+        {
+          "label": "Numbers 25:12-13",
+          "refs": [
+            "Numbers 25:12-13"
+          ]
+        },
+        {
+          "label": "Deuteronomy 4:31",
+          "refs": [
+            "Deuteronomy 4:31"
+          ]
+        },
+        {
+          "label": "Deuteronomy 5:2-3",
+          "refs": [
+            "Deuteronomy 5:2-3"
+          ]
+        },
+        {
+          "label": "Deuteronomy 7:8-9",
+          "refs": [
+            "Deuteronomy 7:8-9"
+          ]
+        },
+        {
+          "label": "Deuteronomy 9:9",
+          "refs": [
+            "Deuteronomy 9:9"
+          ]
+        },
+        {
+          "label": "Deuteronomy 29:1-15",
+          "refs": [
+            "Deuteronomy 29:1-15"
+          ]
+        },
+        {
+          "label": "Joshua 9:18-21",
+          "refs": [
+            "Joshua 9:18-21"
+          ]
+        },
+        {
+          "label": "Joshua 24:25",
+          "refs": [
+            "Joshua 24:25"
+          ]
+        },
+        {
+          "label": "Judges 2:1",
+          "refs": [
+            "Judges 2:1"
+          ]
+        },
+        {
+          "label": "Ruth 4:7-11",
+          "refs": [
+            "Ruth 4:7-11"
+          ]
+        },
+        {
+          "label": "1 Samuel 18:3-4",
+          "refs": [
+            "1 Samuel 18:3-4"
+          ]
+        },
+        {
+          "label": "1 Samuel 20:16",
+          "refs": [
+            "1 Samuel 20:16"
+          ]
+        },
+        {
+          "label": "1 Samuel 20:42",
+          "refs": [
+            "1 Samuel 20:42"
+          ]
+        },
+        {
+          "label": "2 Samuel 7:12-16",
+          "refs": [
+            "2 Samuel 7:12-16"
+          ]
+        },
+        {
+          "label": "2 Samuel 15:7-8",
+          "refs": [
+            "2 Samuel 15:7-8"
+          ]
+        },
+        {
+          "label": "2 Samuel 21:1-7",
+          "refs": [
+            "2 Samuel 21:1-7"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 4,
+      "week": 1,
+      "title": "2 Samuel 23:5 (+15 more)",
+      "passages": [
+        {
+          "label": "2 Samuel 23:5",
+          "refs": [
+            "2 Samuel 23:5"
+          ]
+        },
+        {
+          "label": "1 Kings 8:23",
+          "refs": [
+            "1 Kings 8:23"
+          ]
+        },
+        {
+          "label": "1 Kings 20:34",
+          "refs": [
+            "1 Kings 20:34"
+          ]
+        },
+        {
+          "label": "2 Kings 11:17",
+          "refs": [
+            "2 Kings 11:17"
+          ]
+        },
+        {
+          "label": "2 Kings 23:3",
+          "refs": [
+            "2 Kings 23:3"
+          ]
+        },
+        {
+          "label": "1 Chronicles 17:11-14",
+          "refs": [
+            "1 Chronicles 17:11-14"
+          ]
+        },
+        {
+          "label": "2 Chronicles 6:16",
+          "refs": [
+            "2 Chronicles 6:16"
+          ]
+        },
+        {
+          "label": "2 Chronicles 13:5",
+          "refs": [
+            "2 Chronicles 13:5"
+          ]
+        },
+        {
+          "label": "2 Chronicles 15:12-15",
+          "refs": [
+            "2 Chronicles 15:12-15"
+          ]
+        },
+        {
+          "label": "2 Chronicles 23:1-3",
+          "refs": [
+            "2 Chronicles 23:1-3"
+          ]
+        },
+        {
+          "label": "2 Chronicles 23:16",
+          "refs": [
+            "2 Chronicles 23:16"
+          ]
+        },
+        {
+          "label": "Ezra 10:19",
+          "refs": [
+            "Ezra 10:19"
+          ]
+        },
+        {
+          "label": "Nehemiah 9:38",
+          "refs": [
+            "Nehemiah 9:38"
+          ]
+        },
+        {
+          "label": "Nehemiah 10",
+          "refs": [
+            "Nehemiah 10"
+          ]
+        },
+        {
+          "label": "Nehemiah 13:29",
+          "refs": [
+            "Nehemiah 13:29"
+          ]
+        },
+        {
+          "label": "Psalms 89:20-37",
+          "refs": [
+            "Psalms 89:20-37"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 5,
+      "week": 1,
+      "title": "Psalms 105:8-11 (+17 more)",
+      "passages": [
+        {
+          "label": "Psalms 105:8-11",
+          "refs": [
+            "Psalms 105:8-11"
+          ]
+        },
+        {
+          "label": "Psalms 106:45",
+          "refs": [
+            "Psalms 106:45"
+          ]
+        },
+        {
+          "label": "Psalms 111:5",
+          "refs": [
+            "Psalms 111:5"
+          ]
+        },
+        {
+          "label": "Isaiah 54:10",
+          "refs": [
+            "Isaiah 54:10"
+          ]
+        },
+        {
+          "label": "Isaiah 55:3",
+          "refs": [
+            "Isaiah 55:3"
+          ]
+        },
+        {
+          "label": "Isaiah 59:21",
+          "refs": [
+            "Isaiah 59:21"
+          ]
+        },
+        {
+          "label": "Isaiah 61:8",
+          "refs": [
+            "Isaiah 61:8"
+          ]
+        },
+        {
+          "label": "Jeremiah 11:2-3",
+          "refs": [
+            "Jeremiah 11:2-3"
+          ]
+        },
+        {
+          "label": "Jeremiah 22:9",
+          "refs": [
+            "Jeremiah 22:9"
+          ]
+        },
+        {
+          "label": "Jeremiah 31:31-34",
+          "refs": [
+            "Jeremiah 31:31-34"
+          ]
+        },
+        {
+          "label": "Jeremiah 32:10-12",
+          "refs": [
+            "Jeremiah 32:10-12"
+          ]
+        },
+        {
+          "label": "Jeremiah 33:21",
+          "refs": [
+            "Jeremiah 33:21"
+          ]
+        },
+        {
+          "label": "Jeremiah 34:8-22",
+          "refs": [
+            "Jeremiah 34:8-22"
+          ]
+        },
+        {
+          "label": "Jeremiah 44:26-27",
+          "refs": [
+            "Jeremiah 44:26-27"
+          ]
+        },
+        {
+          "label": "Jeremiah 50:5",
+          "refs": [
+            "Jeremiah 50:5"
+          ]
+        },
+        {
+          "label": "Lamentations 5:6",
+          "refs": [
+            "Lamentations 5:6"
+          ]
+        },
+        {
+          "label": "Ezekiel 16:59",
+          "refs": [
+            "Ezekiel 16:59"
+          ]
+        },
+        {
+          "label": "Ezekiel 17:13-19",
+          "refs": [
+            "Ezekiel 17:13-19"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 6,
+      "week": 1,
+      "title": "Daniel 9:27 (+9 more)",
+      "passages": [
+        {
+          "label": "Daniel 9:27",
+          "refs": [
+            "Daniel 9:27"
+          ]
+        },
+        {
+          "label": "Micah 7:20",
+          "refs": [
+            "Micah 7:20"
+          ]
+        },
+        {
+          "label": "Malachi 2:4-5",
+          "refs": [
+            "Malachi 2:4-5"
+          ]
+        },
+        {
+          "label": "Luke 1:73",
+          "refs": [
+            "Luke 1:73"
+          ]
+        },
+        {
+          "label": "Romans 9:7-13",
+          "refs": [
+            "Romans 9:7-13"
+          ]
+        },
+        {
+          "label": "Galatians 3",
+          "refs": [
+            "Galatians 3"
+          ]
+        },
+        {
+          "label": "Hebrews 6:13",
+          "refs": [
+            "Hebrews 6:13"
+          ]
+        },
+        {
+          "label": "Hebrews 6:17-18",
+          "refs": [
+            "Hebrews 6:17-18"
+          ]
+        },
+        {
+          "label": "Hebrews 8:4-13",
+          "refs": [
+            "Hebrews 8:4-13"
+          ]
+        },
+        {
+          "label": "Hebrews 12:18-24",
+          "refs": [
+            "Hebrews 12:18-24"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 7,
+      "week": 1,
+      "title": "Hebrews 13:20",
+      "passages": [
+        {
+          "label": "Hebrews 13:20",
+          "refs": [
+            "Hebrews 13:20"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -22,6 +22,11 @@ class PlanMetadata {
   final String dailyCommitment;
   final bool isAvailable;
 
+  /// Source attribution + license (topical plans). When present the plan
+  /// detail screen offers an "About this plan" row.
+  final String? attribution;
+  final String? license;
+
   const PlanMetadata({
     required this.id,
     required this.title,
@@ -31,6 +36,8 @@ class PlanMetadata {
     this.durationDays = 365,
     this.dailyCommitment = '~15 min/day',
     this.isAvailable = true,
+    this.attribution,
+    this.license,
   });
 }
 
@@ -134,6 +141,54 @@ const List<PlanMetadata> availablePlans = [
     durationDays: 365,
     dailyCommitment: '~10 min/day',
     isAvailable: true,
+  ),
+  PlanMetadata(
+    id: 'topical_prayer_21',
+    title: 'A Life of Prayer — 21 Days',
+    description: 'Twenty-one days of Scripture on prayer: asking, intercession, patience and praise.',
+    category: 'Topical',
+    badge: '21 days',
+    durationDays: 21,
+    dailyCommitment: '~15 min/day',
+    isAvailable: true,
+    attribution: "References from Nave's Topical Bible (1896) and Torrey's New Topical Textbook (1897), public domain; normalized via j86schroeder/topical-bible-search (MIT).",
+    license: 'Public domain sources (US); plan arrangement original.',
+  ),
+  PlanMetadata(
+    id: 'topical_faith_21',
+    title: 'The Way of Faith — 21 Days',
+    description: 'Three weeks on trust, belief and faithfulness across the canon.',
+    category: 'Topical',
+    badge: '21 days',
+    durationDays: 21,
+    dailyCommitment: '~15 min/day',
+    isAvailable: true,
+    attribution: "References from Nave's Topical Bible (1896) and Torrey's New Topical Textbook (1897), public domain; normalized via j86schroeder/topical-bible-search (MIT).",
+    license: 'Public domain sources (US); plan arrangement original.',
+  ),
+  PlanMetadata(
+    id: 'topical_praise_14',
+    title: 'Songs of Praise — 14 Days',
+    description: 'Two weeks of psalms and songs celebrating God.',
+    category: 'Topical',
+    badge: '14 days',
+    durationDays: 14,
+    dailyCommitment: '~15 min/day',
+    isAvailable: true,
+    attribution: "References from Nave's Topical Bible (1896) and Torrey's New Topical Textbook (1897), public domain; normalized via j86schroeder/topical-bible-search (MIT).",
+    license: 'Public domain sources (US); plan arrangement original.',
+  ),
+  PlanMetadata(
+    id: 'topical_covenant_7',
+    title: 'The Covenant Story — 7 Days',
+    description: "One week tracing God's covenants from Noah to the new covenant.",
+    category: 'Topical',
+    badge: '7 days',
+    durationDays: 7,
+    dailyCommitment: '~15 min/day',
+    isAvailable: true,
+    attribution: "References from Nave's Topical Bible (1896) and Torrey's New Topical Textbook (1897), public domain; normalized via j86schroeder/topical-bible-search (MIT).",
+    license: 'Public domain sources (US); plan arrangement original.',
   ),
 ];
 

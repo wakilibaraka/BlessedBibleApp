@@ -9,7 +9,7 @@ import '../../data/local_storage/preferences_service.dart';
 import '../widgets/shared_app_bar.dart';
 import '../widgets/study_v2_widgets.dart';
 import 'journey_map_screen.dart';
-import 'plans_hub_v2_screen.dart' show availablePlans;
+import 'plans_hub_v2_screen.dart' show availablePlans, PlanMetadata;
 import 'study_reader_screen.dart';
 
 /// Rebuilt plan detail (V2). Shown from [PlansHubV3Screen] / [StudyScreenV2].
@@ -832,9 +832,17 @@ class _ReadingPlanDetailV2ScreenState
     return '$hh:${m.toString().padLeft(2, '0')} $ap';
   }
 
+  PlanMetadata? _metadata() {
+    for (final p in availablePlans) {
+      if (p.id == widget.planId) return p;
+    }
+    return null;
+  }
+
   void _showPlanSettings(dynamic plan) {
     final notifier =
         ref.read(readingPlanProvider(widget.planId).notifier);
+    final meta = _metadata();
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -852,6 +860,59 @@ class _ReadingPlanDetailV2ScreenState
             mainAxisSize: MainAxisSize.min,
             children: [
               const V2Eyebrow('Plan settings'),
+              if (meta?.attribution != null)
+                ListTile(
+                  leading: const Icon(Icons.info_outline_rounded),
+                  title: const Text('About this plan…'),
+                  onTap: () {
+                    Navigator.of(ctx).pop();
+                    showDialog(
+                      context: context,
+                      builder: (d) => AlertDialog(
+                        title: Text(meta?.title ?? 'About this plan'),
+                        content: SingleChildScrollView(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                            children: [
+                              if ((meta?.description ?? '').isNotEmpty)
+                                Text(meta!.description),
+                              if ((meta?.attribution ?? '').isNotEmpty) ...[
+                                const SizedBox(height: 12),
+                                Text(
+                                  meta!.attribution!,
+                                  style: Theme.of(d)
+                                      .textTheme
+                                      .bodySmall,
+                                ),
+                              ],
+                              if ((meta?.license ?? '').isNotEmpty) ...[
+                                const SizedBox(height: 8),
+                                Text(
+                                  meta!.license!,
+                                  style: Theme.of(d)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () =>
+                                Navigator.of(d).pop(),
+                            child: const Text('Close'),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ListTile(
                 leading: const Icon(Icons.calendar_month_rounded),
                 title: const Text('Change start date…'),
