@@ -24,9 +24,6 @@ class _CoverRange {
   const _CoverRange(this.lo, this.hi, this.done);
 }
 
-// --- LEGACY FOR UI ---
-enum PlanStartMode { startToday, calendarYear }
-
 class PlanChapter {
   final String id;
   final String bookName;
@@ -105,8 +102,6 @@ class PlanDayData {
     }
     return out;
   }
-
-  List<String> get readings => [];
 }
 
 class ReadingPlanState {
@@ -315,9 +310,8 @@ class ReadingPlanState {
     );
   }
 
-  // --- LEGACY ALIASES FOR UI TO COMPILE ---
+  // --- Remaining convenience getters (all live) ---
   int get currentDay => todayReadingDay ?? planData.length;
-  DateTime get startDate => planStartedOn ?? DateTime.now();
 
   /// Chapters fully covered by completed atoms (derived, not stored).
   /// Powers the read-screen end-of-chapter prompt and first-unread lookup.
@@ -376,10 +370,7 @@ class ReadingPlanState {
     return out;
   }
 
-  double get completionPercentage => percentComplete;
   bool get isPlanComplete => isComplete;
-  PlanStartMode get startMode => PlanStartMode.startToday;
-  String getFormattedDateForDay(int day) => '';
 }
 
 const Set<String> kBundledPlanIds = {
@@ -802,9 +793,6 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
     _saveToPrefs(next);
   }
 
-  // --- LEGACY ALIASES FOR UI TO COMPILE ---
-  void startPlanFromDay(int day) {}
-  void changeStartMode(dynamic mode) {}
   void setReminder(bool enabled, int hour, int minute) {
     final next = state.copyWith(
       reminderEnabled: enabled,
@@ -816,11 +804,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
     _syncReminder(next);
   }
 
-  void jumpToDay(int day) {}
-  bool jumpToBook(String book) => false;
-  int? findDayForPassage(String book, int chapter) => 1;
   void markDayComplete(int day) => markReadingComplete(day);
-  void markDayIncomplete(int day) => markReadingIncomplete(day);
 
   /// Marks one chapter read at atom precision: every recorded atom fully
   /// inside (book, chapter) is added, then day numbers are recomputed so

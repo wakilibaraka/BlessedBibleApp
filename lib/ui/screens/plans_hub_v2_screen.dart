@@ -64,13 +64,14 @@ const List<PlanMetadata> availablePlans = [
   ),
   PlanMetadata(
     id: 'horner_10_chapters',
-    title: "Professor Grant Horner's System",
+    title: 'Ten Lists — 10 Chapters a Day',
     description: 'Immerse deeply in Scripture with 10 chapters every day from 10 distinct biblical lists simultaneously.',
     category: 'Classic / 1-Year',
     badge: '10 Chapters/day',
     durationDays: 365,
     dailyCommitment: '~35-45 min/day',
     isAvailable: true,
+    attribution: "Reading method inspired by Grant Horner's 10-list system.",
   ),
   PlanMetadata(
     id: 'esv_through_the_bible',
