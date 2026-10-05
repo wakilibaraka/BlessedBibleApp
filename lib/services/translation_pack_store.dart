@@ -90,6 +90,8 @@ class TranslationPackStore {
     'fra_lsg',
     'ron_btf',
     'tgl_ulb',
+    'por_blj',
+    'spa_r09',
   ];
 
   static bool isCoreId(String id) => coreIds.contains(id);

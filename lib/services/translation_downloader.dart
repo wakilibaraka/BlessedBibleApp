@@ -169,28 +169,26 @@ class TranslationDownloader {
       sha256:
           '3a6d4631581887d7b7cb17d1f094c65cef703ce450c82bc1b79347c9f834ed96',
     ),
-    ..._storagePack(
-      id: 'por_blj',
-      lang: 'pt',
-      langName: 'Portuguese',
-      name: 'Bíblia Livre',
-      abbr: 'BLIVRE',
-      license: 'CC BY 4.0',
-      sizeMB: 5.0,
-      sha256:
-          '0a6145db735f7fa95317979cc7d1a963616ec2a6429a6f5adccae065fee03477',
-    ),
-    ..._storagePack(
-      id: 'spa_r09',
-      lang: 'es',
-      langName: 'Spanish',
-      name: 'Reina Valera 1909',
-      abbr: 'RV1909',
-      license: 'Public Domain',
-      sizeMB: 5.0,
-      sha256:
-          'c1783150ae84f10c76379aa4dc8e8c856b35e3d211134c97628c9e04161dc453',
-    ),
+    {
+      'id': 'por_blj',
+      'lang': 'pt',
+      'langName': 'Portuguese',
+      'name': 'Bíblia Livre',
+      'abbr': 'BLIVRE',
+      'license': 'CC BY 4.0',
+      'sizeMB': 5.0,
+      'source': 'bundled',
+    },
+    {
+      'id': 'spa_r09',
+      'lang': 'es',
+      'langName': 'Spanish',
+      'name': 'Reina Valera 1909',
+      'abbr': 'RV1909',
+      'license': 'Public Domain',
+      'sizeMB': 5.0,
+      'source': 'bundled',
+    },
   ];
 
   static const String _storageBucket = 'blessedbibleapp.firebasestorage.app';
