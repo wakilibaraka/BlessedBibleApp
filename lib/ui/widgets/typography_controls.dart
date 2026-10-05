@@ -95,7 +95,7 @@ class TypographyControls extends ConsumerWidget {
               const SizedBox(width: 8),
               TrText('FONT WEIGHT', style: sectionLabelStyle),
             ]),
-            Text(
+            TrText(
               () {
                 final idx = _weightValues.indexOf(typography.fontWeightValue);
                 return idx >= 0 ? _weightLabels[idx] : 'Regular';
@@ -121,7 +121,7 @@ class TypographyControls extends ConsumerWidget {
                       color: isSelected ? theme.primaryColor : theme.colorScheme.onSurface.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Text(
+                    child: TrText(
                       _weightLabels[i],
                       style: TextStyle(
                         fontSize: 11,
@@ -146,7 +146,7 @@ class TypographyControls extends ConsumerWidget {
               const SizedBox(width: 8),
               TrText('LINE SPACING', style: sectionLabelStyle),
             ]),
-            Text(typography.lineHeight <= 1.4 ? 'Compact' : (typography.lineHeight >= 1.8 ? 'Relaxed' : 'Normal'), style: valueStyle),
+            TrText(typography.lineHeight <= 1.4 ? 'Compact' : (typography.lineHeight >= 1.8 ? 'Relaxed' : 'Normal'), style: valueStyle),
           ],
         ),
         const SizedBox(height: 8),
@@ -199,7 +199,7 @@ class TypographyControls extends ConsumerWidget {
               const SizedBox(width: 8),
               TrText('ALIGNMENT', style: sectionLabelStyle),
             ]),
-            Text(switch (typography.textAlignMode) {
+            TrText(switch (typography.textAlignMode) {
               TextAlignMode.left => 'Left',
               TextAlignMode.center => 'Center',
               TextAlignMode.right => 'Right',
@@ -259,7 +259,7 @@ class TypographyControls extends ConsumerWidget {
                               color: isSelected ? theme.colorScheme.surface : theme.colorScheme.onSurface.withValues(alpha: 0.85),
                             )),
                             const SizedBox(height: 2),
-                            Text(font,
+                            TrText(font,
                               textAlign: TextAlign.center,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,

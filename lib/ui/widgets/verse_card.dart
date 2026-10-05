@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/tr_text.dart';
 
 class VerseCard extends StatelessWidget {
   final String reference;
@@ -29,14 +30,14 @@ class VerseCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            TrText(
               reference,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: theme.primaryColor,
               ),
             ),
             const SizedBox(height: 8),
-            Text(
+            TrText(
               text,
               style: theme.textTheme.bodyLarge,
             ),

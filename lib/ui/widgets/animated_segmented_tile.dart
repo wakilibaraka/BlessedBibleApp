@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/tr_text.dart';
 
 class AnimatedSegmentedTile<T> extends StatelessWidget {
   final String? title;
@@ -24,10 +25,10 @@ class AnimatedSegmentedTile<T> extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (title != null) Text(title!, style: const TextStyle(fontSize: 16)),
+          if (title != null) TrText(title!, style: const TextStyle(fontSize: 16)),
           if (title != null && subtitle != null) const SizedBox(height: 4),
           if (subtitle != null)
-            Text(
+            TrText(
               subtitle!,
               style: TextStyle(
                 fontSize: 14,
@@ -107,7 +108,7 @@ class _SegmentItemState<T> extends State<_SegmentItem<T>> {
                     ]
                   : [],
             ),
-            child: Text(
+            child: TrText(
               widget.option.value,
               textAlign: TextAlign.center,
               style: TextStyle(

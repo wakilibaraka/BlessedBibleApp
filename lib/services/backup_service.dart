@@ -195,7 +195,7 @@ class BackupService {
         ].join('. ');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(details.isEmpty
+              content: TrText(details.isEmpty
                   ? 'Backup restored successfully'
                   : 'Backup restored ($details)')),
         );

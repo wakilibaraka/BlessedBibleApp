@@ -7,6 +7,7 @@ import '../widgets/textured_glass_container.dart';
 import '../widgets/typography_controls.dart';
 import 'theme_picker_sheet.dart';
 import '../../l10n/l10n.dart';
+import '../../l10n/tr_text.dart';
 
 const double kAppearanceSheetHeightFactor = 0.70;
 
@@ -207,7 +208,7 @@ class _TabButton extends StatelessWidget {
                 color: isSelected ? AppColors.lightTextPrimary : theme.colorScheme.onSurface.withValues(alpha: 0.55),
               ),
               const SizedBox(width: 5),
-              Text(label,
+              TrText(label,
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,

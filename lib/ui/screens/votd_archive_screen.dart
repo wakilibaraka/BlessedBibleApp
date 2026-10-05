@@ -214,7 +214,7 @@ class VotdArchiveScreen extends ConsumerWidget {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
+                                      TrText(
                                         displayDate,
                                         style: theme.textTheme.labelMedium
                                             ?.copyWith(
@@ -235,7 +235,7 @@ class VotdArchiveScreen extends ConsumerWidget {
                                           borderRadius:
                                               BorderRadius.circular(8),
                                         ),
-                                        child: Text(
+                                        child: TrText(
                                           bookTag,
                                           style: theme.textTheme.labelSmall
                                               ?.copyWith(
@@ -248,7 +248,7 @@ class VotdArchiveScreen extends ConsumerWidget {
                                     ],
                                   ),
                                   const SizedBox(height: 12),
-                                  Text(
+                                  TrText(
                                     reference,
                                     style: theme.textTheme.titleLarge?.copyWith(
                                       fontWeight: FontWeight.bold,
@@ -256,7 +256,7 @@ class VotdArchiveScreen extends ConsumerWidget {
                                     ),
                                   ),
                                   const SizedBox(height: 8),
-                                  Text(
+                                  TrText(
                                     text,
                                     maxLines: 3,
                                     overflow: TextOverflow.ellipsis,

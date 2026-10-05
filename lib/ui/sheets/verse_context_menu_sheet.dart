@@ -10,6 +10,7 @@ import '../screens/commentary_hub_screen.dart';
 import '../../state/commentary_provider.dart';
 import '../widgets/cross_references_sheet.dart';
 import '../../l10n/l10n.dart';
+import '../../l10n/tr_text.dart';
 
 class VerseContextMenuSheet extends ConsumerStatefulWidget {
   final int verseNumber;
@@ -96,7 +97,7 @@ class _VerseContextMenuSheetState extends ConsumerState<VerseContextMenuSheet> {
                         Expanded(
                           child: _MenuButton(
                             icon: Icon(Icons.edit_document, size: 24),
-                            label: hasNote ? 'Edit Note' : 'Note',
+                            label: hasNote ? context.tr('Edit Note') : context.tr('Note'),
                             color: hasNote ? Colors.blue.shade600 : null,
                             onTap: () {
                               Navigator.of(context).pop();
@@ -214,7 +215,7 @@ class _MenuButton extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Text(
+          TrText(
             label,
             style: theme.textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.w600,

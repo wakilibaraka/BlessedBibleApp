@@ -207,7 +207,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                   borderRadius: BorderRadius.circular(30),
                   border: Border.all(color: tokens.readingAccent.withValues(alpha: 0.5)),
                 ),
-                child: Text(
+                child: TrText(
                   referenceString,
                   style: theme.textTheme.titleSmall?.copyWith(
                     color: tokens.readingAccent,
@@ -226,7 +226,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                         isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded,
                         color: isBookmarked ? tokens.readingAccent : tokens.readingInkMuted,
                       ),
-                      tooltip: isBookmarked ? 'Remove Bookmark' : 'Bookmark Commentary',
+                      tooltip: isBookmarked ? context.tr('Remove Bookmark') : context.tr('Bookmark Commentary'),
                       onPressed: () {
                         VerseActionLogic.handleBookmark(context, theme, ref, bookName, chapterNum, [displayVerse ?? 1]);
                       },
@@ -517,7 +517,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
               child: Row(
                 children: [
                   Expanded(
-                    child: Text(
+                    child: TrText(
                       title,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
@@ -606,7 +606,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
               Icon(sourceIcon, size: 16, color: tokens.readingAccent),
               const SizedBox(width: 8),
               Expanded(
-                child: Text(
+                child: TrText(
                   entry.source.isNotEmpty ? entry.source : 'Commentary',
                   style: theme.textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.bold,
@@ -616,7 +616,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              Text(
+              TrText(
                 entry.author,
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: tokens.readingInkMuted,

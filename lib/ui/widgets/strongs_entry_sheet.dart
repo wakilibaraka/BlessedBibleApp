@@ -124,7 +124,7 @@ class _StrongsEntrySheet extends ConsumerWidget {
                           const SizedBox(width: 12),
                           Padding(
                             padding: const EdgeInsets.only(bottom: 6.0),
-                            child: Text(
+                            child: TrText(
                               entry.id,
                               style: TextStyle(
                                 fontSize: 18,
@@ -149,7 +149,7 @@ class _StrongsEntrySheet extends ConsumerWidget {
                                 color: theme.primaryColor.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(16),
                               ),
-                              child: Text(
+                              child: TrText(
                                 entry.transliteration,
                                 style: TextStyle(
                                   color: theme.primaryColor,
@@ -169,7 +169,7 @@ class _StrongsEntrySheet extends ConsumerWidget {
                                 children: [
                                   Icon(Icons.volume_up_rounded, size: 16, color: theme.colorScheme.onSurface.withOpacity(0.6)),
                                   const SizedBox(width: 4),
-                                  Text(
+                                  TrText(
                                     entry.pronunciation,
                                     style: TextStyle(
                                       color: theme.colorScheme.onSurface.withOpacity(0.8),

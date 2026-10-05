@@ -4,6 +4,7 @@ import '../../state/theme_provider.dart';
 import '../../theme/reading_tokens.dart';
 import 'animated_background.dart';
 import 'textured_glass_container.dart';
+import '../../l10n/tr_text.dart';
 
 /// Shared presentation primitives for the redesigned (V2) Study screens.
 ///
@@ -86,7 +87,7 @@ class V2Eyebrow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
+    return TrText(
       text.toUpperCase(),
       style: Theme.of(context).textTheme.labelSmall?.copyWith(
             fontWeight: FontWeight.w800,
@@ -107,7 +108,7 @@ class V2SectionLabel extends StatelessWidget {
     final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(0, 22, 0, 0),
-      child: Text(
+      child: TrText(
         text.toUpperCase(),
         style: theme.textTheme.labelSmall?.copyWith(
           fontWeight: FontWeight.w800,
@@ -302,7 +303,7 @@ class V2Badge extends StatelessWidget {
           color: theme.primaryColor.withValues(alpha: 0.3),
         ),
       ),
-      child: Text(
+      child: TrText(
         text,
         style: theme.textTheme.labelSmall?.copyWith(
           fontWeight: FontWeight.w800,
@@ -328,7 +329,7 @@ class V2MetaChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
         border: Border.all(color: theme.dividerColor),
       ),
-      child: Text(
+      child: TrText(
         text,
         style: theme.textTheme.labelSmall?.copyWith(
           fontWeight: FontWeight.w700,

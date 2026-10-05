@@ -710,7 +710,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
             return _buildSideButton(
                 context,
                 tokens,
-                Text(
+                TrText(
                   activeTransLabel,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -1333,7 +1333,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                   left: 15.0,
                                                                   right: 12.0,
                                                                 ),
-                                                                child: Text(
+                                                                child: TrText(
                                                                   finalHeadingText,
                                                                   style: theme
                                                                       .textTheme
@@ -1729,7 +1729,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                     color: AppColors.goldAccent, size: 18),
                                 const SizedBox(width: 10),
                                 Expanded(
-                                  child: Text(
+                                  child: TrText(
                                     _currentHintMessage!,
                                     style: theme.textTheme.bodySmall?.copyWith(
                                       color: theme.colorScheme.onSurface,
@@ -2090,7 +2090,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Flexible(
-                                  child: Text(
+                                  child: TrText(
                                     _getTranslationLabel(
                                         isInstalled
                                             ? (translationId ?? langEntry.value)
@@ -2902,7 +2902,7 @@ class VerseActionLogic {
                             ),
                           ),
                           const SizedBox(height: 6),
-                          Text(highlightPaletteNames[i],
+                          TrText(highlightPaletteNames[i],
                               style: theme.textTheme.labelSmall?.copyWith(
                                 color: theme.colorScheme.onSurface
                                     .withValues(alpha: 0.7),

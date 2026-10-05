@@ -191,7 +191,7 @@ class _DictionaryScreenState extends ConsumerState<DictionaryScreen> {
                                     final isActive = letter == _currentDragLetter;
                                     return Expanded(
                                       child: Center(
-                                        child: Text(
+                                        child: TrText(
                                           letter,
                                           style: TextStyle(
                                             fontSize: isActive ? 14 : 11,
@@ -267,7 +267,7 @@ class _DictionaryCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  TrText(
                     word,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
@@ -276,7 +276,7 @@ class _DictionaryCard extends StatelessWidget {
                   ),
                   if (snippet.isNotEmpty) ...[
                     const SizedBox(height: 6),
-                    Text(
+                    TrText(
                       snippet,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,

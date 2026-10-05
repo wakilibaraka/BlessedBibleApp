@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/tr_text.dart';
 
 class PrimaryButton extends StatelessWidget {
   final String label;
@@ -23,7 +24,7 @@ class PrimaryButton extends StatelessWidget {
         ),
         minimumSize: const Size(120, 48), // Ensure >=48dp touch target
       ),
-      child: Text(
+      child: TrText(
         label,
         style: const TextStyle(fontWeight: FontWeight.bold),
       ),

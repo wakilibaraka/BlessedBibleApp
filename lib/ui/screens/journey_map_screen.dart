@@ -197,7 +197,7 @@ class _WeeklyJourneyPath extends StatelessWidget {
           ),
           Positioned(
             bottom: -32,
-            child: Text(
+            child: TrText(
               dayData.title,
               textAlign: TextAlign.center,
               style: theme.textTheme.labelMedium?.copyWith(

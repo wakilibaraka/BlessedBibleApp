@@ -214,7 +214,7 @@ class _SegmentTab extends StatelessWidget {
                 : Colors.transparent,
           ),
         ),
-        child: Text(
+        child: TrText(
           label,
           style: theme.textTheme.labelMedium?.copyWith(
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
@@ -522,7 +522,7 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 12),
-                child: Text(
+                child: TrText(
                   groupKey,
                   style: widget.theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.bold,
@@ -640,7 +640,7 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
+                TrText(
                   selectedFolder.name,
                   style: widget.theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
@@ -751,14 +751,14 @@ class _NotesSegment extends ConsumerWidget {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Expanded(
-                                      child: Text(
+                                      child: TrText(
                                         note.title,
                                         style: theme.textTheme.titleSmall
                                             ?.copyWith(
                                                 fontWeight: FontWeight.bold),
                                       ),
                                     ),
-                                    Text(
+                                    TrText(
                                       note.date,
                                       style:
                                           theme.textTheme.bodySmall?.copyWith(
@@ -771,7 +771,7 @@ class _NotesSegment extends ConsumerWidget {
                                 ),
                                 if (note.reference != null) ...[
                                   const SizedBox(height: 4),
-                                  Text(
+                                  TrText(
                                     note.reference!,
                                     style: theme.textTheme.labelSmall?.copyWith(
                                       color: theme.primaryColor,
@@ -780,7 +780,7 @@ class _NotesSegment extends ConsumerWidget {
                                   ),
                                 ],
                                 const SizedBox(height: 8),
-                                Text(
+                                TrText(
                                   note.content,
                                   maxLines: 3,
                                   overflow: TextOverflow.ellipsis,
@@ -916,7 +916,7 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
               Row(
                 children: [
                   Expanded(
-                    child: Text(
+                    child: TrText(
                       formattedRef,
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.bold,
@@ -986,7 +986,7 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
 
                   Widget verseWidget;
                   if (!settings.syncSavedItemsLanguage || activeTransId == 'kjv') {
-                    verseWidget = Text(
+                    verseWidget = TrText(
                       data.fallbackText,
                       style: theme.textTheme.bodySmall?.copyWith(
                         height: 1.4,
@@ -1007,7 +1007,7 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                     verseWidget = verseAsync.when(
                       data: (verseData) {
                         final displayText = verseData?.text ?? data.fallbackText;
-                        return Text(
+                        return TrText(
                           displayText,
                           style: theme.textTheme.bodySmall?.copyWith(
                             height: 1.4,
@@ -1017,14 +1017,14 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                           ),
                         );
                       },
-                      loading: () => Text(
+                      loading: () => TrText(
                         data.fallbackText,
                         style: theme.textTheme.bodySmall?.copyWith(
                           height: 1.4,
                           color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                         ),
                       ),
-                      error: (_, __) => Text(
+                      error: (_, __) => TrText(
                         data.fallbackText,
                         style: theme.textTheme.bodySmall?.copyWith(
                           height: 1.4,
@@ -1048,7 +1048,7 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                         if (verseData == null) return const SizedBox.shrink();
                         return Padding(
                           padding: const EdgeInsets.only(top: 8.0),
-                          child: Text(
+                          child: TrText(
                             verseData.text,
                             style: theme.textTheme.bodySmall?.copyWith(
                               height: 1.4,
@@ -1117,7 +1117,7 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                                         child: Padding(
                                           padding: const EdgeInsets.symmetric(vertical: 6.0),
                                           child: Center(
-                                            child: Text(
+                                            child: TrText(
                                               langEntry.value,
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
@@ -1165,7 +1165,7 @@ void _showNoteContext(
   final text = note.content.trim();
   ItemContextSheet.show(
     context,
-    title: note.title.isEmpty ? 'Note' : note.title,
+    title: note.title.isEmpty ? context.tr('Note') : note.title,
     subtitle: note.reference ?? note.date,
     actions: [
       ItemAction(
@@ -1271,7 +1271,7 @@ void _showVerseItemContext(
   ItemContextSheet.show(
     context,
     title: formattedRef,
-    subtitle: isBookmarked ? 'Bookmarked verse' : 'Highlighted verse',
+    subtitle: isBookmarked ? context.tr('Bookmarked verse') : context.tr('Highlighted verse'),
     actions: [
       ItemAction(
         icon: Icons.menu_book_rounded,
@@ -1316,7 +1316,7 @@ void _showVerseItemContext(
         ),
       ItemAction(
         icon: Icons.delete_outline_rounded,
-        label: isBookmarked ? 'Remove bookmark' : 'Remove highlight',
+        label: isBookmarked ? context.tr('Remove bookmark') : context.tr('Remove highlight'),
         destructive: true,
         onTap: () async {
           if (isBookmarked) {

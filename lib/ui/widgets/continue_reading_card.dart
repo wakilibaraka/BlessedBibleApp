@@ -54,7 +54,7 @@ class ContinueReadingCard extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text(
+                TrText(
                   translation.toUpperCase(),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.5),

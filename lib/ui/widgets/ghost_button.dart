@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/tr_text.dart';
 
 class GhostButton extends StatelessWidget {
   final String label;
@@ -24,7 +25,7 @@ class GhostButton extends StatelessWidget {
         ),
         minimumSize: const Size(120, 48), // Ensure >=48dp touch target
       ),
-      child: Text(
+      child: TrText(
         label,
         style: const TextStyle(fontWeight: FontWeight.bold),
       ),

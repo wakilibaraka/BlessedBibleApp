@@ -175,11 +175,11 @@ class _AccountSyncCardState extends ConsumerState<AccountSyncCard> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    TrText(
                       user.displayName ?? 'Signed In',
                       style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                     ),
-                    Text(
+                    TrText(
                       user.email ?? '',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -211,7 +211,7 @@ class _AccountSyncCardState extends ConsumerState<AccountSyncCard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    TrText(
                       _lastSynced != null ? 'Last synced ${_formatTimeAgo(_lastSynced!)}' : 'Ready to sync',
                       style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
                     ),

@@ -66,7 +66,7 @@ class VersePreviewDialog extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: Text(
+                  child: TrText(
                     fullBookName != null 
                         ? '$fullBookName $chapter:$verseNum' 
                         : reference,
@@ -116,7 +116,7 @@ class VersePreviewDialog extends ConsumerWidget {
                   }
                   
                   return SingleChildScrollView(
-                    child: Text(
+                    child: TrText(
                       verse.text.replaceAll(RegExp(r'[<\[][^>\]]*[>\]]'), ''),
                       style: theme.textTheme.bodyMedium?.copyWith(
                         height: typography.lineHeight,

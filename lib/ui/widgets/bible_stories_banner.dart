@@ -127,7 +127,7 @@ class BibleStoriesBanner extends ConsumerWidget {
         color: theme.primaryColor.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Text(
+      child: TrText(
         label,
         style: theme.textTheme.labelSmall?.copyWith(
           color: theme.primaryColor,

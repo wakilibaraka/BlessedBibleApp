@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../state/auth_provider.dart';
 import '../../l10n/tr_text.dart';
+import '../../l10n/l10n.dart';
 
 
 
@@ -31,7 +32,7 @@ class AccountButton extends ConsumerWidget {
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(16.0),
-                        child: Text(
+                        child: TrText(
                           currentAuthState.value != null ? 'Account' : 'Sign In',
                           style: const TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold),
@@ -93,7 +94,7 @@ class AccountButton extends ConsumerWidget {
                                 ? const Icon(Icons.person, size: 16)
                                 : null,
                           ),
-                          title: Text(currentAuthState.value?.displayName ?? 'Signed In'),
+                          title: Text(currentAuthState.value?.displayName ?? context.tr('Signed In')),
                         ),
                         ListTile(
                           leading: const Icon(Icons.logout, color: Colors.orange),
@@ -182,7 +183,7 @@ class AccountButton extends ConsumerWidget {
             height: 28,
             child: CircleAvatar(
               backgroundColor: theme.colorScheme.primaryContainer,
-              child: Text(
+              child: TrText(
                 name[0].toUpperCase(),
                 style: TextStyle(
                   fontSize: 14,

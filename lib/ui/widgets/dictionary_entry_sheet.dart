@@ -166,7 +166,7 @@ class DictionaryEntrySheet extends ConsumerWidget {
                             .toList();
                             
                         return [
-                          Text(
+                          TrText(
                             _formatSourceName(def.source).toUpperCase(),
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: theme.colorScheme.onSurface.withValues(alpha: 0.4),

@@ -297,7 +297,7 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Flexible(
-                            child: Text(
+                            child: TrText(
                               libraryDateHeader(now),
                               style:
                                   theme.textTheme.titleMedium?.copyWith(
@@ -419,7 +419,7 @@ class _LibraryCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
+                  TrText(
                     title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -428,7 +428,7 @@ class _LibraryCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
+                  TrText(
                     statusLine,
                     style: theme.textTheme.labelSmall?.copyWith(
                       fontWeight: FontWeight.w800,
@@ -442,7 +442,7 @@ class _LibraryCard extends StatelessWidget {
                         child: V2ProgressBar(fraction: fraction),
                       ),
                       const SizedBox(width: 8),
-                      Text(
+                      TrText(
                         // Words read better than a bare "0%".
                         fraction <= 0
                             ? 'Not started'
@@ -543,7 +543,7 @@ class _ReadingTab extends ConsumerWidget {
                   value: isActive
                       ? 'pause'
                       : (hasProgress ? 'resume' : 'start'),
-                  child: Text(isActive
+                  child: TrText(isActive
                       ? 'Pause (keeps progress)'
                       : (hasProgress ? 'Resume' : 'Start')),
                 ),
@@ -607,7 +607,7 @@ class _BooksTab extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
+                        TrText(
                           preset.title,
                           style:
                               theme.textTheme.titleSmall?.copyWith(
@@ -802,13 +802,13 @@ class _LetReadSheet extends StatelessWidget {
             const SizedBox(height: 14),
             const V2Eyebrow('Let\'s read'),
             const SizedBox(height: 6),
-            Text(
+            TrText(
               dayLabel,
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w800,
               ),
             ),
-            Text(
+            TrText(
               remainingLabel,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.6),

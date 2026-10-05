@@ -239,7 +239,7 @@ class _CustomPlanBuilderV2ScreenState
       final plan = _generator!.generatePlan(
         id: 'preview',
         title: _titleController.text.isEmpty
-            ? 'Custom Plan'
+            ? context.tr('Custom Plan')
             : _titleController.text,
         tracks: tracks,
         days: _days.toInt().clamp(1, 730),
@@ -765,7 +765,7 @@ class _CustomPlanBuilderV2ScreenState
                                   _isSaving)
                               ? null
                               : _save,
-                          child: Text(_isSaving
+                          child: TrText(_isSaving
                               ? 'Saving…'
                               : 'Generate & save plan →'),
                         ),
@@ -885,7 +885,7 @@ class _RefBox extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label,
+            TrText(label,
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.w800,
                   fontSize: 10,
@@ -893,7 +893,7 @@ class _RefBox extends StatelessWidget {
                       .withValues(alpha: 0.55),
                 )),
             const SizedBox(height: 2),
-            Text(value,
+            TrText(value,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                 )),
@@ -932,7 +932,7 @@ class _RestChip extends StatelessWidget {
                 : theme.dividerColor,
           ),
         ),
-        child: Text(
+        child: TrText(
           label,
           style: theme.textTheme.labelLarge?.copyWith(
             fontWeight: FontWeight.w800,

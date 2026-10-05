@@ -35,7 +35,7 @@ class AccountAvatar extends ConsumerWidget {
       fallback = CircleAvatar(
         radius: size / 2,
         backgroundColor: theme.colorScheme.primaryContainer,
-        child: Text(
+        child: TrText(
           name[0].toUpperCase(),
           style: TextStyle(
             fontSize: size * 0.4,
@@ -160,7 +160,7 @@ class _AccountMenuBody extends ConsumerWidget {
                           crossAxisAlignment:
                               CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            TrText(
                               name.isNotEmpty ? name : 'Guest',
                               style: theme.textTheme.titleMedium
                                   ?.copyWith(
@@ -168,7 +168,7 @@ class _AccountMenuBody extends ConsumerWidget {
                               ),
                             ),
                             const SizedBox(height: 2),
-                            Text(
+                            TrText(
                               email.isNotEmpty
                                   ? email
                                   : 'Sign in to sync across devices',
@@ -325,7 +325,7 @@ void _showAccountSheet(BuildContext context) {
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: Text(
+                    child: TrText(
                       currentAuthState.value != null
                           ? 'Account'
                           : 'Sign In',
@@ -391,8 +391,7 @@ void _showAccountSheet(BuildContext context) {
                             ? const Icon(Icons.person, size: 16)
                             : null,
                       ),
-                      title: Text(currentAuthState.value?.displayName ??
-                          'Signed In'),
+                      title: Text(currentAuthState.value?.displayName ?? context.tr('Signed In')),
                     ),
                     ListTile(
                       leading: const Icon(Icons.logout,

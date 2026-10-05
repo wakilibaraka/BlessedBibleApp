@@ -196,7 +196,7 @@ class _TranslationPickerSheetState
               : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Text(
+        child: TrText(
           text,
           style: theme.textTheme.labelLarge?.copyWith(
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
@@ -253,7 +253,7 @@ class _TranslationPickerSheetState
   Widget _languageHeader(ThemeData theme, String lang) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0, top: 12.0),
-      child: Text(
+      child: TrText(
         lang,
         style: theme.textTheme.labelLarge?.copyWith(
           color: theme.primaryColor,
@@ -360,7 +360,7 @@ class _TranslationPickerSheetState
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            TrText(
                               item.translationName,
                               style: theme.textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w600,
@@ -379,7 +379,7 @@ class _TranslationPickerSheetState
                               return Padding(
                                 padding:
                                     const EdgeInsets.only(top: 4),
-                                child: Text(
+                                child: TrText(
                                   subtitle,
                                   style: theme.textTheme.bodySmall
                                       ?.copyWith(
@@ -569,7 +569,7 @@ class _DownloadableTileState extends ConsumerState<_DownloadableTile> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      TrText(
                         widget.item['name'] as String,
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w600,
@@ -584,7 +584,7 @@ class _DownloadableTileState extends ConsumerState<_DownloadableTile> {
                         final label = isRestore
                             ? "${widget.item['license']} · ${sizeMB.toStringAsFixed(1)} MB · restore offline"
                             : "${widget.item['license']} · ${sizeMB.toStringAsFixed(1)} MB";
-                        return Text(
+                        return TrText(
                           label,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurface
@@ -593,7 +593,7 @@ class _DownloadableTileState extends ConsumerState<_DownloadableTile> {
                         );
                       }),
                       if (_error != null)
-                        Text(
+                        TrText(
                           _error!,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.error,

@@ -217,7 +217,7 @@ class ShareCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                TrText(
                   eyebrow.toUpperCase(),
                   style: textStyle(34, FontWeight.w700)
                       .copyWith(color: theme.primaryColor, letterSpacing: 6),
@@ -237,7 +237,7 @@ class ShareCard extends StatelessWidget {
                           : Alignment.topLeft,
                       child: SizedBox(
                         width: 888,
-                        child: Text(
+                        child: TrText(
                           title,
                           textAlign: s.align,
                           maxLines: body == null ? 12 : 20,
@@ -266,7 +266,7 @@ class ShareCard extends StatelessWidget {
                           alignment: Alignment.topLeft,
                           child: SizedBox(
                             width: 888,
-                            child: Text(
+                            child: TrText(
                               body!,
                               textAlign: s.align,
                               maxLines: 10,
@@ -277,7 +277,7 @@ class ShareCard extends StatelessWidget {
                         ),
                 ),
                 const SizedBox(height: 40),
-                Text(footer, style: textStyle(38, FontWeight.w600)),
+                TrText(footer, style: textStyle(38, FontWeight.w600)),
                 const SizedBox(height: 18),
                 TrText('✦ BIBLE',
                   style: textStyle(28, FontWeight.w400)
@@ -658,7 +658,7 @@ class _ControlLabel extends StatelessWidget {
     final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
-      child: Text(
+      child: TrText(
         text,
         style: theme.textTheme.labelSmall?.copyWith(
           fontWeight: FontWeight.w800,

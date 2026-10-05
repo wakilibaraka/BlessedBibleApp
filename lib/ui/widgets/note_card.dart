@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/tr_text.dart';
 
 class NoteCard extends StatelessWidget {
   final String title;
@@ -27,12 +28,12 @@ class NoteCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            TrText(
               title,
               style: theme.textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
-            Text(
+            TrText(
               content,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.textTheme.bodySmall?.color,

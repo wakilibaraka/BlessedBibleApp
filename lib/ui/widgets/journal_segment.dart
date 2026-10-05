@@ -78,12 +78,12 @@ class JournalSegment extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    TrText(
                       entry.date.split('T').first,
                       style: theme.textTheme.labelSmall?.copyWith(color: theme.primaryColor),
                     ),
                     const SizedBox(height: 8),
-                    Text(entry.content, style: theme.textTheme.bodyMedium),
+                    TrText(entry.content, style: theme.textTheme.bodyMedium),
                     const SizedBox(height: 16),
                     if (entry.detectedEmotions.isNotEmpty) ...[
                       Row(
@@ -104,7 +104,7 @@ class JournalSegment extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text('• '),
-                            Expanded(child: Text(p, style: theme.textTheme.bodySmall)),
+                            Expanded(child: TrText(p, style: theme.textTheme.bodySmall)),
                           ],
                         ),
                       )),

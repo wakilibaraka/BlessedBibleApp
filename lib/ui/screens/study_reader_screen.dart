@@ -427,7 +427,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                         _markReadAndPop();
                       }
                     },
-                    child: Text(
+                    child: TrText(
                       widget.payload.mode == StudyMode.plan
                           ? (isDone ? '✓ Completed' : 'Mark as Read')
                           : 'Done',
@@ -527,7 +527,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                                         CrossAxisAlignment.start,
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Text(
+                                      TrText(
                                         passage.label,
                                         style: TextStyle(
                                           fontFamily: 'EB Garamond',
@@ -692,7 +692,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                                     left: 4.0, // Indent less than main reader since passage is padded
                                     right: 4.0,
                                   ),
-                                  child: Text(
+                                  child: TrText(
                                     finalHeadingText,
                                     style: theme.textTheme.titleSmall?.copyWith(
                                       color: theme.primaryColor,

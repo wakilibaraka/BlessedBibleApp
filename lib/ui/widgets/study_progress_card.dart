@@ -30,7 +30,7 @@ class StudyProgressCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            TrText(
               title,
               style: theme.textTheme.titleMedium,
             ),

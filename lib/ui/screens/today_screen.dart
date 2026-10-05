@@ -184,7 +184,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                               ),
                             ),
                           ),
-                          centerContent: Text(
+                          centerContent: TrText(
                             dayLabel,
                             textAlign: TextAlign.center,
                             style: theme.textTheme.titleSmall?.copyWith(
@@ -281,7 +281,7 @@ class _SectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
+    return TrText(
       label,
       style: theme.textTheme.labelSmall?.copyWith(
         color: AppColors.goldAccent,
@@ -331,7 +331,7 @@ class _GreetingHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                TrText(
                   greeting,
                   style: theme.textTheme.headlineSmall?.copyWith(
                     color: theme.colorScheme.onSurface,
@@ -382,7 +382,7 @@ class _LatestNoteCard extends ConsumerWidget {
                   color: AppColors.goldAccent, size: 18),
               const SizedBox(width: 8),
               Expanded(
-                child: Text(
+                child: TrText(
                   noteTitle,
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w700,
@@ -391,7 +391,7 @@ class _LatestNoteCard extends ConsumerWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Text(
+              TrText(
                 noteDate,
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.40),
@@ -400,7 +400,7 @@ class _LatestNoteCard extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 10),
-          Text(
+          TrText(
             notePreview,
             style: theme.textTheme.bodySmall?.copyWith(
               height: 1.55,
@@ -481,7 +481,7 @@ class _StreakProgressCard extends ConsumerWidget {
                     color: theme.colorScheme.primary, size: 28),
               ),
               const SizedBox(height: 8),
-              Text(
+              TrText(
                 streakDays == 1 ? '1 day streak' : '$streakDays days streak',
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.primary,
@@ -688,7 +688,7 @@ class _QuickActionButton extends StatelessWidget {
             child: Icon(icon, color: color, size: 24),
           ),
           const SizedBox(height: 7),
-          Text(
+          TrText(
             label,
             style: theme.textTheme.labelSmall?.copyWith(
               color: theme.colorScheme.onSurface,

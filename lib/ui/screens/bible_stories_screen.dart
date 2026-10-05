@@ -394,7 +394,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                 size: 14,
                 color: active ? theme.primaryColor : theme.colorScheme.onSurface.withValues(alpha: 0.6)),
             const SizedBox(width: 4),
-            Text(label, style: theme.textTheme.labelSmall),
+            TrText(label, style: theme.textTheme.labelSmall),
           ],
         ),
       ),
@@ -441,7 +441,7 @@ class _FilterPill extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Flexible(
-              child: Text(
+              child: TrText(
                 label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -513,7 +513,7 @@ class _EmptyStories extends ConsumerWidget {
             color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
           ),
           const SizedBox(height: 12),
-          Text(
+          TrText(
             title,
             textAlign: TextAlign.center,
             style: theme.textTheme.titleSmall?.copyWith(
@@ -536,7 +536,7 @@ class _EmptyStories extends ConsumerWidget {
                 HapticFeedback.selectionClick();
                 action!();
               },
-              child: Text(actionLabel),
+              child: TrText(actionLabel),
             ),
           ],
         ],
@@ -664,7 +664,7 @@ class _StoryCard extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      TrText(
                         story.title,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -675,7 +675,7 @@ class _StoryCard extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      Text(
+                      TrText(
                         story.ref.toUpperCase(),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -701,7 +701,7 @@ class _StoryCard extends ConsumerWidget {
     return Container(
       color: theme.colorScheme.surfaceContainerHighest,
       alignment: Alignment.center,
-      child: Text(
+      child: TrText(
         story.prefix,
         style: theme.textTheme.titleMedium?.copyWith(
           fontFamily: 'IM Fell English',

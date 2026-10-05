@@ -173,7 +173,7 @@ class _ReadingPlanDetailV2ScreenState
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
+                  TrText(
                     loadError,
                     textAlign: TextAlign.center,
                   ),
@@ -205,12 +205,12 @@ class _ReadingPlanDetailV2ScreenState
           child: ListView(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 60),
             children: [
-              Text(_title(),
+              TrText(_title(),
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   )),
               const SizedBox(height: 4),
-              Text(
+              TrText(
                 total == 0
                     ? 'This plan has no readings yet.'
                     : '$total reading days · ~${(total / 7).ceil()} weeks',
@@ -339,7 +339,7 @@ class _ReadingPlanDetailV2ScreenState
                                         .withValues(alpha: 0.55),
                                   ),
                                 ),
-                                Text(
+                                TrText(
                                   total == 0
                                       ? 'No readings'
                                       : 'Day $current of $total',
@@ -416,7 +416,7 @@ class _ReadingPlanDetailV2ScreenState
                                         BorderRadius.circular(999),
                                   ),
                                   alignment: Alignment.center,
-                                  child: Text(
+                                  child: TrText(
                                     m == 'scheduled'
                                         ? 'Scheduled'
                                         : 'Flexible',
@@ -439,7 +439,7 @@ class _ReadingPlanDetailV2ScreenState
                         ),
                       ),
                       const SizedBox(height: 6),
-                      Text(
+                      TrText(
                         plan.paceMode == 'flexible'
                             ? 'Flexible: work oldest-unread first. No missed days accrue.'
                             : 'Scheduled: each date maps to a reading day. Missed days accrue as behind — catch up below.',
@@ -695,7 +695,7 @@ class _ReadingPlanDetailV2ScreenState
                             crossAxisAlignment:
                                 CrossAxisAlignment.start,
                             children: [
-                              Text(
+                              TrText(
                                 plan.reminderEnabled
                                     ? 'Reminder · ${_fmtTime(plan.reminderTimeHour, plan.reminderTimeMinute)}'
                                     : 'Reminder off',
@@ -811,7 +811,7 @@ class _ReadingPlanDetailV2ScreenState
                 HapticFeedback.selectionClick();
                 Navigator.of(ctx).pop(Set<int>.from(selected));
               },
-              child: Text(
+              child: TrText(
                   selected.isEmpty ? 'No rest days' : 'Save'),
             ),
           ],
@@ -863,7 +863,7 @@ class _ReadingPlanDetailV2ScreenState
                     showDialog(
                       context: context,
                       builder: (d) => AlertDialog(
-                        title: Text(meta?.title ?? 'About this plan'),
+                        title: Text(meta?.title ?? context.tr('About this plan')),
                         content: SingleChildScrollView(
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
@@ -1060,7 +1060,7 @@ class _DayRow extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
+                      TrText(
                         dateLabel,
                         style: theme.textTheme.labelSmall?.copyWith(
                           fontWeight: FontWeight.w800,
@@ -1070,7 +1070,7 @@ class _DayRow extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 2),
-                      Text(
+                      TrText(
                         summary,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -1084,7 +1084,7 @@ class _DayRow extends StatelessWidget {
                 ),
                 IconButton(
                   visualDensity: VisualDensity.compact,
-                  tooltip: done ? 'Mark unread' : 'Mark read',
+                  tooltip: done ? context.tr('Mark unread') : context.tr('Mark read'),
                   icon: Icon(
                     done
                         ? Icons.check_circle_rounded
@@ -1132,7 +1132,7 @@ class _Legend extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 5),
-        Text(
+        TrText(
           text,
           style: theme.textTheme.labelSmall?.copyWith(
             color:
@@ -1204,7 +1204,7 @@ class _DayDetailCardState extends ConsumerState<_DayDetailCard> {
         children: [
           V2Eyebrow('Day ${widget.day}$dateLabel'),
           const SizedBox(height: 6),
-          Text(
+          TrText(
             dayData.passages.map((p) => p.label).join(' · '),
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.bold,
@@ -1282,7 +1282,7 @@ class _DayDetailCardState extends ConsumerState<_DayDetailCard> {
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: Text(
+                        child: TrText(
                           dayData.passages[i].label,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.w600,
@@ -1323,7 +1323,7 @@ class _DayDetailCardState extends ConsumerState<_DayDetailCard> {
                   }
                 }
               },
-              child: Text(done
+              child: TrText(done
                   ? '✓ Completed — tap to undo'
                   : 'Mark Day ${widget.day} as Read ✓ (${_checked.length}/${dayData.passages.length} passages)'),
             ),

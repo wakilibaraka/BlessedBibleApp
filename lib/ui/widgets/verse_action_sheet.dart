@@ -11,6 +11,7 @@ import '../../state/read_settings_provider.dart';
 import '../screens/read_screen.dart' show VerseActionLogic;
 import 'textured_glass_container.dart';
 import '../../l10n/l10n.dart';
+import '../../l10n/tr_text.dart';
 
 /// Compact Apple-style action sheet for a verse selection.
 ///
@@ -67,7 +68,7 @@ Future<bool> showVerseActionSheet(BuildContext context, WidgetRef ref) async {
           icon: allBookmarked
               ? Icons.bookmark_rounded
               : Icons.bookmark_border_rounded,
-          label: allBookmarked ? 'Saved' : 'Save',
+          label: allBookmarked ? context.tr('Saved') : context.tr('Save'),
           active: allBookmarked,
           onTap: () {
             VerseActionLogic.handleBookmark(ctx, theme, ref,
@@ -217,7 +218,7 @@ class VerseActionSheet extends StatelessWidget {
             const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Text(
+              child: TrText(
                 contextLabel,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -277,7 +278,7 @@ class _SheetActionButton extends StatelessWidget {
             children: [
               Icon(action.icon, size: 20, color: color),
               const SizedBox(height: 3),
-              Text(
+              TrText(
                 action.label,
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontSize: 11,

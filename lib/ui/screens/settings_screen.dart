@@ -729,8 +729,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                   const Divider(height: 1, indent: 16),
                   ListTile(
                     title: const TrText('Location'),
-                    subtitle: Text(remindersState.sabbathLocationName ??
-                        'Not set (Tap to set)'),
+                    subtitle: Text(remindersState.sabbathLocationName ?? context.tr('Not set (Tap to set)')),
                     trailing: const Icon(Icons.edit_location_alt_rounded),
                     onTap: () => _showLocationPicker(context, notifier),
                   ),
@@ -808,7 +807,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                             for (int i = 1; i <= 7; i++)
                               SimpleDialogOption(
                                 onPressed: () => Navigator.pop(ctx, i),
-                                child: Text(_weekdayName(i)),
+                                child: TrText(_weekdayName(i)),
                               ),
                           ],
                         ),
@@ -1281,7 +1280,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             return ListTile(
               title: const TrText('Version'),
               trailing: packageInfoAsync.when(
-                data: (info) => Text(info.version,
+                data: (info) => TrText(info.version,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(context)
                             .colorScheme
@@ -1306,7 +1305,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 return Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
+                    TrText(
                       snapshot.hasData ? '${mb.toStringAsFixed(1)} MB' : '…',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context)
@@ -1496,11 +1495,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title,
+                  TrText(title,
                       style: theme.textTheme.titleSmall
                           ?.copyWith(fontWeight: FontWeight.w600)),
                   const SizedBox(height: 4),
-                  Text(subtitle,
+                  TrText(subtitle,
                       style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurface
                               .withValues(alpha: 0.7))),
@@ -1539,7 +1538,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title,
+                  TrText(title,
                       style: TextStyle(
                           fontSize: 15,
                           fontWeight:
@@ -1548,7 +1547,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                               ? theme.primaryColor
                               : theme.colorScheme.onSurface)),
                   const SizedBox(height: 2),
-                  Text(subtitle,
+                  TrText(subtitle,
                       style: TextStyle(
                           fontSize: 13,
                           color: theme.colorScheme.onSurface

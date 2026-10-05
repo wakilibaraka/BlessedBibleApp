@@ -237,7 +237,7 @@ class MainNavScreen extends ConsumerWidget {
                                                     .primaryColor
                                                     .withValues(alpha: 0.2)),
                                           ),
-                                          child: Text(
+                                          child: TrText(
                                             selectedVerses.length == 1
                                                 ? '1 verse selected'
                                                 : '${selectedVerses.length} verses selected',
@@ -778,7 +778,7 @@ class MainNavScreen extends ConsumerWidget {
                       opacity: anim,
                       alwaysIncludeSemantics: true,
                       child: child),
-                  child: Text(
+                  child: TrText(
                     currentLabel,
                     key: ValueKey(currentLabel),
                     textAlign: TextAlign.center,

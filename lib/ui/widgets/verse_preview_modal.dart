@@ -98,7 +98,7 @@ class VersePreviewModal extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                    child: Text(
+                    child: TrText(
                       reference,
                       style: theme.textTheme.titleMedium?.copyWith(
                         color: theme.primaryColor,
@@ -127,7 +127,7 @@ class VersePreviewModal extends ConsumerWidget {
             Flexible(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(24.0),
-                child: Text(
+                child: TrText(
                   verseText,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontFamily: typography.fontFamily,

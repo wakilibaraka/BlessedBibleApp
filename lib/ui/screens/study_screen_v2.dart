@@ -293,7 +293,7 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                         children: [
                           V2Eyebrow(greetingEyebrow(now)),
                           const SizedBox(height: 2),
-                          Text(
+                          TrText(
                             greeting.title,
                             key: const Key('studyGreetingTitle'),
                             style: theme.textTheme.titleLarge?.copyWith(
@@ -301,7 +301,7 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                             ),
                           ),
                           const SizedBox(height: 4),
-                          Text(
+                          TrText(
                             greeting.subtitle,
                             key: const Key('studyGreetingSubtitle'),
                             style: theme.textTheme.labelMedium?.copyWith(
@@ -579,7 +579,7 @@ class _YourSpaceCard extends ConsumerWidget {
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w800,
                       )),
-                  Text(c.$2,
+                  TrText(c.$2,
                       style: theme.textTheme.labelSmall?.copyWith(
                         fontSize: 10,
                         color: theme.colorScheme.onSurface
@@ -722,7 +722,7 @@ class _PlansLiveCardState extends ConsumerState<_PlansLiveCard> {
               children: [
                 const V2Eyebrow('Active plan'),
                 const SizedBox(height: 2),
-                Text(
+                TrText(
                   widget.planTitle(planId!),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -738,7 +738,7 @@ class _PlansLiveCardState extends ConsumerState<_PlansLiveCard> {
                           fraction: plan.percentComplete),
                     ),
                     const SizedBox(width: 8),
-                    Text(
+                    TrText(
                       total == 0
                           ? '…'
                           : 'Day $current of $total',
@@ -899,7 +899,7 @@ class _TodayRow extends ConsumerWidget {
                     ReadingPlanDetailV2Screen(planId: planId),
               ));
             },
-            child: Text(plan.completedReadings.contains(current)
+            child: TrText(plan.completedReadings.contains(current)
                 ? 'Review'
                 : 'Read'),
           ),
@@ -959,7 +959,7 @@ class _ToolCard extends StatelessWidget {
           const SizedBox(height: 8),
           V2Eyebrow(eyebrow),
           const SizedBox(height: 2),
-          Text(title,
+          TrText(title,
               style: (expanded
                       ? theme.textTheme.titleMedium
                       : theme.textTheme.titleSmall)
@@ -968,7 +968,7 @@ class _ToolCard extends StatelessWidget {
               )),
           if (span == CardSpan.full || expanded) ...[
             const SizedBox(height: 4),
-            Text(snippet,
+            TrText(snippet,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.bodySmall?.copyWith(
@@ -1030,7 +1030,7 @@ class _VotdArchiveCard extends ConsumerWidget {
           const SizedBox(height: 8),
           const V2Eyebrow('Word of the day'),
           const SizedBox(height: 2),
-          Text(title,
+          TrText(title,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: (expanded
@@ -1041,7 +1041,7 @@ class _VotdArchiveCard extends ConsumerWidget {
               )),
           if (showSnippet && snippet != null && snippet.isNotEmpty) ...[
             const SizedBox(height: 4),
-            Text(snippet,
+            TrText(snippet,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.bodySmall?.copyWith(
@@ -1151,7 +1151,7 @@ class _StreakCard extends ConsumerWidget {
           const SizedBox(height: 8),
           const V2Eyebrow('Reading streak'),
           const SizedBox(height: 2),
-          Text(
+          TrText(
               count == 0
                   ? 'Start your streak'
                   : '$count day${count == 1 ? '' : 's'}',
@@ -1163,7 +1163,7 @@ class _StreakCard extends ConsumerWidget {
               )),
           if (span == CardSpan.full || expanded) ...[
             const SizedBox(height: 4),
-            Text(
+            TrText(
                 count > 0
                     ? 'Open daily to grow it.'
                     : 'Complete a reading each day.',

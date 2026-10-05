@@ -142,7 +142,7 @@ class _DictionaryV2ScreenState
                         return Padding(
                           padding:
                               const EdgeInsets.all(32),
-                          child: Text(
+                          child: TrText(
                             _query.isEmpty && !_savedOnly
                                 ? 'No headwords found.'
                                 : 'No matches. Try “grace”, “atonement” or “wilderness”.',
@@ -222,7 +222,7 @@ class _WordCard extends ConsumerWidget {
                 crossAxisAlignment:
                     CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  TrText(
                     head.isEmpty
                         ? '(untitled entry)'
                         : head,
@@ -231,7 +231,7 @@ class _WordCard extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 2),
-                  Text(
+                  TrText(
                     word.snippet,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -243,7 +243,7 @@ class _WordCard extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
+                  TrText(
                     word.sources,
                     style:
                         theme.textTheme.labelSmall?.copyWith(

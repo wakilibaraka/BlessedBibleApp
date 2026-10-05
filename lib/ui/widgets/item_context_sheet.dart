@@ -79,7 +79,7 @@ class ItemContextSheet extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
+                  TrText(
                     title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -89,7 +89,7 @@ class ItemContextSheet extends StatelessWidget {
                   ),
                   if (subtitle != null && subtitle!.isNotEmpty) ...[
                     const SizedBox(height: 2),
-                    Text(
+                    TrText(
                       subtitle!,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -139,7 +139,7 @@ class ItemContextSheet extends StatelessWidget {
                               Icon(a.icon, size: 20, color: color),
                               const SizedBox(width: 14),
                               Expanded(
-                                child: Text(
+                                child: TrText(
                                   a.label,
                                   style: theme.textTheme.bodyLarge
                                       ?.copyWith(
@@ -201,7 +201,7 @@ Future<bool> confirmDestructive(
         ),
         TextButton(
           onPressed: () => Navigator.of(ctx).pop(true),
-          child: Text(
+          child: TrText(
             confirmLabel,
             style: TextStyle(color: Theme.of(ctx).colorScheme.error),
           ),

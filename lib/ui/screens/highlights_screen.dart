@@ -108,7 +108,7 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
               Row(
                 children: [
                   Expanded(
-                    child: Text(
+                    child: TrText(
                       formattedRef,
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.bold,
@@ -129,7 +129,7 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                 ],
               ),
               const SizedBox(height: 8),
-              Text(
+              TrText(
                 data.text,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.8),

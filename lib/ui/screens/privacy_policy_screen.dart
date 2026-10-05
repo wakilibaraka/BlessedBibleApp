@@ -73,13 +73,13 @@ class PrivacyPolicyScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          TrText(
             title,
             style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold, color: theme.primaryColor),
           ),
           const SizedBox(height: 8),
-          Text(
+          TrText(
             content,
             style: theme.textTheme.bodyMedium,
           ),

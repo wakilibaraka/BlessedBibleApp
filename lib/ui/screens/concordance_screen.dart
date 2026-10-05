@@ -180,7 +180,7 @@ class _ConcordanceScreenState extends ConsumerState<ConcordanceScreen> {
                   else if (_hits == null)
                     Padding(
                       padding: const EdgeInsets.only(top: 24),
-                      child: Text(
+                      child: TrText(
                         _searched.isEmpty
                             ? 'Every verse containing your word, in canonical order.'
                             : 'Enter a single English word to search.',
@@ -238,7 +238,7 @@ class _HitRow extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            TrText(
               hit.reference,
               style: theme.textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.w800,
@@ -246,7 +246,7 @@ class _HitRow extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 2),
-            Text(
+            TrText(
               hit.text,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,

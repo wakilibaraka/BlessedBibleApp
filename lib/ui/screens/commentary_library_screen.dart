@@ -124,7 +124,7 @@ class CommentaryLibraryScreen extends ConsumerWidget {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
-        child: Text(
+        child: TrText(
           title.toUpperCase(),
           style: theme.textTheme.labelMedium?.copyWith(
             fontWeight: FontWeight.bold,
@@ -173,7 +173,7 @@ class _BookSectionState extends State<_BookSection> {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text(
+                  child: TrText(
                     widget.book,
                     style: widget.theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,

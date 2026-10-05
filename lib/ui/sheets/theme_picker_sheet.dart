@@ -585,7 +585,7 @@ class _ThemePillState extends ConsumerState<_ThemePill>
               ),
               child: Align(
                 alignment: Alignment.center,
-                child: Text(
+                child: TrText(
                   widget.label,
                   textAlign: widget.label.contains('\n')
                       ? TextAlign.left
@@ -777,7 +777,7 @@ class _DarkThemePillState extends ConsumerState<_DarkThemePill>
               ),
               child: Align(
                 alignment: Alignment.center,
-                child: Text(
+                child: TrText(
                   activeVariant == AppThemeMode.oled
                       ? 'OLED\nDark'
                       : 'Dusk\nOLED',
@@ -1075,7 +1075,7 @@ class _SurfaceStyleTile extends StatelessWidget {
               color: isSelected ? primary : onSurface.withValues(alpha: 0.55),
             ),
             const SizedBox(height: 5),
-            Text(
+            TrText(
               meta.label,
               textAlign: TextAlign.center,
               style: TextStyle(
@@ -1086,7 +1086,7 @@ class _SurfaceStyleTile extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 2),
-            Text(
+            TrText(
               meta.subtitle,
               textAlign: TextAlign.center,
               maxLines: 1,

@@ -250,7 +250,7 @@ class _CrossRefTileState extends ConsumerState<_CrossRefTile> {
                 color: theme.primaryColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(6),
               ),
-              child: Text(
+              child: TrText(
                 widget.refLabel,
                 style: TextStyle(
                   fontSize: 12,
@@ -269,7 +269,7 @@ class _CrossRefTileState extends ConsumerState<_CrossRefTile> {
                         borderRadius: BorderRadius.circular(4),
                       ),
                     )
-                  : Text(
+                  : TrText(
                       _verseText ?? 'Verse not available',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         height: 1.4,

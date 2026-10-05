@@ -231,7 +231,7 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
                 value: value,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Text(value),
+                  child: TrText(value),
                 ),
               );
             }).toList(),
@@ -321,7 +321,7 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
               Icon(sourceIcon, size: 16, color: tokens.readingAccent),
               const SizedBox(width: 8),
               Expanded(
-                child: Text(
+                child: TrText(
                   entry.source.isNotEmpty ? entry.source : 'Commentary',
                   style: theme.textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.bold,
@@ -337,7 +337,7 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
                   color: tokens.readingAccent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Text(
+                child: TrText(
                   entry.scope.type == 'verse'
                       ? 'Verse ${entry.scope.verse}'
                       : 'Chapter View',
@@ -362,7 +362,7 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
           Divider(height: 24, color: tokens.readingBorder),
           Row(
             children: [
-              Text(
+              TrText(
                 entry.author,
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.bold,

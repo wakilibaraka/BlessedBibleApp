@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../state/reading_plan_provider.dart';
 import 'study_v2_widgets.dart';
 import '../../l10n/l10n.dart';
+import '../../l10n/tr_text.dart';
 
 const List<String> _weekdayNames = [
   'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN',
@@ -212,7 +213,7 @@ class _DayCell extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 1),
-            Text(
+            TrText(
               _weekdayNames[day.weekday - 1],
               style: theme.textTheme.labelSmall?.copyWith(
                 fontWeight: isToday ? FontWeight.w800 : FontWeight.w500,

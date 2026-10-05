@@ -214,7 +214,7 @@ class _NoteEditorScreenState extends ConsumerState<NoteEditorScreen> {
             ],
           ),
           const SizedBox(height: 8),
-          Text(data.text, style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.8), height: 1.4)),
+          TrText(data.text, style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.8), height: 1.4)),
         ],
       ),
     );
@@ -250,7 +250,7 @@ class _NoteEditorScreenState extends ConsumerState<NoteEditorScreen> {
                   _buildContextualVerseCard(context, ref, widget.initialNote!.reference!, theme),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12.0),
-                  child: Text(
+                  child: TrText(
                     _dateStamp,
                     style: theme.textTheme.labelSmall?.copyWith(
                       fontFamily: 'EB Garamond',

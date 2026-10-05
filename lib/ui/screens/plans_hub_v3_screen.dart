@@ -447,7 +447,7 @@ class _MyPlansTab extends ConsumerWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: Text(
+                      child: TrText(
                         _title(ref, id),
                         style: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.bold,
@@ -464,7 +464,7 @@ class _MyPlansTab extends ConsumerWidget {
                   ],
                 ),
                 const SizedBox(height: 4),
-                Text(
+                TrText(
                   total == 0
                       ? 'Loading…'
                       : 'Day $current of $total',
@@ -496,7 +496,7 @@ class _MyPlansTab extends ConsumerWidget {
                       const SizedBox(width: 8),
                       FilledButton.tonal(
                         onPressed: () => onOpen(id),
-                        child: Text(plan.completedReadings
+                        child: TrText(plan.completedReadings
                                 .contains(current)
                             ? 'Review'
                             : 'Read'),
@@ -682,14 +682,14 @@ class _LibraryTab extends ConsumerWidget {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  Text(
+                  TrText(
                     meta.title,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
+                  TrText(
                     meta.description,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurface
@@ -725,7 +725,7 @@ class _LibraryTab extends ConsumerWidget {
                             onPressed: atCapacity
                                 ? null
                                 : () => onStart(meta),
-                            child: Text(atCapacity
+                            child: TrText(atCapacity
                                 ? 'Slots full (3/3)'
                                 : 'Start plan'),
                           ),

@@ -159,7 +159,7 @@ class _BibleStoryReaderScreenState
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
+                  TrText(
                     _story.title,
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontFamily: 'Playfair Display',
@@ -169,7 +169,7 @@ class _BibleStoryReaderScreenState
                   ),
                   if (position != null) ...[
                     const SizedBox(height: 6),
-                    Text(
+                    TrText(
                       position,
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
@@ -240,7 +240,7 @@ class _BibleStoryReaderScreenState
                     ],
                   ),
                   const SizedBox(height: 20),
-                  Text(
+                  TrText(
                     _story.retelling,
                     style: theme.textTheme.bodyLarge?.copyWith(
                       fontFamily: 'Source Serif 4',

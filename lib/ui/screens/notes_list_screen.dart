@@ -84,13 +84,13 @@ class NotesListScreen extends ConsumerWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Expanded(
-                                  child: Text(
+                                  child: TrText(
                                     note.title,
                                     style: theme.textTheme.titleMedium
                                         ?.copyWith(fontWeight: FontWeight.bold),
                                   ),
                                 ),
-                                Text(
+                                TrText(
                                   note.date,
                                   style: theme.textTheme.bodySmall?.copyWith(
                                     color: theme.colorScheme.onSurface
@@ -101,7 +101,7 @@ class NotesListScreen extends ConsumerWidget {
                             ),
                             if (note.reference != null) ...[
                               const SizedBox(height: 4),
-                              Text(
+                              TrText(
                                 note.reference!,
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: theme.primaryColor,
@@ -110,7 +110,7 @@ class NotesListScreen extends ConsumerWidget {
                               ),
                             ],
                             const SizedBox(height: 8),
-                            Text(
+                            TrText(
                               note.content,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
@@ -383,7 +383,7 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
+            TrText(
               widget.editingNote != null
                   ? 'Edit Note'
                   : (widget.initialReference != null
@@ -534,7 +534,7 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
                   const SnackBar(content: TrText('Note saved!')),
                 );
               },
-              child: Text(widget.editingNote != null ? 'Save Changes' : 'Save Note',
+              child: TrText(widget.editingNote != null ? 'Save Changes' : 'Save Note',
                   style: const TextStyle(fontWeight: FontWeight.bold)),
             ),
             if (widget.editingId != null) ...[

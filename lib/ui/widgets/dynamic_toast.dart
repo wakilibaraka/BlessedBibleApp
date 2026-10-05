@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'textured_glass_container.dart';
+import '../../l10n/tr_text.dart';
 
 class DynamicToast {
   static void show(
@@ -113,7 +114,7 @@ class _ToastOverlayState extends State<_ToastOverlay> with SingleTickerProviderS
                     const SizedBox(width: 12),
                   ],
                   Flexible(
-                    child: Text(
+                    child: TrText(
                       widget.message,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,

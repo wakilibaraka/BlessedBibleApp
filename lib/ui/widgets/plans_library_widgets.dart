@@ -58,7 +58,7 @@ class LibraryGreetingHeader extends StatelessWidget {
                   height: 1.1,
                 ),
               ),
-              Text(
+              TrText(
                 name,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -92,7 +92,7 @@ class LibraryGreetingHeader extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
+                    TrText(
                       progressLabel,
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w800,
@@ -100,7 +100,7 @@ class LibraryGreetingHeader extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 1),
-                    Text(
+                    TrText(
                       remainingLabel,
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurface
@@ -267,7 +267,7 @@ class PlanCoverPlaceholder extends StatelessWidget {
             ),
           ),
           Center(
-            child: Text(
+            child: TrText(
               initials,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w800,
@@ -371,7 +371,7 @@ class LibraryPlateBand extends ConsumerWidget {
                             ),
                           ),
                           const SizedBox(height: 2),
-                          Text(
+                          TrText(
                             p.caption,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,

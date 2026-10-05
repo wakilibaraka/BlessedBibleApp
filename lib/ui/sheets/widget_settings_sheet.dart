@@ -165,7 +165,7 @@ class WidgetSettingsSheet extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: 2),
-                    Text(
+                    TrText(
                       wotdWord,
                       style: TextStyle(
                         fontSize: 14,
@@ -174,7 +174,7 @@ class WidgetSettingsSheet extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: 2),
-                    Text(
+                    TrText(
                       wotdSnippet,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,

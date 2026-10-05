@@ -209,7 +209,7 @@ class _FeatureRow extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              TrText(
                 title,
                 style: TextStyle(
                   fontFamily: 'EB Garamond',
@@ -219,7 +219,7 @@ class _FeatureRow extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
-              Text(
+              TrText(
                 subtitle,
                 style: TextStyle(
                   fontSize: 15,

@@ -309,7 +309,7 @@ class _BookChapterSelectorSheetState
           ),
           child: Column(
             children: [
-              Text(
+              TrText(
                 label.toUpperCase(),
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.bold,
@@ -321,7 +321,7 @@ class _BookChapterSelectorSheetState
                 ),
               ),
               const SizedBox(height: 2),
-              Text(
+              TrText(
                 value,
                 style: theme.textTheme.labelMedium?.copyWith(
                   fontWeight: FontWeight.bold,
@@ -600,7 +600,7 @@ class _BookChapterSelectorSheetState
                         child: Row(
                           children: [
                             Expanded(
-                              child: Text(
+                              child: TrText(
                                 p.title,
                                 style: theme.textTheme.titleSmall?.copyWith(
                                   color: isSel ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
@@ -685,7 +685,7 @@ class _BookChapterSelectorSheetState
           : theme.colorScheme.onSurface.withValues(alpha: 0.8),
     );
 
-    Widget content = Text(
+    Widget content = TrText(
       text,
       style: textStyle,
       maxLines: 1,
@@ -699,7 +699,7 @@ class _BookChapterSelectorSheetState
         children: [
           content,
           const SizedBox(height: 2),
-          Text(
+          TrText(
             subtitle,
             style: theme.textTheme.bodySmall?.copyWith(
               fontSize: 9,

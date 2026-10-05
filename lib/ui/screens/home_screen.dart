@@ -325,7 +325,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 const SizedBox(height: 10),
                 BouncyEntrance(
                   delay: const Duration(milliseconds: 300),
-                  child: Text(
+                  child: TrText(
                     data.verseOfTheDay.reference,
                     style: theme.textTheme.titleSmall?.copyWith(
                       color: theme.primaryColor,
@@ -366,7 +366,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         ),
                         const SizedBox(width: 6),
                         Expanded(
-                          child: Text(
+                          child: TrText(
                             (data.verseOfTheDay.isDevotional
                                     ? 'DEVOTIONAL'
                                     : 'COMMENTARY') +
@@ -387,7 +387,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       ],
                     ),
                     const SizedBox(height: 8),
-                    Text(
+                    TrText(
                       excerpt,
                       maxLines: 8,
                       overflow: TextOverflow.ellipsis,
@@ -498,7 +498,7 @@ class _PillButton extends StatelessWidget {
             shape: shape,
             padding: EdgeInsets.zero,
           ),
-          child: Text(
+          child: TrText(
             label,
             style: theme.textTheme.labelMedium
                 ?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
@@ -521,7 +521,7 @@ class _PillButton extends StatelessWidget {
             shape: shape,
             padding: EdgeInsets.zero,
           ),
-          child: Text(
+          child: TrText(
             label,
             style: theme.textTheme.labelMedium
                 ?.copyWith(color: gold, fontWeight: FontWeight.w500),
@@ -564,7 +564,7 @@ class WordOfTheDaySection extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              Text(
+              TrText(
                 wotd.word,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.headlineMedium?.copyWith(
@@ -581,7 +581,7 @@ class WordOfTheDaySection extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(
+                    TrText(
                       wotd.snippet,
                       maxLines: 4,
                       overflow: TextOverflow.ellipsis,
@@ -683,7 +683,7 @@ class _WotdFallback extends StatelessWidget {
           isScrollable: false,
           borderRadius: BorderRadius.circular(24),
           padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
-          child: Text(
+          child: TrText(
             message,
             textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall?.copyWith(

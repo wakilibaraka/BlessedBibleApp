@@ -49,7 +49,7 @@ class _CommentaryLibraryV2ScreenState
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(book,
+              TrText(book,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   )),
@@ -197,7 +197,7 @@ class _CommentaryLibraryV2ScreenState
                           color: theme.colorScheme.onSurface
                               .withValues(alpha: 0.4)),
                       const SizedBox(height: 12),
-                      Text(
+                      TrText(
                         entries.isEmpty
                             ? 'No commentary available yet.'
                             : 'No books match "$_query".',
@@ -278,7 +278,7 @@ class _CommentaryLibraryV2ScreenState
                                 crossAxisAlignment:
                                     CrossAxisAlignment.start,
                                 children: [
-                                  Text(
+                                  TrText(
                                     book,
                                     style: theme
                                         .textTheme.titleSmall
@@ -576,7 +576,7 @@ class _FilterChip extends StatelessWidget {
                 : theme.dividerColor,
           ),
         ),
-        child: Text(
+        child: TrText(
           label,
           style: theme.textTheme.labelLarge?.copyWith(
             fontWeight: FontWeight.w700,
@@ -616,7 +616,7 @@ class _EntryCard extends ConsumerWidget {
                     size: 16, color: theme.primaryColor),
                 const SizedBox(width: 6),
                 Expanded(
-                  child: Text(
+                  child: TrText(
                     entry.source,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -640,7 +640,7 @@ class _EntryCard extends ConsumerWidget {
             Row(
               children: [
                 Expanded(
-                  child: Text(
+                  child: TrText(
                     entry.author,
                     style: theme.textTheme.labelLarge?.copyWith(
                       fontWeight: FontWeight.bold,

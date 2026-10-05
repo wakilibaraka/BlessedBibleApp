@@ -306,7 +306,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         _buildFilterChip(
-                                          label: searchState.filterBook ?? 'All Books',
+                                          label: searchState.filterBook ?? context.tr('All Books'),
                                           icon: Icons.menu_book_rounded,
                                           isActive: searchState.filterBook != null,
                                           onTap: () async {
@@ -473,7 +473,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                   : theme.colorScheme.onSurface,
             ),
             const SizedBox(width: 6),
-            Text(
+            TrText(
               label,
               style: theme.textTheme.labelMedium?.copyWith(
                 fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
@@ -570,7 +570,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
                     const SizedBox(width: 6),
-                    Text(
+                    TrText(
                       query,
                       style: theme.textTheme.labelMedium?.copyWith(
                         color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
@@ -670,7 +670,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 16.0, left: 4.0),
-          child: Text(
+          child: TrText(
             state.results.length >= 100 ? 'Showing top 100 results' : '${state.results.length} results found',
             style: theme.textTheme.labelMedium?.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
@@ -722,7 +722,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
   Widget _buildSectionHeader(String title, ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10.0, left: 4.0, top: 4.0),
-      child: Text(
+      child: TrText(
         title,
         style: theme.textTheme.labelSmall?.copyWith(
           color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
@@ -772,7 +772,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                   Icon(icon, size: 15, color: theme.primaryColor),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: Text(
+                    child: TrText(
                       result.subtitle,
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.primaryColor,
@@ -784,7 +784,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                 ],
               ),
               const SizedBox(height: 8),
-              Text(
+              TrText(
                 result.title,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
@@ -815,7 +815,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     );
 
     if (query.isEmpty) {
-      return Text(text,
+      return TrText(text,
           style: baseStyle, maxLines: 2, overflow: TextOverflow.ellipsis);
     }
 
@@ -823,7 +823,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     final textLower = text.toLowerCase();
     
     if (!textLower.contains(queryLower)) {
-      return Text(text,
+      return TrText(text,
           style: baseStyle, maxLines: 2, overflow: TextOverflow.ellipsis);
     }
 

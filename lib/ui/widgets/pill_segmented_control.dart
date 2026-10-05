@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/tr_text.dart';
 
 class PillSegmentedControl extends StatelessWidget {
   final List<String> segments;
@@ -35,7 +36,7 @@ class PillSegmentedControl extends StatelessWidget {
                 borderRadius: BorderRadius.circular(24),
               ),
               child: Center(
-                child: Text(
+                child: TrText(
                   segments[index],
                   style: TextStyle(
                     color: isSelected

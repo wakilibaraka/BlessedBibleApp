@@ -225,7 +225,7 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(
+            child: TrText(
               confirmLabel,
               style: destructive
                   ? TextStyle(color: Theme.of(ctx).colorScheme.error)
@@ -325,7 +325,7 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text(
+                                  TrText(
                                     pack.name,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
@@ -406,12 +406,12 @@ class _StatRow extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Flexible(
-            child: Text(label,
+            child: TrText(label,
                 style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurface
                         .withValues(alpha: 0.75))),
           ),
-          Text(value,
+          TrText(value,
               style: theme.textTheme.bodyMedium
                   ?.copyWith(fontWeight: FontWeight.w800)),
         ],
