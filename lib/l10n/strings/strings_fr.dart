@@ -786,4 +786,6 @@ const Map<String, String> frStrings = <String, String>{
   '⋯ {0} more balanced days': '⋯ encore {0} jours équilibrés',
   '⚠ {0} Title updated to the real day count.': '⚠ Le titre de {0} a été mis à jour avec le nombre réel de jours.',
   '🎉 {0} readings completed — keep going!': '🎉 {0} lectures terminées — continuez !',
+  'Occurrences in {0} — tap a verse to read it in context.': 'Occurrences dans {0} — appuyez sur un verset pour le lire dans son contexte.',
+  'Enter a word or phrase to search.': 'Saisissez un mot ou une expression pour rechercher.',
 };

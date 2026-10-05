@@ -794,4 +794,6 @@ const Map<String, String> itStrings = <String, String>{
   '⋯ {0} more balanced days': '⋯ altri {0} giorni bilanciati',
   '⚠ {0} Title updated to the real day count.': '⚠ Il titolo di {0} è stato aggiornato al numero reale di giorni.',
   '🎉 {0} readings completed — keep going!': '🎉 {0} letture completate — continua!',
+  'Occurrences in {0} — tap a verse to read it in context.': 'Occorrenze in {0} — tocca il versetto per leggerlo nel contesto.',
+  'Enter a word or phrase to search.': 'Inserisci una parola o una frase per cercare.',
 };

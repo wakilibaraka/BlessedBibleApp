@@ -790,4 +790,6 @@ const Map<String, String> roStrings = <String, String>{
   '⋯ {0} more balanced days': '⋯ încă {0} zile echilibrate',
   '⚠ {0} Title updated to the real day count.': '⚠ Titlul {0} a fost actualizat la numărul real de zile.',
   '🎉 {0} readings completed — keep going!': '🎉 {0} lecturi finalizate — continuă!',
+  'Occurrences in {0} — tap a verse to read it in context.': 'Apariții în {0} — atingeți versetul pentru a-l citi în context.',
+  'Enter a word or phrase to search.': 'Introduceți un cuvânt sau o expresie pentru a căuta.',
 };

@@ -800,4 +800,6 @@ const Map<String, String> ptStrings = <String, String>{
   '⋯ {0} more balanced days': '⋯ mais {0} dias equilibrados',
   '⚠ {0} Title updated to the real day count.': '⚠ O título de {0} foi atualizado para o número real de dias.',
   '🎉 {0} readings completed — keep going!': '🎉 {0} leituras concluídas — continue!',
+  'Occurrences in {0} — tap a verse to read it in context.': 'Ocorrências em {0} — toque num versículo para o ler em contexto.',
+  'Enter a word or phrase to search.': 'Escreva uma palavra ou uma frase para pesquisar.',
 };

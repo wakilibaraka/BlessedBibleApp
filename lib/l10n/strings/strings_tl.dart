@@ -775,4 +775,6 @@ const Map<String, String> tlStrings = <String, String>{
   '⋯ {0} more balanced days': '⋯ {0} pang karagdagang balansadong araw',
   '⚠ {0} Title updated to the real day count.': '⚠ In-update ang pamagat ng {0} sa totoong bilang ng araw.',
   '🎉 {0} readings completed — keep going!': '🎉 {0} pagbabasa ang tapos — ipagpatuloy!',
+  'Occurrences in {0} — tap a verse to read it in context.': 'Mga pagkakataon sa {0} — pindutin ang talata para basahin sa konteksto.',
+  'Enter a word or phrase to search.': 'Mag-type ng salita o pariralula upang maghanap.',
 };

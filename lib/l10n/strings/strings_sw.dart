@@ -793,4 +793,6 @@ const Map<String, String> swStrings = <String, String>{
   '⋯ {0} more balanced days': '⋯ siku {0} zaidi zilizobalansiwa',
   '⚠ {0} Title updated to the real day count.': '⚠ Kichwa cha {0} kimebadilishwa kuwa idadi halisi ya siku.',
   '🎉 {0} readings completed — keep going!': '🎉 Masomo {0} yamekamilika — endelea!',
+  'Occurrences in {0} — tap a verse to read it in context.': 'Matokeo katika {0} — gusa aya ili isome katika muktadha.',
+  'Enter a word or phrase to search.': 'Andika neno au sentensi ili utafute.',
 };
