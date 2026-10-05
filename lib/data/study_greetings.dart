@@ -1,3 +1,5 @@
+import '../l10n/l10n.dart';
+
 /// A Study hub greeting: benediction title + companion subtitle.
 class StudyGreeting {
   final String title;
@@ -117,14 +119,14 @@ String greetingEyebrow(DateTime now) {
     'Saturday',
     'Sunday'
   ];
-  final day = weekdays[now.weekday - 1];
+  final day = tr(weekdays[now.weekday - 1]);
   final hour = now.hour;
   final part = hour >= 5 && hour < 12
-      ? 'morning'
+      ? tr('morning')
       : hour >= 12 && hour < 18
-          ? 'afternoon'
+          ? tr('afternoon')
           : hour >= 18
-              ? 'evening'
-              : 'night';
+              ? tr('evening')
+              : tr('night');
   return '$day $part';
 }

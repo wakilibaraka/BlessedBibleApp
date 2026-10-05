@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../l10n/l10n.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../../data/let_read.dart';
 import '../../data/models/home_data.dart';
@@ -520,14 +521,14 @@ class _ReadingTab extends ConsumerWidget {
             } else if (total <= 0) {
               status = 'Started';
             } else if (behind > 0) {
-              status = '$behind day${behind == 1 ? '' : 's'} behind';
+              status = context.tr(behind == 1 ? '{0} day behind' : '{0} days behind', [behind]);
             } else if (current < total && st.isDayComplete(current)) {
               status = 'Caught up';
             } else if (pct >= 1.0) {
               status = 'Complete';
             } else {
               final left = total - current;
-              status = 'Day $current of $total · $left left';
+              status = context.tr('Day {0} of {1} · {2} left', [current, total, left]);
             }
             return _LibraryCard(
               seed: meta.id,
@@ -658,7 +659,7 @@ class _BooksTab extends ConsumerWidget {
                 title: titleFor(id),
                 statusLine: started
                     ? (total > 0
-                        ? 'Day $current of $total'
+                        ? context.tr('Day {0} of {1}', [current, total])
                         : 'Started')
                     : 'Custom plan',
                 fraction: started ? st.percentComplete : 0,
@@ -731,7 +732,7 @@ class _MyPlansTab extends ConsumerWidget {
               seed: id,
               title: titleFor(id),
               statusLine: total > 0
-                  ? 'Day $current of $total'
+                  ? context.tr('Day {0} of {1}', [current, total])
                   : 'Started',
               fraction: st.percentComplete,
               featured: true,

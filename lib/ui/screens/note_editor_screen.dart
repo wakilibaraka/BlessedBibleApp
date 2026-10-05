@@ -136,7 +136,7 @@ class _NoteEditorScreenState extends ConsumerState<NoteEditorScreen> {
     } else {
       final now = DateTime.now();
       const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-      final month = months[now.month - 1];
+      final month = tr(months[now.month - 1]);
       var hour = now.hour;
       final ampm = hour >= 12 ? 'PM' : 'AM';
       if (hour == 0) hour = 12;

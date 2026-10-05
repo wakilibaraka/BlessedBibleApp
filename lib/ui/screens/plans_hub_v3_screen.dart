@@ -432,7 +432,7 @@ class _MyPlansTab extends ConsumerWidget {
         final plan = ref.watch(readingPlanProvider(id));
         final total = plan.planData.length;
         final current = plan.todayReadingDay ?? total;
-        String todayLabel = 'Ready to begin';
+        String todayLabel = context.tr('Ready to begin');
         if (total > 0 && current >= 1 && current <= total) {
           todayLabel =
               plan.planData[current - 1].passages.map((p) => p.label).join(' · ');

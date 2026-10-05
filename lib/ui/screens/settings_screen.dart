@@ -14,6 +14,7 @@ import '../../state/bbe_substitutions_provider.dart';
 import '../../services/backup_service.dart';
 import '../../services/bible_database_service.dart';
 import '../../state/reminders_provider.dart';
+import '../../state/locale_provider.dart';
 import '../widgets/shared_app_bar.dart';
 import '../widgets/animated_segmented_tile.dart';
 import '../widgets/settings_pill_card.dart';
@@ -128,6 +129,31 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
   // --- Page 1: General ---
   Widget _buildGeneralPage(BuildContext context, WidgetRef ref) {
     return _buildPageContainer(context, [
+      SettingsPillCard(
+        children: [
+          Consumer(builder: (context, ref, _) {
+            final chosen = ref.watch(localeProvider);
+            final systemCode = AppL10n.resolve(
+                View.of(context).platformDispatcher.locale.languageCode);
+            final currentName = chosen == null
+                ? context.tr('System default')
+                : kLanguageNames[chosen] ?? chosen;
+            return ListTile(
+              leading: Icon(
+                Icons.translate_rounded,
+                color: Theme.of(context).primaryColor,
+              ),
+              title: const TrText('Language'),
+              subtitle: Text(currentName),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () {
+                HapticFeedback.selectionClick();
+                _showLanguagePicker(context, ref, systemCode);
+              },
+            );
+          }),
+        ],
+      ),
       SettingsPillCard(
         children: [
           ListTile(
@@ -695,6 +721,57 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
         ],
       ),
     ]);
+  }
+
+  void _showLanguagePicker(BuildContext context, WidgetRef ref,
+      String systemCode) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (ctx) {
+        final current = ref.read(localeProvider);
+        Widget row(String? code, String label) {
+          final selected = code == current;
+          return ListTile(
+            title: Text(label),
+            trailing: selected
+                ? Icon(Icons.check_rounded,
+                    color: Theme.of(context).primaryColor)
+                : null,
+            onTap: () {
+              HapticFeedback.selectionClick();
+              ref.read(localeProvider.notifier).setLocale(code);
+              Navigator.pop(ctx);
+            },
+          );
+        }
+
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+            top: 24,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: TrText('Language',
+                    style: Theme.of(context).textTheme.titleLarge),
+              ),
+              const SizedBox(height: 8),
+              row(null,
+                  '${context.tr('System default')} · ${kLanguageNames[systemCode] ?? systemCode}'),
+              for (final code in kLanguageNames.keys)
+                row(code, kLanguageNames[code]!),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   // --- Page 2: Reminders ---

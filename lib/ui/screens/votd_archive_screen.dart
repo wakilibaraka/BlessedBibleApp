@@ -8,6 +8,7 @@ import '../../state/theme_provider.dart';
 import 'commentary_hub_screen.dart';
 import '../../state/commentary_provider.dart';
 import '../../theme/reading_tokens.dart';
+import '../../l10n/l10n.dart';
 import '../../l10n/tr_text.dart';
 
 class VotdArchiveScreen extends ConsumerWidget {
@@ -109,7 +110,7 @@ class VotdArchiveScreen extends ConsumerWidget {
                       'Dec'
                     ];
                     displayDate =
-                        '${months[date.month - 1]} ${date.day}, ${date.year}';
+                        '${context.tr(months[date.month - 1])} ${date.day}, ${date.year}';
                   }
 
                   final bookName = reference.split(' ').first;

@@ -341,7 +341,7 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
     setState(() { _showSlashMenu = false; });
     final now = DateTime.now();
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    _insertText('${months[now.month - 1]} ${now.day}, ${now.year} ');
+    _insertText('${tr(months[now.month - 1])} ${now.day}, ${now.year} ');
   }
 
   void _insertChapterTitle() {
@@ -514,7 +514,7 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
                   'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
                 ];
                 final date =
-                    '${months[now.month - 1]} ${now.day.toString().padLeft(2, '0')}, ${now.year}';
+                    '${tr(months[now.month - 1])} ${now.day.toString().padLeft(2, '0')}, ${now.year}';
                 final note = PersonalNote(
                   widget.editingNote?.id ?? const Uuid().v4(),
                   titleController.text.trim(),

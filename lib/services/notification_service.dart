@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import '../l10n/l10n.dart';
 import '../utils/sunset_calculator.dart';
 
 final notificationServiceProvider = Provider<NotificationService>((ref) {
@@ -78,14 +79,14 @@ class NotificationService {
 
     await _flutterLocalNotificationsPlugin.zonedSchedule(
       id: 0,
-      title: 'Time to Read',
-      body: 'Take a moment to read and reflect today.',
+      title: tr('Time to Read'),
+      body: tr('Take a moment to read and reflect today.'),
       scheduledDate: scheduledDate,
-      notificationDetails: const NotificationDetails(
+      notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           'daily_reminder_channel',
-          'Daily Reminders',
-          channelDescription: 'Reminders for daily reading',
+          tr('Daily Reminders'),
+          channelDescription: tr('Reminders for daily reading'),
           importance: Importance.high,
           priority: Priority.high,
         ),
@@ -108,14 +109,14 @@ class NotificationService {
 
     await _flutterLocalNotificationsPlugin.zonedSchedule(
       id: 2,
-      title: "Time for Prayer",
-      body: "Pause for a moment of reflection and prayer.",
+      title: tr('Time for Prayer'),
+      body: tr('Pause for a moment of reflection and prayer.'),
       scheduledDate: scheduledDate,
-      notificationDetails: const NotificationDetails(
+      notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           "prayer_reminder_channel",
-          "Prayer Reminders",
-          channelDescription: "Daily prayer reminders",
+          tr('Prayer Reminders'),
+          channelDescription: tr('Daily prayer reminders'),
           importance: Importance.high,
           priority: Priority.high,
         ),
@@ -144,14 +145,14 @@ class NotificationService {
 
     await _flutterLocalNotificationsPlugin.zonedSchedule(
       id: 1,
-      title: 'Weekly Study Time',
-      body: 'It\'s your scheduled time for study and reflection.',
+      title: tr('Weekly Study Time'),
+      body: tr('It\'s your scheduled time for study and reflection.'),
       scheduledDate: scheduledDate,
-      notificationDetails: const NotificationDetails(
+      notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           'weekly_reminder_channel',
-          'Weekly Reminders',
-          channelDescription: 'Custom weekly study reminders',
+          tr('Weekly Reminders'),
+          channelDescription: tr('Custom weekly study reminders'),
           importance: Importance.high,
           priority: Priority.high,
         ),
@@ -192,14 +193,14 @@ class NotificationService {
 
       await _flutterLocalNotificationsPlugin.zonedSchedule(
         id: 10 + i,
-        title: 'The Sabbath is Approaching',
-        body: 'Welcome the day of rest.',
+        title: tr('The Sabbath is Approaching'),
+        body: tr('Welcome the day of rest.'),
         scheduledDate: tDate,
-        notificationDetails: const NotificationDetails(
+        notificationDetails: NotificationDetails(
           android: AndroidNotificationDetails(
             'sabbath_reminder_channel',
-            'Sabbath Reminders',
-            channelDescription: 'Weekly sunset reminders for Sabbath',
+            tr('Sabbath Reminders'),
+            channelDescription: tr('Weekly sunset reminders for Sabbath'),
             importance: Importance.high,
             priority: Priority.high,
           ),
@@ -280,12 +281,12 @@ class NotificationService {
 
       await _flutterLocalNotificationsPlugin.zonedSchedule(
         id: base,
-        title: 'Time to Read',
-        body: 'Take a moment to read your daily passage.',
+        title: tr('Time to Read'),
+        body: tr('Take a moment to read your daily passage.'),
         scheduledDate: scheduledDate,
-        notificationDetails: const NotificationDetails(
+        notificationDetails: NotificationDetails(
           android: AndroidNotificationDetails(
-              'reading_plan_channel', 'Reading Plan',
+              'reading_plan_channel', tr('Reading Plan'),
               importance: Importance.high, priority: Priority.high),
         ),
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
@@ -306,12 +307,12 @@ class NotificationService {
 
         await _flutterLocalNotificationsPlugin.zonedSchedule(
           id: base + i,
-          title: 'Time to Read',
-          body: 'Take a moment to read your daily passage.',
+          title: tr('Time to Read'),
+          body: tr('Take a moment to read your daily passage.'),
           scheduledDate: scheduledDate,
-          notificationDetails: const NotificationDetails(
+          notificationDetails: NotificationDetails(
             android: AndroidNotificationDetails(
-                'reading_plan_channel', 'Reading Plan',
+                'reading_plan_channel', tr('Reading Plan'),
                 importance: Importance.high, priority: Priority.high),
           ),
           androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,

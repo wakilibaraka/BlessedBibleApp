@@ -87,7 +87,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
       'December'
     ];
     final dayLabel =
-        '${weekdays[now.weekday - 1]} · ${months[now.month - 1]} ${now.day}';
+        '${context.tr(weekdays[now.weekday - 1])} · ${context.tr(months[now.month - 1])} ${now.day}';
 
     final streak = ref.watch(streakProvider);
     final showNudge = !streak.readToday && streak.count > 0;
