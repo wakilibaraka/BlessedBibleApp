@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../services/bible_database_service.dart';
+import '../../l10n/tr_text.dart';
 
 class SplashLoadingScreen extends StatelessWidget {
   const SplashLoadingScreen({super.key});
@@ -50,8 +51,7 @@ class SplashLoadingScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      'Preparing offline Bible… ${(progress * 100).round()}%',
+                    TrText('Preparing offline Bible… {0}%', args: [(progress * 100).round()],
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurface
                             .withValues(alpha: 0.6),

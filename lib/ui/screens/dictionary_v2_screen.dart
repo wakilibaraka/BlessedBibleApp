@@ -7,6 +7,8 @@ import '../../state/theme_provider.dart';
 import '../widgets/dictionary_entry_sheet.dart';
 import '../widgets/shared_app_bar.dart';
 import '../widgets/study_v2_widgets.dart';
+import '../../l10n/tr_text.dart';
+import '../../l10n/l10n.dart';
 
 /// Standalone dictionary (V2): just words — bookmarks, highlights and
 /// notes moved to the Your Space banner.
@@ -47,7 +49,7 @@ class _DictionaryV2ScreenState
       appThemeMode: appThemeMode,
       page: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: const SharedAppBar(title: Text('Dictionary')),
+        appBar: const SharedAppBar(title: TrText('Dictionary')),
         body: SafeArea(
           bottom: false,
           child: Center(
@@ -59,7 +61,7 @@ class _DictionaryV2ScreenState
                 children: [
                   TextField(
                     decoration: InputDecoration(
-                      hintText: 'Search 3,400+ words…',
+                      hintText: context.tr('Search 3,400+ words…'),
                       prefixIcon:
                           const Icon(Icons.search_rounded),
                       filled: true,
@@ -99,7 +101,7 @@ class _DictionaryV2ScreenState
                             ),
                           ),
                         FilterChip(
-                          label: const Text('★ Saved'),
+                          label: const TrText('★ Saved'),
                           selected: _savedOnly,
                           onSelected: (v) => setState(
                               () => _savedOnly = v),
@@ -117,8 +119,7 @@ class _DictionaryV2ScreenState
                     ),
                     error: (e, _) => Padding(
                       padding: const EdgeInsets.all(24),
-                      child: Text(
-                          'Dictionary unavailable.\n$e',
+                      child: TrText('Dictionary unavailable.\n{0}', args: [e],
                           textAlign: TextAlign.center),
                     ),
                     data: (words) {
@@ -163,8 +164,7 @@ class _DictionaryV2ScreenState
                             padding:
                                 const EdgeInsets.symmetric(
                                     vertical: 6),
-                            child: Text(
-                              '${list.length} result${list.length == 1 ? '' : 's'}',
+                            child: TrText('{0} result{1}', args: [list.length, list.length == 1 ? '' : 's'],
                               style: theme
                                   .textTheme.labelSmall
                                   ?.copyWith(

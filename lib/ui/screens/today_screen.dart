@@ -27,6 +27,8 @@ import '../../state/bible_provider.dart';
 import '../../state/study_provider.dart';
 import '../../state/commentary_provider.dart';
 import 'votd_archive_screen.dart';
+import '../../l10n/tr_text.dart';
+import '../../l10n/l10n.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TODAY SCREEN — static scaffold (Stage 1: design / no data wiring)
@@ -204,7 +206,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                         // ═══════════════════════════════════════════════════════
                         // 1B. CONTINUE READING
                         // ═══════════════════════════════════════════════════════
-                        _SectionLabel(label: 'RESUME', theme: theme),
+                        _SectionLabel(label: context.tr('RESUME'), theme: theme),
                         const SizedBox(height: 8),
                         ContinueReadingCard(theme: theme),
 
@@ -213,7 +215,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                         // ═══════════════════════════════════════════════════════
                         // 2. READING STREAK
                         // ═══════════════════════════════════════════════════════
-                        _SectionLabel(label: 'READING STREAK', theme: theme),
+                        _SectionLabel(label: context.tr('READING STREAK'), theme: theme),
                         const SizedBox(height: 8),
                         _StreakProgressCard(theme: theme),
 
@@ -229,7 +231,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                         // ═══════════════════════════════════════════════════════
                         // 4. LATEST NOTE / HIGHLIGHT
                         // ═══════════════════════════════════════════════════════
-                        _SectionLabel(label: 'LATEST NOTE', theme: theme),
+                        _SectionLabel(label: context.tr('LATEST NOTE'), theme: theme),
                         const SizedBox(height: 8),
                         _LatestNoteCard(theme: theme),
 
@@ -238,7 +240,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                         // ═══════════════════════════════════════════════════════
                         // 5. QUICK ACTIONS
                         // ═══════════════════════════════════════════════════════
-                        _SectionLabel(label: 'QUICK ACTIONS', theme: theme),
+                        _SectionLabel(label: context.tr('QUICK ACTIONS'), theme: theme),
                         const SizedBox(height: 8),
                         _QuickActionsRow(theme: theme),
 
@@ -247,7 +249,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                         // ═══════════════════════════════════════════════════════
                         // 6. DAILY REMINDERS
                         // ═══════════════════════════════════════════════════════
-                        _SectionLabel(label: 'DAILY REMINDERS', theme: theme),
+                        _SectionLabel(label: context.tr('DAILY REMINDERS'), theme: theme),
                         const SizedBox(height: 8),
                         ReminderSettingsCard(theme: theme),
 
@@ -338,8 +340,7 @@ class _GreetingHeader extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  'Your daily moment of peace.',
+                TrText('Your daily moment of peace.',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
                   ),
@@ -419,7 +420,7 @@ class _LatestNoteCard extends ConsumerWidget {
                 );
               },
               icon: const Icon(Icons.arrow_forward_rounded, size: 14),
-              label: const Text('View all notes'),
+              label: const TrText('View all notes'),
               style: TextButton.styleFrom(
                 foregroundColor: AppColors.goldAccent,
                 textStyle: theme.textTheme.labelSmall
@@ -504,8 +505,7 @@ class _StreakProgressCard extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Day $dayOfYear of $daysInYear',
+                TrText('Day {0} of {1}', args: [dayOfYear, daysInYear],
                   style: theme.textTheme.titleSmall?.copyWith(
                     color: theme.colorScheme.onSurface,
                     fontWeight: FontWeight.w700,
@@ -524,8 +524,7 @@ class _StreakProgressCard extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  '$daysRemaining days of year remaining.',
+                TrText('{0} days of year remaining.', args: [daysRemaining],
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.50),
                   ),
@@ -551,7 +550,7 @@ class _QuickActionsRow extends ConsumerWidget {
     final actions = [
       (
         icon: Icons.menu_book_rounded,
-        label: 'Read',
+        label: context.tr('Read'),
         color: theme.colorScheme.primary,
         onTap: () {
           Navigator.of(context).pop();
@@ -560,7 +559,7 @@ class _QuickActionsRow extends ConsumerWidget {
       ),
       (
         icon: Icons.casino_rounded,
-        label: 'Surprise Me',
+        label: context.tr('Surprise Me'),
         color: theme.colorScheme.primary,
         onTap: () {
           final availableVerses =
@@ -611,7 +610,7 @@ class _QuickActionsRow extends ConsumerWidget {
       ),
       (
         icon: Icons.calendar_today_rounded,
-        label: 'Reading Plan',
+        label: context.tr('Reading Plan'),
         color: theme.colorScheme.primary,
         onTap: () {
           Navigator.of(context).push(
@@ -622,7 +621,7 @@ class _QuickActionsRow extends ConsumerWidget {
       ),
       (
         icon: Icons.self_improvement_rounded,
-        label: 'Your Space',
+        label: context.tr('Your Space'),
         color: theme.colorScheme.primary,
         onTap: () {
           Navigator.of(context).push(
@@ -736,14 +735,12 @@ class _VotdArchiveBanner extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Verse of the Day Archive',
+                          TrText('Verse of the Day Archive',
                             style: theme.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Text(
-                            'Catch up on verses from days you missed.',
+                          TrText('Catch up on verses from days you missed.',
                             style: theme.textTheme.bodySmall?.copyWith(
                                 color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                           ),
@@ -765,7 +762,7 @@ class _VotdArchiveBanner extends StatelessWidget {
                       Icon(Icons.auto_awesome,
                           color: theme.primaryColor.withValues(alpha: 0.7), size: 16),
                       const SizedBox(width: 8),
-                      Text('Explore your past daily verses',
+                      TrText('Explore your past daily verses',
                           style: theme.textTheme.labelSmall?.copyWith(
                               color: theme.colorScheme.onSurface.withValues(alpha: 0.7))),
                     ],

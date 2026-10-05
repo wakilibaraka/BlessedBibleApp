@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/typography_provider.dart';
 import 'pill_segmented_control.dart';
+import '../../l10n/tr_text.dart';
 
 // Fonts grouped by family for 3-per-row grid
 const _fontGroups = [
@@ -46,7 +47,7 @@ class TypographyControls extends ConsumerWidget {
             Row(children: [
               Icon(Icons.text_increase_rounded, size: 16, color: iconColor),
               const SizedBox(width: 8),
-              Text('FONT SIZE', style: sectionLabelStyle),
+              TrText('FONT SIZE', style: sectionLabelStyle),
             ]),
             Text('${typography.fontSize.clamp(12.0, 32.0).round()}', style: valueStyle),
           ],
@@ -92,7 +93,7 @@ class TypographyControls extends ConsumerWidget {
             Row(children: [
               Icon(Icons.line_weight_rounded, size: 16, color: iconColor),
               const SizedBox(width: 8),
-              Text('FONT WEIGHT', style: sectionLabelStyle),
+              TrText('FONT WEIGHT', style: sectionLabelStyle),
             ]),
             Text(
               () {
@@ -143,7 +144,7 @@ class TypographyControls extends ConsumerWidget {
             Row(children: [
               Icon(Icons.format_line_spacing_rounded, size: 16, color: iconColor),
               const SizedBox(width: 8),
-              Text('LINE SPACING', style: sectionLabelStyle),
+              TrText('LINE SPACING', style: sectionLabelStyle),
             ]),
             Text(typography.lineHeight <= 1.4 ? 'Compact' : (typography.lineHeight >= 1.8 ? 'Relaxed' : 'Normal'), style: valueStyle),
           ],
@@ -165,7 +166,7 @@ class TypographyControls extends ConsumerWidget {
             Row(children: [
               Icon(Icons.padding_rounded, size: 16, color: iconColor),
               const SizedBox(width: 8),
-              Text('MARGINS', style: sectionLabelStyle),
+              TrText('MARGINS', style: sectionLabelStyle),
             ]),
             Text('${typography.marginPercent.toStringAsFixed(0)}%', style: valueStyle),
           ],
@@ -196,7 +197,7 @@ class TypographyControls extends ConsumerWidget {
             Row(children: [
               Icon(Icons.format_align_left_rounded, size: 16, color: iconColor),
               const SizedBox(width: 8),
-              Text('ALIGNMENT', style: sectionLabelStyle),
+              TrText('ALIGNMENT', style: sectionLabelStyle),
             ]),
             Text(switch (typography.textAlignMode) {
               TextAlignMode.left => 'Left',
@@ -225,7 +226,7 @@ class TypographyControls extends ConsumerWidget {
         Row(children: [
           Icon(Icons.font_download_rounded, size: 16, color: iconColor),
           const SizedBox(width: 8),
-          Text('FONT FAMILY', style: sectionLabelStyle),
+          TrText('FONT FAMILY', style: sectionLabelStyle),
         ]),
         const SizedBox(height: 8),
         for (final group in _fontGroups)
@@ -251,7 +252,7 @@ class TypographyControls extends ConsumerWidget {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text('Aa', style: TextStyle(
+                            TrText('Aa', style: TextStyle(
                               fontFamily: font,
                               fontSize: 18,
                               fontWeight: typography.fontWeight,
@@ -289,7 +290,7 @@ class TypographyControls extends ConsumerWidget {
               title: Row(children: [
                 Icon(Icons.format_italic_rounded, size: 16, color: iconColor),
                 const SizedBox(width: 8),
-                Text('ITALIC READING TEXT', style: sectionLabelStyle),
+                TrText('ITALIC READING TEXT', style: sectionLabelStyle),
               ]),
               value: typography.italicEnabled,
               onChanged: (val) { HapticFeedback.selectionClick(); typographyNotifier.setItalicEnabled(val); },

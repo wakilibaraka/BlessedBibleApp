@@ -6,6 +6,7 @@ import '../../theme/app_colors.dart';
 import '../widgets/textured_glass_container.dart';
 import '../widgets/typography_controls.dart';
 import 'theme_picker_sheet.dart';
+import '../../l10n/l10n.dart';
 
 const double kAppearanceSheetHeightFactor = 0.70;
 
@@ -93,7 +94,7 @@ class _AppearanceSettingsSheetState extends ConsumerState<AppearanceSettingsShee
                       child: Row(
                         children: [
                           _TabButton(
-                            label: 'Typography',
+                            label: context.tr('Typography'),
                             icon: Icons.text_fields_rounded,
                             isSelected: _activeTab == AppearanceTab.typography,
                             onTap: () {
@@ -104,7 +105,7 @@ class _AppearanceSettingsSheetState extends ConsumerState<AppearanceSettingsShee
                             },
                           ),
                           _TabButton(
-                            label: 'Theme',
+                            label: context.tr('Theme'),
                             icon: Icons.palette_rounded,
                             isSelected: _activeTab == AppearanceTab.theme,
                             onTap: () {

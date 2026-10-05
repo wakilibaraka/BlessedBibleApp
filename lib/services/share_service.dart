@@ -12,6 +12,7 @@ import 'package:share_plus/share_plus.dart';
 import '../data/bible_books.dart';
 import '../state/translation_provider.dart';
 import 'bible_database_service.dart';
+import '../l10n/tr_text.dart';
 
 /// A centralized service for formatting and sharing Bible content.
 ///
@@ -204,7 +205,7 @@ class ShareService {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text('Copied to clipboard'),
+            content: TrText('Copied to clipboard'),
             duration: Duration(seconds: 2)),
       );
     }

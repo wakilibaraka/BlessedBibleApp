@@ -5,6 +5,8 @@ import '../../state/notes_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../state/bible_provider.dart';
 import '../widgets/animated_background.dart';
+import '../../l10n/tr_text.dart';
+import '../../l10n/l10n.dart';
 
 class _ParsedVerseData {
   final String bookAbbrev;
@@ -232,7 +234,7 @@ class _NoteEditorScreenState extends ConsumerState<NoteEditorScreen> {
         actions: [
           TextButton(
             onPressed: () => FocusScope.of(context).unfocus(),
-            child: Text('Done', style: TextStyle(fontWeight: FontWeight.bold, color: theme.primaryColor)),
+            child: TrText('Done', style: TextStyle(fontWeight: FontWeight.bold, color: theme.primaryColor)),
           ),
         ],
       ),
@@ -282,7 +284,7 @@ class _NoteEditorScreenState extends ConsumerState<NoteEditorScreen> {
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 24.0),
-                        hintText: 'Start typing...',
+                        hintText: context.tr('Start typing...'),
                         hintStyle: TextStyle(
                           fontFamily: 'EB Garamond',
                           fontStyle: FontStyle.italic,

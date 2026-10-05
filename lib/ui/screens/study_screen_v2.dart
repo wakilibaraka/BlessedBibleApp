@@ -14,6 +14,8 @@ import 'votd_archive_screen.dart';
 import '../../data/study_greetings.dart';
 import '../../state/user_data_provider.dart'
     show bookmarksProvider, highlightsProvider;
+import '../../l10n/tr_text.dart';
+import '../../l10n/l10n.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../widgets/account_menu.dart';
 import '../widgets/study_v2_widgets.dart';
@@ -113,7 +115,7 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Could not open that screen. $e'),
+          content: TrText('Could not open that screen. {0}', args: [e]),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -194,8 +196,8 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                 child: V2Eyebrow('Card size'),
               ),
               option(
-                label: 'Large',
-                hint: 'Full width, same size as everything',
+                label: context.tr('Large'),
+                hint: context.tr('Full width, same size as everything'),
                 icon: Icons.crop_landscape_rounded,
                 selected: isLarge,
                 onPick: () => ref
@@ -204,8 +206,8 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                         span: CardSpan.full, expanded: false),
               ),
               option(
-                label: 'Extra Large',
-                hint: 'Full width, roomier content',
+                label: context.tr('Extra Large'),
+                hint: context.tr('Full width, roomier content'),
                 icon: Icons.aspect_ratio_rounded,
                 selected: isXLarge,
                 onPick: () => ref
@@ -214,8 +216,8 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                         span: CardSpan.full, expanded: true),
               ),
               option(
-                label: 'Half',
-                hint: 'Compact, two per row',
+                label: context.tr('Half'),
+                hint: context.tr('Compact, two per row'),
                 icon: Icons.splitscreen_rounded,
                 selected: isHalf,
                 onPick: () => ref
@@ -229,8 +231,8 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
               ),
               if (canUp)
                 option(
-                  label: 'Move up',
-                  hint: 'Swap with the card above',
+                  label: context.tr('Move up'),
+                  hint: context.tr('Swap with the card above'),
                   icon: Icons.arrow_upward_rounded,
                   selected: false,
                   onPick: () => ref
@@ -239,8 +241,8 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                 ),
               if (canDown)
                 option(
-                  label: 'Move down',
-                  hint: 'Swap with the card below',
+                  label: context.tr('Move down'),
+                  hint: context.tr('Swap with the card below'),
                   icon: Icons.arrow_downward_rounded,
                   selected: false,
                   onPick: () => ref
@@ -459,10 +461,10 @@ class _CardBody extends ConsumerWidget {
           expanded: expanded,
           icon: Icons.library_books_rounded,
           eyebrow: 'Commentary',
-          title: 'Verse-by-verse insight',
+          title: context.tr('Verse-by-verse insight'),
           snippet:
               'Historicist commentary with chapter + verse filters.',
-          cta: 'Open Commentary',
+          cta: context.tr('Open Commentary'),
           onTap: () => onOpen(
               const CommentaryLibraryV2Screen()),
         );
@@ -472,9 +474,9 @@ class _CardBody extends ConsumerWidget {
           expanded: expanded,
           icon: Icons.book_outlined,
           eyebrow: 'Dictionary',
-          title: 'Words defined',
+          title: context.tr('Words defined'),
           snippet: 'Easton & Smith, offline, with saved words.',
-          cta: 'Look up',
+          cta: context.tr('Look up'),
           onTap: () =>
               onOpen(const DictionaryV2Screen()),
         );
@@ -484,9 +486,9 @@ class _CardBody extends ConsumerWidget {
           expanded: expanded,
           icon: Icons.auto_stories_rounded,
           eyebrow: 'Bible stories',
-          title: 'Narratives retold',
+          title: context.tr('Narratives retold'),
           snippet: '66 stories across every book.',
-          cta: 'Read stories',
+          cta: context.tr('Read stories'),
           onTap: () =>
               onOpen(const BibleStoriesScreen()),
         );
@@ -496,9 +498,9 @@ class _CardBody extends ConsumerWidget {
           expanded: expanded,
           icon: Icons.find_in_page_rounded,
           eyebrow: 'Concordance',
-          title: 'Every occurrence',
+          title: context.tr('Every occurrence'),
           snippet: 'Find each verse where a word appears.',
-          cta: 'Search words',
+          cta: context.tr('Search words'),
           onTap: () =>
               onOpen(const ConcordanceScreen()),
         );
@@ -607,8 +609,7 @@ class _YourSpaceCard extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 4),
-          Text(
-            'Bookmarks, highlights, notes & journal',
+          TrText('Bookmarks, highlights, notes & journal',
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -697,7 +698,7 @@ class _PlansLiveCardState extends ConsumerState<_PlansLiveCard> {
                 children: [
                   const V2Eyebrow('Reading plan'),
                   const SizedBox(height: 2),
-                  Text('Start a reading plan',
+                  TrText('Start a reading plan',
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                       )),
@@ -773,12 +774,12 @@ class _PlansLiveCardState extends ConsumerState<_PlansLiveCard> {
               children: [
                 const V2Eyebrow('Plans'),
                 const SizedBox(height: 2),
-                Text('Guided reading',
+                TrText('Guided reading',
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     )),
                 const SizedBox(height: 2),
-                Text('Curated, paced and custom',
+                TrText('Curated, paced and custom',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodySmall?.copyWith(
@@ -882,8 +883,7 @@ class _TodayRow extends ConsumerWidget {
       child: Row(
         children: [
           Expanded(
-            child: Text(
-              'Today: $label',
+            child: TrText('Today: {0}', args: [label],
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: theme.textTheme.bodySmall?.copyWith(
@@ -1051,7 +1051,7 @@ class _VotdArchiveCard extends ConsumerWidget {
                 )),
           ],
           const SizedBox(height: 6),
-          Text('Archive →',
+          TrText('Archive →',
               style: theme.textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.w800,
                 color: theme.primaryColor,
@@ -1086,7 +1086,7 @@ class _VotdArchiveCard extends ConsumerWidget {
         textured: true,
         featured: span == CardSpan.full,
         padding: const EdgeInsets.all(15),
-        child: Text('Loading…',
+        child: TrText('Loading…',
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurface
                   .withValues(alpha: 0.6),
@@ -1176,7 +1176,7 @@ class _StreakCard extends ConsumerWidget {
                 )),
           ],
           const SizedBox(height: 6),
-          Text('View progress →',
+          TrText('View progress →',
               style: theme.textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.w800,
                 color: theme.primaryColor,

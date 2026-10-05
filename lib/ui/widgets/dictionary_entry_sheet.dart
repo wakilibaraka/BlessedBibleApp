@@ -7,6 +7,7 @@ import '../../state/typography_provider.dart';
 import '../../services/share_service.dart';
 import 'share_card.dart';
 import '../dialogs/verse_preview_dialog.dart';
+import '../../l10n/tr_text.dart';
 
 class DictionaryEntrySheet extends ConsumerWidget {
   final String normalizedWord;
@@ -63,7 +64,7 @@ class DictionaryEntrySheet extends ConsumerWidget {
                   TextButton.icon(
                     onPressed: () => Navigator.of(context).pop(),
                     icon: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: theme.primaryColor),
-                    label: Text('Back', style: TextStyle(fontSize: 16, color: theme.primaryColor)),
+                    label: TrText('Back', style: TextStyle(fontSize: 16, color: theme.primaryColor)),
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     ),
@@ -130,7 +131,7 @@ class DictionaryEntrySheet extends ConsumerWidget {
                   if (defs.isEmpty) {
                     return const Padding(
                       padding: EdgeInsets.all(32.0),
-                      child: Text('No definition found.'),
+                      child: TrText('No definition found.'),
                     );
                   }
 
@@ -203,7 +204,7 @@ class DictionaryEntrySheet extends ConsumerWidget {
                   padding: EdgeInsets.all(40.0),
                   child: CircularProgressIndicator(),
                 )),
-                error: (e, __) => Center(child: Text('Failed to load: $e')),
+                error: (e, __) => Center(child: TrText('Failed to load: {0}', args: [e])),
               ),
             ),
           ],

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/home_data.dart';
 import '../../state/notes_provider.dart';
+import '../../l10n/tr_text.dart';
+import '../../l10n/l10n.dart';
 
 class QuickNoteSheet extends ConsumerStatefulWidget {
   final PersonalNote? initialNote;
@@ -103,11 +105,11 @@ class _QuickNoteSheetState extends ConsumerState<QuickNoteSheet> {
               children: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: Text('Cancel', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
+                  child: TrText('Cancel', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
                 ),
                 TextButton(
                   onPressed: _saveNote,
-                  child: Text('Save', style: TextStyle(color: theme.primaryColor, fontWeight: FontWeight.bold)),
+                  child: TrText('Save', style: TextStyle(color: theme.primaryColor, fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
@@ -133,7 +135,7 @@ class _QuickNoteSheetState extends ConsumerState<QuickNoteSheet> {
                         fontFamily: 'EB Garamond',
                       ),
                       decoration: InputDecoration(
-                        hintText: 'Title or Verse...',
+                        hintText: context.tr('Title or Verse...'),
                         hintStyle: theme.textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
@@ -149,7 +151,7 @@ class _QuickNoteSheetState extends ConsumerState<QuickNoteSheet> {
                       maxLines: null,
                       keyboardType: TextInputType.multiline,
                       decoration: InputDecoration(
-                        hintText: 'Write your thoughts here...',
+                        hintText: context.tr('Write your thoughts here...'),
                         hintStyle: theme.textTheme.bodyLarge?.copyWith(
                           color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
                         ),

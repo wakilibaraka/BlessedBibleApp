@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../l10n/tr_text.dart';
 
 /// Apple-standard context sheet rows for Your Space items.
 ///
@@ -165,8 +166,7 @@ class ItemContextSheet extends StatelessWidget {
               child: SizedBox(
                 height: 50,
                 child: Center(
-                  child: Text(
-                    'Cancel',
+                  child: TrText('Cancel',
                     style: theme.textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.w700,
                       color: theme.primaryColor,
@@ -197,7 +197,7 @@ Future<bool> confirmDestructive(
       actions: [
         TextButton(
           onPressed: () => Navigator.of(ctx).pop(false),
-          child: const Text('Cancel'),
+          child: const TrText('Cancel'),
         ),
         TextButton(
           onPressed: () => Navigator.of(ctx).pop(true),

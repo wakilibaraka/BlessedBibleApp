@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../state/nav_provider.dart';
 import 'glass_container.dart';
+import '../../l10n/tr_text.dart';
 
 class AppErrorFallback extends StatelessWidget {
   final FlutterErrorDetails? details;
@@ -39,8 +40,7 @@ class AppErrorFallback extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  Text(
-                    'Something Went Wrong',
+                  TrText('Something Went Wrong',
                     textAlign: TextAlign.center,
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
@@ -48,8 +48,7 @@ class AppErrorFallback extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  Text(
-                    'An unexpected issue occurred. Tap below to return to the home screen.',
+                  TrText('An unexpected issue occurred. Tap below to return to the home screen.',
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
@@ -80,8 +79,7 @@ class AppErrorFallback extends StatelessWidget {
                           elevation: 0,
                         ),
                         icon: const Icon(Icons.home_rounded, size: 20),
-                        label: const Text(
-                          'Back to Home',
+                        label: const TrText('Back to Home',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       );

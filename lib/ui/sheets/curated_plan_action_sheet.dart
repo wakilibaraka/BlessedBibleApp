@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../state/reading_plan_provider.dart';
+import '../../l10n/tr_text.dart';
 
 enum _CuratedPlanAction { makePrimary, togglePause, toggleHide, restart }
 
@@ -23,15 +24,14 @@ class CuratedPlanActionSheet {
             children: [
               const Padding(
                 padding: EdgeInsets.all(16.0),
-                child: Text(
-                  'Manage Curated Plan',
+                child: TrText('Manage Curated Plan',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ),
               if (isActive && !isPrimary)
                 ListTile(
                   leading: const Icon(Icons.vertical_align_top),
-                  title: const Text('Make Primary'),
+                  title: const TrText('Make Primary'),
                   onTap: () => Navigator.pop(context, _CuratedPlanAction.makePrimary),
                 ),
               if (!isHidden)
@@ -49,7 +49,7 @@ class CuratedPlanActionSheet {
               ),
               ListTile(
                 leading: const Icon(Icons.restart_alt, color: Colors.orange),
-                title: const Text('Restart Plan', style: TextStyle(color: Colors.orange)),
+                title: const TrText('Restart Plan', style: TextStyle(color: Colors.orange)),
                 onTap: () => Navigator.pop(context, _CuratedPlanAction.restart),
               ),
             ],
@@ -85,16 +85,16 @@ class CuratedPlanActionSheet {
       final confirm = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Restart Plan?'),
-          content: const Text('This will permanently reset all your progress for this plan to Day 1.', style: TextStyle(color: Colors.orange)),
+          title: const TrText('Restart Plan?'),
+          content: const TrText('This will permanently reset all your progress for this plan to Day 1.', style: TextStyle(color: Colors.orange)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel'),
+              child: const TrText('Cancel'),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Restart', style: TextStyle(color: Colors.orange)),
+              child: const TrText('Restart', style: TextStyle(color: Colors.orange)),
             ),
           ],
         ),

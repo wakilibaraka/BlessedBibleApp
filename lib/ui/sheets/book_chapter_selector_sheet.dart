@@ -9,6 +9,8 @@ import '../widgets/textured_glass_container.dart';
 import '../../state/read_settings_provider.dart';
 
 import '../../utils/bible_sections.dart';
+import '../../l10n/tr_text.dart';
+import '../../l10n/l10n.dart';
 
 enum SelectionMode { testament, book, chapter, verse }
 
@@ -361,7 +363,7 @@ class _BookChapterSelectorSheetState
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: _buildGridTile(
-              text: 'Old\nTestament',
+              text: context.tr('Old\nTestament'),
               isSelected: isOldTestament,
               onTap: () => _onTestamentSelected(true),
               theme: theme,
@@ -372,7 +374,7 @@ class _BookChapterSelectorSheetState
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: _buildGridTile(
-              text: 'New\nTestament',
+              text: context.tr('New\nTestament'),
               isSelected: !isOldTestament,
               onTap: () => _onTestamentSelected(false),
               theme: theme,
@@ -425,7 +427,7 @@ class _BookChapterSelectorSheetState
         Expanded(
           child: Column(
             children: [
-              Text('Old Testament',
+              TrText('Old Testament',
                   style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                       color:
@@ -467,7 +469,7 @@ class _BookChapterSelectorSheetState
         Expanded(
           child: Column(
             children: [
-              Text('New Testament',
+              TrText('New Testament',
                   style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                       color:
@@ -570,8 +572,7 @@ class _BookChapterSelectorSheetState
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 12.0, left: 4.0),
-                child: Text(
-                  'Stories & Sections',
+                child: TrText('Stories & Sections',
                   style: theme.textTheme.labelMedium?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     fontWeight: FontWeight.bold,
@@ -608,8 +609,7 @@ class _BookChapterSelectorSheetState
                               ),
                             ),
                             const SizedBox(width: 12),
-                            Text(
-                              'v. ${p.startVerse}',
+                            TrText('v. {0}', args: [p.startVerse],
                               style: theme.textTheme.labelMedium?.copyWith(
                                 color: isSel ? theme.colorScheme.onPrimary.withValues(alpha: 0.7) : theme.colorScheme.primary,
                                 fontWeight: FontWeight.bold,
@@ -627,8 +627,7 @@ class _BookChapterSelectorSheetState
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 12.0, left: 4.0),
-                child: Text(
-                  'All Verses',
+                child: TrText('All Verses',
                   style: theme.textTheme.labelMedium?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     fontWeight: FontWeight.bold,

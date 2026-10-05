@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/tr_text.dart';
 
 class PrivacyPolicyScreen extends StatelessWidget {
   const PrivacyPolicyScreen({super.key});
@@ -9,7 +10,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Privacy Policy'),
+        title: const TrText('Privacy Policy'),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -17,14 +18,12 @@ class PrivacyPolicyScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Privacy Policy',
+            TrText('Privacy Policy',
               style: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold, color: theme.primaryColor),
             ),
             const SizedBox(height: 8),
-            Text(
-              'Effective Date: August 26, 2026',
+            TrText('Effective Date: August 26, 2026',
               style: theme.textTheme.bodySmall?.copyWith(fontStyle: FontStyle.italic),
             ),
             const SizedBox(height: 24),

@@ -11,6 +11,8 @@ import '../widgets/study_v2_widgets.dart';
 import 'custom_plan_builder_v2_screen.dart';
 import 'reading_plan_detail_v2_screen.dart';
 import '../../data/curated_plans.dart';
+import '../../l10n/tr_text.dart';
+import '../../l10n/l10n.dart';
 
 /// Redesigned reading-plans hub (V3). Shown when the study-design flag is on.
 ///
@@ -80,8 +82,7 @@ class _PlansHubV3ScreenState extends ConsumerState<PlansHubV3Screen>
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-              'All 3 plan slots are in use. Pause a plan to free a slot — progress is kept.'),
+          content: TrText('All 3 plan slots are in use. Pause a plan to free a slot — progress is kept.'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -119,7 +120,7 @@ class _PlansHubV3ScreenState extends ConsumerState<PlansHubV3Screen>
             children: [
               ListTile(
                 leading: const Icon(Icons.star_outline_rounded),
-                title: Text('Make primary — $title',
+                title: TrText('Make primary — {0}', args: [title],
                     maxLines: 1, overflow: TextOverflow.ellipsis),
                 onTap: () {
                   ref
@@ -154,8 +155,7 @@ class _PlansHubV3ScreenState extends ConsumerState<PlansHubV3Screen>
                         ScaffoldMessenger.of(context)
                             .showSnackBar(
                           const SnackBar(
-                            content: Text(
-                                'All 3 slots are in use.'),
+                            content: TrText('All 3 slots are in use.'),
                             behavior:
                                 SnackBarBehavior.floating,
                           ),
@@ -169,22 +169,21 @@ class _PlansHubV3ScreenState extends ConsumerState<PlansHubV3Screen>
               ),
               ListTile(
                 leading: const Icon(Icons.restart_alt_rounded),
-                title: const Text('Restart from Day 1…'),
+                title: const TrText('Restart from Day 1…'),
                 onTap: () async {
                   final confirm = await showDialog<bool>(
                     context: context,
                     builder: (d) => AlertDialog(
-                      title: const Text('Restart plan?'),
-                      content: const Text(
-                          'Completed days will be cleared. This cannot be undone.'),
+                      title: const TrText('Restart plan?'),
+                      content: const TrText('Completed days will be cleared. This cannot be undone.'),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.of(d).pop(false),
-                          child: const Text('Cancel'),
+                          child: const TrText('Cancel'),
                         ),
                         TextButton(
                           onPressed: () => Navigator.of(d).pop(true),
-                          child: const Text('Restart'),
+                          child: const TrText('Restart'),
                         ),
                       ],
                     ),
@@ -201,24 +200,23 @@ class _PlansHubV3ScreenState extends ConsumerState<PlansHubV3Screen>
                 ListTile(
                   leading: Icon(Icons.delete_outline_rounded,
                       color: theme.colorScheme.error),
-                  title: Text('Delete custom plan…',
+                  title: TrText('Delete custom plan…',
                       style:
                           TextStyle(color: theme.colorScheme.error)),
                   onTap: () async {
                     final confirm = await showDialog<bool>(
                       context: context,
                       builder: (d) => AlertDialog(
-                        title: const Text('Delete plan?'),
-                        content: const Text(
-                            'The plan definition and its progress are removed.'),
+                        title: const TrText('Delete plan?'),
+                        content: const TrText('The plan definition and its progress are removed.'),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.of(d).pop(false),
-                            child: const Text('Cancel'),
+                            child: const TrText('Cancel'),
                           ),
                           TextButton(
                             onPressed: () => Navigator.of(d).pop(true),
-                            child: const Text('Delete'),
+                            child: const TrText('Delete'),
                           ),
                         ],
                       ),
@@ -254,7 +252,7 @@ class _PlansHubV3ScreenState extends ConsumerState<PlansHubV3Screen>
       appThemeMode: appThemeMode,
       page: Scaffold(
       backgroundColor: Colors.transparent,
-      appBar: const SharedAppBar(title: Text('Reading Plans')),
+      appBar: const SharedAppBar(title: TrText('Reading Plans')),
       body: SafeArea(
         bottom: false,
         child: Center(
@@ -267,8 +265,7 @@ class _PlansHubV3ScreenState extends ConsumerState<PlansHubV3Screen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Grow at a pace you can keep.',
+                      TrText('Grow at a pace you can keep.',
                         style: theme.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -288,8 +285,7 @@ class _PlansHubV3ScreenState extends ConsumerState<PlansHubV3Screen>
                                 used: activeIds.length, total: 3),
                             const SizedBox(width: 10),
                             Expanded(
-                              child: Text(
-                                '${activeIds.length} of 3 plan slots used',
+                              child: TrText('{0} of 3 plan slots used', args: [activeIds.length],
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   fontWeight: FontWeight.w700,
                                 ),
@@ -411,13 +407,12 @@ class _MyPlansTab extends ConsumerWidget {
                 Icon(Icons.spa_rounded,
                     size: 32, color: theme.primaryColor),
                 const SizedBox(height: 10),
-                Text('No active plans',
+                TrText('No active plans',
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     )),
                 const SizedBox(height: 4),
-                Text(
-                  'Browse the library to start your first plan.',
+                TrText('Browse the library to start your first plan.',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface
                         .withValues(alpha: 0.6),
@@ -492,8 +487,7 @@ class _MyPlansTab extends ConsumerWidget {
                   child: Row(
                     children: [
                       Expanded(
-                        child: Text(
-                          'Today: $todayLabel',
+                        child: TrText('Today: {0}', args: [todayLabel],
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.bodySmall,
@@ -547,20 +541,19 @@ class _LibraryTab extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (d) => AlertDialog(
-        title: const Text('Whole Bible in N days'),
+        title: const TrText('Whole Bible in N days'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-                'Opens the builder with the whole canon pre-loaded. Check the daily-load preview, then save.'),
+            const TrText('Opens the builder with the whole canon pre-loaded. Check the daily-load preview, then save.'),
             const SizedBox(height: 12),
             TextField(
               controller: controller,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Days',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: context.tr('Days'),
+                border: const OutlineInputBorder(),
               ),
             ),
           ],
@@ -568,7 +561,7 @@ class _LibraryTab extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(d).pop(),
-            child: const Text('Cancel'),
+            child: const TrText('Cancel'),
           ),
           FilledButton(
             onPressed: () {
@@ -582,7 +575,7 @@ class _LibraryTab extends ConsumerWidget {
                 ),
               ));
             },
-            child: const Text('Continue →'),
+            child: const TrText('Continue →'),
           ),
         ],
       ),
@@ -611,7 +604,7 @@ class _LibraryTab extends ConsumerWidget {
       children: [
         TextField(
           decoration: InputDecoration(
-            hintText: 'Search plans…',
+            hintText: context.tr('Search plans…'),
             prefixIcon: const Icon(Icons.search_rounded),
             filled: true,
             fillColor: theme.colorScheme.surface,
@@ -656,7 +649,7 @@ class _LibraryTab extends ConsumerWidget {
                   ));
                 },
                 icon: const Icon(Icons.tune_rounded, size: 18),
-                label: const Text('Build custom plan'),
+                label: const TrText('Build custom plan'),
               ),
             ),
             const SizedBox(width: 8),
@@ -665,7 +658,7 @@ class _LibraryTab extends ConsumerWidget {
                 onPressed: () =>
                     _showPacedDialog(context, ref),
                 icon: const Icon(Icons.timer_outlined, size: 18),
-                label: const Text('Paced Bible-in-N'),
+                label: const TrText('Paced Bible-in-N'),
               ),
             ),
           ],
@@ -718,7 +711,7 @@ class _LibraryTab extends ConsumerWidget {
                         Expanded(
                           child: FilledButton.tonal(
                             onPressed: () => onOpen(meta.id),
-                            child: const Text('Open'),
+                            child: const TrText('Open'),
                           ),
                         ),
                         IconButton(
@@ -740,7 +733,7 @@ class _LibraryTab extends ConsumerWidget {
                         const SizedBox(width: 8),
                         OutlinedButton(
                           onPressed: () => onOpen(meta.id),
-                          child: const Text('Details'),
+                          child: const TrText('Details'),
                         ),
                       ],
                     ],
@@ -752,8 +745,7 @@ class _LibraryTab extends ConsumerWidget {
         if (visible.isEmpty)
           Padding(
             padding: const EdgeInsets.only(top: 24),
-            child: Text(
-              'No plans match. Try a different search or category.',
+            child: TrText('No plans match. Try a different search or category.',
               textAlign: TextAlign.center,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.6),

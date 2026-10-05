@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../state/reading_plan_provider.dart';
 import 'study_v2_widgets.dart';
+import '../../l10n/l10n.dart';
 
 const List<String> _weekdayNames = [
   'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN',
@@ -261,7 +262,7 @@ class _StepButton extends StatelessWidget {
     return Semantics(
       button: true,
       enabled: enabled,
-      label: 'Change week',
+      label: context.tr('Change week'),
       child: ExcludeSemantics(
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,

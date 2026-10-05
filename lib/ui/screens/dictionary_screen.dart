@@ -8,6 +8,8 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../../state/dictionary_search_provider.dart';
 import '../widgets/dictionary_entry_sheet.dart';
 import '../../state/dictionary_provider.dart';
+import '../../l10n/tr_text.dart';
+import '../../l10n/l10n.dart';
 
 class DictionaryScreen extends ConsumerStatefulWidget {
   const DictionaryScreen({super.key});
@@ -62,8 +64,7 @@ class _DictionaryScreenState extends ConsumerState<DictionaryScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
-        title: Text(
-          'Bible Dictionary',
+        title: TrText('Bible Dictionary',
           style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -90,7 +91,7 @@ class _DictionaryScreenState extends ConsumerState<DictionaryScreen> {
               child: CupertinoSearchTextField(
                 controller: _searchController,
                 onChanged: _onSearchChanged,
-                placeholder: 'Search for Words',
+                placeholder: context.tr('Search for Words'),
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                 prefixIcon: Padding(
                   padding: const EdgeInsets.only(left: 8.0, top: 2),
@@ -112,8 +113,7 @@ class _DictionaryScreenState extends ConsumerState<DictionaryScreen> {
               data: (results) {
                 if (results.isEmpty) {
                   return Center(
-                    child: Text(
-                      'No results found.',
+                    child: TrText('No results found.',
                       style: theme.textTheme.bodyLarge?.copyWith(
                         color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                       ),
@@ -214,7 +214,7 @@ class _DictionaryScreenState extends ConsumerState<DictionaryScreen> {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, __) => Center(child: Text('Error: $e')),
+              error: (e, __) => Center(child: TrText('Error: {0}', args: [e])),
             ),
           ),
         ],

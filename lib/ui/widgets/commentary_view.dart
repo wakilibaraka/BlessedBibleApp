@@ -17,6 +17,8 @@ import '../../models/study_content_category.dart';
 import '../screens/commentary_hub_screen.dart';
 import '../../state/read_location_provider.dart';
 import 'verse_link_text.dart';
+import '../../l10n/tr_text.dart';
+import '../../l10n/l10n.dart';
 
 class CommentaryView extends ConsumerStatefulWidget {
   final String book;
@@ -195,7 +197,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                 child: IconButton(
                   icon: Icon(Icons.arrow_back_ios_new_rounded, color: theme.primaryColor),
                   onPressed: () => Navigator.pop(context),
-                  tooltip: 'Back',
+                  tooltip: context.tr('Back'),
                 ),
               ),
               Container(
@@ -232,7 +234,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                     if (widget.onExpand != null)
                       IconButton(
                         icon: Icon(Icons.open_in_full_rounded, color: tokens.readingAccent, size: 20),
-                        tooltip: 'Expand to full screen',
+                        tooltip: context.tr('Expand to full screen'),
                         onPressed: widget.onExpand,
                       ),
                   ],
@@ -352,8 +354,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          '\u201c$finalVerseText\u201d',
+                        TrText('\u201c{0}\u201d', args: [finalVerseText],
                           textAlign: TextAlign.center,
                           style: theme.textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.w600,
@@ -368,8 +369,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(
-                              'Tap to read in context',
+                            TrText('Tap to read in context',
                               style: theme.textTheme.bodyMedium?.copyWith(
                                 color: tokens.readingInkMuted.withValues(alpha: 0.6),
                                 letterSpacing: 0.5,
@@ -425,7 +425,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                 child: _buildCollapsibleSection(
                   theme: theme,
                   tokens: tokens,
-                  title: 'On this chapter',
+                  title: context.tr('On this chapter'),
                   isExpanded: _userToggledChapter ? _showChapter : (verseEntries.isEmpty || _showChapter),
                   entries: chapterEntries,
                   typography: typography,
@@ -441,7 +441,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                 child: _buildCollapsibleSection(
                   theme: theme,
                   tokens: tokens,
-                  title: 'On this book',
+                  title: context.tr('On this book'),
                   isExpanded: _userToggledBook ? _showBook : (verseEntries.isEmpty && chapterEntries.isEmpty || _showBook),
                   entries: bookEntries,
                   typography: typography,
@@ -476,16 +476,14 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
           Icon(Icons.menu_book_rounded,
               size: 56, color: tokens.readingAccent.withValues(alpha: 0.4)),
           const SizedBox(height: 20),
-          Text(
-            'No commentary yet',
+          TrText('No commentary yet',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: tokens.readingInk,
             ),
           ),
           const SizedBox(height: 12),
-          Text(
-            'We couldn\'t find specific commentary for this passage. Try exploring the chapter or book-level commentary below.',
+          TrText('We couldn\'t find specific commentary for this passage. Try exploring the chapter or book-level commentary below.',
             textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall?.copyWith(
               color: tokens.readingInkMuted,

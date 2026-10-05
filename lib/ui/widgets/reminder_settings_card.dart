@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/reminders_provider.dart';
+import '../../l10n/l10n.dart';
 
 class ReminderSettingsCard extends ConsumerWidget {
   final ThemeData theme;
@@ -51,7 +52,7 @@ class ReminderSettingsCard extends ConsumerWidget {
             context,
             ref,
             icon: Icons.menu_book_rounded,
-            title: 'Daily Reading',
+            title: context.tr('Daily Reading'),
             enabled: state.dailyEnabled,
             time: readingTime,
             onToggle: (v) => ref.read(remindersProvider.notifier).toggleDaily(v),
@@ -62,7 +63,7 @@ class ReminderSettingsCard extends ConsumerWidget {
             context,
             ref,
             icon: Icons.volunteer_activism_rounded,
-            title: 'Custom Reminder',
+            title: context.tr('Custom Reminder'),
             enabled: state.customWeeklyEnabled,
             time: prayerTime,
             onToggle: (v) => ref.read(remindersProvider.notifier).toggleCustomWeekly(v),

@@ -25,6 +25,8 @@ import 'storage_screen.dart';
 import 'onboarding_screen.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../sheets/widget_settings_sheet.dart';
+import '../../l10n/tr_text.dart';
+import '../../l10n/l10n.dart';
 
 
 final packageInfoProvider = FutureProvider<PackageInfo>((ref) async {
@@ -70,7 +72,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: SharedAppBar(
-          title: const Text('Settings'),
+          title: const TrText('Settings'),
           backgroundColor: Colors.transparent,
           elevation: 0,
         ),
@@ -86,11 +88,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 labelColor: theme.primaryColor,
                 unselectedLabelColor:
                     theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                tabs: const [
-                  Tab(text: 'General'),
-                  Tab(text: 'Navigation'),
-                  Tab(text: 'Reminders'),
-                  Tab(text: 'Info'),
+                tabs: [
+                  Tab(text: context.tr('General')),
+                  Tab(text: context.tr('Navigation')),
+                  Tab(text: context.tr('Reminders')),
+                  Tab(text: context.tr('Info')),
                 ],
               ),
               Expanded(
@@ -133,8 +135,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               Icons.widgets_rounded,
               color: Theme.of(context).primaryColor,
             ),
-            title: const Text('Home Screen Widgets'),
-            subtitle: const Text('Customize gradients, transparency, and live preview'),
+            title: const TrText('Home Screen Widgets'),
+            subtitle: const TrText('Customize gradients, transparency, and live preview'),
             trailing: const Icon(Icons.chevron_right_rounded),
             onTap: () {
               HapticFeedback.selectionClick();
@@ -149,8 +151,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             final defaultStartTab = ref
                 .watch(readSettingsProvider.select((s) => s.defaultStartTab));
             return AnimatedSegmentedTile<int>(
-              title: 'Default start page',
-              subtitle: 'Choose which page the app opens to on launch',
+              title: context.tr('Default start page'),
+              subtitle: context.tr('Choose which page the app opens to on launch'),
               selectedValue: defaultStartTab,
               options: const [
                 MapEntry(0, 'Home'),
@@ -180,12 +182,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 const Padding(
                   padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
                   child:
-                      Text('Immersive Reading', style: TextStyle(fontSize: 16)),
+                      TrText('Immersive Reading', style: TextStyle(fontSize: 16)),
                 ),
                 _buildImmersiveTile(
                   context,
-                  title: 'Anchored (Off)',
-                  subtitle: 'Navigation remains visible at all times',
+                  title: context.tr('Anchored (Off)'),
+                  subtitle: context.tr('Navigation remains visible at all times'),
                   value: ReadingViewMode.pinned,
                   groupValue: viewMode,
                   onTap: (val) {
@@ -197,7 +199,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 ),
                 _buildImmersiveTile(
                   context,
-                  title: 'Guided (Partial)',
+                  title: context.tr('Guided (Partial)'),
                   subtitle:
                       'Auto-hides main navigation, but leaves the book & chapter pill',
                   value: ReadingViewMode.partial,
@@ -211,8 +213,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 ),
                 _buildImmersiveTile(
                   context,
-                  title: 'Deep Waters (Full)',
-                  subtitle: 'Total immersion. All menus hide when scrolling',
+                  title: context.tr('Deep Waters (Full)'),
+                  subtitle: context.tr('Total immersion. All menus hide when scrolling'),
                   value: ReadingViewMode.full,
                   groupValue: viewMode,
                   onTap: (val) {
@@ -249,9 +251,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             return Column(
               children: [
                 SwitchListTile(
-                  title: const Text("Show Strong's Numbers"),
-                  subtitle: const Text(
-                      'Displays original Hebrew/Greek identifiers alongside KJV text for deep word study'),
+                  title: const TrText("Show Strong's Numbers"),
+                  subtitle: const TrText('Displays original Hebrew/Greek identifiers alongside KJV text for deep word study'),
                   value: showStrongs,
                   onChanged: (val) {
                     HapticFeedback.selectionClick();
@@ -266,8 +267,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                     child: Row(
                       children: [
                         Expanded(
-                          child: Text(
-                            "Requires the “KJV with Strong's” pack "
+                          child: TrText("Requires the “KJV with Strong's” pack "
                             '(7.7 MB download).',
                             style: Theme.of(context)
                                 .textTheme
@@ -292,7 +292,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                                   const TranslationPickerSheet(),
                             );
                           },
-                          child: const Text('Get it'),
+                          child: const TrText('Get it'),
                         ),
                       ],
                     ),
@@ -304,15 +304,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                       segments: const [
                         ButtonSegment(
                           value: StrongsIndicatorStyle.asterisk,
-                          label: Text('Asterisk (*)'),
+                          label: TrText('Asterisk (*)'),
                         ),
                         ButtonSegment(
                           value: StrongsIndicatorStyle.chain,
-                          label: Text('Chain (🔗)'),
+                          label: TrText('Chain (🔗)'),
                         ),
                         ButtonSegment(
                           value: StrongsIndicatorStyle.number,
-                          label: Text('Number (H1234)'),
+                          label: TrText('Number (H1234)'),
                         ),
                       ],
                       selected: {strongsStyle},
@@ -336,9 +336,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             return Column(
               children: [
                 ListTile(
-                  title: const Text('Reading speed'),
-                  subtitle: const Text(
-                      'Pace estimates for plans (words per minute)'),
+                  title: const TrText('Reading speed'),
+                  subtitle: const TrText('Pace estimates for plans (words per minute)'),
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(
@@ -347,15 +346,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                     segments: const [
                       ButtonSegment(
                         value: 100,
-                        label: Text('Relaxed'),
+                        label: TrText('Relaxed'),
                       ),
                       ButtonSegment(
                         value: 130,
-                        label: Text('Standard'),
+                        label: TrText('Standard'),
                       ),
                       ButtonSegment(
                         value: 200,
-                        label: Text('Brisk'),
+                        label: TrText('Brisk'),
                       ),
                     ],
                     selected: {wpm},
@@ -382,8 +381,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             final isEnabled = ref.watch(
                 readSettingsProvider.select((s) => s.dictionaryUnderlinesEnabled));
             return SwitchListTile(
-              title: const Text('Dictionary Underlines'),
-              subtitle: const Text('Dotted underlines on biblical terms and archaic words'),
+              title: const TrText('Dictionary Underlines'),
+              subtitle: const TrText('Dotted underlines on biblical terms and archaic words'),
               value: isEnabled,
               onChanged: (val) {
                 HapticFeedback.selectionClick();
@@ -407,12 +406,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               children: [
                 const Padding(
                   padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
-                  child: Text('Underline Scope', style: TextStyle(fontSize: 16)),
+                  child: TrText('Underline Scope', style: TextStyle(fontSize: 16)),
                 ),
                 _buildDictScopeTile(
                   context,
-                  title: 'Names & terms only',
-                  subtitle: 'Proper nouns and specific biblical concepts',
+                  title: context.tr('Names & terms only'),
+                  subtitle: context.tr('Proper nouns and specific biblical concepts'),
                   value: DictionaryScope.term,
                   groupValue: scope,
                   onTap: (val) {
@@ -422,8 +421,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 ),
                 _buildDictScopeTile(
                   context,
-                  title: 'Names + tricky words (Recommended)',
-                  subtitle: 'Includes archaic words with changed meanings (e.g., let, prevent)',
+                  title: context.tr('Names + tricky words (Recommended)'),
+                  subtitle: context.tr('Includes archaic words with changed meanings (e.g., let, prevent)'),
                   value: DictionaryScope.termAndTricky,
                   groupValue: scope,
                   onTap: (val) {
@@ -433,8 +432,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 ),
                 _buildDictScopeTile(
                   context,
-                  title: 'Everything',
-                  subtitle: 'Highlights all archaic grammar (e.g., thee, thou, hath, unto)',
+                  title: context.tr('Everything'),
+                  subtitle: context.tr('Highlights all archaic grammar (e.g., thee, thou, hath, unto)'),
                   value: DictionaryScope.everything,
                   groupValue: scope,
                   onTap: (val) {
@@ -444,7 +443,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 ),
                 _buildDictScopeTile(
                   context,
-                  title: 'Difficult words only',
+                  title: context.tr('Difficult words only'),
                   subtitle:
                       'Archaic, misleading and contested words — easy words like god and son stay unmarked',
                   value: DictionaryScope.difficult,
@@ -456,7 +455,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 ),
                 _buildDictScopeTile(
                   context,
-                  title: 'Difficult + names',
+                  title: context.tr('Difficult + names'),
                   subtitle:
                       'Adds people and places (e.g., David, Jerusalem) to difficult words',
                   value: DictionaryScope.difficultAndNames,
@@ -483,12 +482,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               children: [
                 const Padding(
                   padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
-                  child: Text('Other English versions',
+                  child: TrText('Other English versions',
                       style: TextStyle(fontSize: 16)),
                 ),
                 _buildRadioTile<NonKjvDictionaryMode>(
                   context,
-                  title: 'Contested words only',
+                  title: context.tr('Contested words only'),
                   subtitle:
                       'BBE, WEB and other English versions mark disputed words (e.g., hell, baptism)',
                   value: NonKjvDictionaryMode.contestedOnly,
@@ -502,7 +501,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 ),
                 _buildRadioTile<NonKjvDictionaryMode>(
                   context,
-                  title: 'Follow underline scope',
+                  title: context.tr('Follow underline scope'),
                   subtitle:
                       'Same marking as KJV in every English version',
                   value: NonKjvDictionaryMode.followScope,
@@ -516,8 +515,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 ),
                 _buildRadioTile<NonKjvDictionaryMode>(
                   context,
-                  title: 'No underlines',
-                  subtitle: 'Other English versions show no dictionary marks',
+                  title: context.tr('No underlines'),
+                  subtitle: context.tr('Other English versions show no dictionary marks'),
                   value: NonKjvDictionaryMode.off,
                   groupValue: mode,
                   onTap: (val) {
@@ -535,8 +534,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             final popupStyle = ref.watch(
                 readSettingsProvider.select((s) => s.popupStyle));
             return AnimatedSegmentedTile<PopupStyle>(
-              title: 'Popup Style',
-              subtitle: 'How dictionary definitions and Strong\'s numbers are displayed',
+              title: context.tr('Popup Style'),
+              subtitle: context.tr('How dictionary definitions and Strong\'s numbers are displayed'),
               selectedValue: popupStyle,
               options: const [
                 MapEntry(PopupStyle.floating, 'Floating'),
@@ -556,9 +555,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             final syncLang = ref.watch(
                 readSettingsProvider.select((s) => s.syncSavedItemsLanguage));
             return SwitchListTile(
-              title: const Text('Show saved items in my language'),
-              subtitle: const Text(
-                  'Display Bookmarks, Highlights, and Commentary verses in your active primary translation'),
+              title: const TrText('Show saved items in my language'),
+              subtitle: const TrText('Display Bookmarks, Highlights, and Commentary verses in your active primary translation'),
               value: syncLang,
               onChanged: (val) {
                 HapticFeedback.selectionClick();
@@ -573,9 +571,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             final showChips = ref.watch(
                 readSettingsProvider.select((s) => s.showChipsOnSavedItems));
             return SwitchListTile(
-              title: const Text('Show translation options on saved items'),
-              subtitle: const Text(
-                  'Adds a compact translation chip row to view saved verses in other translations'),
+              title: const TrText('Show translation options on saved items'),
+              subtitle: const TrText('Adds a compact translation chip row to view saved verses in other translations'),
               value: showChips,
               onChanged: (val) {
                 HapticFeedback.selectionClick();
@@ -593,7 +590,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             final actionStyle = ref
                 .watch(readSettingsProvider.select((s) => s.verseActionStyle));
             return AnimatedSegmentedTile<VerseActionStyle>(
-              title: 'Verse Action Style',
+              title: context.tr('Verse Action Style'),
               subtitle:
                   'Sheet (compact) or Classic (tall dock) when verses are selected; Radial moves the long-press menu to a circular ring',
               selectedValue: actionStyle,
@@ -620,9 +617,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             final keepAwake = ref
                 .watch(readSettingsProvider.select((s) => s.keepScreenAwake));
             return SwitchListTile(
-              title: const Text('Keep Screen Awake'),
+              title: const TrText('Keep Screen Awake'),
               subtitle:
-                  const Text('Prevent device from sleeping while reading'),
+                  const TrText('Prevent device from sleeping while reading'),
               value: keepAwake,
               onChanged: (val) {
                 HapticFeedback.selectionClick();
@@ -638,8 +635,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           Consumer(builder: (context, ref, _) {
             final theme = Theme.of(context);
             return ListTile(
-              title: const Text('Restart onboarding'),
-              subtitle: const Text('Replay the first-time setup'),
+              title: const TrText('Restart onboarding'),
+              subtitle: const TrText('Replay the first-time setup'),
               trailing:
                   Icon(Icons.restart_alt_rounded, color: theme.primaryColor),
               onTap: () {
@@ -647,13 +644,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 showDialog(
                   context: context,
                   builder: (ctx) => AlertDialog(
-                    title: const Text('Restart onboarding?'),
-                    content: const Text(
-                        'This will replay the first-time setup. Your current theme, font, and translation stay unless you change them.'),
+                    title: const TrText('Restart onboarding?'),
+                    content: const TrText('This will replay the first-time setup. Your current theme, font, and translation stay unless you change them.'),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.of(ctx).pop(),
-                        child: const Text('Cancel'),
+                        child: const TrText('Cancel'),
                       ),
                       TextButton(
                         onPressed: () {
@@ -667,7 +663,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                             (route) => false,
                           );
                         },
-                        child: Text('Restart',
+                        child: TrText('Restart',
                             style: TextStyle(
                                 color: theme.primaryColor,
                                 fontWeight: FontWeight.bold)),
@@ -687,9 +683,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               Icons.palette_outlined,
               color: Theme.of(context).primaryColor,
             ),
-            title: const Text('Appearance & text'),
-            subtitle: const Text(
-                'Theme, fonts, sizes and reading colors'),
+            title: const TrText('Appearance & text'),
+            subtitle: const TrText('Theme, fonts, sizes and reading colors'),
             trailing: const Icon(Icons.chevron_right_rounded),
             onTap: () {
               HapticFeedback.selectionClick();
@@ -714,13 +709,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             SettingsPillCard(
               children: [
                 SwitchListTile(
-                  title: Text(
-                    'Friday Sunset Reminder',
+                  title: TrText('Friday Sunset Reminder',
                     style: theme.textTheme.titleSmall
                         ?.copyWith(fontWeight: FontWeight.bold),
                   ),
-                  subtitle: Text(
-                    'Welcome the Sabbath at your local sunset time.',
+                  subtitle: TrText('Welcome the Sabbath at your local sunset time.',
                     style: theme.textTheme.bodySmall,
                   ),
                   value: remindersState.sabbathEnabled,
@@ -735,7 +728,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 if (remindersState.sabbathEnabled) ...[
                   const Divider(height: 1, indent: 16),
                   ListTile(
-                    title: const Text('Location'),
+                    title: const TrText('Location'),
                     subtitle: Text(remindersState.sabbathLocationName ??
                         'Not set (Tap to set)'),
                     trailing: const Icon(Icons.edit_location_alt_rounded),
@@ -747,13 +740,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             SettingsPillCard(
               children: [
                 SwitchListTile(
-                  title: Text(
-                    'Daily Reading Reminder',
+                  title: TrText('Daily Reading Reminder',
                     style: theme.textTheme.titleSmall
                         ?.copyWith(fontWeight: FontWeight.bold),
                   ),
-                  subtitle: Text(
-                    'A daily nudge to spend time in the Word.',
+                  subtitle: TrText('A daily nudge to spend time in the Word.',
                     style: theme.textTheme.bodySmall,
                   ),
                   value: remindersState.dailyEnabled,
@@ -766,7 +757,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 if (remindersState.dailyEnabled) ...[
                   const Divider(height: 1, indent: 16),
                   ListTile(
-                    title: const Text('Time'),
+                    title: const TrText('Time'),
                     subtitle: Text(
                         '${remindersState.dailyHour.toString().padLeft(2, '0')}:${remindersState.dailyMinute.toString().padLeft(2, '0')}'),
                     trailing: const Icon(Icons.access_time_rounded),
@@ -788,13 +779,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             SettingsPillCard(
               children: [
                 SwitchListTile(
-                  title: Text(
-                    'Custom Weekly Reminder',
+                  title: TrText('Custom Weekly Reminder',
                     style: theme.textTheme.titleSmall
                         ?.copyWith(fontWeight: FontWeight.bold),
                   ),
-                  subtitle: Text(
-                    'Set a specific day and time each week for deeper study.',
+                  subtitle: TrText('Set a specific day and time each week for deeper study.',
                     style: theme.textTheme.bodySmall,
                   ),
                   value: remindersState.customWeeklyEnabled,
@@ -807,15 +796,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 if (remindersState.customWeeklyEnabled) ...[
                   const Divider(height: 1, indent: 16),
                   ListTile(
-                    title: const Text('Day & Time'),
-                    subtitle: Text(
-                        '${_weekdayName(remindersState.customWeeklyDay)} at ${remindersState.customWeeklyHour.toString().padLeft(2, '0')}:${remindersState.customWeeklyMinute.toString().padLeft(2, '0')}'),
+                    title: const TrText('Day & Time'),
+                    subtitle: TrText('{0} at {1}:{2}', args: [_weekdayName(remindersState.customWeeklyDay), remindersState.customWeeklyHour.toString().padLeft(2, '0'), remindersState.customWeeklyMinute.toString().padLeft(2, '0')]),
                     trailing: const Icon(Icons.edit_calendar_rounded),
                     onTap: () async {
                       int? selectedDay = await showDialog<int>(
                         context: context,
                         builder: (ctx) => SimpleDialog(
-                          title: const Text('Choose Day'),
+                          title: const TrText('Choose Day'),
                           children: [
                             for (int i = 1; i <= 7; i++)
                               SimpleDialogOption(
@@ -851,9 +839,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             final prefs = ref.watch(preferencesProvider);
             return StatefulBuilder(builder: (context, setState) {
               return SwitchListTile(
-                title: const Text('Show reading tips'),
-                subtitle: const Text(
-                    'Show guided hints for reading actions like highlighting and swiping'),
+                title: const TrText('Show reading tips'),
+                subtitle: const TrText('Show guided hints for reading actions like highlighting and swiping'),
                 value: prefs.showReadingTips,
                 onChanged: (val) {
                   HapticFeedback.selectionClick();
@@ -880,7 +867,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             final depth =
                 ref.watch(bibleNavSettingsProvider.select((s) => s.depth));
             return AnimatedSegmentedTile<NavigationDepth>(
-              title: 'Navigation Steps',
+              title: context.tr('Navigation Steps'),
               subtitle:
                   'How many steps to reach a verse. 2-step: Book → Chapter. 3-step: Book → Chapter → Verse. 4-step: Testament → Book → Chapter → Verse.',
               selectedValue: depth,
@@ -900,9 +887,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             final autoClose = ref.watch(bibleNavSettingsProvider
                 .select((s) => s.autoCloseOnFinalSelection));
             return SwitchListTile(
-              title: const Text('Auto-close sheet on final selection'),
-              subtitle: const Text(
-                  'Automatically dismiss the picker after the last step'),
+              title: const TrText('Auto-close sheet on final selection'),
+              subtitle: const TrText('Automatically dismiss the picker after the last step'),
               value: autoClose,
               onChanged: (value) {
                 HapticFeedback.selectionClick();
@@ -918,8 +904,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             final selectorHeight =
                 ref.watch(readSettingsProvider.select((s) => s.selectorHeight));
             return AnimatedSegmentedTile<SelectorHeight>(
-              title: 'Book selector height',
-              subtitle: 'Control how far up the book/chapter sheet opens',
+              title: context.tr('Book selector height'),
+              subtitle: context.tr('Control how far up the book/chapter sheet opens'),
               selectedValue: selectorHeight,
               options: const [
                 MapEntry(SelectorHeight.quarter, 'Half'),
@@ -938,15 +924,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
         children: [
           const Padding(
             padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
-            child: Text('Search', style: TextStyle(fontSize: 16)),
+            child: TrText('Search', style: TextStyle(fontSize: 16)),
           ),
           Consumer(builder: (context, ref, _) {
             final autoOpen = ref.watch(searchSettingsProvider
                 .select((s) => s.autoOpenSingleSearchResult));
             return SwitchListTile(
-              title: const Text('Auto-open single search result'),
-              subtitle: const Text(
-                  'Automatically navigate when a search returns exactly one result'),
+              title: const TrText('Auto-open single search result'),
+              subtitle: const TrText('Automatically navigate when a search returns exactly one result'),
               value: autoOpen,
               onChanged: (value) {
                 HapticFeedback.selectionClick();
@@ -959,9 +944,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             final includeNotes = ref.watch(
                 searchSettingsProvider.select((s) => s.includeNotesInSearch));
             return SwitchListTile(
-              title: const Text('Include personal notes in search'),
-              subtitle: const Text(
-                  'Allow search to look through your personal notes'),
+              title: const TrText('Include personal notes in search'),
+              subtitle: const TrText('Allow search to look through your personal notes'),
               value: includeNotes,
               onChanged: (value) {
                 HapticFeedback.selectionClick();
@@ -976,9 +960,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             final matchWholeWords = ref
                 .watch(searchSettingsProvider.select((s) => s.matchWholeWords));
             return SwitchListTile(
-              title: const Text('Match whole words only'),
-              subtitle: const Text(
-                  'Only find exact word matches (disables partial/prefix matching)'),
+              title: const TrText('Match whole words only'),
+              subtitle: const TrText('Only find exact word matches (disables partial/prefix matching)'),
               value: matchWholeWords,
               onChanged: (value) {
                 HapticFeedback.selectionClick();
@@ -993,9 +976,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             final fuzzy = ref.watch(
                 searchSettingsProvider.select((s) => s.fuzzySearch));
             return SwitchListTile(
-              title: const Text('Forgiving search'),
-              subtitle: const Text(
-                  'Also show close matches for typos (e.g. Jhon finds John)'),
+              title: const TrText('Forgiving search'),
+              subtitle: const TrText('Also show close matches for typos (e.g. Jhon finds John)'),
               value: fuzzy,
               onChanged: (value) {
                 HapticFeedback.selectionClick();
@@ -1018,11 +1000,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               children: [
                 const Padding(
                   padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
-                  child: Text('Default Search Scopes',
+                  child: TrText('Default Search Scopes',
                       style: TextStyle(fontSize: 14)),
                 ),
                 SwitchListTile(
-                  title: const Text('Old Testament'),
+                  title: const TrText('Old Testament'),
                   value: defaultOt,
                   dense: true,
                   onChanged: (value) {
@@ -1033,7 +1015,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                   },
                 ),
                 SwitchListTile(
-                  title: const Text('New Testament'),
+                  title: const TrText('New Testament'),
                   value: defaultNt,
                   dense: true,
                   onChanged: (value) {
@@ -1044,7 +1026,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                   },
                 ),
                 SwitchListTile(
-                  title: const Text('Commentary'),
+                  title: const TrText('Commentary'),
                   value: defaultComm,
                   dense: true,
                   onChanged: (value) {
@@ -1063,15 +1045,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
         children: [
           const Padding(
             padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
-            child: Text('Gestures', style: TextStyle(fontSize: 16)),
+            child: TrText('Gestures', style: TextStyle(fontSize: 16)),
           ),
           Consumer(builder: (context, ref, _) {
             final pullDown = ref.watch(bibleNavSettingsProvider
                 .select((s) => s.homePullDownEnabled));
             return SwitchListTile(
-              title: const Text('Pull down on Home'),
-              subtitle: const Text(
-                  'Pull down past the top to open Settings or Appearance'),
+              title: const TrText('Pull down on Home'),
+              subtitle: const TrText('Pull down past the top to open Settings or Appearance'),
               value: pullDown,
               onChanged: (value) {
                 HapticFeedback.selectionClick();
@@ -1085,8 +1066,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             final target = ref.watch(bibleNavSettingsProvider
                 .select((s) => s.homePullDownTarget));
             return AnimatedSegmentedTile<HomePullDownTarget>(
-              title: 'Pull-down opens',
-              subtitle: 'Destination of the Home pull-down gesture',
+              title: context.tr('Pull-down opens'),
+              subtitle: context.tr('Destination of the Home pull-down gesture'),
               selectedValue: target,
               options: const [
                 MapEntry(HomePullDownTarget.appearance, 'Appearance'),
@@ -1105,8 +1086,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             final swipeLeft = ref.watch(bibleNavSettingsProvider
                 .select((s) => s.homeSwipeLeftEnabled));
             return SwitchListTile(
-              title: const Text('Swipe left on Home'),
-              subtitle: const Text('Swipe left to jump to the Read tab'),
+              title: const TrText('Swipe left on Home'),
+              subtitle: const TrText('Swipe left to jump to the Read tab'),
               value: swipeLeft,
               onChanged: (value) {
                 HapticFeedback.selectionClick();
@@ -1121,15 +1102,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             final fabLongPress = ref
                 .watch(readSettingsProvider.select((s) => s.fabLongPressToNav));
             return SwitchListTile(
-              title: Text(
-                'Long-press button to open navigation',
+              title: TrText('Long-press button to open navigation',
                 style: Theme.of(context)
                     .textTheme
                     .titleSmall
                     ?.copyWith(fontWeight: FontWeight.bold),
               ),
-              subtitle: Text(
-                'Long-press the bottom-right button to quickly open the Book/Chapter selector.',
+              subtitle: TrText('Long-press the bottom-right button to quickly open the Book/Chapter selector.',
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               value: fabLongPress,
@@ -1158,9 +1137,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                   ref.watch(bbeSubstitutionsProvider).value?.length ?? 94;
               return ListTile(
                 leading: const Icon(Icons.info_outline_rounded),
-                title: const Text('BBE Translation Note'),
-                subtitle: Text(
-                    'The Bible in Basic English originally left some verses untranslated or heavily truncated. For those ($subsCount verses), the World English Bible (WEB) text is shown instead and marked with a WEB badge.'),
+                title: const TrText('BBE Translation Note'),
+                subtitle: TrText('The Bible in Basic English originally left some verses untranslated or heavily truncated. For those ({0} verses), the World English Bible (WEB) text is shown instead and marked with a WEB badge.', args: [subsCount]),
                 isThreeLine: true,
               );
             },
@@ -1172,33 +1150,33 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
         children: [
           ListTile(
             leading: const Icon(Icons.upload_file_rounded),
-            title: const Text('Back up my data'),
-            subtitle: const Text('Export notes, highlights, and settings'),
+            title: const TrText('Back up my data'),
+            subtitle: const TrText('Export notes, highlights, and settings'),
             onTap: () => BackupService.exportData(context, ref),
           ),
           const Divider(height: 1, indent: 16),
           ListTile(
             leading: const Icon(Icons.download_rounded),
-            title: const Text('Restore from backup'),
-            subtitle: const Text('Import your data from a backup JSON'),
+            title: const TrText('Restore from backup'),
+            subtitle: const TrText('Import your data from a backup JSON'),
             onTap: () {
               final controller = TextEditingController();
               showDialog(
                 context: context,
                 builder: (ctx) => AlertDialog(
-                  title: const Text('Restore from Backup'),
+                  title: const TrText('Restore from Backup'),
                   content: TextField(
                     controller: controller,
                     maxLines: 5,
-                    decoration: const InputDecoration(
-                      hintText: 'Paste your backup JSON here...',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      hintText: context.tr('Paste your backup JSON here...'),
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.of(ctx).pop(),
-                      child: const Text('Cancel'),
+                      child: const TrText('Cancel'),
                     ),
                     ElevatedButton(
                       onPressed: () {
@@ -1208,7 +1186,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                           BackupService.importData(context, ref, text);
                         }
                       },
-                      child: const Text('Restore'),
+                      child: const TrText('Restore'),
                     ),
                   ],
                 ),
@@ -1218,11 +1196,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           const Divider(height: 1, indent: 16),
           ListTile(
             leading: const Icon(Icons.delete_sweep_rounded),
-            title: const Text('Clear cache/downloaded data'),
-            subtitle: const Text('Free up space by removing cached files'),
+            title: const TrText('Clear cache/downloaded data'),
+            subtitle: const TrText('Free up space by removing cached files'),
             onTap: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Not yet implemented')),
+                const SnackBar(content: TrText('Not yet implemented')),
               );
             },
           ),
@@ -1233,21 +1211,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           ListTile(
             leading: Icon(Icons.restore_rounded,
                 color: Theme.of(context).colorScheme.error),
-            title: Text('Reset settings',
+            title: TrText('Reset settings',
                 style: TextStyle(color: Theme.of(context).colorScheme.error)),
             subtitle:
-                const Text('Restore original app settings (content is kept)'),
+                const TrText('Restore original app settings (content is kept)'),
             onTap: () {
               showDialog(
                 context: context,
                 builder: (ctx) => AlertDialog(
-                  title: const Text('Reset settings?'),
-                  content: const Text(
-                      'Reset all settings to default? This won\'t affect your bookmarks, notes, or highlights.'),
+                  title: const TrText('Reset settings?'),
+                  content: const TrText('Reset all settings to default? This won\'t affect your bookmarks, notes, or highlights.'),
                   actions: [
                     TextButton(
                         onPressed: () => Navigator.of(ctx).pop(),
-                        child: const Text('Cancel')),
+                        child: const TrText('Cancel')),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Theme.of(context).colorScheme.error,
@@ -1285,10 +1262,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                  content: Text('Settings reset to default.')));
+                                  content: TrText('Settings reset to default.')));
                         }
                       },
-                      child: const Text('Reset'),
+                      child: const TrText('Reset'),
                     ),
                   ],
                 ),
@@ -1302,7 +1279,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           Consumer(builder: (context, ref, _) {
             final packageInfoAsync = ref.watch(packageInfoProvider);
             return ListTile(
-              title: const Text('Version'),
+              title: const TrText('Version'),
               trailing: packageInfoAsync.when(
                 data: (info) => Text(info.version,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -1314,15 +1291,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                     width: 16,
                     height: 16,
                     child: CircularProgressIndicator(strokeWidth: 2)),
-                error: (_, __) => const Text('Unknown'),
+                error: (_, __) => const TrText('Unknown'),
               ),
             );
           }),
           const Divider(height: 1, indent: 16),
           ListTile(
-            title: const Text('Storage & downloads'),
-            subtitle: const Text(
-                'Cache, downloaded translations and what can be freed'),
+            title: const TrText('Storage & downloads'),
+            subtitle: const TrText('Cache, downloaded translations and what can be freed'),
             trailing: FutureBuilder<int>(
               future: bibleDbService.contentBytesUsed(),
               builder: (context, snapshot) {
@@ -1350,7 +1326,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           ),
           const Divider(height: 1, indent: 16),
           ListTile(
-            title: const Text('Send Feedback'),
+            title: const TrText('Send Feedback'),
             trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
             onTap: () async {
               final uri = Uri.parse(
@@ -1362,7 +1338,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           ),
           const Divider(height: 1, indent: 16),
           ListTile(
-            title: const Text('Privacy Policy'),
+            title: const TrText('Privacy Policy'),
             trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
             onTap: () {
               Navigator.push(
@@ -1373,9 +1349,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           ),
           const Divider(height: 1, indent: 16),
           const ListTile(
-            title: Text('Bible Translations'),
-            subtitle: Text(
-                'Most translations (KJV, WEB, Spanish RV1909, French LSG, German Luther, Italian Diodati, Romanian BTF, Russian Synodal, Chinese CUV, Arabic Van Dyck, Korean 1910, Dutch 1917, Ukrainian Kulish) are in the Public Domain.\n\n'
+            title: TrText('Bible Translations'),
+            subtitle: TrText('Most translations (KJV, WEB, Spanish RV1909, French LSG, German Luther, Italian Diodati, Romanian BTF, Russian Synodal, Chinese CUV, Arabic Van Dyck, Korean 1910, Dutch 1917, Ukrainian Kulish) are in the Public Domain.\n\n'
                 'Creative Commons:\n'
                 '• Swahili ULB & Tagalog ULB (CC BY-SA 4.0)\n'
                 '• Portuguese Bíblia Livre (CC BY 4.0)\n'
@@ -1421,7 +1396,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('Set Location for Sunset',
+              TrText('Set Location for Sunset',
                   style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 16),
               ElevatedButton.icon(
@@ -1432,14 +1407,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                   Navigator.pop(ctx);
                 },
                 icon: const Icon(Icons.my_location),
-                label: const Text('Use my current location'),
+                label: const TrText('Use my current location'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).primaryColor,
                   foregroundColor: Colors.white,
                 ),
               ),
               const SizedBox(height: 16),
-              const Center(child: Text('OR select a major city')),
+              const Center(child: TrText('OR select a major city')),
               const SizedBox(height: 16),
               SizedBox(
                 height: 200,

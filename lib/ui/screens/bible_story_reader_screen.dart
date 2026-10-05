@@ -6,6 +6,8 @@ import '../../state/devotional_provider.dart';
 import '../widgets/verse_link_text.dart' show splitBoldSegments;
 import '../../theme/app_colors.dart';
 import 'bible_stories_screen.dart';
+import '../../l10n/tr_text.dart';
+import '../../l10n/l10n.dart';
 
 /// Two-page devotional reader: engraving on top, scripture + retelling below.
 class BibleStoryReaderScreen extends ConsumerStatefulWidget {
@@ -93,7 +95,7 @@ class _BibleStoryReaderScreenState
                   isFavorite ? Icons.favorite_rounded : Icons.favorite_outline_rounded,
                   color: isFavorite ? AppColors.goldAccent : null,
                 ),
-                tooltip: 'Favorite',
+                tooltip: context.tr('Favorite'),
                 onPressed: () =>
                     ref.read(devotionalFavoritesProvider.notifier).toggle(_story.id),
               ),
@@ -104,7 +106,7 @@ class _BibleStoryReaderScreenState
                       : Icons.check_circle_outline_rounded,
                   color: _markedRead ? AppColors.goldAccent : null,
                 ),
-                tooltip: 'Mark as read',
+                tooltip: context.tr('Mark as read'),
                 onPressed: () {
                   ref.read(devotionalReadProvider.notifier).markRead(_story.id);
                   setState(() => _markedRead = true);
@@ -189,8 +191,7 @@ class _BibleStoryReaderScreenState
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'KEY VERSE · ${_story.keyVerseRef.toUpperCase()}',
+                          TrText('KEY VERSE · {0}', args: [_story.keyVerseRef.toUpperCase()],
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: theme.primaryColor,
                               fontWeight: FontWeight.bold,
@@ -223,8 +224,7 @@ class _BibleStoryReaderScreenState
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: Text(
-                          'THE STORY',
+                        child: TrText('THE STORY',
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: theme.primaryColor,
                             fontWeight: FontWeight.bold,
@@ -249,8 +249,7 @@ class _BibleStoryReaderScreenState
                   ),
                   if (_story.plateCaption != null) ...[
                     const SizedBox(height: 24),
-                    Text(
-                      'Artwork: ${_story.plateCaption} — Gustave Doré, public domain',
+                    TrText('Artwork: {0} — Gustave Doré, public domain', args: [_story.plateCaption],
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurface.withValues(alpha: 0.45),
                         fontStyle: FontStyle.italic,
@@ -288,7 +287,7 @@ class _BibleStoryReaderScreenState
               IconButton(
                 onPressed: () => _goNeighbor(next: false),
                 icon: const Icon(Icons.chevron_left_rounded),
-                tooltip: 'Previous story',
+                tooltip: context.tr('Previous story'),
               ),
               Expanded(
                 child: Text(
@@ -304,7 +303,7 @@ class _BibleStoryReaderScreenState
               IconButton(
                 onPressed: () => _goNeighbor(next: true),
                 icon: const Icon(Icons.chevron_right_rounded),
-                tooltip: 'Next story',
+                tooltip: context.tr('Next story'),
               ),
             ],
           ),

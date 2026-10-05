@@ -8,6 +8,7 @@ import '../../state/study_layout_provider.dart';
 import '../../services/cloud_sync_service.dart';
 import 'textured_glass_container.dart';
 import 'mesh_gradient_bg.dart';
+import '../../l10n/tr_text.dart';
 
 class AccountSyncCard extends ConsumerStatefulWidget {
   final CardSize size;
@@ -49,7 +50,7 @@ class _AccountSyncCardState extends ConsumerState<AccountSyncCard> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Sync complete! Latest changes merged.'),
+            content: const TrText('Sync complete! Latest changes merged.'),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
@@ -58,7 +59,7 @@ class _AccountSyncCardState extends ConsumerState<AccountSyncCard> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to sync. Check network.')),
+          const SnackBar(content: TrText('Failed to sync. Check network.')),
         );
       }
     } finally {
@@ -99,8 +100,7 @@ class _AccountSyncCardState extends ConsumerState<AccountSyncCard> {
           children: [
             Icon(Icons.cloud_sync_rounded, color: theme.primaryColor, size: 24),
             const SizedBox(width: 8),
-            Text(
-              'CLOUD SYNC',
+            TrText('CLOUD SYNC',
               style: theme.textTheme.labelSmall?.copyWith(
                 color: theme.primaryColor,
                 letterSpacing: 1.5,
@@ -110,13 +110,11 @@ class _AccountSyncCardState extends ConsumerState<AccountSyncCard> {
           ],
         ),
         const SizedBox(height: 16),
-        Text(
-          'Sync Your Journey',
+        TrText('Sync Your Journey',
           style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
-        Text(
-          'Backup your highlights, bookmarks, and streaks across all your devices securely.',
+        TrText('Backup your highlights, bookmarks, and streaks across all your devices securely.',
           style: theme.textTheme.bodyMedium?.copyWith(
             height: 1.5,
             color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
@@ -128,7 +126,7 @@ class _AccountSyncCardState extends ConsumerState<AccountSyncCard> {
           child: ElevatedButton.icon(
             onPressed: () => _signInWithGoogle(),
             icon: const Icon(Icons.g_mobiledata_rounded, size: 28),
-            label: const Text('Continue with Google'),
+            label: const TrText('Continue with Google'),
             style: ElevatedButton.styleFrom(
               backgroundColor: theme.colorScheme.surface,
               foregroundColor: theme.colorScheme.onSurface,
@@ -145,7 +143,7 @@ class _AccountSyncCardState extends ConsumerState<AccountSyncCard> {
           child: ElevatedButton.icon(
             onPressed: () => _signInWithApple(),
             icon: const Icon(Icons.apple, size: 24),
-            label: const Text('Continue with Apple'),
+            label: const TrText('Continue with Apple'),
             style: ElevatedButton.styleFrom(
               backgroundColor: theme.colorScheme.onSurface,
               foregroundColor: theme.colorScheme.surface,
@@ -218,8 +216,7 @@ class _AccountSyncCardState extends ConsumerState<AccountSyncCard> {
                       style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 2),
-                    Text(
-                      'Latest highlights win on merge.',
+                    TrText('Latest highlights win on merge.',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
@@ -281,8 +278,8 @@ class _AccountSyncCardState extends ConsumerState<AccountSyncCard> {
                 const SizedBox(height: 24),
                 ListTile(
                   leading: const Icon(Icons.cloud_off_rounded, color: Colors.orange),
-                  title: const Text('Sign Out', style: TextStyle(color: Colors.orange)),
-                  subtitle: const Text('Your local data will remain.'),
+                  title: const TrText('Sign Out', style: TextStyle(color: Colors.orange)),
+                  subtitle: const TrText('Your local data will remain.'),
                   onTap: () async {
                     Navigator.pop(ctx);
                     await ref.read(authActionsProvider).signOut();
@@ -290,8 +287,8 @@ class _AccountSyncCardState extends ConsumerState<AccountSyncCard> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.delete_sweep_rounded, color: Colors.red),
-                  title: const Text('Reset Local Data', style: TextStyle(color: Colors.red)),
-                  subtitle: const Text('Clear local device highlights & bookmarks.'),
+                  title: const TrText('Reset Local Data', style: TextStyle(color: Colors.red)),
+                  subtitle: const TrText('Clear local device highlights & bookmarks.'),
                   onTap: () async {
                     Navigator.pop(ctx);
                     final confirm = await _confirmDialog(context, 'Reset Local Data?', 'This clears your local database. Your cloud data is untouched.');
@@ -303,8 +300,8 @@ class _AccountSyncCardState extends ConsumerState<AccountSyncCard> {
                 const Divider(),
                 ListTile(
                   leading: const Icon(Icons.delete_forever_rounded, color: Colors.red),
-                  title: const Text('Delete Account', style: TextStyle(color: Colors.red)),
-                  subtitle: const Text('Permanently erase all cloud data and sign out.'),
+                  title: const TrText('Delete Account', style: TextStyle(color: Colors.red)),
+                  subtitle: const TrText('Permanently erase all cloud data and sign out.'),
                   onTap: () async {
                     Navigator.pop(ctx);
                     final confirm = await _confirmDialog(context, 'Delete Account?', 'This is permanent and irreversible. All cloud backups will be deleted.');
@@ -312,10 +309,10 @@ class _AccountSyncCardState extends ConsumerState<AccountSyncCard> {
                       try {
                         await ref.read(authActionsProvider).deleteAccount();
                         if (!mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Account deleted successfully.')));
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: TrText('Account deleted successfully.')));
                       } catch (e) {
                          if (!mounted) return;
-                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: ${e.toString()}')));
+                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: TrText('Failed: {0}', args: [e.toString()])));
                       }
                     }
                   },
@@ -337,11 +334,11 @@ class _AccountSyncCardState extends ConsumerState<AccountSyncCard> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
+            child: const TrText('Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Confirm', style: TextStyle(color: Colors.red)),
+            child: const TrText('Confirm', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),

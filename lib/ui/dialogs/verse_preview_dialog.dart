@@ -5,6 +5,7 @@ import '../../state/translation_provider.dart';
 import '../../services/bible_database_service.dart';
 import '../../data/models/bible_model.dart';
 import '../../state/typography_provider.dart';
+import '../../l10n/tr_text.dart';
 
 class VersePreviewDialog extends ConsumerWidget {
   final String reference;
@@ -86,7 +87,7 @@ class VersePreviewDialog extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             if (bookNumber == null)
-              const Text('Could not find the referenced book.')
+              const TrText('Could not find the referenced book.')
             else
               FutureBuilder<BibleVerse?>(
                 future: bibleDbService.getVerse(
@@ -106,12 +107,12 @@ class VersePreviewDialog extends ConsumerWidget {
                   }
                   
                   if (snapshot.hasError) {
-                    return Text('Error loading verse: ${snapshot.error}');
+                    return TrText('Error loading verse: {0}', args: [snapshot.error]);
                   }
                   
                   final verse = snapshot.data;
                   if (verse == null) {
-                    return const Text('Verse not found.');
+                    return const TrText('Verse not found.');
                   }
                   
                   return SingleChildScrollView(

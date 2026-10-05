@@ -7,6 +7,7 @@ import '../../state/streak_provider.dart';
 import '../../state/wotd_provider.dart';
 import '../../services/widget_update_service.dart';
 import '../widgets/dynamic_toast.dart';
+import '../../l10n/tr_text.dart';
 
 class WidgetSettingsSheet extends ConsumerWidget {
   const WidgetSettingsSheet({super.key});
@@ -94,12 +95,10 @@ class WidgetSettingsSheet extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Home Screen Widgets',
+                        TrText('Home Screen Widgets',
                           style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                         ),
-                        Text(
-                          'Live preview & style customization',
+                        TrText('Live preview & style customization',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                           ),
@@ -113,8 +112,7 @@ class WidgetSettingsSheet extends ConsumerWidget {
               const SizedBox(height: 24),
 
               // Section: Live Previews
-              Text(
-                'LIVE WIDGET PREVIEW',
+              TrText('LIVE WIDGET PREVIEW',
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.2,
@@ -136,16 +134,14 @@ class WidgetSettingsSheet extends ConsumerWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              '${streak.count} Days',
+                            TrText('{0} Days', args: [streak.count],
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 color: primaryTextColor,
                               ),
                             ),
-                            Text(
-                              'Streak Active! • Daily Goal',
+                            TrText('Streak Active! • Daily Goal',
                               style: TextStyle(
                                 fontSize: 11,
                                 color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF16A34A),
@@ -160,8 +156,7 @@ class WidgetSettingsSheet extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Divider(height: 1, color: dividerColor),
                     ),
-                    Text(
-                      'WORD OF THE DAY',
+                    TrText('WORD OF THE DAY',
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
@@ -201,8 +196,7 @@ class WidgetSettingsSheet extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'VERSE OF THE DAY',
+                    TrText('VERSE OF THE DAY',
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
@@ -244,8 +238,7 @@ class WidgetSettingsSheet extends ConsumerWidget {
               const SizedBox(height: 28),
 
               // Section: Style Selection
-              Text(
-                'BACKGROUND THEME & GRADIENTS',
+              TrText('BACKGROUND THEME & GRADIENTS',
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.2,
@@ -296,8 +289,7 @@ class WidgetSettingsSheet extends ConsumerWidget {
               const SizedBox(height: 24),
 
               // Section: Text Contrast Mode
-              Text(
-                'TEXT CONTRAST',
+              TrText('TEXT CONTRAST',
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.2,
@@ -345,7 +337,7 @@ class WidgetSettingsSheet extends ConsumerWidget {
                     }
                   },
                   icon: const Icon(Icons.sync_rounded),
-                  label: const Text('Apply & Sync to Home Screen'),
+                  label: const TrText('Apply & Sync to Home Screen'),
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(

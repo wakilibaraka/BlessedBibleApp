@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/local_storage/preferences_service.dart';
 import 'main_nav_screen.dart';
 import '../../theme/app_colors.dart';
+import '../../l10n/tr_text.dart';
+import '../../l10n/l10n.dart';
 
 class OnboardingScreen extends ConsumerWidget {
   const OnboardingScreen({super.key});
@@ -62,8 +64,7 @@ class OnboardingScreen extends ConsumerWidget {
                         ),
                         Column(
                           children: [
-                            const Text(
-                              'The Blessed Bible',
+                            const TrText('The Blessed Bible',
                               style: TextStyle(
                                 fontFamily: 'EB Garamond',
                                 fontSize: 36,
@@ -75,8 +76,7 @@ class OnboardingScreen extends ConsumerWidget {
                               textAlign: TextAlign.center,
                             ),
                             const SizedBox(height: 12),
-                            Text(
-                              'Scripture, without distraction.',
+                            TrText('Scripture, without distraction.',
                               style: TextStyle(
                                 fontSize: 17,
                                 color: sepiaMuted.withValues(alpha: 0.7),
@@ -97,8 +97,8 @@ class OnboardingScreen extends ConsumerWidget {
                       children: [
                         _FeatureRow(
                           icon: Icons.menu_book_rounded,
-                          title: 'The Pure Word',
-                          subtitle: 'Read the Scriptures without distraction. Customize fonts and translations as you read.',
+                          title: context.tr('The Pure Word'),
+                          subtitle: context.tr('Read the Scriptures without distraction. Customize fonts and translations as you read.'),
                           tileColor: amberGold,
                           iconColor: tileGlyph,
                           titleColor: sepiaInk,
@@ -107,8 +107,8 @@ class OnboardingScreen extends ConsumerWidget {
                         const SizedBox(height: 26),
                         _FeatureRow(
                           icon: Icons.calendar_month_rounded,
-                          title: 'Curated Plans',
-                          subtitle: 'Follow chronological or custom reading plans built to keep you consistent.',
+                          title: context.tr('Curated Plans'),
+                          subtitle: context.tr('Follow chronological or custom reading plans built to keep you consistent.'),
                           tileColor: terracotta,
                           iconColor: tileGlyph,
                           titleColor: sepiaInk,
@@ -117,8 +117,8 @@ class OnboardingScreen extends ConsumerWidget {
                         const SizedBox(height: 26),
                         _FeatureRow(
                           icon: Icons.lightbulb_rounded,
-                          title: 'Deep Insights',
-                          subtitle: 'Access integrated commentary, maps, and pericopes seamlessly as you study.',
+                          title: context.tr('Deep Insights'),
+                          subtitle: context.tr('Access integrated commentary, maps, and pericopes seamlessly as you study.'),
                           tileColor: oliveSage,
                           iconColor: tileGlyph,
                           titleColor: sepiaInk,
@@ -153,8 +153,7 @@ class OnboardingScreen extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(14),
                         ),
                       ),
-                      child: const Text(
-                        'Continue',
+                      child: const TrText('Continue',
                         style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w600,

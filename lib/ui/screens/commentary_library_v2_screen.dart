@@ -8,6 +8,8 @@ import '../../state/commentary_provider.dart';
 import '../../state/theme_provider.dart';
 import '../widgets/shared_app_bar.dart';
 import '../widgets/study_v2_widgets.dart';
+import '../../l10n/tr_text.dart';
+import '../../l10n/l10n.dart';
 
 /// Redesigned commentary library (V2).
 ///
@@ -52,7 +54,7 @@ class _CommentaryLibraryV2ScreenState
                     fontWeight: FontWeight.bold,
                   )),
               const SizedBox(height: 4),
-              Text('${chapters.length} chapters with content',
+              TrText('{0} chapters with content', args: [chapters.length],
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface
                         .withValues(alpha: 0.6),
@@ -122,7 +124,7 @@ class _CommentaryLibraryV2ScreenState
       page: Scaffold(
         backgroundColor: Colors.transparent,
         appBar:
-            const SharedAppBar(title: Text('Commentary Library')),
+            const SharedAppBar(title: TrText('Commentary Library')),
       body: SafeArea(
         bottom: false,
         child: Center(
@@ -140,8 +142,7 @@ class _CommentaryLibraryV2ScreenState
                       color: theme.colorScheme.onSurface
                           .withValues(alpha: 0.4)),
                   const SizedBox(height: 12),
-                  Text(
-                    'Could not load commentary.',
+                  TrText('Could not load commentary.',
                     textAlign: TextAlign.center,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
@@ -161,7 +162,7 @@ class _CommentaryLibraryV2ScreenState
                     child: FilledButton.tonal(
                       onPressed: () =>
                           ref.invalidate(commentaryProvider),
-                      child: const Text('Retry'),
+                      child: const TrText('Retry'),
                     ),
                   ),
                 ],
@@ -287,8 +288,7 @@ class _CommentaryLibraryV2ScreenState
                                     ),
                                   ),
                                   const SizedBox(height: 2),
-                                  Text(
-                                    '${authors[book] ?? 'Classic sources'} · ${chapters.length} ch',
+                                  TrText('{0} · {1} ch', args: [authors[book] ?? 'Classic sources', chapters.length],
                                     style: theme
                                         .textTheme.bodySmall
                                         ?.copyWith(
@@ -389,8 +389,7 @@ class _CommentaryHubV2ScreenState
                                   .withValues(alpha: 0.3),
                             ),
                           ),
-                          child: Text(
-                            'Reading · ${widget.book} ${widget.chapter}:${widget.verse}',
+                          child: TrText('Reading · {0} {1}:{2}', args: [widget.book, widget.chapter, widget.verse],
                             style: theme.textTheme.titleSmall
                                 ?.copyWith(
                               fontWeight: FontWeight.w700,
@@ -404,7 +403,7 @@ class _CommentaryHubV2ScreenState
                         child: Row(
                           children: [
                             _FilterChip(
-                              label: 'All sources',
+                              label: context.tr('All sources'),
                               selected: _filter == null,
                               onTap: () =>
                                   setState(() => _filter = null),
@@ -424,7 +423,7 @@ class _CommentaryHubV2ScreenState
                                 ),
                               ),
                             _FilterChip(
-                              label: 'Verse-level',
+                              label: context.tr('Verse-level'),
                               selected: _verseOnly,
                               onTap: () => setState(
                                   () => _verseOnly = !_verseOnly),
@@ -468,13 +467,13 @@ class _CommentaryHubV2ScreenState
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text('Could not load entries.\n$e',
+                          TrText('Could not load entries.\n{0}', args: [e],
                               textAlign: TextAlign.center),
                           const SizedBox(height: 12),
                           FilledButton.tonal(
                             onPressed: () => ref
                                 .invalidate(commentaryProvider),
-                            child: const Text('Retry'),
+                            child: const TrText('Retry'),
                           ),
                         ],
                       ),
@@ -517,8 +516,7 @@ class _CommentaryHubV2ScreenState
                         return Center(
                           child: Padding(
                             padding: const EdgeInsets.all(32),
-                            child: Text(
-                              'No entries match these filters.\nTry All sources, or browse the library.',
+                            child: TrText('No entries match these filters.\nTry All sources, or browse the library.',
                               textAlign: TextAlign.center,
                               style: theme.textTheme.bodyMedium
                                   ?.copyWith(

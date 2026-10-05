@@ -8,6 +8,7 @@ import '../widgets/shared_app_bar.dart';
 import '../widgets/animated_background.dart';
 import '../../state/theme_provider.dart';
 import 'note_editor_screen.dart';
+import '../../l10n/tr_text.dart';
 
 class _ParsedVerseData {
   final String bookAbbrev;
@@ -137,7 +138,7 @@ class BookmarksScreen extends ConsumerWidget {
       appBar: SharedAppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text('Bookmarks',
+        title: TrText('Bookmarks',
             style: theme.textTheme.titleMedium
                 ?.copyWith(fontWeight: FontWeight.bold)),
       ),
@@ -151,8 +152,7 @@ class BookmarksScreen extends ConsumerWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-                  child: Text(
-                    "Verses you're reflecting on. Tap any bookmark to add a note.",
+                  child: TrText("Verses you're reflecting on. Tap any bookmark to add a note.",
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                       height: 1.4,
@@ -162,8 +162,7 @@ class BookmarksScreen extends ConsumerWidget {
                 Expanded(
                   child: bookmarks.isEmpty
                       ? Center(
-                          child: Text(
-                            "No bookmarks yet.",
+                          child: TrText("No bookmarks yet.",
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                             ),

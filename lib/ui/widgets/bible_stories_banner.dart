@@ -7,6 +7,7 @@ import '../../state/study_layout_provider.dart' show CardSize;
 import '../../theme/app_colors.dart';
 import '../screens/bible_stories_screen.dart';
 import 'textured_glass_container.dart';
+import '../../l10n/tr_text.dart';
 
 /// "Bible Stories" banner card for the Study tab layout grid.
 class BibleStoriesBanner extends ConsumerWidget {
@@ -59,8 +60,7 @@ class BibleStoriesBanner extends ConsumerWidget {
                           Icon(Icons.auto_stories_rounded,
                               size: 20, color: AppColors.goldAccent),
                           const SizedBox(width: 8),
-                          Text(
-                            'BIBLE STORIES',
+                          TrText('BIBLE STORIES',
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: AppColors.goldAccent,
                               letterSpacing: 1.5,
@@ -69,8 +69,7 @@ class BibleStoriesBanner extends ConsumerWidget {
                           ),
                           const Spacer(),
                           if (readCount > 0)
-                            Text(
-                              '$readCount read',
+                            TrText('{0} read', args: [readCount],
                               style: theme.textTheme.labelSmall?.copyWith(
                                 color: theme.colorScheme.onSurface
                                     .withValues(alpha: 0.55),
@@ -79,16 +78,14 @@ class BibleStoriesBanner extends ConsumerWidget {
                         ],
                       ),
                       const SizedBox(height: 12),
-                      Text(
-                        'An Illustrated Journey Through Scripture',
+                      TrText('An Illustrated Journey Through Scripture',
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontFamily: 'Playfair Display',
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Text(
-                        '500 stories from Genesis to Revelation, each with classical '
+                      TrText('500 stories from Genesis to Revelation, each with classical '
                         'Doré engravings, the full KJV passage, and a narrative retelling.'
                         '${favCount > 0 ? ' You have $favCount favorites.' : ''}',
                         maxLines: size == CardSize.small ? 2 : 4,

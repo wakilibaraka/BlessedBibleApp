@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../state/auth_provider.dart';
+import '../../l10n/tr_text.dart';
 
 
 
@@ -39,7 +40,7 @@ class AccountButton extends ConsumerWidget {
                       if (currentAuthState.value == null) ...[
                         ListTile(
                           leading: const Icon(Icons.account_circle),
-                          title: const Text('Sign in with Google'),
+                          title: const TrText('Sign in with Google'),
                           onTap: () async {
                             final result = await ref
                                 .read(authActionsProvider)
@@ -47,8 +48,7 @@ class AccountButton extends ConsumerWidget {
                             if (context.mounted && result == SignInResult.failed) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: const Text(
-                                      'Sign in failed. Please try again.'),
+                                  content: const TrText('Sign in failed. Please try again.'),
                                   behavior: SnackBarBehavior.floating,
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12)),
@@ -62,7 +62,7 @@ class AccountButton extends ConsumerWidget {
                         ),
                         ListTile(
                           leading: const Icon(Icons.apple),
-                          title: const Text('Sign in with Apple'),
+                          title: const TrText('Sign in with Apple'),
                           onTap: () async {
                             final result = await ref
                                 .read(authActionsProvider)
@@ -70,8 +70,7 @@ class AccountButton extends ConsumerWidget {
                             if (context.mounted && result == SignInResult.failed) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: const Text(
-                                      'Sign in failed. Please try again.'),
+                                  content: const TrText('Sign in failed. Please try again.'),
                                   behavior: SnackBarBehavior.floating,
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12)),
@@ -98,7 +97,7 @@ class AccountButton extends ConsumerWidget {
                         ),
                         ListTile(
                           leading: const Icon(Icons.logout, color: Colors.orange),
-                          title: const Text('Sign Out',
+                          title: const TrText('Sign Out',
                               style: TextStyle(color: Colors.orange)),
                           onTap: () async {
                             await ref.read(authActionsProvider).signOut();
@@ -107,7 +106,7 @@ class AccountButton extends ConsumerWidget {
                         ),
                         ListTile(
                           leading: const Icon(Icons.delete_forever, color: Colors.red),
-                          title: const Text('Delete Account',
+                          title: const TrText('Delete Account',
                               style: TextStyle(color: Colors.red)),
                           onTap: () async {
                             // Close the bottom sheet first
@@ -116,9 +115,8 @@ class AccountButton extends ConsumerWidget {
                             final confirm = await showDialog<bool>(
                               context: context,
                               builder: (ctx) => AlertDialog(
-                                title: const Text('Delete Account?'),
-                                content: const Text(
-                                    'This is permanent and irreversible.\n\n'
+                                title: const TrText('Delete Account?'),
+                                content: const TrText('This is permanent and irreversible.\n\n'
                                     'The following will be completely removed:\n'
                                     '• Your sign-in account\n'
                                     '• Your cloud-synced custom plans\n'
@@ -126,11 +124,11 @@ class AccountButton extends ConsumerWidget {
                                 actions: [
                                   TextButton(
                                     onPressed: () => Navigator.pop(ctx, false),
-                                    child: const Text('Cancel'),
+                                    child: const TrText('Cancel'),
                                   ),
                                   TextButton(
                                     onPressed: () => Navigator.pop(ctx, true),
-                                    child: const Text('Delete',
+                                    child: const TrText('Delete',
                                         style: TextStyle(color: Colors.red)),
                                   ),
                                 ],
@@ -142,7 +140,7 @@ class AccountButton extends ConsumerWidget {
                                 await ref.read(authActionsProvider).deleteAccount();
                                 if (context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Account deleted successfully.')),
+                                    const SnackBar(content: TrText('Account deleted successfully.')),
                                   );
                                 }
                               } on ReauthCancelledException catch (_) {
@@ -151,7 +149,7 @@ class AccountButton extends ConsumerWidget {
                                 if (context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text('Failed to delete account: ${e.toString().replaceAll("Exception: ", "")}'),
+                                      content: TrText('Failed to delete account: {0}', args: [e.toString().replaceAll("Exception: ", "")]),
                                       duration: const Duration(seconds: 4),
                                     ),
                                   );

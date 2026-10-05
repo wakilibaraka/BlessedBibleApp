@@ -20,6 +20,7 @@ import '../state/study_layout_provider.dart';
 import '../state/theme_provider.dart';
 import '../state/typography_provider.dart';
 import '../state/surface_style_provider.dart';
+import '../l10n/tr_text.dart';
 
 class BackupService {
   static const int currentVersion = 1;
@@ -72,7 +73,7 @@ class BackupService {
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Export failed: $e')),
+          SnackBar(content: TrText('Export failed: {0}', args: [e])),
         );
       }
     }
@@ -101,20 +102,19 @@ class BackupService {
       final confirm = await showDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: const Text('Confirm Restore'),
-          content: const Text(
-              'This will overwrite all existing notes, highlights, bookmarks, and settings. Are you sure?'),
+          title: const TrText('Confirm Restore'),
+          content: const TrText('This will overwrite all existing notes, highlights, bookmarks, and settings. Are you sure?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(false),
-              child: const Text('Cancel'),
+              child: const TrText('Cancel'),
             ),
             ElevatedButton(
               onPressed: () => Navigator.of(ctx).pop(true),
               style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.error),
               child:
-                  const Text('Restore', style: TextStyle(color: Colors.white)),
+                  const TrText('Restore', style: TextStyle(color: Colors.white)),
             ),
           ],
         ),
@@ -205,7 +205,7 @@ class BackupService {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content:
-                  Text('Restore failed: Invalid or corrupted backup ($e)')),
+                  TrText('Restore failed: Invalid or corrupted backup ({0})', args: [e])),
         );
       }
     }

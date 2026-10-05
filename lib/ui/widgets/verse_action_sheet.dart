@@ -10,6 +10,7 @@ import '../../state/bible_provider.dart';
 import '../../state/read_settings_provider.dart';
 import '../screens/read_screen.dart' show VerseActionLogic;
 import 'textured_glass_container.dart';
+import '../../l10n/l10n.dart';
 
 /// Compact Apple-style action sheet for a verse selection.
 ///
@@ -75,26 +76,26 @@ Future<bool> showVerseActionSheet(BuildContext context, WidgetRef ref) async {
         ),
         SheetAction(
           icon: Icons.color_lens_rounded,
-          label: 'Highlight',
+          label: context.tr('Highlight'),
           onTap: () =>
               ref.read(readSettingsProvider.notifier).cycleHighlightColor(),
         ),
         SheetAction(
           icon: Icons.note_add_outlined,
-          label: 'Note',
+          label: context.tr('Note'),
           onTap: () => VerseActionLogic.handleNote(
               ctx, ref, theme, readLoc.bookName, readLoc.chapter, verses),
         ),
         SheetAction(
           icon: Icons.menu_book_rounded,
-          label: 'Study',
+          label: context.tr('Study'),
           onTap: () => VerseActionLogic.handleCommentary(
               ctx, ref, readLoc.bookName, readLoc.chapter, verses.first,
               verses),
         ),
         SheetAction(
           icon: Icons.ios_share_rounded,
-          label: 'Share',
+          label: context.tr('Share'),
           onTap: () async {
             await VerseActionLogic.handleShareOptions(
                 ctx, ref, readLoc.bookName, readLoc.chapter, verses);

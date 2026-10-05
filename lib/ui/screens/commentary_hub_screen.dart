@@ -9,6 +9,7 @@ import '../../models/commentary_entry.dart';
 import '../../models/study_content_category.dart';
 import '../../state/typography_provider.dart';
 import 'dart:ui';
+import '../../l10n/tr_text.dart';
 
 class CommentaryHubScreen extends ConsumerStatefulWidget {
   final String book;
@@ -106,14 +107,14 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text('Could not load commentary.\n$e',
+                      TrText('Could not load commentary.\n{0}', args: [e],
                           textAlign: TextAlign.center),
                       const SizedBox(height: 12),
                       TextButton.icon(
                         onPressed: () =>
                             ref.invalidate(commentaryProvider),
                         icon: const Icon(Icons.refresh_rounded),
-                        label: const Text('Retry'),
+                        label: const TrText('Retry'),
                       ),
                     ],
                   ),
@@ -150,7 +151,7 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
               if (filtered.isEmpty) {
                 return SliverFillRemaining(
                   child: Center(
-                    child: Text('No content found for these filters.',
+                    child: TrText('No content found for these filters.',
                         style: theme.textTheme.bodyLarge
                             ?.copyWith(color: tokens.readingInkMuted)),
                   ),

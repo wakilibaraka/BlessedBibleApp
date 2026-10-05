@@ -19,6 +19,8 @@ import '../widgets/item_context_sheet.dart';
 import '../widgets/share_card.dart';
 import 'package:flutter/services.dart';
 import '../../data/models/home_data.dart';
+import '../../l10n/tr_text.dart';
+import '../../l10n/l10n.dart';
 
 class YourSpaceScreen extends ConsumerStatefulWidget {
   final int initialTab; // 0=Highlights, 1=Bookmarks, 2=Notes
@@ -92,7 +94,7 @@ class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
       appBar: SharedAppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text('Your Space',
+        title: TrText('Your Space',
             style: theme.textTheme.titleMedium
                 ?.copyWith(fontWeight: FontWeight.bold)),
       ),
@@ -113,7 +115,7 @@ class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
                     children: [
                       Expanded(
                         child: _SegmentTab(
-                          label: 'Highlights',
+                          label: context.tr('Highlights'),
                           isSelected: _selectedIndex == 0,
                           onTap: () => _onTabTapped(0),
                           theme: theme,
@@ -121,7 +123,7 @@ class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
                       ),
                       Expanded(
                         child: _SegmentTab(
-                          label: 'Bookmarks',
+                          label: context.tr('Bookmarks'),
                           isSelected: _selectedIndex == 1,
                           onTap: () => _onTabTapped(1),
                           theme: theme,
@@ -129,7 +131,7 @@ class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
                       ),
                       Expanded(
                         child: _SegmentTab(
-                          label: 'Notes',
+                          label: context.tr('Notes'),
                           isSelected: _selectedIndex == 2,
                           onTap: () => _onTabTapped(2),
                           theme: theme,
@@ -137,7 +139,7 @@ class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
                       ),
                       Expanded(
                         child: _SegmentTab(
-                          label: 'Journal',
+                          label: context.tr('Journal'),
                           isSelected: _selectedIndex == 3,
                           onTap: () => _onTabTapped(3),
                           theme: theme,
@@ -247,8 +249,7 @@ class _HighlightsSegment extends ConsumerWidget {
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-          child: Text(
-            "Verses you've marked in colour.",
+          child: TrText("Verses you've marked in colour.",
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
               height: 1.4,
@@ -287,8 +288,7 @@ class _HighlightsSegment extends ConsumerWidget {
                                     shape: BoxShape.circle),
                               ),
                               const SizedBox(width: 10),
-                              Text(
-                                'Highlighted',
+                              TrText('Highlighted',
                                 style: theme.textTheme.labelMedium
                                     ?.copyWith(fontWeight: FontWeight.bold),
                               ),
@@ -325,16 +325,16 @@ void _showAddFolderDialog(BuildContext context, WidgetRef ref) {
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: const Text('New Folder'),
+        title: const TrText('New Folder'),
         content: TextField(
           controller: nameController,
           autofocus: true,
-          decoration: const InputDecoration(hintText: 'Folder name'),
+          decoration: InputDecoration(hintText: context.tr('Folder name')),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: const TrText('Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -343,7 +343,7 @@ void _showAddFolderDialog(BuildContext context, WidgetRef ref) {
               }
               Navigator.pop(context);
             },
-            child: const Text('Create'),
+            child: const TrText('Create'),
           ),
         ],
       );
@@ -357,16 +357,16 @@ void _showRenameFolderDialog(BuildContext context, WidgetRef ref, String folderI
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: const Text('Rename Folder'),
+        title: const TrText('Rename Folder'),
         content: TextField(
           controller: nameController,
           autofocus: true,
-          decoration: const InputDecoration(hintText: 'Folder name'),
+          decoration: InputDecoration(hintText: context.tr('Folder name')),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: const TrText('Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -375,7 +375,7 @@ void _showRenameFolderDialog(BuildContext context, WidgetRef ref, String folderI
               }
               Navigator.pop(context);
             },
-            child: const Text('Rename'),
+            child: const TrText('Rename'),
           ),
         ],
       );
@@ -388,19 +388,19 @@ void _showDeleteFolderDialog(BuildContext context, WidgetRef ref, String folderI
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: const Text('Delete Folder?'),
-        content: Text('Are you sure you want to delete "$folderName"?\n\nYour bookmarks inside this folder will NOT be deleted; they will be moved to Unfiled.'),
+        title: const TrText('Delete Folder?'),
+        content: TrText('Are you sure you want to delete "{0}"?\n\nYour bookmarks inside this folder will NOT be deleted; they will be moved to Unfiled.', args: [folderName]),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: const TrText('Cancel'),
           ),
           TextButton(
             onPressed: () {
               ref.read(bookmarkDataProvider.notifier).deleteFolder(folderId);
               Navigator.pop(context);
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: const TrText('Delete', style: TextStyle(color: Colors.red)),
           ),
         ],
       );
@@ -424,10 +424,10 @@ void _showMoveToFolderSheet(BuildContext context, WidgetRef ref, String refStr, 
             children: [
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Text('Move to Folder', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                child: TrText('Move to Folder', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
               ),
               ListTile(
-                title: const Text('Unfiled'),
+                title: const TrText('Unfiled'),
                 trailing: currentFolderId == null ? Icon(Icons.check, color: theme.primaryColor) : null,
                 onTap: () {
                   ref.read(bookmarkDataProvider.notifier).moveBookmark(refStr, null);
@@ -542,8 +542,7 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
     } else {
       content = filteredNodes.isEmpty
           ? Center(
-              child: Text(
-                'No bookmarks here.',
+              child: TrText('No bookmarks here.',
                 style: widget.theme.textTheme.bodySmall?.copyWith(
                   color: widget.theme.colorScheme.onSurface.withValues(alpha: 0.5),
                 ),
@@ -575,7 +574,7 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
           child: Row(
             children: [
               ChoiceChip(
-                label: const Text('All'),
+                label: const TrText('All'),
                 selected: _viewType == _BookmarkViewType.all,
                 onSelected: (val) {
                   if (val) setState(() => _viewType = _BookmarkViewType.all);
@@ -583,7 +582,7 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
               ),
               const SizedBox(width: 8),
               ChoiceChip(
-                label: const Text('Unfiled'),
+                label: const TrText('Unfiled'),
                 selected: _viewType == _BookmarkViewType.unfiled,
                 onSelected: (val) {
                   if (val) setState(() => _viewType = _BookmarkViewType.unfiled);
@@ -609,14 +608,14 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
                   )),
               ActionChip(
                 avatar: const Icon(Icons.add, size: 16),
-                label: const Text('New Folder'),
+                label: const TrText('New Folder'),
                 onPressed: () => _showAddFolderDialog(context, ref),
               ),
               const SizedBox(width: 8),
               Container(width: 1, height: 20, color: widget.theme.dividerColor.withValues(alpha: 0.2)),
               const SizedBox(width: 8),
               ChoiceChip(
-                label: const Text('By Date'),
+                label: const TrText('By Date'),
                 selected: _viewType == _BookmarkViewType.byDate,
                 onSelected: (val) {
                   if (val) setState(() => _viewType = _BookmarkViewType.byDate);
@@ -624,7 +623,7 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
               ),
               const SizedBox(width: 8),
               ChoiceChip(
-                label: const Text('By Book'),
+                label: const TrText('By Book'),
                 selected: _viewType == _BookmarkViewType.byBook,
                 onSelected: (val) {
                   if (val) setState(() => _viewType = _BookmarkViewType.byBook);
@@ -689,8 +688,7 @@ class _NotesSegment extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
-                child: Text(
-                  'Your notes.',
+                child: TrText('Your notes.',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                     height: 1.4,
@@ -707,8 +705,7 @@ class _NotesSegment extends ConsumerWidget {
         Expanded(
           child: notes.isEmpty
               ? Center(
-                  child: Text(
-                    'No notes yet.\nTap + to create one.',
+                  child: TrText('No notes yet.\nTap + to create one.',
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodySmall?.copyWith(
                         color:
@@ -940,7 +937,7 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                   // Same sheet as long-press: one behaviour for
                   // highlights and bookmarks.
                   IconButton(
-                    tooltip: 'More',
+                    tooltip: context.tr('More'),
                     icon: Icon(Icons.more_vert_rounded,
                         size: 20,
                         color: theme.colorScheme.onSurface
@@ -1173,7 +1170,7 @@ void _showNoteContext(
     actions: [
       ItemAction(
         icon: Icons.edit_outlined,
-        label: 'Edit',
+        label: context.tr('Edit'),
         onTap: () => showAddNoteSheet(
           context,
           ref,
@@ -1184,7 +1181,7 @@ void _showNoteContext(
       ),
       ItemAction(
         icon: Icons.copy_rounded,
-        label: 'Copy text',
+        label: context.tr('Copy text'),
         onTap: () => ShareService.copyText(
             context,
             text.isEmpty
@@ -1194,7 +1191,7 @@ void _showNoteContext(
       ),
       ItemAction(
         icon: Icons.ios_share_rounded,
-        label: 'Share',
+        label: context.tr('Share'),
         onTap: () => ShareService.shareText(
           body: text.isEmpty
               ? '${note.title}${note.reference != null ? " — ${note.reference}" : ""}'
@@ -1203,13 +1200,13 @@ void _showNoteContext(
       ),
       ItemAction(
         icon: Icons.delete_outline_rounded,
-        label: 'Delete',
+        label: context.tr('Delete'),
         destructive: true,
         onTap: () async {
           final ok = await confirmDestructive(
             context,
-            title: 'Delete note?',
-            message: '"${note.title.isEmpty ? "Untitled" : note.title}" will be removed permanently.',
+            title: context.tr('Delete note?'),
+            message: context.tr('"{0}" will be removed permanently.', [note.title.isEmpty ? "Untitled" : note.title]),
           );
           if (ok) ref.read(notesProvider.notifier).remove(note.id);
         },
@@ -1278,18 +1275,18 @@ void _showVerseItemContext(
     actions: [
       ItemAction(
         icon: Icons.menu_book_rounded,
-        label: 'Open in Read',
+        label: context.tr('Open in Read'),
         onTap: openInRead,
       ),
       ItemAction(
         icon: Icons.note_add_outlined,
-        label: 'Add note',
+        label: context.tr('Add note'),
         onTap: () => showAddNoteSheet(context, ref, theme,
             initialReference: formattedRef),
       ),
       ItemAction(
         icon: Icons.copy_rounded,
-        label: 'Copy verse',
+        label: context.tr('Copy verse'),
         onTap: () => ShareService.copyText(
           context,
           ShareService.formatVerse(
@@ -1301,20 +1298,20 @@ void _showVerseItemContext(
       ),
       ItemAction(
         icon: Icons.ios_share_rounded,
-        label: 'Share verse',
+        label: context.tr('Share verse'),
         onTap: shareVerse,
       ),
       if (!isBookmarked)
         ItemAction(
           icon: Icons.color_lens_rounded,
-          label: 'Change colour',
+          label: context.tr('Change colour'),
           onTap: () => _showHighlightColorSheet(
               context, ref, theme, refKey, highlightColorIndex),
         ),
       if (isBookmarked)
         ItemAction(
           icon: Icons.folder_copy_outlined,
-          label: 'Move to folder',
+          label: context.tr('Move to folder'),
           onTap: () => _showMoveToFolderSheet(context, ref, refKey, theme),
         ),
       ItemAction(
@@ -1359,7 +1356,7 @@ void _showHighlightColorSheet(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Highlight colour',
+            TrText('Highlight colour',
                 style: theme.textTheme.titleSmall
                     ?.copyWith(fontWeight: FontWeight.w800)),
             const SizedBox(height: 14),
@@ -1371,7 +1368,7 @@ void _showHighlightColorSheet(
                   Semantics(
                     button: true,
                     selected: currentIndex == i,
-                    label: 'Colour ${i + 1}',
+                    label: context.tr('Colour {0}', [i + 1]),
                     child: GestureDetector(
                       onTap: () {
                         HapticFeedback.selectionClick();

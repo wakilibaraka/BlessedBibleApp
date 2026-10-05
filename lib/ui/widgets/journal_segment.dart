@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/journal_provider.dart';
+import '../../l10n/tr_text.dart';
+import '../../l10n/l10n.dart';
 
 class JournalSegment extends ConsumerWidget {
   final ThemeData theme;
@@ -11,17 +13,17 @@ class JournalSegment extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (c) => AlertDialog(
-        title: const Text('New Journal Entry'),
+        title: const TrText('New Journal Entry'),
         content: TextField(
           controller: controller,
           maxLines: 5,
           autofocus: true,
-          decoration: const InputDecoration(
-            hintText: 'How are you feeling today? Pour your heart out...',
+          decoration: InputDecoration(
+            hintText: context.tr('How are you feeling today? Pour your heart out...'),
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(c), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(c), child: const TrText('Cancel')),
           FilledButton(
             onPressed: () {
               if (controller.text.trim().isNotEmpty) {
@@ -29,7 +31,7 @@ class JournalSegment extends ConsumerWidget {
               }
               Navigator.pop(c);
             },
-            child: const Text('Save & Analyze'),
+            child: const TrText('Save & Analyze'),
           ),
         ],
       ),
@@ -47,12 +49,12 @@ class JournalSegment extends ConsumerWidget {
           children: [
             const Icon(Icons.book, size: 64, color: Colors.grey),
             const SizedBox(height: 16),
-            Text('No journal entries yet.', style: theme.textTheme.titleMedium),
+            TrText('No journal entries yet.', style: theme.textTheme.titleMedium),
             const SizedBox(height: 16),
             FilledButton.icon(
               onPressed: () => _showAddJournalDialog(context, ref),
               icon: const Icon(Icons.add),
-              label: const Text('Write Entry'),
+              label: const TrText('Write Entry'),
             ),
           ],
         ),
@@ -88,13 +90,13 @@ class JournalSegment extends ConsumerWidget {
                         children: [
                           Icon(Icons.auto_awesome, size: 16, color: theme.primaryColor),
                           const SizedBox(width: 8),
-                          Text('AI Reflection', style: theme.textTheme.labelMedium?.copyWith(color: theme.primaryColor, fontWeight: FontWeight.bold)),
+                          TrText('AI Reflection', style: theme.textTheme.labelMedium?.copyWith(color: theme.primaryColor, fontWeight: FontWeight.bold)),
                         ],
                       ),
                       const SizedBox(height: 8),
-                      Text('Detected Emotion: ${entry.detectedEmotions.first}', style: theme.textTheme.bodySmall),
+                      TrText('Detected Emotion: {0}', args: [entry.detectedEmotions.first], style: theme.textTheme.bodySmall),
                       const SizedBox(height: 8),
-                      Text('Verses: ${entry.recommendedVerses.join(', ')}', style: theme.textTheme.bodySmall),
+                      TrText('Verses: {0}', args: [entry.recommendedVerses.join(', ')], style: theme.textTheme.bodySmall),
                       const SizedBox(height: 8),
                       ...entry.prayerPoints.map((p) => Padding(
                         padding: const EdgeInsets.only(top: 4.0),

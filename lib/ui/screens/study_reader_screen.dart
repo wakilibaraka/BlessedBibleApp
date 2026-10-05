@@ -35,6 +35,8 @@ import '../sheets/verse_context_menu_sheet.dart';
 import '../../state/pericopes_provider.dart';
 
 import '../../models/pericope_entry.dart';
+import '../../l10n/tr_text.dart';
+import '../../l10n/l10n.dart';
 
 enum StudyMode { plan, deepDive }
 
@@ -373,9 +375,9 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
     if (_passages.isEmpty) {
       return Scaffold(
         appBar: AppBar(
-            title: const Text('Passage not found'),
+            title: const TrText('Passage not found'),
             backgroundColor: Colors.transparent),
-        body: const Center(child: Text('Could not load passage data.')),
+        body: const Center(child: TrText('Could not load passage data.')),
       );
     }
 
@@ -447,7 +449,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('Next Passage',
+                        TrText('Next Passage',
                             style: TextStyle(
                                 fontFamily: 'EB Garamond',
                                 fontSize: 18,
@@ -538,8 +540,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                       ),
-                                      Text(
-                                        'KJV',
+                                      TrText('KJV',
                                         style: theme.textTheme.labelSmall
                                             ?.copyWith(
                                           color: theme.colorScheme.onSurface
@@ -572,8 +573,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                                           width: 1),
                                       borderRadius: BorderRadius.circular(16),
                                     ),
-                                    child: Text(
-                                      'Full chapter',
+                                    child: TrText('Full chapter',
                                       style: TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.w600,
@@ -589,8 +589,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                             ),
                             if (_passages.length > 1)
                               IgnorePointer(
-                                child: Text(
-                                  'Passage ${_passageIndex + 1} of ${_passages.length}',
+                                child: TrText('Passage {0} of {1}', args: [_passageIndex + 1, _passages.length],
                                   style: theme.textTheme.labelSmall?.copyWith(
                                     color: gold.withValues(alpha: 0.75),
                                     letterSpacing: 1.0,
@@ -940,21 +939,21 @@ class _VerseActionBar extends ConsumerWidget {
           children: [
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
-              child: Text('${selectedVerses.length} selected',
+              child: TrText('{0} selected', args: [selectedVerses.length],
                   style: theme.textTheme.labelMedium),
             ),
             // Highlight — opens color palette sheet
             GestureDetector(
               onLongPress: onHighlightLongPress,
               child: IconButton(
-                tooltip: 'Highlight',
+                tooltip: context.tr('Highlight'),
                 icon: Icon(Icons.highlight_rounded, color: gold),
                 onPressed: onHighlight,
               ),
             ),
             // Bookmark
             IconButton(
-              tooltip: 'Bookmark',
+              tooltip: context.tr('Bookmark'),
               icon: Icon(Icons.bookmark_rounded, color: gold),
               onPressed: () {
                 VerseActionLogic.handleBookmark(
@@ -964,7 +963,7 @@ class _VerseActionBar extends ConsumerWidget {
             ),
             // Note
             IconButton(
-              tooltip: 'Add Note',
+              tooltip: context.tr('Add Note'),
               icon: Icon(Icons.note_add_rounded, color: gold),
               onPressed: () async {
                 await VerseActionLogic.handleNote(
@@ -974,13 +973,13 @@ class _VerseActionBar extends ConsumerWidget {
             ),
             // Commentary (first selected verse)
             IconButton(
-              tooltip: 'Commentary',
+              tooltip: context.tr('Commentary'),
               icon: Icon(Icons.star_rounded, color: gold),
               onPressed: () => onCommentary(selectedVerses.first),
             ),
             // Share
             IconButton(
-              tooltip: 'Share',
+              tooltip: context.tr('Share'),
               icon: Icon(Icons.share_rounded, color: gold),
               onPressed: () async {
                 await VerseActionLogic.handleShare(

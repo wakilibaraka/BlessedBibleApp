@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../state/reading_plan_provider.dart'
     show readingPlanProvider, appWeekday, ReadingPlanState;
+import '../../l10n/tr_text.dart';
+import '../../l10n/l10n.dart';
 import '../../state/theme_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../widgets/shared_app_bar.dart';
@@ -132,8 +134,7 @@ class _ReadingPlanDetailV2ScreenState
     HapticFeedback.mediumImpact();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-            'Schedule rebased +$behind reading days. Completed days untouched.'),
+        content: TrText('Schedule rebased +{0} reading days. Completed days untouched.', args: [behind]),
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -152,7 +153,7 @@ class _ReadingPlanDetailV2ScreenState
         appThemeMode: appThemeMode,
         page: Scaffold(
           backgroundColor: Colors.transparent,
-          appBar: const SharedAppBar(title: Text('Plan')),
+          appBar: const SharedAppBar(title: TrText('Plan')),
           body:
               const Center(child: CircularProgressIndicator()),
         ),
@@ -165,7 +166,7 @@ class _ReadingPlanDetailV2ScreenState
         appThemeMode: appThemeMode,
         page: Scaffold(
           backgroundColor: Colors.transparent,
-          appBar: const SharedAppBar(title: Text('Plan')),
+          appBar: const SharedAppBar(title: TrText('Plan')),
           body: Center(
             child: Padding(
               padding: const EdgeInsets.all(32),
@@ -180,7 +181,7 @@ class _ReadingPlanDetailV2ScreenState
                   FilledButton.tonal(
                     onPressed: () => ref.invalidate(
                         readingPlanProvider(widget.planId)),
-                    child: const Text('Retry'),
+                    child: const TrText('Retry'),
                   ),
                 ],
               ),
@@ -199,7 +200,7 @@ class _ReadingPlanDetailV2ScreenState
         appThemeMode: appThemeMode,
         page: Scaffold(
           backgroundColor: Colors.transparent,
-          appBar: const SharedAppBar(title: Text('Plan')),
+          appBar: const SharedAppBar(title: TrText('Plan')),
           body: SafeArea(
           child: ListView(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 60),
@@ -228,7 +229,7 @@ class _ReadingPlanDetailV2ScreenState
                     ListTile(
                       contentPadding: EdgeInsets.zero,
                       leading: const Icon(Icons.calendar_month_rounded),
-                      title: const Text('Start date'),
+                      title: const TrText('Start date'),
                       subtitle: Text(
                           '${start.year}-${start.month.toString().padLeft(2, '0')}-${start.day.toString().padLeft(2, '0')}'),
                       trailing: const Icon(Icons.chevron_right_rounded),
@@ -260,12 +261,11 @@ class _ReadingPlanDetailV2ScreenState
                                 );
                                 HapticFeedback.mediumImpact();
                               },
-                        child: const Text('Start Day 1 →'),
+                        child: const TrText('Start Day 1 →'),
                       ),
                     ),
                     const SizedBox(height: 6),
-                    Text(
-                      'The chosen date is passed into startPlan — it is honoured, not replaced with today.',
+                    TrText('The chosen date is passed into startPlan — it is honoured, not replaced with today.',
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurface
                             .withValues(alpha: 0.55),
@@ -327,8 +327,7 @@ class _ReadingPlanDetailV2ScreenState
                               crossAxisAlignment:
                                   CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'SCHEDULE',
+                                TrText('SCHEDULE',
                                   style: theme
                                       .textTheme.labelSmall
                                       ?.copyWith(
@@ -353,8 +352,7 @@ class _ReadingPlanDetailV2ScreenState
                                 V2ProgressBar(
                                     fraction: plan.percentComplete),
                                 const SizedBox(height: 4),
-                                Text(
-                                  '${(plan.percentComplete * 100).round()}% complete',
+                                TrText('{0}% complete', args: [(plan.percentComplete * 100).round()],
                                   style: theme.textTheme.labelSmall
                                       ?.copyWith(
                                     fontWeight: FontWeight.w700,
@@ -464,15 +462,13 @@ class _ReadingPlanDetailV2ScreenState
                         children: [
                           const V2Eyebrow('Catch up'),
                           const SizedBox(height: 6),
-                          Text(
-                            'Behind by $behind — oldest unread is Day ${plan.oldestUnread}.',
+                          TrText('Behind by {0} — oldest unread is Day {1}.', args: [behind, plan.oldestUnread],
                             style: theme.textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.w700,
                             ),
                           ),
                           const SizedBox(height: 4),
-                          Text(
-                            'Backfilling marks progress. Rebase shifts the remaining schedule forward instead.',
+                          TrText('Backfilling marks progress. Rebase shifts the remaining schedule forward instead.',
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onSurface
                                   .withValues(alpha: 0.6),
@@ -486,7 +482,7 @@ class _ReadingPlanDetailV2ScreenState
                               FilledButton(
                                 onPressed: () => setState(() =>
                                     _selectedDay = plan.oldestUnread),
-                                child: const Text('Go to oldest'),
+                                child: const TrText('Go to oldest'),
                               ),
                               FilledButton.tonal(
                                 onPressed: () {
@@ -494,7 +490,7 @@ class _ReadingPlanDetailV2ScreenState
                                       plan.oldestUnread);
                                   HapticFeedback.mediumImpact();
                                 },
-                                child: const Text('Mark oldest done'),
+                                child: const TrText('Mark oldest done'),
                               ),
                               FilledButton.tonal(
                                 onPressed: () {
@@ -519,11 +515,11 @@ class _ReadingPlanDetailV2ScreenState
                                   );
                                 },
                                 child:
-                                    const Text('Mark all previous done'),
+                                    const TrText('Mark all previous done'),
                               ),
                               OutlinedButton(
                                 onPressed: () => _rebase(behind),
-                                child: Text('Rebase +$behind days'),
+                                child: TrText('Rebase +{0} days', args: [behind]),
                               ),
                             ],
                           ),
@@ -546,8 +542,7 @@ class _ReadingPlanDetailV2ScreenState
                         Row(
                           children: [
                             Expanded(
-                              child: Text(
-                                'READINGS · $total DAYS',
+                              child: TrText('READINGS · {0} DAYS', args: [total],
                                 style: theme.textTheme.labelSmall
                                     ?.copyWith(
                                   fontWeight: FontWeight.w800,
@@ -563,7 +558,7 @@ class _ReadingPlanDetailV2ScreenState
                                   VisualDensity.compact,
                               icon: const Icon(
                                   Icons.map_rounded),
-                              tooltip: 'Journey map view',
+                              tooltip: context.tr('Journey map view'),
                               onPressed: () {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
@@ -580,7 +575,7 @@ class _ReadingPlanDetailV2ScreenState
                                   VisualDensity.compact,
                               icon: const Icon(
                                   Icons.today_rounded),
-                              tooltip: 'Jump to today',
+                              tooltip: context.tr('Jump to today'),
                               onPressed: () {
                                 setState(() =>
                                     _selectedDay = current);
@@ -605,8 +600,7 @@ class _ReadingPlanDetailV2ScreenState
                                     plan.oldestUnread);
                                 HapticFeedback.mediumImpact();
                               },
-                              child: const Text(
-                                  'Mark all previous done'),
+                              child: const TrText('Mark all previous done'),
                             ),
                           ),
                         for (var day = 1; day <= total; day++)
@@ -710,8 +704,7 @@ class _ReadingPlanDetailV2ScreenState
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
-                              Text(
-                                'Per-plan notification — skips the rest day automatically.',
+                              TrText('Per-plan notification — skips the rest day automatically.',
                                 style: theme.textTheme.bodySmall
                                     ?.copyWith(
                                   color: theme.colorScheme.onSurface
@@ -782,7 +775,7 @@ class _ReadingPlanDetailV2ScreenState
       context: context,
       builder: (ctx) {
         return AlertDialog(
-          title: const Text('Rest days'),
+          title: const TrText('Rest days'),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -811,7 +804,7 @@ class _ReadingPlanDetailV2ScreenState
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(null),
-              child: const Text('Cancel'),
+              child: const TrText('Cancel'),
             ),
             FilledButton(
               onPressed: () {
@@ -864,7 +857,7 @@ class _ReadingPlanDetailV2ScreenState
               if (meta?.attribution != null)
                 ListTile(
                   leading: const Icon(Icons.info_outline_rounded),
-                  title: const Text('About this plan…'),
+                  title: const TrText('About this plan…'),
                   onTap: () {
                     Navigator.of(ctx).pop();
                     showDialog(
@@ -907,7 +900,7 @@ class _ReadingPlanDetailV2ScreenState
                           TextButton(
                             onPressed: () =>
                                 Navigator.of(d).pop(),
-                            child: const Text('Close'),
+                            child: const TrText('Close'),
                           ),
                         ],
                       ),
@@ -916,7 +909,7 @@ class _ReadingPlanDetailV2ScreenState
                 ),
               ListTile(
                 leading: const Icon(Icons.calendar_month_rounded),
-                title: const Text('Change start date…'),
+                title: const TrText('Change start date…'),
                 onTap: () async {
                   Navigator.of(ctx).pop();
                   final picked = await showDatePicker(
@@ -932,9 +925,9 @@ class _ReadingPlanDetailV2ScreenState
               ),
               ListTile(
                 leading: const Icon(Icons.bedtime_rounded),
-                title: Text('Rest days: ${_restSummary(p)}'),
+                title: TrText('Rest days: {0}', args: [_restSummary(p)]),
                 subtitle:
-                    const Text('Tap to choose any weekdays'),
+                    const TrText('Tap to choose any weekdays'),
                 onTap: () async {
                   final picked = await _pickRestDays(context, p);
                   if (!ctx.mounted) return;
@@ -945,7 +938,7 @@ class _ReadingPlanDetailV2ScreenState
               ListTile(
                 leading: Icon(Icons.restart_alt_rounded,
                     color: theme.colorScheme.error),
-                title: Text('Restart from Day 1…',
+                title: TrText('Restart from Day 1…',
                     style: TextStyle(
                         color: theme.colorScheme.error)),
                 onTap: () async {
@@ -953,19 +946,18 @@ class _ReadingPlanDetailV2ScreenState
                   final confirm = await showDialog<bool>(
                     context: context,
                     builder: (d) => AlertDialog(
-                      title: const Text('Restart plan?'),
-                      content: const Text(
-                          'Completed days will be cleared.'),
+                      title: const TrText('Restart plan?'),
+                      content: const TrText('Completed days will be cleared.'),
                       actions: [
                         TextButton(
                           onPressed: () =>
                               Navigator.of(d).pop(false),
-                          child: const Text('Cancel'),
+                          child: const TrText('Cancel'),
                         ),
                         TextButton(
                           onPressed: () =>
                               Navigator.of(d).pop(true),
-                          child: const Text('Restart'),
+                          child: const TrText('Restart'),
                         ),
                       ],
                     ),
@@ -1195,8 +1187,7 @@ class _DayDetailCardState extends ConsumerState<_DayDetailCard> {
           children: [
             const V2Eyebrow('Rest & reflect'),
             const SizedBox(height: 6),
-            Text(
-              'A day of rest — no reading assigned. Rest days carry no reading.',
+            TrText('A day of rest — no reading assigned. Rest days carry no reading.',
               style: theme.textTheme.bodyMedium,
             ),
           ],
@@ -1220,8 +1211,7 @@ class _DayDetailCardState extends ConsumerState<_DayDetailCard> {
             ),
           ),
           const SizedBox(height: 4),
-          Text(
-            'Tap a passage to open it. Check each one off as you read.',
+          TrText('Tap a passage to open it. Check each one off as you read.',
             style: theme.textTheme.bodySmall?.copyWith(
               color:
                   theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -1326,8 +1316,7 @@ class _DayDetailCardState extends ConsumerState<_DayDetailCard> {
                   if (completed % 30 == 0 && mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(
-                            '🎉 $completed readings completed — keep going!'),
+                        content: TrText('🎉 {0} readings completed — keep going!', args: [completed]),
                         behavior: SnackBarBehavior.floating,
                       ),
                     );

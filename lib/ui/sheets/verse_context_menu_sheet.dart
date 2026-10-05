@@ -9,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 import '../screens/commentary_hub_screen.dart';
 import '../../state/commentary_provider.dart';
 import '../widgets/cross_references_sheet.dart';
+import '../../l10n/l10n.dart';
 
 class VerseContextMenuSheet extends ConsumerStatefulWidget {
   final int verseNumber;
@@ -79,7 +80,7 @@ class _VerseContextMenuSheetState extends ConsumerState<VerseContextMenuSheet> {
                             child: _MenuButton(
                               icon: const Icon(Icons.comment_bank_outlined,
                                   size: 24),
-                              label: 'Commentary',
+                              label: context.tr('Commentary'),
                               onTap: () {
                                 Navigator.of(context).pop();
                                 Navigator.of(context).push(CupertinoPageRoute(
@@ -113,7 +114,7 @@ class _VerseContextMenuSheetState extends ConsumerState<VerseContextMenuSheet> {
                         Expanded(
                           child: _MenuButton(
                             icon: Icon(Icons.ios_share_rounded, size: 24),
-                            label: 'Share',
+                            label: context.tr('Share'),
                             onTap: () {
                               Navigator.of(context).pop();
                               VerseActionLogic.handleShareOptions(
@@ -129,7 +130,7 @@ class _VerseContextMenuSheetState extends ConsumerState<VerseContextMenuSheet> {
                         Expanded(
                             child: _MenuButton(
                               icon: const Icon(Icons.link_rounded, size: 24),
-                              label: 'Related',
+                              label: context.tr('Related'),
                               onTap: () {
                                 Navigator.of(context).pop();
                                 showCrossReferencesSheet(
@@ -145,7 +146,7 @@ class _VerseContextMenuSheetState extends ConsumerState<VerseContextMenuSheet> {
                         Expanded(
                           child: _MenuButton(
                             icon: Icon(Icons.crop_free_rounded, size: 24),
-                            label: 'Select Text',
+                            label: context.tr('Select Text'),
                             onTap: () {
                               Navigator.of(context).pop();
                               widget.onCustomSelection();

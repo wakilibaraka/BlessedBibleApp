@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/tr_text.dart';
 
 class StudyProgressCard extends StatelessWidget {
   final String title;
@@ -34,8 +35,7 @@ class StudyProgressCard extends StatelessWidget {
               style: theme.textTheme.titleMedium,
             ),
             const SizedBox(height: 4),
-            Text(
-              '$chaptersRemaining chapters remaining',
+            TrText('{0} chapters remaining', args: [chaptersRemaining],
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7),
               ),

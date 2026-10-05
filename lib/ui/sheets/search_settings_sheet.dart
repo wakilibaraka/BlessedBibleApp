@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/search_provider.dart';
 import '../../state/search_settings_provider.dart';
+import '../../l10n/tr_text.dart';
 
 class SearchSettingsSheet extends ConsumerWidget {
   const SearchSettingsSheet({super.key});
@@ -38,8 +39,7 @@ class SearchSettingsSheet extends ConsumerWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Search Settings',
+                  TrText('Search Settings',
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -60,8 +60,7 @@ class SearchSettingsSheet extends ConsumerWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                    child: Text(
-                      'MATCH TYPE',
+                    child: TrText('MATCH TYPE',
                       style: theme.textTheme.labelSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1.2,
@@ -70,8 +69,8 @@ class SearchSettingsSheet extends ConsumerWidget {
                     ),
                   ),
                   SwitchListTile(
-                    title: const Text('Exact Match'),
-                    subtitle: const Text('Only match the exact phrase'),
+                    title: const TrText('Exact Match'),
+                    subtitle: const TrText('Only match the exact phrase'),
                     value: searchState.exactMatch,
                     onChanged: (val) {
                       ref.read(searchStateProvider.notifier).toggleExactMatch();
@@ -81,8 +80,7 @@ class SearchSettingsSheet extends ConsumerWidget {
                   const Divider(height: 1),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16).copyWith(bottom: 8),
-                    child: Text(
-                      'SCOPE',
+                    child: TrText('SCOPE',
                       style: theme.textTheme.labelSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1.2,
@@ -91,8 +89,8 @@ class SearchSettingsSheet extends ConsumerWidget {
                     ),
                   ),
                   SwitchListTile(
-                    title: const Text('Old Testament'),
-                    subtitle: searchState.filterBook != null ? const Text('Disabled (Book Filter Active)') : null,
+                    title: const TrText('Old Testament'),
+                    subtitle: searchState.filterBook != null ? const TrText('Disabled (Book Filter Active)') : null,
                     value: searchState.filterOt,
                     onChanged: searchState.filterBook != null ? null : (val) {
                       ref.read(searchStateProvider.notifier).toggleOtFilter();
@@ -100,8 +98,8 @@ class SearchSettingsSheet extends ConsumerWidget {
                     secondary: const Icon(Icons.history_edu_rounded),
                   ),
                   SwitchListTile(
-                    title: const Text('New Testament'),
-                    subtitle: searchState.filterBook != null ? const Text('Disabled (Book Filter Active)') : null,
+                    title: const TrText('New Testament'),
+                    subtitle: searchState.filterBook != null ? const TrText('Disabled (Book Filter Active)') : null,
                     value: searchState.filterNt,
                     onChanged: searchState.filterBook != null ? null : (val) {
                       ref.read(searchStateProvider.notifier).toggleNtFilter();
@@ -109,7 +107,7 @@ class SearchSettingsSheet extends ConsumerWidget {
                     secondary: const Icon(Icons.menu_book_rounded),
                   ),
                   SwitchListTile(
-                    title: const Text('Commentary'),
+                    title: const TrText('Commentary'),
                     value: searchState.filterCommentary,
                     onChanged: (val) {
                       ref.read(searchStateProvider.notifier).toggleCommentaryFilter();
@@ -117,7 +115,7 @@ class SearchSettingsSheet extends ConsumerWidget {
                     secondary: const Icon(Icons.library_books_rounded),
                   ),
                   SwitchListTile(
-                    title: const Text('My Notes'),
+                    title: const TrText('My Notes'),
                     value: searchState.filterNotes,
                     onChanged: (val) {
                       ref.read(searchStateProvider.notifier).toggleNotesFilter();
@@ -127,8 +125,7 @@ class SearchSettingsSheet extends ConsumerWidget {
                   const Divider(height: 1),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16).copyWith(bottom: 8),
-                    child: Text(
-                      'BEHAVIOR',
+                    child: TrText('BEHAVIOR',
                       style: theme.textTheme.labelSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1.2,
@@ -137,8 +134,8 @@ class SearchSettingsSheet extends ConsumerWidget {
                     ),
                   ),
                   SwitchListTile(
-                    title: const Text('Auto-open Single Result'),
-                    subtitle: const Text('Jump directly if only one result is found'),
+                    title: const TrText('Auto-open Single Result'),
+                    subtitle: const TrText('Jump directly if only one result is found'),
                     value: searchSettings.autoOpenSingleSearchResult,
                     onChanged: (val) {
                       ref.read(searchSettingsProvider.notifier).toggleAutoOpen(val);

@@ -5,6 +5,7 @@ import '../../state/cross_references_provider.dart';
 import '../../state/bible_provider.dart';
 import '../../state/translation_provider.dart';
 import '../../services/bible_database_service.dart';
+import '../../l10n/tr_text.dart';
 
 
 /// A bottom sheet showing all cross-references for a given verse.
@@ -61,8 +62,7 @@ class CrossReferencesSheet extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Related Verses',
+                TrText('Related Verses',
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -94,16 +94,14 @@ class CrossReferencesSheet extends ConsumerWidget {
                             color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
                           ),
                           const SizedBox(height: 12),
-                          Text(
-                            'No cross-references found for this verse.',
+                          TrText('No cross-references found for this verse.',
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                             ),
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 4),
-                          Text(
-                            'Cross-references will be available\nafter the next app update.',
+                          TrText('Cross-references will be available\nafter the next app update.',
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
                             ),
@@ -144,8 +142,7 @@ class CrossReferencesSheet extends ConsumerWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      'Could not load cross-references.\n$e',
+                    TrText('Could not load cross-references.\n{0}', args: [e],
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 12),
@@ -153,7 +150,7 @@ class CrossReferencesSheet extends ConsumerWidget {
                       onPressed: () => ref.invalidate(
                           crossReferencesProvider(key)),
                       icon: const Icon(Icons.refresh_rounded),
-                      label: const Text('Retry'),
+                      label: const TrText('Retry'),
                     ),
                   ],
                 ),
@@ -233,7 +230,7 @@ class _CrossRefTileState extends ConsumerState<_CrossRefTile> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Close'),
+                  child: const TrText('Close'),
                 ),
               ],
             ),

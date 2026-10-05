@@ -30,6 +30,7 @@ import '../../state/read_settings_provider.dart';
 import '../../state/study_provider.dart';
 import '../../state/commentary_provider.dart';
 import '../widgets/commentary_view.dart';
+import '../../l10n/tr_text.dart';
 
 const double kBottomDockHeight = 64.0;
 const double kBottomDockInset = 16.0;
@@ -101,20 +102,20 @@ class MainNavScreen extends ConsumerWidget {
             context: context,
             builder: (dialogContext) {
               return AlertDialog(
-                title: const Text('Exit The Blessed Bible?'),
-                content: const Text('Are you sure you want to exit the app?'),
+                title: const TrText('Exit The Blessed Bible?'),
+                content: const TrText('Are you sure you want to exit the app?'),
                 backgroundColor:
                     Theme.of(dialogContext).scaffoldBackgroundColor,
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.of(dialogContext).pop(false),
-                    child: Text('Cancel',
+                    child: TrText('Cancel',
                         style: TextStyle(
                             color: Theme.of(dialogContext).primaryColor)),
                   ),
                   TextButton(
                     onPressed: () => Navigator.of(dialogContext).pop(true),
-                    child: Text('Exit',
+                    child: TrText('Exit',
                         style: TextStyle(
                             color: Theme.of(dialogContext).primaryColor)),
                   ),
@@ -1001,7 +1002,7 @@ class MainNavScreen extends ConsumerWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Could not cast lots — please try again.'),
+              content: TrText('Could not cast lots — please try again.'),
               behavior: SnackBarBehavior.floating,
             ),
           );
@@ -1340,8 +1341,7 @@ class _CastingLotsDialogState extends State<CastingLotsDialog>
                 ),
               ),
               const SizedBox(height: 24),
-              Text(
-                'Casting lots...',
+              TrText('Casting lots...',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: AppColors.goldAccent,

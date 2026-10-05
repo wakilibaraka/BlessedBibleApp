@@ -5,6 +5,7 @@ import '../../state/typography_provider.dart';
 import '../../state/read_location_provider.dart';
 import '../../data/models/bible_model.dart';
 import 'textured_glass_container.dart';
+import '../../l10n/tr_text.dart';
 
 class VersePreviewModal extends ConsumerWidget {
   final String reference;
@@ -156,7 +157,7 @@ class VersePreviewModal extends ConsumerWidget {
                     );
                   },
                   icon: const Icon(Icons.menu_book_rounded),
-                  label: const Text('Open in Read'),
+                  label: const TrText('Open in Read'),
                 ),
               ),
             ),

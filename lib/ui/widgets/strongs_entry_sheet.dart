@@ -5,6 +5,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../state/strongs_provider.dart';
 import '../../state/typography_provider.dart';
 import '../../state/read_settings_provider.dart';
+import '../../l10n/tr_text.dart';
 
 void showStrongsEntrySheet(BuildContext context, String strongsId) {
   final ref = ProviderScope.containerOf(context);
@@ -72,7 +73,7 @@ class _StrongsEntrySheet extends ConsumerWidget {
                   TextButton.icon(
                     onPressed: () => Navigator.of(context).pop(),
                     icon: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: theme.primaryColor),
-                    label: Text('Back', style: TextStyle(fontSize: 16, color: theme.primaryColor)),
+                    label: TrText('Back', style: TextStyle(fontSize: 16, color: theme.primaryColor)),
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     ),
@@ -98,7 +99,7 @@ class _StrongsEntrySheet extends ConsumerWidget {
                   if (entry == null) {
                     return Padding(
                       padding: const EdgeInsets.all(32.0),
-                      child: Text('No entry found for $strongsId.'),
+                      child: TrText('No entry found for {0}.', args: [strongsId]),
                     );
                   }
 
@@ -183,8 +184,7 @@ class _StrongsEntrySheet extends ConsumerWidget {
                       
                       const SizedBox(height: 32),
                       
-                      Text(
-                        'STRONG\'S LEXICON',
+                      TrText('STRONG\'S LEXICON',
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                           letterSpacing: 1.5,
@@ -214,7 +214,7 @@ class _StrongsEntrySheet extends ConsumerWidget {
                   padding: EdgeInsets.all(40.0),
                   child: CircularProgressIndicator(),
                 )),
-                error: (e, __) => Center(child: Text('Failed to load: $e')),
+                error: (e, __) => Center(child: TrText('Failed to load: {0}', args: [e])),
               ),
             ),
           ],

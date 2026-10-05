@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/local_storage/preferences_service.dart';
 import '../../state/reading_plan_provider.dart';
+import '../../l10n/tr_text.dart';
+import '../../l10n/l10n.dart';
 
 enum _CustomPlanAction { rename, makePrimary, togglePause, adjustPace, restart, delete }
 
@@ -29,28 +31,27 @@ class CustomPlanActionSheet {
             children: [
               const Padding(
                 padding: EdgeInsets.all(16.0),
-                child: Text(
-                  'Manage Plan',
+                child: TrText('Manage Plan',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ),
               if (isActive && !isPrimary)
                 ListTile(
                   leading: const Icon(Icons.vertical_align_top),
-                  title: const Text('Make Primary'),
+                  title: const TrText('Make Primary'),
                   onTap: () => Navigator.pop(context, _CustomPlanAction.makePrimary),
                 ),
               ListTile(
                 leading: const Icon(Icons.edit),
-                title: const Text('Rename Plan'),
+                title: const TrText('Rename Plan'),
                 onTap: () => Navigator.pop(context, _CustomPlanAction.rename),
               ),
               ListTile(
                 leading: const Icon(Icons.speed),
-                title: const Text('Adjust Pace'),
+                title: const TrText('Adjust Pace'),
                 subtitle: hasTracks
-                    ? const Text('Change your daily reading pace.')
-                    : const Text('Not available — recreate this plan to enable.'),
+                    ? const TrText('Change your daily reading pace.')
+                    : const TrText('Not available — recreate this plan to enable.'),
                 enabled: hasTracks,
                 onTap: hasTracks
                     ? () => Navigator.pop(context, _CustomPlanAction.adjustPace)
@@ -64,12 +65,12 @@ class CustomPlanActionSheet {
               ),
               ListTile(
                 leading: const Icon(Icons.restart_alt, color: Colors.orange),
-                title: const Text('Restart Plan', style: TextStyle(color: Colors.orange)),
+                title: const TrText('Restart Plan', style: TextStyle(color: Colors.orange)),
                 onTap: () => Navigator.pop(context, _CustomPlanAction.restart),
               ),
               ListTile(
                 leading: const Icon(Icons.delete, color: Colors.red),
-                title: const Text('Delete Plan', style: TextStyle(color: Colors.red)),
+                title: const TrText('Delete Plan', style: TextStyle(color: Colors.red)),
                 onTap: () => Navigator.pop(context, _CustomPlanAction.delete),
               ),
             ],
@@ -99,21 +100,21 @@ class CustomPlanActionSheet {
         builder: (context) {
           final controller = TextEditingController(text: currentTitle);
           return AlertDialog(
-            title: const Text('Rename Plan'),
+            title: const TrText('Rename Plan'),
             content: TextField(
               controller: controller,
               autofocus: true,
               textCapitalization: TextCapitalization.words,
-              decoration: const InputDecoration(hintText: 'Plan Title'),
+              decoration: InputDecoration(hintText: context.tr('Plan Title')),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, null),
-                child: const Text('Cancel'),
+                child: const TrText('Cancel'),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, controller.text.trim()),
-                child: const Text('Save'),
+                child: const TrText('Save'),
               ),
             ],
           );
@@ -134,16 +135,16 @@ class CustomPlanActionSheet {
       final confirm = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Restart Plan?'),
-          content: const Text('This will permanently reset all your progress for this plan to Day 1.', style: TextStyle(color: Colors.red)),
+          title: const TrText('Restart Plan?'),
+          content: const TrText('This will permanently reset all your progress for this plan to Day 1.', style: TextStyle(color: Colors.red)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel'),
+              child: const TrText('Cancel'),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Restart', style: TextStyle(color: Colors.red)),
+              child: const TrText('Restart', style: TextStyle(color: Colors.red)),
             ),
           ],
         ),
@@ -157,16 +158,16 @@ class CustomPlanActionSheet {
       final confirm = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Delete Plan?'),
-          content: const Text('This will permanently delete this custom plan and all its progress.', style: TextStyle(color: Colors.red)),
+          title: const TrText('Delete Plan?'),
+          content: const TrText('This will permanently delete this custom plan and all its progress.', style: TextStyle(color: Colors.red)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel'),
+              child: const TrText('Cancel'),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+              child: const TrText('Delete', style: TextStyle(color: Colors.red)),
             ),
           ],
         ),
@@ -194,19 +195,18 @@ class CustomPlanActionSheet {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Apply New Pace?'),
-        content: const Text(
-          'Your progress will be mapped to the new schedule as closely as possible.\n\n'
+        title: const TrText('Apply New Pace?'),
+        content: const TrText('Your progress will be mapped to the new schedule as closely as possible.\n\n'
           'Days that mix already-read and unread passages will show as unread.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: const TrText('Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Apply'),
+            child: const TrText('Apply'),
           ),
         ],
       ),
@@ -216,7 +216,7 @@ class CustomPlanActionSheet {
 
     // Show loading snackbar
     ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Adjusting pace…'), duration: Duration(seconds: 3)));
+        const SnackBar(content: TrText('Adjusting pace…'), duration: Duration(seconds: 3)));
 
     final error = await ref
         .read(readingPlanProvider(planId).notifier)
@@ -229,7 +229,7 @@ class CustomPlanActionSheet {
           .showSnackBar(SnackBar(content: Text(error)));
     } else {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Pace updated to $chosenDays days!')));
+          .showSnackBar(SnackBar(content: TrText('Pace updated to {0} days!', args: [chosenDays])));
     }
   }
 }
@@ -257,11 +257,11 @@ class _AdjustPaceDialogState extends State<_AdjustPaceDialog> {
     final theme = Theme.of(context);
     final daysInt = _days.round();
     return AlertDialog(
-      title: const Text('Adjust Pace'),
+      title: const TrText('Adjust Pace'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('New day count: $daysInt days',
+          TrText('New day count: {0} days', args: [daysInt],
               style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(height: 16),
           Slider(
@@ -269,12 +269,11 @@ class _AdjustPaceDialogState extends State<_AdjustPaceDialog> {
             min: 7,
             max: 365,
             divisions: 358,
-            label: '$daysInt days',
+            label: context.tr('{0} days', [daysInt]),
             onChanged: (v) => setState(() => _days = v),
           ),
           const SizedBox(height: 8),
-          Text(
-            'Current: ${widget.currentDayCount} days',
+          TrText('Current: {0} days', args: [widget.currentDayCount],
             style: theme.textTheme.bodySmall
                 ?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
           ),
@@ -283,11 +282,11 @@ class _AdjustPaceDialogState extends State<_AdjustPaceDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context, null),
-          child: const Text('Cancel'),
+          child: const TrText('Cancel'),
         ),
         TextButton(
           onPressed: () => Navigator.pop(context, daysInt),
-          child: const Text('Preview'),
+          child: const TrText('Preview'),
         ),
       ],
     );

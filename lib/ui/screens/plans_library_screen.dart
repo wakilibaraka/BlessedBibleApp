@@ -20,6 +20,7 @@ import 'custom_plan_builder_v2_screen.dart';
 import '../../data/curated_plans.dart';
 import 'reading_plan_detail_v2_screen.dart';
 import 'bible_story_reader_screen.dart';
+import '../../l10n/tr_text.dart';
 
 /// Preset book plans for the Books tab: a title, an inclusive book range
 /// (matched by book name) and a day count. Tapping one opens the custom
@@ -139,8 +140,7 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-              'All 3 plan slots are in use. Pause a plan to free a slot — progress is kept.'),
+          content: TrText('All 3 plan slots are in use. Pause a plan to free a slot — progress is kept.'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -163,8 +163,7 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-              'All 3 plan slots are in use. Pause a plan to free a slot — progress is kept.'),
+          content: TrText('All 3 plan slots are in use. Pause a plan to free a slot — progress is kept.'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -180,7 +179,7 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Plan paused — all progress is kept.'),
+        content: TrText('Plan paused — all progress is kept.'),
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -248,7 +247,7 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
       HapticFeedback.selectionClick();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Browse Reading to start your first plan.'),
+          content: TrText('Browse Reading to start your first plan.'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -278,7 +277,7 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
       appThemeMode: appThemeMode,
       page: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: const SharedAppBar(title: Text('Plans')),
+        appBar: const SharedAppBar(title: TrText('Plans')),
         body: SafeArea(
           bottom: false,
           child: Center(
@@ -481,7 +480,7 @@ class _LibraryCard extends StatelessWidget {
 }
 
 List<PopupMenuEntry<String>> _openMenu(BuildContext context) => [
-      const PopupMenuItem(value: 'open', child: Text('Open')),
+      const PopupMenuItem(value: 'open', child: TrText('Open')),
     ];
 
 /// Reading tab: every curated plan with live progress.
@@ -539,7 +538,7 @@ class _ReadingTab extends ConsumerWidget {
               onOpen: () => onOpen(meta.id),
               menuBuilder: (_) => [
                 const PopupMenuItem(
-                    value: 'open', child: Text('Open')),
+                    value: 'open', child: TrText('Open')),
                 PopupMenuItem(
                   value: isActive
                       ? 'pause'
@@ -616,8 +615,7 @@ class _BooksTab extends ConsumerWidget {
                           ),
                         ),
                         const SizedBox(height: 4),
-                        Text(
-                          '${preset.days} days · tap to build',
+                        TrText('{0} days · tap to build', args: [preset.days],
                           style:
                               theme.textTheme.labelSmall?.copyWith(
                             fontWeight: FontWeight.w800,
@@ -639,8 +637,7 @@ class _BooksTab extends ConsumerWidget {
         if (customIds.isNotEmpty) ...[
           Padding(
             padding: const EdgeInsets.fromLTRB(4, 8, 4, 8),
-            child: Text(
-              'YOUR CUSTOM PLANS',
+            child: TrText('YOUR CUSTOM PLANS',
               style: theme.textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1.5,
@@ -704,13 +701,12 @@ class _MyPlansTab extends ConsumerWidget {
                 Icon(Icons.spa_rounded,
                     size: 32, color: theme.primaryColor),
                 const SizedBox(height: 10),
-                Text('No active plans',
+                TrText('No active plans',
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     )),
                 const SizedBox(height: 4),
-                Text(
-                  'Browse Reading or Books to start your first plan.',
+                TrText('Browse Reading or Books to start your first plan.',
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface
@@ -742,10 +738,10 @@ class _MyPlansTab extends ConsumerWidget {
               onOpen: () => onOpen(id),
               menuBuilder: (_) => const [
                 PopupMenuItem(
-                    value: 'open', child: Text('Open')),
+                    value: 'open', child: TrText('Open')),
                 PopupMenuItem(
                     value: 'pause',
-                    child: Text('Pause (keeps progress)')),
+                    child: TrText('Pause (keeps progress)')),
               ],
               onMenu: (action) {
                 if (action == 'pause') {
@@ -868,7 +864,7 @@ class _LetReadSheet extends StatelessWidget {
                     borderRadius: BorderRadius.circular(14),
                   ),
                 ),
-                child: const Text('Open today\'s reading'),
+                child: const TrText('Open today\'s reading'),
               ),
             ),
           ],

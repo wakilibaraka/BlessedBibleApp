@@ -9,6 +9,8 @@ import '../../services/translation_downloader.dart';
 import '../../services/translation_pack_store.dart';
 import '../widgets/animated_segmented_tile.dart';
 import '../widgets/textured_glass_container.dart';
+import '../../l10n/tr_text.dart';
+import '../../l10n/l10n.dart';
 
 class TranslationPickerSheet extends ConsumerStatefulWidget {
   const TranslationPickerSheet({super.key});
@@ -82,8 +84,7 @@ class _TranslationPickerSheetState
               Row(
                 children: [
                   Expanded(
-                    child: Text(
-                      'Bible Translation',
+                    child: TrText('Bible Translation',
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
@@ -98,7 +99,7 @@ class _TranslationPickerSheetState
               ),
               const SizedBox(height: 8),
               AnimatedSegmentedTile<ReadingLayout>(
-                title: 'Reading Layout',
+                title: context.tr('Reading Layout'),
                 subtitle: () {
                   switch (readingLayout) {
                     case ReadingLayout.single:
@@ -168,7 +169,7 @@ class _TranslationPickerSheetState
                             padding: EdgeInsets.all(32),
                             child: CircularProgressIndicator())),
                     error: (e, st) =>
-                        Center(child: Text('Error loading translations: $e')),
+                        Center(child: TrText('Error loading translations: {0}', args: [e])),
                   ),
                 ),
               ),
@@ -232,7 +233,7 @@ class _TranslationPickerSheetState
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${item.translationName} deleted.'),
+            content: TrText('{0} deleted.', args: [item.translationName]),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -241,7 +242,7 @@ class _TranslationPickerSheetState
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Could not delete: $e'),
+            content: TrText('Could not delete: {0}', args: [e]),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -393,7 +394,7 @@ class _TranslationPickerSheetState
                       ),
                       if (!isLocked)
                         IconButton(
-                          tooltip: 'Delete ${item.translationName}',
+                          tooltip: context.tr('Delete {0}', [item.translationName]),
                           icon: const Icon(
                               Icons.delete_outline_rounded,
                               size: 20),
@@ -409,7 +410,7 @@ class _TranslationPickerSheetState
                         )
                       else if (isLocked)
                         Tooltip(
-                          message: 'Cannot delete — app backbone',
+                          message: context.tr('Cannot delete — app backbone'),
                           child: Icon(
                             Icons.lock_outline_rounded,
                             size: 20,
@@ -439,8 +440,7 @@ class _TranslationPickerSheetState
       children.add(
         Padding(
           padding: const EdgeInsets.only(bottom: 4.0, top: 16.0),
-          child: Text(
-            'AVAILABLE TO ADD',
+          child: TrText('AVAILABLE TO ADD',
             style: theme.textTheme.labelLarge?.copyWith(
               color: theme.primaryColor,
               fontWeight: FontWeight.w700,

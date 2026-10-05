@@ -10,6 +10,8 @@ import '../../services/devotional_service.dart';
 import '../../services/share_service.dart';
 import '../../state/devotional_provider.dart';
 import '../../state/read_settings_provider.dart';
+import '../../l10n/tr_text.dart';
+import '../../l10n/l10n.dart';
 
 /// Shareable image cards (1080x1350, WhatsApp-Status-friendly 4:5).
 ///
@@ -277,8 +279,7 @@ class ShareCard extends StatelessWidget {
                 const SizedBox(height: 40),
                 Text(footer, style: textStyle(38, FontWeight.w600)),
                 const SizedBox(height: 18),
-                Text(
-                  '✦ BIBLE',
+                TrText('✦ BIBLE',
                   style: textStyle(28, FontWeight.w400)
                       .copyWith(color: Colors.white70, letterSpacing: 5),
                 ),
@@ -521,7 +522,7 @@ class _ShareCardSheetState extends ConsumerState<_ShareCardSheet> {
               ),
             ),
             const SizedBox(height: 14),
-            Text('Backdrop',
+            TrText('Backdrop',
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.w800,
                   color: theme.colorScheme.onSurface
@@ -538,7 +539,7 @@ class _ShareCardSheetState extends ConsumerState<_ShareCardSheet> {
                   ShareCardBackdrop.gradient => 'Gradient',
                 }, (b) => setState(() => _backdrop = b)),
             const SizedBox(height: 12),
-            Text('Font',
+            TrText('Font',
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.w800,
                   color: theme.colorScheme.onSurface
@@ -717,7 +718,7 @@ Future<void> showShareOptionsSheet({
             ),
             row(
               icon: Icons.copy_rounded,
-              label: 'Copy text',
+              label: context.tr('Copy text'),
               onTap: () {
                 Navigator.of(ctx).pop();
                 ShareService.copyText(context, copyText);
@@ -725,7 +726,7 @@ Future<void> showShareOptionsSheet({
             ),
             row(
               icon: Icons.ios_share_rounded,
-              label: 'Share text',
+              label: context.tr('Share text'),
               onTap: () {
                 Navigator.of(ctx).pop();
                 ShareService.shareText(body: shareText);
@@ -734,7 +735,7 @@ Future<void> showShareOptionsSheet({
             if (buildCard != null)
               row(
                 icon: Icons.image_rounded,
-                label: 'Share image card',
+                label: context.tr('Share image card'),
                 onTap: () {
                   Navigator.of(ctx).pop();
                   showShareCardSheet(

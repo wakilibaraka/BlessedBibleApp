@@ -22,6 +22,8 @@ import '../../services/share_service.dart';
 import '../../services/devotional_service.dart';
 import '../../state/devotional_provider.dart';
 import '../widgets/share_card.dart';
+import '../../l10n/tr_text.dart';
+import '../../l10n/l10n.dart';
 
 class StrictHorizontalDragGestureRecognizer
     extends HorizontalDragGestureRecognizer {
@@ -270,8 +272,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
           // ── Header Row ────────────────────────────────────────────────
           SharedTopHeader(
-            centerContent: Text(
-              'Wednesday · July 22',
+            centerContent: TrText('Wednesday · July 22',
               textAlign: TextAlign.center,
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w500,
@@ -302,8 +303,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               children: [
                 BouncyEntrance(
                   delay: const Duration(milliseconds: 100),
-                  child: Text(
-                    'VERSE OF THE DAY',
+                  child: TrText('VERSE OF THE DAY',
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: theme.primaryColor,
                       letterSpacing: 2.0,
@@ -314,8 +314,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 const SizedBox(height: 12),
                 BouncyEntrance(
                   delay: const Duration(milliseconds: 200),
-                  child: Text(
-                    '\u201c${data.verseOfTheDay.text}\u201d',
+                  child: TrText('\u201c{0}\u201d', args: [data.verseOfTheDay.text],
                     textAlign: TextAlign.center,
                     style: theme.textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.w600,
@@ -408,7 +407,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         Expanded(
                           flex: 3,
                           child: _PillButton(
-                            label: 'Go Deeper',
+                            label: context.tr('Go Deeper'),
                             filled: true,
                             onPressed: () {
                               final refStr = data.verseOfTheDay.reference;
@@ -440,7 +439,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       Expanded(
                         flex: 2,
                         child: _PillButton(
-                          label: 'Share',
+                          label: context.tr('Share'),
                           filled: false,
                           onPressed: () => _shareVotd(data.verseOfTheDay),
                         ),
@@ -557,8 +556,7 @@ class WordOfTheDaySection extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                'WORD OF THE DAY',
+              TrText('WORD OF THE DAY',
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.primaryColor,
                   letterSpacing: 2.0,
@@ -597,7 +595,7 @@ class WordOfTheDaySection extends ConsumerWidget {
                       children: [
                         Expanded(
                           child: _PillButton(
-                            label: 'Read Full Definition',
+                            label: context.tr('Read Full Definition'),
                             filled: true,
                             onPressed: () {
                               showModalBottomSheet(
@@ -613,7 +611,7 @@ class WordOfTheDaySection extends ConsumerWidget {
                         const SizedBox(width: 10),
                         Expanded(
                           child: _PillButton(
-                            label: 'Share',
+                            label: context.tr('Share'),
                             filled: false,
                             onPressed: () {
                               HapticFeedback.selectionClick();
@@ -673,8 +671,7 @@ class _WotdFallback extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          'WORD OF THE DAY',
+        TrText('WORD OF THE DAY',
           style: theme.textTheme.labelSmall?.copyWith(
             color: theme.primaryColor,
             letterSpacing: 2.0,

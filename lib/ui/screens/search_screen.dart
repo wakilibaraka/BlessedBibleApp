@@ -15,6 +15,8 @@ import '../../state/most_read_provider.dart';
 import 'package:flutter/services.dart';
 import '../../state/typography_provider.dart';
 import '../widgets/textured_glass_container.dart';
+import '../../l10n/tr_text.dart';
+import '../../l10n/l10n.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -338,7 +340,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                         if (searchState.filterBook == null) ...[
                                           const SizedBox(width: 8),
                                           _buildFilterChip(
-                                            label: 'OT',
+                                            label: context.tr('OT'),
                                             icon: Icons.history_edu_rounded,
                                             isActive: searchState.filterOt,
                                             onTap: () => ref
@@ -350,7 +352,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                         if (searchState.filterBook == null) ...[
                                           const SizedBox(width: 8),
                                           _buildFilterChip(
-                                            label: 'NT',
+                                            label: context.tr('NT'),
                                             icon: Icons.menu_book_rounded,
                                             isActive: searchState.filterNt,
                                             onTap: () => ref
@@ -361,7 +363,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                         ],
                                         const SizedBox(width: 8),
                                         _buildFilterChip(
-                                          label: 'Commentary',
+                                          label: context.tr('Commentary'),
                                           icon: Icons.library_books_rounded,
                                           isActive:
                                               searchState.filterCommentary,
@@ -377,7 +379,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                               .select((s) => s.includeNotesInSearch));
                                           if (!includeNotes) return const SizedBox.shrink();
                                           return _buildFilterChip(
-                                            label: 'My Notes',
+                                            label: context.tr('My Notes'),
                                             icon: Icons.sticky_note_2_outlined,
                                             isActive: searchState.filterNotes,
                                             onTap: () => ref
@@ -502,8 +504,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
               color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
             ),
             const SizedBox(height: 16),
-            Text(
-              'Search the Bible, commentary\nand your notes',
+            TrText('Search the Bible, commentary\nand your notes',
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.45),
@@ -524,8 +525,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'RECENT SEARCHES',
+              TrText('RECENT SEARCHES',
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                   fontWeight: FontWeight.bold,
@@ -534,8 +534,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
               ),
               GestureDetector(
                 onTap: () => ref.read(searchStateProvider.notifier).clearRecentQueries(),
-                child: Text(
-                  'CLEAR',
+                child: TrText('CLEAR',
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: theme.primaryColor,
                     fontWeight: FontWeight.bold,
@@ -585,8 +584,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
           const SizedBox(height: 24),
         ],
         if (state.recentPlaces.isNotEmpty) ...[
-          Text(
-            'RECENT PLACES',
+          TrText('RECENT PLACES',
             style: theme.textTheme.labelSmall?.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
               fontWeight: FontWeight.bold,
@@ -598,8 +596,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
           const SizedBox(height: 24),
         ],
         if (showMostRead) ...[
-          Text(
-            'MOST READ',
+          TrText('MOST READ',
             style: theme.textTheme.labelSmall?.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
               fontWeight: FontWeight.bold,
@@ -638,8 +635,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
               color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
             ),
             const SizedBox(height: 12),
-            Text(
-              'No results found',
+            TrText('No results found',
               style: theme.textTheme.bodyLarge?.copyWith(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
               ),
@@ -759,9 +755,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
       child: GestureDetector(
         onTap: () => _onResultTap(result),
         onLongPress: () {
-          Clipboard.setData(ClipboardData(text: '${result.title}\n${result.snippet.replaceAll('...', '')}'));
+          Clipboard.setData(ClipboardData(text: context.tr('{0}\n{1}', [result.title, result.snippet.replaceAll('...', '')])));
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Copied to clipboard')),
+            const SnackBar(content: TrText('Copied to clipboard')),
           );
         },
         child: TexturedGlassContainer(

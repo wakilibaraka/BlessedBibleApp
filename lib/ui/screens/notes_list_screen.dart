@@ -11,6 +11,8 @@ import '../../data/models/home_data.dart';
 import '../widgets/textured_glass_container.dart';
 import '../widgets/shared_app_bar.dart';
 import '../sheets/book_chapter_selector_sheet.dart';
+import '../../l10n/tr_text.dart';
+import '../../l10n/l10n.dart';
 
 class NotesListScreen extends ConsumerWidget {
   const NotesListScreen({super.key});
@@ -25,7 +27,7 @@ class NotesListScreen extends ConsumerWidget {
       appBar: SharedAppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text('My Notes',
+        title: TrText('My Notes',
             style: theme.textTheme.titleMedium
                 ?.copyWith(fontWeight: FontWeight.bold)),
       ),
@@ -38,16 +40,14 @@ class NotesListScreen extends ConsumerWidget {
                       size: 64,
                       color: theme.primaryColor.withValues(alpha: 0.5)),
                   const SizedBox(height: 16),
-                  Text(
-                    'No notes yet',
+                  TrText('No notes yet',
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    'Tap the + button to add your first note.',
+                  TrText('Tap the + button to add your first note.',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
@@ -307,9 +307,9 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
           
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Verse inserted'),
+              content: const TrText('Verse inserted'),
               action: SnackBarAction(
-                label: 'Add Commentary',
+                label: context.tr('Add Commentary'),
                 onPressed: () {
                   final commentaryList = ref.read(commentaryProvider).value ?? [];
                   final matchList = commentaryList.where(
@@ -399,7 +399,7 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
               controller: titleController,
               style: TextStyle(color: theme.colorScheme.onSurface),
               decoration: InputDecoration(
-                hintText: 'Note Title',
+                hintText: context.tr('Note Title'),
                 hintStyle: TextStyle(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
                 filled: true,
@@ -436,7 +436,7 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
                 maxLines: null,
                 keyboardType: TextInputType.multiline,
                 decoration: InputDecoration(
-                  hintText: 'Start typing... (type / for commands)',
+                  hintText: context.tr('Start typing... (type / for commands)'),
                   hintStyle: TextStyle(
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
                   filled: true,
@@ -477,17 +477,17 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
                   children: [
                     ListTile(
                       leading: const Icon(Icons.book),
-                      title: const Text('Insert verse'),
+                      title: const TrText('Insert verse'),
                       onTap: _insertVerse,
                     ),
                     ListTile(
                       leading: const Icon(Icons.calendar_today),
-                      title: const Text('Insert date'),
+                      title: const TrText('Insert date'),
                       onTap: _insertDate,
                     ),
                     ListTile(
                       leading: const Icon(Icons.title),
-                      title: const Text('Insert chapter title'),
+                      title: const TrText('Insert chapter title'),
                       onTap: _insertChapterTitle,
                     ),
                   ],
@@ -531,7 +531,7 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
                 Navigator.pop(context);
 
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Note saved!')),
+                  const SnackBar(content: TrText('Note saved!')),
                 );
               },
               child: Text(widget.editingNote != null ? 'Save Changes' : 'Save Note',
@@ -548,10 +548,10 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
                   ref.read(notesProvider.notifier).remove(widget.editingId!);
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Note deleted')),
+                    const SnackBar(content: TrText('Note deleted')),
                   );
                 },
-                child: const Text('Delete Note',
+                child: const TrText('Delete Note',
                     style: TextStyle(fontWeight: FontWeight.bold)),
               ),
             ],

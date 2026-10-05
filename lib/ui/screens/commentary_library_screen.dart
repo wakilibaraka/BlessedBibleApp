@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 
 import '../../state/commentary_provider.dart';
 import 'commentary_hub_screen.dart';
+import '../../l10n/tr_text.dart';
 
 /// A simple list of all books/chapters that have commentary.
 /// Reachable from the CommentaryBanner on chapters with no commentary.
@@ -51,8 +52,7 @@ class CommentaryLibraryScreen extends ConsumerWidget {
               color: theme.primaryColor, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text(
-          'Commentary Library',
+        title: TrText('Commentary Library',
           style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
             letterSpacing: 0.3,
@@ -71,8 +71,7 @@ class CommentaryLibraryScreen extends ConsumerWidget {
           ? Center(
               child: Padding(
                 padding: const EdgeInsets.all(32),
-                child: Text(
-                  'No commentary available yet.',
+                child: TrText('No commentary available yet.',
                   style: theme.textTheme.bodyLarge?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
@@ -187,8 +186,7 @@ class _BookSectionState extends State<_BookSection> {
                     color: widget.theme.primaryColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Text(
-                    '${widget.chapters.length} ch',
+                  child: TrText('{0} ch', args: [widget.chapters.length],
                     style: widget.theme.textTheme.labelSmall?.copyWith(
                       color: widget.theme.primaryColor,
                       fontWeight: FontWeight.w600,
@@ -211,8 +209,7 @@ class _BookSectionState extends State<_BookSection> {
             (chapter) => ListTile(
               contentPadding: const EdgeInsets.only(left: 52, right: 20),
               dense: true,
-              title: Text(
-                'Chapter $chapter',
+              title: TrText('Chapter {0}', args: [chapter],
                 style: widget.theme.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w500,
                 ),

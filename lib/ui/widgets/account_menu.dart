@@ -16,6 +16,8 @@ import '../../state/streak_provider.dart';
 import '../../state/translation_provider.dart';
 import '../../state/user_data_provider.dart'
     show bookmarkDataProvider, highlightsProvider;
+import '../../l10n/tr_text.dart';
+import '../../l10n/l10n.dart';
 
 /// Shared account avatar: photo → initial → person icon, themed.
 /// Extracted from the account button so every surface matches.
@@ -186,7 +188,7 @@ class _AccountMenuBody extends ConsumerWidget {
                 const Divider(height: 1, indent: 16, endIndent: 16),
                 _MenuTile(
                   icon: Icons.person_outline_rounded,
-                  label: 'Account',
+                  label: context.tr('Account'),
                   onTap: () {
                     Navigator.of(context).pop();
                     _showAccountSheet(context);
@@ -194,7 +196,7 @@ class _AccountMenuBody extends ConsumerWidget {
                 ),
                 _MenuTile(
                   icon: Icons.settings_outlined,
-                  label: 'Settings',
+                  label: context.tr('Settings'),
                   onTap: () {
                     HapticFeedback.selectionClick();
                     Navigator.of(context).pop();
@@ -203,8 +205,8 @@ class _AccountMenuBody extends ConsumerWidget {
                 ),
                 _MenuTile(
                   icon: Icons.upload_file_outlined,
-                  label: 'Back up data',
-                  subtitle: 'Export notes, highlights and settings',
+                  label: context.tr('Back up data'),
+                  subtitle: context.tr('Export notes, highlights and settings'),
                   onTap: () {
                     Navigator.of(context).pop();
                     BackupService.exportData(context, ref);
@@ -212,8 +214,8 @@ class _AccountMenuBody extends ConsumerWidget {
                 ),
                 _MenuTile(
                   icon: Icons.download_outlined,
-                  label: 'Restore data',
-                  subtitle: 'Import from a backup file',
+                  label: context.tr('Restore data'),
+                  subtitle: context.tr('Import from a backup file'),
                   onTap: () {
                     Navigator.of(context).pop();
                     _showRestoreDialog(context, ref);
@@ -222,20 +224,20 @@ class _AccountMenuBody extends ConsumerWidget {
                 if (user == null) ...[
                   _MenuTile(
                     icon: Icons.account_circle_outlined,
-                    label: 'Sign in with Google',
+                    label: context.tr('Sign in with Google'),
                     onTap: () =>
                         _signIn(context, context, ref, google: true),
                   ),
                   _MenuTile(
                     icon: Icons.apple,
-                    label: 'Sign in with Apple',
+                    label: context.tr('Sign in with Apple'),
                     onTap: () =>
                         _signIn(context, context, ref, google: false),
                   ),
                 ] else ...[
                   _MenuTile(
                     icon: Icons.logout_rounded,
-                    label: 'Sign Out',
+                    label: context.tr('Sign Out'),
                     destructive: true,
                     onTap: () async {
                       await ref
@@ -247,8 +249,8 @@ class _AccountMenuBody extends ConsumerWidget {
                 ],
                 _MenuTile(
                   icon: Icons.delete_sweep_outlined,
-                  label: 'Reset app',
-                  subtitle: 'Erase all on-device data',
+                  label: context.tr('Reset app'),
+                  subtitle: context.tr('Erase all on-device data'),
                   destructive: true,
                   onTap: () => _confirmReset(context, context, ref),
                 ),
@@ -334,7 +336,7 @@ void _showAccountSheet(BuildContext context) {
                   if (currentAuthState.value == null) ...[
                     ListTile(
                       leading: const Icon(Icons.account_circle),
-                      title: const Text('Sign in with Google'),
+                      title: const TrText('Sign in with Google'),
                       onTap: () async {
                         final result = await ref
                             .read(authActionsProvider)
@@ -343,8 +345,7 @@ void _showAccountSheet(BuildContext context) {
                             result == SignInResult.failed) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text(
-                                  'Sign in failed. Please try again.'),
+                              content: TrText('Sign in failed. Please try again.'),
                               behavior: SnackBarBehavior.floating,
                             ),
                           );
@@ -357,7 +358,7 @@ void _showAccountSheet(BuildContext context) {
                     ),
                     ListTile(
                       leading: const Icon(Icons.apple),
-                      title: const Text('Sign in with Apple'),
+                      title: const TrText('Sign in with Apple'),
                       onTap: () async {
                         final result = await ref
                             .read(authActionsProvider)
@@ -366,8 +367,7 @@ void _showAccountSheet(BuildContext context) {
                             result == SignInResult.failed) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text(
-                                  'Sign in failed. Please try again.'),
+                              content: TrText('Sign in failed. Please try again.'),
                               behavior: SnackBarBehavior.floating,
                             ),
                           );
@@ -397,7 +397,7 @@ void _showAccountSheet(BuildContext context) {
                     ListTile(
                       leading: const Icon(Icons.logout,
                           color: Colors.orange),
-                      title: const Text('Sign Out',
+                      title: const TrText('Sign Out',
                           style: TextStyle(color: Colors.orange)),
                       onTap: () async {
                         await ref.read(authActionsProvider).signOut();
@@ -407,16 +407,15 @@ void _showAccountSheet(BuildContext context) {
                     ListTile(
                       leading: const Icon(Icons.delete_forever,
                           color: Colors.red),
-                      title: const Text('Delete Account',
+                      title: const TrText('Delete Account',
                           style: TextStyle(color: Colors.red)),
                       onTap: () async {
                         Navigator.pop(context);
                         final confirm = await showDialog<bool>(
                           context: context,
                           builder: (ctx) => AlertDialog(
-                            title: const Text('Delete Account?'),
-                            content: const Text(
-                                'This is permanent and irreversible.\n\n'
+                            title: const TrText('Delete Account?'),
+                            content: const TrText('This is permanent and irreversible.\n\n'
                                 'The following will be completely removed:\n'
                                 '• Your sign-in account\n'
                                 '• Your cloud-synced custom plans\n'
@@ -425,12 +424,12 @@ void _showAccountSheet(BuildContext context) {
                               TextButton(
                                 onPressed: () =>
                                     Navigator.pop(ctx, false),
-                                child: const Text('Cancel'),
+                                child: const TrText('Cancel'),
                               ),
                               TextButton(
                                 onPressed: () =>
                                     Navigator.pop(ctx, true),
-                                child: const Text('Delete',
+                                child: const TrText('Delete',
                                     style:
                                         TextStyle(color: Colors.red)),
                               ),
@@ -446,8 +445,7 @@ void _showAccountSheet(BuildContext context) {
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                    content: Text(
-                                        'Account deleted successfully.')),
+                                    content: TrText('Account deleted successfully.')),
                               );
                             }
                           } on ReauthCancelledException catch (_) {
@@ -456,8 +454,7 @@ void _showAccountSheet(BuildContext context) {
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text(
-                                      'Failed to delete account: ${e.toString().replaceAll("Exception: ", "")}'),
+                                  content: TrText('Failed to delete account: {0}', args: [e.toString().replaceAll("Exception: ", "")]),
                                   duration:
                                       const Duration(seconds: 4),
                                 ),
@@ -491,7 +488,7 @@ Future<void> _signIn(
   if (result == SignInResult.failed) {
     ScaffoldMessenger.of(sheetContext).showSnackBar(
       const SnackBar(
-        content: Text('Sign in failed. Please try again.'),
+        content: TrText('Sign in failed. Please try again.'),
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -506,19 +503,19 @@ void _showRestoreDialog(BuildContext context, WidgetRef ref) {
   showDialog(
     context: context,
     builder: (ctx) => AlertDialog(
-      title: const Text('Restore from Backup'),
+      title: const TrText('Restore from Backup'),
       content: TextField(
         controller: controller,
         maxLines: 5,
-        decoration: const InputDecoration(
-          hintText: 'Paste your backup JSON here...',
-          border: OutlineInputBorder(),
+        decoration: InputDecoration(
+          hintText: context.tr('Paste your backup JSON here...'),
+          border: const OutlineInputBorder(),
         ),
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(ctx).pop(),
-          child: const Text('Cancel'),
+          child: const TrText('Cancel'),
         ),
         ElevatedButton(
           onPressed: () {
@@ -528,7 +525,7 @@ void _showRestoreDialog(BuildContext context, WidgetRef ref) {
               BackupService.importData(context, ref, text);
             }
           },
-          child: const Text('Restore'),
+          child: const TrText('Restore'),
         ),
       ],
     ),
@@ -541,9 +538,8 @@ void _confirmReset(
   showDialog(
     context: context,
     builder: (ctx) => AlertDialog(
-      title: const Text('Reset app?'),
-      content: const Text(
-          'This erases all on-device data:\n'
+      title: const TrText('Reset app?'),
+      content: const TrText('This erases all on-device data:\n'
           '• Bookmarks, highlights, notes & journal\n'
           '• Reading plans, progress & custom plans\n'
           '• Downloaded translations & streaks\n\n'
@@ -552,7 +548,7 @@ void _confirmReset(
       actions: [
         TextButton(
           onPressed: () => Navigator.of(ctx).pop(),
-          child: const Text('Cancel'),
+          child: const TrText('Cancel'),
         ),
         TextButton(
           onPressed: () async {
@@ -562,13 +558,13 @@ void _confirmReset(
             if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('App data reset. Fresh start!'),
+                  content: TrText('App data reset. Fresh start!'),
                   behavior: SnackBarBehavior.floating,
                 ),
               );
             }
           },
-          child: Text('Reset',
+          child: TrText('Reset',
               style: TextStyle(color: Theme.of(ctx).colorScheme.error)),
         ),
       ],

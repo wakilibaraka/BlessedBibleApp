@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../services/devotional_service.dart';
 import '../../state/devotional_provider.dart';
+import '../../l10n/tr_text.dart';
+import '../../l10n/l10n.dart';
 
 /// Presentation widgets for the Plans Library redesign.
 ///
@@ -50,8 +52,7 @@ class LibraryGreetingHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                'Hello,',
+              TrText('Hello,',
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w800,
                   height: 1.1,
@@ -323,7 +324,7 @@ class LibraryPlateBand extends ConsumerWidget {
         if (p == null) return const SizedBox.shrink();
         return Semantics(
           button: true,
-          label: 'Open story: ${p.caption}',
+          label: context.tr('Open story: {0}', [p.caption]),
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: () => onOpen(p),
@@ -362,8 +363,7 @@ class LibraryPlateBand extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Text(
-                            'Bible story',
+                          TrText('Bible story',
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: Colors.white.withValues(alpha: 0.75),
                               letterSpacing: 1.6,

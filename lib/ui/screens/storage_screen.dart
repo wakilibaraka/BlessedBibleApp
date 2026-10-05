@@ -11,6 +11,8 @@ import '../../services/translation_pack_store.dart';
 import '../../state/theme_provider.dart';
 import '../widgets/shared_app_bar.dart';
 import '../widgets/study_v2_widgets.dart';
+import '../../l10n/tr_text.dart';
+import '../../l10n/l10n.dart';
 
 /// Storage manager: cache, downloaded data, and translation packs.
 ///
@@ -126,7 +128,7 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
 
   Future<void> _clearCache() async {
     final confirmed = await _confirm(
-      title: 'Clear cache?',
+      title: context.tr('Clear cache?'),
       body: 'Removes temporary files (generated share cards, thumbnails). '
           'Your notes, bookmarks, highlights and downloads are untouched.',
       confirmLabel: 'Clear cache',
@@ -152,7 +154,7 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
 
   Future<void> _deletePack(_PackRow pack) async {
     final confirmed = await _confirm(
-      title: 'Delete ${pack.name}?',
+      title: context.tr('Delete {0}?', [pack.name]),
       body: pack.bundled
           ? 'Frees ${_mb(pack.sizeBytes)}. You can restore it offline from the app at any time.'
           : 'Frees ${_mb(pack.sizeBytes)}. You can download it again later.',
@@ -219,7 +221,7 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+            child: const TrText('Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
@@ -248,7 +250,7 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
       appThemeMode: appThemeMode,
       page: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: const SharedAppBar(title: Text('Storage')),
+        appBar: const SharedAppBar(title: TrText('Storage')),
         body: SafeArea(
           bottom: false,
           child: Center(
@@ -271,11 +273,11 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
                         const V2Eyebrow('On this device'),
                         const SizedBox(height: 10),
                         _StatRow(
-                          label: 'Bible content (always kept)',
+                          label: context.tr('Bible content (always kept)'),
                           value: _mb(_contentBytes),
                         ),
-                        _StatRow(label: 'Downloaded packs', value: _mb(_downloadBytes)),
-                        _StatRow(label: 'Cache', value: _mb(_cacheBytes)),
+                        _StatRow(label: context.tr('Downloaded packs'), value: _mb(_downloadBytes)),
+                        _StatRow(label: context.tr('Cache'), value: _mb(_cacheBytes)),
                       ],
                     ),
                   ),
@@ -287,8 +289,7 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
                       children: [
                         const V2Eyebrow('Cache'),
                         const SizedBox(height: 6),
-                        Text(
-                          'Temporary files only — generated share cards and '
+                        TrText('Temporary files only — generated share cards and '
                           'thumbnails. Safe to clear at any time.',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurface
@@ -301,7 +302,7 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
                           child: OutlinedButton.icon(
                             onPressed: _busy ? null : _clearCache,
                             icon: const Icon(Icons.cleaning_services_rounded),
-                            label: const Text('Clear cache'),
+                            label: const TrText('Clear cache'),
                           ),
                         ),
                       ],
@@ -356,8 +357,7 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
                       ),
                     ),
                   const SizedBox(height: 6),
-                  Text(
-                    'Core KJV and BBE are part of the app and can\'t be removed.',
+                  TrText('Core KJV and BBE are part of the app and can\'t be removed.',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color:
                           theme.colorScheme.onSurface.withValues(alpha: 0.55),
@@ -439,11 +439,11 @@ class _PackAction extends StatelessWidget {
       return TextButton.icon(
         onPressed: busy ? null : onDownload,
         icon: const Icon(Icons.download_rounded, size: 18),
-        label: const Text('Get'),
+        label: const TrText('Get'),
       );
     }
     return IconButton(
-      tooltip: 'Delete ${pack.name}',
+      tooltip: context.tr('Delete {0}', [pack.name]),
       onPressed: busy ? null : onDelete,
       icon: const Icon(Icons.delete_outline_rounded),
     );

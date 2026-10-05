@@ -8,6 +8,7 @@ import '../../state/theme_provider.dart';
 import 'commentary_hub_screen.dart';
 import '../../state/commentary_provider.dart';
 import '../../theme/reading_tokens.dart';
+import '../../l10n/tr_text.dart';
 
 class VotdArchiveScreen extends ConsumerWidget {
   const VotdArchiveScreen({super.key});
@@ -45,8 +46,7 @@ class VotdArchiveScreen extends ConsumerWidget {
             elevation: 0,
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsets.only(left: 16, bottom: 16),
-              title: Text(
-                'Daily Verses',
+              title: TrText('Daily Verses',
                 style: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: theme.primaryColor,

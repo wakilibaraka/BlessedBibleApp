@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:confetti/confetti.dart';
+import '../../l10n/tr_text.dart';
 
 class DayCompleteCelebration extends StatefulWidget {
   final int day;
@@ -112,8 +113,7 @@ class _DayCompleteCelebrationState extends State<DayCompleteCelebration>
                           Icon(Icons.stars_rounded,
                               color: Theme.of(context).primaryColor, size: 64),
                           const SizedBox(height: 16),
-                          Text(
-                            'Reading Plan\nDay ${widget.day} Complete!',
+                          TrText('Reading Plan\nDay {0} Complete!', args: [widget.day],
                             textAlign: TextAlign.center,
                             style: Theme.of(context)
                                 .textTheme

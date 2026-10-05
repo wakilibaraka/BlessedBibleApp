@@ -67,6 +67,8 @@ import '../widgets/commentary_view.dart';
 import '../sheets/verse_context_menu_sheet.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import '../sheets/book_chapter_selector_sheet.dart';
+import '../../l10n/tr_text.dart';
+import '../../l10n/l10n.dart';
 
 class ExpandedChipsNotifier extends Notifier<Map<int, String?>> {
   @override
@@ -237,31 +239,31 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         actions: [
           RadialAction(
             icon: Icons.copy_rounded,
-            label: 'Copy',
+            label: context.tr('Copy'),
             onTap: () => VerseActionLogic.handleCopy(
                 context, ref, bookName, chapterNumber, [verseNumber]),
           ),
           RadialAction(
             icon: Icons.bookmark_border_rounded,
-            label: 'Bookmark',
+            label: context.tr('Bookmark'),
             onTap: () => VerseActionLogic.handleBookmark(context, theme, ref,
                 bookName, chapterNumber, [verseNumber]),
           ),
           RadialAction(
             icon: Icons.note_add_outlined,
-            label: 'Note',
+            label: context.tr('Note'),
             onTap: () => VerseActionLogic.handleNote(
                 context, ref, theme, bookName, chapterNumber, [verseNumber]),
           ),
           RadialAction(
             icon: Icons.menu_book_rounded,
-            label: 'Commentary',
+            label: context.tr('Commentary'),
             onTap: () => VerseActionLogic.handleCommentary(context, ref,
                 bookName, chapterNumber, verseNumber, [verseNumber]),
           ),
           RadialAction(
             icon: Icons.link_rounded,
-            label: 'Related',
+            label: context.tr('Related'),
             onTap: () => showCrossReferencesSheet(
               context,
               bookNumber: bookNumber,
@@ -272,7 +274,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           ),
           RadialAction(
             icon: Icons.ios_share_rounded,
-            label: 'Share',
+            label: context.tr('Share'),
             onTap: () => VerseActionLogic.handleShareOptions(
                 context, ref, bookName, chapterNumber, [verseNumber]),
           ),
@@ -731,8 +733,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         ? _buildSideButton(
             context,
             tokens,
-            Text(
-              'Done',
+            TrText('Done',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: tokens.readingInk,
@@ -743,8 +744,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         : _buildSideButton(
             context,
             tokens,
-            Text(
-              'Aa',
+            TrText('Aa',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: tokens.readingInk,
@@ -943,7 +943,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                         )
                       : flatChapters.isEmpty
                           ? Center(
-                              child: Text('Passage not found.',
+                              child: TrText('Passage not found.',
                                   style: theme.textTheme.bodyLarge),
                             )
                           : MediaQuery(
@@ -1759,7 +1759,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                       child: FilledButton.icon(
                         onPressed: _exitPageSelection,
                         icon: const Icon(Icons.check, size: 20),
-                        label: const Text('Done'),
+                        label: const TrText('Done'),
                         style: FilledButton.styleFrom(
                           backgroundColor: theme.primaryColor,
                           foregroundColor: theme.colorScheme.onPrimary,
@@ -2444,8 +2444,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                 color: theme.colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(4),
               ),
-              child: Text(
-                'WEB',
+              child: TrText('WEB',
                 style: TextStyle(
                   fontSize: typography.fontSize * 0.45,
                   fontWeight: FontWeight.bold,
@@ -2487,8 +2486,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                   color: tokens?.readingBorder ?? theme.dividerColor),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Text(
-                  '· End of ${fc.book.name} ${fc.chapter.number} ·',
+                child: TrText('· End of {0} {1} ·', args: [fc.book.name, fc.chapter.number],
                   style: theme.textTheme.labelMedium?.copyWith(
                     fontFamily: 'Georgia',
                     fontStyle: FontStyle.italic,
@@ -2520,8 +2518,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                 color: hasChapterCommentary
                     ? (tokens?.readingAccent ?? theme.primaryColor)
                     : theme.disabledColor),
-            label: Text(
-              'Read commentary on this chapter',
+            label: TrText('Read commentary on this chapter',
               style: theme.textTheme.titleSmall?.copyWith(
                 color: hasChapterCommentary
                     ? (tokens?.readingInk ?? Colors.black)
@@ -2554,7 +2551,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 12),
                   ),
-                  child: Text('‹ Previous',
+                  child: TrText('‹ Previous',
                       style: theme.textTheme.titleMedium?.copyWith(
                           color: tokens?.readingAccent ?? theme.primaryColor)),
                 )
@@ -2572,7 +2569,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 12),
                   ),
-                  child: Text('Next ›',
+                  child: TrText('Next ›',
                       style: theme.textTheme.titleMedium?.copyWith(
                           color: tokens?.readingAccent ?? theme.primaryColor)),
                 )
@@ -2622,8 +2619,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                   child: Column(
                     children: [
-                      Text(
-                        'Reading Plan · Day $activePlanDay',
+                      TrText('Reading Plan · Day {0}', args: [activePlanDay],
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: theme.colorScheme.onSurface
                               .withValues(alpha: 0.6),
@@ -2673,8 +2669,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                     primaryPlanId));
                                             if (finalState.isPlanComplete) {
                                               messenger.showSnackBar(const SnackBar(
-                                                  content: Text(
-                                                      'Plan completed! Congratulations! 🎉')));
+                                                  content: TrText('Plan completed! Congratulations! 🎉')));
                                             } else {
                                               final nextDay =
                                                   finalState.currentDay;
@@ -2773,8 +2768,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16)),
                           ),
-                          label: Text(
-                              'Mark ${fc.book.name} ${fc.chapter.number} done & continue',
+                          label: TrText('Mark {0} {1} done & continue', args: [fc.book.name, fc.chapter.number],
                               style: const TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.w600)),
                         ),
@@ -2863,7 +2857,7 @@ class VerseActionLogic {
                                   .withValues(alpha: 0.6)),
                         ),
                         const SizedBox(height: 6),
-                        Text('None',
+                        TrText('None',
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: theme.colorScheme.onSurface
                                   .withValues(alpha: 0.7),
