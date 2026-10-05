@@ -7,6 +7,9 @@ import 'dart:io' as dart_io;
 
 import 'state/theme_provider.dart';
 import 'state/surface_style_provider.dart';
+import 'state/locale_provider.dart';
+import 'l10n/l10n.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'theme/app_theme.dart';
 import 'ui/screens/main_nav_screen.dart';
 
@@ -103,6 +106,7 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
     
     final themeMode = ref.watch(themeProvider);
     final surfaceStyle = ref.watch(surfaceStyleProvider);
+    final chosenLocale = ref.watch(localeProvider);
     final isBibleLoading = ref.watch(bibleProvider.select((s) => s.isLoading));
 
     ThemeData lightBase = themeMode == AppThemeMode.lilies
@@ -152,9 +156,21 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
 
     final hasCompletedOnboarding = prefsService.hasCompletedOnboarding();
 
+    // Follow the system language unless the user picked one in Settings.
+    final systemCode = View.of(context).platformDispatcher.locale.languageCode;
+    final effectiveCode = chosenLocale ?? AppL10n.resolve(systemCode);
+    AppL10n.localeCode = effectiveCode;
+
     return MaterialApp(
       title: 'The Blessed Bible',
       debugShowCheckedModeBanner: false,
+      locale: Locale(effectiveCode),
+      supportedLocales: kSupportedLocales,
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       themeAnimationDuration: const Duration(milliseconds: 600),
       themeAnimationCurve: Curves.easeInOut,
       themeMode: switch (themeMode) {
