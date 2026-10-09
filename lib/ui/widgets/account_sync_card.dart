@@ -194,7 +194,7 @@ class _AccountSyncCardState extends ConsumerState<AccountSyncCard> {
             IconButton(
               icon: const Icon(Icons.settings_rounded),
               color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-              onPressed: () => _showManageDataSheet(context, theme),
+              onPressed: () => _showManageDataSheet(theme),
             ),
           ],
         ),
@@ -258,7 +258,7 @@ class _AccountSyncCardState extends ConsumerState<AccountSyncCard> {
     }
   }
 
-  void _showManageDataSheet(BuildContext context, ThemeData theme) {
+  void _showManageDataSheet(ThemeData theme) {
     showModalBottomSheet(
       context: context,
       backgroundColor: theme.colorScheme.surface,

@@ -221,7 +221,7 @@ class SearchNotifier extends Notifier<SearchState> {
     try {
       final db = await bibleDbService.database;
       final q = query.trim();
-      final likeTerm = '%${q}%';
+      final likeTerm = '%$q%';
       
       final rows = await db.query(
         'dictionary',

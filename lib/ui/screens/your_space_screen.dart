@@ -1242,11 +1242,6 @@ void _showVerseItemContext(
   }
 
   void shareVerse() {
-    final refParts = formattedRef.split(' ');
-    final bookName =
-        refParts.isNotEmpty ? refParts.sublist(0, refParts.length - 1).join(' ') : '';
-    final chapterVerse = refParts.isNotEmpty ? refParts.last : '1:1';
-    final cv = chapterVerse.split(':');
     showShareOptionsSheet(
       context: context,
       copyText: ShareService.formatVerse(

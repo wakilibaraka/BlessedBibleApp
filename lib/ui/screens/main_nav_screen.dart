@@ -157,10 +157,6 @@ class MainNavScreen extends ConsumerWidget {
                 final isMinimalAction = currentIndex == 1 &&
                     selectedVerses.isNotEmpty &&
                     style == VerseActionStyle.horizontal;
-                // Compact sheet: actions live in a short sheet, not the dock.
-                final usesActionSheet = currentIndex == 1 &&
-                    selectedVerses.isNotEmpty &&
-                    style == VerseActionStyle.classic;
                 final isRaindropAction = currentIndex == 1 &&
                     selectedVerses.isNotEmpty &&
                     style == VerseActionStyle.raindrop;

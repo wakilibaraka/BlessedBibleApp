@@ -19,7 +19,6 @@ import '../widgets/bouncy_entrance.dart';
 import '../widgets/commentary_view.dart';
 import '../../state/commentary_provider.dart';
 import '../../services/share_service.dart';
-import '../../services/devotional_service.dart';
 import '../../state/devotional_provider.dart';
 import '../widgets/share_card.dart';
 

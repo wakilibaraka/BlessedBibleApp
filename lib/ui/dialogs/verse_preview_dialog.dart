@@ -51,7 +51,7 @@ class VersePreviewDialog extends ConsumerWidget {
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 24,
               spreadRadius: 8,
             )
@@ -79,7 +79,7 @@ class VersePreviewDialog extends ConsumerWidget {
                 IconButton(
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
-                  icon: Icon(Icons.close_rounded, color: theme.colorScheme.onSurface.withOpacity(0.4)),
+                  icon: Icon(Icons.close_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.4)),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],

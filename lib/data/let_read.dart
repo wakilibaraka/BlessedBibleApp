@@ -1,5 +1,4 @@
 import '../../data/models/home_data.dart';
-import '../../state/home_provider.dart';
 
 /// Year-progress helpers for the Plans Library header.
 ///
