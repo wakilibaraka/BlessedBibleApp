@@ -5,11 +5,11 @@ Fetches all 500 devotional spreads from graham-devotional's public Supabase REST
 endpoint and writes:
   assets/devotional/stories/index.json        - light story index (all 500)
   assets/devotional/stories/<BOOK>.json       - full text per book (66 files)
-  tools/data/export_manifest.json             - build report
+  tool/data/export_manifest.json             - build report
 
 Text rights: KJV is public domain. Narrative summaries are included per the
 project owner's decision; attribution is embedded in each book file.
-Run:  python3 tools/export_bible_stories.py
+Run:  python3 tool/export_bible_stories.py
 """
 
 import os

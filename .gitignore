@@ -96,5 +96,4 @@ ios/Runner/GoogleService-Info.plist
 macos/Runner/GoogleService-Info.plist
 *.db.bak
 assets/bible/bible_*.db
-scripts/dict_tmp/
 .tmp.driveupload/

@@ -9,7 +9,7 @@ Downloads latin subsets of:
 Also writes the OFL license for each family. Flutter requires TTF/OTF, so we
 use Fontsource's TTF builds rather than Google Fonts' woff2.
 
-Run:  python3 tools/fetch_devotional_fonts.py
+Run:  python3 tool/fetch_devotional_fonts.py
 """
 
 import os

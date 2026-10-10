@@ -25,7 +25,7 @@ ASSETS_DEVOTIONAL = os.path.join(REPO_ROOT, "assets", "devotional")
 STORIES_DIR = os.path.join(ASSETS_DEVOTIONAL, "stories")
 ART_DIR = os.path.join(ASSETS_DEVOTIONAL, "art")
 FONTS_DIR = os.path.join(REPO_ROOT, "assets", "fonts")
-TOOLS_DATA_DIR = os.path.join(REPO_ROOT, "tools", "data")
+TOOLS_DATA_DIR = os.path.join(REPO_ROOT, "tool", "data")
 
 ATTRIBUTION = (
     "Scripture quotations are from the King James Version (public domain). "

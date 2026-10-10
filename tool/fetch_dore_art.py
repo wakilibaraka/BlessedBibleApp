@@ -8,9 +8,9 @@ order until one resolves. Thumbnail downloads are batched and cached.
 Writes:
   assets/devotional/art/<slug>.webp       - processed engravings
   assets/devotional/art/artwork_map.json  - book prefix -> artwork mapping
-  tools/data/dore_credits.json            - source URLs + credits
+  tool/data/dore_credits.json            - source URLs + credits
 
-Run:  python3 tools/fetch_dore_art.py
+Run:  python3 tool/fetch_dore_art.py
 """
 
 import io

@@ -1,4 +1,4 @@
-# Project Rules & Workflow
+# Contributing: Project Rules & Workflow
 
 ## 1. Always Verify Build Before Done
 After making ANY code change, before reporting a task or prompt as complete, the agent/developer MUST:
