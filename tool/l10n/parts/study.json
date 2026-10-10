@@ -1,0 +1,1628 @@
+{
+ "studyCouldNotOpenScreen": {
+  "en": "Could not open that screen. {error}",
+  "fr": "Impossible d'ouvrir cet écran. {error}",
+  "it": "Impossibile aprire questa schermata. {error}",
+  "ro": "Ecranul nu a putut fi deschis. {error}",
+  "sw": "Imeshindwa kufungua skrini hiyo. {error}",
+  "tl": "Hindi mabuksan ang screen na iyon. {error}",
+  "@": {
+   "placeholders": {
+    "error": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "studyCardSize": {
+  "en": "Card size",
+  "fr": "Taille de la carte",
+  "it": "Dimensione scheda",
+  "ro": "Dimensiunea cardului",
+  "sw": "Ukubwa wa kadi",
+  "tl": "Laki ng card"
+ },
+ "studyPosition": {
+  "en": "Position",
+  "fr": "Position",
+  "it": "Posizione",
+  "ro": "Poziție",
+  "sw": "Mahali",
+  "tl": "Posisyon"
+ },
+ "studySizeLarge": {
+  "en": "Large",
+  "fr": "Grande",
+  "it": "Grande",
+  "ro": "Mare",
+  "sw": "Kubwa",
+  "tl": "Malaki"
+ },
+ "studySizeLargeHint": {
+  "en": "Full width, same size as everything",
+  "fr": "Pleine largeur, même taille que le reste",
+  "it": "Larghezza piena, come le altre",
+  "ro": "Lățime completă, la fel ca restul",
+  "sw": "Upana kamili, sawa na zingine",
+  "tl": "Buong lapad, kapareho ng lahat"
+ },
+ "studySizeExtraLarge": {
+  "en": "Extra Large",
+  "fr": "Très grande",
+  "it": "Extra grande",
+  "ro": "Foarte mare",
+  "sw": "Kubwa zaidi",
+  "tl": "Napakalaki"
+ },
+ "studySizeExtraLargeHint": {
+  "en": "Full width, roomier content",
+  "fr": "Pleine largeur, contenu plus aéré",
+  "it": "Larghezza piena, contenuto più ampio",
+  "ro": "Lățime completă, conținut mai aerisit",
+  "sw": "Upana kamili, maudhui yenye nafasi",
+  "tl": "Buong lapad, mas maluwag na nilalaman"
+ },
+ "studySizeHalf": {
+  "en": "Half",
+  "fr": "Moitié",
+  "it": "Metà",
+  "ro": "Jumătate",
+  "sw": "Nusu",
+  "tl": "Kalahati"
+ },
+ "studySizeHalfHint": {
+  "en": "Compact, two per row",
+  "fr": "Compacte, deux par ligne",
+  "it": "Compatta, due per riga",
+  "ro": "Compact, două pe rând",
+  "sw": "Ndogo, mbili kwa safu",
+  "tl": "Siksik, dalawa bawat hanay"
+ },
+ "studyMoveUp": {
+  "en": "Move up",
+  "fr": "Monter",
+  "it": "Sposta su",
+  "ro": "Mută în sus",
+  "sw": "Sogeza juu",
+  "tl": "Iakyat"
+ },
+ "studyMoveUpHint": {
+  "en": "Swap with the card above",
+  "fr": "Échanger avec la carte du dessus",
+  "it": "Scambia con la scheda sopra",
+  "ro": "Schimbă cu cardul de deasupra",
+  "sw": "Badilisha na kadi ya juu",
+  "tl": "Ipagpalit sa card sa itaas"
+ },
+ "studyMoveDown": {
+  "en": "Move down",
+  "fr": "Descendre",
+  "it": "Sposta giù",
+  "ro": "Mută în jos",
+  "sw": "Sogeza chini",
+  "tl": "Ibaba"
+ },
+ "studyMoveDownHint": {
+  "en": "Swap with the card below",
+  "fr": "Échanger avec la carte du dessous",
+  "it": "Scambia con la scheda sotto",
+  "ro": "Schimbă cu cardul de dedesubt",
+  "sw": "Badilisha na kadi ya chini",
+  "tl": "Ipagpalit sa card sa ibaba"
+ },
+ "studyCommentaryEyebrow": {
+  "en": "Commentary",
+  "fr": "Commentaire",
+  "it": "Commento",
+  "ro": "Comentariu",
+  "sw": "Ufafanuzi",
+  "tl": "Komentaryo"
+ },
+ "studyCommentaryTitle": {
+  "en": "Verse-by-verse insight",
+  "fr": "Éclairage verset par verset",
+  "it": "Approfondimento versetto per versetto",
+  "ro": "Explicații verset cu verset",
+  "sw": "Maarifa mstari kwa mstari",
+  "tl": "Pag-unawa bawat talata"
+ },
+ "studyCommentarySnippet": {
+  "en": "Historicist commentary with chapter + verse filters.",
+  "fr": "Commentaire historiciste, filtrable par chapitre et verset.",
+  "it": "Commento storicista con filtri per capitolo e versetto.",
+  "ro": "Comentariu istoricist cu filtre pe capitol și verset.",
+  "sw": "Ufafanuzi wa kihistoria wenye vichujio vya sura na mstari.",
+  "tl": "Historisistang komentaryo na may filter sa kabanata at talata."
+ },
+ "studyCommentaryCta": {
+  "en": "Open Commentary",
+  "fr": "Ouvrir le commentaire",
+  "it": "Apri il commento",
+  "ro": "Deschide comentariul",
+  "sw": "Fungua ufafanuzi",
+  "tl": "Buksan ang komentaryo"
+ },
+ "studyDictionaryEyebrow": {
+  "en": "Dictionary",
+  "fr": "Dictionnaire",
+  "it": "Dizionario",
+  "ro": "Dicționar",
+  "sw": "Kamusi",
+  "tl": "Diksiyunaryo"
+ },
+ "studyDictionaryTitle": {
+  "en": "Words defined",
+  "fr": "Mots définis",
+  "it": "Parole spiegate",
+  "ro": "Cuvinte explicate",
+  "sw": "Maneno yamefafanuliwa",
+  "tl": "Kahulugan ng mga salita"
+ },
+ "studyDictionarySnippet": {
+  "en": "Easton & Smith, offline, with saved words.",
+  "fr": "Easton et Smith, hors ligne, avec mots enregistrés.",
+  "it": "Easton e Smith, offline, con parole salvate.",
+  "ro": "Easton și Smith, offline, cu cuvinte salvate.",
+  "sw": "Easton na Smith, nje ya mtandao, na maneno yaliyohifadhiwa.",
+  "tl": "Easton at Smith, offline, may naka-save na salita."
+ },
+ "studyDictionaryCta": {
+  "en": "Look up",
+  "fr": "Rechercher",
+  "it": "Cerca",
+  "ro": "Caută",
+  "sw": "Tafuta",
+  "tl": "Hanapin"
+ },
+ "studyStoriesEyebrow": {
+  "en": "Bible stories",
+  "fr": "Histoires bibliques",
+  "it": "Storie bibliche",
+  "ro": "Povestiri biblice",
+  "sw": "Hadithi za Biblia",
+  "tl": "Mga kuwento sa Bibliya"
+ },
+ "studyStoriesTitle": {
+  "en": "Narratives retold",
+  "fr": "Récits racontés",
+  "it": "Racconti narrati",
+  "ro": "Relatări repovestite",
+  "sw": "Simulizi zilizosimuliwa upya",
+  "tl": "Mga salaysay na muling isinalaysay"
+ },
+ "studyStoriesSnippet": {
+  "en": "66 stories across every book.",
+  "fr": "66 histoires à travers chaque livre.",
+  "it": "66 storie da ogni libro.",
+  "ro": "66 de povestiri din fiecare carte.",
+  "sw": "Hadithi 66 kutoka kila kitabu.",
+  "tl": "66 kuwento mula sa bawat aklat."
+ },
+ "studyStoriesCta": {
+  "en": "Read stories",
+  "fr": "Lire les histoires",
+  "it": "Leggi le storie",
+  "ro": "Citește povestirile",
+  "sw": "Soma hadithi",
+  "tl": "Basahin ang mga kuwento"
+ },
+ "studyConcordanceEyebrow": {
+  "en": "Concordance",
+  "fr": "Concordance",
+  "it": "Concordanza",
+  "ro": "Concordanță",
+  "sw": "Konkodansi",
+  "tl": "Konkordansya"
+ },
+ "studyConcordanceTitle": {
+  "en": "Every occurrence",
+  "fr": "Chaque occurrence",
+  "it": "Ogni occorrenza",
+  "ro": "Fiecare apariție",
+  "sw": "Kila mahali neno lilipo",
+  "tl": "Bawat paglitaw"
+ },
+ "studyConcordanceSnippet": {
+  "en": "Find each verse where a word appears.",
+  "fr": "Trouvez chaque verset où un mot apparaît.",
+  "it": "Trova ogni versetto in cui compare una parola.",
+  "ro": "Găsește fiecare verset în care apare un cuvânt.",
+  "sw": "Pata kila mstari ambapo neno linaonekana.",
+  "tl": "Hanapin ang bawat talata kung saan lumilitaw ang salita."
+ },
+ "studyConcordanceCta": {
+  "en": "Search words",
+  "fr": "Rechercher des mots",
+  "it": "Cerca parole",
+  "ro": "Caută cuvinte",
+  "sw": "Tafuta maneno",
+  "tl": "Maghanap ng salita"
+ },
+ "studySpaceSaved": {
+  "en": "Saved",
+  "fr": "Enregistrés",
+  "it": "Salvati",
+  "ro": "Salvate",
+  "sw": "Zilizohifadhiwa",
+  "tl": "Naka-save"
+ },
+ "studySpaceMarked": {
+  "en": "Marked",
+  "fr": "Surlignés",
+  "it": "Evidenziati",
+  "ro": "Evidențiate",
+  "sw": "Zilizowekwa alama",
+  "tl": "Minarkahan"
+ },
+ "studySpaceNotes": {
+  "en": "Notes",
+  "fr": "Notes",
+  "it": "Note",
+  "ro": "Notițe",
+  "sw": "Maelezo",
+  "tl": "Tala"
+ },
+ "studySpaceJournal": {
+  "en": "Journal",
+  "fr": "Journal",
+  "it": "Diario",
+  "ro": "Jurnal",
+  "sw": "Shajara",
+  "tl": "Journal"
+ },
+ "studySpaceTitle": {
+  "en": "Your Space",
+  "fr": "Votre espace",
+  "it": "Il tuo spazio",
+  "ro": "Spațiul tău",
+  "sw": "Nafasi yako",
+  "tl": "Iyong Espasyo"
+ },
+ "studySpaceSubtitle": {
+  "en": "Bookmarks, highlights, notes & journal",
+  "fr": "Signets, surlignages, notes et journal",
+  "it": "Segnalibri, evidenziazioni, note e diario",
+  "ro": "Semne de carte, evidențieri, notițe și jurnal",
+  "sw": "Alamisho, vivutio, maelezo na shajara",
+  "tl": "Bookmark, highlight, tala at journal"
+ },
+ "studyReadingPlan": {
+  "en": "Reading plan",
+  "fr": "Plan de lecture",
+  "it": "Piano di lettura",
+  "ro": "Plan de citire",
+  "sw": "Mpango wa kusoma",
+  "tl": "Plano sa pagbasa"
+ },
+ "studyStartReadingPlan": {
+  "en": "Start a reading plan",
+  "fr": "Commencer un plan de lecture",
+  "it": "Inizia un piano di lettura",
+  "ro": "Începe un plan de citire",
+  "sw": "Anza mpango wa kusoma",
+  "tl": "Magsimula ng plano sa pagbasa"
+ },
+ "studyActivePlan": {
+  "en": "Active plan",
+  "fr": "Plan en cours",
+  "it": "Piano attivo",
+  "ro": "Plan activ",
+  "sw": "Mpango unaoendelea",
+  "tl": "Aktibong plano"
+ },
+ "studyDayOfTotal": {
+  "en": "Day {current} of {total}",
+  "fr": "Jour {current} sur {total}",
+  "it": "Giorno {current} di {total}",
+  "ro": "Ziua {current} din {total}",
+  "sw": "Siku {current} kati ya {total}",
+  "tl": "Araw {current} ng {total}",
+  "@": {
+   "placeholders": {
+    "current": {
+     "type": "int"
+    },
+    "total": {
+     "type": "int"
+    }
+   }
+  }
+ },
+ "studyDaysBehind": {
+  "en": "{count} behind",
+  "fr": "{count} en retard",
+  "it": "{count} indietro",
+  "ro": "{count} în urmă",
+  "sw": "{count} nyuma",
+  "tl": "{count} nahuhuli",
+  "@": {
+   "placeholders": {
+    "count": {
+     "type": "int"
+    }
+   }
+  }
+ },
+ "studyPlans": {
+  "en": "Plans",
+  "fr": "Plans",
+  "it": "Piani",
+  "ro": "Planuri",
+  "sw": "Mipango",
+  "tl": "Mga plano"
+ },
+ "studyGuidedReading": {
+  "en": "Guided reading",
+  "fr": "Lecture guidée",
+  "it": "Lettura guidata",
+  "ro": "Citire ghidată",
+  "sw": "Usomaji ulioongozwa",
+  "tl": "Gabay na pagbasa"
+ },
+ "studyGuidedReadingSubtitle": {
+  "en": "Curated, paced and custom",
+  "fr": "Sélectionnés, rythmés et personnalisés",
+  "it": "Selezionati, cadenzati e personalizzati",
+  "ro": "Selectate, ritmate și personalizate",
+  "sw": "Teule, kwa mwendo na maalum",
+  "tl": "Pinili, may takbo at pasadya"
+ },
+ "studyReadyToBegin": {
+  "en": "Ready to begin",
+  "fr": "Prêt à commencer",
+  "it": "Pronto per iniziare",
+  "ro": "Gata de început",
+  "sw": "Tayari kuanza",
+  "tl": "Handa nang magsimula"
+ },
+ "studyTodayLabel": {
+  "en": "Today: {label}",
+  "fr": "Aujourd'hui : {label}",
+  "it": "Oggi: {label}",
+  "ro": "Azi: {label}",
+  "sw": "Leo: {label}",
+  "tl": "Ngayon: {label}",
+  "@": {
+   "placeholders": {
+    "label": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "studyReview": {
+  "en": "Review",
+  "fr": "Revoir",
+  "it": "Rivedi",
+  "ro": "Revezi",
+  "sw": "Pitia",
+  "tl": "Balikan"
+ },
+ "studyRead": {
+  "en": "Read",
+  "fr": "Lire",
+  "it": "Leggi",
+  "ro": "Citește",
+  "sw": "Soma",
+  "tl": "Basahin"
+ },
+ "studyCtaArrow": {
+  "en": "{cta} →",
+  "fr": "{cta} →",
+  "it": "{cta} →",
+  "ro": "{cta} →",
+  "sw": "{cta} →",
+  "tl": "{cta} →",
+  "@": {
+   "placeholders": {
+    "cta": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "studyWordOfTheDay": {
+  "en": "Word of the day",
+  "fr": "Mot du jour",
+  "it": "Parola del giorno",
+  "ro": "Cuvântul zilei",
+  "sw": "Neno la siku",
+  "tl": "Salita ng araw"
+ },
+ "studyArchiveLink": {
+  "en": "Archive →",
+  "fr": "Archives →",
+  "it": "Archivio →",
+  "ro": "Arhivă →",
+  "sw": "Kumbukumbu →",
+  "tl": "Archive →"
+ },
+ "studyLoading": {
+  "en": "Loading…",
+  "fr": "Chargement…",
+  "it": "Caricamento…",
+  "ro": "Se încarcă…",
+  "sw": "Inapakia…",
+  "tl": "Naglo-load…"
+ },
+ "studyUnavailableNow": {
+  "en": "Unavailable right now",
+  "fr": "Indisponible pour le moment",
+  "it": "Non disponibile al momento",
+  "ro": "Indisponibil momentan",
+  "sw": "Haipatikani kwa sasa",
+  "tl": "Hindi available ngayon"
+ },
+ "studyReadingStreak": {
+  "en": "Reading streak",
+  "fr": "Série de lecture",
+  "it": "Serie di lettura",
+  "ro": "Serie de citire",
+  "sw": "Mfululizo wa kusoma",
+  "tl": "Sunod-sunod na pagbasa"
+ },
+ "studyStartStreak": {
+  "en": "Start your streak",
+  "fr": "Lancez votre série",
+  "it": "Inizia la tua serie",
+  "ro": "Începe-ți seria",
+  "sw": "Anza mfululizo wako",
+  "tl": "Simulan ang iyong streak"
+ },
+ "studyStreakDays": {
+  "en": "{count, plural, =1{1 day} other{{count} days}}",
+  "fr": "{count, plural, =1{1 jour} other{{count} jours}}",
+  "it": "{count, plural, =1{1 giorno} other{{count} giorni}}",
+  "ro": "{count, plural, =1{1 zi} few{{count} zile} other{{count} de zile}}",
+  "sw": "{count, plural, =1{Siku 1} other{Siku {count}}}",
+  "tl": "{count, plural, =1{1 araw} other{{count} araw}}",
+  "@": {
+   "placeholders": {
+    "count": {
+     "type": "int"
+    }
+   }
+  }
+ },
+ "studyStreakGrow": {
+  "en": "Open daily to grow it.",
+  "fr": "Revenez chaque jour pour la prolonger.",
+  "it": "Aprila ogni giorno per farla crescere.",
+  "ro": "Deschide zilnic ca s-o crești.",
+  "sw": "Fungua kila siku ili uikuze.",
+  "tl": "Buksan araw-araw para lumago ito."
+ },
+ "studyStreakStart": {
+  "en": "Complete a reading each day.",
+  "fr": "Faites une lecture chaque jour.",
+  "it": "Completa una lettura ogni giorno.",
+  "ro": "Finalizează o citire în fiecare zi.",
+  "sw": "Kamilisha usomaji kila siku.",
+  "tl": "Tapusin ang isang pagbasa araw-araw."
+ },
+ "studyViewProgress": {
+  "en": "View progress →",
+  "fr": "Voir la progression →",
+  "it": "Vedi i progressi →",
+  "ro": "Vezi progresul →",
+  "sw": "Tazama maendeleo →",
+  "tl": "Tingnan ang progreso →"
+ },
+ "studyPassageNotFound": {
+  "en": "Passage not found",
+  "fr": "Passage introuvable",
+  "it": "Passo non trovato",
+  "ro": "Pasaj negăsit",
+  "sw": "Kifungu hakijapatikana",
+  "tl": "Hindi nakita ang talata"
+ },
+ "studyPassageLoadError": {
+  "en": "Could not load passage data.",
+  "fr": "Impossible de charger le passage.",
+  "it": "Impossibile caricare il passo.",
+  "ro": "Pasajul nu a putut fi încărcat.",
+  "sw": "Imeshindwa kupakia kifungu.",
+  "tl": "Hindi ma-load ang talata."
+ },
+ "studyCompletedCheck": {
+  "en": "✓ Completed",
+  "fr": "✓ Terminé",
+  "it": "✓ Completato",
+  "ro": "✓ Finalizat",
+  "sw": "✓ Imekamilika",
+  "tl": "✓ Natapos"
+ },
+ "studyMarkAsRead": {
+  "en": "Mark as Read",
+  "fr": "Marquer comme lu",
+  "it": "Segna come letto",
+  "ro": "Marchează ca citit",
+  "sw": "Weka kuwa imesomwa",
+  "tl": "Markahang nabasa"
+ },
+ "studyNextPassage": {
+  "en": "Next Passage",
+  "fr": "Passage suivant",
+  "it": "Passo successivo",
+  "ro": "Pasajul următor",
+  "sw": "Kifungu kijacho",
+  "tl": "Susunod na talata"
+ },
+ "studyFullChapter": {
+  "en": "Full chapter",
+  "fr": "Chapitre entier",
+  "it": "Capitolo intero",
+  "ro": "Tot capitolul",
+  "sw": "Sura nzima",
+  "tl": "Buong kabanata"
+ },
+ "studyPassageOfTotal": {
+  "en": "Passage {current} of {total}",
+  "fr": "Passage {current} sur {total}",
+  "it": "Passo {current} di {total}",
+  "ro": "Pasajul {current} din {total}",
+  "sw": "Kifungu {current} kati ya {total}",
+  "tl": "Talata {current} ng {total}",
+  "@": {
+   "placeholders": {
+    "current": {
+     "type": "int"
+    },
+    "total": {
+     "type": "int"
+    }
+   }
+  }
+ },
+ "studySelectedCount": {
+  "en": "{count} selected",
+  "fr": "{count, plural, =1{1 sélectionné} other{{count} sélectionnés}}",
+  "it": "{count, plural, =1{1 selezionato} other{{count} selezionati}}",
+  "ro": "{count, plural, =1{1 selectat} few{{count} selectate} other{{count} de selectate}}",
+  "sw": "{count} vimechaguliwa",
+  "tl": "{count} ang napili",
+  "@": {
+   "placeholders": {
+    "count": {
+     "type": "int"
+    }
+   }
+  }
+ },
+ "studyHighlight": {
+  "en": "Highlight",
+  "fr": "Surligner",
+  "it": "Evidenzia",
+  "ro": "Evidențiază",
+  "sw": "Angazia",
+  "tl": "I-highlight"
+ },
+ "studyBookmark": {
+  "en": "Bookmark",
+  "fr": "Signet",
+  "it": "Segnalibro",
+  "ro": "Semn de carte",
+  "sw": "Alamisho",
+  "tl": "Bookmark"
+ },
+ "studyAddNote": {
+  "en": "Add Note",
+  "fr": "Ajouter une note",
+  "it": "Aggiungi nota",
+  "ro": "Adaugă notiță",
+  "sw": "Ongeza maelezo",
+  "tl": "Magdagdag ng tala"
+ },
+ "studyChaptersWithContent": {
+  "en": "{count, plural, =1{1 chapter with content} other{{count} chapters with content}}",
+  "fr": "{count, plural, =1{1 chapitre commenté} other{{count} chapitres commentés}}",
+  "it": "{count, plural, =1{1 capitolo con contenuti} other{{count} capitoli con contenuti}}",
+  "ro": "{count, plural, =1{1 capitol cu conținut} few{{count} capitole cu conținut} other{{count} de capitole cu conținut}}",
+  "sw": "{count, plural, =1{Sura 1 yenye maudhui} other{Sura {count} zenye maudhui}}",
+  "tl": "{count, plural, =1{1 kabanata na may nilalaman} other{{count} kabanata na may nilalaman}}",
+  "@": {
+   "placeholders": {
+    "count": {
+     "type": "int"
+    }
+   }
+  }
+ },
+ "studyCommentaryLibrary": {
+  "en": "Commentary Library",
+  "fr": "Bibliothèque de commentaires",
+  "it": "Biblioteca dei commenti",
+  "ro": "Biblioteca de comentarii",
+  "sw": "Maktaba ya ufafanuzi",
+  "tl": "Aklatan ng komentaryo"
+ },
+ "studyCommentaryLoadError": {
+  "en": "Could not load commentary.",
+  "fr": "Impossible de charger le commentaire.",
+  "it": "Impossibile caricare il commento.",
+  "ro": "Comentariul nu a putut fi încărcat.",
+  "sw": "Imeshindwa kupakia ufafanuzi.",
+  "tl": "Hindi ma-load ang komentaryo."
+ },
+ "studyNoCommentaryYet": {
+  "en": "No commentary available yet.",
+  "fr": "Aucun commentaire disponible pour l'instant.",
+  "it": "Nessun commento ancora disponibile.",
+  "ro": "Niciun comentariu disponibil încă.",
+  "sw": "Bado hakuna ufafanuzi.",
+  "tl": "Wala pang komentaryo."
+ },
+ "studyNoBooksMatch": {
+  "en": "No books match \"{query}\".",
+  "fr": "Aucun livre ne correspond à « {query} ».",
+  "it": "Nessun libro corrisponde a \"{query}\".",
+  "ro": "Nicio carte nu corespunde cu „{query}”.",
+  "sw": "Hakuna kitabu kinacholingana na \"{query}\".",
+  "tl": "Walang aklat na tugma sa \"{query}\".",
+  "@": {
+   "placeholders": {
+    "query": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "studySearchBooksCount": {
+  "en": "Search {count} books…",
+  "fr": "Rechercher parmi {count} livres…",
+  "it": "Cerca tra {count} libri…",
+  "ro": "Caută în {count} cărți…",
+  "sw": "Tafuta katika vitabu {count}…",
+  "tl": "Maghanap sa {count} aklat…",
+  "@": {
+   "placeholders": {
+    "count": {
+     "type": "int"
+    }
+   }
+  }
+ },
+ "studyClassicSources": {
+  "en": "Classic sources",
+  "fr": "Sources classiques",
+  "it": "Fonti classiche",
+  "ro": "Surse clasice",
+  "sw": "Vyanzo vya kale",
+  "tl": "Mga klasikong sanggunian"
+ },
+ "studyBookAuthorChapters": {
+  "en": "{author} · {count} ch",
+  "fr": "{author} · {count} chap.",
+  "it": "{author} · {count} cap.",
+  "ro": "{author} · {count} cap.",
+  "sw": "{author} · sura {count}",
+  "tl": "{author} · {count} kab.",
+  "@": {
+   "placeholders": {
+    "author": {
+     "type": "String"
+    },
+    "count": {
+     "type": "int"
+    }
+   }
+  }
+ },
+ "studyReadingRef": {
+  "en": "Reading · {reference}",
+  "fr": "Lecture · {reference}",
+  "it": "Lettura · {reference}",
+  "ro": "Citire · {reference}",
+  "sw": "Usomaji · {reference}",
+  "tl": "Binabasa · {reference}",
+  "@": {
+   "placeholders": {
+    "reference": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "studyAllSources": {
+  "en": "All sources",
+  "fr": "Toutes les sources",
+  "it": "Tutte le fonti",
+  "ro": "Toate sursele",
+  "sw": "Vyanzo vyote",
+  "tl": "Lahat ng sanggunian"
+ },
+ "studyVerseLevel": {
+  "en": "Verse-level",
+  "fr": "Par verset",
+  "it": "Per versetto",
+  "ro": "La nivel de verset",
+  "sw": "Kwa mstari",
+  "tl": "Bawat talata"
+ },
+ "studySearchWithin": {
+  "en": "Search within {reference}…",
+  "fr": "Rechercher dans {reference}…",
+  "it": "Cerca in {reference}…",
+  "ro": "Caută în {reference}…",
+  "sw": "Tafuta ndani ya {reference}…",
+  "tl": "Maghanap sa {reference}…",
+  "@": {
+   "placeholders": {
+    "reference": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "studyEntriesLoadError": {
+  "en": "Could not load entries.\n{error}",
+  "fr": "Impossible de charger les entrées.\n{error}",
+  "it": "Impossibile caricare le voci.\n{error}",
+  "ro": "Intrările nu au putut fi încărcate.\n{error}",
+  "sw": "Imeshindwa kupakia maingizo.\n{error}",
+  "tl": "Hindi ma-load ang mga entry.\n{error}",
+  "@": {
+   "placeholders": {
+    "error": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "studyNoEntriesMatch": {
+  "en": "No entries match these filters.\nTry All sources, or browse the library.",
+  "fr": "Aucune entrée ne correspond à ces filtres.\nEssayez Toutes les sources ou parcourez la bibliothèque.",
+  "it": "Nessuna voce corrisponde ai filtri.\nProva Tutte le fonti o sfoglia la biblioteca.",
+  "ro": "Nicio intrare nu corespunde filtrelor.\nÎncearcă Toate sursele sau răsfoiește biblioteca.",
+  "sw": "Hakuna maingizo yanayolingana na vichujio hivi.\nJaribu Vyanzo vyote, au vinjari maktaba.",
+  "tl": "Walang entry na tugma sa mga filter.\nSubukan ang Lahat ng sanggunian, o tingnan ang aklatan."
+ },
+ "studyVerseN": {
+  "en": "Verse {verse}",
+  "fr": "Verset {verse}",
+  "it": "Versetto {verse}",
+  "ro": "Versetul {verse}",
+  "sw": "Mstari {verse}",
+  "tl": "Talata {verse}",
+  "@": {
+   "placeholders": {
+    "verse": {
+     "type": "int"
+    }
+   }
+  }
+ },
+ "studyChapter": {
+  "en": "Chapter",
+  "fr": "Chapitre",
+  "it": "Capitolo",
+  "ro": "Capitol",
+  "sw": "Sura",
+  "tl": "Kabanata"
+ },
+ "studyCategoryCommentary": {
+  "en": "Commentary",
+  "fr": "Commentaire",
+  "it": "Commento",
+  "ro": "Comentariu",
+  "sw": "Ufafanuzi",
+  "tl": "Komentaryo"
+ },
+ "studyCategoryDevotional": {
+  "en": "Devotional",
+  "fr": "Méditation",
+  "it": "Meditazione",
+  "ro": "Devoțional",
+  "sw": "Ibada",
+  "tl": "Debosyonal"
+ },
+ "studyCategoryStudyNote": {
+  "en": "Study Note",
+  "fr": "Note d'étude",
+  "it": "Nota di studio",
+  "ro": "Notă de studiu",
+  "sw": "Dokezo la funzo",
+  "tl": "Tala sa pag-aaral"
+ },
+ "studyCommentaryLoadErrorDetail": {
+  "en": "Could not load commentary.\n{error}",
+  "fr": "Impossible de charger le commentaire.\n{error}",
+  "it": "Impossibile caricare il commento.\n{error}",
+  "ro": "Comentariul nu a putut fi încărcat.\n{error}",
+  "sw": "Imeshindwa kupakia ufafanuzi.\n{error}",
+  "tl": "Hindi ma-load ang komentaryo.\n{error}",
+  "@": {
+   "placeholders": {
+    "error": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "studyNoContentForFilters": {
+  "en": "No content found for these filters.",
+  "fr": "Aucun contenu pour ces filtres.",
+  "it": "Nessun contenuto per questi filtri.",
+  "ro": "Niciun conținut pentru aceste filtre.",
+  "sw": "Hakuna maudhui kwa vichujio hivi.",
+  "tl": "Walang nilalaman para sa mga filter na ito."
+ },
+ "studyVerseLabel": {
+  "en": "Verse {verse}",
+  "fr": "Verset {verse}",
+  "it": "Versetto {verse}",
+  "ro": "Versetul {verse}",
+  "sw": "Mstari {verse}",
+  "tl": "Talata {verse}",
+  "@": {
+   "placeholders": {
+    "verse": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "studyChapterView": {
+  "en": "Chapter View",
+  "fr": "Vue du chapitre",
+  "it": "Vista capitolo",
+  "ro": "Tot capitolul",
+  "sw": "Mwonekano wa sura",
+  "tl": "Buong kabanata"
+ },
+ "studyFilterAll": {
+  "en": "All",
+  "fr": "Tout",
+  "it": "Tutto",
+  "ro": "Toate",
+  "sw": "Zote",
+  "tl": "Lahat"
+ },
+ "studyFilterDevotionals": {
+  "en": "Devotionals",
+  "fr": "Méditations",
+  "it": "Meditazioni",
+  "ro": "Devoționale",
+  "sw": "Ibada",
+  "tl": "Mga debosyonal"
+ },
+ "studyFilterAllContexts": {
+  "en": "All Contexts",
+  "fr": "Tous les contextes",
+  "it": "Tutti i contesti",
+  "ro": "Toate contextele",
+  "sw": "Miktadha yote",
+  "tl": "Lahat ng konteksto"
+ },
+ "studyFilterChapterLevel": {
+  "en": "Chapter Level",
+  "fr": "Par chapitre",
+  "it": "Per capitolo",
+  "ro": "La nivel de capitol",
+  "sw": "Kwa sura",
+  "tl": "Bawat kabanata"
+ },
+ "studyFilterVerseLevel": {
+  "en": "Verse Level",
+  "fr": "Par verset",
+  "it": "Per versetto",
+  "ro": "La nivel de verset",
+  "sw": "Kwa mstari",
+  "tl": "Bawat talata"
+ },
+ "studyRemoveBookmark": {
+  "en": "Remove Bookmark",
+  "fr": "Retirer le signet",
+  "it": "Rimuovi segnalibro",
+  "ro": "Elimină semnul de carte",
+  "sw": "Ondoa alamisho",
+  "tl": "Alisin ang bookmark"
+ },
+ "studyBookmarkCommentary": {
+  "en": "Bookmark Commentary",
+  "fr": "Ajouter un signet",
+  "it": "Aggiungi ai segnalibri",
+  "ro": "Adaugă semn de carte",
+  "sw": "Weka alamisho",
+  "tl": "I-bookmark ang komentaryo"
+ },
+ "studyExpandFullScreen": {
+  "en": "Expand to full screen",
+  "fr": "Plein écran",
+  "it": "Schermo intero",
+  "ro": "Ecran complet",
+  "sw": "Panua skrini nzima",
+  "tl": "I-full screen"
+ },
+ "studyTapToReadInContext": {
+  "en": "Tap to read in context",
+  "fr": "Touchez pour lire dans le contexte",
+  "it": "Tocca per leggere nel contesto",
+  "ro": "Atinge pentru a citi în context",
+  "sw": "Gusa kusoma katika muktadha",
+  "tl": "I-tap para basahin sa konteksto"
+ },
+ "studyOnThisChapter": {
+  "en": "On this chapter",
+  "fr": "Sur ce chapitre",
+  "it": "Su questo capitolo",
+  "ro": "Despre acest capitol",
+  "sw": "Kuhusu sura hii",
+  "tl": "Tungkol sa kabanatang ito"
+ },
+ "studyOnThisBook": {
+  "en": "On this book",
+  "fr": "Sur ce livre",
+  "it": "Su questo libro",
+  "ro": "Despre această carte",
+  "sw": "Kuhusu kitabu hiki",
+  "tl": "Tungkol sa aklat na ito"
+ },
+ "studyNoCommentaryTitle": {
+  "en": "No commentary yet",
+  "fr": "Pas encore de commentaire",
+  "it": "Ancora nessun commento",
+  "ro": "Încă niciun comentariu",
+  "sw": "Bado hakuna ufafanuzi",
+  "tl": "Wala pang komentaryo"
+ },
+ "studyNoCommentaryBody": {
+  "en": "We couldn't find specific commentary for this passage. Try exploring the chapter or book-level commentary below.",
+  "fr": "Aucun commentaire précis pour ce passage. Explorez les commentaires du chapitre ou du livre ci-dessous.",
+  "it": "Nessun commento specifico per questo passo. Esplora i commenti al capitolo o al libro qui sotto.",
+  "ro": "Nu am găsit un comentariu specific pentru acest pasaj. Explorează comentariile capitolului sau ale cărții de mai jos.",
+  "sw": "Hatukupata ufafanuzi maalum wa kifungu hiki. Jaribu ufafanuzi wa sura au kitabu hapa chini.",
+  "tl": "Walang tiyak na komentaryo para sa talatang ito. Subukan ang komentaryo sa kabanata o aklat sa ibaba."
+ },
+ "storiesTitle": {
+  "en": "Bible Stories",
+  "fr": "Histoires bibliques",
+  "it": "Storie bibliche",
+  "ro": "Povestiri biblice",
+  "sw": "Hadithi za Biblia",
+  "tl": "Mga Kuwento sa Bibliya"
+ },
+ "storiesFilters": {
+  "en": "Filters",
+  "fr": "Filtres",
+  "it": "Filtri",
+  "ro": "Filtre",
+  "sw": "Vichujio",
+  "tl": "Mga filter"
+ },
+ "storiesSubtitle": {
+  "en": "500 illustrated moments from Genesis to Revelation",
+  "fr": "500 moments illustrés de la Genèse à l'Apocalypse",
+  "it": "500 momenti illustrati dalla Genesi all'Apocalisse",
+  "ro": "500 de momente ilustrate de la Geneza la Apocalipsa",
+  "sw": "Matukio 500 yenye picha kutoka Mwanzo hadi Ufunuo",
+  "tl": "500 larawang sandali mula Genesis hanggang Pahayag"
+ },
+ "storiesSearchHint": {
+  "en": "Search title, book, or reference…",
+  "fr": "Titre, livre ou référence…",
+  "it": "Titolo, libro o riferimento…",
+  "ro": "Titlu, carte sau referință…",
+  "sw": "Tafuta kichwa, kitabu au rejea…",
+  "tl": "Pamagat, aklat, o sanggunian…"
+ },
+ "storiesClearSearch": {
+  "en": "Clear search",
+  "fr": "Effacer la recherche",
+  "it": "Cancella ricerca",
+  "ro": "Șterge căutarea",
+  "sw": "Futa utafutaji",
+  "tl": "I-clear ang paghahanap"
+ },
+ "storiesFilterAll": {
+  "en": "All",
+  "fr": "Tout",
+  "it": "Tutte",
+  "ro": "Toate",
+  "sw": "Zote",
+  "tl": "Lahat"
+ },
+ "storiesFilterOt": {
+  "en": "OT",
+  "fr": "AT",
+  "it": "AT",
+  "ro": "VT",
+  "sw": "AK",
+  "tl": "LT"
+ },
+ "storiesFilterNt": {
+  "en": "NT",
+  "fr": "NT",
+  "it": "NT",
+  "ro": "NT",
+  "sw": "AJ",
+  "tl": "BT"
+ },
+ "storiesCountOfTotal": {
+  "en": "{count} of {total} stories",
+  "fr": "{count} histoires sur {total}",
+  "it": "{count} storie su {total}",
+  "ro": "{count} din {total} povestiri",
+  "sw": "Hadithi {count} kati ya {total}",
+  "tl": "{count} sa {total} kuwento",
+  "@": {
+   "placeholders": {
+    "count": {
+     "type": "int"
+    },
+    "total": {
+     "type": "int"
+    }
+   }
+  }
+ },
+ "storiesFavorites": {
+  "en": "Favorites",
+  "fr": "Favoris",
+  "it": "Preferiti",
+  "ro": "Favorite",
+  "sw": "Vipendwa",
+  "tl": "Mga paborito"
+ },
+ "storiesUnread": {
+  "en": "Unread",
+  "fr": "Non lues",
+  "it": "Non lette",
+  "ro": "Necitite",
+  "sw": "Hazijasomwa",
+  "tl": "Hindi pa nabasa"
+ },
+ "storiesLoadError": {
+  "en": "Could not load stories:\n{error}",
+  "fr": "Impossible de charger les histoires :\n{error}",
+  "it": "Impossibile caricare le storie:\n{error}",
+  "ro": "Povestirile nu au putut fi încărcate:\n{error}",
+  "sw": "Imeshindwa kupakia hadithi:\n{error}",
+  "tl": "Hindi ma-load ang mga kuwento:\n{error}",
+  "@": {
+   "placeholders": {
+    "error": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "storiesBooks": {
+  "en": "Books",
+  "fr": "Livres",
+  "it": "Libri",
+  "ro": "Cărți",
+  "sw": "Vitabu",
+  "tl": "Mga aklat"
+ },
+ "storiesSearchBooks": {
+  "en": "Search books…",
+  "fr": "Rechercher un livre…",
+  "it": "Cerca un libro…",
+  "ro": "Caută o carte…",
+  "sw": "Tafuta vitabu…",
+  "tl": "Maghanap ng aklat…"
+ },
+ "storiesAllBooks": {
+  "en": "All books",
+  "fr": "Tous les livres",
+  "it": "Tutti i libri",
+  "ro": "Toate cărțile",
+  "sw": "Vitabu vyote",
+  "tl": "Lahat ng aklat"
+ },
+ "storiesNoMatch": {
+  "en": "No stories match these filters.",
+  "fr": "Aucune histoire ne correspond à ces filtres.",
+  "it": "Nessuna storia corrisponde ai filtri.",
+  "ro": "Nicio povestire nu corespunde filtrelor.",
+  "sw": "Hakuna hadithi inayolingana na vichujio hivi.",
+  "tl": "Walang kuwentong tugma sa mga filter."
+ },
+ "storiesNoFavorites": {
+  "en": "No favorites yet.",
+  "fr": "Aucun favori pour l'instant.",
+  "it": "Ancora nessun preferito.",
+  "ro": "Încă nicio favorită.",
+  "sw": "Bado hakuna vipendwa.",
+  "tl": "Wala pang paborito."
+ },
+ "storiesBrowseAll": {
+  "en": "Browse all stories",
+  "fr": "Parcourir toutes les histoires",
+  "it": "Sfoglia tutte le storie",
+  "ro": "Răsfoiește toate povestirile",
+  "sw": "Vinjari hadithi zote",
+  "tl": "Tingnan ang lahat ng kuwento"
+ },
+ "storiesAllCaughtUp": {
+  "en": "You're all caught up.",
+  "fr": "Vous avez tout lu.",
+  "it": "Sei in pari.",
+  "ro": "Ești la zi.",
+  "sw": "Umesoma zote.",
+  "tl": "Nabasa mo na lahat."
+ },
+ "storiesShowRead": {
+  "en": "Show read stories",
+  "fr": "Afficher les histoires lues",
+  "it": "Mostra storie lette",
+  "ro": "Arată povestirile citite",
+  "sw": "Onyesha hadithi zilizosomwa",
+  "tl": "Ipakita ang mga nabasa na"
+ },
+ "storiesClearFilters": {
+  "en": "Clear filters",
+  "fr": "Effacer les filtres",
+  "it": "Cancella filtri",
+  "ro": "Șterge filtrele",
+  "sw": "Futa vichujio",
+  "tl": "I-clear ang mga filter"
+ },
+ "storiesFavoritesHint": {
+  "en": "Tap ♥ on any story to save it here.",
+  "fr": "Touchez ♥ sur une histoire pour l'enregistrer ici.",
+  "it": "Tocca ♥ su una storia per salvarla qui.",
+  "ro": "Atinge ♥ pe o povestire ca s-o salvezi aici.",
+  "sw": "Gusa ♥ kwenye hadithi yoyote kuihifadhi hapa.",
+  "tl": "I-tap ang ♥ sa kuwento para i-save ito rito."
+ },
+ "storiesAttribution": {
+  "en": "Scripture from the King James Version (public domain). Narrative summaries adapted from The Graham Bible (grahambible.com), AI-assisted and human reviewed. Artwork: Gustave Doré (1832–1883), public domain, via Wikimedia Commons.",
+  "fr": "Écritures tirées de la King James Version (domaine public). Résumés adaptés de The Graham Bible (grahambible.com), assistés par IA et relus par des humains. Illustrations : Gustave Doré (1832–1883), domaine public, via Wikimedia Commons.",
+  "it": "Scritture dalla King James Version (pubblico dominio). Sintesi adattate da The Graham Bible (grahambible.com), con assistenza IA e revisione umana. Illustrazioni: Gustave Doré (1832–1883), pubblico dominio, tramite Wikimedia Commons.",
+  "ro": "Scriptura din King James Version (domeniu public). Rezumate adaptate după The Graham Bible (grahambible.com), asistate de IA și revizuite de oameni. Ilustrații: Gustave Doré (1832–1883), domeniu public, prin Wikimedia Commons.",
+  "sw": "Maandiko kutoka King James Version (kikoa cha umma). Muhtasari umetoholewa kutoka The Graham Bible (grahambible.com), kwa msaada wa AI na kukaguliwa na binadamu. Picha: Gustave Doré (1832–1883), kikoa cha umma, kupitia Wikimedia Commons.",
+  "tl": "Kasulatan mula sa King James Version (pampublikong domain). Mga buod na hinango mula sa The Graham Bible (grahambible.com), tinulungan ng AI at sinuri ng tao. Likhang-sining: Gustave Doré (1832–1883), pampublikong domain, sa pamamagitan ng Wikimedia Commons."
+ },
+ "storiesReachedEnd": {
+  "en": "You have reached the end.",
+  "fr": "Vous êtes arrivé à la fin.",
+  "it": "Sei arrivato alla fine.",
+  "ro": "Ai ajuns la final.",
+  "sw": "Umefika mwisho.",
+  "tl": "Narating mo na ang dulo."
+ },
+ "storiesFirstStory": {
+  "en": "This is the first story.",
+  "fr": "C'est la première histoire.",
+  "it": "Questa è la prima storia.",
+  "ro": "Aceasta este prima povestire.",
+  "sw": "Hii ni hadithi ya kwanza.",
+  "tl": "Ito ang unang kuwento."
+ },
+ "storiesFavorite": {
+  "en": "Favorite",
+  "fr": "Favori",
+  "it": "Preferito",
+  "ro": "Favorită",
+  "sw": "Kipendwa",
+  "tl": "Paborito"
+ },
+ "storiesMarkAsRead": {
+  "en": "Mark as read",
+  "fr": "Marquer comme lu",
+  "it": "Segna come letta",
+  "ro": "Marchează ca citită",
+  "sw": "Weka kuwa imesomwa",
+  "tl": "Markahang nabasa"
+ },
+ "storiesKeyVerse": {
+  "en": "KEY VERSE · {reference}",
+  "fr": "VERSET CLÉ · {reference}",
+  "it": "VERSETTO CHIAVE · {reference}",
+  "ro": "VERSET CHEIE · {reference}",
+  "sw": "MSTARI MKUU · {reference}",
+  "tl": "SUSING TALATA · {reference}",
+  "@": {
+   "placeholders": {
+    "reference": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "storiesTheStory": {
+  "en": "THE STORY",
+  "fr": "LE RÉCIT",
+  "it": "IL RACCONTO",
+  "ro": "POVESTIREA",
+  "sw": "HADITHI",
+  "tl": "ANG KUWENTO"
+ },
+ "storiesArtworkCaption": {
+  "en": "Artwork: {caption} — Gustave Doré, public domain",
+  "fr": "Illustration : {caption} — Gustave Doré, domaine public",
+  "it": "Illustrazione: {caption} — Gustave Doré, pubblico dominio",
+  "ro": "Ilustrație: {caption} — Gustave Doré, domeniu public",
+  "sw": "Picha: {caption} — Gustave Doré, kikoa cha umma",
+  "tl": "Likhang-sining: {caption} — Gustave Doré, pampublikong domain",
+  "@": {
+   "placeholders": {
+    "caption": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "storiesPrevious": {
+  "en": "Previous story",
+  "fr": "Histoire précédente",
+  "it": "Storia precedente",
+  "ro": "Povestirea anterioară",
+  "sw": "Hadithi iliyotangulia",
+  "tl": "Nakaraang kuwento"
+ },
+ "storiesNext": {
+  "en": "Next story",
+  "fr": "Histoire suivante",
+  "it": "Storia successiva",
+  "ro": "Povestirea următoare",
+  "sw": "Hadithi inayofuata",
+  "tl": "Susunod na kuwento"
+ },
+ "studyDictionarySearchHint": {
+  "en": "Search 3,400+ words…",
+  "fr": "Rechercher parmi 3 400+ mots…",
+  "it": "Cerca tra oltre 3.400 parole…",
+  "ro": "Caută în peste 3.400 de cuvinte…",
+  "sw": "Tafuta maneno 3,400+…",
+  "tl": "Maghanap sa 3,400+ salita…"
+ },
+ "studyDictionarySavedFilter": {
+  "en": "★ Saved",
+  "fr": "★ Enregistrés",
+  "it": "★ Salvate",
+  "ro": "★ Salvate",
+  "sw": "★ Zilizohifadhiwa",
+  "tl": "★ Naka-save"
+ },
+ "studyDictionaryUnavailable": {
+  "en": "Dictionary unavailable.\n{error}",
+  "fr": "Dictionnaire indisponible.\n{error}",
+  "it": "Dizionario non disponibile.\n{error}",
+  "ro": "Dicționar indisponibil.\n{error}",
+  "sw": "Kamusi haipatikani.\n{error}",
+  "tl": "Hindi available ang diksiyunaryo.\n{error}",
+  "@": {
+   "placeholders": {
+    "error": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "studyNoHeadwords": {
+  "en": "No headwords found.",
+  "fr": "Aucune entrée trouvée.",
+  "it": "Nessun lemma trovato.",
+  "ro": "Niciun cuvânt-titlu găsit.",
+  "sw": "Hakuna vichwa vya maneno vilivyopatikana.",
+  "tl": "Walang nahanap na salita."
+ },
+ "studyDictionaryNoMatches": {
+  "en": "No matches. Try “grace”, “atonement” or “wilderness”.",
+  "fr": "Aucun résultat. Essayez « grace », « atonement » ou « wilderness » (dictionnaire en anglais).",
+  "it": "Nessun risultato. Prova “grace”, “atonement” o “wilderness” (dizionario in inglese).",
+  "ro": "Niciun rezultat. Încearcă „grace”, „atonement” sau „wilderness” (dicționar în engleză).",
+  "sw": "Hakuna matokeo. Jaribu “grace”, “atonement” au “wilderness” (kamusi ya Kiingereza).",
+  "tl": "Walang tugma. Subukan ang “grace”, “atonement” o “wilderness” (diksiyunaryong Ingles)."
+ },
+ "studyResultCount": {
+  "en": "{count, plural, =1{1 result} other{{count} results}}",
+  "fr": "{count, plural, =1{1 résultat} other{{count} résultats}}",
+  "it": "{count, plural, =1{1 risultato} other{{count} risultati}}",
+  "ro": "{count, plural, =1{1 rezultat} few{{count} rezultate} other{{count} de rezultate}}",
+  "sw": "{count, plural, =1{Tokeo 1} other{Matokeo {count}}}",
+  "tl": "{count, plural, =1{1 resulta} other{{count} resulta}}",
+  "@": {
+   "placeholders": {
+    "count": {
+     "type": "int"
+    }
+   }
+  }
+ },
+ "studyUntitledEntry": {
+  "en": "(untitled entry)",
+  "fr": "(entrée sans titre)",
+  "it": "(voce senza titolo)",
+  "ro": "(intrare fără titlu)",
+  "sw": "(ingizo bila kichwa)",
+  "tl": "(entry na walang pamagat)"
+ },
+ "studyRemoveSavedWord": {
+  "en": "Remove saved word",
+  "fr": "Retirer le mot enregistré",
+  "it": "Rimuovi parola salvata",
+  "ro": "Elimină cuvântul salvat",
+  "sw": "Ondoa neno lililohifadhiwa",
+  "tl": "Alisin ang naka-save na salita"
+ },
+ "studySaveWord": {
+  "en": "Save word",
+  "fr": "Enregistrer le mot",
+  "it": "Salva parola",
+  "ro": "Salvează cuvântul",
+  "sw": "Hifadhi neno",
+  "tl": "I-save ang salita"
+ },
+ "studyNoDefinition": {
+  "en": "No definition found.",
+  "fr": "Aucune définition trouvée.",
+  "it": "Nessuna definizione trovata.",
+  "ro": "Nicio definiție găsită.",
+  "sw": "Hakuna maana iliyopatikana.",
+  "tl": "Walang nahanap na kahulugan."
+ },
+ "studyFailedToLoad": {
+  "en": "Failed to load: {error}",
+  "fr": "Échec du chargement : {error}",
+  "it": "Caricamento non riuscito: {error}",
+  "ro": "Încărcarea a eșuat: {error}",
+  "sw": "Imeshindwa kupakia: {error}",
+  "tl": "Hindi na-load: {error}",
+  "@": {
+   "placeholders": {
+    "error": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "studyStrongsShareText": {
+  "en": "{id} - {lemma}\n\nTransliteration: {transliteration}\nPronunciation: {pronunciation}\n\nDefinition:\n{definition}",
+  "fr": "{id} - {lemma}\n\nTranslittération : {transliteration}\nPrononciation : {pronunciation}\n\nDéfinition :\n{definition}",
+  "it": "{id} - {lemma}\n\nTraslitterazione: {transliteration}\nPronuncia: {pronunciation}\n\nDefinizione:\n{definition}",
+  "ro": "{id} - {lemma}\n\nTransliterare: {transliteration}\nPronunție: {pronunciation}\n\nDefiniție:\n{definition}",
+  "sw": "{id} - {lemma}\n\nUnukuzi: {transliteration}\nMatamshi: {pronunciation}\n\nMaana:\n{definition}",
+  "tl": "{id} - {lemma}\n\nTransliterasyon: {transliteration}\nBigkas: {pronunciation}\n\nKahulugan:\n{definition}",
+  "@": {
+   "placeholders": {
+    "id": {
+     "type": "String"
+    },
+    "lemma": {
+     "type": "String"
+    },
+    "transliteration": {
+     "type": "String"
+    },
+    "pronunciation": {
+     "type": "String"
+    },
+    "definition": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "studyNoStrongsEntry": {
+  "en": "No entry found for {id}.",
+  "fr": "Aucune entrée pour {id}.",
+  "it": "Nessuna voce per {id}.",
+  "ro": "Nicio intrare pentru {id}.",
+  "sw": "Hakuna ingizo la {id}.",
+  "tl": "Walang entry para sa {id}.",
+  "@": {
+   "placeholders": {
+    "id": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "studyStrongsLexicon": {
+  "en": "STRONG'S LEXICON",
+  "fr": "LEXIQUE DE STRONG",
+  "it": "LESSICO DI STRONG",
+  "ro": "LEXICONUL STRONG",
+  "sw": "KAMUSI YA STRONG",
+  "tl": "LEKSIKON NI STRONG"
+ },
+ "studyConcordanceHint": {
+  "en": "Type a word (e.g., grace, covenant)…",
+  "fr": "Mot anglais (ex. grace, covenant)…",
+  "it": "Parola inglese (es. grace, covenant)…",
+  "ro": "Cuvânt în engleză (ex. grace, covenant)…",
+  "sw": "Neno la Kiingereza (k.m. grace, covenant)…",
+  "tl": "Salitang Ingles (hal. grace, covenant)…"
+ },
+ "studyConcordanceIntro": {
+  "en": "KJV occurrences — tap a verse to read it in context.",
+  "fr": "Occurrences dans la KJV — touchez un verset pour le lire dans son contexte.",
+  "it": "Occorrenze nella KJV — tocca un versetto per leggerlo nel contesto.",
+  "ro": "Apariții în KJV — atinge un verset pentru a-l citi în context.",
+  "sw": "Matukio katika KJV — gusa mstari kuusoma katika muktadha.",
+  "tl": "Mga paglitaw sa KJV — i-tap ang talata para basahin sa konteksto."
+ },
+ "studyConcordanceEmpty": {
+  "en": "Every verse containing your word, in canonical order.",
+  "fr": "Chaque verset contenant votre mot, dans l'ordre canonique.",
+  "it": "Ogni versetto che contiene la parola, in ordine canonico.",
+  "ro": "Fiecare verset care conține cuvântul, în ordine canonică.",
+  "sw": "Kila mstari wenye neno lako, kwa mpangilio wa vitabu.",
+  "tl": "Bawat talatang may iyong salita, ayon sa kanonikong ayos."
+ },
+ "studyConcordanceSingleWord": {
+  "en": "Enter a single English word to search.",
+  "fr": "Saisissez un seul mot anglais.",
+  "it": "Inserisci una sola parola inglese.",
+  "ro": "Introdu un singur cuvânt în engleză.",
+  "sw": "Andika neno moja la Kiingereza.",
+  "tl": "Maglagay ng isang salitang Ingles."
+ },
+ "studyConcordanceNoVerses": {
+  "en": "No verses contain \"{word}\".",
+  "fr": "Aucun verset ne contient « {word} ».",
+  "it": "Nessun versetto contiene \"{word}\".",
+  "ro": "Niciun verset nu conține „{word}”.",
+  "sw": "Hakuna mstari wenye \"{word}\".",
+  "tl": "Walang talatang may \"{word}\".",
+  "@": {
+   "placeholders": {
+    "word": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "studyConcordanceCount": {
+  "en": "{count, plural, =1{1 verse} other{{count} verses}}",
+  "fr": "{count, plural, =1{1 verset} other{{count} versets}}",
+  "it": "{count, plural, =1{1 versetto} other{{count} versetti}}",
+  "ro": "{count, plural, =1{1 verset} few{{count} versete} other{{count} de versete}}",
+  "sw": "{count, plural, =1{Mstari 1} other{Mistari {count}}}",
+  "tl": "{count, plural, =1{1 talata} other{{count} talata}}",
+  "@": {
+   "placeholders": {
+    "count": {
+     "type": "int"
+    }
+   }
+  }
+ },
+ "studyConcordanceCountTruncated": {
+  "en": "{count, plural, =1{1 verse} other{{count} verses}} (first {limit} shown)",
+  "fr": "{count, plural, =1{1 verset} other{{count} versets}} ({limit} premiers affichés)",
+  "it": "{count, plural, =1{1 versetto} other{{count} versetti}} (primi {limit} mostrati)",
+  "ro": "{count, plural, =1{1 verset} few{{count} versete} other{{count} de versete}} (primele {limit} afișate)",
+  "sw": "{count, plural, =1{Mstari 1} other{Mistari {count}}} ({limit} ya kwanza yameonyeshwa)",
+  "tl": "{count, plural, =1{1 talata} other{{count} talata}} (unang {limit} ang ipinapakita)",
+  "@": {
+   "placeholders": {
+    "count": {
+     "type": "int"
+    },
+    "limit": {
+     "type": "int"
+    }
+   }
+  }
+ },
+ "creditsTitle": {
+  "en": "Credits & sources",
+  "fr": "Crédits et sources",
+  "it": "Crediti e fonti",
+  "ro": "Mulțumiri și surse",
+  "sw": "Shukrani na vyanzo",
+  "tl": "Mga kredito at sanggunian"
+ },
+ "creditsLicenses": {
+  "en": "Open-source licenses",
+  "fr": "Licences open source",
+  "it": "Licenze open source",
+  "ro": "Licențe open source",
+  "sw": "Leseni za chanzo huria",
+  "tl": "Mga open-source na lisensya"
+ },
+ "creditsLicensesSubtitle": {
+  "en": "Fonts and software packages",
+  "fr": "Polices et logiciels",
+  "it": "Font e pacchetti software",
+  "ro": "Fonturi și pachete software",
+  "sw": "Fonti na vifurushi vya programu",
+  "tl": "Mga font at software package"
+ },
+ "studyPreparingOfflineBible": {
+  "en": "Preparing offline Bible… {percent}%",
+  "fr": "Préparation de la Bible hors ligne… {percent} %",
+  "it": "Preparazione della Bibbia offline… {percent}%",
+  "ro": "Se pregătește Biblia offline… {percent}%",
+  "sw": "Inaandaa Biblia nje ya mtandao… {percent}%",
+  "tl": "Inihahanda ang offline na Bibliya… {percent}%",
+  "@": {
+   "placeholders": {
+    "percent": {
+     "type": "int"
+    }
+   }
+  }
+ },
+ "errorTitle": {
+  "en": "Something Went Wrong",
+  "fr": "Un problème est survenu",
+  "it": "Qualcosa è andato storto",
+  "ro": "A apărut o problemă",
+  "sw": "Hitilafu imetokea",
+  "tl": "May nangyaring mali"
+ },
+ "errorBody": {
+  "en": "An unexpected issue occurred. Tap below to return to the home screen.",
+  "fr": "Un problème inattendu s'est produit. Touchez ci-dessous pour revenir à l'accueil.",
+  "it": "Si è verificato un problema imprevisto. Tocca qui sotto per tornare alla home.",
+  "ro": "A apărut o problemă neașteptată. Atinge mai jos pentru a reveni la ecranul principal.",
+  "sw": "Tatizo lisilotarajiwa limetokea. Gusa hapa chini kurudi mwanzo.",
+  "tl": "May hindi inaasahang problema. I-tap sa ibaba para bumalik sa home screen."
+ },
+ "errorBackHome": {
+  "en": "Back to Home",
+  "fr": "Retour à l'accueil",
+  "it": "Torna alla home",
+  "ro": "Înapoi la început",
+  "sw": "Rudi mwanzo",
+  "tl": "Bumalik sa Home"
+ },
+ "studyWeekN": {
+  "en": "Week {week}",
+  "fr": "Semaine {week}",
+  "it": "Settimana {week}",
+  "ro": "Săptămâna {week}",
+  "sw": "Wiki {week}",
+  "tl": "Linggo {week}",
+  "@": {
+   "placeholders": {
+    "week": {
+     "type": "int"
+    }
+   }
+  }
+ },
+ "privacyTitle": {
+  "en": "Privacy Policy",
+  "fr": "Politique de confidentialité",
+  "it": "Informativa sulla privacy",
+  "ro": "Politica de confidențialitate",
+  "sw": "Sera ya faragha",
+  "tl": "Patakaran sa Privacy"
+ },
+ "privacyLoadError": {
+  "en": "Could not load the privacy policy.",
+  "fr": "Impossible de charger la politique de confidentialité.",
+  "it": "Impossibile caricare l'informativa sulla privacy.",
+  "ro": "Politica de confidențialitate nu a putut fi încărcată.",
+  "sw": "Imeshindwa kupakia sera ya faragha.",
+  "tl": "Hindi ma-load ang patakaran sa privacy."
+ },
+ "privacyEffectiveDate": {
+  "en": "Effective Date: {date}",
+  "fr": "Date d'entrée en vigueur : {date}",
+  "it": "Data di entrata in vigore: {date}",
+  "ro": "Data intrării în vigoare: {date}",
+  "sw": "Tarehe ya kuanza kutumika: {date}",
+  "tl": "Petsa ng bisa: {date}",
+  "@": {
+   "placeholders": {
+    "date": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "privacyEnglishOnly": {
+  "en": "This policy is provided in English.",
+  "fr": "Cette politique est fournie en anglais.",
+  "it": "Questa informativa è disponibile in inglese.",
+  "ro": "Această politică este disponibilă în limba engleză.",
+  "sw": "Sera hii inapatikana kwa Kiingereza.",
+  "tl": "Ang patakarang ito ay nasa Ingles."
+ },
+ "privacyViewOnline": {
+  "en": "View online",
+  "fr": "Voir en ligne",
+  "it": "Vedi online",
+  "ro": "Vezi online",
+  "sw": "Tazama mtandaoni",
+  "tl": "Tingnan online"
+ }
+}

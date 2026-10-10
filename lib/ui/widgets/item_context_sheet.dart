@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/l10n.dart';
 import 'package:flutter/services.dart';
 
 /// Apple-standard context sheet rows for Your Space items.
@@ -166,7 +167,7 @@ class ItemContextSheet extends StatelessWidget {
                 height: 50,
                 child: Center(
                   child: Text(
-                    'Cancel',
+                    context.l10n.commonCancel,
                     style: theme.textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.w700,
                       color: theme.primaryColor,
@@ -187,7 +188,7 @@ Future<bool> confirmDestructive(
   BuildContext context, {
   required String title,
   required String message,
-  String confirmLabel = 'Delete',
+  String? confirmLabel,
 }) async {
   final result = await showDialog<bool>(
     context: context,
@@ -197,12 +198,12 @@ Future<bool> confirmDestructive(
       actions: [
         TextButton(
           onPressed: () => Navigator.of(ctx).pop(false),
-          child: const Text('Cancel'),
+          child: Text(context.l10n.commonCancel),
         ),
         TextButton(
           onPressed: () => Navigator.of(ctx).pop(true),
           child: Text(
-            confirmLabel,
+            confirmLabel ?? context.l10n.commonDelete,
             style: TextStyle(color: Theme.of(ctx).colorScheme.error),
           ),
         ),

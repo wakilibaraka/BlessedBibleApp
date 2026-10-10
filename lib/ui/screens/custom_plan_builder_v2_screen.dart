@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../models/reading_plan.dart';
@@ -17,11 +18,12 @@ import '../../state/bible_provider.dart';
 import '../../state/read_settings_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../state/reading_plan_provider.dart'
-    show readingPlanProvider, activePlanIdsProvider, appWeekday;
+    show readingPlanProvider, activePlanIdsProvider;
 import '../../data/local_storage/preferences_service.dart';
 import '../widgets/shared_app_bar.dart';
 import '../widgets/study_v2_widgets.dart';
 import '../sheets/book_chapter_selector_sheet.dart';
+import '../../l10n/l10n.dart';
 
 class _TrackDraftV2 {
   BibleBook? startBook;
@@ -234,7 +236,7 @@ class _CustomPlanBuilderV2ScreenState
       final plan = _generator!.generatePlan(
         id: 'preview',
         title: _titleController.text.isEmpty
-            ? 'Custom Plan'
+            ? context.l10n.plansCustomPlanDefaultTitle
             : _titleController.text,
         tracks: tracks,
         days: _days.toInt().clamp(1, 730),
@@ -251,18 +253,19 @@ class _CustomPlanBuilderV2ScreenState
     if (_titleTouched) return;
     final valid = _drafts.where((d) => d.isValid).toList();
     if (valid.isEmpty) return;
+    final l10n = context.l10n;
     String base;
     if (valid.length == 1 && valid.first.startBook != null) {
       final d = valid.first;
       base = d.startBook!.name == d.endBook!.name
           ? d.startBook!.name
-          : '${d.startBook!.name} to ${d.endBook!.name}';
+          : l10n.plansBookRange(d.startBook!.name, d.endBook!.name);
     } else {
-      base = valid.first.startBook?.name ?? 'Custom';
+      base = valid.first.startBook?.name ?? l10n.plansCustom;
       if (valid.length > 1) base += ' +${valid.length - 1}';
     }
     // Honest clamp: title uses the actual day count, not the request.
-    final name = '$base in ${plan.days} Days';
+    final name = l10n.plansPresetBookTitle(base, plan.days);
     if (_titleController.text != name) {
       _titleController.text = name;
     }
@@ -371,9 +374,8 @@ class _CustomPlanBuilderV2ScreenState
         !ref.read(activePlanIdsProvider).contains(_preview!.id)) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-              'All 3 plan slots are in use. Pause a plan first — progress is kept.'),
+        SnackBar(
+          content: Text(context.l10n.plansSlotsFull(3)),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -417,7 +419,7 @@ class _CustomPlanBuilderV2ScreenState
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Could not save plan: $e'),
+          content: Text(context.l10n.plansCouldNotSave('$e')),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -434,17 +436,17 @@ class _CustomPlanBuilderV2ScreenState
       appThemeMode: appThemeMode,
       page: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: const SharedAppBar(title: Text('Custom Plan Builder')),
+        appBar: SharedAppBar(title: Text(context.l10n.plansBuilderTitle)),
         body: SafeArea(
           bottom: false,
           child: _isLoading
               ? const Center(child: CircularProgressIndicator())
               : _error != null
-                  ? Center(child: Text('Error: $_error'))
+                  ? Center(child: Text(context.l10n.plansError('$_error')))
                   : ListView(
                       padding: const EdgeInsets.fromLTRB(20, 12, 20, 140),
                       children: [
-                        Text('Plan name',
+                        Text(context.l10n.plansPlanName,
                             style: theme.textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.bold,
                             )),
@@ -452,7 +454,7 @@ class _CustomPlanBuilderV2ScreenState
                         TextField(
                           controller: _titleController,
                           decoration: InputDecoration(
-                            hintText: 'e.g. Genesis in 30 Days',
+                            hintText: context.l10n.plansPlanNameHint,
                             filled: true,
                             fillColor: theme.colorScheme.surface,
                             border: OutlineInputBorder(
@@ -465,7 +467,7 @@ class _CustomPlanBuilderV2ScreenState
                             _schedulePreview();
                           },
                         ),
-                        const V2SectionLabel('Reading tracks'),
+                        V2SectionLabel(context.l10n.plansReadingTracks),
                         for (var i = 0; i < _drafts.length; i++)
                           _TrackCard(
                             draft: _drafts[i],
@@ -485,7 +487,7 @@ class _CustomPlanBuilderV2ScreenState
                             _schedulePreview();
                           }),
                           icon: const Icon(Icons.add_rounded),
-                          label: const Text('Add track'),
+                          label: Text(context.l10n.plansAddTrack),
                         ),
                         if (_overlaps())
                           Padding(
@@ -501,12 +503,12 @@ class _CustomPlanBuilderV2ScreenState
                                         .withValues(alpha: 0.4)),
                               ),
                               child: Text(
-                                '⚠ Tracks overlap — shared verses are counted once in the preview below.',
+                                '⚠ ${context.l10n.plansTracksOverlap}',
                                 style: theme.textTheme.bodySmall,
                               ),
                             ),
                           ),
-                        const V2SectionLabel('Duration'),
+                        V2SectionLabel(context.l10n.plansDuration),
                         V2Card(
                           child: Column(
                             children: [
@@ -518,7 +520,8 @@ class _CustomPlanBuilderV2ScreenState
                                       min: 1,
                                       max: 730,
                                       divisions: 730,
-                                      label: '${_days.toInt()} days',
+                                      label:
+                                          context.l10n.plansDays(_days.toInt()),
                                       onChanged: (v) {
                                         setState(() {
                                           _days = v;
@@ -535,7 +538,8 @@ class _CustomPlanBuilderV2ScreenState
                                       controller: _daysController,
                                       keyboardType: TextInputType.number,
                                       decoration: InputDecoration(
-                                        suffixText: 'days',
+                                        suffixText:
+                                            context.l10n.plansDaysSuffix,
                                         border: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(12),
@@ -574,7 +578,7 @@ class _CustomPlanBuilderV2ScreenState
                             ],
                           ),
                         ),
-                        const V2SectionLabel('Start, rest & reminder'),
+                        V2SectionLabel(context.l10n.plansStartRestReminder),
                         V2Card(
                           child: Column(
                             children: [
@@ -582,9 +586,10 @@ class _CustomPlanBuilderV2ScreenState
                                 contentPadding: EdgeInsets.zero,
                                 leading:
                                     const Icon(Icons.calendar_month_rounded),
-                                title: const Text('Start date'),
-                                subtitle: Text(
-                                    '${_startDate.year}-${_startDate.month.toString().padLeft(2, '0')}-${_startDate.day.toString().padLeft(2, '0')} (${_weekdayShort(appWeekday(_startDate))})'),
+                                title: Text(context.l10n.plansStartDate),
+                                subtitle: Text(DateFormat.yMMMEd(
+                                  Localizations.localeOf(context).toString(),
+                                ).format(_startDate)),
                                 trailing:
                                     const Icon(Icons.chevron_right_rounded),
                                 onTap: () async {
@@ -607,22 +612,25 @@ class _CustomPlanBuilderV2ScreenState
                                     const EdgeInsets.symmetric(vertical: 10),
                                 child: Row(
                                   children: [
-                                    const Expanded(
-                                        child: Text('Rest days (neutral)')),
+                                    Expanded(
+                                        child: Text(
+                                            context.l10n.plansRestDaysNeutral)),
                                     _RestChip(
-                                        label: 'None',
+                                        label: context.l10n.plansNone,
                                         selected: _restDay == null,
                                         onTap: () =>
                                             setState(() => _restDay = null)),
                                     const SizedBox(width: 6),
                                     _RestChip(
-                                        label: 'Sat',
+                                        label: _weekdayShort(
+                                            context, DateTime(2024, 1, 6)),
                                         selected: _restDay == 7,
                                         onTap: () =>
                                             setState(() => _restDay = 7)),
                                     const SizedBox(width: 6),
                                     _RestChip(
-                                        label: 'Sun',
+                                        label: _weekdayShort(
+                                            context, DateTime(2024, 1, 7)),
                                         selected: _restDay == 1,
                                         onTap: () =>
                                             setState(() => _restDay = 1)),
@@ -632,10 +640,11 @@ class _CustomPlanBuilderV2ScreenState
                               const Divider(height: 1),
                               SwitchListTile(
                                 contentPadding: EdgeInsets.zero,
-                                title: const Text('Daily reminder'),
+                                title: Text(context.l10n.plansDailyReminder),
                                 subtitle: Text(_reminder
-                                    ? 'At ${_reminderTime.format(context)}'
-                                    : 'Off'),
+                                    ? context.l10n.plansReminderAt(
+                                        _reminderTime.format(context))
+                                    : context.l10n.plansOff),
                                 value: _reminder,
                                 onChanged: (v) async {
                                   if (v) {
@@ -656,12 +665,12 @@ class _CustomPlanBuilderV2ScreenState
                             ],
                           ),
                         ),
-                        const V2SectionLabel('Live preview'),
+                        V2SectionLabel(context.l10n.plansLivePreview),
                         V2Card(
                           featured: true,
                           child: _preview == null
                               ? Text(
-                                  'Add at least one track above to preview the word-balanced schedule.',
+                                  context.l10n.plansPreviewEmpty,
                                   style: theme.textTheme.bodySmall?.copyWith(
                                     color: theme.colorScheme.onSurface
                                         .withValues(alpha: 0.6),
@@ -670,11 +679,12 @@ class _CustomPlanBuilderV2ScreenState
                               : Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const V2Eyebrow(
-                                        'Word-balanced · pericope-aware'),
+                                    V2Eyebrow(context.l10n.plansWordBalanced),
                                     const SizedBox(height: 6),
                                     Text(
-                                      '${_preview!.days} days · ${_preview!.schedule.length} reading days',
+                                      context.l10n.plansPreviewSummary(
+                                          _preview!.days,
+                                          _preview!.schedule.length),
                                       style:
                                           theme.textTheme.titleSmall?.copyWith(
                                         fontWeight: FontWeight.w800,
@@ -684,7 +694,7 @@ class _CustomPlanBuilderV2ScreenState
                                         _preview!.clampReason != null) ...[
                                       const SizedBox(height: 6),
                                       Text(
-                                        '⚠ ${_preview!.clampReason} Title updated to the real day count.',
+                                        '⚠ ${context.l10n.plansClampedNotice(_preview!.days)}',
                                         style:
                                             theme.textTheme.bodySmall?.copyWith(
                                           color: theme.colorScheme.error,
@@ -701,13 +711,18 @@ class _CustomPlanBuilderV2ScreenState
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 3),
                                         child: Text(
-                                          'Day ${_preview!.schedule[i].dayNumber}: ${_preview!.schedule[i].portions.map((p) => '${p.book} ${p.startChapter}').join(' · ')}',
+                                          context.l10n.plansPreviewDay(
+                                              _preview!.schedule[i].dayNumber,
+                                              _preview!.schedule[i].portions
+                                                  .map((p) =>
+                                                      '${p.book} ${p.startChapter}')
+                                                  .join(' · ')),
                                           style: theme.textTheme.bodySmall,
                                         ),
                                       ),
                                     if (_preview!.schedule.length > 3)
                                       Text(
-                                        '⋯ ${_preview!.schedule.length - 3} more balanced days',
+                                        '⋯ ${context.l10n.plansMoreBalancedDays(_preview!.schedule.length - 3)}',
                                         style:
                                             theme.textTheme.bodySmall?.copyWith(
                                           color: theme.colorScheme.onSurface
@@ -727,8 +742,8 @@ class _CustomPlanBuilderV2ScreenState
                                 ? null
                                 : _save,
                             child: Text(_isSaving
-                                ? 'Saving…'
-                                : 'Generate & save plan →'),
+                                ? context.l10n.plansSaving
+                                : context.l10n.plansGenerateAndSave),
                           ),
                         ),
                         if (_preview == null ||
@@ -736,7 +751,7 @@ class _CustomPlanBuilderV2ScreenState
                           Padding(
                             padding: const EdgeInsets.only(top: 8),
                             child: Text(
-                              'Name the plan and add at least one track to continue.',
+                              context.l10n.plansNameAndTrackHint,
                               textAlign: TextAlign.center,
                               style: theme.textTheme.labelSmall?.copyWith(
                                 color: theme.colorScheme.onSurface
@@ -751,10 +766,8 @@ class _CustomPlanBuilderV2ScreenState
     );
   }
 
-  String _weekdayShort(int appDay) {
-    const names = ['', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    return (appDay >= 1 && appDay <= 7) ? names[appDay] : '';
-  }
+  String _weekdayShort(BuildContext context, DateTime day) =>
+      DateFormat.E(Localizations.localeOf(context).toString()).format(day);
 }
 
 class _TrackCard extends StatelessWidget {
@@ -773,7 +786,11 @@ class _TrackCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     String fmt(BibleBook? b, int c, int v, bool end) {
-      if (b == null) return end ? 'End…' : 'Start…';
+      if (b == null) {
+        return end
+            ? context.l10n.plansEndEllipsis
+            : context.l10n.plansStartEllipsis;
+      }
       return '${b.name} $c:$v';
     }
 
@@ -791,7 +808,7 @@ class _TrackCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _RefBox(
-                    label: 'START',
+                    label: context.l10n.plansStartLabel,
                     value: fmt(draft.startBook, draft.startChapter,
                         draft.startVerse, false),
                     onTap: onStart),
@@ -799,7 +816,7 @@ class _TrackCard extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: _RefBox(
-                    label: 'END',
+                    label: context.l10n.plansEndLabel,
                     value: fmt(
                         draft.endBook, draft.endChapter, draft.endVerse, true),
                     onTap: onEnd),
@@ -811,7 +828,7 @@ class _TrackCard extends StatelessWidget {
               alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: onRemove,
-                child: Text('Remove track',
+                child: Text(context.l10n.plansRemoveTrack,
                     style: TextStyle(color: theme.colorScheme.error)),
               ),
             ),

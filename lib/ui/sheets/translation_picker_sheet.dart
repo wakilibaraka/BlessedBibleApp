@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../l10n/l10n.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/translation_provider.dart';
@@ -84,7 +85,7 @@ class _TranslationPickerSheetState
               children: [
                 Expanded(
                   child: Text(
-                    'Bible Translation',
+                    context.l10n.readTranslationTitle,
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
@@ -99,25 +100,27 @@ class _TranslationPickerSheetState
             ),
             const SizedBox(height: 8),
             AnimatedSegmentedTile<ReadingLayout>(
-              title: 'Reading Layout',
+              title: context.l10n.readLayoutTitle,
               subtitle: () {
                 switch (readingLayout) {
                   case ReadingLayout.single:
-                    return 'One translation';
+                    return context.l10n.readLayoutSingleDesc;
                   case ReadingLayout.interleaved:
-                    return 'Two translations stacked per verse';
+                    return context.l10n.readLayoutBilingualDesc;
                   case ReadingLayout.sideBySide:
-                    return 'Two translations in side-by-side columns';
+                    return context.l10n.readLayoutParallelDesc;
                   case ReadingLayout.chips:
-                    return 'Tap a verse to switch its translation';
+                    return context.l10n.readLayoutChipsDesc;
                 }
               }(),
               selectedValue: readingLayout,
-              options: const [
-                MapEntry(ReadingLayout.single, 'Single'),
-                MapEntry(ReadingLayout.interleaved, 'Bilingual'),
-                MapEntry(ReadingLayout.sideBySide, 'Parallel'),
-                MapEntry(ReadingLayout.chips, 'Chips'),
+              options: [
+                MapEntry(ReadingLayout.single, context.l10n.readLayoutSingle),
+                MapEntry(ReadingLayout.interleaved,
+                    context.l10n.readLayoutBilingual),
+                MapEntry(
+                    ReadingLayout.sideBySide, context.l10n.readLayoutParallel),
+                MapEntry(ReadingLayout.chips, context.l10n.readLayoutChips),
               ],
               onChanged: (val) {
                 HapticFeedback.selectionClick();
@@ -139,7 +142,7 @@ class _TranslationPickerSheetState
                   children: [
                     Expanded(
                       child: _buildTabButton(
-                        'Primary',
+                        context.l10n.readPrimary,
                         !_isSelectingSecondary,
                         () => setState(() => _isSelectingSecondary = false),
                         theme,
@@ -147,7 +150,7 @@ class _TranslationPickerSheetState
                     ),
                     Expanded(
                       child: _buildTabButton(
-                        'Secondary',
+                        context.l10n.readSecondary,
                         _isSelectingSecondary,
                         () => setState(() => _isSelectingSecondary = true),
                         theme,
@@ -173,8 +176,9 @@ class _TranslationPickerSheetState
                       child: Padding(
                           padding: EdgeInsets.all(32),
                           child: CircularProgressIndicator())),
-                  error: (e, st) =>
-                      Center(child: Text('Error loading translations: $e')),
+                  error: (e, st) => Center(
+                      child:
+                          Text(context.l10n.readTranslationsLoadError('$e'))),
                 ),
               ),
             ),
@@ -238,7 +242,8 @@ class _TranslationPickerSheetState
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${item.translationName} deleted.'),
+            content:
+                Text(context.l10n.readTranslationDeleted(item.translationName)),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -247,7 +252,7 @@ class _TranslationPickerSheetState
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Could not delete: $e'),
+            content: Text(context.l10n.readDeleteFailed('$e')),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -378,7 +383,7 @@ class _TranslationPickerSheetState
                               ),
                               Builder(builder: (_) {
                                 final subtitle = isKjv
-                                    ? 'Always available · app backbone'
+                                    ? context.l10n.readKjvAlwaysAvailable
                                     : item.license;
                                 if (subtitle.isEmpty) {
                                   return const SizedBox.shrink();
@@ -399,7 +404,8 @@ class _TranslationPickerSheetState
                         ),
                         if (!isLocked)
                           IconButton(
-                            tooltip: 'Delete ${item.translationName}',
+                            tooltip: context.l10n
+                                .readDeleteTranslation(item.translationName),
                             icon: const Icon(Icons.delete_outline_rounded,
                                 size: 20),
                             color: theme.colorScheme.onSurface
@@ -414,7 +420,7 @@ class _TranslationPickerSheetState
                           )
                         else if (isLocked)
                           Tooltip(
-                            message: 'Cannot delete — app backbone',
+                            message: context.l10n.readCannotDeleteBackbone,
                             child: Icon(
                               Icons.lock_outline_rounded,
                               size: 20,
@@ -445,7 +451,7 @@ class _TranslationPickerSheetState
         Padding(
           padding: const EdgeInsets.only(bottom: 4.0, top: 16.0),
           child: Text(
-            'AVAILABLE TO ADD',
+            context.l10n.readAvailableToAdd,
             style: theme.textTheme.labelLarge?.copyWith(
               color: theme.primaryColor,
               fontWeight: FontWeight.w700,
@@ -535,11 +541,15 @@ class _DownloadableTileState extends ConsumerState<_DownloadableTile> {
             text.contains('Connection refused') ||
             text.contains('Connection reset');
         final message = offline
-            ? 'No internet connection — try again when online.'
-            : (_isRestore ? 'Restore failed ($e).' : 'Download failed ($e).');
+            ? context.l10n.readNoInternet
+            : (_isRestore
+                ? context.l10n.readRestoreFailedDetail('$e')
+                : context.l10n.readDownloadFailedDetail('$e'));
         setState(() {
           _isDownloading = false;
-          _error = _isRestore ? 'Restore failed' : 'Download failed';
+          _error = _isRestore
+              ? context.l10n.readRestoreFailed
+              : context.l10n.readDownloadFailed;
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(message)),
@@ -589,7 +599,7 @@ class _DownloadableTileState extends ConsumerState<_DownloadableTile> {
                       Builder(builder: (_) {
                         final isRestore = widget.item['source'] == 'bundled';
                         final label = isRestore
-                            ? "${widget.item['license']} · ${sizeMB.toStringAsFixed(1)} MB · restore offline"
+                            ? "${widget.item['license']} · ${sizeMB.toStringAsFixed(1)} MB · ${context.l10n.readRestoreOffline}"
                             : "${widget.item['license']} · ${sizeMB.toStringAsFixed(1)} MB";
                         return Text(
                           label,

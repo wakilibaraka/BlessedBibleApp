@@ -1,0 +1,1408 @@
+{
+ "spaceTitle": {
+  "en": "Your Space",
+  "fr": "Votre espace",
+  "it": "Il tuo spazio",
+  "ro": "Spațiul tău",
+  "sw": "Nafasi Yako",
+  "tl": "Iyong Espasyo"
+ },
+ "spaceTabHighlights": {
+  "en": "Highlights",
+  "fr": "Surlignages",
+  "it": "Evidenziazioni",
+  "ro": "Evidențieri",
+  "sw": "Vivutio",
+  "tl": "Mga Highlight"
+ },
+ "spaceTabBookmarks": {
+  "en": "Bookmarks",
+  "fr": "Signets",
+  "it": "Segnalibri",
+  "ro": "Semne de carte",
+  "sw": "Alamisho",
+  "tl": "Mga Bookmark"
+ },
+ "spaceTabNotes": {
+  "en": "Notes",
+  "fr": "Notes",
+  "it": "Note",
+  "ro": "Notițe",
+  "sw": "Maelezo",
+  "tl": "Mga Tala"
+ },
+ "spaceTabJournal": {
+  "en": "Journal",
+  "fr": "Journal",
+  "it": "Diario",
+  "ro": "Jurnal",
+  "sw": "Shajara",
+  "tl": "Talaarawan"
+ },
+ "spaceHighlighted": {
+  "en": "Highlighted",
+  "fr": "Surligné",
+  "it": "Evidenziato",
+  "ro": "Evidențiat",
+  "sw": "Imeangaziwa",
+  "tl": "Naka-highlight"
+ },
+ "spaceNewFolder": {
+  "en": "New Folder",
+  "fr": "Nouveau dossier",
+  "it": "Nuova cartella",
+  "ro": "Dosar nou",
+  "sw": "Folda Mpya",
+  "tl": "Bagong Folder"
+ },
+ "spaceFolderNameHint": {
+  "en": "Folder name",
+  "fr": "Nom du dossier",
+  "it": "Nome cartella",
+  "ro": "Numele dosarului",
+  "sw": "Jina la folda",
+  "tl": "Pangalan ng folder"
+ },
+ "spaceCreate": {
+  "en": "Create",
+  "fr": "Créer",
+  "it": "Crea",
+  "ro": "Creează",
+  "sw": "Unda",
+  "tl": "Gumawa"
+ },
+ "spaceRenameFolder": {
+  "en": "Rename Folder",
+  "fr": "Renommer le dossier",
+  "it": "Rinomina cartella",
+  "ro": "Redenumește dosarul",
+  "sw": "Badilisha Jina la Folda",
+  "tl": "Palitan ang Pangalan ng Folder"
+ },
+ "spaceRename": {
+  "en": "Rename",
+  "fr": "Renommer",
+  "it": "Rinomina",
+  "ro": "Redenumește",
+  "sw": "Badilisha jina",
+  "tl": "Palitan ang pangalan"
+ },
+ "spaceDeleteFolderTitle": {
+  "en": "Delete Folder?",
+  "fr": "Supprimer le dossier ?",
+  "it": "Eliminare la cartella?",
+  "ro": "Ștergi dosarul?",
+  "sw": "Futa Folda?",
+  "tl": "Burahin ang Folder?"
+ },
+ "spaceDeleteFolderBody": {
+  "en": "Are you sure you want to delete \"{folderName}\"?\n\nYour bookmarks inside this folder will NOT be deleted; they will be moved to Unfiled.",
+  "fr": "Voulez-vous vraiment supprimer « {folderName} » ?\n\nVos signets dans ce dossier ne seront PAS supprimés ; ils seront déplacés vers Non classés.",
+  "it": "Eliminare davvero \"{folderName}\"?\n\nI segnalibri in questa cartella NON verranno eliminati; saranno spostati in Non archiviati.",
+  "ro": "Sigur vrei să ștergi „{folderName}”?\n\nSemnele de carte din acest dosar NU vor fi șterse; vor fi mutate în Neclasate.",
+  "sw": "Una uhakika unataka kufuta \"{folderName}\"?\n\nAlamisho ndani ya folda hii HAZITAFUTWA; zitahamishiwa Bila Folda.",
+  "tl": "Sigurado ka bang buburahin ang \"{folderName}\"?\n\nHINDI mabubura ang mga bookmark sa folder na ito; ililipat sila sa Walang Folder.",
+  "@": {
+   "placeholders": {
+    "folderName": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "spaceMoveToFolder": {
+  "en": "Move to Folder",
+  "fr": "Déplacer vers un dossier",
+  "it": "Sposta in cartella",
+  "ro": "Mută în dosar",
+  "sw": "Hamishia Folda",
+  "tl": "Ilipat sa Folder"
+ },
+ "spaceUnfiled": {
+  "en": "Unfiled",
+  "fr": "Non classés",
+  "it": "Non archiviati",
+  "ro": "Neclasate",
+  "sw": "Bila Folda",
+  "tl": "Walang Folder"
+ },
+ "spaceGroupEarlier": {
+  "en": "Earlier",
+  "fr": "Plus ancien",
+  "it": "Precedenti",
+  "ro": "Mai devreme",
+  "sw": "Awali",
+  "tl": "Mas maaga"
+ },
+ "spaceGroupLast7Days": {
+  "en": "Last 7 Days",
+  "fr": "7 derniers jours",
+  "it": "Ultimi 7 giorni",
+  "ro": "Ultimele 7 zile",
+  "sw": "Siku 7 Zilizopita",
+  "tl": "Huling 7 Araw"
+ },
+ "spaceGroupLast30Days": {
+  "en": "Last 30 Days",
+  "fr": "30 derniers jours",
+  "it": "Ultimi 30 giorni",
+  "ro": "Ultimele 30 de zile",
+  "sw": "Siku 30 Zilizopita",
+  "tl": "Huling 30 Araw"
+ },
+ "spaceUnknownBook": {
+  "en": "Unknown Book",
+  "fr": "Livre inconnu",
+  "it": "Libro sconosciuto",
+  "ro": "Carte necunoscută",
+  "sw": "Kitabu Kisichojulikana",
+  "tl": "Hindi kilalang aklat"
+ },
+ "spaceNoBookmarks": {
+  "en": "No bookmarks here.",
+  "fr": "Aucun signet ici.",
+  "it": "Nessun segnalibro qui.",
+  "ro": "Niciun semn de carte aici.",
+  "sw": "Hakuna alamisho hapa.",
+  "tl": "Walang bookmark dito."
+ },
+ "spaceFilterAll": {
+  "en": "All",
+  "fr": "Tous",
+  "it": "Tutti",
+  "ro": "Toate",
+  "sw": "Zote",
+  "tl": "Lahat"
+ },
+ "spaceByDate": {
+  "en": "By Date",
+  "fr": "Par date",
+  "it": "Per data",
+  "ro": "După dată",
+  "sw": "Kwa Tarehe",
+  "tl": "Ayon sa Petsa"
+ },
+ "spaceByBook": {
+  "en": "By Book",
+  "fr": "Par livre",
+  "it": "Per libro",
+  "ro": "După carte",
+  "sw": "Kwa Kitabu",
+  "tl": "Ayon sa Aklat"
+ },
+ "spaceYourNotes": {
+  "en": "Your notes.",
+  "fr": "Vos notes.",
+  "it": "Le tue note.",
+  "ro": "Notițele tale.",
+  "sw": "Maelezo yako.",
+  "tl": "Iyong mga tala."
+ },
+ "spaceNoNotesTapPlus": {
+  "en": "No notes yet.\nTap + to create one.",
+  "fr": "Aucune note.\nAppuyez sur + pour en créer une.",
+  "it": "Ancora nessuna nota.\nTocca + per crearne una.",
+  "ro": "Nicio notiță încă.\nApasă + pentru a crea una.",
+  "sw": "Hakuna maelezo bado.\nGusa + kuunda moja.",
+  "tl": "Wala pang tala.\nPindutin ang + para gumawa."
+ },
+ "spaceMore": {
+  "en": "More",
+  "fr": "Plus",
+  "it": "Altro",
+  "ro": "Mai mult",
+  "sw": "Zaidi",
+  "tl": "Higit pa"
+ },
+ "spaceNote": {
+  "en": "Note",
+  "fr": "Note",
+  "it": "Nota",
+  "ro": "Notiță",
+  "sw": "Maelezo",
+  "tl": "Tala"
+ },
+ "spaceCopyText": {
+  "en": "Copy text",
+  "fr": "Copier le texte",
+  "it": "Copia testo",
+  "ro": "Copiază textul",
+  "sw": "Nakili maandishi",
+  "tl": "Kopyahin ang teksto"
+ },
+ "spaceDeleteNoteTitle": {
+  "en": "Delete note?",
+  "fr": "Supprimer la note ?",
+  "it": "Eliminare la nota?",
+  "ro": "Ștergi notița?",
+  "sw": "Futa maelezo?",
+  "tl": "Burahin ang tala?"
+ },
+ "spaceDeleteNoteBody": {
+  "en": "\"{title}\" will be removed permanently.",
+  "fr": "« {title} » sera supprimée définitivement.",
+  "it": "\"{title}\" verrà eliminata definitivamente.",
+  "ro": "„{title}” va fi ștearsă definitiv.",
+  "sw": "\"{title}\" itaondolewa kabisa.",
+  "tl": "Permanenteng aalisin ang \"{title}\".",
+  "@": {
+   "placeholders": {
+    "title": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "spaceUntitled": {
+  "en": "Untitled",
+  "fr": "Sans titre",
+  "it": "Senza titolo",
+  "ro": "Fără titlu",
+  "sw": "Bila kichwa",
+  "tl": "Walang pamagat"
+ },
+ "spaceBookmarkedVerse": {
+  "en": "Bookmarked verse",
+  "fr": "Verset en signet",
+  "it": "Versetto salvato",
+  "ro": "Verset marcat",
+  "sw": "Mstari ulioalamishwa",
+  "tl": "Naka-bookmark na talata"
+ },
+ "spaceHighlightedVerse": {
+  "en": "Highlighted verse",
+  "fr": "Verset surligné",
+  "it": "Versetto evidenziato",
+  "ro": "Verset evidențiat",
+  "sw": "Mstari ulioangaziwa",
+  "tl": "Naka-highlight na talata"
+ },
+ "spaceOpenInRead": {
+  "en": "Open in Read",
+  "fr": "Ouvrir dans Lecture",
+  "it": "Apri in Lettura",
+  "ro": "Deschide în Citire",
+  "sw": "Fungua katika Soma",
+  "tl": "Buksan sa Basahin"
+ },
+ "spaceAddNote": {
+  "en": "Add note",
+  "fr": "Ajouter une note",
+  "it": "Aggiungi nota",
+  "ro": "Adaugă notiță",
+  "sw": "Ongeza maelezo",
+  "tl": "Magdagdag ng tala"
+ },
+ "spaceCopyVerse": {
+  "en": "Copy verse",
+  "fr": "Copier le verset",
+  "it": "Copia versetto",
+  "ro": "Copiază versetul",
+  "sw": "Nakili mstari",
+  "tl": "Kopyahin ang talata"
+ },
+ "spaceShareVerse": {
+  "en": "Share verse",
+  "fr": "Partager le verset",
+  "it": "Condividi versetto",
+  "ro": "Distribuie versetul",
+  "sw": "Shiriki mstari",
+  "tl": "Ibahagi ang talata"
+ },
+ "spaceChangeColour": {
+  "en": "Change colour",
+  "fr": "Changer la couleur",
+  "it": "Cambia colore",
+  "ro": "Schimbă culoarea",
+  "sw": "Badilisha rangi",
+  "tl": "Palitan ang kulay"
+ },
+ "spaceMoveToFolderAction": {
+  "en": "Move to folder",
+  "fr": "Déplacer vers un dossier",
+  "it": "Sposta in cartella",
+  "ro": "Mută în dosar",
+  "sw": "Hamishia folda",
+  "tl": "Ilipat sa folder"
+ },
+ "spaceRemoveBookmark": {
+  "en": "Remove bookmark",
+  "fr": "Retirer le signet",
+  "it": "Rimuovi segnalibro",
+  "ro": "Elimină semnul de carte",
+  "sw": "Ondoa alamisho",
+  "tl": "Alisin ang bookmark"
+ },
+ "spaceRemoveHighlight": {
+  "en": "Remove highlight",
+  "fr": "Retirer le surlignage",
+  "it": "Rimuovi evidenziazione",
+  "ro": "Elimină evidențierea",
+  "sw": "Ondoa kivutio",
+  "tl": "Alisin ang highlight"
+ },
+ "spaceHighlightColour": {
+  "en": "Highlight colour",
+  "fr": "Couleur de surlignage",
+  "it": "Colore evidenziazione",
+  "ro": "Culoarea evidențierii",
+  "sw": "Rangi ya kivutio",
+  "tl": "Kulay ng highlight"
+ },
+ "spaceColourN": {
+  "en": "Colour {index}",
+  "fr": "Couleur {index}",
+  "it": "Colore {index}",
+  "ro": "Culoarea {index}",
+  "sw": "Rangi {index}",
+  "tl": "Kulay {index}",
+  "@": {
+   "placeholders": {
+    "index": {
+     "type": "int"
+    }
+   }
+  }
+ },
+ "notesMyNotes": {
+  "en": "My Notes",
+  "fr": "Mes notes",
+  "it": "Le mie note",
+  "ro": "Notițele mele",
+  "sw": "Maelezo Yangu",
+  "tl": "Aking mga Tala"
+ },
+ "notesEmptyTitle": {
+  "en": "No notes yet",
+  "fr": "Aucune note",
+  "it": "Ancora nessuna nota",
+  "ro": "Nicio notiță încă",
+  "sw": "Hakuna maelezo bado",
+  "tl": "Wala pang tala"
+ },
+ "notesEmptyBody": {
+  "en": "Tap the + button to add your first note.",
+  "fr": "Appuyez sur + pour ajouter votre première note.",
+  "it": "Tocca + per aggiungere la tua prima nota.",
+  "ro": "Apasă butonul + pentru a adăuga prima notiță.",
+  "sw": "Gusa kitufe cha + kuongeza maelezo yako ya kwanza.",
+  "tl": "Pindutin ang + para idagdag ang una mong tala."
+ },
+ "notesVerseInserted": {
+  "en": "Verse inserted",
+  "fr": "Verset inséré",
+  "it": "Versetto inserito",
+  "ro": "Verset inserat",
+  "sw": "Mstari umeingizwa",
+  "tl": "Naisingit ang talata"
+ },
+ "notesAddCommentary": {
+  "en": "Add Commentary",
+  "fr": "Ajouter un commentaire",
+  "it": "Aggiungi commento",
+  "ro": "Adaugă comentariu",
+  "sw": "Ongeza Ufafanuzi",
+  "tl": "Magdagdag ng Komentaryo"
+ },
+ "notesChapterTitlePlaceholder": {
+  "en": "Chapter Title",
+  "fr": "Titre du chapitre",
+  "it": "Titolo del capitolo",
+  "ro": "Titlul capitolului",
+  "sw": "Kichwa cha Sura",
+  "tl": "Pamagat ng Kabanata"
+ },
+ "notesEditNote": {
+  "en": "Edit Note",
+  "fr": "Modifier la note",
+  "it": "Modifica nota",
+  "ro": "Editează notița",
+  "sw": "Hariri Maelezo",
+  "tl": "I-edit ang Tala"
+ },
+ "notesNewNoteOn": {
+  "en": "New Note on {reference}",
+  "fr": "Nouvelle note sur {reference}",
+  "it": "Nuova nota su {reference}",
+  "ro": "Notiță nouă la {reference}",
+  "sw": "Maelezo Mapya juu ya {reference}",
+  "tl": "Bagong Tala sa {reference}",
+  "@": {
+   "placeholders": {
+    "reference": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "notesNewNote": {
+  "en": "New Note",
+  "fr": "Nouvelle note",
+  "it": "Nuova nota",
+  "ro": "Notiță nouă",
+  "sw": "Maelezo Mapya",
+  "tl": "Bagong Tala"
+ },
+ "notesTitleHint": {
+  "en": "Note Title",
+  "fr": "Titre de la note",
+  "it": "Titolo della nota",
+  "ro": "Titlul notiței",
+  "sw": "Kichwa cha Maelezo",
+  "tl": "Pamagat ng Tala"
+ },
+ "notesContentHint": {
+  "en": "Start typing... (type / for commands)",
+  "fr": "Commencez à écrire… (tapez / pour les commandes)",
+  "it": "Inizia a scrivere… (digita / per i comandi)",
+  "ro": "Începe să scrii… (tastează / pentru comenzi)",
+  "sw": "Anza kuandika... (andika / kwa amri)",
+  "tl": "Magsimulang mag-type... (i-type ang / para sa mga utos)"
+ },
+ "notesInsertVerse": {
+  "en": "Insert verse",
+  "fr": "Insérer un verset",
+  "it": "Inserisci versetto",
+  "ro": "Inserează verset",
+  "sw": "Ingiza mstari",
+  "tl": "Isingit ang talata"
+ },
+ "notesInsertDate": {
+  "en": "Insert date",
+  "fr": "Insérer la date",
+  "it": "Inserisci data",
+  "ro": "Inserează data",
+  "sw": "Ingiza tarehe",
+  "tl": "Isingit ang petsa"
+ },
+ "notesInsertChapterTitle": {
+  "en": "Insert chapter title",
+  "fr": "Insérer le titre du chapitre",
+  "it": "Inserisci titolo capitolo",
+  "ro": "Inserează titlul capitolului",
+  "sw": "Ingiza kichwa cha sura",
+  "tl": "Isingit ang pamagat ng kabanata"
+ },
+ "notesSaved": {
+  "en": "Note saved!",
+  "fr": "Note enregistrée !",
+  "it": "Nota salvata!",
+  "ro": "Notiță salvată!",
+  "sw": "Maelezo yamehifadhiwa!",
+  "tl": "Na-save ang tala!"
+ },
+ "notesSaveChanges": {
+  "en": "Save Changes",
+  "fr": "Enregistrer",
+  "it": "Salva modifiche",
+  "ro": "Salvează modificările",
+  "sw": "Hifadhi Mabadiliko",
+  "tl": "I-save ang mga Pagbabago"
+ },
+ "notesSaveNote": {
+  "en": "Save Note",
+  "fr": "Enregistrer la note",
+  "it": "Salva nota",
+  "ro": "Salvează notița",
+  "sw": "Hifadhi Maelezo",
+  "tl": "I-save ang Tala"
+ },
+ "notesDeleted": {
+  "en": "Note deleted",
+  "fr": "Note supprimée",
+  "it": "Nota eliminata",
+  "ro": "Notiță ștearsă",
+  "sw": "Maelezo yamefutwa",
+  "tl": "Nabura ang tala"
+ },
+ "notesDeleteNote": {
+  "en": "Delete Note",
+  "fr": "Supprimer la note",
+  "it": "Elimina nota",
+  "ro": "Șterge notița",
+  "sw": "Futa Maelezo",
+  "tl": "Burahin ang Tala"
+ },
+ "notesNewJournalEntry": {
+  "en": "New Journal Entry",
+  "fr": "Nouvelle entrée de journal",
+  "it": "Nuova voce di diario",
+  "ro": "Intrare nouă în jurnal",
+  "sw": "Ingizo Jipya la Shajara",
+  "tl": "Bagong Tala sa Talaarawan"
+ },
+ "notesJournalHint": {
+  "en": "How are you feeling today? Pour your heart out...",
+  "fr": "Comment vous sentez-vous aujourd'hui ? Ouvrez votre cœur…",
+  "it": "Come ti senti oggi? Apri il tuo cuore…",
+  "ro": "Cum te simți azi? Deschide-ți inima…",
+  "sw": "Unajisikiaje leo? Mimina moyo wako...",
+  "tl": "Kumusta ang pakiramdam mo ngayon? Ibuhos ang iyong puso..."
+ },
+ "notesSaveAndAnalyze": {
+  "en": "Save & Analyze",
+  "fr": "Enregistrer et analyser",
+  "it": "Salva e analizza",
+  "ro": "Salvează și analizează",
+  "sw": "Hifadhi na Uchambue",
+  "tl": "I-save at Suriin"
+ },
+ "notesNoJournalEntries": {
+  "en": "No journal entries yet.",
+  "fr": "Aucune entrée de journal.",
+  "it": "Ancora nessuna voce nel diario.",
+  "ro": "Nicio intrare în jurnal încă.",
+  "sw": "Hakuna maingizo ya shajara bado.",
+  "tl": "Wala pang tala sa talaarawan."
+ },
+ "notesWriteEntry": {
+  "en": "Write Entry",
+  "fr": "Écrire",
+  "it": "Scrivi",
+  "ro": "Scrie",
+  "sw": "Andika",
+  "tl": "Sumulat"
+ },
+ "notesAiReflection": {
+  "en": "AI Reflection",
+  "fr": "Réflexion IA",
+  "it": "Riflessione IA",
+  "ro": "Reflecție AI",
+  "sw": "Tafakari ya AI",
+  "tl": "Pagninilay ng AI"
+ },
+ "notesDetectedEmotion": {
+  "en": "Detected Emotion: {emotion}",
+  "fr": "Émotion détectée : {emotion}",
+  "it": "Emozione rilevata: {emotion}",
+  "ro": "Emoție detectată: {emotion}",
+  "sw": "Hisia Iliyogunduliwa: {emotion}",
+  "tl": "Natukoy na Damdamin: {emotion}",
+  "@": {
+   "placeholders": {
+    "emotion": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "notesVersesList": {
+  "en": "Verses: {verses}",
+  "fr": "Versets : {verses}",
+  "it": "Versetti: {verses}",
+  "ro": "Versete: {verses}",
+  "sw": "Mistari: {verses}",
+  "tl": "Mga Talata: {verses}",
+  "@": {
+   "placeholders": {
+    "verses": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "accountGuest": {
+  "en": "Guest",
+  "fr": "Invité",
+  "it": "Ospite",
+  "ro": "Invitat",
+  "sw": "Mgeni",
+  "tl": "Bisita"
+ },
+ "accountSignInToSync": {
+  "en": "Sign in to sync across devices",
+  "fr": "Connectez-vous pour synchroniser vos appareils",
+  "it": "Accedi per sincronizzare i dispositivi",
+  "ro": "Conectează-te pentru sincronizare",
+  "sw": "Ingia ili kusawazisha vifaa",
+  "tl": "Mag-sign in para mag-sync sa mga device"
+ },
+ "accountAccount": {
+  "en": "Account",
+  "fr": "Compte",
+  "it": "Account",
+  "ro": "Cont",
+  "sw": "Akaunti",
+  "tl": "Account"
+ },
+ "accountSettings": {
+  "en": "Settings",
+  "fr": "Paramètres",
+  "it": "Impostazioni",
+  "ro": "Setări",
+  "sw": "Mipangilio",
+  "tl": "Mga Setting"
+ },
+ "accountBackUp": {
+  "en": "Back up data",
+  "fr": "Sauvegarder",
+  "it": "Backup dati",
+  "ro": "Salvează datele",
+  "sw": "Hifadhi nakala",
+  "tl": "I-back up ang data"
+ },
+ "accountBackUpSubtitle": {
+  "en": "Export notes, highlights and settings",
+  "fr": "Exporter notes, surlignages et paramètres",
+  "it": "Esporta note, evidenziazioni e impostazioni",
+  "ro": "Exportă notițe, evidențieri și setări",
+  "sw": "Hamisha maelezo, vivutio na mipangilio",
+  "tl": "I-export ang tala, highlight at setting"
+ },
+ "accountRestore": {
+  "en": "Restore data",
+  "fr": "Restaurer",
+  "it": "Ripristina dati",
+  "ro": "Restaurează datele",
+  "sw": "Rejesha data",
+  "tl": "Ibalik ang data"
+ },
+ "accountRestoreSubtitle": {
+  "en": "Import from a backup file",
+  "fr": "Importer depuis une sauvegarde",
+  "it": "Importa da un file di backup",
+  "ro": "Importă dintr-o copie de rezervă",
+  "sw": "Leta kutoka faili la nakala",
+  "tl": "Mag-import mula sa backup"
+ },
+ "accountSignInGoogle": {
+  "en": "Sign in with Google",
+  "fr": "Se connecter avec Google",
+  "it": "Accedi con Google",
+  "ro": "Conectează-te cu Google",
+  "sw": "Ingia kwa Google",
+  "tl": "Mag-sign in gamit ang Google"
+ },
+ "accountSignInApple": {
+  "en": "Sign in with Apple",
+  "fr": "Se connecter avec Apple",
+  "it": "Accedi con Apple",
+  "ro": "Conectează-te cu Apple",
+  "sw": "Ingia kwa Apple",
+  "tl": "Mag-sign in gamit ang Apple"
+ },
+ "accountSignOut": {
+  "en": "Sign Out",
+  "fr": "Se déconnecter",
+  "it": "Esci",
+  "ro": "Deconectează-te",
+  "sw": "Toka",
+  "tl": "Mag-sign out"
+ },
+ "accountResetApp": {
+  "en": "Reset app",
+  "fr": "Réinitialiser",
+  "it": "Reimposta app",
+  "ro": "Resetează aplicația",
+  "sw": "Weka upya programu",
+  "tl": "I-reset ang app"
+ },
+ "accountResetAppSubtitle": {
+  "en": "Erase all on-device data",
+  "fr": "Effacer les données de l'appareil",
+  "it": "Cancella i dati sul dispositivo",
+  "ro": "Șterge datele de pe dispozitiv",
+  "sw": "Futa data yote kwenye kifaa",
+  "tl": "Burahin ang lahat ng data sa device"
+ },
+ "accountSignIn": {
+  "en": "Sign In",
+  "fr": "Se connecter",
+  "it": "Accedi",
+  "ro": "Conectare",
+  "sw": "Ingia",
+  "tl": "Mag-sign in"
+ },
+ "accountSignedIn": {
+  "en": "Signed In",
+  "fr": "Connecté",
+  "it": "Accesso effettuato",
+  "ro": "Conectat",
+  "sw": "Umeingia",
+  "tl": "Naka-sign in"
+ },
+ "accountDeleteAccount": {
+  "en": "Delete Account",
+  "fr": "Supprimer le compte",
+  "it": "Elimina account",
+  "ro": "Șterge contul",
+  "sw": "Futa Akaunti",
+  "tl": "Burahin ang Account"
+ },
+ "accountDeleteAccountTitle": {
+  "en": "Delete Account?",
+  "fr": "Supprimer le compte ?",
+  "it": "Eliminare l'account?",
+  "ro": "Ștergi contul?",
+  "sw": "Futa Akaunti?",
+  "tl": "Burahin ang Account?"
+ },
+ "accountDeleteAccountBody": {
+  "en": "This is permanent and irreversible.\n\nThe following will be completely removed:\n• Your sign-in account\n• Its cloud data in The Blessed Bible and Blessed Arcade (they share the account)\n• All on-device study data (bookmarks, highlights, history)",
+  "fr": "Cette action est définitive et irréversible.\n\nSeront entièrement supprimés :\n• Votre compte de connexion\n• Ses données cloud dans The Blessed Bible et Blessed Arcade (compte partagé)\n• Toutes les données d'étude sur l'appareil (signets, surlignages, historique)",
+  "it": "Questa azione è permanente e irreversibile.\n\nVerranno rimossi completamente:\n• Il tuo account di accesso\n• I suoi dati cloud in The Blessed Bible e Blessed Arcade (account condiviso)\n• Tutti i dati di studio sul dispositivo (segnalibri, evidenziazioni, cronologia)",
+  "ro": "Acțiunea este permanentă și ireversibilă.\n\nVor fi eliminate complet:\n• Contul tău de conectare\n• Datele sale din cloud în The Blessed Bible și Blessed Arcade (cont comun)\n• Toate datele de studiu de pe dispozitiv (semne de carte, evidențieri, istoric)",
+  "sw": "Hili ni la kudumu na haliwezi kutenduliwa.\n\nVifuatavyo vitaondolewa kabisa:\n• Akaunti yako ya kuingia\n• Data yake ya wingu katika The Blessed Bible na Blessed Arcade (zinashiriki akaunti)\n• Data yote ya kujifunza kwenye kifaa (alamisho, vivutio, historia)",
+  "tl": "Permanente ito at hindi na maibabalik.\n\nTuluyang aalisin ang mga sumusunod:\n• Ang iyong sign-in account\n• Ang cloud data nito sa The Blessed Bible at Blessed Arcade (iisang account)\n• Lahat ng study data sa device (bookmark, highlight, history)"
+ },
+ "accountDeleted": {
+  "en": "Account deleted successfully.",
+  "fr": "Compte supprimé.",
+  "it": "Account eliminato.",
+  "ro": "Cont șters cu succes.",
+  "sw": "Akaunti imefutwa.",
+  "tl": "Matagumpay na nabura ang account."
+ },
+ "accountReauthFailed": {
+  "en": "Couldn't confirm it's you, so nothing was deleted. {reason}",
+  "fr": "Impossible de confirmer votre identité ; rien n'a été supprimé. {reason}",
+  "it": "Impossibile confermare la tua identità, nulla è stato eliminato. {reason}",
+  "ro": "Nu am putut confirma că ești tu, deci nu s-a șters nimic. {reason}",
+  "sw": "Hatukuweza kuthibitisha ni wewe, hivyo hakuna kilichofutwa. {reason}",
+  "tl": "Hindi makumpirma na ikaw ito, kaya walang nabura. {reason}",
+  "@": {
+   "placeholders": {
+    "reason": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "accountDeleteFailed": {
+  "en": "Failed to delete account. Please try again.",
+  "fr": "Échec de la suppression du compte. Réessayez.",
+  "it": "Impossibile eliminare l'account. Riprova.",
+  "ro": "Contul nu a putut fi șters. Încearcă din nou.",
+  "sw": "Imeshindwa kufuta akaunti. Tafadhali jaribu tena.",
+  "tl": "Hindi nabura ang account. Pakisubukan muli."
+ },
+ "accountOtherDataTitle": {
+  "en": "This device has data from another account",
+  "fr": "Cet appareil contient les données d'un autre compte",
+  "it": "Questo dispositivo ha dati di un altro account",
+  "ro": "Dispozitivul are date din alt cont",
+  "sw": "Kifaa hiki kina data ya akaunti nyingine",
+  "tl": "May data mula sa ibang account ang device na ito"
+ },
+ "accountOtherDataBody": {
+  "en": "Your bookmarks, highlights and notes on this device came from a different account. What should happen to them?",
+  "fr": "Les signets, surlignages et notes de cet appareil proviennent d'un autre compte. Que faut-il en faire ?",
+  "it": "Segnalibri, evidenziazioni e note su questo dispositivo provengono da un altro account. Cosa vuoi farne?",
+  "ro": "Semnele de carte, evidențierile și notițele de pe acest dispozitiv provin din alt cont. Ce vrei să faci cu ele?",
+  "sw": "Alamisho, vivutio na maelezo kwenye kifaa hiki yametoka akaunti nyingine. Yafanywe nini?",
+  "tl": "Galing sa ibang account ang mga bookmark, highlight at tala sa device na ito. Ano ang gagawin sa mga ito?"
+ },
+ "accountStartFresh": {
+  "en": "Start fresh on this device",
+  "fr": "Repartir de zéro ici",
+  "it": "Ricomincia da zero qui",
+  "ro": "Începe de la zero aici",
+  "sw": "Anza upya kwenye kifaa hiki",
+  "tl": "Magsimula muli sa device na ito"
+ },
+ "accountMerge": {
+  "en": "Merge into this account",
+  "fr": "Fusionner avec ce compte",
+  "it": "Unisci a questo account",
+  "ro": "Combină cu acest cont",
+  "sw": "Unganisha na akaunti hii",
+  "tl": "Isama sa account na ito"
+ },
+ "accountSignOutTitle": {
+  "en": "Sign out?",
+  "fr": "Se déconnecter ?",
+  "it": "Uscire?",
+  "ro": "Te deconectezi?",
+  "sw": "Toka?",
+  "tl": "Mag-sign out?"
+ },
+ "accountSignOutBody": {
+  "en": "Your bookmarks, highlights and notes stay safe in your account. Keep a copy on this device?",
+  "fr": "Vos signets, surlignages et notes restent en sécurité dans votre compte. Garder une copie sur cet appareil ?",
+  "it": "Segnalibri, evidenziazioni e note restano al sicuro nel tuo account. Tenere una copia su questo dispositivo?",
+  "ro": "Semnele de carte, evidențierile și notițele rămân în siguranță în cont. Păstrezi o copie pe dispozitiv?",
+  "sw": "Alamisho, vivutio na maelezo yako yako salama kwenye akaunti yako. Uhifadhi nakala kwenye kifaa hiki?",
+  "tl": "Ligtas sa iyong account ang mga bookmark, highlight at tala. Magtabi ng kopya sa device na ito?"
+ },
+ "accountRemoveFromDevice": {
+  "en": "Remove from device",
+  "fr": "Retirer de l'appareil",
+  "it": "Rimuovi dal dispositivo",
+  "ro": "Elimină de pe dispozitiv",
+  "sw": "Ondoa kwenye kifaa",
+  "tl": "Alisin sa device"
+ },
+ "accountKeepOnDevice": {
+  "en": "Keep on device",
+  "fr": "Garder sur l'appareil",
+  "it": "Tieni sul dispositivo",
+  "ro": "Păstrează pe dispozitiv",
+  "sw": "Weka kwenye kifaa",
+  "tl": "Itabi sa device"
+ },
+ "accountSyncing": {
+  "en": "Syncing…",
+  "fr": "Synchronisation…",
+  "it": "Sincronizzazione…",
+  "ro": "Se sincronizează…",
+  "sw": "Inasawazisha…",
+  "tl": "Nagsi-sync…"
+ },
+ "accountSyncFailed": {
+  "en": "Couldn't sync",
+  "fr": "Échec de la synchro",
+  "it": "Sincronizzazione non riuscita",
+  "ro": "Sincronizare eșuată",
+  "sw": "Imeshindwa kusawazisha",
+  "tl": "Hindi ma-sync"
+ },
+ "accountTapToRetry": {
+  "en": "Tap to try again",
+  "fr": "Appuyez pour réessayer",
+  "it": "Tocca per riprovare",
+  "ro": "Apasă pentru a reîncerca",
+  "sw": "Gusa kujaribu tena",
+  "tl": "Pindutin para subukan muli"
+ },
+ "accountSyncPaused": {
+  "en": "Sync paused",
+  "fr": "Synchro en pause",
+  "it": "Sincronizzazione in pausa",
+  "ro": "Sincronizare întreruptă",
+  "sw": "Usawazishaji umesitishwa",
+  "tl": "Naka-pause ang sync"
+ },
+ "accountSyncChoose": {
+  "en": "Choose what to do with this device's data",
+  "fr": "Choisissez quoi faire des données de cet appareil",
+  "it": "Scegli cosa fare con i dati del dispositivo",
+  "ro": "Alege ce faci cu datele acestui dispozitiv",
+  "sw": "Chagua la kufanya na data ya kifaa hiki",
+  "tl": "Piliin ang gagawin sa data ng device na ito"
+ },
+ "accountSyncNow": {
+  "en": "Sync now",
+  "fr": "Synchroniser",
+  "it": "Sincronizza ora",
+  "ro": "Sincronizează acum",
+  "sw": "Sawazisha sasa",
+  "tl": "I-sync ngayon"
+ },
+ "accountNotSyncedYet": {
+  "en": "Not synced yet",
+  "fr": "Jamais synchronisé",
+  "it": "Non ancora sincronizzato",
+  "ro": "Nesincronizat încă",
+  "sw": "Bado haijasawazishwa",
+  "tl": "Hindi pa naka-sync"
+ },
+ "accountSyncedJustNow": {
+  "en": "Synced just now",
+  "fr": "Synchronisé à l'instant",
+  "it": "Sincronizzato ora",
+  "ro": "Sincronizat chiar acum",
+  "sw": "Imesawazishwa sasa hivi",
+  "tl": "Na-sync ngayon lang"
+ },
+ "accountSyncedMinAgo": {
+  "en": "Synced {minutes} min ago",
+  "fr": "Synchronisé il y a {minutes} min",
+  "it": "Sincronizzato {minutes} min fa",
+  "ro": "Sincronizat acum {minutes} min",
+  "sw": "Imesawazishwa dak {minutes} zilizopita",
+  "tl": "Na-sync {minutes} min ang nakalipas",
+  "@": {
+   "placeholders": {
+    "minutes": {
+     "type": "int"
+    }
+   }
+  }
+ },
+ "accountSyncedHoursAgo": {
+  "en": "Synced {hours} h ago",
+  "fr": "Synchronisé il y a {hours} h",
+  "it": "Sincronizzato {hours} h fa",
+  "ro": "Sincronizat acum {hours} h",
+  "sw": "Imesawazishwa saa {hours} zilizopita",
+  "tl": "Na-sync {hours} oras ang nakalipas",
+  "@": {
+   "placeholders": {
+    "hours": {
+     "type": "int"
+    }
+   }
+  }
+ },
+ "accountSyncedOn": {
+  "en": "Synced {day}/{month}/{year}",
+  "fr": "Synchronisé le {day}/{month}/{year}",
+  "it": "Sincronizzato il {day}/{month}/{year}",
+  "ro": "Sincronizat pe {day}/{month}/{year}",
+  "sw": "Imesawazishwa {day}/{month}/{year}",
+  "tl": "Na-sync noong {day}/{month}/{year}",
+  "@": {
+   "placeholders": {
+    "day": {
+     "type": "int"
+    },
+    "month": {
+     "type": "int"
+    },
+    "year": {
+     "type": "int"
+    }
+   }
+  }
+ },
+ "accountRestoreTitle": {
+  "en": "Restore from Backup",
+  "fr": "Restaurer une sauvegarde",
+  "it": "Ripristina dal backup",
+  "ro": "Restaurează din copie",
+  "sw": "Rejesha kutoka Nakala",
+  "tl": "Ibalik mula sa Backup"
+ },
+ "accountRestoreHint": {
+  "en": "Paste your backup JSON here...",
+  "fr": "Collez ici le JSON de sauvegarde…",
+  "it": "Incolla qui il JSON di backup…",
+  "ro": "Lipește aici JSON-ul copiei…",
+  "sw": "Bandika JSON ya nakala hapa...",
+  "tl": "I-paste dito ang backup JSON..."
+ },
+ "accountRestoreAction": {
+  "en": "Restore",
+  "fr": "Restaurer",
+  "it": "Ripristina",
+  "ro": "Restaurează",
+  "sw": "Rejesha",
+  "tl": "Ibalik"
+ },
+ "accountResetTitle": {
+  "en": "Reset app?",
+  "fr": "Réinitialiser l'app ?",
+  "it": "Reimpostare l'app?",
+  "ro": "Resetezi aplicația?",
+  "sw": "Weka upya programu?",
+  "tl": "I-reset ang app?"
+ },
+ "accountResetBody": {
+  "en": "This erases all on-device data:\n• Bookmarks, highlights, notes & journal\n• Reading plans, progress & custom plans\n• Downloaded translations & streaks\n\nSettings, theme and the offline Bible stay untouched. This cannot be undone — back up first if needed.",
+  "fr": "Cela efface toutes les données de l'appareil :\n• Signets, surlignages, notes et journal\n• Plans de lecture, progression et plans perso\n• Traductions téléchargées et séries\n\nLes paramètres, le thème et la Bible hors ligne sont conservés. Action irréversible — sauvegardez d'abord si besoin.",
+  "it": "Cancella tutti i dati sul dispositivo:\n• Segnalibri, evidenziazioni, note e diario\n• Piani di lettura, progressi e piani personali\n• Traduzioni scaricate e serie\n\nImpostazioni, tema e Bibbia offline restano intatti. Non si può annullare: fai prima un backup se serve.",
+  "ro": "Se șterg toate datele de pe dispozitiv:\n• Semne de carte, evidențieri, notițe și jurnal\n• Planuri de citire, progres și planuri proprii\n• Traduceri descărcate și serii\n\nSetările, tema și Biblia offline rămân neatinse. Acțiunea nu poate fi anulată — fă o copie de rezervă dacă e nevoie.",
+  "sw": "Hii inafuta data yote kwenye kifaa:\n• Alamisho, vivutio, maelezo na shajara\n• Mipango ya kusoma, maendeleo na mipango yako\n• Tafsiri zilizopakuliwa na mfululizo\n\nMipangilio, mandhari na Biblia ya nje ya mtandao havitaguswa. Haiwezi kutenduliwa — hifadhi nakala kwanza ikihitajika.",
+  "tl": "Buburahin nito ang lahat ng data sa device:\n• Bookmark, highlight, tala at talaarawan\n• Mga plano sa pagbasa, progreso at sariling plano\n• Na-download na salin at streak\n\nHindi gagalawin ang setting, tema at offline na Biblia. Hindi na ito maibabalik — mag-back up muna kung kailangan."
+ },
+ "accountResetDone": {
+  "en": "App data reset. Fresh start!",
+  "fr": "Données réinitialisées. Nouveau départ !",
+  "it": "Dati reimpostati. Si riparte!",
+  "ro": "Datele au fost resetate. Un nou început!",
+  "sw": "Data imewekwa upya. Mwanzo mpya!",
+  "tl": "Na-reset ang data. Bagong simula!"
+ },
+ "accountReset": {
+  "en": "Reset",
+  "fr": "Réinitialiser",
+  "it": "Reimposta",
+  "ro": "Resetează",
+  "sw": "Weka upya",
+  "tl": "I-reset"
+ },
+ "shareBackdrop": {
+  "en": "Backdrop",
+  "fr": "Arrière-plan",
+  "it": "Sfondo",
+  "ro": "Fundal",
+  "sw": "Mandharinyuma",
+  "tl": "Background"
+ },
+ "shareBackdropDawn": {
+  "en": "Dawn",
+  "fr": "Aube",
+  "it": "Alba",
+  "ro": "Zori",
+  "sw": "Alfajiri",
+  "tl": "Bukang-liwayway"
+ },
+ "shareBackdropDusk": {
+  "en": "Dusk",
+  "fr": "Crépuscule",
+  "it": "Tramonto",
+  "ro": "Amurg",
+  "sw": "Machweo",
+  "tl": "Takipsilim"
+ },
+ "shareBackdropArtwork": {
+  "en": "Artwork",
+  "fr": "Illustration",
+  "it": "Illustrazione",
+  "ro": "Ilustrație",
+  "sw": "Mchoro",
+  "tl": "Likhang-sining"
+ },
+ "shareBackdropGradient": {
+  "en": "Gradient",
+  "fr": "Dégradé",
+  "it": "Sfumatura",
+  "ro": "Degradeu",
+  "sw": "Upinde rangi",
+  "tl": "Gradient"
+ },
+ "shareFont": {
+  "en": "Font",
+  "fr": "Police",
+  "it": "Carattere",
+  "ro": "Font",
+  "sw": "Fonti",
+  "tl": "Font"
+ },
+ "shareFontTheme": {
+  "en": "Theme",
+  "fr": "Thème",
+  "it": "Tema",
+  "ro": "Temă",
+  "sw": "Mandhari",
+  "tl": "Tema"
+ },
+ "shareSize": {
+  "en": "Size",
+  "fr": "Taille",
+  "it": "Dimensione",
+  "ro": "Mărime",
+  "sw": "Ukubwa",
+  "tl": "Laki"
+ },
+ "shareSpacing": {
+  "en": "Spacing",
+  "fr": "Espacement",
+  "it": "Spaziatura",
+  "ro": "Spațiere",
+  "sw": "Nafasi",
+  "tl": "Pagitan"
+ },
+ "shareSpacingNormal": {
+  "en": "Normal",
+  "fr": "Normal",
+  "it": "Normale",
+  "ro": "Normal",
+  "sw": "Kawaida",
+  "tl": "Normal"
+ },
+ "shareSpacingWide": {
+  "en": "Wide {value}",
+  "fr": "Large {value}",
+  "it": "Ampia {value}",
+  "ro": "Lată {value}",
+  "sw": "Pana {value}",
+  "tl": "Malapad {value}",
+  "@": {
+   "placeholders": {
+    "value": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "shareLineHeight": {
+  "en": "Line height",
+  "fr": "Interligne",
+  "it": "Interlinea",
+  "ro": "Înălțime rând",
+  "sw": "Urefu wa mstari",
+  "tl": "Taas ng linya"
+ },
+ "shareAlignment": {
+  "en": "Alignment",
+  "fr": "Alignement",
+  "it": "Allineamento",
+  "ro": "Aliniere",
+  "sw": "Mpangilio",
+  "tl": "Pagkakahanay"
+ },
+ "shareAlignCenter": {
+  "en": "Center",
+  "fr": "Centré",
+  "it": "Centro",
+  "ro": "Centru",
+  "sw": "Katikati",
+  "tl": "Gitna"
+ },
+ "shareAlignLeft": {
+  "en": "Left",
+  "fr": "Gauche",
+  "it": "Sinistra",
+  "ro": "Stânga",
+  "sw": "Kushoto",
+  "tl": "Kaliwa"
+ },
+ "sharePreparing": {
+  "en": "Preparing…",
+  "fr": "Préparation…",
+  "it": "Preparazione…",
+  "ro": "Se pregătește…",
+  "sw": "Inaandaa…",
+  "tl": "Inihahanda…"
+ },
+ "shareImage": {
+  "en": "Share image",
+  "fr": "Partager l'image",
+  "it": "Condividi immagine",
+  "ro": "Distribuie imaginea",
+  "sw": "Shiriki picha",
+  "tl": "Ibahagi ang larawan"
+ },
+ "shareText": {
+  "en": "Share text",
+  "fr": "Partager le texte",
+  "it": "Condividi testo",
+  "ro": "Distribuie textul",
+  "sw": "Shiriki maandishi",
+  "tl": "Ibahagi ang teksto"
+ },
+ "shareImageCard": {
+  "en": "Share image card",
+  "fr": "Partager une carte image",
+  "it": "Condividi card immagine",
+  "ro": "Distribuie card-ul imagine",
+  "sw": "Shiriki kadi ya picha",
+  "tl": "Ibahagi ang image card"
+ },
+ "spaceStorageTitle": {
+  "en": "Storage",
+  "fr": "Stockage",
+  "it": "Spazio di archiviazione",
+  "ro": "Stocare",
+  "sw": "Hifadhi",
+  "tl": "Storage"
+ },
+ "spaceClearCacheTitle": {
+  "en": "Clear cache?",
+  "fr": "Vider le cache ?",
+  "it": "Svuotare la cache?",
+  "ro": "Golești memoria cache?",
+  "sw": "Futa akiba?",
+  "tl": "I-clear ang cache?"
+ },
+ "spaceClearCacheBody": {
+  "en": "Removes temporary files (generated share cards, thumbnails). Your notes, bookmarks, highlights and downloads are untouched.",
+  "fr": "Supprime les fichiers temporaires (cartes de partage, miniatures). Vos notes, signets, surlignages et téléchargements sont conservés.",
+  "it": "Rimuove i file temporanei (card di condivisione, miniature). Note, segnalibri, evidenziazioni e download restano intatti.",
+  "ro": "Elimină fișierele temporare (carduri generate, miniaturi). Notițele, semnele de carte, evidențierile și descărcările rămân neatinse.",
+  "sw": "Huondoa faili za muda (kadi za kushiriki, picha ndogo). Maelezo, alamisho, vivutio na vipakuliwa vyako havitaguswa.",
+  "tl": "Inaalis ang pansamantalang file (share card, thumbnail). Hindi gagalawin ang iyong tala, bookmark, highlight at download."
+ },
+ "spaceClearCache": {
+  "en": "Clear cache",
+  "fr": "Vider le cache",
+  "it": "Svuota cache",
+  "ro": "Golește cache",
+  "sw": "Futa akiba",
+  "tl": "I-clear ang cache"
+ },
+ "spaceCacheCleared": {
+  "en": "Cache cleared",
+  "fr": "Cache vidé",
+  "it": "Cache svuotata",
+  "ro": "Cache golit",
+  "sw": "Akiba imefutwa",
+  "tl": "Na-clear ang cache"
+ },
+ "spaceDeletePackTitle": {
+  "en": "Delete {name}?",
+  "fr": "Supprimer {name} ?",
+  "it": "Eliminare {name}?",
+  "ro": "Ștergi {name}?",
+  "sw": "Futa {name}?",
+  "tl": "Burahin ang {name}?",
+  "@": {
+   "placeholders": {
+    "name": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "spaceDeletePackBundled": {
+  "en": "Frees {size}. You can restore it offline from the app at any time.",
+  "fr": "Libère {size}. Vous pourrez la restaurer hors ligne à tout moment.",
+  "it": "Libera {size}. Puoi ripristinarla offline in qualsiasi momento.",
+  "ro": "Eliberează {size}. O poți restaura offline oricând.",
+  "sw": "Inaachilia {size}. Unaweza kuirejesha bila mtandao wakati wowote.",
+  "tl": "Magpapalaya ng {size}. Maibabalik mo ito offline anumang oras.",
+  "@": {
+   "placeholders": {
+    "size": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "spaceDeletePackDownloaded": {
+  "en": "Frees {size}. You can download it again later.",
+  "fr": "Libère {size}. Vous pourrez la retélécharger plus tard.",
+  "it": "Libera {size}. Potrai scaricarla di nuovo in seguito.",
+  "ro": "Eliberează {size}. O poți descărca din nou mai târziu.",
+  "sw": "Inaachilia {size}. Unaweza kuipakua tena baadaye.",
+  "tl": "Magpapalaya ng {size}. Mada-download mo ulit ito mamaya.",
+  "@": {
+   "placeholders": {
+    "size": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "spacePackDeleted": {
+  "en": "{abbr} deleted",
+  "fr": "{abbr} supprimée",
+  "it": "{abbr} eliminata",
+  "ro": "{abbr} ștearsă",
+  "sw": "{abbr} imefutwa",
+  "tl": "Nabura ang {abbr}",
+  "@": {
+   "placeholders": {
+    "abbr": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "spacePackDownloaded": {
+  "en": "{abbr} downloaded",
+  "fr": "{abbr} téléchargée",
+  "it": "{abbr} scaricata",
+  "ro": "{abbr} descărcată",
+  "sw": "{abbr} imepakuliwa",
+  "tl": "Na-download ang {abbr}",
+  "@": {
+   "placeholders": {
+    "abbr": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "spaceCouldNotFinish": {
+  "en": "Could not finish: {error}",
+  "fr": "Échec : {error}",
+  "it": "Impossibile completare: {error}",
+  "ro": "Nu s-a putut finaliza: {error}",
+  "sw": "Imeshindwa kukamilisha: {error}",
+  "tl": "Hindi natapos: {error}",
+  "@": {
+   "placeholders": {
+    "error": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "spaceFreed": {
+  "en": "{message} · freed {size}",
+  "fr": "{message} · {size} libérés",
+  "it": "{message} · liberati {size}",
+  "ro": "{message} · eliberat {size}",
+  "sw": "{message} · {size} zimeachiliwa",
+  "tl": "{message} · napalaya ang {size}",
+  "@": {
+   "placeholders": {
+    "message": {
+     "type": "String"
+    },
+    "size": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "spaceOnThisDevice": {
+  "en": "On this device",
+  "fr": "Sur cet appareil",
+  "it": "Su questo dispositivo",
+  "ro": "Pe acest dispozitiv",
+  "sw": "Kwenye kifaa hiki",
+  "tl": "Sa device na ito"
+ },
+ "spaceBibleContent": {
+  "en": "Bible content (always kept)",
+  "fr": "Contenu biblique (toujours conservé)",
+  "it": "Contenuto biblico (sempre conservato)",
+  "ro": "Conținut biblic (păstrat mereu)",
+  "sw": "Maudhui ya Biblia (huhifadhiwa daima)",
+  "tl": "Nilalaman ng Biblia (laging itinatabi)"
+ },
+ "spaceDownloadedPacks": {
+  "en": "Downloaded packs",
+  "fr": "Packs téléchargés",
+  "it": "Pacchetti scaricati",
+  "ro": "Pachete descărcate",
+  "sw": "Vifurushi vilivyopakuliwa",
+  "tl": "Na-download na pack"
+ },
+ "spaceCache": {
+  "en": "Cache",
+  "fr": "Cache",
+  "it": "Cache",
+  "ro": "Cache",
+  "sw": "Akiba",
+  "tl": "Cache"
+ },
+ "spaceCacheExplain": {
+  "en": "Temporary files only — generated share cards and thumbnails. Safe to clear at any time.",
+  "fr": "Fichiers temporaires uniquement — cartes de partage et miniatures. Peut être vidé à tout moment.",
+  "it": "Solo file temporanei: card di condivisione e miniature. Puoi svuotarla in qualsiasi momento.",
+  "ro": "Doar fișiere temporare — carduri generate și miniaturi. Poate fi golit oricând.",
+  "sw": "Faili za muda tu — kadi za kushiriki na picha ndogo. Ni salama kufuta wakati wowote.",
+  "tl": "Pansamantalang file lang — share card at thumbnail. Ligtas i-clear anumang oras."
+ },
+ "spaceTranslationsDownloads": {
+  "en": "Translations & downloads",
+  "fr": "Traductions et téléchargements",
+  "it": "Traduzioni e download",
+  "ro": "Traduceri și descărcări",
+  "sw": "Tafsiri na vipakuliwa",
+  "tl": "Mga salin at download"
+ },
+ "spaceBundledSuffix": {
+  "en": " · bundled",
+  "fr": " · intégrée",
+  "it": " · inclusa",
+  "ro": " · inclusă",
+  "sw": " · imejumuishwa",
+  "tl": " · kasama"
+ },
+ "spaceCoreNotRemovable": {
+  "en": "Core KJV and BBE are part of the app and can't be removed.",
+  "fr": "Les versions KJV et BBE font partie de l'app et ne peuvent pas être supprimées.",
+  "it": "KJV e BBE fanno parte dell'app e non possono essere rimosse.",
+  "ro": "KJV și BBE fac parte din aplicație și nu pot fi eliminate.",
+  "sw": "KJV na BBE ni sehemu ya programu na haziwezi kuondolewa.",
+  "tl": "Bahagi ng app ang KJV at BBE at hindi maaalis."
+ },
+ "spaceGet": {
+  "en": "Get",
+  "fr": "Obtenir",
+  "it": "Scarica",
+  "ro": "Obține",
+  "sw": "Pata",
+  "tl": "Kunin"
+ },
+ "spaceDeletePackTooltip": {
+  "en": "Delete {name}",
+  "fr": "Supprimer {name}",
+  "it": "Elimina {name}",
+  "ro": "Șterge {name}",
+  "sw": "Futa {name}",
+  "tl": "Burahin ang {name}",
+  "@": {
+   "placeholders": {
+    "name": {
+     "type": "String"
+    }
+   }
+  }
+ }
+}

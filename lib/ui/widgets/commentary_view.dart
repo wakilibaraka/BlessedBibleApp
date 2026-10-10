@@ -17,6 +17,7 @@ import '../../models/study_content_category.dart';
 import '../screens/commentary_hub_screen.dart';
 import '../../state/read_location_provider.dart';
 import 'verse_link_text.dart';
+import '../../l10n/l10n.dart';
 
 class CommentaryView extends ConsumerStatefulWidget {
   final String book;
@@ -201,7 +202,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                   icon: Icon(Icons.arrow_back_ios_new_rounded,
                       color: theme.primaryColor),
                   onPressed: () => Navigator.pop(context),
-                  tooltip: 'Back',
+                  tooltip: context.l10n.commonBack,
                 ),
               ),
               Container(
@@ -237,8 +238,8 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                             : tokens.readingInkMuted,
                       ),
                       tooltip: isBookmarked
-                          ? 'Remove Bookmark'
-                          : 'Bookmark Commentary',
+                          ? context.l10n.studyRemoveBookmark
+                          : context.l10n.studyBookmarkCommentary,
                       onPressed: () {
                         VerseActionLogic.handleBookmark(context, theme, ref,
                             bookName, chapterNum, [displayVerse ?? 1]);
@@ -248,7 +249,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                       IconButton(
                         icon: Icon(Icons.open_in_full_rounded,
                             color: tokens.readingAccent, size: 20),
-                        tooltip: 'Expand to full screen',
+                        tooltip: context.l10n.studyExpandFullScreen,
                         onPressed: widget.onExpand,
                       ),
                   ],
@@ -386,7 +387,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Tap to read in context',
+                              context.l10n.studyTapToReadInContext,
                               style: theme.textTheme.bodyMedium?.copyWith(
                                 color: tokens.readingInkMuted
                                     .withValues(alpha: 0.6),
@@ -443,7 +444,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                 child: _buildCollapsibleSection(
                   theme: theme,
                   tokens: tokens,
-                  title: 'On this chapter',
+                  title: context.l10n.studyOnThisChapter,
                   isExpanded: _userToggledChapter
                       ? _showChapter
                       : (verseEntries.isEmpty || _showChapter),
@@ -463,7 +464,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                 child: _buildCollapsibleSection(
                   theme: theme,
                   tokens: tokens,
-                  title: 'On this book',
+                  title: context.l10n.studyOnThisBook,
                   isExpanded: _userToggledBook
                       ? _showBook
                       : (verseEntries.isEmpty && chapterEntries.isEmpty ||
@@ -505,7 +506,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
               size: 56, color: tokens.readingAccent.withValues(alpha: 0.4)),
           const SizedBox(height: 20),
           Text(
-            'No commentary yet',
+            context.l10n.studyNoCommentaryTitle,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: tokens.readingInk,
@@ -513,7 +514,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
           ),
           const SizedBox(height: 12),
           Text(
-            'We couldn\'t find specific commentary for this passage. Try exploring the chapter or book-level commentary below.',
+            context.l10n.studyNoCommentaryBody,
             textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall?.copyWith(
               color: tokens.readingInkMuted,
@@ -637,7 +638,9 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  entry.source.isNotEmpty ? entry.source : 'Commentary',
+                  entry.source.isNotEmpty
+                      ? entry.source
+                      : context.l10n.studyCommentaryEyebrow,
                   style: theme.textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.1,

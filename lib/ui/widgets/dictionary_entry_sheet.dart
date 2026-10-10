@@ -6,6 +6,7 @@ import '../../state/typography_provider.dart';
 import '../../services/share_service.dart';
 import 'share_card.dart';
 import '../dialogs/verse_preview_dialog.dart';
+import '../../l10n/l10n.dart';
 
 class DictionaryEntrySheet extends ConsumerWidget {
   final String normalizedWord;
@@ -74,7 +75,7 @@ class DictionaryEntrySheet extends ConsumerWidget {
                     onPressed: () => Navigator.of(context).pop(),
                     icon: Icon(Icons.arrow_back_ios_new_rounded,
                         size: 18, color: theme.primaryColor),
-                    label: Text('Back',
+                    label: Text(context.l10n.commonBack,
                         style:
                             TextStyle(fontSize: 16, color: theme.primaryColor)),
                     style: TextButton.styleFrom(
@@ -85,6 +86,9 @@ class DictionaryEntrySheet extends ConsumerWidget {
                   Row(
                     children: [
                       IconButton(
+                        tooltip: isBookmarked
+                            ? context.l10n.studyRemoveSavedWord
+                            : context.l10n.studySaveWord,
                         onPressed: () {
                           ref
                               .read(bookmarkedWordsProvider.notifier)
@@ -103,6 +107,7 @@ class DictionaryEntrySheet extends ConsumerWidget {
                       ),
                       const SizedBox(width: 4),
                       IconButton(
+                        tooltip: context.l10n.commonShare,
                         onPressed: () {
                           final defs = definitionsAsync.asData?.value;
                           if (defs == null || defs.isEmpty) return;
@@ -126,7 +131,8 @@ class DictionaryEntrySheet extends ConsumerWidget {
                             shareText: full,
                             imageFilename: 'word',
                             buildCard: (backdrop, style) => ShareCard.word(
-                              eyebrow: 'DICTIONARY',
+                              eyebrow: context.l10n.studyDictionaryEyebrow
+                                  .toUpperCase(),
                               word: displayWord,
                               definition: defs.first.definition,
                               source: _formatSourceName(defs.first.source),
@@ -151,9 +157,9 @@ class DictionaryEntrySheet extends ConsumerWidget {
               child: definitionsAsync.when(
                 data: (defs) {
                   if (defs.isEmpty) {
-                    return const Padding(
-                      padding: EdgeInsets.all(32.0),
-                      child: Text('No definition found.'),
+                    return Padding(
+                      padding: const EdgeInsets.all(32.0),
+                      child: Text(context.l10n.studyNoDefinition),
                     );
                   }
 
@@ -233,7 +239,8 @@ class DictionaryEntrySheet extends ConsumerWidget {
                   padding: EdgeInsets.all(40.0),
                   child: CircularProgressIndicator(),
                 )),
-                error: (e, __) => Center(child: Text('Failed to load: $e')),
+                error: (e, __) =>
+                    Center(child: Text(context.l10n.studyFailedToLoad('$e'))),
               ),
             ),
           ],

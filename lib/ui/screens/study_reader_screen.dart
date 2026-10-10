@@ -35,6 +35,7 @@ import '../sheets/verse_context_menu_sheet.dart';
 import '../../state/pericopes_provider.dart';
 
 import '../../models/pericope_entry.dart';
+import '../../l10n/l10n.dart';
 
 enum StudyMode { plan, deepDive }
 
@@ -380,9 +381,9 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
     if (_passages.isEmpty) {
       return Scaffold(
         appBar: AppBar(
-            title: const Text('Passage not found'),
+            title: Text(context.l10n.studyPassageNotFound),
             backgroundColor: Colors.transparent),
-        body: const Center(child: Text('Could not load passage data.')),
+        body: Center(child: Text(context.l10n.studyPassageLoadError)),
       );
     }
 
@@ -434,8 +435,10 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                     },
                     child: Text(
                       widget.payload.mode == StudyMode.plan
-                          ? (isDone ? '✓ Completed' : 'Mark as Read')
-                          : 'Done',
+                          ? (isDone
+                              ? context.l10n.studyCompletedCheck
+                              : context.l10n.studyMarkAsRead)
+                          : context.l10n.commonDone,
                       style: const TextStyle(
                           fontFamily: 'EB Garamond',
                           fontSize: 18,
@@ -451,16 +454,16 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                           borderRadius: BorderRadius.circular(12)),
                     ),
                     onPressed: () => _goToPassage(_passageIndex + 1),
-                    child: const Row(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('Next Passage',
-                            style: TextStyle(
+                        Text(context.l10n.studyNextPassage,
+                            style: const TextStyle(
                                 fontFamily: 'EB Garamond',
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold)),
-                        SizedBox(width: 8),
-                        Icon(Icons.arrow_forward_rounded, size: 20),
+                        const SizedBox(width: 8),
+                        const Icon(Icons.arrow_forward_rounded, size: 20),
                       ],
                     ),
                   ),
@@ -580,7 +583,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                                       borderRadius: BorderRadius.circular(16),
                                     ),
                                     child: Text(
-                                      'Full chapter',
+                                      context.l10n.studyFullChapter,
                                       style: TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.w600,
@@ -597,7 +600,8 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                             if (_passages.length > 1)
                               IgnorePointer(
                                 child: Text(
-                                  'Passage ${_passageIndex + 1} of ${_passages.length}',
+                                  context.l10n.studyPassageOfTotal(
+                                      _passageIndex + 1, _passages.length),
                                   style: theme.textTheme.labelSmall?.copyWith(
                                     color: gold.withValues(alpha: 0.75),
                                     letterSpacing: 1.0,
@@ -964,21 +968,22 @@ class _VerseActionBar extends ConsumerWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.only(left: 8.0),
-                child: Text('${selectedVerses.length} selected',
+                child: Text(
+                    context.l10n.studySelectedCount(selectedVerses.length),
                     style: theme.textTheme.labelMedium),
               ),
               // Highlight — opens color palette sheet
               GestureDetector(
                 onLongPress: onHighlightLongPress,
                 child: IconButton(
-                  tooltip: 'Highlight',
+                  tooltip: context.l10n.studyHighlight,
                   icon: Icon(Icons.highlight_rounded, color: gold),
                   onPressed: onHighlight,
                 ),
               ),
               // Bookmark
               IconButton(
-                tooltip: 'Bookmark',
+                tooltip: context.l10n.studyBookmark,
                 icon: Icon(Icons.bookmark_rounded, color: gold),
                 onPressed: () {
                   VerseActionLogic.handleBookmark(context, theme, ref, bookName,
@@ -988,7 +993,7 @@ class _VerseActionBar extends ConsumerWidget {
               ),
               // Note
               IconButton(
-                tooltip: 'Add Note',
+                tooltip: context.l10n.studyAddNote,
                 icon: Icon(Icons.note_add_rounded, color: gold),
                 onPressed: () async {
                   await VerseActionLogic.handleNote(context, ref, theme,
@@ -998,13 +1003,13 @@ class _VerseActionBar extends ConsumerWidget {
               ),
               // Commentary (first selected verse)
               IconButton(
-                tooltip: 'Commentary',
+                tooltip: context.l10n.studyCommentaryEyebrow,
                 icon: Icon(Icons.star_rounded, color: gold),
                 onPressed: () => onCommentary(selectedVerses.first),
               ),
               // Share
               IconButton(
-                tooltip: 'Share',
+                tooltip: context.l10n.commonShare,
                 icon: Icon(Icons.share_rounded, color: gold),
                 onPressed: () async {
                   await VerseActionLogic.handleShare(
@@ -1013,6 +1018,7 @@ class _VerseActionBar extends ConsumerWidget {
                 },
               ),
               IconButton(
+                tooltip: context.l10n.commonClose,
                 icon: const Icon(Icons.close_rounded, size: 20),
                 onPressed: onDismiss,
               ),

@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 import '../../state/reading_plan_provider.dart';
 import 'study_v2_widgets.dart';
+import '../../l10n/l10n.dart';
 
-const List<String> _weekdayNames = [
-  'MON',
-  'TUE',
-  'WED',
-  'THU',
-  'FRI',
-  'SAT',
-  'SUN',
-];
+/// Short, upper-cased weekday name for [day] in the current locale.
+String _weekdayShort(BuildContext context, DateTime day) =>
+    DateFormat.E(Localizations.localeOf(context).toString())
+        .format(day)
+        .toUpperCase();
 
 /// Monday-first week containing [day].
 List<DateTime> libraryWeekDays(DateTime day) {
@@ -189,6 +187,14 @@ class _DayCell extends StatelessWidget {
     this.complete = false,
   });
 
+  String _dayLabel(BuildContext context, bool isToday) {
+    final l10n = context.l10n;
+    var label = '${_weekdayShort(context, day)} ${day.day}';
+    if (complete) label = l10n.plansCalendarDayComplete(label);
+    if (isToday) label = l10n.plansCalendarDayToday(label);
+    return label;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -200,9 +206,7 @@ class _DayCell extends StatelessWidget {
         ? theme.primaryColor
         : theme.colorScheme.onSurface.withValues(alpha: inFuture ? 0.3 : 0.5);
     return Semantics(
-      label: '${_weekdayNames[day.weekday - 1]} ${day.day}'
-          '${complete ? ', reading complete' : ''}'
-          '${isToday ? ', today' : ''}',
+      label: _dayLabel(context, isToday),
       child: ExcludeSemantics(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -217,7 +221,7 @@ class _DayCell extends StatelessWidget {
             ),
             const SizedBox(height: 1),
             Text(
-              _weekdayNames[day.weekday - 1],
+              _weekdayShort(context, day),
               style: theme.textTheme.labelSmall?.copyWith(
                 fontWeight: isToday ? FontWeight.w800 : FontWeight.w500,
                 letterSpacing: 0.5,
@@ -266,7 +270,7 @@ class _StepButton extends StatelessWidget {
     return Semantics(
       button: true,
       enabled: enabled,
-      label: 'Change week',
+      label: context.l10n.plansChangeWeek,
       child: ExcludeSemantics(
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,

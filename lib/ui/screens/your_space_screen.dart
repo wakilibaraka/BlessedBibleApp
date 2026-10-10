@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/l10n.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/user_data_provider.dart';
 import '../../state/read_location_provider.dart';
@@ -92,7 +93,7 @@ class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
         appBar: SharedAppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          title: Text('Your Space',
+          title: Text(context.l10n.spaceTitle,
               style: theme.textTheme.titleMedium
                   ?.copyWith(fontWeight: FontWeight.bold)),
         ),
@@ -113,7 +114,7 @@ class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
                       children: [
                         Expanded(
                           child: _SegmentTab(
-                            label: 'Highlights',
+                            label: context.l10n.spaceTabHighlights,
                             isSelected: _selectedIndex == 0,
                             onTap: () => _onTabTapped(0),
                             theme: theme,
@@ -121,7 +122,7 @@ class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
                         ),
                         Expanded(
                           child: _SegmentTab(
-                            label: 'Bookmarks',
+                            label: context.l10n.spaceTabBookmarks,
                             isSelected: _selectedIndex == 1,
                             onTap: () => _onTabTapped(1),
                             theme: theme,
@@ -129,7 +130,7 @@ class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
                         ),
                         Expanded(
                           child: _SegmentTab(
-                            label: 'Notes',
+                            label: context.l10n.spaceTabNotes,
                             isSelected: _selectedIndex == 2,
                             onTap: () => _onTabTapped(2),
                             theme: theme,
@@ -137,7 +138,7 @@ class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
                         ),
                         Expanded(
                           child: _SegmentTab(
-                            label: 'Journal',
+                            label: context.l10n.spaceTabJournal,
                             isSelected: _selectedIndex == 3,
                             onTap: () => _onTabTapped(3),
                             theme: theme,
@@ -288,7 +289,7 @@ class _HighlightsSegment extends ConsumerWidget {
                               ),
                               const SizedBox(width: 10),
                               Text(
-                                'Highlighted',
+                                context.l10n.spaceHighlighted,
                                 style: theme.textTheme.labelMedium
                                     ?.copyWith(fontWeight: FontWeight.bold),
                               ),
@@ -325,16 +326,17 @@ void _showAddFolderDialog(BuildContext context, WidgetRef ref) {
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: const Text('New Folder'),
+        title: Text(context.l10n.spaceNewFolder),
         content: TextField(
           controller: nameController,
           autofocus: true,
-          decoration: const InputDecoration(hintText: 'Folder name'),
+          decoration:
+              InputDecoration(hintText: context.l10n.spaceFolderNameHint),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(context.l10n.commonCancel),
           ),
           TextButton(
             onPressed: () {
@@ -345,7 +347,7 @@ void _showAddFolderDialog(BuildContext context, WidgetRef ref) {
               }
               Navigator.pop(context);
             },
-            child: const Text('Create'),
+            child: Text(context.l10n.spaceCreate),
           ),
         ],
       );
@@ -360,16 +362,17 @@ void _showRenameFolderDialog(
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: const Text('Rename Folder'),
+        title: Text(context.l10n.spaceRenameFolder),
         content: TextField(
           controller: nameController,
           autofocus: true,
-          decoration: const InputDecoration(hintText: 'Folder name'),
+          decoration:
+              InputDecoration(hintText: context.l10n.spaceFolderNameHint),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(context.l10n.commonCancel),
           ),
           TextButton(
             onPressed: () {
@@ -380,7 +383,7 @@ void _showRenameFolderDialog(
               }
               Navigator.pop(context);
             },
-            child: const Text('Rename'),
+            child: Text(context.l10n.spaceRename),
           ),
         ],
       );
@@ -394,20 +397,20 @@ void _showDeleteFolderDialog(
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: const Text('Delete Folder?'),
-        content: Text(
-            'Are you sure you want to delete "$folderName"?\n\nYour bookmarks inside this folder will NOT be deleted; they will be moved to Unfiled.'),
+        title: Text(context.l10n.spaceDeleteFolderTitle),
+        content: Text(context.l10n.spaceDeleteFolderBody(folderName)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(context.l10n.commonCancel),
           ),
           TextButton(
             onPressed: () {
               ref.read(bookmarkDataProvider.notifier).deleteFolder(folderId);
               Navigator.pop(context);
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: Text(context.l10n.commonDelete,
+                style: const TextStyle(color: Colors.red)),
           ),
         ],
       );
@@ -433,12 +436,12 @@ void _showMoveToFolderSheet(
             children: [
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Text('Move to Folder',
+                child: Text(context.l10n.spaceMoveToFolder,
                     style: theme.textTheme.titleMedium
                         ?.copyWith(fontWeight: FontWeight.bold)),
               ),
               ListTile(
-                title: const Text('Unfiled'),
+                title: Text(context.l10n.spaceUnfiled),
                 trailing: currentFolderId == null
                     ? Icon(Icons.check, color: theme.primaryColor)
                     : null,
@@ -515,11 +518,11 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
       final now = DateTime.now();
       for (final n in filteredNodes) {
         final diff = now.difference(n.createdAt);
-        String group = 'Earlier';
+        String group = context.l10n.spaceGroupEarlier;
         if (diff.inDays <= 7) {
-          group = 'Last 7 Days';
+          group = context.l10n.spaceGroupLast7Days;
         } else if (diff.inDays <= 30) {
-          group = 'Last 30 Days';
+          group = context.l10n.spaceGroupLast30Days;
         }
 
         groups.putIfAbsent(group, () => []).add(n);
@@ -527,7 +530,7 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
     } else if (_viewType == _BookmarkViewType.byBook) {
       for (final n in filteredNodes) {
         final data = _parseVerseRef(n.reference, flatChapters);
-        final group = data?.bookName ?? 'Unknown Book';
+        final group = data?.bookName ?? context.l10n.spaceUnknownBook;
         groups.putIfAbsent(group, () => []).add(n);
       }
     }
@@ -570,7 +573,7 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
       content = filteredNodes.isEmpty
           ? Center(
               child: Text(
-                'No bookmarks here.',
+                context.l10n.spaceNoBookmarks,
                 style: widget.theme.textTheme.bodySmall?.copyWith(
                   color:
                       widget.theme.colorScheme.onSurface.withValues(alpha: 0.5),
@@ -607,7 +610,7 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
           child: Row(
             children: [
               ChoiceChip(
-                label: const Text('All'),
+                label: Text(context.l10n.spaceFilterAll),
                 selected: _viewType == _BookmarkViewType.all,
                 onSelected: (val) {
                   if (val) setState(() => _viewType = _BookmarkViewType.all);
@@ -615,7 +618,7 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
               ),
               const SizedBox(width: 8),
               ChoiceChip(
-                label: const Text('Unfiled'),
+                label: Text(context.l10n.spaceUnfiled),
                 selected: _viewType == _BookmarkViewType.unfiled,
                 onSelected: (val) {
                   if (val) {
@@ -647,7 +650,7 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
                   )),
               ActionChip(
                 avatar: const Icon(Icons.add, size: 16),
-                label: const Text('New Folder'),
+                label: Text(context.l10n.spaceNewFolder),
                 onPressed: () => _showAddFolderDialog(context, ref),
               ),
               const SizedBox(width: 8),
@@ -657,7 +660,7 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
                   color: widget.theme.dividerColor.withValues(alpha: 0.2)),
               const SizedBox(width: 8),
               ChoiceChip(
-                label: const Text('By Date'),
+                label: Text(context.l10n.spaceByDate),
                 selected: _viewType == _BookmarkViewType.byDate,
                 onSelected: (val) {
                   if (val) setState(() => _viewType = _BookmarkViewType.byDate);
@@ -665,7 +668,7 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
               ),
               const SizedBox(width: 8),
               ChoiceChip(
-                label: const Text('By Book'),
+                label: Text(context.l10n.spaceByBook),
                 selected: _viewType == _BookmarkViewType.byBook,
                 onSelected: (val) {
                   if (val) setState(() => _viewType = _BookmarkViewType.byBook);
@@ -735,7 +738,7 @@ class _NotesSegment extends ConsumerWidget {
             children: [
               Expanded(
                 child: Text(
-                  'Your notes.',
+                  context.l10n.spaceYourNotes,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                     height: 1.4,
@@ -753,7 +756,7 @@ class _NotesSegment extends ConsumerWidget {
           child: notes.isEmpty
               ? Center(
                   child: Text(
-                    'No notes yet.\nTap + to create one.',
+                    context.l10n.spaceNoNotesTapPlus,
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodySmall?.copyWith(
                         color:
@@ -985,7 +988,7 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                   // Same sheet as long-press: one behaviour for
                   // highlights and bookmarks.
                   IconButton(
-                    tooltip: 'More',
+                    tooltip: context.l10n.spaceMore,
                     icon: Icon(Icons.more_vert_rounded,
                         size: 20,
                         color:
@@ -1264,12 +1267,12 @@ void _showNoteContext(
   final text = note.content.trim();
   ItemContextSheet.show(
     context,
-    title: note.title.isEmpty ? 'Note' : note.title,
+    title: note.title.isEmpty ? context.l10n.spaceNote : note.title,
     subtitle: note.reference ?? note.date,
     actions: [
       ItemAction(
         icon: Icons.edit_outlined,
-        label: 'Edit',
+        label: context.l10n.commonEdit,
         onTap: () => showAddNoteSheet(
           context,
           ref,
@@ -1280,7 +1283,7 @@ void _showNoteContext(
       ),
       ItemAction(
         icon: Icons.copy_rounded,
-        label: 'Copy text',
+        label: context.l10n.spaceCopyText,
         onTap: () => ShareService.copyText(
             context,
             text.isEmpty
@@ -1290,7 +1293,7 @@ void _showNoteContext(
       ),
       ItemAction(
         icon: Icons.ios_share_rounded,
-        label: 'Share',
+        label: context.l10n.commonShare,
         onTap: () => ShareService.shareText(
           body: text.isEmpty
               ? '${note.title}${note.reference != null ? " — ${note.reference}" : ""}'
@@ -1299,14 +1302,14 @@ void _showNoteContext(
       ),
       ItemAction(
         icon: Icons.delete_outline_rounded,
-        label: 'Delete',
+        label: context.l10n.commonDelete,
         destructive: true,
         onTap: () async {
           final ok = await confirmDestructive(
             context,
-            title: 'Delete note?',
-            message:
-                '"${note.title.isEmpty ? "Untitled" : note.title}" will be removed permanently.',
+            title: context.l10n.spaceDeleteNoteTitle,
+            message: context.l10n.spaceDeleteNoteBody(
+                note.title.isEmpty ? context.l10n.spaceUntitled : note.title),
           );
           if (ok) ref.read(notesProvider.notifier).remove(note.id);
         },
@@ -1366,22 +1369,24 @@ void _showVerseItemContext(
   ItemContextSheet.show(
     context,
     title: formattedRef,
-    subtitle: isBookmarked ? 'Bookmarked verse' : 'Highlighted verse',
+    subtitle: isBookmarked
+        ? context.l10n.spaceBookmarkedVerse
+        : context.l10n.spaceHighlightedVerse,
     actions: [
       ItemAction(
         icon: Icons.menu_book_rounded,
-        label: 'Open in Read',
+        label: context.l10n.spaceOpenInRead,
         onTap: openInRead,
       ),
       ItemAction(
         icon: Icons.note_add_outlined,
-        label: 'Add note',
+        label: context.l10n.spaceAddNote,
         onTap: () => showAddNoteSheet(context, ref, theme,
             initialReference: formattedRef),
       ),
       ItemAction(
         icon: Icons.copy_rounded,
-        label: 'Copy verse',
+        label: context.l10n.spaceCopyVerse,
         onTap: () => ShareService.copyText(
           context,
           ShareService.formatVerse(
@@ -1393,25 +1398,27 @@ void _showVerseItemContext(
       ),
       ItemAction(
         icon: Icons.ios_share_rounded,
-        label: 'Share verse',
+        label: context.l10n.spaceShareVerse,
         onTap: shareVerse,
       ),
       if (!isBookmarked)
         ItemAction(
           icon: Icons.color_lens_rounded,
-          label: 'Change colour',
+          label: context.l10n.spaceChangeColour,
           onTap: () => _showHighlightColorSheet(
               context, ref, theme, refKey, highlightColorIndex),
         ),
       if (isBookmarked)
         ItemAction(
           icon: Icons.folder_copy_outlined,
-          label: 'Move to folder',
+          label: context.l10n.spaceMoveToFolderAction,
           onTap: () => _showMoveToFolderSheet(context, ref, refKey, theme),
         ),
       ItemAction(
         icon: Icons.delete_outline_rounded,
-        label: isBookmarked ? 'Remove bookmark' : 'Remove highlight',
+        label: isBookmarked
+            ? context.l10n.spaceRemoveBookmark
+            : context.l10n.spaceRemoveHighlight,
         destructive: true,
         onTap: () async {
           if (isBookmarked) {
@@ -1451,7 +1458,7 @@ void _showHighlightColorSheet(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Highlight colour',
+            Text(context.l10n.spaceHighlightColour,
                 style: theme.textTheme.titleSmall
                     ?.copyWith(fontWeight: FontWeight.w800)),
             const SizedBox(height: 14),
@@ -1463,7 +1470,7 @@ void _showHighlightColorSheet(
                   Semantics(
                     button: true,
                     selected: currentIndex == i,
-                    label: 'Colour ${i + 1}',
+                    label: context.l10n.spaceColourN(i + 1),
                     child: GestureDetector(
                       onTap: () {
                         HapticFeedback.selectionClick();

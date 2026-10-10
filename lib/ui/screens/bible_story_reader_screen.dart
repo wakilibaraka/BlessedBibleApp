@@ -6,6 +6,7 @@ import '../../state/devotional_provider.dart';
 import '../widgets/verse_link_text.dart' show splitBoldSegments;
 import '../../theme/app_colors.dart';
 import 'bible_stories_screen.dart';
+import '../../l10n/l10n.dart';
 
 /// Two-page devotional reader: engraving on top, scripture + retelling below.
 class BibleStoryReaderScreen extends ConsumerStatefulWidget {
@@ -50,8 +51,9 @@ class _BibleStoryReaderScreenState
     if (!mounted) return;
     if (neighbor == null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(
-            next ? 'You have reached the end.' : 'This is the first story.'),
+        content: Text(next
+            ? context.l10n.storiesReachedEnd
+            : context.l10n.storiesFirstStory),
         duration: const Duration(seconds: 1),
       ));
       return;
@@ -96,7 +98,7 @@ class _BibleStoryReaderScreenState
                       : Icons.favorite_outline_rounded,
                   color: isFavorite ? AppColors.goldAccent : null,
                 ),
-                tooltip: 'Favorite',
+                tooltip: context.l10n.storiesFavorite,
                 onPressed: () => ref
                     .read(devotionalFavoritesProvider.notifier)
                     .toggle(_story.id),
@@ -108,7 +110,7 @@ class _BibleStoryReaderScreenState
                       : Icons.check_circle_outline_rounded,
                   color: _markedRead ? AppColors.goldAccent : null,
                 ),
-                tooltip: 'Mark as read',
+                tooltip: context.l10n.storiesMarkAsRead,
                 onPressed: () {
                   ref.read(devotionalReadProvider.notifier).markRead(_story.id);
                   setState(() => _markedRead = true);
@@ -196,7 +198,8 @@ class _BibleStoryReaderScreenState
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'KEY VERSE · ${_story.keyVerseRef.toUpperCase()}',
+                            context.l10n.storiesKeyVerse(
+                                _story.keyVerseRef.toUpperCase()),
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: theme.primaryColor,
                               fontWeight: FontWeight.bold,
@@ -230,7 +233,7 @@ class _BibleStoryReaderScreenState
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         child: Text(
-                          'THE STORY',
+                          context.l10n.storiesTheStory,
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: theme.primaryColor,
                             fontWeight: FontWeight.bold,
@@ -256,7 +259,7 @@ class _BibleStoryReaderScreenState
                   if (_story.plateCaption != null) ...[
                     const SizedBox(height: 24),
                     Text(
-                      'Artwork: ${_story.plateCaption} — Gustave Doré, public domain',
+                      context.l10n.storiesArtworkCaption(_story.plateCaption!),
                       style: theme.textTheme.labelSmall?.copyWith(
                         color:
                             theme.colorScheme.onSurface.withValues(alpha: 0.45),
@@ -296,7 +299,7 @@ class _BibleStoryReaderScreenState
               IconButton(
                 onPressed: () => _goNeighbor(next: false),
                 icon: const Icon(Icons.chevron_left_rounded),
-                tooltip: 'Previous story',
+                tooltip: context.l10n.storiesPrevious,
               ),
               Expanded(
                 child: Text(
@@ -312,7 +315,7 @@ class _BibleStoryReaderScreenState
               IconButton(
                 onPressed: () => _goNeighbor(next: true),
                 icon: const Icon(Icons.chevron_right_rounded),
-                tooltip: 'Next story',
+                tooltip: context.l10n.storiesNext,
               ),
             ],
           ),

@@ -1,3 +1,4 @@
+import '../../l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -101,7 +102,7 @@ class _AppearanceSettingsSheetState
                       child: Row(
                         children: [
                           _TabButton(
-                            label: 'Typography',
+                            label: context.l10n.settingsTypography,
                             icon: Icons.text_fields_rounded,
                             isSelected: _activeTab == AppearanceTab.typography,
                             onTap: () {
@@ -113,7 +114,7 @@ class _AppearanceSettingsSheetState
                             },
                           ),
                           _TabButton(
-                            label: 'Theme',
+                            label: context.l10n.settingsTheme,
                             icon: Icons.palette_rounded,
                             isSelected: _activeTab == AppearanceTab.theme,
                             onTap: () {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/l10n.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -156,7 +157,7 @@ class _AccountMenuBody extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      name.isNotEmpty ? name : 'Guest',
+                      name.isNotEmpty ? name : context.l10n.accountGuest,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -165,7 +166,7 @@ class _AccountMenuBody extends ConsumerWidget {
                     Text(
                       email.isNotEmpty
                           ? email
-                          : 'Sign in to sync across devices',
+                          : context.l10n.accountSignInToSync,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color:
                             theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -180,7 +181,7 @@ class _AccountMenuBody extends ConsumerWidget {
         const Divider(height: 1, indent: 16, endIndent: 16),
         _MenuTile(
           icon: Icons.person_outline_rounded,
-          label: 'Account',
+          label: context.l10n.accountAccount,
           onTap: () {
             Navigator.of(context).pop();
             _showAccountSheet(context);
@@ -188,7 +189,7 @@ class _AccountMenuBody extends ConsumerWidget {
         ),
         _MenuTile(
           icon: Icons.settings_outlined,
-          label: 'Settings',
+          label: context.l10n.accountSettings,
           onTap: () {
             HapticFeedback.selectionClick();
             Navigator.of(context).pop();
@@ -197,8 +198,8 @@ class _AccountMenuBody extends ConsumerWidget {
         ),
         _MenuTile(
           icon: Icons.upload_file_outlined,
-          label: 'Back up data',
-          subtitle: 'Export notes, highlights and settings',
+          label: context.l10n.accountBackUp,
+          subtitle: context.l10n.accountBackUpSubtitle,
           onTap: () {
             Navigator.of(context).pop();
             BackupService.exportData(context, ref);
@@ -206,8 +207,8 @@ class _AccountMenuBody extends ConsumerWidget {
         ),
         _MenuTile(
           icon: Icons.download_outlined,
-          label: 'Restore data',
-          subtitle: 'Import from a backup file',
+          label: context.l10n.accountRestore,
+          subtitle: context.l10n.accountRestoreSubtitle,
           onTap: () {
             Navigator.of(context).pop();
             _showRestoreDialog(context, ref);
@@ -216,28 +217,28 @@ class _AccountMenuBody extends ConsumerWidget {
         if (user == null) ...[
           _MenuTile(
             icon: Icons.account_circle_outlined,
-            label: 'Sign in with Google',
+            label: context.l10n.accountSignInGoogle,
             onTap: () => _signIn(context, ref, google: true),
           ),
           if (ref.watch(appleSignInAvailableProvider))
             _MenuTile(
               icon: Icons.apple,
-              label: 'Sign in with Apple',
+              label: context.l10n.accountSignInApple,
               onTap: () => _signIn(context, ref, google: false),
             ),
         ] else ...[
           const _SyncTile(),
           _MenuTile(
             icon: Icons.logout_rounded,
-            label: 'Sign Out',
+            label: context.l10n.accountSignOut,
             destructive: true,
             onTap: () => _signOut(context, ref),
           ),
         ],
         _MenuTile(
           icon: Icons.delete_sweep_outlined,
-          label: 'Reset app',
-          subtitle: 'Erase all on-device data',
+          label: context.l10n.accountResetApp,
+          subtitle: context.l10n.accountResetAppSubtitle,
           destructive: true,
           onTap: () => _confirmReset(context, context, ref),
         ),
@@ -310,7 +311,9 @@ void _showAccountSheet(BuildContext context) {
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Text(
-                      user != null ? 'Account' : 'Sign In',
+                      user != null
+                          ? context.l10n.accountAccount
+                          : context.l10n.accountSignIn,
                       style: const TextStyle(
                           fontSize: 20, fontWeight: FontWeight.bold),
                     ),
@@ -318,13 +321,13 @@ void _showAccountSheet(BuildContext context) {
                   if (user == null) ...[
                     ListTile(
                       leading: const Icon(Icons.account_circle),
-                      title: const Text('Sign in with Google'),
+                      title: Text(context.l10n.accountSignInGoogle),
                       onTap: () => _signIn(context, ref, google: true),
                     ),
                     if (ref.watch(appleSignInAvailableProvider))
                       ListTile(
                         leading: const Icon(Icons.apple),
-                        title: const Text('Sign in with Apple'),
+                        title: Text(context.l10n.accountSignInApple),
                         onTap: () => _signIn(context, ref, google: false),
                       ),
                   ] else ...[
@@ -338,41 +341,37 @@ void _showAccountSheet(BuildContext context) {
                             ? const Icon(Icons.person, size: 16)
                             : null,
                       ),
-                      title: Text(user.displayName ?? 'Signed In'),
+                      title: Text(
+                          user.displayName ?? context.l10n.accountSignedIn),
                       subtitle: user.email == null ? null : Text(user.email!),
                     ),
                     ListTile(
                       leading: const Icon(Icons.logout, color: Colors.orange),
-                      title: const Text('Sign Out',
+                      title: Text(context.l10n.accountSignOut,
                           style: TextStyle(color: Colors.orange)),
                       onTap: () => _signOut(context, ref),
                     ),
                     ListTile(
                       leading:
                           const Icon(Icons.delete_forever, color: Colors.red),
-                      title: const Text('Delete Account',
+                      title: Text(context.l10n.accountDeleteAccount,
                           style: TextStyle(color: Colors.red)),
                       onTap: () async {
                         Navigator.pop(context);
                         final confirm = await showDialog<bool>(
                           context: context,
                           builder: (ctx) => AlertDialog(
-                            title: const Text('Delete Account?'),
-                            content: const Text(
-                                'This is permanent and irreversible.\n\n'
-                                'The following will be completely removed:\n'
-                                '• Your sign-in account\n'
-                                '• Its cloud data in The Blessed Bible and '
-                                'Blessed Arcade (they share the account)\n'
-                                '• All on-device study data (bookmarks, highlights, history)'),
+                            title: Text(context.l10n.accountDeleteAccountTitle),
+                            content:
+                                Text(context.l10n.accountDeleteAccountBody),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(ctx, false),
-                                child: const Text('Cancel'),
+                                child: Text(context.l10n.commonCancel),
                               ),
                               TextButton(
                                 onPressed: () => Navigator.pop(ctx, true),
-                                child: const Text('Delete',
+                                child: Text(context.l10n.commonDelete,
                                     style: TextStyle(color: Colors.red)),
                               ),
                             ],
@@ -384,9 +383,8 @@ void _showAccountSheet(BuildContext context) {
                             await ref.read(authActionsProvider).deleteAccount();
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content:
-                                        Text('Account deleted successfully.')),
+                                SnackBar(
+                                    content: Text(context.l10n.accountDeleted)),
                               );
                             }
                           } on SignInCancelledException {
@@ -399,12 +397,12 @@ void _showAccountSheet(BuildContext context) {
                             if (!context.mounted) return;
                             _showError(
                                 context,
-                                'Couldn\'t confirm it\'s you, so nothing was '
-                                'deleted. ${SignInResult.failed(e.failure).message}');
+                                context.l10n.accountReauthFailed(
+                                    SignInResult.failed(e.failure).message));
                           } catch (e) {
                             if (!context.mounted) return;
-                            _showError(context,
-                                'Failed to delete account. Please try again.');
+                            _showError(
+                                context, context.l10n.accountDeleteFailed);
                           }
                         }
                       },
@@ -456,18 +454,16 @@ Future<void> _askAccountChoice(BuildContext context, WidgetRef ref) async {
     context: context,
     barrierDismissible: false,
     builder: (ctx) => AlertDialog(
-      title: const Text('This device has data from another account'),
-      content: const Text(
-          'Your bookmarks, highlights and notes on this device came from a '
-          'different account. What should happen to them?'),
+      title: Text(context.l10n.accountOtherDataTitle),
+      content: Text(context.l10n.accountOtherDataBody),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(ctx, true),
-          child: const Text('Start fresh on this device'),
+          child: Text(context.l10n.accountStartFresh),
         ),
         TextButton(
           onPressed: () => Navigator.pop(ctx, false),
-          child: const Text('Merge into this account'),
+          child: Text(context.l10n.accountMerge),
         ),
       ],
     ),
@@ -484,22 +480,20 @@ Future<void> _signOut(BuildContext context, WidgetRef ref) async {
   final remove = await showDialog<bool>(
     context: context,
     builder: (ctx) => AlertDialog(
-      title: const Text('Sign out?'),
-      content: const Text(
-          'Your bookmarks, highlights and notes stay safe in your account. '
-          'Keep a copy on this device?'),
+      title: Text(context.l10n.accountSignOutTitle),
+      content: Text(context.l10n.accountSignOutBody),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(ctx),
-          child: const Text('Cancel'),
+          child: Text(context.l10n.commonCancel),
         ),
         TextButton(
           onPressed: () => Navigator.pop(ctx, true),
-          child: const Text('Remove from device'),
+          child: Text(context.l10n.accountRemoveFromDevice),
         ),
         TextButton(
           onPressed: () => Navigator.pop(ctx, false),
-          child: const Text('Keep on device'),
+          child: Text(context.l10n.accountKeepOnDevice),
         ),
       ],
     ),
@@ -521,21 +515,25 @@ class _SyncTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final status = ref.watch(syncControllerProvider);
     final (icon, label, subtitle) = switch (status.phase) {
-      SyncPhase.syncing => (Icons.sync_rounded, 'Syncing…', null),
+      SyncPhase.syncing => (
+          Icons.sync_rounded,
+          context.l10n.accountSyncing,
+          null
+        ),
       SyncPhase.error => (
           Icons.sync_problem_rounded,
-          'Couldn\'t sync',
-          'Tap to try again'
+          context.l10n.accountSyncFailed,
+          context.l10n.accountTapToRetry
         ),
       SyncPhase.needsAccountChoice => (
           Icons.sync_problem_rounded,
-          'Sync paused',
-          'Choose what to do with this device\'s data'
+          context.l10n.accountSyncPaused,
+          context.l10n.accountSyncChoose
         ),
       _ => (
           Icons.cloud_done_outlined,
-          'Sync now',
-          syncedLabel(status.lastSyncedAt, DateTime.now())
+          context.l10n.accountSyncNow,
+          syncedLabel(status.lastSyncedAt, DateTime.now(), context.l10n)
         ),
     };
     return _MenuTile(
@@ -556,13 +554,14 @@ class _SyncTile extends ConsumerWidget {
 
 /// "Synced just now", "Synced 5 min ago", ...
 @visibleForTesting
-String syncedLabel(DateTime? at, DateTime now) {
-  if (at == null) return 'Not synced yet';
+String syncedLabel(DateTime? at, DateTime now, [AppLocalizations? l10n]) {
+  final l = l10n ?? lookupAppLocalizations(const Locale('en'));
+  if (at == null) return l.accountNotSyncedYet;
   final d = now.difference(at);
-  if (d.inMinutes < 1) return 'Synced just now';
-  if (d.inMinutes < 60) return 'Synced ${d.inMinutes} min ago';
-  if (d.inHours < 24) return 'Synced ${d.inHours} h ago';
-  return 'Synced ${at.day}/${at.month}/${at.year}';
+  if (d.inMinutes < 1) return l.accountSyncedJustNow;
+  if (d.inMinutes < 60) return l.accountSyncedMinAgo(d.inMinutes);
+  if (d.inHours < 24) return l.accountSyncedHoursAgo(d.inHours);
+  return l.accountSyncedOn(at.day, at.month, at.year);
 }
 
 void _showError(BuildContext context, String message) {
@@ -582,19 +581,19 @@ void _showRestoreDialog(BuildContext context, WidgetRef ref) {
   showDialog<void>(
     context: context,
     builder: (ctx) => AlertDialog(
-      title: const Text('Restore from Backup'),
+      title: Text(context.l10n.accountRestoreTitle),
       content: TextField(
         controller: controller,
         maxLines: 5,
-        decoration: const InputDecoration(
-          hintText: 'Paste your backup JSON here...',
-          border: OutlineInputBorder(),
+        decoration: InputDecoration(
+          hintText: context.l10n.accountRestoreHint,
+          border: const OutlineInputBorder(),
         ),
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(ctx).pop(),
-          child: const Text('Cancel'),
+          child: Text(context.l10n.commonCancel),
         ),
         ElevatedButton(
           onPressed: () {
@@ -604,7 +603,7 @@ void _showRestoreDialog(BuildContext context, WidgetRef ref) {
               BackupService.importData(context, ref, text);
             }
           },
-          child: const Text('Restore'),
+          child: Text(context.l10n.accountRestoreAction),
         ),
       ],
     ),
@@ -617,17 +616,12 @@ void _confirmReset(
   showDialog<void>(
     context: context,
     builder: (ctx) => AlertDialog(
-      title: const Text('Reset app?'),
-      content: const Text('This erases all on-device data:\n'
-          '• Bookmarks, highlights, notes & journal\n'
-          '• Reading plans, progress & custom plans\n'
-          '• Downloaded translations & streaks\n\n'
-          'Settings, theme and the offline Bible stay untouched. '
-          'This cannot be undone — back up first if needed.'),
+      title: Text(context.l10n.accountResetTitle),
+      content: Text(context.l10n.accountResetBody),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(ctx).pop(),
-          child: const Text('Cancel'),
+          child: Text(context.l10n.commonCancel),
         ),
         TextButton(
           onPressed: () async {
@@ -636,14 +630,14 @@ void _confirmReset(
             await _resetAppData(ref);
             if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('App data reset. Fresh start!'),
+                SnackBar(
+                  content: Text(context.l10n.accountResetDone),
                   behavior: SnackBarBehavior.floating,
                 ),
               );
             }
           },
-          child: Text('Reset',
+          child: Text(context.l10n.accountReset,
               style: TextStyle(color: Theme.of(ctx).colorScheme.error)),
         ),
       ],

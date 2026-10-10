@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/l10n.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/bible_provider.dart';
 import '../../state/translation_provider.dart';
@@ -88,7 +89,7 @@ class VersePreviewDialog extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             if (bookNumber == null)
-              const Text('Could not find the referenced book.')
+              Text(context.l10n.readBookNotFound)
             else
               FutureBuilder<BibleVerse?>(
                 future: bibleDbService.getVerse(
@@ -108,12 +109,13 @@ class VersePreviewDialog extends ConsumerWidget {
                   }
 
                   if (snapshot.hasError) {
-                    return Text('Error loading verse: ${snapshot.error}');
+                    return Text(
+                        context.l10n.readVerseLoadError('${snapshot.error}'));
                   }
 
                   final verse = snapshot.data;
                   if (verse == null) {
-                    return const Text('Verse not found.');
+                    return Text(context.l10n.readVerseNotFound);
                   }
 
                   return SingleChildScrollView(

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../l10n/l10n.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,6 +24,7 @@ import '../../services/share_service.dart';
 import '../../state/devotional_provider.dart';
 import '../widgets/share_card.dart';
 import '../../utils/log.dart';
+import 'package:intl/intl.dart';
 
 class StrictHorizontalDragGestureRecognizer
     extends HorizontalDragGestureRecognizer {
@@ -283,7 +285,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           // ── Header Row ────────────────────────────────────────────────
           SharedTopHeader(
             centerContent: Text(
-              'Wednesday · July 22',
+              _todayLabel(context),
               textAlign: TextAlign.center,
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w500,
@@ -316,7 +318,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 BouncyEntrance(
                   delay: const Duration(milliseconds: 100),
                   child: Text(
-                    'VERSE OF THE DAY',
+                    context.l10n.homeVerseOfTheDay,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: theme.primaryColor,
                       letterSpacing: 2.0,
@@ -382,8 +384,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         Expanded(
                           child: Text(
                             (data.verseOfTheDay.isDevotional
-                                    ? 'DEVOTIONAL'
-                                    : 'COMMENTARY') +
+                                    ? context.l10n.homeDevotional
+                                    : context.l10n.homeCommentary) +
                                 (data.verseOfTheDay.author != null
                                     ? ' · ${data.verseOfTheDay.author}'
                                     : (data.verseOfTheDay.sourceTitle != null
@@ -421,7 +423,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         Expanded(
                           flex: 3,
                           child: _PillButton(
-                            label: 'Go Deeper',
+                            label: context.l10n.homeGoDeeper,
                             filled: true,
                             onPressed: () {
                               final refStr = data.verseOfTheDay.reference;
@@ -455,7 +457,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       Expanded(
                         flex: 2,
                         child: _PillButton(
-                          label: 'Share',
+                          label: context.l10n.commonShare,
                           filled: false,
                           onPressed: () => _shareVotd(data.verseOfTheDay),
                         ),
@@ -558,8 +560,8 @@ class WordOfTheDaySection extends ConsumerWidget {
     return wotdAsync.when(
       data: (wotd) {
         if (wotd == null) {
-          return const _WotdFallback(
-            'No word picked for today yet — try again later.',
+          return _WotdFallback(
+            context.l10n.homeWotdEmpty,
           );
         }
 
@@ -570,7 +572,7 @@ class WordOfTheDaySection extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'WORD OF THE DAY',
+                context.l10n.homeWordOfTheDayHeading,
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.primaryColor,
                   letterSpacing: 2.0,
@@ -611,7 +613,7 @@ class WordOfTheDaySection extends ConsumerWidget {
                       children: [
                         Expanded(
                           child: _PillButton(
-                            label: 'Read Full Definition',
+                            label: context.l10n.homeReadFullDefinition,
                             filled: true,
                             onPressed: () {
                               showModalBottomSheet<void>(
@@ -627,7 +629,7 @@ class WordOfTheDaySection extends ConsumerWidget {
                         const SizedBox(width: 10),
                         Expanded(
                           child: _PillButton(
-                            label: 'Share',
+                            label: context.l10n.commonShare,
                             filled: false,
                             onPressed: () {
                               HapticFeedback.selectionClick();
@@ -636,19 +638,19 @@ class WordOfTheDaySection extends ConsumerWidget {
                                 copyText: ShareService.formatWord(
                                   word: wotd.word,
                                   definition: wotd.snippet,
-                                  sourceName: 'Word of the day',
+                                  sourceName: context.l10n.homeWordOfTheDay,
                                 ),
                                 shareText: ShareService.formatWord(
                                   word: wotd.word,
                                   definition: wotd.snippet,
-                                  sourceName: 'Word of the day',
+                                  sourceName: context.l10n.homeWordOfTheDay,
                                 ),
                                 imageFilename: 'wotd',
                                 buildCard: (backdrop, style) => ShareCard.word(
-                                  eyebrow: 'Word of the day',
+                                  eyebrow: context.l10n.homeWordOfTheDay,
                                   word: wotd.word,
                                   definition: wotd.snippet,
-                                  source: 'Word of the day',
+                                  source: context.l10n.homeWordOfTheDay,
                                   backdrop: backdrop,
                                   style: style,
                                 ),
@@ -668,7 +670,7 @@ class WordOfTheDaySection extends ConsumerWidget {
       loading: () => const SizedBox.shrink(),
       error: (e, st) {
         logDebug('wordOfTheDayProvider error: $e\n$st');
-        return _WotdFallback('Word of the day unavailable ($e).');
+        return _WotdFallback(context.l10n.homeWotdUnavailable('$e'));
       },
     );
   }
@@ -687,7 +689,7 @@ class _WotdFallback extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          'WORD OF THE DAY',
+          context.l10n.homeWordOfTheDayHeading,
           style: theme.textTheme.labelSmall?.copyWith(
             color: theme.primaryColor,
             letterSpacing: 2.0,
@@ -710,5 +712,18 @@ class _WotdFallback extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+/// Today's date in the interface language, e.g. "Wednesday · July 22".
+String _todayLabel(BuildContext context) {
+  final now = DateTime.now();
+  final locale = Localizations.localeOf(context).toString();
+  try {
+    return '${DateFormat.EEEE(locale).format(now)} · '
+        '${DateFormat.MMMMd(locale).format(now)}';
+  } catch (_) {
+    return '${DateFormat.EEEE('en').format(now)} · '
+        '${DateFormat.MMMMd('en').format(now)}';
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/reading_plan_provider.dart';
 import '../../theme/app_colors.dart';
 import 'reading_plan_detail_v2_screen.dart';
+import '../../l10n/l10n.dart';
 
 class JourneyMapScreen extends ConsumerStatefulWidget {
   final String planId;
@@ -59,7 +60,7 @@ class _JourneyMapScreenState extends ConsumerState<JourneyMapScreen> {
         elevation: 0,
         centerTitle: true,
         title: Text(
-          'Week $_currentWeek',
+          context.l10n.studyWeekN(_currentWeek),
           style: theme.textTheme.titleMedium?.copyWith(
             fontFamily: 'EB Garamond',
             fontWeight: FontWeight.bold,

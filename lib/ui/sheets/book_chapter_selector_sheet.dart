@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/l10n.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/bible_model.dart';
 import '../../state/pericopes_provider.dart';
@@ -251,16 +252,20 @@ class _BookChapterSelectorSheetState
               final isOld = ref
                   .watch(_sheetStateProvider.select((s) => s.isOldTestament));
               final mode = ref.watch(_sheetStateProvider.select((s) => s.mode));
-              return _buildBreadcrumbSegment('Testament', isOld ? 'OT' : 'NT',
-                  SelectionMode.testament, mode, theme);
+              return _buildBreadcrumbSegment(
+                  context.l10n.readTestament,
+                  isOld ? context.l10n.readOtShort : context.l10n.readNtShort,
+                  SelectionMode.testament,
+                  mode,
+                  theme);
             }),
           Consumer(builder: (context, ref, _) {
             final bookName = ref
                 .watch(_sheetStateProvider.select((s) => s.book?.name ?? ''));
             final mode = ref.watch(_sheetStateProvider.select((s) => s.mode));
             return _buildBreadcrumbSegment(
-                'Book',
-                bookName.isEmpty ? 'Select Book' : bookName,
+                context.l10n.readBook,
+                bookName.isEmpty ? context.l10n.readSelectBook : bookName,
                 SelectionMode.book,
                 mode,
                 theme);
@@ -269,8 +274,8 @@ class _BookChapterSelectorSheetState
             final chapter =
                 ref.watch(_sheetStateProvider.select((s) => s.chapter));
             final mode = ref.watch(_sheetStateProvider.select((s) => s.mode));
-            return _buildBreadcrumbSegment(
-                'Chapter', '$chapter', SelectionMode.chapter, mode, theme);
+            return _buildBreadcrumbSegment(context.l10n.readChapter, '$chapter',
+                SelectionMode.chapter, mode, theme);
           }),
           if (settings.depth != NavigationDepth.twoPart)
             Consumer(builder: (context, ref, _) {
@@ -278,7 +283,7 @@ class _BookChapterSelectorSheetState
                   ref.watch(_sheetStateProvider.select((s) => s.verse));
               final mode = ref.watch(_sheetStateProvider.select((s) => s.mode));
               return _buildBreadcrumbSegment(
-                  'Verse',
+                  context.l10n.readVerse,
                   verse != null ? '$verse' : '1',
                   SelectionMode.verse,
                   mode,
@@ -367,7 +372,7 @@ class _BookChapterSelectorSheetState
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: _buildGridTile(
-              text: 'Old\nTestament',
+              text: context.l10n.readOldTestamentTwoLine,
               isSelected: isOldTestament,
               onTap: () => _onTestamentSelected(true),
               theme: theme,
@@ -378,7 +383,7 @@ class _BookChapterSelectorSheetState
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: _buildGridTile(
-              text: 'New\nTestament',
+              text: context.l10n.readNewTestamentTwoLine,
               isSelected: !isOldTestament,
               onTap: () => _onTestamentSelected(false),
               theme: theme,
@@ -431,7 +436,7 @@ class _BookChapterSelectorSheetState
         Expanded(
           child: Column(
             children: [
-              Text('Old Testament',
+              Text(context.l10n.readOldTestament,
                   style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                       color:
@@ -473,7 +478,7 @@ class _BookChapterSelectorSheetState
         Expanded(
           child: Column(
             children: [
-              Text('New Testament',
+              Text(context.l10n.readNewTestament,
                   style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                       color:
@@ -585,7 +590,7 @@ class _BookChapterSelectorSheetState
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 12.0, left: 4.0),
                 child: Text(
-                  'Stories & Sections',
+                  context.l10n.readStoriesSections,
                   style: theme.textTheme.labelMedium?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     fontWeight: FontWeight.bold,
@@ -651,7 +656,7 @@ class _BookChapterSelectorSheetState
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 12.0, left: 4.0),
                 child: Text(
-                  'All Verses',
+                  context.l10n.readAllVerses,
                   style: theme.textTheme.labelMedium?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     fontWeight: FontWeight.bold,

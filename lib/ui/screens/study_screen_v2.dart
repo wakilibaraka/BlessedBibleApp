@@ -25,6 +25,7 @@ import 'plans_library_screen.dart';
 import 'reading_plan_detail_v2_screen.dart';
 import 'your_space_screen.dart';
 import '../../data/curated_plans.dart';
+import '../../l10n/l10n.dart';
 
 /// Redesigned Study hub (V2): Large by default, every card the same
 /// size.
@@ -112,7 +113,7 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Could not open that screen. $e'),
+          content: Text(context.l10n.studyCouldNotOpenScreen('$e')),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -181,13 +182,13 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                   ),
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
-                child: V2Eyebrow('Card size'),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                child: V2Eyebrow(context.l10n.studyCardSize),
               ),
               option(
-                label: 'Large',
-                hint: 'Full width, same size as everything',
+                label: context.l10n.studySizeLarge,
+                hint: context.l10n.studySizeLargeHint,
                 icon: Icons.crop_landscape_rounded,
                 selected: isLarge,
                 onPick: () => ref
@@ -195,8 +196,8 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                     .setCardSize(card.id, span: CardSpan.full, expanded: false),
               ),
               option(
-                label: 'Extra Large',
-                hint: 'Full width, roomier content',
+                label: context.l10n.studySizeExtraLarge,
+                hint: context.l10n.studySizeExtraLargeHint,
                 icon: Icons.aspect_ratio_rounded,
                 selected: isXLarge,
                 onPick: () => ref
@@ -204,22 +205,22 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                     .setCardSize(card.id, span: CardSpan.full, expanded: true),
               ),
               option(
-                label: 'Half',
-                hint: 'Compact, two per row',
+                label: context.l10n.studySizeHalf,
+                hint: context.l10n.studySizeHalfHint,
                 icon: Icons.splitscreen_rounded,
                 selected: isHalf,
                 onPick: () => ref
                     .read(studyLayoutProvider.notifier)
                     .setCardSize(card.id, span: CardSpan.half, expanded: false),
               ),
-              const Padding(
-                padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
-                child: V2Eyebrow('Position'),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                child: V2Eyebrow(context.l10n.studyPosition),
               ),
               if (canUp)
                 option(
-                  label: 'Move up',
-                  hint: 'Swap with the card above',
+                  label: context.l10n.studyMoveUp,
+                  hint: context.l10n.studyMoveUpHint,
                   icon: Icons.arrow_upward_rounded,
                   selected: false,
                   onPick: () => ref
@@ -228,8 +229,8 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                 ),
               if (canDown)
                 option(
-                  label: 'Move down',
-                  hint: 'Swap with the card below',
+                  label: context.l10n.studyMoveDown,
+                  hint: context.l10n.studyMoveDownHint,
                   icon: Icons.arrow_downward_rounded,
                   selected: false,
                   onPick: () => ref
@@ -425,6 +426,7 @@ class _CardBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     switch (id) {
       case 'your_space':
         return _YourSpaceCard(span: span, expanded: expanded, onOpen: onOpen);
@@ -439,10 +441,10 @@ class _CardBody extends ConsumerWidget {
           span: span,
           expanded: expanded,
           icon: Icons.library_books_rounded,
-          eyebrow: 'Commentary',
-          title: 'Verse-by-verse insight',
-          snippet: 'Historicist commentary with chapter + verse filters.',
-          cta: 'Open Commentary',
+          eyebrow: l10n.studyCommentaryEyebrow,
+          title: l10n.studyCommentaryTitle,
+          snippet: l10n.studyCommentarySnippet,
+          cta: l10n.studyCommentaryCta,
           onTap: () => onOpen(const CommentaryLibraryV2Screen()),
         );
       case 'dictionary':
@@ -450,10 +452,10 @@ class _CardBody extends ConsumerWidget {
           span: span,
           expanded: expanded,
           icon: Icons.book_outlined,
-          eyebrow: 'Dictionary',
-          title: 'Words defined',
-          snippet: 'Easton & Smith, offline, with saved words.',
-          cta: 'Look up',
+          eyebrow: l10n.studyDictionaryEyebrow,
+          title: l10n.studyDictionaryTitle,
+          snippet: l10n.studyDictionarySnippet,
+          cta: l10n.studyDictionaryCta,
           onTap: () => onOpen(const DictionaryV2Screen()),
         );
       case 'bible_stories':
@@ -461,10 +463,10 @@ class _CardBody extends ConsumerWidget {
           span: span,
           expanded: expanded,
           icon: Icons.auto_stories_rounded,
-          eyebrow: 'Bible stories',
-          title: 'Narratives retold',
-          snippet: '66 stories across every book.',
-          cta: 'Read stories',
+          eyebrow: l10n.studyStoriesEyebrow,
+          title: l10n.studyStoriesTitle,
+          snippet: l10n.studyStoriesSnippet,
+          cta: l10n.studyStoriesCta,
           onTap: () => onOpen(const BibleStoriesScreen()),
         );
       case 'concordance':
@@ -472,10 +474,10 @@ class _CardBody extends ConsumerWidget {
           span: span,
           expanded: expanded,
           icon: Icons.find_in_page_rounded,
-          eyebrow: 'Concordance',
-          title: 'Every occurrence',
-          snippet: 'Find each verse where a word appears.',
-          cta: 'Search words',
+          eyebrow: l10n.studyConcordanceEyebrow,
+          title: l10n.studyConcordanceTitle,
+          snippet: l10n.studyConcordanceSnippet,
+          cta: l10n.studyConcordanceCta,
           onTap: () => onOpen(const ConcordanceScreen()),
         );
       case 'votd_archive':
@@ -499,18 +501,29 @@ class _YourSpaceCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final counts = [
-      (Icons.bookmark_rounded, 'Saved', ref.watch(bookmarksProvider).length, 1),
+      (
+        Icons.bookmark_rounded,
+        l10n.studySpaceSaved,
+        ref.watch(bookmarksProvider).length,
+        1
+      ),
       (
         Icons.highlight_rounded,
-        'Marked',
+        l10n.studySpaceMarked,
         ref.watch(highlightsProvider).length,
         0
       ),
-      (Icons.note_alt_rounded, 'Notes', ref.watch(notesProvider).length, 2),
+      (
+        Icons.note_alt_rounded,
+        l10n.studySpaceNotes,
+        ref.watch(notesProvider).length,
+        2
+      ),
       (
         Icons.menu_book_rounded,
-        'Journal',
+        l10n.studySpaceJournal,
         ref.watch(journalProvider).length,
         3
       ),
@@ -562,14 +575,14 @@ class _YourSpaceCard extends ConsumerWidget {
         children: [
           Row(
             children: [
-              const Expanded(child: V2Eyebrow('Your Space')),
+              Expanded(child: V2Eyebrow(l10n.studySpaceTitle)),
               Icon(Icons.chevron_right_rounded,
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
             ],
           ),
           const SizedBox(height: 4),
           Text(
-            'Bookmarks, highlights, notes & journal',
+            l10n.studySpaceSubtitle,
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -630,6 +643,7 @@ class _PlansLiveCardState extends ConsumerState<_PlansLiveCard> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final activeIds = ref.watch(activePlanIdsProvider);
     void openLibrary() => widget.onOpen(const PlansLibraryScreen());
     void openDetail(String id) =>
@@ -653,9 +667,9 @@ class _PlansLiveCardState extends ConsumerState<_PlansLiveCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const V2Eyebrow('Reading plan'),
+                  V2Eyebrow(l10n.studyReadingPlan),
                   const SizedBox(height: 2),
-                  Text('Start a reading plan',
+                  Text(l10n.studyStartReadingPlan,
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                       )),
@@ -677,7 +691,7 @@ class _PlansLiveCardState extends ConsumerState<_PlansLiveCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                const V2Eyebrow('Active plan'),
+                V2Eyebrow(l10n.studyActivePlan),
                 const SizedBox(height: 2),
                 Text(
                   widget.planTitle(planId!),
@@ -695,7 +709,7 @@ class _PlansLiveCardState extends ConsumerState<_PlansLiveCard> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      total == 0 ? '…' : 'Day $current of $total',
+                      total == 0 ? '…' : l10n.studyDayOfTotal(current, total),
                       style: theme.textTheme.labelSmall?.copyWith(
                         fontWeight: FontWeight.w800,
                         color:
@@ -706,7 +720,7 @@ class _PlansLiveCardState extends ConsumerState<_PlansLiveCard> {
                 ),
                 if (behind > 0) ...[
                   const SizedBox(height: 4),
-                  V2MetaChip('$behind behind'),
+                  V2MetaChip(l10n.studyDaysBehind(behind)),
                 ],
               ],
             ),
@@ -726,14 +740,14 @@ class _PlansLiveCardState extends ConsumerState<_PlansLiveCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                const V2Eyebrow('Plans'),
+                V2Eyebrow(l10n.studyPlans),
                 const SizedBox(height: 2),
-                Text('Guided reading',
+                Text(l10n.studyGuidedReading,
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     )),
                 const SizedBox(height: 2),
-                Text('Curated, paced and custom',
+                Text(l10n.studyGuidedReadingSubtitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodySmall?.copyWith(
@@ -817,7 +831,7 @@ class _TodayRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final plan = ref.watch(readingPlanProvider(planId));
-    String label = 'Ready to begin';
+    String label = context.l10n.studyReadyToBegin;
     if (total > 0 && current >= 1 && current <= total) {
       label =
           plan.planData[current - 1].passages.map((p) => p.label).join(' · ');
@@ -833,7 +847,7 @@ class _TodayRow extends ConsumerWidget {
         children: [
           Expanded(
             child: Text(
-              'Today: $label',
+              context.l10n.studyTodayLabel(label),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: theme.textTheme.bodySmall?.copyWith(
@@ -848,8 +862,9 @@ class _TodayRow extends ConsumerWidget {
                 builder: (_) => ReadingPlanDetailV2Screen(planId: planId),
               ));
             },
-            child: Text(
-                plan.completedReadings.contains(current) ? 'Review' : 'Read'),
+            child: Text(plan.completedReadings.contains(current)
+                ? context.l10n.studyReview
+                : context.l10n.studyRead),
           ),
         ],
       ),
@@ -924,7 +939,7 @@ class _ToolCard extends StatelessWidget {
                 )),
           ],
           const SizedBox(height: 6),
-          Text('$cta →',
+          Text(context.l10n.studyCtaArrow(cta),
               style: theme.textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.w800,
                 color: theme.primaryColor,
@@ -973,7 +988,7 @@ class _VotdArchiveCard extends ConsumerWidget {
                 size: expanded ? 24 : 18, color: theme.primaryColor),
           ),
           const SizedBox(height: 8),
-          const V2Eyebrow('Word of the day'),
+          V2Eyebrow(context.l10n.studyWordOfTheDay),
           const SizedBox(height: 2),
           Text(title,
               maxLines: 2,
@@ -995,7 +1010,7 @@ class _VotdArchiveCard extends ConsumerWidget {
                 )),
           ],
           const SizedBox(height: 6),
-          Text('Archive →',
+          Text(context.l10n.studyArchiveLink,
               style: theme.textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.w800,
                 color: theme.primaryColor,
@@ -1012,7 +1027,8 @@ class _VotdArchiveCard extends ConsumerWidget {
             featured: span == CardSpan.full,
             onTap: open,
             padding: EdgeInsets.all(expanded ? 20 : 15),
-            child: body('Word of the day', null, showSnippet: false),
+            child:
+                body(context.l10n.studyWordOfTheDay, null, showSnippet: false),
           );
         }
         return V2Card(
@@ -1028,7 +1044,7 @@ class _VotdArchiveCard extends ConsumerWidget {
         textured: true,
         featured: span == CardSpan.full,
         padding: const EdgeInsets.all(15),
-        child: Text('Loading…',
+        child: Text(context.l10n.studyLoading,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
             )),
@@ -1038,7 +1054,8 @@ class _VotdArchiveCard extends ConsumerWidget {
         featured: span == CardSpan.full,
         onTap: open,
         padding: const EdgeInsets.all(15),
-        child: body('Word of the day', 'Unavailable right now',
+        child: body(
+            context.l10n.studyWordOfTheDay, context.l10n.studyUnavailableNow,
             showSnippet: false),
       ),
     );
@@ -1089,12 +1106,12 @@ class _StreakCard extends ConsumerWidget {
                     : theme.colorScheme.onSurface.withValues(alpha: 0.4)),
           ),
           const SizedBox(height: 8),
-          const V2Eyebrow('Reading streak'),
+          V2Eyebrow(context.l10n.studyReadingStreak),
           const SizedBox(height: 2),
           Text(
               count == 0
-                  ? 'Start your streak'
-                  : '$count day${count == 1 ? '' : 's'}',
+                  ? context.l10n.studyStartStreak
+                  : context.l10n.studyStreakDays(count),
               style: (expanded
                       ? theme.textTheme.titleMedium
                       : theme.textTheme.titleSmall)
@@ -1105,8 +1122,8 @@ class _StreakCard extends ConsumerWidget {
             const SizedBox(height: 4),
             Text(
                 count > 0
-                    ? 'Open daily to grow it.'
-                    : 'Complete a reading each day.',
+                    ? context.l10n.studyStreakGrow
+                    : context.l10n.studyStreakStart,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.bodySmall?.copyWith(
@@ -1115,7 +1132,7 @@ class _StreakCard extends ConsumerWidget {
                 )),
           ],
           const SizedBox(height: 6),
-          Text('View progress →',
+          Text(context.l10n.studyViewProgress,
               style: theme.textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.w800,
                 color: theme.primaryColor,
