@@ -88,12 +88,13 @@ class TranslationPackStore {
     'swh_ulb',
     'ita_dio',
     'fra_lsg',
+    'ron_btf',
     'tgl_ulb',
   ];
 
   /// Packs withdrawn from the app (e.g. found to be under copyright).
   /// Removed from devices that installed them on the next start.
-  static const List<String> retiredPackIds = ['ron_btf'];
+  static const List<String> retiredPackIds = [];
 
   static bool isCoreId(String id) => coreIds.contains(id);
 

@@ -6,7 +6,7 @@ Reads the full content-source database (all translations) and produces:
                             dictionary + strongs_lexicon (+ app tables at
                             runtime). Never deletable, always self-healed.
   - assets/packs/<id>.db    Bundled, user-deletable packs:
-                            swh_ulb, ita_dio, fra_lsg, tgl_ulb
+                            swh_ulb, ita_dio, fra_lsg, ron_btf, tgl_ulb
                             (copied to the device on first run; restore =
                             copy from APK, instant and offline).
   - content_packs/<id>.db   Upload-ready downloadable packs (NOT bundled):
@@ -36,7 +36,7 @@ ROOT = Path(__file__).resolve().parent.parent
 # tree; to rebuild from scratch, materialize it from git history (LFS) and
 # pass --full-source <path>. Day-to-day verification uses --check-only.
 CORE_IDS = ("kjv", "bbe")
-BUNDLED_PACK_IDS = ("swh_ulb", "ita_dio", "fra_lsg", "tgl_ulb")
+BUNDLED_PACK_IDS = ("swh_ulb", "ita_dio", "fra_lsg", "ron_btf", "tgl_ulb")
 # Upload packs rebuildable from a legacy full source DB.
 FULL_SOURCE_PACKS = ("web", "kjv_strongs")
 # Upload packs whose only durable source is their content_packs file itself
