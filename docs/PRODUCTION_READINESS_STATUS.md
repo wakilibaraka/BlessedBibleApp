@@ -4,7 +4,9 @@ Audit of `main` @ `9ad360f` against *Blessed Bible App: Production Readiness Che
 
 Legend: ✅ done · 🟡 partial · ❌ not done · 🔍 needs manual or device verification (can't be judged from code)
 
-**Update (Phases 1 and 2 done):** repo cleanup and the dead-code sweep are complete. Verified with Flutter 3.47.7: `flutter analyze` reports 0 errors, 0 warnings, 6 infos (deprecations and one async `BuildContext`, left for Phase 3); `flutter test` passes 174/174; `dart format` is clean. `flutter build apk` was not run (no Android SDK in the audit environment).
+**Update (Phases 1–4 done, 2026-10-10):** code-side work for Phases 3 and 4 is complete; what remains for them is console/admin work listed under each phase below. Verified on the pinned Flutter 3.44.9 (and 3.47.7): `flutter analyze --fatal-infos` clean under strict modes, `flutter test` 181/181, Firestore rules tests 16/16 on the emulator. `flutter build apk` still not run here (no Android SDK); the CI Android job covers it once a PR is opened.
+
+**Earlier update (Phases 1 and 2 done):** repo cleanup and the dead-code sweep are complete. Verified with Flutter 3.47.7: `flutter analyze` reports 0 errors, 0 warnings, 6 infos (deprecations and one async `BuildContext`, left for Phase 3); `flutter test` passes 174/174; `dart format` is clean. `flutter build apk` was not run (no Android SDK in the audit environment).
 
 **How the original audit was checked:** static reading of the repo. The clone is shallow (last 50 commits), so the secrets-in-history check covers those commits only.
 
@@ -14,19 +16,19 @@ Legend: ✅ done · 🟡 partial · ❌ not done · 🔍 needs manual or device 
 
 | Section | Status | Key gaps |
 | --- | --- | --- |
-| 1. Known blockers | 🟡 3 of 8 | iOS not configured, licensing unverified, privacy policy not hosted, root not clean |
-| 2. Code clean sweep | 🟡 | ✅ orphans, unused fonts/dependency/providers removed, formatted. Still: no strict analyzer, no crash reporting, no FVM pin |
+| 1. Known blockers | 🟡 5 of 8 | iOS not configured; licensing has open items (Romanian BTF is copyrighted); privacy policy ready but GitHub Pages must be enabled |
+| 2. Code clean sweep | 🟡 | ✅ orphans, unused fonts/dependency/providers removed, formatted. ✅ strict analyzer, Crashlytics, FVM pin (Phase 3/4) |
 | 3. Repo hygiene | 🟡 | ✅ root, tooling, docs, platforms, README, LICENSE done. Still: no CI, branch protection, PR template |
 | 4. Feature inventory | 🔍 | needs a device test pass. **Cloud sync is not wired into the live app** (see section 4). |
 | 5. Onboarding | 🟡 | single screen, not the multi-step flow the checklist describes |
 | 6–9. Gestures, settings, themes, consistency | 🔍 | manual matrices. Code signals: 212 `Color(0x`, 636 `Colors.`, 121 literal `fontSize:` |
 | 10. Bible essentials | 🟡 | most features present. Credits/sources screen and doctrinal-perspective statement missing. |
-| 11. Data, sync, privacy | 🟡 | owner-only rules ✅, deletion ✅. No App Check, no rules tests, sync design not documented. |
+| 11. Data, sync, privacy | 🟡 | ✅ owner-only rules with validation + emulator tests, App Check, deletion, accurate policy. Still: cloud sync unwired (decision), enable App Check enforcement in console |
 | 12. Accessibility and l10n | ❌ | no ARB/intl setup, only 31 semantics/tooltip sites |
 | 13. Performance | 🔍 | needs profiling. 14 MB fonts + 22 MB devotional assets. |
-| 14. Licensing | ❌ | no licenses register. `ron_btf` "Public Domain" claim is doubtful. No OSS licenses screen. |
-| 15. Testing | 🟡 | 24 test files / 171 cases. No goldens, integration, rules, or migration tests. No CI. |
-| 16. Release engineering | 🟡 | Android release signing ✅. No flavors, CI/CD, obfuscation, crash reporter, or iOS setup. |
+| 14. Licensing | 🟡 | ✅ register (`docs/LICENSES_REGISTER.md`), Credits & sources screen, font + package licenses page. ⛔ Romanian BTF is copyrighted; ⚠️ 8 items to verify |
+| 15. Testing | 🟡 | 181 Dart tests, 16 rules tests, CI. Still: goldens, integration, migration tests, coverage |
+| 16. Release engineering | 🟡 | ✅ signing, CI, Crashlytics. Still: flavors, CD, obfuscation + symbol upload, iOS |
 | 17. Store compliance | ❌ | blocked by sections 1, 11, 14 |
 
 ---
@@ -38,10 +40,10 @@ Legend: ✅ done · 🟡 partial · ❌ not done · 🔍 needs manual or device 
 | P0 iOS build signs and passes TestFlight | ❌ | `ios/` exists (bundle `com.baraka.bibleapp`, iOS 15.0, WidgetExtension), but there is no `Runner.entitlements` (Sign in with Apple capability), no `PrivacyInfo.xcprivacy`, and no `GoogleService-Info.plist` workflow. README still says "iOS planned". |
 | P0 Sign in with Apple | 🟡 | Code done: `lib/state/auth_provider.dart:56` plus buttons in `account_menu.dart` and `account_sync_card.dart`. **Missing:** the iOS entitlement and Apple/Firebase console configuration, and an on-device test. |
 | P0 In-app account deletion removes cloud data | ✅ | `auth_provider.dart:127–183`: reauthenticates, deletes `users/{uid}/plans/*`, `users/{uid}/sync_data/*`, `users/{uid}`, the auth user, and local data. Covers every path the app writes (`cloud_sync_service.dart`, `custom_plan_builder_v2_screen.dart:408`). Still needs a device test. |
-| P0 Content licensing verified | ❌ | See section 14. |
-| P0 Firestore rules owner-only | ✅ | `firestore.rules`: `users/{userId}/**` requires `auth.uid == userId`. CMS collections are world-readable and admin-write by a hardcoded UID. Missing: field validation and size limits, emulator tests. |
-| P0 No secrets in git | 🟡 | No keystores, `key.properties`, `google-services.json`, `firebase_options.dart`, or `AIza…` keys in the visible history, and `.gitignore` covers them. **Re-run on a full clone** (`git log --all` with gitleaks or trufflehog) because this clone was shallow. |
-| P0 Privacy policy at a public URL | 🟡 | In-app `privacy_policy_screen.dart` and `docs/privacy_policy.{md,html}` exist, but there's no public URL in the code. Policy says Crashlytics is used, but Crashlytics is **not** a dependency. Fix the text or add Crashlytics. |
+| P0 Content licensing verified | 🟡 | Register done (`docs/LICENSES_REGISTER.md`). **Open:** Romanian BTF is © 2015 Dr. Brian J. Nibbe, Sr. and is bundled: remove or get permission. Andreasen 1948 renewal, Graham Bible summaries, and Crossway/Heartlight/Guthrie plan schedules need verification. |
+| P0 Firestore rules owner-only | ✅ | `firestore.rules`: `users/{userId}/**` requires `auth.uid == userId`. CMS collections are world-readable and admin-write by a hardcoded UID. ✅ Now also: only known paths, field/type/size validation, 16 emulator tests in CI (`firestore-tests/`). Deploy with `firebase deploy --only firestore:rules`. |
+| P0 No secrets in git | 🟡 | No keystores, `key.properties`, `google-services.json`, `firebase_options.dart`, or `AIza…` keys in the visible history, and `.gitignore` covers them. ✅ Full history (534 commits) scanned: no keystores, service files, private keys or Firebase keys ever committed. Only hit is a third party's public Supabase anon key in `tool/devotional_common.py` (documented as public). |
+| P0 Privacy policy at a public URL | 🟡 | Policy rewritten to match the app, single source `assets/legal/privacy_policy.json` → in-app screen + generated `docs/privacy_policy.html`, plus `docs/delete_account.html`. **To do:** enable GitHub Pages (Settings → Pages → `main` / `docs`) so https://wakilibaraka.github.io/BlessedBibleApp/privacy_policy.html resolves, then add it to both store listings. |
 | P1 Clean repo root | ✅ | Done in Phase 1. See section 3. |
 
 ## 2. Code stability and clean sweep
@@ -174,12 +176,17 @@ Ordered so each phase unblocks the next. Each phase is roughly one PR.
 3. Remove the empty `kStartupTrace` blocks. Replace `debugPrint` with a release-silent logger.
 4. Run `dart fix --apply` and `dart format .`.
 
-### Phase 3: Quality gates (1 PR)
+### Phase 3: Quality gates ✅ done
+*Remaining (repo admin):* turn on branch protection for `main` requiring the CI checks.
+
 1. Tighten `analysis_options.yaml` (strict modes plus extra lints) and fix the findings.
 2. Add `.fvmrc`.
 3. Add `.github/workflows/ci.yml` (analyze, format check, test, Android build) and a PR template. Turn on branch protection for `main`.
 
-### Phase 4: P0 compliance (2–3 PRs plus console work)
+### Phase 4: P0 compliance ✅ code done
+*Remaining:* (a) decide on Romanian BTF and the other ⚠️ rows in `docs/LICENSES_REGISTER.md`; (b) enable GitHub Pages; (c) Firebase console: register apps for App Check (Play Integrity, App Attest), add debug tokens, then enforce for Firestore/Storage; (d) run `flutterfire configure` to add the Crashlytics Gradle plugin and iOS dSYM upload, then delete `android/app/src/main/res/values/crashlytics.xml`; (e) deploy the new Firestore rules; (f) obfuscation + symbol upload moves to Phase 7.
+*Also fixed:* signed-in users couldn't create custom plans (nested-array Firestore write threw before the local save).
+
 1. **Crash reporting:** add Crashlytics (or remove it from the policy). Replace the `crash_log.txt` writes. Add obfuscation and symbol upload.
 2. **Privacy:** host `docs/privacy_policy.html` (GitHub Pages) and link the URL in Settings and both stores. Reconcile its claims with the code (Crashlytics, notes sync).
 3. **Licensing:** create `docs/LICENSES_REGISTER.md` for every text, font, and image. Resolve `ron_btf` and `por_blj`. Add a Credits & Sources screen, `showLicensePage`, and a doctrinal-perspective note.

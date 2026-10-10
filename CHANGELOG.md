@@ -10,6 +10,19 @@ All notable changes to The Blessed Bible. Newest first.
 - Removed unsupported platform folders (linux, macos, windows, web) and the `design-previews/` mockups. Android and iOS are the only targets.
 - Added a proprietary `LICENSE`.
 
+### Fixed
+- Signed-in users can create custom reading plans again (the cloud copy used nested arrays, which Firestore rejects, and failed before the local save). Plans now save locally first and back up in the background.
+
+### Added
+- Crash reporting via Firebase Crashlytics, with a **Send crash reports** switch in Settings.
+- Firebase App Check.
+- **Credits & sources** screen (Settings) with translation, commentary and data credits, a note on the commentary's perspective, and an open-source licenses page including font licenses.
+- Rewritten privacy policy, viewable in-app and online; web page for account deletion.
+
+### Changed
+- Firestore rules only allow the paths the app uses and validate document shape and size.
+- Developer: strict analyzer modes, CI (format, analyze, test, Android build, rules tests), Flutter pinned to 3.44.9 in `.fvmrc`.
+
 ## 1.0.2+9
 
 See git history for changes since prerelease-1.
