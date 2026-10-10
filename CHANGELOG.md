@@ -10,6 +10,12 @@ All notable changes to The Blessed Bible. Newest first.
 - Removed unsupported platform folders (linux, macos, windows, web) and the `design-previews/` mockups. Android and iOS are the only targets.
 - Added a proprietary `LICENSE`.
 
+### Accounts
+- Sign-in now uses the shared `blessed_account` package, so the same Google (or Apple) account works in Blessed Arcade. Signing in creates a small shared profile (display name, optional avatar).
+- "Sign in with Apple" is shown only on iPhone and iPad, where it works.
+- Failed sign-ins say why (no connection, app not set up for this sign-in method, email already used with another method, account disabled) instead of a generic error; the reason is reported to Crashlytics without personal data.
+- Deleting the account also removes its Blessed Arcade cloud data.
+
 ### Fixed
 - Signed-in users can create custom reading plans again (the cloud copy used nested arrays, which Firestore rejects, and failed before the local save). Plans now save locally first and back up in the background.
 

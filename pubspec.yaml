@@ -30,19 +30,24 @@ dependencies:
   uuid: ^4.6.0
   firebase_core: ^4.13.0
   firebase_auth: ^6.5.7
-  google_sign_in: ^7.2.0
   cloud_firestore: ^6.8.0
-  sign_in_with_apple: ^8.1.0
   home_widget: ^0.10.0
   firebase_app_check: ^0.4.8
   firebase_crashlytics: ^5.4.0
   xml: ^7.0.1
+  # Shared sign-in/account code with Blessed Arcade. Pinned to a commit;
+  # bump deliberately.
+  blessed_account:
+    git:
+      url: https://github.com/wakilibaraka/blessed-account
+      ref: 6fa86ee3d510f2fe31b95a193616296dcc55cd43
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.3
+  fake_cloud_firestore: ^4.3.0
 
 flutter_launcher_icons:
   android: true

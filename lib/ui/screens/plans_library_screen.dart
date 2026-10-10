@@ -263,7 +263,7 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
     final appThemeMode = ref.watch(themeProvider);
     final now = DateTime.now();
     final rawName =
-        ref.watch(authStateProvider).value?.displayName?.trim() ?? '';
+        ref.watch(accountUserProvider).value?.displayName?.trim() ?? '';
     final name =
         rawName.isEmpty ? 'Friend' : rawName.split(RegExp(r'\s+')).first;
     final activeIds = ref.watch(activePlanIdsProvider);

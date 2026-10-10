@@ -22,7 +22,9 @@ If you use Export backup, the app creates a file and hands it to the share desti
 
 You can sign in with Google or Apple. Google Firebase Authentication then receives your name, email address (Apple may provide a private relay address) and an account identifier, which we use only to manage your account.
 
-While signed in, reading plans you create are also saved to your account in Google Cloud Firestore so they can be restored. No other personal content is uploaded at this time.
+While signed in, a small profile (your display name, an optional avatar and when it was created or changed) and the reading plans you create are saved to your account in Google Cloud Firestore so they can be restored. No other personal content is uploaded at this time.
+
+The same account works in our game Blessed Arcade: if you sign in there with the same Google or Apple account, both apps share that profile. Each app's own data stays separate.
 
 ## Crash reports
 
@@ -52,7 +54,7 @@ Account data and cloud copies of your reading plans are kept until you delete yo
 
 ## Deleting your account
 
-In the app, go to the Study tab, tap your avatar at the top, then Account > Delete Account. This deletes your sign-in record and all data stored in your account in the cloud, and clears your personal data from that device. You can also email us to request deletion; we will complete it within 30 days.
+In the app, go to the Study tab, tap your avatar at the top, then Account > Delete Account. This deletes your sign-in record and all data stored in your account in the cloud (for both The Blessed Bible and Blessed Arcade, since they share the account), and clears your personal data from that device. You can also email us to request deletion; we will complete it within 30 days.
 
 ## Your rights
 

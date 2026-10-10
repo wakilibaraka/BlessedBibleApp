@@ -45,7 +45,7 @@ Note on step 7: Android and iOS don't share login sessions between separate apps
 
 ## Decisions (2026-10-10)
 
-1. **Package location: separate public repo `wakilibaraka/blessed-account`**, consumed by both apps as a git dependency pinned to a tag (`ref: v1.0.0`). It's the most stable option long term:
+1. **Package location: separate public repo `wakilibaraka/blessed-account`**, consumed by both apps as a git dependency pinned to a tag or commit SHA (`ref: 6fa86ee…` today; tags can't be pushed from the authoring environment). It's the most stable option long term:
    - each app upgrades only when it chooses (no accidental breakage from the other app's work);
    - the package has its own tests and CI;
    - being public means builds and CI never need a GitHub token to fetch it (the code holds no secrets).
@@ -62,9 +62,9 @@ Note on step 7: Android and iOS don't share login sessions between separate apps
 
 | # | Work | Repo |
 | --- | --- | --- |
-| A | `blessed-account` v0.1: `AccountService` (Google sign-in/out, reauth, delete account across both apps' subcollections), `SharedProfile`, account sheet widgets, tests with fakes | blessed-account |
-| B | Bible app adopts the package (Phase 5B.1 sign-in hardening happens here: Apple hidden on Android, clear error messages) | BlessedBibleApp |
+| A ✅ | `blessed-account` v0.1 (v0.2 adds test overrides): `AccountService` (Google sign-in/out, reauth, delete account across both apps' subcollections), `SharedProfile`, account sheet widgets, tests with fakes | blessed-account |
+| B ✅ (code; device check pending) | Bible app adopts the package, pinned by commit SHA (Phase 5B.1 sign-in hardening happens here: Apple hidden on Android, clear error messages) | BlessedBibleApp |
 | C | Sync engine (ledger + LWW merge + Firestore repository) in the package (Phase 5B.2–5B.3); Bible app wires it (5B.4) | both |
-| D | Firestore rules for profile + `arcade/**`, emulator tests; account deletion covers both apps | BlessedBibleApp (rules live with the shared project) |
+| D | Firestore rules for profile (✅ done with B) + `arcade/**`, emulator tests; account deletion covers both apps | BlessedBibleApp (rules live with the shared project) |
 | E | Arcade: Firebase setup, real login via the package (guest mode kept), upload local `PlayerProfile` on first sign-in, cloud sync of progress, its own privacy policy | blessed-arcade |
 | F | Device test on both apps, same account | you + me |

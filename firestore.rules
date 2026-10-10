@@ -10,10 +10,13 @@ service cloud.firestore {
     match /pericopes/{doc}     { allow read: if true; allow write: if isAdmin(); }
 
     // ---- Per-user data: only the signed-in owner, only known paths ----
-    // The root doc holds no data today; owners may read it and delete it
-    // (account deletion), nothing else.
+    // The root doc is the profile shared with Blessed Arcade
+    // (blessed_account SharedProfile): owner-only, validated fields.
     match /users/{userId} {
       allow read, delete: if isOwner(userId);
+      allow create: if isOwner(userId) && validProfile();
+      allow update: if isOwner(userId) && validProfile()
+        && request.resource.data.createdAt == resource.data.createdAt;
 
       // Custom reading plans (lib/services/plan_cloud_backup.dart).
       match /plans/{planId} {
@@ -51,6 +54,17 @@ service cloud.firestore {
         && d.days is int && d.days >= 1 && d.days <= 730
         && d.schedule is list && d.schedule.size() <= 730
         && (!('tracks' in d) || (d.tracks is list && d.tracks.size() <= 20));
+    }
+
+    function validProfile() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['displayName', 'avatar', 'createdAt', 'updatedAt'])
+        && d.keys().hasAll(['displayName', 'createdAt', 'updatedAt'])
+        && d.displayName is string
+        && d.displayName.size() >= 1 && d.displayName.size() <= 100
+        && (!('avatar' in d) || d.avatar == null
+            || (d.avatar is string && d.avatar.size() <= 500))
+        && d.createdAt is int && d.updatedAt is int;
     }
 
     function validSyncDoc(docId) {

@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../../services/backup_service.dart';
 import '../../services/bible_database_service.dart';
+import '../../services/firebase_setup.dart';
 import '../../services/translation_pack_store.dart';
 import '../../state/auth_provider.dart';
 import '../../state/journal_provider.dart';
@@ -26,7 +27,7 @@ class AccountAvatar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final user = ref.watch(authStateProvider).value;
+    final user = ref.watch(accountUserProvider).value;
     Widget fallback;
     final name = user?.displayName?.trim() ?? '';
     if (name.isNotEmpty) {
@@ -60,7 +61,7 @@ class AccountAvatar extends ConsumerWidget {
       );
     }
 
-    if (user?.photoURL != null) {
+    if (user?.photoUrl != null) {
       return Container(
         width: size,
         height: size,
@@ -73,7 +74,7 @@ class AccountAvatar extends ConsumerWidget {
         ),
         child: ClipOval(
           child: Image.network(
-            user!.photoURL!,
+            user!.photoUrl!,
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) => fallback,
           ),
@@ -124,7 +125,7 @@ class _AccountMenuBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final user = ref.watch(authStateProvider).value;
+    final user = ref.watch(accountUserProvider).value;
     final name = user?.displayName?.trim() ?? '';
     final email = user?.email?.trim() ?? '';
     return Column(
@@ -215,13 +216,14 @@ class _AccountMenuBody extends ConsumerWidget {
           _MenuTile(
             icon: Icons.account_circle_outlined,
             label: 'Sign in with Google',
-            onTap: () => _signIn(context, context, ref, google: true),
+            onTap: () => _signIn(context, ref, google: true),
           ),
-          _MenuTile(
-            icon: Icons.apple,
-            label: 'Sign in with Apple',
-            onTap: () => _signIn(context, context, ref, google: false),
-          ),
+          if (ref.watch(appleSignInAvailableProvider))
+            _MenuTile(
+              icon: Icons.apple,
+              label: 'Sign in with Apple',
+              onTap: () => _signIn(context, ref, google: false),
+            ),
         ] else ...[
           _MenuTile(
             icon: Icons.logout_rounded,
@@ -285,8 +287,8 @@ class _MenuTile extends StatelessWidget {
   }
 }
 
-/// Existing account sheet (sign in/out, delete account), shared with the
-/// account button. See account_button.dart for the source of truth.
+/// Account sheet: sign in, or the signed-in account with sign-out and
+/// delete-account.
 void _showAccountSheet(BuildContext context) {
   showModalBottomSheet<void>(
     context: context,
@@ -294,7 +296,7 @@ void _showAccountSheet(BuildContext context) {
     builder: (BuildContext context) {
       return Consumer(
         builder: (context, ref, child) {
-          final currentAuthState = ref.watch(authStateProvider);
+          final user = ref.watch(accountUserProvider).value;
           return SafeArea(
             child: Container(
               decoration: BoxDecoration(
@@ -309,68 +311,36 @@ void _showAccountSheet(BuildContext context) {
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Text(
-                      currentAuthState.value != null ? 'Account' : 'Sign In',
+                      user != null ? 'Account' : 'Sign In',
                       style: const TextStyle(
                           fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                   ),
-                  if (currentAuthState.value == null) ...[
+                  if (user == null) ...[
                     ListTile(
                       leading: const Icon(Icons.account_circle),
                       title: const Text('Sign in with Google'),
-                      onTap: () async {
-                        final result = await ref
-                            .read(authActionsProvider)
-                            .signInWithGoogle();
-                        if (context.mounted && result == SignInResult.failed) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content:
-                                  Text('Sign in failed. Please try again.'),
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
-                        }
-                        if (context.mounted && result == SignInResult.success) {
-                          Navigator.pop(context);
-                        }
-                      },
+                      onTap: () => _signIn(context, ref, google: true),
                     ),
-                    ListTile(
-                      leading: const Icon(Icons.apple),
-                      title: const Text('Sign in with Apple'),
-                      onTap: () async {
-                        final result = await ref
-                            .read(authActionsProvider)
-                            .signInWithApple();
-                        if (context.mounted && result == SignInResult.failed) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content:
-                                  Text('Sign in failed. Please try again.'),
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
-                        }
-                        if (context.mounted && result == SignInResult.success) {
-                          Navigator.pop(context);
-                        }
-                      },
-                    ),
+                    if (ref.watch(appleSignInAvailableProvider))
+                      ListTile(
+                        leading: const Icon(Icons.apple),
+                        title: const Text('Sign in with Apple'),
+                        onTap: () => _signIn(context, ref, google: false),
+                      ),
                   ] else ...[
                     ListTile(
                       leading: CircleAvatar(
                         radius: 12,
-                        backgroundImage: currentAuthState.value?.photoURL !=
-                                null
-                            ? NetworkImage(currentAuthState.value!.photoURL!)
+                        backgroundImage: user.photoUrl != null
+                            ? NetworkImage(user.photoUrl!)
                             : null,
-                        child: currentAuthState.value?.photoURL == null
+                        child: user.photoUrl == null
                             ? const Icon(Icons.person, size: 16)
                             : null,
                       ),
-                      title: Text(
-                          currentAuthState.value?.displayName ?? 'Signed In'),
+                      title: Text(user.displayName ?? 'Signed In'),
+                      subtitle: user.email == null ? null : Text(user.email!),
                     ),
                     ListTile(
                       leading: const Icon(Icons.logout, color: Colors.orange),
@@ -396,7 +366,8 @@ void _showAccountSheet(BuildContext context) {
                                 'This is permanent and irreversible.\n\n'
                                 'The following will be completely removed:\n'
                                 '• Your sign-in account\n'
-                                '• Your cloud-synced custom plans\n'
+                                '• Its cloud data in The Blessed Bible and '
+                                'Blessed Arcade (they share the account)\n'
                                 '• All on-device study data (bookmarks, highlights, history)'),
                             actions: [
                               TextButton(
@@ -422,18 +393,22 @@ void _showAccountSheet(BuildContext context) {
                                         Text('Account deleted successfully.')),
                               );
                             }
-                          } on ReauthCancelledException catch (_) {
-                            // Ignore cancellation silently
+                          } on SignInCancelledException {
+                            // The user dismissed re-authentication; nothing
+                            // was deleted.
+                          } on SignInFailedException catch (e) {
+                            reportNonFatal(
+                                'Re-authentication failed: ${e.failure.name}',
+                                code: e.code);
+                            if (!context.mounted) return;
+                            _showError(
+                                context,
+                                'Couldn\'t confirm it\'s you, so nothing was '
+                                'deleted. ${SignInResult.failed(e.failure).message}');
                           } catch (e) {
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                      'Failed to delete account: ${e.toString().replaceAll("Exception: ", "")}'),
-                                  duration: const Duration(seconds: 4),
-                                ),
-                              );
-                            }
+                            if (!context.mounted) return;
+                            _showError(context,
+                                'Failed to delete account. Please try again.');
                           }
                         }
                       },
@@ -449,26 +424,39 @@ void _showAccountSheet(BuildContext context) {
   );
 }
 
+/// Runs a sign-in from a sheet: closes it on success, explains a failure,
+/// and stays quiet when the user cancels.
 Future<void> _signIn(
   BuildContext sheetContext,
-  BuildContext context,
   WidgetRef ref, {
   required bool google,
 }) async {
+  final actions = ref.read(authActionsProvider);
   final result = google
-      ? await ref.read(authActionsProvider).signInWithGoogle()
-      : await ref.read(authActionsProvider).signInWithApple();
+      ? await actions.signInWithGoogle()
+      : await actions.signInWithApple();
   if (!sheetContext.mounted) return;
-  if (result == SignInResult.failed) {
-    ScaffoldMessenger.of(sheetContext).showSnackBar(
-      const SnackBar(
-        content: Text('Sign in failed. Please try again.'),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  } else if (result == SignInResult.success) {
-    Navigator.of(sheetContext).pop();
+  switch (result.status) {
+    case SignInStatus.success:
+      Navigator.of(sheetContext).pop();
+    case SignInStatus.failed:
+      reportNonFatal('Sign-in failed: ${result.failure?.name}',
+          code: result.code);
+      _showError(sheetContext, result.message);
+    case SignInStatus.cancelled:
+      break;
   }
+}
+
+void _showError(BuildContext context, String message) {
+  if (!context.mounted) return;
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(message),
+      behavior: SnackBarBehavior.floating,
+      duration: const Duration(seconds: 5),
+    ),
+  );
 }
 
 /// Restore dialog: paste a backup JSON (same format as Settings).
