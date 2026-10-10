@@ -35,8 +35,11 @@ Status: ✅ OK to ship · ⚠️ verify before release · ⛔ do not ship as-is
 | Diodati 1885 | `assets/packs/ita_dio.db` | Public domain | ✅ |
 | Russian Synodal, Chinese Union Version, Arabic Van Dyck, Korean 1910, Ukrainian Kulish | downloaded | Public domain | ✅ |
 
-**Download source:** every downloadable translation except KJV with Strong's comes from the [Free Use Bible API](https://bible.helloao.org) (`/api/{id}/complete.json`; MIT tooling, texts from eBible.org). KJV with Strong's is served from this repository's own Git LFS copy (`content_packs/kjv_strongs.db`, sha256-verified). CI (`tool/check_translation_sources.py`) checks that every catalog entry resolves to a complete 66-book text.
+**Download source:** every downloadable translation except KJV with Strong's and Hungarian Károli (from [open-bibles](https://github.com/seven1m/open-bibles), pinned commit + sha256) comes from the [Free Use Bible API](https://bible.helloao.org) (`/api/{id}/complete.json`; MIT tooling, texts from eBible.org). KJV with Strong's is served from this repository's own Git LFS copy (`content_packs/kjv_strongs.db`, sha256-verified). CI (`tool/check_translation_sources.py`) checks that every catalog entry resolves to a complete 66-book text.
 
+| Polish Updated Gdańsk Bible (UBG) | downloaded (`pol_ubg`) | © 2018 Fundacja Wrota Nadziei, CC BY-ND 4.0: redistribution incl. commercial, attribution, no changes to the words; credited in app | ✅ |
+| Czech Kralice Bible 1613 | downloaded (`ces_bkr`) | Public domain | ✅ |
+| Hungarian Károli Bible | downloaded (`hun_kar`) from open-bibles (Unbound Bible / Biola), pinned commit + sha256 | Public domain. Older encoding's õ/û are mapped to ő/ű (no wording changes) | ✅ |
 | Swahili ULB, Tagalog ULB | `assets/packs/swh_ulb.db`, `tgl_ulb.db` | CC BY-SA 4.0: attribution + share-alike; credited in app | ✅ |
 | Hindi Indian Revised Version | downloaded | CC BY-SA 4.0; credited in app | ✅ |
 | Bíblia Livre | `content_packs/por_blj.db` | CC BY (version: item 5) | ⚠️ |

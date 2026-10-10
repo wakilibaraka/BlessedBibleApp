@@ -43,10 +43,12 @@ jobs:
       - name: Analyze
         run: flutter analyze --fatal-infos
 
-      - name: Fetch a live translation for the parser test
+      - name: Fetch live translations for the parser tests
         run: |
           mkdir -p build/helloao
           curl -fsSL --retry 3 https://bible.helloao.org/api/deu_l12/complete.json -o build/helloao/deu_l12.complete.json
+          mkdir -p build/open-bibles
+          curl -fsSL --retry 3 https://raw.githubusercontent.com/seven1m/open-bibles/f257a3559025c3f873b48a75019f53a9354ed7de/hun-karoli.osis.xml -o build/open-bibles/hun-karoli.osis.xml
 
       - name: Test
         run: flutter test
@@ -117,6 +119,4 @@ jobs:
       - uses: actions/checkout@v4
       - name: Every catalog translation downloads and is complete
         run: python3 tool/check_translation_sources.py
-      - name: Candidate languages (temporary discovery)
-        run: python3 tool/check_translation_sources.py --find pol hun ell ces swe ron
 

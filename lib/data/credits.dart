@@ -31,16 +31,23 @@ const List<CreditSection> kCreditSections = [
     CreditItem(
         'Reina-Valera 1909, Louis Segond 1910, Luther 1912, Diodati 1885, '
             'Dutch 1917, Russian Synodal, Chinese Union Version, '
-            'Arabic Van Dyck, Korean 1910, Ukrainian Kulish',
+            'Arabic Van Dyck, Korean 1910, Ukrainian Kulish, '
+            'Kralice Bible 1613 (Czech), Károli Bible (Hungarian)',
         'Public domain.'),
     CreditItem('Swahili and Tagalog Unlocked Literal Bible',
         'Licensed under CC BY-SA 4.0 (creativecommons.org/licenses/by-sa/4.0).'),
     CreditItem('Hindi Indian Revised Version',
         'Licensed under CC BY-SA 4.0 (creativecommons.org/licenses/by-sa/4.0).'),
     CreditItem(
+        'Updated Gdańsk Bible (Polish)',
+        '© 2018 Fundacja Wrota Nadziei. Licensed under CC BY-ND 4.0 '
+            '(creativecommons.org/licenses/by-nd/4.0).'),
+    CreditItem(
         'Bíblia Livre', 'Licensed under Creative Commons Attribution (CC BY).'),
-    CreditItem('Additional translations',
-        'Downloaded from the Free Use Bible API (bible.helloao.org).'),
+    CreditItem(
+        'Additional translations',
+        'Downloaded from the Free Use Bible API (bible.helloao.org) and '
+            'open-bibles (github.com/seven1m/open-bibles).'),
   ]),
   CreditSection(
     'Commentary',

@@ -36,6 +36,7 @@ dependencies:
   home_widget: ^0.10.0
   firebase_app_check: ^0.4.8
   firebase_crashlytics: ^5.4.0
+  xml: ^7.0.1
 
 dev_dependencies:
   flutter_test:

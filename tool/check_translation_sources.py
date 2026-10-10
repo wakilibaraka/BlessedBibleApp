@@ -8,8 +8,8 @@ Usage:
       translations for these ISO 639-3 language codes (id, name, license)
 
 The catalog is read from lib/services/translation_downloader.dart: the
-`_helloao('<id>', ...)` entries, plus 'prebuilt' packs (downloaded and
-sha256-checked). CI runs the verify mode.
+`_helloao('<id>', ...)` entries, plus 'prebuilt' and 'osis' downloads
+(fetched and sha256-checked). CI runs the verify mode.
 """
 import hashlib
 import json
@@ -35,17 +35,19 @@ def catalog_ids():
     return re.findall(r"_helloao\(\s*'([^']+)'", src)
 
 
-def prebuilt_packs():
-    """(id, url, sha256) for 'prebuilt' entries, resolving the Dart const."""
+def hashed_downloads():
+    """(id, url, sha256) for 'prebuilt' and 'osis' entries, resolving the
+    Dart URL constants they interpolate."""
     src = open(CATALOG, encoding="utf-8").read()
-    base = re.search(r"_repoPacksBase =\s*'([^']+)'", src).group(1)
-    packs = []
-    for block in re.findall(r"\{[^{}]*'source':\s*'prebuilt'[^{}]*\}", src):
+    consts = dict(re.findall(r"static const String (_\w+) =\s*'([^']+)'", src))
+    out = []
+    for block in re.findall(r"\{[^{}]*'source':\s*'(?:prebuilt|osis)'[^{}]*\}", src):
         pid = re.search(r"'id':\s*'([^']+)'", block).group(1)
-        url = re.search(r"'url':\s*'([^']+)'", block).group(1).replace("$_repoPacksBase", base)
+        url = re.search(r"'url':\s*'([^']+)'", block).group(1)
+        url = re.sub(r"\$(_\w+)", lambda m: consts[m.group(1)], url)
         sha = re.search(r"'sha256':\s*'([0-9a-f]{64})'", block).group(1)
-        packs.append((pid, url, sha))
-    return packs
+        out.append((pid, url, sha))
+    return out
 
 
 def find(langs):
@@ -82,13 +84,13 @@ def verify():
         ok = len(books) == 66 and verses > 30000
         failed |= not ok
         print(f"{'OK  ' if ok else 'FAIL'} {tid}: {meta.get('englishName')} | books={len(books)} verses={verses} | {meta.get('licenseUrl')}")
-    for pid, url, sha in prebuilt_packs():
+    for pid, url, sha in hashed_downloads():
         req = urllib.request.Request(url, headers={"User-Agent": "blessed-bible-ci/1.0"})
         with urllib.request.urlopen(req, timeout=300) as r:
             digest = hashlib.sha256(r.read()).hexdigest()
         ok = digest == sha
         failed |= not ok
-        print(f"{'OK  ' if ok else 'FAIL'} {pid}: prebuilt pack sha256 {'matches' if ok else 'is ' + digest}")
+        print(f"{'OK  ' if ok else 'FAIL'} {pid}: download sha256 {'matches' if ok else 'is ' + digest}")
     if failed:
         sys.exit(1)
 

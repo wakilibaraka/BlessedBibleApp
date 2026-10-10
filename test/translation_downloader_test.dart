@@ -116,4 +116,34 @@ void main() {
     expect({for (final r in rows) r['book_number']}, hasLength(66));
     expect(rows.first['text'], startsWith('Am Anfang schuf Gott'));
   }, skip: live.existsSync() ? false : 'no live download in this run');
+
+  test('parses OSIS verses, skipping notes and apocrypha', () {
+    const xml = """<?xml version="1.0" encoding="UTF-8"?>
+<osis><osisText><div type="book" osisID="Gen"><chapter osisID="Gen.1">
+<verse osisID="Gen.1.1">Kezdetben teremté Isten<note>jegyzet</note> az eget és a földet .</verse>
+<verse osisID="Gen.1.2">Hogy az õ egyszülött Fiát adta</verse>
+</chapter></div><div type="book" osisID="Tob"><chapter osisID="Tob.1">
+<verse osisID="Tob.1.1">Tobiás</verse></chapter></div></osisText></osis>""";
+    final rows = TranslationDownloader.versesFromOsis(xml,
+        translationId: 'hun_kar', languageCode: 'hu', fixLegacyHungarian: true);
+    expect(rows, hasLength(2));
+    expect(rows[0]['text'], 'Kezdetben teremté Isten az eget és a földet.');
+    expect(rows[0]['book_number'], 1);
+    expect(rows[1]['text'], 'Hogy az ő egyszülött Fiát adta');
+  });
+
+  final liveOsis = File('build/open-bibles/hun-karoli.osis.xml');
+  test('parses the live Károli OSIS end to end', () {
+    final rows = TranslationDownloader.versesFromOsis(
+        liveOsis.readAsStringSync(),
+        translationId: 'hun_kar',
+        languageCode: 'hu',
+        fixLegacyHungarian: true);
+    expect(rows, hasLength(31170));
+    expect({for (final r in rows) r['book_number']}, hasLength(66));
+    final john316 = rows.firstWhere(
+        (r) => r['book_number'] == 43 && r['chapter'] == 3 && r['verse'] == 16);
+    expect(john316['text'], contains('az ő egyszülött Fiát'));
+    expect(rows.any((r) => (r['text'] as String).contains('õ')), isFalse);
+  }, skip: liveOsis.existsSync() ? false : 'no live download in this run');
 }

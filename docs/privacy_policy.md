@@ -36,7 +36,7 @@ To protect our servers from abuse, the app uses Firebase App Check, which asks G
 
 ## Downloading content
 
-When you download a Bible translation, the app requests it from the Free Use Bible API (bible.helloao.org) or, for KJV with Strong's numbers, from GitHub. When the app refreshes study content, it reads from Google Cloud Firestore. As with any internet request, these servers receive your device's IP address. No account information is sent.
+When you download a Bible translation, the app requests it from the Free Use Bible API (bible.helloao.org) or, for KJV with Strong's numbers and the Hungarian Károli Bible, from GitHub. When the app refreshes study content, it reads from Google Cloud Firestore. As with any internet request, these servers receive your device's IP address. No account information is sent.
 
 ## Notifications and widgets
 

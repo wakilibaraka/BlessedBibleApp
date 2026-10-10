@@ -26,7 +26,7 @@ void main() {
         // Offline restore: must be a shipped bundled pack.
         expect(TranslationPackStore.bundledPackIds.contains(id), isTrue,
             reason: '$id marked bundled but not shipped in assets/packs');
-      } else if (source == 'prebuilt') {
+      } else if (source == 'prebuilt' || source == 'osis') {
         final url = t['url'] as String?;
         final sha = t['sha256'] as String?;
         expect(url != null && url.startsWith('https://'), isTrue,

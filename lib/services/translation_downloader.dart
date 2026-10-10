@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'dart:isolate';
+
+import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
+import 'package:xml/xml.dart';
 import '../data/models/translation_model.dart';
 import 'bible_database_service.dart';
 
@@ -16,6 +19,11 @@ class TranslationDownloader {
   /// this repository's Git LFS copy (content_packs/) and hash-verified.
   static const String _repoPacksBase =
       'https://media.githubusercontent.com/media/wakilibaraka/BlessedBibleApp/main/content_packs';
+
+  /// Public-domain OSIS texts from seven1m/open-bibles, pinned to a commit
+  /// so the bytes never change under the recorded sha256.
+  static const String _openBiblesBase =
+      'https://raw.githubusercontent.com/seven1m/open-bibles/f257a3559025c3f873b48a75019f53a9354ed7de';
 
   // Downloadable translation definitions. `id` is the download id (the
   // API's translation id); `db_id` the on-device id when it differs.
@@ -45,6 +53,26 @@ class TranslationDownloader {
         'CC BY 4.0', 5.0),
     ..._helloao('spa_r09', 'es', 'Spanish', 'Reina Valera 1909', 'RV1909',
         'Public Domain', 5.0),
+    ..._helloao('pol_ubg', 'pl', 'Polish', 'Updated Gdańsk Bible', 'UBG',
+        'CC BY-ND 4.0', 5.0),
+    ..._helloao('ces_bkr', 'cs', 'Czech', 'Kralice Bible 1613', 'BKR',
+        'Public Domain', 5.0),
+    // Not on the Free Use Bible API: public-domain OSIS from
+    // github.com/seven1m/open-bibles, pinned to a commit and hash-checked.
+    {
+      'id': 'hun_kar',
+      'lang': 'hu',
+      'langName': 'Hungarian',
+      'name': 'Károli Bible',
+      'abbr': 'KAR',
+      'license': 'Public Domain',
+      'sizeMB': 5.3,
+      'source': 'osis',
+      'url': '$_openBiblesBase/hun-karoli.osis.xml',
+      'sha256':
+          '91f9b0c1447d96400a1cc0e7200eb37f74570b323a71ee16c497d681cd55b863',
+      'fixLegacyHungarian': true,
+    },
     {
       'id': 'kjv_strongs',
       'lang': 'en',
@@ -133,116 +161,61 @@ class TranslationDownloader {
       String translationId, void Function(double) onProgress) async {
     final meta = downloadableTranslations
         .firstWhere((t) => (t['db_id'] ?? t['id']) == translationId);
+    final tid = (meta['db_id'] ?? meta['id']) as String;
+    final expectedSha256 = meta['sha256'] as String?;
 
-    final url = meta['url'] as String;
+    final bytes = await _fetchBytes(meta['url'] as String,
+        ((meta['sizeMB'] as num) * 1024 * 1024).toInt(), onProgress);
+    onProgress(1.0); // Verifying + installing
 
-    // Prebuilt pack database: exact bytes, hash-verified.
+    // Prebuilt pack database: exact bytes, hash-verified by the pack store.
     if (meta['source'] == 'prebuilt') {
-      await _downloadPrebuiltPack(meta, url, onProgress);
+      await bibleDbService.installPrebuiltPack(tid, bytes,
+          expectedSha256: expectedSha256);
       return;
     }
 
-    String? jsonString;
-    Exception? lastError;
-
-    // Retry logic
-    for (int i = 0; i < _maxRetries; i++) {
-      try {
-        final request = http.Request('GET', Uri.parse(url));
-        final response = await request.send();
-
-        if (response.statusCode == 200) {
-          final int totalBytes = response.contentLength ??
-              ((meta['sizeMB'] as num) * 1024 * 1024).toInt();
-          int receivedBytes = 0;
-          final List<int> bytes = [];
-
-          await for (final chunk in response.stream) {
-            bytes.addAll(chunk);
-            receivedBytes += chunk.length;
-            onProgress(receivedBytes / totalBytes);
-          }
-
-          jsonString = utf8.decode(bytes);
-          break; // Success
-        } else {
-          throw Exception('HTTP ${response.statusCode}');
-        }
-      } catch (e) {
-        lastError = e as Exception;
-        if (i < _maxRetries - 1) {
-          await Future<void>.delayed(_retryDelay * (i + 1));
-        }
-      }
+    if (expectedSha256 != null &&
+        sha256.convert(bytes).toString() != expectedSha256) {
+      throw StateError('Download of $tid failed integrity check.');
     }
 
-    if (jsonString == null) {
-      throw lastError ?? Exception('Download failed');
-    }
-
-    onProgress(1.0); // Processing
-
-    // Parse large JSON in isolate to avoid ANR
-    final parsedData =
-        await Isolate.run(() => _parseTranslationJson(jsonString!, meta));
-
-    // Install to DB
-    await bibleDbService.insertTranslationPack(
-        parsedData.info, parsedData.verses);
+    // Parse in an isolate to keep the UI responsive.
+    final text = utf8.decode(bytes);
+    final parsed = await Isolate.run(() => _parse(text, meta));
+    await bibleDbService.insertTranslationPack(parsed.info, parsed.verses);
   }
 
-  /// Downloads a prebuilt pack database with retries,
-  /// verifies its sha256, and installs it as a standalone pack file.
-  static Future<void> _downloadPrebuiltPack(
-    Map<String, dynamic> meta,
-    String url,
-    void Function(double) onProgress,
-  ) async {
-    final tid = (meta['db_id'] ?? meta['id']) as String;
-    List<int>? bytes;
+  /// GETs [url] with retries, reporting progress against the
+  /// Content-Length (or [expectedBytes] when the server omits it).
+  static Future<List<int>> _fetchBytes(
+      String url, int expectedBytes, void Function(double) onProgress) async {
     Exception? lastError;
-
     for (int i = 0; i < _maxRetries; i++) {
       try {
-        final request = http.Request('GET', Uri.parse(url));
-        final response = await request.send();
-        if (response.statusCode == 200) {
-          final int totalBytes = response.contentLength ??
-              ((meta['sizeMB'] as num) * 1024 * 1024).toInt();
-          int receivedBytes = 0;
-          final chunks = <int>[];
-          await for (final chunk in response.stream) {
-            chunks.addAll(chunk);
-            receivedBytes += chunk.length;
-            onProgress(receivedBytes / totalBytes);
-          }
-          bytes = chunks;
-          break;
-        } else {
+        final response = await http.Request('GET', Uri.parse(url)).send();
+        if (response.statusCode != 200) {
           throw Exception('HTTP ${response.statusCode}');
         }
-      } catch (e) {
-        lastError = e as Exception;
+        final total = response.contentLength ?? expectedBytes;
+        final bytes = <int>[];
+        await for (final chunk in response.stream) {
+          bytes.addAll(chunk);
+          onProgress((bytes.length / total).clamp(0.0, 1.0));
+        }
+        return bytes;
+      } on Exception catch (e) {
+        lastError = e;
         if (i < _maxRetries - 1) {
           await Future<void>.delayed(_retryDelay * (i + 1));
         }
       }
     }
-
-    if (bytes == null) {
-      throw lastError ?? Exception('Download failed');
-    }
-    onProgress(1.0); // Verifying + installing
-    await bibleDbService.installPrebuiltPack(
-      tid,
-      bytes,
-      expectedSha256: meta['sha256'] as String?,
-    );
+    throw lastError ?? Exception('Download failed');
   }
 
   // Runs in an isolate
-  static _ParsedData _parseTranslationJson(
-      String jsonString, Map<String, dynamic> meta) {
+  static _ParsedData _parse(String text, Map<String, dynamic> meta) {
     final info = TranslationInfo(
       translationId: (meta['db_id'] ?? meta['id']) as String,
       languageCode: meta['lang'] as String,
@@ -253,11 +226,22 @@ class TranslationDownloader {
       isComplete: true,
       isDownloaded: true,
     );
-    final verses = versesFromCompleteJson(
-      jsonDecode(jsonString) as Map<String, dynamic>,
-      translationId: info.translationId,
-      languageCode: info.languageCode,
-    );
+    final verses = meta['source'] == 'osis'
+        ? versesFromOsis(
+            text,
+            translationId: info.translationId,
+            languageCode: info.languageCode,
+            fixLegacyHungarian: meta['fixLegacyHungarian'] == true,
+          )
+        : versesFromCompleteJson(
+            jsonDecode(text) as Map<String, dynamic>,
+            translationId: info.translationId,
+            languageCode: info.languageCode,
+          );
+    if (verses.length < 30000) {
+      throw StateError('${info.translationId}: incomplete download '
+          '(${verses.length} verses)');
+    }
     return _ParsedData(info, verses);
   }
 
@@ -308,6 +292,61 @@ class TranslationDownloader {
     return rows;
   }
 
+  /// OSIS book ids in canon order (book_number = index + 1).
+  static const List<String> _osisBooks = [
+    'Gen', 'Exod', 'Lev', 'Num', 'Deut', 'Josh', 'Judg', 'Ruth', '1Sam', //
+    '2Sam', '1Kgs', '2Kgs', '1Chr', '2Chr', 'Ezra', 'Neh', 'Esth', 'Job',
+    'Ps', 'Prov', 'Eccl', 'Song', 'Isa', 'Jer', 'Lam', 'Ezek', 'Dan', 'Hos',
+    'Joel', 'Amos', 'Obad', 'Jonah', 'Mic', 'Nah', 'Hab', 'Zeph', 'Hag',
+    'Zech', 'Mal', 'Matt', 'Mark', 'Luke', 'John', 'Acts', 'Rom', '1Cor',
+    '2Cor', 'Gal', 'Eph', 'Phil', 'Col', '1Thess', '2Thess', '1Tim', '2Tim',
+    'Titus', 'Phlm', 'Heb', 'Jas', '1Pet', '2Pet', '1John', '2John',
+    '3John', 'Jude', 'Rev',
+  ];
+
+  /// Converts an OSIS XML Bible with container `<verse osisID="Gen.1.1">`
+  /// elements into verse rows. `<note>` content is dropped and books outside
+  /// the 66-book canon are skipped. [fixLegacyHungarian] repairs the
+  /// Latin-1 stand-ins (õ/û) older Hungarian files use for ő/ű.
+  static List<Map<String, dynamic>> versesFromOsis(
+    String xml, {
+    required String translationId,
+    required String languageCode,
+    bool fixLegacyHungarian = false,
+  }) {
+    final rows = <Map<String, dynamic>>[];
+    for (final verse in XmlDocument.parse(xml).findAllElements('verse')) {
+      final ref = verse.getAttribute('osisID')?.split(' ').first.split('.');
+      if (ref == null || ref.length != 3) continue;
+      final bookNumber = _osisBooks.indexOf(ref[0]) + 1;
+      if (bookNumber == 0) continue;
+      final parts = verse.descendants
+          .whereType<XmlText>()
+          .where((t) => !t.ancestors
+              .whereType<XmlElement>()
+              .any((e) => e.name.local == 'note'))
+          .map((t) => t.value);
+      var text = _clean(parts.join(' '));
+      if (fixLegacyHungarian) {
+        text = text
+            .replaceAll('õ', 'ő')
+            .replaceAll('Õ', 'Ő')
+            .replaceAll('û', 'ű')
+            .replaceAll('Û', 'Ű');
+      }
+      if (text.isEmpty) continue;
+      rows.add({
+        'translation_id': translationId,
+        'language_code': languageCode,
+        'book_number': bookNumber,
+        'chapter': int.parse(ref[1]),
+        'verse': int.parse(ref[2]),
+        'text': text,
+      });
+    }
+    return rows;
+  }
+
   /// Joins a verse's content parts: plain strings and `{text}` runs are
   /// kept; `{heading}`, `{lineBreak}` and `{noteId}` parts are dropped.
   static String _verseText(List<dynamic> parts) {
@@ -319,8 +358,13 @@ class TranslationDownloader {
         pieces.add(part['text'] as String);
       }
     }
-    return pieces
-        .join(' ')
+    return _clean(pieces.join(' '));
+  }
+
+  /// Collapses whitespace, removes space before punctuation, and normalises
+  /// curly apostrophes.
+  static String _clean(String text) {
+    return text
         .replaceAll(RegExp(r'\s+'), ' ')
         .replaceAllMapped(RegExp(r' ([,.;:!?])'), (m) => m.group(1)!)
         .replaceAll('\u2019', "'")
