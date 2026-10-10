@@ -40,8 +40,6 @@ import '../../data/local_storage/preferences_service.dart';
 import '../../data/models/translation_model.dart';
 import '../../state/hints_provider.dart';
 import '../../services/share_service.dart';
-import '../../services/devotional_service.dart';
-import '../../state/devotional_provider.dart';
 import '../widgets/share_card.dart';
 import '../widgets/radial_action_menu.dart';
 import '../widgets/cross_references_sheet.dart';
@@ -55,7 +53,6 @@ import '../../state/theme_provider.dart';
 import '../../state/bbe_substitutions_provider.dart';
 import '../../state/typography_provider.dart';
 import '../../state/immersive_mode_provider.dart';
-import '../../state/bible_nav_settings_provider.dart';
 import '../../state/read_selection_provider.dart';
 import '../../state/commentary_provider.dart';
 import '../../state/read_location_provider.dart';
@@ -2250,7 +2247,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
             strongsSpan = TextSpan(
               text: '*',
               style: style.copyWith(
-                color: theme.colorScheme.primary.withOpacity(0.8),
+                color: theme.colorScheme.primary.withValues(alpha: 0.8),
                 fontWeight: FontWeight.bold,
               ),
               recognizer: tapGesture,
@@ -2260,7 +2257,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
               text: strongsId,
               style: style.copyWith(
                 fontSize: (style.fontSize ?? 16) * 0.7,
-                color: theme.colorScheme.primary.withOpacity(0.9),
+                color: theme.colorScheme.primary.withValues(alpha: 0.9),
                 fontWeight: FontWeight.bold,
               ),
               recognizer: tapGesture,
@@ -2275,7 +2272,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                   child: Icon(
                     Icons.link,
                     size: (style.fontSize ?? 16) * 0.85,
-                    color: theme.colorScheme.primary.withOpacity(0.7),
+                    color: theme.colorScheme.primary.withValues(alpha: 0.7),
                   ),
                 ),
               ),

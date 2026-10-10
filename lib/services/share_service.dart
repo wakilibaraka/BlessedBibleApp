@@ -12,6 +12,7 @@ import 'package:share_plus/share_plus.dart';
 import '../data/bible_books.dart';
 import '../state/translation_provider.dart';
 import 'bible_database_service.dart';
+import '../utils/log.dart';
 
 /// A centralized service for formatting and sharing Bible content.
 ///
@@ -216,7 +217,7 @@ class ShareService {
       // ignore: deprecated_member_use
       await Share.share(body, subject: subject);
     } catch (e) {
-      debugPrint('Share failed: $e');
+      logDebug('Share failed: $e');
     }
   }
 
@@ -243,7 +244,7 @@ class ShareService {
       // ignore: deprecated_member_use
       await Share.shareXFiles([XFile(file.path)], text: caption);
     } catch (e) {
-      debugPrint('Share image failed: $e');
+      logDebug('Share image failed: $e');
     }
   }
 }

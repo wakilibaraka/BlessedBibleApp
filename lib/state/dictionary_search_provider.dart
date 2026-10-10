@@ -64,7 +64,7 @@ final dictionarySearchProvider = FutureProvider.family<List<DictionaryHeadword>,
   
   final db = await bibleDbService.database;
   final q = query.trim();
-  final likeTerm = '%${q}%';
+  final likeTerm = '%$q%';
   
   final rows = await db.query(
     'dictionary',

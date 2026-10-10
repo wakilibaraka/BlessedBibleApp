@@ -6,6 +6,7 @@ import '../models/study_content_category.dart';
 import '../data/local_storage/preferences_service.dart';
 import 'package:flutter/foundation.dart';
 import '../utils/isolate_parsers.dart';
+import '../utils/log.dart';
 
 class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
   List<String> _cachedFormattedVerses = [];
@@ -65,7 +66,7 @@ class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
     } catch (e) {
       // Never fail silently: providers surface the error so screens render
       // an honest error + retry instead of a permanently blank library.
-      debugPrint('commentaryProvider failed to load bundled commentary: $e');
+      logDebug('commentaryProvider failed to load bundled commentary: $e');
       throw StateError('Could not load commentary ($e).');
     }
   }
@@ -188,11 +189,3 @@ final commentaryForChapterProvider =
   return notifier.hasCommentary(book, chapter, null);
 });
 
-/// Returns the set of books that have ANY commentary — used by Library.
-final commentaryAvailableBooksProvider = Provider<Set<String>>((ref) {
-  final list = ref.watch(commentaryProvider).value ?? [];
-  return list
-      .where((e) => e.scope.book != null)
-      .map((e) => e.scope.book!)
-      .toSet();
-});

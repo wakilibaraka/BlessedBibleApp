@@ -33,7 +33,6 @@ dependencies:
   google_sign_in: ^7.2.0
   cloud_firestore: ^6.8.0
   sign_in_with_apple: ^8.1.0
-  flutter_timezone: ^5.1.0
   home_widget: ^0.10.0
 
 dev_dependencies:
@@ -55,7 +54,6 @@ flutter:
   assets:
     - assets/bible/bible.db
     - assets/packs/
-    - assets/images/
     - assets/data/
     - assets/icon/
     - assets/reading_plans/
@@ -124,12 +122,6 @@ flutter:
         - asset: assets/fonts/OpenDyslexic-Regular.otf
         - asset: assets/fonts/OpenDyslexic-Bold.otf
           weight: 700
-    - family: Bonheur Royale
-      fonts:
-        - asset: assets/fonts/BonheurRoyale-Regular.ttf
-    - family: Shadows Into Light
-      fonts:
-        - asset: assets/fonts/ShadowsIntoLight-Regular.ttf
     - family: Bitter
       fonts:
         - asset: assets/fonts/Bitter-Regular.ttf

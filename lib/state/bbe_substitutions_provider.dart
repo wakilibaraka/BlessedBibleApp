@@ -11,7 +11,7 @@ final bbeSubstitutionsProvider = FutureProvider<Set<String>>((ref) async {
       final b = item['book'];
       final c = item['chapter'];
       final v = item['verse'];
-      subs.add('${b}_${c}_${v}');
+      subs.add('${b}_${c}_$v');
     }
     return subs;
   } catch (e) {

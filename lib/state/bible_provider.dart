@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/models/bible_model.dart';
 import '../utils/isolate_parsers.dart';
-import '../utils/startup_stopwatch.dart'; // For startupStopwatch
 import '../services/bible_database_service.dart';
 
 class BibleState {
@@ -42,12 +41,8 @@ class BibleNotifier extends Notifier<BibleState> {
       // network). The query below also drives DB install/verify/repair, so
       // the splash screen stays active until content is fully ready.
       final rows = await bibleDbService.getAllVerses('kjv');
-      if (kStartupTrace) {
-      }
 
       final booksList = await compute(parseBibleRows, rows);
-      if (kStartupTrace) {
-      }
 
       state = state.copyWith(isLoading: false, books: booksList);
     } catch (e) {

@@ -12,7 +12,7 @@ import 'journey_map_screen.dart';
 import '../../data/curated_plans.dart';
 import 'study_reader_screen.dart';
 
-/// Rebuilt plan detail (V2). Shown from [PlansHubV3Screen] / [StudyScreenV2].
+/// Rebuilt plan detail (V2). Shown from [StudyScreenV2].
 ///
 /// Same [readingPlanProvider] state as V1 — this screen only changes
 /// presentation and fixes mapping bugs locally:

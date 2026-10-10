@@ -16,7 +16,6 @@ import 'package:flutter/cupertino.dart';
 import 'your_space_screen.dart';
 import 'notes_list_screen.dart';
 
-import '../../data/curated_plans.dart';
 import '../widgets/continue_reading_card.dart';
 import '../widgets/reminder_settings_card.dart';
 

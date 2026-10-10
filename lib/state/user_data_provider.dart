@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:convert';
 import '../data/models/bookmark_model.dart';
 import '../data/local_storage/preferences_service.dart';
+import '../utils/log.dart';
 
 /// Canonical key for persistent verse data (bookmarks, highlights, etc.).
 /// Uses the 3-letter abbreviation (e.g. 'GEN', '1CO') which is unique and
@@ -46,7 +47,7 @@ class BookmarkDataNotifier extends Notifier<BookmarkData> {
         final decoded = jsonDecode(jsonStr);
         return BookmarkData.fromJson(decoded);
       } catch (e) {
-        debugPrint('Error parsing bookmarks_v2: $e');
+        logDebug('Error parsing bookmarks_v2: $e');
       }
     }
 
@@ -89,15 +90,15 @@ class BookmarkDataNotifier extends Notifier<BookmarkData> {
               verificationPassed = true;
             }
           } catch (e) {
-            debugPrint('Migration verification failed parsing: $e');
+            logDebug('Migration verification failed parsing: $e');
           }
         }
 
         if (!verificationPassed) {
           prefs.removeBookmarksV2();
-          debugPrint('MIGRATION READ-BACK FAILED. Legacy data untouched. Migration reverted.');
+          logDebug('MIGRATION READ-BACK FAILED. Legacy data untouched. Migration reverted.');
         } else {
-          debugPrint('MIGRATION SUCCESS: Read-back verified ${nodes.length} bookmarks.');
+          logDebug('MIGRATION SUCCESS: Read-back verified ${nodes.length} bookmarks.');
         }
       });
     }

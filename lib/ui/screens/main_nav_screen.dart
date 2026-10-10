@@ -30,6 +30,7 @@ import '../../state/read_settings_provider.dart';
 import '../../state/study_provider.dart';
 import '../../state/commentary_provider.dart';
 import '../widgets/commentary_view.dart';
+import '../../utils/log.dart';
 
 const double kBottomDockHeight = 64.0;
 const double kBottomDockInset = 16.0;
@@ -157,10 +158,6 @@ class MainNavScreen extends ConsumerWidget {
                 final isMinimalAction = currentIndex == 1 &&
                     selectedVerses.isNotEmpty &&
                     style == VerseActionStyle.horizontal;
-                // Compact sheet: actions live in a short sheet, not the dock.
-                final usesActionSheet = currentIndex == 1 &&
-                    selectedVerses.isNotEmpty &&
-                    style == VerseActionStyle.classic;
                 final isRaindropAction = currentIndex == 1 &&
                     selectedVerses.isNotEmpty &&
                     style == VerseActionStyle.raindrop;
@@ -997,7 +994,7 @@ class MainNavScreen extends ConsumerWidget {
                   )));
         });
       } catch (e, st) {
-        debugPrint('Casting lots error: $e\n$st');
+        logDebug('Casting lots error: $e\n$st');
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(

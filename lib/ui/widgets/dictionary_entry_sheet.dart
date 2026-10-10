@@ -1,6 +1,5 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/dictionary_provider.dart';
 import '../../state/typography_provider.dart';
@@ -43,7 +42,7 @@ class DictionaryEntrySheet extends ConsumerWidget {
             : const BorderRadius.vertical(top: Radius.circular(32)),
         boxShadow: isFloating ? [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 24,
             spreadRadius: 8,
           )
@@ -95,10 +94,9 @@ class DictionaryEntrySheet extends ConsumerWidget {
                             sourceName: _formatSourceName(defs.first.source),
                           );
                           final full = defs.length > 1
-                              ? '$text\n\n' +
-                                  defs.skip(1).map((d) {
+                              ? '$text\n\n${defs.skip(1).map((d) {
                                     return "${_formatSourceName(d.source).toUpperCase()}:\n${d.definition.trim()}";
-                                  }).join('\n\n')
+                                  }).join('\n\n')}'
                               : text;
                           showShareOptionsSheet(
                             context: context,

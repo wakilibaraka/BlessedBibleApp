@@ -6,10 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/local_storage/preferences_service.dart';
-import '../../services/devotional_service.dart';
 import '../../services/share_service.dart';
-import '../../state/devotional_provider.dart';
-import '../../state/read_settings_provider.dart';
 
 /// Shareable image cards (1080x1350, WhatsApp-Status-friendly 4:5).
 ///
@@ -77,8 +74,6 @@ const List<String> kShareCardFonts = [
 ];
 
 class ShareCardStyleNotifier extends Notifier<ShareCardStyle> {
-  static const _key = 'share_card_style';
-
   @override
   ShareCardStyle build() {
     _load();

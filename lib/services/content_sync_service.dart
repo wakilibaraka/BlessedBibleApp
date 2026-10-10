@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
+import '../utils/log.dart';
 
 class ContentSyncService<T> {
   final String collectionName;
@@ -34,7 +35,7 @@ class ContentSyncService<T> {
       }
       return result;
     } catch (e) {
-      debugPrint('Error loading local cache for $collectionName: $e');
+      logDebug('Error loading local cache for $collectionName: $e');
       return {};
     }
   }
@@ -81,7 +82,7 @@ class ContentSyncService<T> {
            parsedResult[entry.key] = parsed;
            cleanDataMap[entry.key] = toJson(parsed);
          } catch (e) {
-           debugPrint('Error parsing doc ${entry.key}: $e');
+           logDebug('Error parsing doc ${entry.key}: $e');
          }
       }
 
@@ -98,7 +99,7 @@ class ContentSyncService<T> {
       onUpdate(parsedResult);
       
     } catch (e) {
-      debugPrint('Error syncing $collectionName: $e');
+      logDebug('Error syncing $collectionName: $e');
       // Silently swallow network/firestore errors
     }
   }

@@ -1,8 +1,8 @@
 import 'dart:math';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dictionary_provider.dart';
 import 'dictionary_search_provider.dart';
+import '../utils/log.dart';
 
 class WordOfTheDay {
   final String word;
@@ -18,7 +18,7 @@ class WordOfTheDay {
 final wordOfTheDayProvider = FutureProvider<WordOfTheDay?>((ref) async {
   final allWords = await ref.watch(dictionaryIndexProvider.future);
   if (allWords.isEmpty) {
-    debugPrint('wordOfTheDayProvider: dictionary index is empty');
+    logDebug('wordOfTheDayProvider: dictionary index is empty');
     return null;
   }
   
@@ -32,7 +32,7 @@ final wordOfTheDayProvider = FutureProvider<WordOfTheDay?>((ref) async {
   
   final defs = await ref.watch(dictionaryDefinitionProvider(headword.normalizedWord).future);
   if (defs.isEmpty) {
-    debugPrint(
+    logDebug(
         'wordOfTheDayProvider: no definition for "${headword.normalizedWord}"');
     return null;
   }

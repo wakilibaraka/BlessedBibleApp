@@ -10,6 +10,7 @@ import '../models/reading_plan.dart';
 import '../services/pace_remap_service.dart';
 import '../services/word_count_service.dart';
 import '../utils/isolate_parsers.dart';
+import '../utils/log.dart';
 
 /// App weekday: 1=Sunday, 2=Monday, ..., 7=Saturday
 int appWeekday(DateTime date) {
@@ -538,7 +539,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
       try {
         canon = await _canonIndex();
       } catch (e) {
-        debugPrint('plan refs: canon unavailable ($e)');
+        logDebug('plan refs: canon unavailable ($e)');
       }
       var parsedPlanData = finalPlanData;
       if (canon != null) {
@@ -628,7 +629,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
       }
     }
     if (parsed == null) {
-      debugPrint('plan refs: unparseable passage "${passage.label}"');
+      logDebug('plan refs: unparseable passage "${passage.label}"');
       return passage;
     }
     return PlanPassage(
@@ -766,7 +767,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
           restDays: next.restDays,
           planId: next.planId);
     } catch (e) {
-      debugPrint('plan reminder sync failed (non-fatal): $e');
+      logDebug('plan reminder sync failed (non-fatal): $e');
     }
   }
 
@@ -937,30 +938,6 @@ class ActivePlanIdsNotifier extends Notifier<List<String>> {
 final activePlanIdsProvider =
     NotifierProvider<ActivePlanIdsNotifier, List<String>>(
         ActivePlanIdsNotifier.new);
-
-class HiddenPlanIdsNotifier extends Notifier<List<String>> {
-  @override
-  List<String> build() {
-    return ref.read(preferencesProvider).getHiddenPlanIds();
-  }
-
-  void addPlan(String id) {
-    if (state.contains(id)) return;
-    final next = [...state, id];
-    state = next;
-    ref.read(preferencesProvider).saveHiddenPlanIds(next);
-  }
-
-  void removePlan(String id) {
-    final next = state.where((e) => e != id).toList();
-    state = next;
-    ref.read(preferencesProvider).saveHiddenPlanIds(next);
-  }
-}
-
-final hiddenPlanIdsProvider =
-    NotifierProvider<HiddenPlanIdsNotifier, List<String>>(
-        HiddenPlanIdsNotifier.new);
 
 class CurrentActivePlanIdNotifier extends Notifier<String?> {
   @override

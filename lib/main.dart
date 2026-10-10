@@ -19,8 +19,8 @@ import 'ui/screens/onboarding_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'ui/widgets/app_error_fallback.dart';
 
-import 'utils/startup_stopwatch.dart';
 import 'services/widget_update_service.dart';
+import 'utils/log.dart';
 
 void main() async {
   // Global Flutter framework error handling
@@ -41,7 +41,7 @@ void main() async {
   // Global Platform/Async uncaught error handling
   PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
     if (kDebugMode) {
-      debugPrint('Uncaught async error: $error\n$stack');
+      logDebug('Uncaught async error: $error\n$stack');
     }
     try {
       final file = dart_io.File('crash_log.txt');
@@ -59,16 +59,10 @@ void main() async {
     return AppErrorFallback(details: details);
   };
 
-  if (kStartupTrace) {
-  }
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await GoogleSignIn.instance.initialize();
-  if (kStartupTrace) {
-  }
   final prefs = await SharedPreferences.getInstance();
-  if (kStartupTrace) {
-  }
 
   runApp(
     ProviderScope(
@@ -88,15 +82,6 @@ class TheBlessedBibleApp extends ConsumerStatefulWidget {
 }
 
 class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (kStartupTrace) {
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     ref.watch(widgetUpdateServiceProvider); // Initialize widget background sync

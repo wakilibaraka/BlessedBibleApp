@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
@@ -52,7 +51,7 @@ class _StrongsEntrySheet extends ConsumerWidget {
             : const BorderRadius.vertical(top: Radius.circular(32)),
         boxShadow: isFloating ? [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 24,
             spreadRadius: 8,
           )
@@ -145,7 +144,7 @@ class _StrongsEntrySheet extends ConsumerWidget {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                               decoration: BoxDecoration(
-                                color: theme.primaryColor.withOpacity(0.1),
+                                color: theme.primaryColor.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Text(
@@ -160,18 +159,18 @@ class _StrongsEntrySheet extends ConsumerWidget {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                               decoration: BoxDecoration(
-                                color: theme.colorScheme.onSurface.withOpacity(0.05),
+                                color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.volume_up_rounded, size: 16, color: theme.colorScheme.onSurface.withOpacity(0.6)),
+                                  Icon(Icons.volume_up_rounded, size: 16, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                                   const SizedBox(width: 4),
                                   Text(
                                     entry.pronunciation,
                                     style: TextStyle(
-                                      color: theme.colorScheme.onSurface.withOpacity(0.8),
+                                      color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),

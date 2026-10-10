@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/pericope_entry.dart';
+import '../utils/log.dart';
 
 Map<String, List<PericopeEntry>> _parsePericopes(String jsonString) {
   final List<dynamic> data = jsonDecode(jsonString);
@@ -47,12 +48,12 @@ class PericopesNotifier extends Notifier<Map<String, List<PericopeEntry>>> {
           }
         }
       } catch (e) {
-        debugPrint('Failed to load local pericopes: $e');
+        logDebug('Failed to load local pericopes: $e');
       }
 
       state = data;
     } catch (e) {
-      debugPrint('Failed to load pericopes: $e');
+      logDebug('Failed to load pericopes: $e');
       loadError = 'Could not load pericopes ($e).';
     }
   }

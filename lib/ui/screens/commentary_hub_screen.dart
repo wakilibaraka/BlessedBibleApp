@@ -122,8 +122,9 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
               // Filter data based on context and selected chips
               final filtered = entries.where((e) {
                 // Must match the book and chapter context
-                if (e.scope.book?.toLowerCase() != widget.book.toLowerCase())
+                if (e.scope.book?.toLowerCase() != widget.book.toLowerCase()) {
                   return false;
+                }
                 if (e.scope.chapter != widget.chapter) return false;
 
                 // Filter by Source / Category
@@ -140,9 +141,12 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
 
                 // Filter by Scope
                 if (_selectedScope == 'Chapter Level' &&
-                    e.scope.type != 'chapter') return false;
-                if (_selectedScope == 'Verse Level' && e.scope.type != 'verse')
+                    e.scope.type != 'chapter') {
                   return false;
+                }
+                if (_selectedScope == 'Verse Level' && e.scope.type != 'verse') {
+                  return false;
+                }
 
                 return true;
               }).toList();
