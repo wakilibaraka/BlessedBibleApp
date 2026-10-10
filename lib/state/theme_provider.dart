@@ -27,10 +27,17 @@ extension AppThemeModeExtension on AppThemeMode {
     if (this == AppThemeMode.automatic) {
       final days = DateTime.now().millisecondsSinceEpoch ~/ 86400000;
       const cycle = [
-        AppThemeMode.light, AppThemeMode.sepia, AppThemeMode.dawn, 
-        AppThemeMode.fresh, AppThemeMode.lilies, AppThemeMode.roses, 
-        AppThemeMode.olives, AppThemeMode.dusk, AppThemeMode.priestlyPurple, 
-        AppThemeMode.galileeBlue, AppThemeMode.scarletRed
+        AppThemeMode.light,
+        AppThemeMode.sepia,
+        AppThemeMode.dawn,
+        AppThemeMode.fresh,
+        AppThemeMode.lilies,
+        AppThemeMode.roses,
+        AppThemeMode.olives,
+        AppThemeMode.dusk,
+        AppThemeMode.priestlyPurple,
+        AppThemeMode.galileeBlue,
+        AppThemeMode.scarletRed
       ];
       return cycle[days % cycle.length];
     }
@@ -87,7 +94,8 @@ extension AppThemeModeExtension on AppThemeMode {
       case AppThemeMode.fresh:
         return const Color(0xFF132C33);
       default:
-        return Colors.transparent; // callers will coalesce with theme.scaffoldBackgroundColor
+        return Colors
+            .transparent; // callers will coalesce with theme.scaffoldBackgroundColor
     }
   }
 
@@ -118,7 +126,6 @@ extension AppThemeModeExtension on AppThemeMode {
         return Colors.deepOrange.shade400;
     }
   }
-
 }
 
 class ThemeNotifier extends Notifier<AppThemeMode> {
@@ -139,7 +146,8 @@ class ThemeNotifier extends Notifier<AppThemeMode> {
     final migrated = prefs.getBool('engine_migrated_v3') ?? false;
     if (!migrated) {
       final engineMode = prefs.getInt(_engineModeKey);
-      if (engineMode == 1) { // 1 was ThemeEngineMode.timeBased
+      if (engineMode == 1) {
+        // 1 was ThemeEngineMode.timeBased
         await prefs.setInt(_themeKey, AppThemeMode.automatic.index);
       }
       await prefs.setBool('engine_migrated_v3', true);
@@ -168,7 +176,8 @@ class ThemeNotifier extends Notifier<AppThemeMode> {
     state = mode;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_themeKey, mode.index);
-    await prefs.setInt(_lockedThemeKey, mode.index); // Keep updated for backwards safety if ever downgraded
+    await prefs.setInt(_lockedThemeKey,
+        mode.index); // Keep updated for backwards safety if ever downgraded
   }
 
   /// Surprise me: random theme (anything but automatic), persisted.
@@ -176,8 +185,7 @@ class ThemeNotifier extends Notifier<AppThemeMode> {
     final pool = AppThemeMode.values
         .where((m) => m != AppThemeMode.automatic && m != state)
         .toList();
-    final pick =
-        pool.isEmpty ? state : pool[Random().nextInt(pool.length)];
+    final pick = pool.isEmpty ? state : pool[Random().nextInt(pool.length)];
     await setTheme(pick);
     return pick;
   }

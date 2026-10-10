@@ -15,9 +15,10 @@ class DictionaryHeadword {
   });
 }
 
-final dictionaryIndexProvider = FutureProvider<List<DictionaryHeadword>>((ref) async {
+final dictionaryIndexProvider =
+    FutureProvider<List<DictionaryHeadword>>((ref) async {
   final db = await bibleDbService.database;
-  
+
   final rows = await db.query(
     'dictionary',
     columns: ['display_headword', 'source', 'definition', 'normalized_word'],
@@ -25,7 +26,7 @@ final dictionaryIndexProvider = FutureProvider<List<DictionaryHeadword>>((ref) a
   );
 
   final Map<String, Map<String, dynamic>> grouped = {};
-  
+
   for (final row in rows) {
     final headword = row['display_headword'] as String;
     if (!grouped.containsKey(headword)) {
@@ -36,7 +37,8 @@ final dictionaryIndexProvider = FutureProvider<List<DictionaryHeadword>>((ref) a
         'definition': row['definition'] as String,
       };
     }
-    (grouped[headword]!['sources'] as List<String>).add(row['source'] as String);
+    (grouped[headword]!['sources'] as List<String>)
+        .add(row['source'] as String);
   }
 
   return grouped.values.map((g) {
@@ -44,12 +46,13 @@ final dictionaryIndexProvider = FutureProvider<List<DictionaryHeadword>>((ref) a
     final preview = g['definition'] as String;
     final normWord = g['normalized_word'] as String;
     final sourceList = (g['sources'] as List<String>).join(', ');
-    
-    var cleanSnippet = preview.replaceAll(RegExp(r'<[^>]*>'), '').replaceAll('\n', ' ');
+
+    var cleanSnippet =
+        preview.replaceAll(RegExp(r'<[^>]*>'), '').replaceAll('\n', ' ');
     if (cleanSnippet.length > 80) {
       cleanSnippet = '${cleanSnippet.substring(0, 80)}...';
     }
-    
+
     return DictionaryHeadword(
       normalizedWord: normWord,
       displayHeadword: headword,
@@ -59,13 +62,14 @@ final dictionaryIndexProvider = FutureProvider<List<DictionaryHeadword>>((ref) a
   }).toList();
 });
 
-final dictionarySearchProvider = FutureProvider.family<List<DictionaryHeadword>, String>((ref, query) async {
+final dictionarySearchProvider =
+    FutureProvider.family<List<DictionaryHeadword>, String>((ref, query) async {
   if (query.trim().isEmpty) return ref.read(dictionaryIndexProvider.future);
-  
+
   final db = await bibleDbService.database;
   final q = query.trim();
   final likeTerm = '%$q%';
-  
+
   final rows = await db.query(
     'dictionary',
     columns: ['display_headword', 'source', 'definition', 'normalized_word'],
@@ -76,7 +80,7 @@ final dictionarySearchProvider = FutureProvider.family<List<DictionaryHeadword>,
   );
 
   final Map<String, Map<String, dynamic>> grouped = {};
-  
+
   for (final row in rows) {
     final headword = row['display_headword'] as String;
     if (!grouped.containsKey(headword)) {
@@ -87,7 +91,8 @@ final dictionarySearchProvider = FutureProvider.family<List<DictionaryHeadword>,
         'definition': row['definition'] as String,
       };
     }
-    (grouped[headword]!['sources'] as List<String>).add(row['source'] as String);
+    (grouped[headword]!['sources'] as List<String>)
+        .add(row['source'] as String);
   }
 
   return grouped.values.map((g) {
@@ -95,12 +100,13 @@ final dictionarySearchProvider = FutureProvider.family<List<DictionaryHeadword>,
     final preview = g['definition'] as String;
     final normWord = g['normalized_word'] as String;
     final sourceList = (g['sources'] as List<String>).join(', ');
-    
-    var cleanSnippet = preview.replaceAll(RegExp(r'<[^>]*>'), '').replaceAll('\n', ' ');
+
+    var cleanSnippet =
+        preview.replaceAll(RegExp(r'<[^>]*>'), '').replaceAll('\n', ' ');
     if (cleanSnippet.length > 80) {
       cleanSnippet = '${cleanSnippet.substring(0, 80)}...';
     }
-    
+
     return DictionaryHeadword(
       normalizedWord: normWord,
       displayHeadword: headword,

@@ -3,16 +3,26 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/local_storage/preferences_service.dart';
 
 enum WidgetBackgroundStyle {
-  gradientDusk('gradient_dusk', 'Celestial Dusk 🌌', [Color(0xFF1A102F), Color(0xFF4A154B)]),
-  gradientDawn('gradient_dawn', 'Morning Dawn 🌅', [Color(0xFFFF6B6B), Color(0xFF6C5B7B)]),
-  gradientEmerald('gradient_emerald', 'Sanctuary Emerald 🌿', [Color(0xFF064E3B), Color(0xFF0F766E)]),
-  gradientGolden('gradient_golden', 'Sacred Amber 🍯', [Color(0xFF78350F), Color(0xFFD97706)]),
-  gradientRoyal('gradient_royal', 'Royal Sapphire ⚓', [Color(0xFF0F172A), Color(0xFF1E3A8A)]),
-  glassLight('glass_light', 'Frosted Glass ❄️', [Color(0xCCFFFFFF), Color(0x99FFFFFF)]),
-  glassDark('glass_dark', 'Obsidian Glass 🌑', [Color(0xCC18181B), Color(0x9918181B)]),
-  solidLight('solid_light', 'Clean Paper 📄', [Color(0xFFFFFFFF), Color(0xFFF4F4F5)]),
-  solidDark('solid_dark', 'Deep Charcoal 🖤', [Color(0xFF121214), Color(0xFF18181B)]),
-  transparent('transparent', 'Clear Wallpaper 🪟', [Colors.transparent, Colors.transparent]);
+  gradientDusk('gradient_dusk', 'Celestial Dusk 🌌',
+      [Color(0xFF1A102F), Color(0xFF4A154B)]),
+  gradientDawn('gradient_dawn', 'Morning Dawn 🌅',
+      [Color(0xFFFF6B6B), Color(0xFF6C5B7B)]),
+  gradientEmerald('gradient_emerald', 'Sanctuary Emerald 🌿',
+      [Color(0xFF064E3B), Color(0xFF0F766E)]),
+  gradientGolden('gradient_golden', 'Sacred Amber 🍯',
+      [Color(0xFF78350F), Color(0xFFD97706)]),
+  gradientRoyal('gradient_royal', 'Royal Sapphire ⚓',
+      [Color(0xFF0F172A), Color(0xFF1E3A8A)]),
+  glassLight('glass_light', 'Frosted Glass ❄️',
+      [Color(0xCCFFFFFF), Color(0x99FFFFFF)]),
+  glassDark('glass_dark', 'Obsidian Glass 🌑',
+      [Color(0xCC18181B), Color(0x9918181B)]),
+  solidLight(
+      'solid_light', 'Clean Paper 📄', [Color(0xFFFFFFFF), Color(0xFFF4F4F5)]),
+  solidDark(
+      'solid_dark', 'Deep Charcoal 🖤', [Color(0xFF121214), Color(0xFF18181B)]),
+  transparent('transparent', 'Clear Wallpaper 🪟',
+      [Colors.transparent, Colors.transparent]);
 
   final String id;
   final String label;
@@ -73,7 +83,8 @@ class WidgetSettingsNotifier extends Notifier<WidgetSettingsState> {
   @override
   WidgetSettingsState build() {
     final prefs = ref.watch(preferencesProvider).prefs;
-    final bgStyleId = prefs.getString(_bgStyleKey) ?? WidgetBackgroundStyle.gradientDusk.id;
+    final bgStyleId =
+        prefs.getString(_bgStyleKey) ?? WidgetBackgroundStyle.gradientDusk.id;
     final textModeId = prefs.getString(_textModeKey) ?? WidgetTextMode.auto.id;
 
     return WidgetSettingsState(
@@ -96,4 +107,5 @@ class WidgetSettingsNotifier extends Notifier<WidgetSettingsState> {
 }
 
 final widgetSettingsProvider =
-    NotifierProvider<WidgetSettingsNotifier, WidgetSettingsState>(WidgetSettingsNotifier.new);
+    NotifierProvider<WidgetSettingsNotifier, WidgetSettingsState>(
+        WidgetSettingsNotifier.new);

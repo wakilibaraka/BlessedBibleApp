@@ -4,7 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final bbeSubstitutionsProvider = FutureProvider<Set<String>>((ref) async {
   try {
-    final jsonStr = await rootBundle.loadString('assets/data/bbe_web_substitutions.json');
+    final jsonStr =
+        await rootBundle.loadString('assets/data/bbe_web_substitutions.json');
     final List<dynamic> decoded = jsonDecode(jsonStr);
     final Set<String> subs = {};
     for (var item in decoded) {

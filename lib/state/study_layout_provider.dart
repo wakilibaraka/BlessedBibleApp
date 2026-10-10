@@ -51,8 +51,7 @@ class StudyCardConfig {
     // Migration from old `isExpanded` boolean
     if (json.containsKey('isExpanded')) {
       final isExpanded = json['isExpanded'] as bool;
-      final size =
-          isExpanded ? CardSize.medium : CardSize.small;
+      final size = isExpanded ? CardSize.medium : CardSize.small;
       return StudyCardConfig(id: json['id'] as String, size: size);
     }
 
@@ -111,7 +110,6 @@ class StudyCardConfig {
 }
 
 class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
-
   @override
   List<StudyCardConfig> build() {
     final prefsJson = ref.read(preferencesProvider).getStudyLayout();
@@ -126,13 +124,11 @@ class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
         // stories+dictionary pair, commentary full, votd+streak pair).
         // Recomputed idempotently on every launch until a v5 save lands,
         // so no write is needed here. Unknown future ids are preserved.
-        final needsReset = decoded.any((e) =>
-            ((e as Map<String, dynamic>)['version'] as int? ?? 1) < 5);
+        final needsReset = decoded.any(
+            (e) => ((e as Map<String, dynamic>)['version'] as int? ?? 1) < 5);
         if (needsReset) {
           final byId = {for (final c in loaded) c.id: c};
-          final defaults = {
-            for (final d in defaultLayoutV2()) d.id: d
-          };
+          final defaults = {for (final d in defaultLayoutV2()) d.id: d};
           final ordered = <StudyCardConfig>[];
           for (final def in defaultLayoutV2()) {
             ordered.add(byId.containsKey(def.id) &&
@@ -216,9 +212,7 @@ class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
       if (card.id == id) {
         return StudyCardConfig(
           id: card.id,
-          size: safeSpan == CardSpan.full
-              ? CardSize.large
-              : CardSize.medium,
+          size: safeSpan == CardSpan.full ? CardSize.large : CardSize.medium,
           span: safeSpan,
           expanded: safeExpanded,
         );
@@ -234,37 +228,21 @@ class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
   /// via long-press and reorder via the same sheet.
   static List<StudyCardConfig> defaultLayoutV2() => [
         StudyCardConfig(
-            id: 'your_space',
-            size: CardSize.large,
-            span: CardSpan.full),
+            id: 'your_space', size: CardSize.large, span: CardSpan.full),
         StudyCardConfig(
-            id: 'plans_live',
-            size: CardSize.large,
-            span: CardSpan.full),
+            id: 'plans_live', size: CardSize.large, span: CardSpan.full),
         StudyCardConfig(
-            id: 'bible_stories',
-            size: CardSize.medium,
-            span: CardSpan.half),
+            id: 'bible_stories', size: CardSize.medium, span: CardSpan.half),
         StudyCardConfig(
-            id: 'dictionary',
-            size: CardSize.medium,
-            span: CardSpan.half),
+            id: 'dictionary', size: CardSize.medium, span: CardSpan.half),
         StudyCardConfig(
-            id: 'concordance',
-            size: CardSize.large,
-            span: CardSpan.full),
+            id: 'concordance', size: CardSize.large, span: CardSpan.full),
         StudyCardConfig(
-            id: 'commentary',
-            size: CardSize.large,
-            span: CardSpan.full),
+            id: 'commentary', size: CardSize.large, span: CardSpan.full),
         StudyCardConfig(
-            id: 'votd_archive',
-            size: CardSize.medium,
-            span: CardSpan.half),
+            id: 'votd_archive', size: CardSize.medium, span: CardSpan.half),
         StudyCardConfig(
-            id: 'streak',
-            size: CardSize.medium,
-            span: CardSpan.half),
+            id: 'streak', size: CardSize.medium, span: CardSpan.half),
       ];
 }
 

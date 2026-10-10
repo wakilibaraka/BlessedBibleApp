@@ -38,19 +38,16 @@ void main() {
     expect(find.byType(AccountAvatar), findsOneWidget);
     // Streak lives as a hub card (flame icon + progress CTA), not a
     // header pill.
-    expect(find.byIcon(Icons.local_fire_department_rounded),
-        findsOneWidget);
+    expect(find.byIcon(Icons.local_fire_department_rounded), findsOneWidget);
     expect(find.text('Start your streak'), findsOneWidget);
     // Cards render (Your Space banner + tool cards + merged plans).
-    expect(find.text('Bookmarks, highlights, notes & journal'),
-        findsOneWidget);
+    expect(find.text('Bookmarks, highlights, notes & journal'), findsOneWidget);
     expect(find.text('Words defined'), findsOneWidget);
     // Merged plans_live card (no active plans -> start CTA page).
     expect(find.text('Start a reading plan'), findsOneWidget);
   });
 
-  testWidgets('avatar opens the account menu with data rows',
-      (tester) async {
+  testWidgets('avatar opens the account menu with data rows', (tester) async {
     await pumpHub(tester);
 
     await tester.tap(find.byType(AccountAvatar));

@@ -13,9 +13,11 @@ enum AppearanceTab { typography, theme }
 
 class AppearanceSettingsSheet extends ConsumerStatefulWidget {
   final AppearanceTab initialTab;
-  const AppearanceSettingsSheet({super.key, this.initialTab = AppearanceTab.typography});
+  const AppearanceSettingsSheet(
+      {super.key, this.initialTab = AppearanceTab.typography});
 
-  static Future<void> show(BuildContext context, {AppearanceTab initialTab = AppearanceTab.typography}) {
+  static Future<void> show(BuildContext context,
+      {AppearanceTab initialTab = AppearanceTab.typography}) {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -26,10 +28,12 @@ class AppearanceSettingsSheet extends ConsumerStatefulWidget {
   }
 
   @override
-  ConsumerState<AppearanceSettingsSheet> createState() => _AppearanceSettingsSheetState();
+  ConsumerState<AppearanceSettingsSheet> createState() =>
+      _AppearanceSettingsSheetState();
 }
 
-class _AppearanceSettingsSheetState extends ConsumerState<AppearanceSettingsSheet> {
+class _AppearanceSettingsSheetState
+    extends ConsumerState<AppearanceSettingsSheet> {
   late AppearanceTab _activeTab;
 
   @override
@@ -52,7 +56,8 @@ class _AppearanceSettingsSheetState extends ConsumerState<AppearanceSettingsShee
       },
       child: Container(
         constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * kAppearanceSheetHeightFactor,
+          maxHeight:
+              MediaQuery.of(context).size.height * kAppearanceSheetHeightFactor,
         ),
         child: TexturedGlassContainer(
           sigmaX: 45.0,
@@ -75,9 +80,11 @@ class _AppearanceSettingsSheetState extends ConsumerState<AppearanceSettingsShee
                     // Drag handle
                     Center(
                       child: Container(
-                        width: 36, height: 4,
+                        width: 36,
+                        height: 4,
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -87,7 +94,8 @@ class _AppearanceSettingsSheetState extends ConsumerState<AppearanceSettingsShee
                     Container(
                       height: 36,
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.06),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.06),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Row(
@@ -99,7 +107,8 @@ class _AppearanceSettingsSheetState extends ConsumerState<AppearanceSettingsShee
                             onTap: () {
                               if (_activeTab != AppearanceTab.typography) {
                                 HapticFeedback.selectionClick();
-                                setState(() => _activeTab = AppearanceTab.typography);
+                                setState(() =>
+                                    _activeTab = AppearanceTab.typography);
                               }
                             },
                           ),
@@ -110,7 +119,8 @@ class _AppearanceSettingsSheetState extends ConsumerState<AppearanceSettingsShee
                             onTap: () {
                               if (_activeTab != AppearanceTab.theme) {
                                 HapticFeedback.selectionClick();
-                                setState(() => _activeTab = AppearanceTab.theme);
+                                setState(
+                                    () => _activeTab = AppearanceTab.theme);
                               }
                             },
                           ),
@@ -148,7 +158,8 @@ class _TypographyTabBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
-        left: 20, right: 20,
+        left: 20,
+        right: 20,
         bottom: MediaQuery.of(context).padding.bottom + 8,
       ),
       child: const TypographyControls(),
@@ -183,7 +194,11 @@ class _TabButton extends StatelessWidget {
   final IconData icon;
   final bool isSelected;
   final VoidCallback onTap;
-  const _TabButton({required this.label, required this.icon, required this.isSelected, required this.onTap});
+  const _TabButton(
+      {required this.label,
+      required this.icon,
+      required this.isSelected,
+      required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -202,15 +217,22 @@ class _TabButton extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 13,
-                color: isSelected ? AppColors.lightTextPrimary : theme.colorScheme.onSurface.withValues(alpha: 0.55),
+              Icon(
+                icon,
+                size: 13,
+                color: isSelected
+                    ? AppColors.lightTextPrimary
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.55),
               ),
               const SizedBox(width: 5),
-              Text(label,
+              Text(
+                label,
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: isSelected ? AppColors.lightTextPrimary : theme.colorScheme.onSurface.withValues(alpha: 0.55),
+                  color: isSelected
+                      ? AppColors.lightTextPrimary
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.55),
                 ),
               ),
             ],

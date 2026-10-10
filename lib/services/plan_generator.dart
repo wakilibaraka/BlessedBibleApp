@@ -9,12 +9,14 @@ class _Chunk {
   final int endCh;
   final int endV;
   final int words;
-  
+
   /// Identifies if this chunk ends on a pericope boundary naturally.
   final bool endsOnPericope;
   final bool endsOnChapter;
 
-  _Chunk(this.book, this.startCh, this.startV, this.endCh, this.endV, this.words, {this.endsOnPericope = false, this.endsOnChapter = false});
+  _Chunk(
+      this.book, this.startCh, this.startV, this.endCh, this.endV, this.words,
+      {this.endsOnPericope = false, this.endsOnChapter = false});
 }
 
 const int kSlowReaderWpm = 130;
@@ -60,12 +62,23 @@ class PlanGenerator {
     int totalPlanWords = 0;
     for (final track in tracks) {
       for (final range in track) {
-        totalPlanWords += wordCountService.wordsInRange(range.book, range.startChapter, range.startVerse, range.endChapter, range.endVerse);
+        totalPlanWords += wordCountService.wordsInRange(
+            range.book,
+            range.startChapter,
+            range.startVerse,
+            range.endChapter,
+            range.endVerse);
       }
     }
-    
+
     if (totalPlanWords == 0) {
-      return ReadingPlan(id: id, title: title, days: 0, cadence: cadence, schedule: [], tracks: tracks);
+      return ReadingPlan(
+          id: id,
+          title: title,
+          days: 0,
+          cadence: cadence,
+          schedule: [],
+          tracks: tracks);
     }
 
     int effectiveReadingDays = (days * cadence / 7).round();
@@ -85,10 +98,16 @@ class PlanGenerator {
     // Initialize empty days
     List<PlanDay> schedule = List.generate(
         effectiveReadingDays,
-        (i) => PlanDay(dayNumber: i + 1, portions: [], totalWords: 0, estimatedMinutes: 0, estimatedTimeDisplay: ''));
+        (i) => PlanDay(
+            dayNumber: i + 1,
+            portions: [],
+            totalWords: 0,
+            estimatedMinutes: 0,
+            estimatedTimeDisplay: ''));
 
     for (final track in tracks) {
-      _distributeTrack(track, effectiveReadingDays, schedule, atomicRanges: atomicRanges);
+      _distributeTrack(track, effectiveReadingDays, schedule,
+          atomicRanges: atomicRanges);
     }
 
     // Remove any trailing empty days (happens if days > available break points)
@@ -110,7 +129,8 @@ class PlanGenerator {
     return ReadingPlan(
       id: id,
       title: title,
-      days: finalizedSchedule.length, // Clamp the reported days to the actual produced days
+      days: finalizedSchedule
+          .length, // Clamp the reported days to the actual produced days
       cadence: cadence,
       wasClamped: wasClamped,
       clampReason: clampReason,
@@ -120,11 +140,16 @@ class PlanGenerator {
   }
 
   void _distributeTrack(
-      List<PlanRange> track, int effectiveReadingDays, List<PlanDay> schedule, {bool atomicRanges = false}) {
+      List<PlanRange> track, int effectiveReadingDays, List<PlanDay> schedule,
+      {bool atomicRanges = false}) {
     int totalWords = 0;
     for (final range in track) {
       totalWords += wordCountService.wordsInRange(
-          range.book, range.startChapter, range.startVerse, range.endChapter, range.endVerse);
+          range.book,
+          range.startChapter,
+          range.startVerse,
+          range.endChapter,
+          range.endVerse);
     }
 
     if (totalWords == 0) return;
@@ -135,9 +160,10 @@ class PlanGenerator {
     List<_Chunk> splitChunks = [];
     if (atomicRanges) {
       for (final range in track) {
-        final w = wordCountService.wordsInRange(
-          range.book, range.startChapter, range.startVerse, range.endChapter, range.endVerse);
-        splitChunks.add(_Chunk(range.book, range.startChapter, range.startVerse, range.endChapter, range.endVerse, w));
+        final w = wordCountService.wordsInRange(range.book, range.startChapter,
+            range.startVerse, range.endChapter, range.endVerse);
+        splitChunks.add(_Chunk(range.book, range.startChapter, range.startVerse,
+            range.endChapter, range.endVerse, w));
       }
     } else {
       for (final range in track) {
@@ -162,7 +188,8 @@ class PlanGenerator {
       }
 
       int targetForThisDay = ((currentDayIndex + 1) * targetPerDay).round();
-      int errorIfAdded = (currentRunningTotal + chunk.words - targetForThisDay).abs();
+      int errorIfAdded =
+          (currentRunningTotal + chunk.words - targetForThisDay).abs();
       int errorIfNotAdded = (currentRunningTotal - targetForThisDay).abs();
 
       if (currentDayChunks.isEmpty || errorIfAdded <= errorIfNotAdded) {
@@ -198,8 +225,12 @@ class PlanGenerator {
         .toList();
     if (bookPericopes.isEmpty) {
       return [
-        _Chunk(range.book, range.startChapter, range.startVerse,
-            range.endChapter, range.endVerse,
+        _Chunk(
+            range.book,
+            range.startChapter,
+            range.startVerse,
+            range.endChapter,
+            range.endVerse,
             wordCountService.wordsInRange(range.book, range.startChapter,
                 range.startVerse, range.endChapter, range.endVerse))
       ];
@@ -246,10 +277,15 @@ class PlanGenerator {
     var runStart = 0;
     var runKey = keyFor(0);
     void emitRun(int end) {
-      final words = wordCountService.wordsInRange(range.book, chs[runStart],
-          vs[runStart], chs[end], vs[end]);
+      final words = wordCountService.wordsInRange(
+          range.book, chs[runStart], vs[runStart], chs[end], vs[end]);
       chunks.add(_Chunk(
-        range.book, chs[runStart], vs[runStart], chs[end], vs[end], words,
+        range.book,
+        chs[runStart],
+        vs[runStart],
+        chs[end],
+        vs[end],
+        words,
         endsOnPericope: pericopeEndsAt(end),
         endsOnChapter:
             vs[end] == wordCountService.maxVerseInChapter(range.book, chs[end]),
@@ -280,11 +316,13 @@ class PlanGenerator {
             ? c.endV
             : wordCountService.maxVerseInChapter(c.book, ch);
         int words = wordCountService.wordsInRange(c.book, ch, sV, ch, eV);
-        
+
         bool endsOnPericope = (ch == c.endCh) ? c.endsOnPericope : false;
-        bool endsOnChapter = eV == wordCountService.maxVerseInChapter(c.book, ch);
-        
-        chapterChunks.add(_Chunk(c.book, ch, sV, ch, eV, words, endsOnPericope: endsOnPericope, endsOnChapter: endsOnChapter));
+        bool endsOnChapter =
+            eV == wordCountService.maxVerseInChapter(c.book, ch);
+
+        chapterChunks.add(_Chunk(c.book, ch, sV, ch, eV, words,
+            endsOnPericope: endsOnPericope, endsOnChapter: endsOnChapter));
       }
       return chapterChunks.expand((cc) => _splitChunk(cc, maxWords)).toList();
     }
@@ -293,10 +331,13 @@ class PlanGenerator {
     if (c.startV < c.endV) {
       List<_Chunk> verseChunks = [];
       for (int v = c.startV; v <= c.endV; v++) {
-        int words = wordCountService.wordsInRange(c.book, c.startCh, v, c.startCh, v);
+        int words =
+            wordCountService.wordsInRange(c.book, c.startCh, v, c.startCh, v);
         bool endsOnPericope = (v == c.endV) ? c.endsOnPericope : false;
-        bool endsOnChapter = (v == wordCountService.maxVerseInChapter(c.book, c.startCh));
-        verseChunks.add(_Chunk(c.book, c.startCh, v, c.startCh, v, words, endsOnPericope: endsOnPericope, endsOnChapter: endsOnChapter));
+        bool endsOnChapter =
+            (v == wordCountService.maxVerseInChapter(c.book, c.startCh));
+        verseChunks.add(_Chunk(c.book, c.startCh, v, c.startCh, v, words,
+            endsOnPericope: endsOnPericope, endsOnChapter: endsOnChapter));
       }
       return verseChunks;
     }
@@ -355,17 +396,21 @@ class PlanGenerator {
     }
   }
 
-  void _addPortion(PlanDay day, String book, int startCh, int startV,
-      int endCh, int endV, int totalWords) {
+  void _addPortion(PlanDay day, String book, int startCh, int startV, int endCh,
+      int endV, int totalWords) {
     int startRef = _ref(startCh, startV);
     int endRef = _ref(endCh, endV);
 
-    final titles = allPericopes.where((p) {
-      if (p.book != book || !p.isPlanBreak) return false;
-      int pStart = _ref(p.startChapter, p.startVerse);
-      int pEnd = _ref(p.endChapter, p.endVerse);
-      return startRef <= pEnd && endRef >= pStart;
-    }).map((p) => p.title).toSet().toList();
+    final titles = allPericopes
+        .where((p) {
+          if (p.book != book || !p.isPlanBreak) return false;
+          int pStart = _ref(p.startChapter, p.startVerse);
+          int pEnd = _ref(p.endChapter, p.endVerse);
+          return startRef <= pEnd && endRef >= pStart;
+        })
+        .map((p) => p.title)
+        .toSet()
+        .toList();
 
     day.portions.add(PlanPortion(
       book: book,

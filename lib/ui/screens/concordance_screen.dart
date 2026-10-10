@@ -19,8 +19,7 @@ class ConcordanceScreen extends ConsumerStatefulWidget {
   const ConcordanceScreen({super.key});
 
   @override
-  ConsumerState<ConcordanceScreen> createState() =>
-      _ConcordanceScreenState();
+  ConsumerState<ConcordanceScreen> createState() => _ConcordanceScreenState();
 }
 
 class _ConcordanceHit {
@@ -36,8 +35,7 @@ class _ConcordanceHit {
     required this.text,
   });
 
-  String get reference =>
-      '${kBibleBookNames[bookNumber - 1]} $chapter:$verse';
+  String get reference => '${kBibleBookNames[bookNumber - 1]} $chapter:$verse';
 }
 
 class _ConcordanceScreenState extends ConsumerState<ConcordanceScreen> {
@@ -136,27 +134,23 @@ class _ConcordanceScreenState extends ConsumerState<ConcordanceScreen> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 800),
               child: ListView(
-                padding:
-                    const EdgeInsets.fromLTRB(20, 12, 20, 140),
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 140),
                 children: [
                   TextField(
                     controller: _controller,
                     textInputAction: TextInputAction.search,
                     decoration: InputDecoration(
                       hintText: 'Type a word (e.g., grace, covenant)…',
-                      prefixIcon:
-                          const Icon(Icons.search_rounded),
+                      prefixIcon: const Icon(Icons.search_rounded),
                       filled: true,
                       fillColor: theme.colorScheme.surface,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide(
-                            color: theme.dividerColor),
+                        borderSide: BorderSide(color: theme.dividerColor),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide(
-                            color: theme.dividerColor),
+                        borderSide: BorderSide(color: theme.dividerColor),
                       ),
                     ),
                     onSubmitted: _search,
@@ -165,16 +159,14 @@ class _ConcordanceScreenState extends ConsumerState<ConcordanceScreen> {
                   Text(
                     'KJV occurrences — tap a verse to read it in context.',
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurface
-                          .withValues(alpha: 0.6),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                   const SizedBox(height: 12),
                   if (_searching)
                     const Padding(
                       padding: EdgeInsets.only(top: 32),
-                      child: Center(
-                          child: CircularProgressIndicator()),
+                      child: Center(child: CircularProgressIndicator()),
                     )
                   else if (_hits == null)
                     Padding(

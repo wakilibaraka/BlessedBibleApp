@@ -32,10 +32,10 @@ class CloudSyncService {
         _syncHighlights(currentUid),
         _syncStreaks(currentUid),
       ]);
-      
+
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt('last_cloud_sync_timestamp', DateTime.now().millisecondsSinceEpoch);
-      
+      await prefs.setInt(
+          'last_cloud_sync_timestamp', DateTime.now().millisecondsSinceEpoch);
     } catch (e) {
       logDebug('Cloud sync failed: $e');
       rethrow;
@@ -47,7 +47,7 @@ class CloudSyncService {
     final localJson = prefs.getString('bookmarks_v2');
     Map<String, dynamic> localData = {};
     BookmarkData? currentLocalBookmarkData;
-    
+
     if (localJson != null && localJson.isNotEmpty) {
       try {
         final decoded = jsonDecode(localJson);
@@ -59,9 +59,13 @@ class CloudSyncService {
       } catch (_) {}
     }
 
-    final docRef = _firestore.collection('users').doc(uid).collection('sync_data').doc('bookmarks');
+    final docRef = _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('sync_data')
+        .doc('bookmarks');
     final docSnap = await docRef.get();
-    
+
     Map<String, dynamic> remoteData = {};
     if (docSnap.exists) {
       remoteData = docSnap.data() as Map<String, dynamic>;
@@ -69,7 +73,7 @@ class CloudSyncService {
 
     bool hasRemoteNewer = false;
     Map<String, dynamic> merged = {...remoteData};
-    
+
     for (final entry in localData.entries) {
       final key = entry.key;
       final localTs = entry.value as int;
@@ -94,10 +98,11 @@ class CloudSyncService {
         newNodes[e.key] = BookmarkNode(
           reference: e.key,
           createdAt: DateTime.fromMillisecondsSinceEpoch(e.value as int),
-          folderId: currentLocalBookmarkData?.nodes[e.key]?.folderId, // preserve local folder if exists
+          folderId: currentLocalBookmarkData
+              ?.nodes[e.key]?.folderId, // preserve local folder if exists
         );
       }
-      
+
       final newData = BookmarkData(
         folders: currentLocalBookmarkData?.folders ?? [],
         nodes: newNodes,
@@ -119,9 +124,13 @@ class CloudSyncService {
       } catch (_) {}
     }
 
-    final docRef = _firestore.collection('users').doc(uid).collection('sync_data').doc('highlights');
+    final docRef = _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('sync_data')
+        .doc('highlights');
     final docSnap = await docRef.get();
-    
+
     // Remote data schema: reference -> { "colorIndex": X, "timestamp": Y }
     Map<String, dynamic> remoteData = {};
     if (docSnap.exists) {
@@ -130,13 +139,13 @@ class CloudSyncService {
 
     bool hasRemoteNewer = false;
     Map<String, dynamic> merged = {...remoteData};
-    
+
     final now = DateTime.now().millisecondsSinceEpoch;
 
     for (final entry in localData.entries) {
       final key = entry.key;
       final localColor = entry.value;
-      
+
       if (!merged.containsKey(key)) {
         // We don't have a local timestamp, so if it's not in remote, we assign now.
         merged[key] = {
@@ -144,14 +153,14 @@ class CloudSyncService {
           'timestamp': now,
         };
       } else {
-        // If it exists in remote, check if the color matches. 
+        // If it exists in remote, check if the color matches.
         final remoteVal = merged[key] as Map<String, dynamic>;
         if (remoteVal['colorIndex'] != localColor) {
-           // Local color differs from remote. Since we have no local timestamp, we assume local was modified more recently if it differs.
-           merged[key] = {
-             'colorIndex': localColor,
-             'timestamp': now,
-           };
+          // Local color differs from remote. Since we have no local timestamp, we assume local was modified more recently if it differs.
+          merged[key] = {
+            'colorIndex': localColor,
+            'timestamp': now,
+          };
         }
       }
     }
@@ -161,15 +170,15 @@ class CloudSyncService {
       final key = entry.key;
       final remoteVal = entry.value as Map<String, dynamic>;
       final remoteColor = remoteVal['colorIndex'] as int;
-      
+
       if (!localData.containsKey(key) || localData[key] != remoteColor) {
         // Remote has something we don't have, OR remote color is different and we just merged.
-        // Wait, if local color differs, we just overwrote it in `merged`. 
-        // So we only care if remote HAS it but local DOES NOT HAVE it, 
+        // Wait, if local color differs, we just overwrote it in `merged`.
+        // So we only care if remote HAS it but local DOES NOT HAVE it,
         // OR local HAS it but we are yielding to remote (which we aren't, because no local ts).
         // Actually, if we didn't have it locally, we should pull it.
         if (!localData.containsKey(key)) {
-           hasRemoteNewer = true;
+          hasRemoteNewer = true;
         }
       }
     }
@@ -192,9 +201,13 @@ class CloudSyncService {
     final localCount = prefs.getInt('streak_count') ?? 0;
     final localLastRead = prefs.getInt('streak_last_read') ?? 0;
 
-    final docRef = _firestore.collection('users').doc(uid).collection('sync_data').doc('streak');
+    final docRef = _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('sync_data')
+        .doc('streak');
     final docSnap = await docRef.get();
-    
+
     int remoteCount = 0;
     int remoteLastRead = 0;
     if (docSnap.exists) {
@@ -229,7 +242,7 @@ class CloudSyncService {
     await prefs.remove('streak_count');
     await prefs.remove('streak_last_read');
     await prefs.remove('last_cloud_sync_timestamp');
-    
+
     ref.invalidate(bookmarkDataProvider);
     ref.invalidate(highlightsProvider);
     ref.invalidate(streakProvider);

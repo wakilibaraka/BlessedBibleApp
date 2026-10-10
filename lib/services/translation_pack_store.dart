@@ -263,12 +263,11 @@ class TranslationPackStore {
         throw StateError('pack $id failed integrity check');
       }
       final rows = await db.query('translations', limit: 1);
-      if (rows.isEmpty ||
-          (rows.first['translation_id'] as String?) != id) {
+      if (rows.isEmpty || (rows.first['translation_id'] as String?) != id) {
         throw StateError('pack $id has no matching translations row');
       }
-      final n = Sqflite.firstIntValue(await db
-              .rawQuery('SELECT COUNT(*) AS c FROM verses')) ??
+      final n = Sqflite.firstIntValue(
+              await db.rawQuery('SELECT COUNT(*) AS c FROM verses')) ??
           0;
       if (n < 30000) throw StateError('pack $id has too few verses: $n');
     } finally {
@@ -351,8 +350,7 @@ class TranslationPackStore {
   Future<void> installPackFromRows(
       TranslationInfo info, List<Map<String, dynamic>> verses) async {
     if (verses.length < 30000) {
-      throw StateError(
-          'Downloaded ${info.translationId} looks incomplete '
+      throw StateError('Downloaded ${info.translationId} looks incomplete '
           '(${verses.length} verses).');
     }
     final file = await _packFile(info.translationId);
@@ -450,8 +448,7 @@ class TranslationPackStore {
         await db.execute(_versesDdl);
         await db.execute(_translationsDdl);
         final tmap = Map<String, dynamic>.from(r);
-        tmap['is_downloaded'] =
-            bundledPackIds.contains(tid) ? 0 : 1;
+        tmap['is_downloaded'] = bundledPackIds.contains(tid) ? 0 : 1;
         await db.insert('translations', tmap);
         final batch = db.batch();
         for (final v in verses) {

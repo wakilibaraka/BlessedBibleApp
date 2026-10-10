@@ -33,8 +33,7 @@ class _TrackDraftV2 {
 
   List<PlanRange> toRanges(List<BibleBook> allBooks) {
     if (!isValid) return [];
-    final startIndex =
-        allBooks.indexWhere((b) => b.name == startBook!.name);
+    final startIndex = allBooks.indexWhere((b) => b.name == startBook!.name);
     final endIndex = allBooks.indexWhere((b) => b.name == endBook!.name);
     if (startIndex > endIndex || startIndex < 0 || endIndex < 0) {
       return [];
@@ -50,11 +49,8 @@ class _TrackDraftV2 {
       final b = allBooks[i];
       final sCh = (i == startIndex) ? startChapter : 1;
       final sV = (i == startIndex) ? startVerse : 1;
-      final eCh =
-          (i == endIndex) ? endChapter : b.chapters.last.number;
-      final eV = (i == endIndex)
-          ? endVerse
-          : b.chapters.last.verses.length;
+      final eCh = (i == endIndex) ? endChapter : b.chapters.last.number;
+      final eV = (i == endIndex) ? endVerse : b.chapters.last.verses.length;
       result.add(PlanRange(
         book: b.name,
         startChapter: sCh,
@@ -151,8 +147,7 @@ class _CustomPlanBuilderV2ScreenState
     try {
       final wcs = ref.read(wordCountServiceProvider);
       await wcs.init();
-      final pJson =
-          await rootBundle.loadString('assets/data/pericopes.json');
+      final pJson = await rootBundle.loadString('assets/data/pericopes.json');
       final allPericopes = await compute(parsePericopesJson, pJson);
       if (!mounted) return;
       final allBooks = ref.read(bibleProvider).books;
@@ -308,17 +303,15 @@ class _CustomPlanBuilderV2ScreenState
         selectedBookAbbrev:
             draft.startBook?.abbreviation ?? allBooks.first.abbreviation,
         selectedChapter: draft.startChapter,
-        onSelectionChanged:
-            (abbrev, name, chapter, verse, {bool autoClose = true}) {
-          final book =
-              allBooks.firstWhere((b) => b.abbreviation == abbrev);
+        onSelectionChanged: (abbrev, name, chapter, verse,
+            {bool autoClose = true}) {
+          final book = allBooks.firstWhere((b) => b.abbreviation == abbrev);
           setState(() {
             draft.startBook = book;
             draft.startChapter = chapter;
             draft.startVerse = verse ?? 1;
             if (draft.endBook == null ||
-                allBooks.indexOf(draft.endBook!) <
-                    allBooks.indexOf(book)) {
+                allBooks.indexOf(draft.endBook!) < allBooks.indexOf(book)) {
               draft.endBook = book;
               draft.endChapter = book.chapters.last.number;
               draft.endVerse = book.chapters.last.verses.length;
@@ -343,13 +336,12 @@ class _CustomPlanBuilderV2ScreenState
       useRootNavigator: true,
       builder: (context) => BookChapterSelectorSheet(
         books: allBooks.sublist(startIndex),
-        selectedBookAbbrev: draft.endBook?.abbreviation ??
-            draft.startBook!.abbreviation,
+        selectedBookAbbrev:
+            draft.endBook?.abbreviation ?? draft.startBook!.abbreviation,
         selectedChapter: draft.endChapter,
-        onSelectionChanged:
-            (abbrev, name, chapter, verse, {bool autoClose = true}) {
-          final book =
-              allBooks.firstWhere((b) => b.abbreviation == abbrev);
+        onSelectionChanged: (abbrev, name, chapter, verse,
+            {bool autoClose = true}) {
+          final book = allBooks.firstWhere((b) => b.abbreviation == abbrev);
           setState(() {
             draft.endBook = book;
             draft.endChapter = chapter;
@@ -369,9 +361,7 @@ class _CustomPlanBuilderV2ScreenState
   }
 
   Future<void> _save() async {
-    if (_preview == null ||
-        _titleController.text.trim().isEmpty ||
-        _isSaving) {
+    if (_preview == null || _titleController.text.trim().isEmpty || _isSaving) {
       return;
     }
     // Slot guard before saving (V1 saved, then silently failed to activate).
@@ -423,8 +413,9 @@ class _CustomPlanBuilderV2ScreenState
             startDate: _startDate,
           );
       if (_reminder) {
-        ref.read(readingPlanProvider(finalPlan.id).notifier).setReminder(
-            true, _reminderTime.hour, _reminderTime.minute);
+        ref
+            .read(readingPlanProvider(finalPlan.id).notifier)
+            .setReminder(true, _reminderTime.hour, _reminderTime.minute);
       }
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
@@ -448,351 +439,319 @@ class _CustomPlanBuilderV2ScreenState
       appThemeMode: appThemeMode,
       page: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar:
-            const SharedAppBar(title: Text('Custom Plan Builder')),
-      body: SafeArea(
-        bottom: false,
-        child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : _error != null
-                ? Center(child: Text('Error: $_error'))
-                : ListView(
-                    padding:
-                        const EdgeInsets.fromLTRB(20, 12, 20, 140),
-                    children: [
-                      Text('Plan name',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          )),
-                      const SizedBox(height: 8),
-                      TextField(
-                        controller: _titleController,
-                        decoration: InputDecoration(
-                          hintText: 'e.g. Genesis in 30 Days',
-                          filled: true,
-                          fillColor: theme.colorScheme.surface,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide: BorderSide(
-                                color: theme.dividerColor),
-                          ),
-                        ),
-                        onChanged: (_) {
-                          _titleTouched = true;
-                          _schedulePreview();
-                        },
-                      ),
-                      const V2SectionLabel('Reading tracks'),
-                      for (var i = 0;
-                          i < _drafts.length;
-                          i++)
-                        _TrackCard(
-                          draft: _drafts[i],
-                          onStart: () => _pickStart(i),
-                          onEnd: () => _pickEnd(i),
-                          onRemove: _drafts.length > 1
-                              ? () => setState(() {
-                                    _drafts.removeAt(i);
-                                    _schedulePreview();
-                                  })
-                              : null,
-                        ),
-                      const SizedBox(height: 8),
-                      OutlinedButton.icon(
-                        onPressed: () => setState(() {
-                          _drafts.add(_TrackDraftV2());
-                          _schedulePreview();
-                        }),
-                        icon: const Icon(Icons.add_rounded),
-                        label: const Text('Add track'),
-                      ),
-                      if (_overlaps())
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10),
-                          child: Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.error
-                                  .withValues(alpha: 0.08),
-                              borderRadius:
-                                  BorderRadius.circular(14),
-                              border: Border.all(
-                                  color: theme.colorScheme.error
-                                      .withValues(alpha: 0.4)),
-                            ),
-                            child: Text(
-                              '⚠ Tracks overlap — shared verses are counted once in the preview below.',
-                              style: theme.textTheme.bodySmall,
+        appBar: const SharedAppBar(title: Text('Custom Plan Builder')),
+        body: SafeArea(
+          bottom: false,
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _error != null
+                  ? Center(child: Text('Error: $_error'))
+                  : ListView(
+                      padding: const EdgeInsets.fromLTRB(20, 12, 20, 140),
+                      children: [
+                        Text('Plan name',
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            )),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: _titleController,
+                          decoration: InputDecoration(
+                            hintText: 'e.g. Genesis in 30 Days',
+                            filled: true,
+                            fillColor: theme.colorScheme.surface,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14),
+                              borderSide: BorderSide(color: theme.dividerColor),
                             ),
                           ),
+                          onChanged: (_) {
+                            _titleTouched = true;
+                            _schedulePreview();
+                          },
                         ),
-                      const V2SectionLabel('Duration'),
-                      V2Card(
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Slider(
-                                    value: _days,
-                                    min: 1,
-                                    max: 730,
-                                    divisions: 730,
-                                    label: '${_days.toInt()} days',
-                                    onChanged: (v) {
-                                      setState(() {
-                                        _days = v;
-                                        _daysController.text =
-                                            v.toInt().toString();
-                                      });
+                        const V2SectionLabel('Reading tracks'),
+                        for (var i = 0; i < _drafts.length; i++)
+                          _TrackCard(
+                            draft: _drafts[i],
+                            onStart: () => _pickStart(i),
+                            onEnd: () => _pickEnd(i),
+                            onRemove: _drafts.length > 1
+                                ? () => setState(() {
+                                      _drafts.removeAt(i);
                                       _schedulePreview();
-                                    },
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 76,
-                                  child: TextField(
-                                    controller: _daysController,
-                                    keyboardType:
-                                        TextInputType.number,
-                                    decoration: InputDecoration(
-                                      suffixText: 'days',
-                                      border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(
-                                                12),
-                                      ),
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                              horizontal: 10,
-                                              vertical: 10),
-                                    ),
-                                    onChanged: (v) {
-                                      final n =
-                                          int.tryParse(v) ?? 0;
-                                      if (n >= 1 && n <= 730) {
-                                        setState(
-                                            () => _days = n.toDouble());
-                                        _schedulePreview();
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Wrap(
-                              spacing: 8,
-                              children: [30, 60, 90, 180, 365]
-                                  .map((d) => ChoiceChip(
-                                        label: Text('$d'),
-                                        selected:
-                                            _days.toInt() == d,
-                                        onSelected: (_) {
-                                          setState(() {
-                                            _days = d.toDouble();
-                                            _daysController.text =
-                                                '$d';
-                                          });
-                                          _schedulePreview();
-                                        },
-                                      ))
-                                  .toList(),
-                            ),
-                          ],
+                                    })
+                                : null,
+                          ),
+                        const SizedBox(height: 8),
+                        OutlinedButton.icon(
+                          onPressed: () => setState(() {
+                            _drafts.add(_TrackDraftV2());
+                            _schedulePreview();
+                          }),
+                          icon: const Icon(Icons.add_rounded),
+                          label: const Text('Add track'),
                         ),
-                      ),
-                      const V2SectionLabel('Start, rest & reminder'),
-                      V2Card(
-                        child: Column(
-                          children: [
-                            ListTile(
-                              contentPadding: EdgeInsets.zero,
-                              leading: const Icon(
-                                  Icons.calendar_month_rounded),
-                              title: const Text('Start date'),
-                              subtitle: Text(
-                                  '${_startDate.year}-${_startDate.month.toString().padLeft(2, '0')}-${_startDate.day.toString().padLeft(2, '0')} (${_weekdayShort(appWeekday(_startDate))})'),
-                              trailing: const Icon(
-                                  Icons.chevron_right_rounded),
-                              onTap: () async {
-                                final picked =
-                                    await showDatePicker(
-                                  context: context,
-                                  initialDate: _startDate,
-                                  firstDate: DateTime.now()
-                                      .subtract(const Duration(
-                                          days: 30)),
-                                  lastDate: DateTime.now().add(
-                                      const Duration(days: 365)),
-                                );
-                                if (picked != null) {
-                                  setState(
-                                      () => _startDate = picked);
-                                }
-                              },
-                            ),
-                            const Divider(height: 1),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 10),
-                              child: Row(
-                                children: [
-                                  const Expanded(
-                                      child:
-                                          Text('Rest days (neutral)')),
-                                  _RestChip(
-                                      label: 'None',
-                                      selected: _restDay == null,
-                                      onTap: () => setState(
-                                          () => _restDay = null)),
-                                  const SizedBox(width: 6),
-                                  _RestChip(
-                                      label: 'Sat',
-                                      selected: _restDay == 7,
-                                      onTap: () => setState(
-                                          () => _restDay = 7)),
-                                  const SizedBox(width: 6),
-                                  _RestChip(
-                                      label: 'Sun',
-                                      selected: _restDay == 1,
-                                      onTap: () => setState(
-                                          () => _restDay = 1)),
-                                ],
+                        if (_overlaps())
+                          Padding(
+                            padding: const EdgeInsets.only(top: 10),
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.error
+                                    .withValues(alpha: 0.08),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                    color: theme.colorScheme.error
+                                        .withValues(alpha: 0.4)),
+                              ),
+                              child: Text(
+                                '⚠ Tracks overlap — shared verses are counted once in the preview below.',
+                                style: theme.textTheme.bodySmall,
                               ),
                             ),
-                            const Divider(height: 1),
-                            SwitchListTile(
-                              contentPadding: EdgeInsets.zero,
-                              title: const Text('Daily reminder'),
-                              subtitle: Text(_reminder
-                                  ? 'At ${_reminderTime.format(context)}'
-                                  : 'Off'),
-                              value: _reminder,
-                              onChanged: (v) async {
-                                if (v) {
-                                  final picked =
-                                      await showTimePicker(
-                                    context: context,
-                                    initialTime: _reminderTime,
-                                  );
-                                  if (picked == null) return;
-                                  setState(() {
-                                    _reminder = true;
-                                    _reminderTime = picked;
-                                  });
-                                } else {
-                                  setState(
-                                      () => _reminder = false);
-                                }
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      const V2SectionLabel('Live preview'),
-                      V2Card(
-                        featured: true,
-                        child: _preview == null
-                            ? Text(
-                                'Add at least one track above to preview the word-balanced schedule.',
-                                style: theme.textTheme.bodySmall
-                                    ?.copyWith(
-                                  color: theme.colorScheme.onSurface
-                                      .withValues(alpha: 0.6),
-                                ),
-                              )
-                            : Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                          ),
+                        const V2SectionLabel('Duration'),
+                        V2Card(
+                          child: Column(
+                            children: [
+                              Row(
                                 children: [
-                                  const V2Eyebrow(
-                                      'Word-balanced · pericope-aware'),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    '${_preview!.days} days · ${_preview!.schedule.length} reading days',
-                                    style: theme.textTheme.titleSmall
-                                        ?.copyWith(
-                                      fontWeight: FontWeight.w800,
+                                  Expanded(
+                                    child: Slider(
+                                      value: _days,
+                                      min: 1,
+                                      max: 730,
+                                      divisions: 730,
+                                      label: '${_days.toInt()} days',
+                                      onChanged: (v) {
+                                        setState(() {
+                                          _days = v;
+                                          _daysController.text =
+                                              v.toInt().toString();
+                                        });
+                                        _schedulePreview();
+                                      },
                                     ),
                                   ),
-                                  if (_preview!.wasClamped &&
-                                      _preview!.clampReason !=
-                                          null) ...[
+                                  SizedBox(
+                                    width: 76,
+                                    child: TextField(
+                                      controller: _daysController,
+                                      keyboardType: TextInputType.number,
+                                      decoration: InputDecoration(
+                                        suffixText: 'days',
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                horizontal: 10, vertical: 10),
+                                      ),
+                                      onChanged: (v) {
+                                        final n = int.tryParse(v) ?? 0;
+                                        if (n >= 1 && n <= 730) {
+                                          setState(() => _days = n.toDouble());
+                                          _schedulePreview();
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Wrap(
+                                spacing: 8,
+                                children: [30, 60, 90, 180, 365]
+                                    .map((d) => ChoiceChip(
+                                          label: Text('$d'),
+                                          selected: _days.toInt() == d,
+                                          onSelected: (_) {
+                                            setState(() {
+                                              _days = d.toDouble();
+                                              _daysController.text = '$d';
+                                            });
+                                            _schedulePreview();
+                                          },
+                                        ))
+                                    .toList(),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const V2SectionLabel('Start, rest & reminder'),
+                        V2Card(
+                          child: Column(
+                            children: [
+                              ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                leading:
+                                    const Icon(Icons.calendar_month_rounded),
+                                title: const Text('Start date'),
+                                subtitle: Text(
+                                    '${_startDate.year}-${_startDate.month.toString().padLeft(2, '0')}-${_startDate.day.toString().padLeft(2, '0')} (${_weekdayShort(appWeekday(_startDate))})'),
+                                trailing:
+                                    const Icon(Icons.chevron_right_rounded),
+                                onTap: () async {
+                                  final picked = await showDatePicker(
+                                    context: context,
+                                    initialDate: _startDate,
+                                    firstDate: DateTime.now()
+                                        .subtract(const Duration(days: 30)),
+                                    lastDate: DateTime.now()
+                                        .add(const Duration(days: 365)),
+                                  );
+                                  if (picked != null) {
+                                    setState(() => _startDate = picked);
+                                  }
+                                },
+                              ),
+                              const Divider(height: 1),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                child: Row(
+                                  children: [
+                                    const Expanded(
+                                        child: Text('Rest days (neutral)')),
+                                    _RestChip(
+                                        label: 'None',
+                                        selected: _restDay == null,
+                                        onTap: () =>
+                                            setState(() => _restDay = null)),
+                                    const SizedBox(width: 6),
+                                    _RestChip(
+                                        label: 'Sat',
+                                        selected: _restDay == 7,
+                                        onTap: () =>
+                                            setState(() => _restDay = 7)),
+                                    const SizedBox(width: 6),
+                                    _RestChip(
+                                        label: 'Sun',
+                                        selected: _restDay == 1,
+                                        onTap: () =>
+                                            setState(() => _restDay = 1)),
+                                  ],
+                                ),
+                              ),
+                              const Divider(height: 1),
+                              SwitchListTile(
+                                contentPadding: EdgeInsets.zero,
+                                title: const Text('Daily reminder'),
+                                subtitle: Text(_reminder
+                                    ? 'At ${_reminderTime.format(context)}'
+                                    : 'Off'),
+                                value: _reminder,
+                                onChanged: (v) async {
+                                  if (v) {
+                                    final picked = await showTimePicker(
+                                      context: context,
+                                      initialTime: _reminderTime,
+                                    );
+                                    if (picked == null) return;
+                                    setState(() {
+                                      _reminder = true;
+                                      _reminderTime = picked;
+                                    });
+                                  } else {
+                                    setState(() => _reminder = false);
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        const V2SectionLabel('Live preview'),
+                        V2Card(
+                          featured: true,
+                          child: _preview == null
+                              ? Text(
+                                  'Add at least one track above to preview the word-balanced schedule.',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.6),
+                                  ),
+                                )
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const V2Eyebrow(
+                                        'Word-balanced · pericope-aware'),
                                     const SizedBox(height: 6),
                                     Text(
-                                      '⚠ ${_preview!.clampReason} Title updated to the real day count.',
-                                      style: theme
-                                          .textTheme.bodySmall
-                                          ?.copyWith(
-                                        color: theme
-                                            .colorScheme.error,
+                                      '${_preview!.days} days · ${_preview!.schedule.length} reading days',
+                                      style:
+                                          theme.textTheme.titleSmall?.copyWith(
+                                        fontWeight: FontWeight.w800,
                                       ),
                                     ),
+                                    if (_preview!.wasClamped &&
+                                        _preview!.clampReason != null) ...[
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        '⚠ ${_preview!.clampReason} Title updated to the real day count.',
+                                        style:
+                                            theme.textTheme.bodySmall?.copyWith(
+                                          color: theme.colorScheme.error,
+                                        ),
+                                      ),
+                                    ],
+                                    const SizedBox(height: 6),
+                                    for (var i = 0;
+                                        i <
+                                            _preview!.schedule.length
+                                                .clamp(0, 3);
+                                        i++)
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 3),
+                                        child: Text(
+                                          'Day ${_preview!.schedule[i].dayNumber}: ${_preview!.schedule[i].portions.map((p) => '${p.book} ${p.startChapter}').join(' · ')}',
+                                          style: theme.textTheme.bodySmall,
+                                        ),
+                                      ),
+                                    if (_preview!.schedule.length > 3)
+                                      Text(
+                                        '⋯ ${_preview!.schedule.length - 3} more balanced days',
+                                        style:
+                                            theme.textTheme.bodySmall?.copyWith(
+                                          color: theme.colorScheme.onSurface
+                                              .withValues(alpha: 0.6),
+                                        ),
+                                      ),
                                   ],
-                                  const SizedBox(height: 6),
-                                  for (var i = 0;
-                                      i <
-                                          _preview!.schedule.length
-                                              .clamp(0, 3);
-                                      i++)
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.symmetric(
-                                              vertical: 3),
-                                      child: Text(
-                                        'Day ${_preview!.schedule[i].dayNumber}: ${_preview!.schedule[i].portions.map((p) => '${p.book} ${p.startChapter}').join(' · ')}',
-                                        style: theme
-                                            .textTheme.bodySmall,
-                                      ),
-                                    ),
-                                  if (_preview!.schedule.length > 3)
-                                    Text(
-                                      '⋯ ${_preview!.schedule.length - 3} more balanced days',
-                                      style: theme
-                                          .textTheme.bodySmall
-                                          ?.copyWith(
-                                        color: theme
-                                            .colorScheme.onSurface
-                                            .withValues(alpha: 0.6),
-                                      ),
-                                    ),
-                                ],
-                              ),
-                      ),
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        width: double.infinity,
-                        child: FilledButton(
-                          onPressed: (_preview == null ||
-                                  _titleController.text
-                                      .trim()
-                                      .isEmpty ||
-                                  _isSaving)
-                              ? null
-                              : _save,
-                          child: Text(_isSaving
-                              ? 'Saving…'
-                              : 'Generate & save plan →'),
+                                ),
                         ),
-                      ),
-                      if (_preview == null ||
-                          _titleController.text.trim().isEmpty)
-                        Padding(
-                          padding:
-                              const EdgeInsets.only(top: 8),
-                          child: Text(
-                            'Name the plan and add at least one track to continue.',
-                            textAlign: TextAlign.center,
-                            style: theme.textTheme.labelSmall
-                                ?.copyWith(
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.55),
-                            ),
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          width: double.infinity,
+                          child: FilledButton(
+                            onPressed: (_preview == null ||
+                                    _titleController.text.trim().isEmpty ||
+                                    _isSaving)
+                                ? null
+                                : _save,
+                            child: Text(_isSaving
+                                ? 'Saving…'
+                                : 'Generate & save plan →'),
                           ),
                         ),
-                    ],
-                  ),
-      ),
+                        if (_preview == null ||
+                            _titleController.text.trim().isEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Text(
+                              'Name the plan and add at least one track to continue.',
+                              textAlign: TextAlign.center,
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: theme.colorScheme.onSurface
+                                    .withValues(alpha: 0.55),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+        ),
       ),
     );
   }
@@ -838,16 +797,16 @@ class _TrackCard extends StatelessWidget {
               Expanded(
                 child: _RefBox(
                     label: 'START',
-                    value: fmt(draft.startBook,
-                        draft.startChapter, draft.startVerse, false),
+                    value: fmt(draft.startBook, draft.startChapter,
+                        draft.startVerse, false),
                     onTap: onStart),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: _RefBox(
                     label: 'END',
-                    value: fmt(draft.endBook, draft.endChapter,
-                        draft.endVerse, true),
+                    value: fmt(
+                        draft.endBook, draft.endChapter, draft.endVerse, true),
                     onTap: onEnd),
               ),
             ],
@@ -858,8 +817,7 @@ class _TrackCard extends StatelessWidget {
               child: TextButton(
                 onPressed: onRemove,
                 child: Text('Remove track',
-                    style: TextStyle(
-                        color: theme.colorScheme.error)),
+                    style: TextStyle(color: theme.colorScheme.error)),
               ),
             ),
         ],
@@ -895,8 +853,7 @@ class _RefBox extends StatelessWidget {
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.w800,
                   fontSize: 10,
-                  color: theme.colorScheme.onSurface
-                      .withValues(alpha: 0.55),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
                 )),
             const SizedBox(height: 2),
             Text(value,
@@ -915,9 +872,7 @@ class _RestChip extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
   const _RestChip(
-      {required this.label,
-      required this.selected,
-      required this.onTap});
+      {required this.label, required this.selected, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -925,17 +880,14 @@ class _RestChip extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: selected
               ? theme.primaryColor
               : theme.colorScheme.onSurface.withValues(alpha: 0.06),
           borderRadius: BorderRadius.circular(11),
           border: Border.all(
-            color: selected
-                ? theme.primaryColor
-                : theme.dividerColor,
+            color: selected ? theme.primaryColor : theme.dividerColor,
           ),
         ),
         child: Text(

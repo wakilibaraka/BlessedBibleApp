@@ -21,29 +21,32 @@ final wordOfTheDayProvider = FutureProvider<WordOfTheDay?>((ref) async {
     logDebug('wordOfTheDayProvider: dictionary index is empty');
     return null;
   }
-  
+
   // Deterministic random based on date
   final now = DateTime.now();
-  final dayIndex = DateTime(now.year, now.month, now.day).difference(DateTime(2026, 1, 1)).inDays;
-  
+  final dayIndex = DateTime(now.year, now.month, now.day)
+      .difference(DateTime(2026, 1, 1))
+      .inDays;
+
   final random = Random(dayIndex);
   final index = random.nextInt(allWords.length);
   final headword = allWords[index];
-  
-  final defs = await ref.watch(dictionaryDefinitionProvider(headword.normalizedWord).future);
+
+  final defs = await ref
+      .watch(dictionaryDefinitionProvider(headword.normalizedWord).future);
   if (defs.isEmpty) {
     logDebug(
         'wordOfTheDayProvider: no definition for "${headword.normalizedWord}"');
     return null;
   }
-  
+
   final def = defs.first;
   // Get a snippet of the definition
   String snippet = def.definition;
   if (snippet.length > 150) {
     snippet = '${snippet.substring(0, 150)}...';
   }
-  
+
   return WordOfTheDay(def.displayHeadword, snippet,
       normalized: headword.normalizedWord);
 });

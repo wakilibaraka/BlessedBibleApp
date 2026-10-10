@@ -50,7 +50,8 @@ class _BibleStoryReaderScreenState
     if (!mounted) return;
     if (neighbor == null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(next ? 'You have reached the end.' : 'This is the first story.'),
+        content: Text(
+            next ? 'You have reached the end.' : 'This is the first story.'),
         duration: const Duration(seconds: 1),
       ));
       return;
@@ -90,12 +91,15 @@ class _BibleStoryReaderScreenState
             actions: [
               IconButton(
                 icon: Icon(
-                  isFavorite ? Icons.favorite_rounded : Icons.favorite_outline_rounded,
+                  isFavorite
+                      ? Icons.favorite_rounded
+                      : Icons.favorite_outline_rounded,
                   color: isFavorite ? AppColors.goldAccent : null,
                 ),
                 tooltip: 'Favorite',
-                onPressed: () =>
-                    ref.read(devotionalFavoritesProvider.notifier).toggle(_story.id),
+                onPressed: () => ref
+                    .read(devotionalFavoritesProvider.notifier)
+                    .toggle(_story.id),
               ),
               IconButton(
                 icon: Icon(
@@ -121,7 +125,8 @@ class _BibleStoryReaderScreenState
                       'assets/devotional/art/${_story.plateSlug}.webp',
                       fit: BoxFit.cover,
                       alignment: Alignment.topCenter,
-                      errorBuilder: (_, __, ___) => Container(color: theme.colorScheme.surfaceContainerHighest),
+                      errorBuilder: (_, __, ___) => Container(
+                          color: theme.colorScheme.surfaceContainerHighest),
                     )
                   else
                     Container(color: theme.colorScheme.surfaceContainerHighest),
@@ -170,7 +175,8 @@ class _BibleStoryReaderScreenState
                     Text(
                       position,
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.5),
                       ),
                     ),
                   ],
@@ -252,7 +258,8 @@ class _BibleStoryReaderScreenState
                     Text(
                       'Artwork: ${_story.plateCaption} — Gustave Doré, public domain',
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.45),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.45),
                         fontStyle: FontStyle.italic,
                       ),
                     ),
@@ -274,7 +281,8 @@ class _BibleStoryReaderScreenState
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: theme.dividerColor.withValues(alpha: 0.4)),
+            border:
+                Border.all(color: theme.dividerColor.withValues(alpha: 0.4)),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.08),
@@ -339,14 +347,11 @@ class _PassageText extends StatelessWidget {
                   for (final segment in splitBoldSegments(line))
                     TextSpan(
                       text: segment.text,
-                      style:
-                          theme.textTheme.bodyLarge?.copyWith(
+                      style: theme.textTheme.bodyLarge?.copyWith(
                         fontFamily: 'Cormorant Garamond',
                         fontSize: 19,
                         height: 1.55,
-                        fontWeight: segment.bold
-                            ? FontWeight.bold
-                            : null,
+                        fontWeight: segment.bold ? FontWeight.bold : null,
                       ),
                     ),
                 ],
@@ -359,7 +364,8 @@ class _PassageText extends StatelessWidget {
 }
 
 /// Resolves "N of total in book" for the current story.
-final _positionProvider = FutureProvider.family<String?, String>((ref, id) async {
+final _positionProvider =
+    FutureProvider.family<String?, String>((ref, id) async {
   final service = ref.watch(devotionalServiceProvider);
   final all = await service.loadAllStoryRefs();
   final i = all.indexWhere((s) => s.id == id);

@@ -23,7 +23,8 @@ class TypographyState {
     this.fontWeightValue = 400,
   });
 
-  FontStyle get fontStyle => italicEnabled ? FontStyle.italic : FontStyle.normal;
+  FontStyle get fontStyle =>
+      italicEnabled ? FontStyle.italic : FontStyle.normal;
   FontWeight get fontWeight => FontWeight.values.firstWhere(
         (w) => w.value == fontWeightValue,
         orElse: () => FontWeight.normal,
@@ -119,7 +120,6 @@ class TypographyNotifier extends Notifier<TypographyState> {
     }
   }
 
-
   Future<void> setFontFamily(String family) async {
     state = state.copyWith(fontFamily: family);
     final prefs = await SharedPreferences.getInstance();
@@ -131,8 +131,6 @@ class TypographyNotifier extends Notifier<TypographyState> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble(_fontSizeKey, size);
   }
-
-  
 
   Future<void> setLineHeight(double height) async {
     state = state.copyWith(lineHeight: height);

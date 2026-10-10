@@ -57,6 +57,7 @@ class AnimatedSegmentedTile<T> extends StatelessWidget {
     );
   }
 }
+
 class _SegmentItem<T> extends StatefulWidget {
   final MapEntry<T, String> option;
   final bool isSelected;
@@ -95,7 +96,9 @@ class _SegmentItemState<T> extends State<_SegmentItem<T>> {
             curve: Curves.easeOutCubic,
             padding: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
-              color: widget.isSelected ? theme.colorScheme.surface : Colors.transparent,
+              color: widget.isSelected
+                  ? theme.colorScheme.surface
+                  : Colors.transparent,
               borderRadius: BorderRadius.circular(8),
               boxShadow: widget.isSelected
                   ? [
@@ -112,7 +115,8 @@ class _SegmentItemState<T> extends State<_SegmentItem<T>> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13,
-                fontWeight: widget.isSelected ? FontWeight.w600 : FontWeight.w400,
+                fontWeight:
+                    widget.isSelected ? FontWeight.w600 : FontWeight.w400,
                 color: widget.isSelected
                     ? theme.colorScheme.onSurface
                     : theme.colorScheme.onSurface.withValues(alpha: 0.7),

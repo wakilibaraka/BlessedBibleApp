@@ -36,14 +36,12 @@ VerseOfTheDay verseForDay(List<VerseOfTheDay> pool, DateTime day) {
     return VerseOfTheDay(
       'Revelation 14:12',
       'Here is the patience of the saints: here are they that keep the '
-      'commandments of God, and the faith of Jesus.',
+          'commandments of God, and the faith of Jesus.',
     );
   }
   final start = DateTime(2026, 1, 1);
-  final index = DateTime(day.year, day.month, day.day)
-          .difference(start)
-          .inDays
-          .abs() %
-      pool.length;
+  final index =
+      DateTime(day.year, day.month, day.day).difference(start).inDays.abs() %
+          pool.length;
   return pool[index];
 }

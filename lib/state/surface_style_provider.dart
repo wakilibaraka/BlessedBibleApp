@@ -4,21 +4,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'theme_provider.dart';
 
-enum EarthHeavenStyle { 
-  earth, 
-  heaven, 
-  paperlike, 
-  claymorphic, 
+enum EarthHeavenStyle {
+  earth,
+  heaven,
+  paperlike,
+  claymorphic,
 }
 
-enum SurfaceStyle { 
-  flat, 
-  frosted, 
-  threeDimensional, 
-  paperlike, 
-  claymorphic, 
-  frutigerAero, 
-  skeuomorphic 
+enum SurfaceStyle {
+  flat,
+  frosted,
+  threeDimensional,
+  paperlike,
+  claymorphic,
+  frutigerAero,
+  skeuomorphic
 }
 
 // Earth is now uniformly flat for ALL 14 themes.
@@ -82,10 +82,8 @@ class EarthHeavenStyleNotifier extends Notifier<EarthHeavenStyle> {
 
   /// Surprise me: random surface (different from current), persisted.
   Future<EarthHeavenStyle> shuffleStyle() async {
-    final pool =
-        EarthHeavenStyle.values.where((s) => s != state).toList();
-    final pick =
-        pool.isEmpty ? state : pool[Random().nextInt(pool.length)];
+    final pool = EarthHeavenStyle.values.where((s) => s != state).toList();
+    final pick = pool.isEmpty ? state : pool[Random().nextInt(pool.length)];
     await setStyle(pick);
     return pick;
   }

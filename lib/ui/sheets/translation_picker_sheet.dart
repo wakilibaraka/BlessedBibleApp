@@ -66,116 +66,121 @@ class _TranslationPickerSheetState
     final availableTranslations = ref.watch(availableTranslationsProvider);
 
     return FractionallySizedBox(
-        heightFactor: 0.75,
-          child: TexturedGlassContainer(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-          padding: EdgeInsets.only(
-            top: 24,
-            bottom: MediaQuery.of(context).padding.bottom + 24,
-            left: 20,
-            right: 20,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      'Bible Translation',
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
+      heightFactor: 0.75,
+      child: TexturedGlassContainer(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        padding: EdgeInsets.only(
+          top: 24,
+          bottom: MediaQuery.of(context).padding.bottom + 24,
+          left: 20,
+          right: 20,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Bible Translation',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                  IconButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.close_rounded),
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              AnimatedSegmentedTile<ReadingLayout>(
-                title: 'Reading Layout',
-                subtitle: () {
-                  switch (readingLayout) {
-                    case ReadingLayout.single:
-                      return 'One translation';
-                    case ReadingLayout.interleaved:
-                      return 'Two translations stacked per verse';
-                    case ReadingLayout.sideBySide:
-                      return 'Two translations in side-by-side columns';
-                    case ReadingLayout.chips:
-                      return 'Tap a verse to switch its translation';
-                  }
-                }(),
-                selectedValue: readingLayout,
-                options: const [
-                  MapEntry(ReadingLayout.single, 'Single'),
-                  MapEntry(ReadingLayout.interleaved, 'Bilingual'),
-                  MapEntry(ReadingLayout.sideBySide, 'Parallel'),
-                  MapEntry(ReadingLayout.chips, 'Chips'),
-                ],
-                onChanged: (val) {
-                  HapticFeedback.selectionClick();
-                  ref.read(readSettingsProvider.notifier).setReadingLayout(val);
-                },
+                ),
+                IconButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(Icons.close_rounded),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            AnimatedSegmentedTile<ReadingLayout>(
+              title: 'Reading Layout',
+              subtitle: () {
+                switch (readingLayout) {
+                  case ReadingLayout.single:
+                    return 'One translation';
+                  case ReadingLayout.interleaved:
+                    return 'Two translations stacked per verse';
+                  case ReadingLayout.sideBySide:
+                    return 'Two translations in side-by-side columns';
+                  case ReadingLayout.chips:
+                    return 'Tap a verse to switch its translation';
+                }
+              }(),
+              selectedValue: readingLayout,
+              options: const [
+                MapEntry(ReadingLayout.single, 'Single'),
+                MapEntry(ReadingLayout.interleaved, 'Bilingual'),
+                MapEntry(ReadingLayout.sideBySide, 'Parallel'),
+                MapEntry(ReadingLayout.chips, 'Chips'),
+              ],
+              onChanged: (val) {
+                HapticFeedback.selectionClick();
+                ref.read(readSettingsProvider.notifier).setReadingLayout(val);
+              },
+            ),
+            const SizedBox(height: 16),
+            if (readingLayout != ReadingLayout.single) ...[
+              Container(
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                      color:
+                          theme.colorScheme.onSurface.withValues(alpha: 0.1)),
+                ),
+                padding: const EdgeInsets.all(4),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _buildTabButton(
+                        'Primary',
+                        !_isSelectingSecondary,
+                        () => setState(() => _isSelectingSecondary = false),
+                        theme,
+                      ),
+                    ),
+                    Expanded(
+                      child: _buildTabButton(
+                        'Secondary',
+                        _isSelectingSecondary,
+                        () => setState(() => _isSelectingSecondary = true),
+                        theme,
+                      ),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 16),
-              if (readingLayout != ReadingLayout.single) ...[
-                Container(
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surface,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                        color:
-                            theme.colorScheme.onSurface.withValues(alpha: 0.1)),
-                  ),
-                  padding: const EdgeInsets.all(4),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: _buildTabButton(
-                          'Primary',
-                          !_isSelectingSecondary,
-                          () => setState(() => _isSelectingSecondary = false),
-                          theme,
-                        ),
-                      ),
-                      Expanded(
-                        child: _buildTabButton(
-                          'Secondary',
-                          _isSelectingSecondary,
-                          () => setState(() => _isSelectingSecondary = true),
-                          theme,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-              ],
-              Expanded(
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  child: availableTranslations.when(
-                    data: (installed) => _buildTranslationList(
-                        context, ref, theme, activeTranslationId, otherTranslationId, installed),
-                    loading: () => const Center(
-                        child: Padding(
-                            padding: EdgeInsets.all(32),
-                            child: CircularProgressIndicator())),
-                    error: (e, st) =>
-                        Center(child: Text('Error loading translations: $e')),
-                  ),
+            ],
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: availableTranslations.when(
+                  data: (installed) => _buildTranslationList(
+                      context,
+                      ref,
+                      theme,
+                      activeTranslationId,
+                      otherTranslationId,
+                      installed),
+                  loading: () => const Center(
+                      child: Padding(
+                          padding: EdgeInsets.all(32),
+                          child: CircularProgressIndicator())),
+                  error: (e, st) =>
+                      Center(child: Text('Error loading translations: $e')),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      );
+      ),
+    );
   }
 
   Widget _buildTabButton(
@@ -293,8 +298,7 @@ class _TranslationPickerSheetState
 
     final installedByLang = <String, List<TranslationInfo>>{};
     for (final t in installed) {
-      installedByLang[t.languageName] =
-          installedByLang[t.languageName] ?? [];
+      installedByLang[t.languageName] = installedByLang[t.languageName] ?? [];
       installedByLang[t.languageName]!.add(t);
     }
     final pendingByLang = <String, List<Map<String, dynamic>>>{};
@@ -311,11 +315,12 @@ class _TranslationPickerSheetState
       for (final item in installedByLang[lang]!) {
         // Installed
         final isSelected = item.translationId == activeTranslationId;
-        final isOtherSelected = ref.read(readSettingsProvider).readingLayout != ReadingLayout.single && item.translationId == otherTranslationId;
+        final isOtherSelected = ref.read(readSettingsProvider).readingLayout !=
+                ReadingLayout.single &&
+            item.translationId == otherTranslationId;
         // Backbone (KJV + BBE) lives in the core database and cannot be
         // deleted; everything else can be removed to slim the app.
-        final isLocked =
-            TranslationPackStore.isCoreId(item.translationId);
+        final isLocked = TranslationPackStore.isCoreId(item.translationId);
         final isKjv = item.translationId == 'kjv';
         children.add(
           Padding(
@@ -326,107 +331,106 @@ class _TranslationPickerSheetState
                 color: isSelected
                     ? theme.primaryColor.withValues(alpha: 0.1)
                     : theme.colorScheme.surface,
-              borderRadius: BorderRadius.circular(16),
-              child: InkWell(
                 borderRadius: BorderRadius.circular(16),
-                onTap: isOtherSelected ? null : () {
-                  if (_isSelectingSecondary) {
-                    ref
-                        .read(secondaryTranslationProvider.notifier)
-                        .setTranslation(item.translationId);
-                  } else {
-                    ref
-                        .read(activeTranslationProvider.notifier)
-                        .setTranslation(item.translationId);
-                  }
-                  Navigator.of(context).pop();
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 16),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: isSelected
-                          ? theme.primaryColor.withValues(alpha: 0.5)
-                          : theme.colorScheme.onSurface
-                              .withValues(alpha: 0.1),
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              item.translationName,
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: isSelected
-                                    ? theme.primaryColor
-                                    : theme.colorScheme.onSurface,
-                              ),
-                            ),
-                            Builder(builder: (_) {
-                              final subtitle = isKjv
-                                  ? 'Always available · app backbone'
-                                  : item.license;
-                              if (subtitle.isEmpty) {
-                                return const SizedBox.shrink();
-                              }
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.only(top: 4),
-                                child: Text(
-                                  subtitle,
-                                  style: theme.textTheme.bodySmall
-                                      ?.copyWith(
-                                    color: theme.colorScheme.onSurface
-                                        .withValues(alpha: 0.6),
-                                  ),
-                                ),
-                              );
-                            }),
-                          ],
-                        ),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(16),
+                  onTap: isOtherSelected
+                      ? null
+                      : () {
+                          if (_isSelectingSecondary) {
+                            ref
+                                .read(secondaryTranslationProvider.notifier)
+                                .setTranslation(item.translationId);
+                          } else {
+                            ref
+                                .read(activeTranslationProvider.notifier)
+                                .setTranslation(item.translationId);
+                          }
+                          Navigator.of(context).pop();
+                        },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 16),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: isSelected
+                            ? theme.primaryColor.withValues(alpha: 0.5)
+                            : theme.colorScheme.onSurface
+                                .withValues(alpha: 0.1),
                       ),
-                      if (!isLocked)
-                        IconButton(
-                          tooltip: 'Delete ${item.translationName}',
-                          icon: const Icon(
-                              Icons.delete_outline_rounded,
-                              size: 20),
-                          color: theme.colorScheme.onSurface
-                              .withValues(alpha: 0.4),
-                          onPressed: () => _deleteTranslation(
-                              context, ref, item),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                item.translationName,
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: isSelected
+                                      ? theme.primaryColor
+                                      : theme.colorScheme.onSurface,
+                                ),
+                              ),
+                              Builder(builder: (_) {
+                                final subtitle = isKjv
+                                    ? 'Always available · app backbone'
+                                    : item.license;
+                                if (subtitle.isEmpty) {
+                                  return const SizedBox.shrink();
+                                }
+                                return Padding(
+                                  padding: const EdgeInsets.only(top: 4),
+                                  child: Text(
+                                    subtitle,
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: theme.colorScheme.onSurface
+                                          .withValues(alpha: 0.6),
+                                    ),
+                                  ),
+                                );
+                              }),
+                            ],
+                          ),
                         ),
-                      if (isSelected)
-                        Icon(
-                          Icons.check_circle_rounded,
-                          color: theme.primaryColor,
-                        )
-                      else if (isLocked)
-                        Tooltip(
-                          message: 'Cannot delete — app backbone',
-                          child: Icon(
-                            Icons.lock_outline_rounded,
+                        if (!isLocked)
+                          IconButton(
+                            tooltip: 'Delete ${item.translationName}',
+                            icon: const Icon(Icons.delete_outline_rounded,
+                                size: 20),
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.4),
+                            onPressed: () =>
+                                _deleteTranslation(context, ref, item),
+                          ),
+                        if (isSelected)
+                          Icon(
+                            Icons.check_circle_rounded,
+                            color: theme.primaryColor,
+                          )
+                        else if (isLocked)
+                          Tooltip(
+                            message: 'Cannot delete — app backbone',
+                            child: Icon(
+                              Icons.lock_outline_rounded,
+                              size: 20,
+                              color: theme.colorScheme.onSurface
+                                  .withValues(alpha: 0.3),
+                            ),
+                          )
+                        else
+                          Icon(
+                            Icons.cloud_done_outlined,
                             size: 20,
                             color: theme.colorScheme.onSurface
                                 .withValues(alpha: 0.3),
                           ),
-                        )
-                      else
-                        Icon(
-                          Icons.cloud_done_outlined,
-                          size: 20,
-                          color: theme.colorScheme.onSurface
-                              .withValues(alpha: 0.3),
-                        ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
                 ),
               ),
             ),
@@ -579,8 +583,7 @@ class _DownloadableTileState extends ConsumerState<_DownloadableTile> {
                       ),
                       const SizedBox(height: 4),
                       Builder(builder: (_) {
-                        final isRestore =
-                            widget.item['source'] == 'bundled';
+                        final isRestore = widget.item['source'] == 'bundled';
                         final label = isRestore
                             ? "${widget.item['license']} · ${sizeMB.toStringAsFixed(1)} MB · restore offline"
                             : "${widget.item['license']} · ${sizeMB.toStringAsFixed(1)} MB";

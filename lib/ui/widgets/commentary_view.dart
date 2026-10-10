@@ -140,26 +140,31 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
         ? '$bookName $chapterNum:$displayVerse'
         : '$bookName $chapterNum';
 
-    final isBookmarked = displayVerse != null 
-        ? ref.watch(bookmarksProvider).any((b) => b.endsWith('_$chapterNum:$displayVerse'))
+    final isBookmarked = displayVerse != null
+        ? ref
+            .watch(bookmarksProvider)
+            .any((b) => b.endsWith('_$chapterNum:$displayVerse'))
         : ref.watch(bookmarksProvider).any((b) => b.endsWith('_$chapterNum:1'));
     final fallbackVerseText = _lookupVerseText(ref, displayVerse);
     String? finalVerseText = fallbackVerseText;
-    
+
     final settings = ref.watch(readSettingsProvider);
     final activeTransId = ref.watch(activeTranslationProvider);
-    
-    if (settings.syncSavedItemsLanguage && activeTransId != 'kjv' && displayVerse != null) {
+
+    if (settings.syncSavedItemsLanguage &&
+        activeTransId != 'kjv' &&
+        displayVerse != null) {
       final bibleState = ref.watch(bibleProvider);
       int? bookNum;
       try {
         final b = bibleState.books.firstWhere(
-          (b) => b.name.toLowerCase() == widget.book.toLowerCase() ||
-                 b.abbreviation.toLowerCase() == widget.book.toLowerCase(),
+          (b) =>
+              b.name.toLowerCase() == widget.book.toLowerCase() ||
+              b.abbreviation.toLowerCase() == widget.book.toLowerCase(),
         );
         bookNum = bibleState.books.indexOf(b) + 1;
       } catch (_) {}
-      
+
       if (bookNum != null) {
         final request = (
           translationId: activeTransId,
@@ -193,17 +198,20 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: IconButton(
-                  icon: Icon(Icons.arrow_back_ios_new_rounded, color: theme.primaryColor),
+                  icon: Icon(Icons.arrow_back_ios_new_rounded,
+                      color: theme.primaryColor),
                   onPressed: () => Navigator.pop(context),
                   tooltip: 'Back',
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                 decoration: BoxDecoration(
                   color: Colors.transparent,
                   borderRadius: BorderRadius.circular(30),
-                  border: Border.all(color: tokens.readingAccent.withValues(alpha: 0.5)),
+                  border: Border.all(
+                      color: tokens.readingAccent.withValues(alpha: 0.5)),
                 ),
                 child: Text(
                   referenceString,
@@ -221,17 +229,25 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                   children: [
                     IconButton(
                       icon: Icon(
-                        isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded,
-                        color: isBookmarked ? tokens.readingAccent : tokens.readingInkMuted,
+                        isBookmarked
+                            ? Icons.bookmark_rounded
+                            : Icons.bookmark_outline_rounded,
+                        color: isBookmarked
+                            ? tokens.readingAccent
+                            : tokens.readingInkMuted,
                       ),
-                      tooltip: isBookmarked ? 'Remove Bookmark' : 'Bookmark Commentary',
+                      tooltip: isBookmarked
+                          ? 'Remove Bookmark'
+                          : 'Bookmark Commentary',
                       onPressed: () {
-                        VerseActionLogic.handleBookmark(context, theme, ref, bookName, chapterNum, [displayVerse ?? 1]);
+                        VerseActionLogic.handleBookmark(context, theme, ref,
+                            bookName, chapterNum, [displayVerse ?? 1]);
                       },
                     ),
                     if (widget.onExpand != null)
                       IconButton(
-                        icon: Icon(Icons.open_in_full_rounded, color: tokens.readingAccent, size: 20),
+                        icon: Icon(Icons.open_in_full_rounded,
+                            color: tokens.readingAccent, size: 20),
                         tooltip: 'Expand to full screen',
                         onPressed: widget.onExpand,
                       ),
@@ -241,23 +257,23 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
             ],
           ),
         ),
-        
+
         // Base: Scrollable Content
         Expanded(
           child: _buildScrollableContent(
-              verseEntries,
-              chapterEntries,
-              bookEntries,
-              commentaryAsync,
-              hasContent,
-              theme,
-              tokens,
-              is3DTheme,
-              typography,
-              finalVerseText,
-              bookName,
-              chapterNum,
-              displayVerse,
+            verseEntries,
+            chapterEntries,
+            bookEntries,
+            commentaryAsync,
+            hasContent,
+            theme,
+            tokens,
+            is3DTheme,
+            typography,
+            finalVerseText,
+            bookName,
+            chapterNum,
+            displayVerse,
           ),
         ),
       ],
@@ -340,7 +356,8 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                       color: tokens.readingSurface,
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(
-                          color: tokens.readingInkMuted.withValues(alpha: 0.15)),
+                          color:
+                              tokens.readingInkMuted.withValues(alpha: 0.15)),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withValues(alpha: 0.08),
@@ -371,7 +388,8 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                             Text(
                               'Tap to read in context',
                               style: theme.textTheme.bodyMedium?.copyWith(
-                                color: tokens.readingInkMuted.withValues(alpha: 0.6),
+                                color: tokens.readingInkMuted
+                                    .withValues(alpha: 0.6),
                                 letterSpacing: 0.5,
                               ),
                             ),
@@ -379,7 +397,8 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                             Icon(
                               Icons.open_in_new_rounded,
                               size: 12,
-                              color: tokens.readingInkMuted.withValues(alpha: 0.6),
+                              color:
+                                  tokens.readingInkMuted.withValues(alpha: 0.6),
                             ),
                           ],
                         ),
@@ -426,11 +445,15 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                   theme: theme,
                   tokens: tokens,
                   title: 'On this chapter',
-                  isExpanded: _userToggledChapter ? _showChapter : (verseEntries.isEmpty || _showChapter),
+                  isExpanded: _userToggledChapter
+                      ? _showChapter
+                      : (verseEntries.isEmpty || _showChapter),
                   entries: chapterEntries,
                   typography: typography,
                   onToggle: () => setState(() {
-                    final currentlyExpanded = _userToggledChapter ? _showChapter : (verseEntries.isEmpty || _showChapter);
+                    final currentlyExpanded = _userToggledChapter
+                        ? _showChapter
+                        : (verseEntries.isEmpty || _showChapter);
                     _userToggledChapter = true;
                     _showChapter = !currentlyExpanded;
                   }),
@@ -442,11 +465,17 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                   theme: theme,
                   tokens: tokens,
                   title: 'On this book',
-                  isExpanded: _userToggledBook ? _showBook : (verseEntries.isEmpty && chapterEntries.isEmpty || _showBook),
+                  isExpanded: _userToggledBook
+                      ? _showBook
+                      : (verseEntries.isEmpty && chapterEntries.isEmpty ||
+                          _showBook),
                   entries: bookEntries,
                   typography: typography,
                   onToggle: () => setState(() {
-                    final currentlyExpanded = _userToggledBook ? _showBook : (verseEntries.isEmpty && chapterEntries.isEmpty || _showBook);
+                    final currentlyExpanded = _userToggledBook
+                        ? _showBook
+                        : (verseEntries.isEmpty && chapterEntries.isEmpty ||
+                            _showBook);
                     _userToggledBook = true;
                     _showBook = !currentlyExpanded;
                   }),
@@ -558,15 +587,15 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
       CommentaryEntry entry, TypographyState typography) {
     final isDevotional = entry.category == StudyContentCategory.devotional;
     final isStudyNote = entry.category == StudyContentCategory.studyNote;
-    
-    final bgColor = isDevotional 
-        ? tokens.readingAccent.withValues(alpha: 0.05) 
-        : isStudyNote 
+
+    final bgColor = isDevotional
+        ? tokens.readingAccent.withValues(alpha: 0.05)
+        : isStudyNote
             ? tokens.readingInkMuted.withValues(alpha: 0.05)
             : Colors.transparent;
-            
-    final border = isDevotional 
-        ? Border.all(color: tokens.readingAccent.withValues(alpha: 0.2)) 
+
+    final border = isDevotional
+        ? Border.all(color: tokens.readingAccent.withValues(alpha: 0.2))
         : null;
 
     return Container(

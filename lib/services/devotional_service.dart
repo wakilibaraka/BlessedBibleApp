@@ -139,7 +139,8 @@ class DevotionalService {
   }
 
   /// Finds the previous/next story in global chronological order.
-  Future<DevotionalStory?> neighborOf(DevotionalStory story, {required bool next}) async {
+  Future<DevotionalStory?> neighborOf(DevotionalStory story,
+      {required bool next}) async {
     final all = await loadAllStoryRefs();
     final i = all.indexWhere((s) => s.id == story.id);
     if (i == -1) return null;

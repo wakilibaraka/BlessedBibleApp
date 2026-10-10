@@ -185,4 +185,3 @@ final devotionalBooksProvider = Provider<List<DevotionalBookInfo>>((ref) {
     return true;
   }).toList(growable: false);
 });
-

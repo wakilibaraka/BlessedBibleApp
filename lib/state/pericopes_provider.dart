@@ -35,9 +35,10 @@ class PericopesNotifier extends Notifier<Map<String, List<PericopeEntry>>> {
   Future<void> _loadData() async {
     loadError = null;
     try {
-      final jsonString = await rootBundle.loadString('assets/data/pericopes.json');
+      final jsonString =
+          await rootBundle.loadString('assets/data/pericopes.json');
       final data = await compute(_parsePericopes, jsonString);
-      
+
       try {
         final prefs = await SharedPreferences.getInstance();
         final webStr = prefs.getString('pericopes_web');
@@ -60,20 +61,23 @@ class PericopesNotifier extends Notifier<Map<String, List<PericopeEntry>>> {
 
   /// O(1)-ish lookup for pericopes in a specific book and chapter.
   /// The resulting list usually contains 0-5 items, making startVerse scanning trivial.
-  List<PericopeEntry> getPericopesForChapter(String book, int chapter, {String? translationId}) {
+  List<PericopeEntry> getPericopesForChapter(String book, int chapter,
+      {String? translationId}) {
     final all = state['${book}_$chapter'] ?? const [];
-    
+
     if (translationId != null) {
-      final translationSpecific = all.where((p) => p.translationId == translationId).toList();
+      final translationSpecific =
+          all.where((p) => p.translationId == translationId).toList();
       if (translationSpecific.isNotEmpty) {
         return translationSpecific;
       }
     }
-    
+
     return all.where((p) => p.translationId == null).toList();
   }
 }
 
-final pericopesProvider = NotifierProvider<PericopesNotifier, Map<String, List<PericopeEntry>>>(
+final pericopesProvider =
+    NotifierProvider<PericopesNotifier, Map<String, List<PericopeEntry>>>(
   PericopesNotifier.new,
 );

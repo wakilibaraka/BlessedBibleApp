@@ -10,7 +10,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
 
-
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/gestures.dart';
@@ -187,7 +186,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   void _showDictionaryPopover(String normalizedWord) {
     final style = ref.read(readSettingsProvider).popupStyle;
     final isFloating = style == PopupStyle.floating;
-    
+
     if (isFloating) {
       showDialog(
         context: context,
@@ -241,8 +240,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           RadialAction(
             icon: Icons.bookmark_border_rounded,
             label: 'Bookmark',
-            onTap: () => VerseActionLogic.handleBookmark(context, theme, ref,
-                bookName, chapterNumber, [verseNumber]),
+            onTap: () => VerseActionLogic.handleBookmark(
+                context, theme, ref, bookName, chapterNumber, [verseNumber]),
           ),
           RadialAction(
             icon: Icons.note_add_outlined,
@@ -752,27 +751,28 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(
-        textScaler: MediaQuery.textScalerOf(context).clamp(minScaleFactor: 1.0, maxScaleFactor: 1.3),
+        textScaler: MediaQuery.textScalerOf(context)
+            .clamp(minScaleFactor: 1.0, maxScaleFactor: 1.3),
       ),
       child: ConstrainedBox(
         constraints: const BoxConstraints(minHeight: 48),
         child: Stack(
           alignment: Alignment.center,
           children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: leadingButton,
-          ),
-          Align(
-            alignment: Alignment.center,
-            child: centerPill,
-          ),
-          Align(
-            alignment: Alignment.centerRight,
-            child: trailingButton,
-          ),
-        ],
-      ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: leadingButton,
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: centerPill,
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: trailingButton,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -802,8 +802,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         commentaryNotifier.versesWithCommentarySet;
     final Set<String> versesWithDevotionals =
         commentaryNotifier.versesWithDevotionalsSet;
-    final Set<String> versesWithNotes =
-        commentaryNotifier.versesWithNotesSet;
+    final Set<String> versesWithNotes = commentaryNotifier.versesWithNotesSet;
     final Set<String> chaptersWithCommentary =
         commentaryNotifier.chaptersWithCommentarySet;
 
@@ -833,14 +832,13 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         _hasInitialJumped = true;
         _currentPageIndex = safeTarget;
         if (!_pageController.hasClients) {
-      
-    for (final list in _dictRecognizers.values) {
-      for (final r in list) {
-        r.dispose();
-      }
-    }
-    _dictRecognizers.clear();
-    _pageController.dispose();
+          for (final list in _dictRecognizers.values) {
+            for (final r in list) {
+              r.dispose();
+            }
+          }
+          _dictRecognizers.clear();
+          _pageController.dispose();
           _pageController = PageController(initialPage: safeTarget);
         } else {
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -920,7 +918,11 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     }
 
     final tokens = theme.extension<ReadingTokens>()!;
-    Color getThemeBackgroundColor() { return appThemeMode.is3DTheme ? appThemeMode.backgroundColor : tokens.readingPaper; }
+    Color getThemeBackgroundColor() {
+      return appThemeMode.is3DTheme
+          ? appThemeMode.backgroundColor
+          : tokens.readingPaper;
+    }
 
     return Scaffold(
       backgroundColor: getThemeBackgroundColor(),
@@ -1205,449 +1207,542 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                 }
                                                 return false;
                                               },
-                                              child: Builder(
-                                                builder: (context) {
-                                                  final availableTrans = ref.watch(availableTranslationsProvider).value ?? [];
-                                                  final activeTransId = ref.watch(activeTranslationProvider);
-                                                  final transInfo = availableTrans.firstWhere(
-                                                    (t) => t.translationId == activeTransId,
-                                                    orElse: () => availableTrans.isNotEmpty
-                                                        ? availableTrans.first
-                                                        : TranslationInfo(
-                                                            translationId: 'kjv',
-                                                            languageCode: 'en',
-                                                            languageName: 'English',
-                                                            translationName: 'King James Version',
-                                                            abbreviation: 'KJV',
-                                                            license: 'Public Domain',
-                                                            isComplete: true,
-                                                          ));
-                                                  final isRtl = ['ar', 'he', 'fa', 'ur'].contains(transInfo.languageCode);
-                                                  
-                                                  return Directionality(
-                                                    textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
-                                                    child: Center(
-                                                  child: ConstrainedBox(
-                                                    constraints:
-                                                        const BoxConstraints(
-                                                            maxWidth: 800),
-                                                    child: Builder(
-                                                        builder: (context) {
-                                                      final double chromeScale = MediaQuery.textScalerOf(context).clamp(minScaleFactor: 1.0, maxScaleFactor: 1.3).scale(1.0);
-                                                      final double dynamicTopBarHeight = 48.0 * chromeScale;
-                                                      final double dynamicBottomDockHeight = kBottomDockHeight * chromeScale;
-                                                      
-                                                      final listPadding = EdgeInsets.only(
-                                                          top: MediaQuery.viewPaddingOf(context).top + dynamicTopBarHeight + 32.0,
-                                                          left: math.max(
-                                                              MediaQuery.viewPaddingOf(context).left,
-                                                              MediaQuery.sizeOf(context).width * (typography.marginPercent / 100.0)),
-                                                          right: math.max(
-                                                              MediaQuery.viewPaddingOf(context).right,
-                                                              MediaQuery.sizeOf(context).width * (typography.marginPercent / 100.0)),
-                                                          bottom: MediaQuery.viewPaddingOf(context).bottom + dynamicBottomDockHeight + kBottomDockInset + 24.0);
-
-                                                      Widget buildVerseItem(
-                                                          BuildContext context,
-                                                          int index) {
-                                                        final isEnglish = transInfo.languageCode == 'en';
-                                                        final chapterDictMap = ref.watch(
-                                                          chapterUnderlineMapProvider(
-                                                            ChapterUnderlineArgs(
-                                                              bookNumber: allBooks.indexOf(fc.book) + 1,
-                                                              chapterNumber: fc.chapter.number,
-                                                              verses: verses,
-                                                              isEnglish: isEnglish,
-                                                              translationId: transInfo.translationId,
-                                                            )
-                                                          )
-                                                        );
-                                                        if (index ==
-                                                            verses.length) {
-                                                          bool
-                                                              hasChapterCommentary =
-                                                              chaptersWithCommentary
-                                                                  .contains(
-                                                                      '${fc.book.name}|${fc.chapter.number}');
-                                                          return _buildEndOfChapterBlock(
-                                                              fc,
-                                                              pageIndex,
-                                                              theme,
-                                                              hasChapterCommentary);
-                                                        }
-                                                        final verse =
-                                                            verses[index];
-                                                        final isSelected =
-                                                            selectedVerses
-                                                                .contains(verse
-                                                                    .number);
-                                                        final isSelectionMode =
-                                                            selectedVerses
-                                                                .isNotEmpty;
-
-                                                        final activeTransId =
-                                                            ref.watch(
-                                                                activeTranslationProvider);
-                                                        final chapterPericopes =
-                                                            pericopesNotifier
-                                                                .getPericopesForChapter(
-                                                                    fc.book
-                                                                        .name,
-                                                                    fc.chapter
-                                                                        .number,
+                                              child:
+                                                  Builder(builder: (context) {
+                                                final availableTrans = ref
+                                                        .watch(
+                                                            availableTranslationsProvider)
+                                                        .value ??
+                                                    [];
+                                                final activeTransId = ref.watch(
+                                                    activeTranslationProvider);
+                                                final transInfo =
+                                                    availableTrans.firstWhere(
+                                                        (t) =>
+                                                            t.translationId ==
+                                                            activeTransId,
+                                                        orElse: () =>
+                                                            availableTrans
+                                                                    .isNotEmpty
+                                                                ? availableTrans
+                                                                    .first
+                                                                : TranslationInfo(
                                                                     translationId:
-                                                                        activeTransId);
-                                                        PericopeEntry?
-                                                            pericopeHeading;
-                                                        for (final p
-                                                            in chapterPericopes) {
-                                                          if (p.startVerse ==
-                                                              verse.number) {
-                                                            pericopeHeading = p;
-                                                            break;
+                                                                        'kjv',
+                                                                    languageCode:
+                                                                        'en',
+                                                                    languageName:
+                                                                        'English',
+                                                                    translationName:
+                                                                        'King James Version',
+                                                                    abbreviation:
+                                                                        'KJV',
+                                                                    license:
+                                                                        'Public Domain',
+                                                                    isComplete:
+                                                                        true,
+                                                                  ));
+                                                final isRtl = [
+                                                  'ar',
+                                                  'he',
+                                                  'fa',
+                                                  'ur'
+                                                ].contains(
+                                                    transInfo.languageCode);
+
+                                                return Directionality(
+                                                  textDirection: isRtl
+                                                      ? TextDirection.rtl
+                                                      : TextDirection.ltr,
+                                                  child: Center(
+                                                    child: ConstrainedBox(
+                                                      constraints:
+                                                          const BoxConstraints(
+                                                              maxWidth: 800),
+                                                      child: Builder(
+                                                          builder: (context) {
+                                                        final double
+                                                            chromeScale =
+                                                            MediaQuery
+                                                                    .textScalerOf(
+                                                                        context)
+                                                                .clamp(
+                                                                    minScaleFactor:
+                                                                        1.0,
+                                                                    maxScaleFactor:
+                                                                        1.3)
+                                                                .scale(1.0);
+                                                        final double
+                                                            dynamicTopBarHeight =
+                                                            48.0 * chromeScale;
+                                                        final double
+                                                            dynamicBottomDockHeight =
+                                                            kBottomDockHeight *
+                                                                chromeScale;
+
+                                                        final listPadding = EdgeInsets.only(
+                                                            top: MediaQuery.viewPaddingOf(context).top +
+                                                                dynamicTopBarHeight +
+                                                                32.0,
+                                                            left: math.max(
+                                                                MediaQuery.viewPaddingOf(context)
+                                                                    .left,
+                                                                MediaQuery.sizeOf(context).width *
+                                                                    (typography.marginPercent /
+                                                                        100.0)),
+                                                            right: math.max(
+                                                                MediaQuery.viewPaddingOf(context)
+                                                                    .right,
+                                                                MediaQuery.sizeOf(context).width *
+                                                                    (typography.marginPercent /
+                                                                        100.0)),
+                                                            bottom: MediaQuery.viewPaddingOf(context)
+                                                                    .bottom +
+                                                                dynamicBottomDockHeight +
+                                                                kBottomDockInset +
+                                                                24.0);
+
+                                                        Widget buildVerseItem(
+                                                            BuildContext
+                                                                context,
+                                                            int index) {
+                                                          final isEnglish =
+                                                              transInfo
+                                                                      .languageCode ==
+                                                                  'en';
+                                                          final chapterDictMap =
+                                                              ref.watch(
+                                                                  chapterUnderlineMapProvider(
+                                                                      ChapterUnderlineArgs(
+                                                            bookNumber: allBooks
+                                                                    .indexOf(fc
+                                                                        .book) +
+                                                                1,
+                                                            chapterNumber: fc
+                                                                .chapter.number,
+                                                            verses: verses,
+                                                            isEnglish:
+                                                                isEnglish,
+                                                            translationId:
+                                                                transInfo
+                                                                    .translationId,
+                                                          )));
+                                                          if (index ==
+                                                              verses.length) {
+                                                            bool
+                                                                hasChapterCommentary =
+                                                                chaptersWithCommentary
+                                                                    .contains(
+                                                                        '${fc.book.name}|${fc.chapter.number}');
+                                                            return _buildEndOfChapterBlock(
+                                                                fc,
+                                                                pageIndex,
+                                                                theme,
+                                                                hasChapterCommentary);
                                                           }
-                                                        }
+                                                          final verse =
+                                                              verses[index];
+                                                          final isSelected =
+                                                              selectedVerses
+                                                                  .contains(verse
+                                                                      .number);
+                                                          final isSelectionMode =
+                                                              selectedVerses
+                                                                  .isNotEmpty;
 
-                                                        final finalHeadingText =
-                                                            pericopeHeading
-                                                                ?.title;
+                                                          final activeTransId =
+                                                              ref.watch(
+                                                                  activeTranslationProvider);
+                                                          final chapterPericopes =
+                                                              pericopesNotifier
+                                                                  .getPericopesForChapter(
+                                                                      fc.book
+                                                                          .name,
+                                                                      fc.chapter
+                                                                          .number,
+                                                                      translationId:
+                                                                          activeTransId);
+                                                          PericopeEntry?
+                                                              pericopeHeading;
+                                                          for (final p
+                                                              in chapterPericopes) {
+                                                            if (p.startVerse ==
+                                                                verse.number) {
+                                                              pericopeHeading =
+                                                                  p;
+                                                              break;
+                                                            }
+                                                          }
 
-                                                        return Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .stretch,
-                                                          children: [
-                                                            if (finalHeadingText !=
-                                                                    null &&
-                                                                finalHeadingText
-                                                                    .isNotEmpty) ...[
-                                                              Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .only(
-                                                                  top: 16.0,
-                                                                  bottom: 8.0,
-                                                                  left: 15.0,
-                                                                  right: 12.0,
-                                                                ),
-                                                                child: Text(
-                                                                  finalHeadingText,
-                                                                  style: theme
-                                                                      .textTheme
-                                                                      .titleSmall
-                                                                      ?.copyWith(
-                                                                    color: theme
-                                                                        .primaryColor,
-                                                                    fontSize:
-                                                                        typography.fontSize *
-                                                                            1.05,
-                                                                    fontFamily:
-                                                                        typography
-                                                                            .fontFamily,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600,
-                                                                    fontStyle:
-                                                                        FontStyle
-                                                                            .italic,
-                                                                    letterSpacing:
-                                                                        0.1,
+                                                          final finalHeadingText =
+                                                              pericopeHeading
+                                                                  ?.title;
+
+                                                          return Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .stretch,
+                                                            children: [
+                                                              if (finalHeadingText !=
+                                                                      null &&
+                                                                  finalHeadingText
+                                                                      .isNotEmpty) ...[
+                                                                Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .only(
+                                                                    top: 16.0,
+                                                                    bottom: 8.0,
+                                                                    left: 15.0,
+                                                                    right: 12.0,
                                                                   ),
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .left,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                            // Check for commentary
-                                                            AnimatedOpacity(
-                                                              duration:
-                                                                  const Duration(
-                                                                      milliseconds:
-                                                                          250),
-                                                              opacity:
-                                                                  (isSelectionMode &&
-                                                                          !isSelected)
-                                                                      ? 0.85
-                                                                      : 1.0,
-                                                              alwaysIncludeSemantics:
-                                                                  true,
-                                                              child: Consumer(
-                                                                  builder:
-                                                                      (context,
-                                                                          itemRef,
-                                                                          _) {
-                                                                final verseKey = '${fc.book.name}|${fc.chapter.number}|${verse.number}';
-                                                                bool hasCommentary = versesWithCommentary.contains(verseKey);
-                                                                bool hasDevotional = versesWithDevotionals.contains(verseKey);
-                                                                bool hasStudyNote = versesWithNotes.contains(verseKey);
-
-                                                                final highlights =
-                                                                    itemRef.watch(
-                                                                        highlightsProvider);
-                                                                final bookmarks =
-                                                                    itemRef.watch(
-                                                                        bookmarksProvider);
-                                                                final refStr = generateVerseKey(
-                                                                    fc.book
-                                                                        .abbreviation,
-                                                                    fc.chapter
-                                                                        .number,
-                                                                    verse
-                                                                        .number);
-                                                                final isBookmarked =
-                                                                    bookmarks
-                                                                        .contains(
-                                                                            refStr);
-                                                                final savedColorIndex =
-                                                                    highlights[
-                                                                        refStr];
-                                                                Color?
-                                                                    highlightColor;
-                                                                if (savedColorIndex !=
-                                                                        null &&
-                                                                    savedColorIndex >=
-                                                                        0 &&
-                                                                    savedColorIndex <
-                                                                        highlightPalette
-                                                                            .length) {
-                                                                  highlightColor = AppColors.getRenderedHighlightColor(
-                                                                      highlightPalette[
-                                                                          savedColorIndex],
-                                                                      theme
-                                                                          .brightness,
-                                                                      theme
-                                                                          .scaffoldBackgroundColor);
-                                                                }
-
-                                                                final verseWidget =
-                                                                    _buildReadingLayoutVerse(
-                                                                  context,
-                                                                  ref,
-                                                                  verse,
-                                                                  secondaryVerseMap[
-                                                                      verse
-                                                                          .number],
-                                                                  allBooks.indexOf(
-                                                                          fc.book) +
-                                                                      1,
-                                                                  fc.chapter
-                                                                      .number,
-                                                                  readSettings
-                                                                      .readingLayout,
-                                                                  theme,
-                                                                  typography,
-                                                                  appThemeMode,
-                                                                  hasCommentary:
-                                                                      hasCommentary,
-                                                                  hasDevotional: hasDevotional,
-                                                                  hasStudyNote: hasStudyNote,
-                                                                  onCommentaryTap: () =>
-                                                                      _showCommentaryBottomSheet(
-                                                                          verse
-                                                                              .number,
-                                                                          verse
-                                                                              .text),
-                                                                  onDevotionalTap: () async {
-                                                                    HapticFeedback.selectionClick();
-                                                                    final refStr = '${fc.book.name} ${fc.chapter.number}:${verse.number}';
-                                                                    final service = ref.read(devotionalServiceProvider);
-                                                                    await service.loadAllStoryRefs();
-                                                                    final story = service.storyByKeyVerse[refStr];
-                                                                    if (story != null && context.mounted) {
-                                                                      Navigator.of(context).push(MaterialPageRoute(
-                                                                        builder: (_) => BibleStoryReaderScreen(initialStory: story),
-                                                                      ));
-                                                                    } else {
-                                                                      _showCommentaryBottomSheet(verse.number, verse.text);
-                                                                    }
-                                                                  },
-                                                                  onStudyNoteTap: () =>
-                                                                      _showCommentaryBottomSheet(
-                                                                          verse
-                                                                              .number,
-                                                                          verse
-                                                                              .text),
-                                                                  isBookmarked:
-                                                                      isBookmarked,
-                                                                  isSelectionMode:
-                                                                      _isPageSelectionMode,
-                                                                  dictTokens:
-                                                                      chapterDictMap[
-                                                                          verse
-                                                                              .number],
-                                                                  onDictTap:
-                                                                      _isPageSelectionMode
-                                                                          ? null
-                                                                          : _showDictionaryPopover,
-                                                                );
-
-                                                                return GestureDetector(
-                                                                  behavior:
-                                                                      HitTestBehavior
-                                                                          .opaque,
-                                                                  onDoubleTap:
-                                                                      _isPageSelectionMode
-                                                                          ? null
-                                                                          : () {
-                                                                              HapticFeedback.lightImpact();
-                                                                              VerseActionLogic.handleBookmark(context, theme, ref, fc.book.name, fc.chapter.number, [
-                                                                                verse.number
-                                                                              ]);
-                                                                            },
-                                                                  onTap:
-                                                                      _isPageSelectionMode
-                                                                          ? null
-                                                                          : () {
-                                                                              if (ref.read(chromeHiddenProvider)) {
-                                                                                ref.read(chromeHiddenProvider.notifier).set(false);
-                                                                              } else {
-                                                                                _toggleVerseSelection(verse.number);
-                                                                              }
-                                                                            },
-                                                                  onLongPressStart:
-                                                                      _isPageSelectionMode
-                                                                          ? null
-                                                                          : (d) => _pendingLongPressPosition =
-                                                                              d.globalPosition,
-                                                                  onLongPress:
-                                                                      _isPageSelectionMode
-                                                                          ? null
-                                                                          : () => _handleVerseLongPress(
-                                                                                _pendingLongPressPosition,
-                                                                                verse.number,
-                                                                                fc.book.name,
-                                                                                fc.chapter.number,
-                                                                                allBooks.indexOf(fc.book) +
-                                                                                    1,
-                                                                              ),
-                                                                  child: Stack(
-                                                                    children: [
-                                                                      AnimatedContainer(
-                                                                        duration:
-                                                                            const Duration(milliseconds: 250),
-                                                                        clipBehavior:
-                                                                            Clip.antiAlias,
-                                                                        padding: const EdgeInsets
-                                                                            .only(
-                                                                            top:
-                                                                                6.0,
-                                                                            bottom:
-                                                                                6.0,
-                                                                            left:
-                                                                                12.0,
-                                                                            right:
-                                                                                12.0),
-                                                                        decoration:
-                                                                            BoxDecoration(
-                                                                          color: isSelected
-                                                                              ? (highlightColor != null ? highlightColor.withValues(alpha: 0.35) : theme.primaryColor.withValues(alpha: 0.15))
-                                                                              : (_navigatedVerseIndex == index ? theme.primaryColor.withValues(alpha: 0.15) : (highlightColor != null ? highlightColor.withValues(alpha: 0.35) : Colors.transparent)),
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(12),
-                                                                          border: (isSelected && highlightColor != null)
-                                                                              ? Border.all(color: theme.primaryColor.withValues(alpha: 0.5), width: 1.5)
-                                                                              : Border.all(color: Colors.transparent, width: 1.5),
-                                                                        ),
-                                                                        child:
-                                                                            verseWidget,
-                                                                      ),
-                                                                    ],
+                                                                  child: Text(
+                                                                    finalHeadingText,
+                                                                    style: theme
+                                                                        .textTheme
+                                                                        .titleSmall
+                                                                        ?.copyWith(
+                                                                      color: theme
+                                                                          .primaryColor,
+                                                                      fontSize:
+                                                                          typography.fontSize *
+                                                                              1.05,
+                                                                      fontFamily:
+                                                                          typography
+                                                                              .fontFamily,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w600,
+                                                                      fontStyle:
+                                                                          FontStyle
+                                                                              .italic,
+                                                                      letterSpacing:
+                                                                          0.1,
+                                                                    ),
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .left,
                                                                   ),
-                                                                );
-                                                              }),
-                                                            ),
-                                                          ],
-                                                        );
-                                                      } // end buildVerseItem
+                                                                ),
+                                                              ],
+                                                              // Check for commentary
+                                                              AnimatedOpacity(
+                                                                duration:
+                                                                    const Duration(
+                                                                        milliseconds:
+                                                                            250),
+                                                                opacity:
+                                                                    (isSelectionMode &&
+                                                                            !isSelected)
+                                                                        ? 0.85
+                                                                        : 1.0,
+                                                                alwaysIncludeSemantics:
+                                                                    true,
+                                                                child: Consumer(
+                                                                    builder:
+                                                                        (context,
+                                                                            itemRef,
+                                                                            _) {
+                                                                  final verseKey =
+                                                                      '${fc.book.name}|${fc.chapter.number}|${verse.number}';
+                                                                  bool
+                                                                      hasCommentary =
+                                                                      versesWithCommentary
+                                                                          .contains(
+                                                                              verseKey);
+                                                                  bool
+                                                                      hasDevotional =
+                                                                      versesWithDevotionals
+                                                                          .contains(
+                                                                              verseKey);
+                                                                  bool
+                                                                      hasStudyNote =
+                                                                      versesWithNotes
+                                                                          .contains(
+                                                                              verseKey);
 
-                                                      final ScrollPhysics
-                                                          basePhysics =
-                                                          const AlwaysScrollableScrollPhysics();
-
-                                                      Widget listWidget;
-                                                      if (_isPageSelectionMode) {
-                                                        if (_selectionVerseKeys
-                                                                .length !=
-                                                            verses.length + 1) {
-                                                          _selectionVerseKeys
-                                                              .clear();
-                                                          _selectionVerseKeys
-                                                              .addAll(List.generate(
-                                                                  verses.length +
-                                                                      1,
-                                                                  (_) =>
-                                                                      GlobalKey()));
-                                                        }
-
-                                                        // Axis-lock: freeze the vertical list while PageView swipes horizontally
-                                                        listWidget =
-                                                            SingleChildScrollView(
-                                                          padding: listPadding,
-                                                          dragStartBehavior:
-                                                              DragStartBehavior
-                                                                  .down,
-                                                          physics: basePhysics,
-                                                          child: SelectionArea(
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .stretch,
-                                                              children:
-                                                                  List.generate(
-                                                                      verses.length +
-                                                                          1,
-                                                                      (index) {
-                                                                return KeyedSubtree(
-                                                                  key: _selectionVerseKeys[
-                                                                      index],
-                                                                  child: Builder(
-                                                                      builder: (ctx) =>
-                                                                          buildVerseItem(
-                                                                              ctx,
-                                                                              index)),
-                                                                );
-                                                              }),
-                                                            ),
-                                                          ),
-                                                        );
-                                                      } else {
-                                                        // Axis-lock: freeze the vertical list while PageView swipes horizontally
-                                                        listWidget =
-                                                            ScrollablePositionedList
-                                                                .builder(
-                                                          itemScrollController:
-                                                              _itemScrollControllers[
-                                                                  pageIndex],
-                                                          itemPositionsListener:
-                                                              _itemPositionsListeners[
-                                                                  pageIndex],
-                                                          initialScrollIndex: (pageIndex ==
-                                                                      _currentPageIndex
-                                                                  ? _navigatedVerseIndex
-                                                                  : null) ??
-                                                              ref
-                                                                  .read(
-                                                                      preferencesProvider)
-                                                                  .getChapterScrollPosition(
+                                                                  final highlights =
+                                                                      itemRef.watch(
+                                                                          highlightsProvider);
+                                                                  final bookmarks =
+                                                                      itemRef.watch(
+                                                                          bookmarksProvider);
+                                                                  final refStr = generateVerseKey(
                                                                       fc.book
                                                                           .abbreviation,
                                                                       fc.chapter
-                                                                          .number) ??
-                                                              0,
-                                                          padding: listPadding,
-                                                          itemCount:
-                                                              verses.length + 1,
-                                                          itemBuilder:
-                                                              buildVerseItem,
-                                                          physics: basePhysics,
-                                                        );
-                                                      }
-                                                      return listWidget;
-                                                    }), // end Builder
-                                                  ), // end ConstrainedBox
-                                                ), // end Center
-                                              ); // end Directionality
+                                                                          .number,
+                                                                      verse
+                                                                          .number);
+                                                                  final isBookmarked =
+                                                                      bookmarks
+                                                                          .contains(
+                                                                              refStr);
+                                                                  final savedColorIndex =
+                                                                      highlights[
+                                                                          refStr];
+                                                                  Color?
+                                                                      highlightColor;
+                                                                  if (savedColorIndex !=
+                                                                          null &&
+                                                                      savedColorIndex >=
+                                                                          0 &&
+                                                                      savedColorIndex <
+                                                                          highlightPalette
+                                                                              .length) {
+                                                                    highlightColor = AppColors.getRenderedHighlightColor(
+                                                                        highlightPalette[
+                                                                            savedColorIndex],
+                                                                        theme
+                                                                            .brightness,
+                                                                        theme
+                                                                            .scaffoldBackgroundColor);
+                                                                  }
+
+                                                                  final verseWidget =
+                                                                      _buildReadingLayoutVerse(
+                                                                    context,
+                                                                    ref,
+                                                                    verse,
+                                                                    secondaryVerseMap[
+                                                                        verse
+                                                                            .number],
+                                                                    allBooks.indexOf(
+                                                                            fc.book) +
+                                                                        1,
+                                                                    fc.chapter
+                                                                        .number,
+                                                                    readSettings
+                                                                        .readingLayout,
+                                                                    theme,
+                                                                    typography,
+                                                                    appThemeMode,
+                                                                    hasCommentary:
+                                                                        hasCommentary,
+                                                                    hasDevotional:
+                                                                        hasDevotional,
+                                                                    hasStudyNote:
+                                                                        hasStudyNote,
+                                                                    onCommentaryTap: () => _showCommentaryBottomSheet(
+                                                                        verse
+                                                                            .number,
+                                                                        verse
+                                                                            .text),
+                                                                    onDevotionalTap:
+                                                                        () async {
+                                                                      HapticFeedback
+                                                                          .selectionClick();
+                                                                      final refStr =
+                                                                          '${fc.book.name} ${fc.chapter.number}:${verse.number}';
+                                                                      final service =
+                                                                          ref.read(
+                                                                              devotionalServiceProvider);
+                                                                      await service
+                                                                          .loadAllStoryRefs();
+                                                                      final story =
+                                                                          service
+                                                                              .storyByKeyVerse[refStr];
+                                                                      if (story !=
+                                                                              null &&
+                                                                          context
+                                                                              .mounted) {
+                                                                        Navigator.of(context)
+                                                                            .push(MaterialPageRoute(
+                                                                          builder: (_) =>
+                                                                              BibleStoryReaderScreen(initialStory: story),
+                                                                        ));
+                                                                      } else {
+                                                                        _showCommentaryBottomSheet(
+                                                                            verse.number,
+                                                                            verse.text);
+                                                                      }
+                                                                    },
+                                                                    onStudyNoteTap: () => _showCommentaryBottomSheet(
+                                                                        verse
+                                                                            .number,
+                                                                        verse
+                                                                            .text),
+                                                                    isBookmarked:
+                                                                        isBookmarked,
+                                                                    isSelectionMode:
+                                                                        _isPageSelectionMode,
+                                                                    dictTokens:
+                                                                        chapterDictMap[
+                                                                            verse.number],
+                                                                    onDictTap:
+                                                                        _isPageSelectionMode
+                                                                            ? null
+                                                                            : _showDictionaryPopover,
+                                                                  );
+
+                                                                  return GestureDetector(
+                                                                    behavior:
+                                                                        HitTestBehavior
+                                                                            .opaque,
+                                                                    onDoubleTap:
+                                                                        _isPageSelectionMode
+                                                                            ? null
+                                                                            : () {
+                                                                                HapticFeedback.lightImpact();
+                                                                                VerseActionLogic.handleBookmark(context, theme, ref, fc.book.name, fc.chapter.number, [
+                                                                                  verse.number
+                                                                                ]);
+                                                                              },
+                                                                    onTap: _isPageSelectionMode
+                                                                        ? null
+                                                                        : () {
+                                                                            if (ref.read(chromeHiddenProvider)) {
+                                                                              ref.read(chromeHiddenProvider.notifier).set(false);
+                                                                            } else {
+                                                                              _toggleVerseSelection(verse.number);
+                                                                            }
+                                                                          },
+                                                                    onLongPressStart: _isPageSelectionMode
+                                                                        ? null
+                                                                        : (d) =>
+                                                                            _pendingLongPressPosition =
+                                                                                d.globalPosition,
+                                                                    onLongPress:
+                                                                        _isPageSelectionMode
+                                                                            ? null
+                                                                            : () =>
+                                                                                _handleVerseLongPress(
+                                                                                  _pendingLongPressPosition,
+                                                                                  verse.number,
+                                                                                  fc.book.name,
+                                                                                  fc.chapter.number,
+                                                                                  allBooks.indexOf(fc.book) + 1,
+                                                                                ),
+                                                                    child:
+                                                                        Stack(
+                                                                      children: [
+                                                                        AnimatedContainer(
+                                                                          duration:
+                                                                              const Duration(milliseconds: 250),
+                                                                          clipBehavior:
+                                                                              Clip.antiAlias,
+                                                                          padding: const EdgeInsets
+                                                                              .only(
+                                                                              top: 6.0,
+                                                                              bottom: 6.0,
+                                                                              left: 12.0,
+                                                                              right: 12.0),
+                                                                          decoration:
+                                                                              BoxDecoration(
+                                                                            color: isSelected
+                                                                                ? (highlightColor != null ? highlightColor.withValues(alpha: 0.35) : theme.primaryColor.withValues(alpha: 0.15))
+                                                                                : (_navigatedVerseIndex == index ? theme.primaryColor.withValues(alpha: 0.15) : (highlightColor != null ? highlightColor.withValues(alpha: 0.35) : Colors.transparent)),
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(12),
+                                                                            border: (isSelected && highlightColor != null)
+                                                                                ? Border.all(color: theme.primaryColor.withValues(alpha: 0.5), width: 1.5)
+                                                                                : Border.all(color: Colors.transparent, width: 1.5),
+                                                                          ),
+                                                                          child:
+                                                                              verseWidget,
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  );
+                                                                }),
+                                                              ),
+                                                            ],
+                                                          );
+                                                        } // end buildVerseItem
+
+                                                        final ScrollPhysics
+                                                            basePhysics =
+                                                            const AlwaysScrollableScrollPhysics();
+
+                                                        Widget listWidget;
+                                                        if (_isPageSelectionMode) {
+                                                          if (_selectionVerseKeys
+                                                                  .length !=
+                                                              verses.length +
+                                                                  1) {
+                                                            _selectionVerseKeys
+                                                                .clear();
+                                                            _selectionVerseKeys
+                                                                .addAll(List.generate(
+                                                                    verses.length +
+                                                                        1,
+                                                                    (_) =>
+                                                                        GlobalKey()));
+                                                          }
+
+                                                          // Axis-lock: freeze the vertical list while PageView swipes horizontally
+                                                          listWidget =
+                                                              SingleChildScrollView(
+                                                            padding:
+                                                                listPadding,
+                                                            dragStartBehavior:
+                                                                DragStartBehavior
+                                                                    .down,
+                                                            physics:
+                                                                basePhysics,
+                                                            child:
+                                                                SelectionArea(
+                                                              child: Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .stretch,
+                                                                children: List
+                                                                    .generate(
+                                                                        verses.length +
+                                                                            1,
+                                                                        (index) {
+                                                                  return KeyedSubtree(
+                                                                    key: _selectionVerseKeys[
+                                                                        index],
+                                                                    child: Builder(
+                                                                        builder: (ctx) => buildVerseItem(
+                                                                            ctx,
+                                                                            index)),
+                                                                  );
+                                                                }),
+                                                              ),
+                                                            ),
+                                                          );
+                                                        } else {
+                                                          // Axis-lock: freeze the vertical list while PageView swipes horizontally
+                                                          listWidget =
+                                                              ScrollablePositionedList
+                                                                  .builder(
+                                                            itemScrollController:
+                                                                _itemScrollControllers[
+                                                                    pageIndex],
+                                                            itemPositionsListener:
+                                                                _itemPositionsListeners[
+                                                                    pageIndex],
+                                                            initialScrollIndex: (pageIndex ==
+                                                                        _currentPageIndex
+                                                                    ? _navigatedVerseIndex
+                                                                    : null) ??
+                                                                ref
+                                                                    .read(
+                                                                        preferencesProvider)
+                                                                    .getChapterScrollPosition(
+                                                                        fc.book
+                                                                            .abbreviation,
+                                                                        fc.chapter
+                                                                            .number) ??
+                                                                0,
+                                                            padding:
+                                                                listPadding,
+                                                            itemCount:
+                                                                verses.length +
+                                                                    1,
+                                                            itemBuilder:
+                                                                buildVerseItem,
+                                                            physics:
+                                                                basePhysics,
+                                                          );
+                                                        }
+                                                        return listWidget;
+                                                      }), // end Builder
+                                                    ), // end ConstrainedBox
+                                                  ), // end Center
+                                                ); // end Directionality
                                               }), // end outer Builder
                                             ), // end NotificationListener
                                           ), // end GestureDetector
@@ -1813,10 +1908,13 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       void Function(String word)? onDictTap}) {
     final activeTrans = ref.read(activeTranslationProvider);
     final secondaryTrans = ref.read(secondaryTranslationProvider);
-    final showStrongs = ref.watch(readSettingsProvider.select((s) => s.showStrongsNumbers));
-    final strongsStyle = ref.watch(readSettingsProvider.select((s) => s.strongsIndicatorStyle));
+    final showStrongs =
+        ref.watch(readSettingsProvider.select((s) => s.showStrongsNumbers));
+    final strongsStyle =
+        ref.watch(readSettingsProvider.select((s) => s.strongsIndicatorStyle));
 
-    final primary = _buildNormalVerse(context, 
+    final primary = _buildNormalVerse(
+      context,
       primaryVerse,
       theme,
       typography,
@@ -1832,7 +1930,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       translationId: activeTrans,
       bookNumber: bookNumber,
       chapterNumber: chapterNumber,
-      showStrongsNumbers: showStrongs, strongsIndicatorStyle: strongsStyle,
+      showStrongsNumbers: showStrongs,
+      strongsIndicatorStyle: strongsStyle,
       dictTokens: dictTokens,
       onDictTap: onDictTap,
     );
@@ -1850,7 +1949,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         fontSize: typography.fontSize * 0.95,
       );
 
-      final secondary = _buildNormalVerse(context, 
+      final secondary = _buildNormalVerse(
+        context,
         secondaryVerse,
         theme,
         secondaryTypography,
@@ -1863,7 +1963,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         translationId: secondaryTrans,
         bookNumber: bookNumber,
         chapterNumber: chapterNumber,
-        showStrongsNumbers: showStrongs, strongsIndicatorStyle: strongsStyle,
+        showStrongsNumbers: showStrongs,
+        strongsIndicatorStyle: strongsStyle,
       );
 
       return Column(
@@ -1893,7 +1994,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         fontSize: typography.fontSize * 0.95,
       );
 
-      final secondary = _buildNormalVerse(context, 
+      final secondary = _buildNormalVerse(
+        context,
         secondaryVerse,
         theme,
         secondaryTypography,
@@ -1906,7 +2008,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         translationId: secondaryTrans,
         bookNumber: bookNumber,
         chapterNumber: chapterNumber,
-        showStrongsNumbers: showStrongs, strongsIndicatorStyle: strongsStyle,
+        showStrongsNumbers: showStrongs,
+        strongsIndicatorStyle: strongsStyle,
       );
 
       return Row(
@@ -1977,20 +2080,22 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         activeTranslationWidget = verseAsync.when(
           data: (verse) {
             if (verse == null) return const SizedBox.shrink();
-            return _buildNormalVerse(context, 
+            return _buildNormalVerse(
+              context,
               verse,
               theme,
               secondaryTypography,
               appThemeMode,
               hasCommentary: false,
               isBookmarked: false,
-                    overrideColor: secondaryColor,
+              overrideColor: secondaryColor,
               hideVerseNumber: true,
               isSelectionMode: isSelectionMode,
               translationId: activeChipId,
               bookNumber: bookNumber,
               chapterNumber: chapterNumber,
-              showStrongsNumbers: showStrongs, strongsIndicatorStyle: strongsStyle,
+              showStrongsNumbers: showStrongs,
+              strongsIndicatorStyle: strongsStyle,
             );
           },
           loading: () => Padding(
@@ -2136,8 +2241,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     return primary;
   }
 
-  Widget _buildNormalVerse(BuildContext context, BibleVerse verse, ThemeData theme,
-      TypographyState typography, AppThemeMode appThemeMode,
+  Widget _buildNormalVerse(BuildContext context, BibleVerse verse,
+      ThemeData theme, TypographyState typography, AppThemeMode appThemeMode,
       {bool hasCommentary = false,
       bool hasDevotional = false,
       bool hasStudyNote = false,
@@ -2151,7 +2256,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       String? translationId,
       int? bookNumber,
       int? chapterNumber,
-      bool showStrongsNumbers = false, StrongsIndicatorStyle strongsIndicatorStyle = StrongsIndicatorStyle.asterisk,
+      bool showStrongsNumbers = false,
+      StrongsIndicatorStyle strongsIndicatorStyle =
+          StrongsIndicatorStyle.asterisk,
       Set<int>? dictTokens,
       void Function(String word)? onDictTap}) {
     final tokens = theme.extension<ReadingTokens>();
@@ -2200,17 +2307,17 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
     final redLetterStyle = fontStyle.copyWith(color: redLetterColor);
     List<InlineSpan> textSpans = [];
-    
+
     String text = verse.text;
-    
+
     // If not showing strongs, simply strip the tags
     if (!showStrongsNumbers) {
       text = text.replaceAll(RegExp(r'\[[HG]\d+\]'), '');
     }
-    
+
     int currentIndex = 0;
     int globalTokenIndex = 0;
-    
+
     final String verseKey = '${bookNumber}_${chapterNumber}_${verse.number}';
     final List<TapGestureRecognizer> localRecognizers = [];
 
@@ -2222,24 +2329,26 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         return;
       }
 
-      final regex = showStrongsNumbers 
+      final regex = showStrongsNumbers
           ? RegExp(r'\[[HG]\d+\]|[a-zA-Z]+')
           : RegExp(r'[a-zA-Z]+');
       final matches = regex.allMatches(chunk);
       int lastMatchEnd = 0;
-      
+
       for (final match in matches) {
         if (match.start > lastMatchEnd) {
-          textSpans.add(TextSpan(text: chunk.substring(lastMatchEnd, match.start), style: style));
+          textSpans.add(TextSpan(
+              text: chunk.substring(lastMatchEnd, match.start), style: style));
         }
-        
+
         final word = match.group(0)!;
-        
+
         if (word.startsWith('[') && word.endsWith(']')) {
           final strongsId = word.substring(1, word.length - 1);
-          final tapGesture = TapGestureRecognizer()..onTap = () {
-            showStrongsEntrySheet(context, strongsId);
-          };
+          final tapGesture = TapGestureRecognizer()
+            ..onTap = () {
+              showStrongsEntrySheet(context, strongsId);
+            };
           localRecognizers.add(tapGesture);
 
           InlineSpan strongsSpan;
@@ -2281,13 +2390,14 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           textSpans.add(strongsSpan);
         } else {
           final isUnderlined = dictTokens?.contains(globalTokenIndex) ?? false;
-          
+
           if (isUnderlined) {
-            final tapGesture = TapGestureRecognizer()..onTap = () {
-              onDictTap?.call(word.toLowerCase());
-            };
+            final tapGesture = TapGestureRecognizer()
+              ..onTap = () {
+                onDictTap?.call(word.toLowerCase());
+              };
             localRecognizers.add(tapGesture);
-            
+
             textSpans.add(TextSpan(
               text: word,
               style: style.copyWith(
@@ -2302,12 +2412,13 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           }
           globalTokenIndex++;
         }
-        
+
         lastMatchEnd = match.end;
       }
-      
+
       if (lastMatchEnd < chunk.length) {
-        textSpans.add(TextSpan(text: chunk.substring(lastMatchEnd), style: style));
+        textSpans
+            .add(TextSpan(text: chunk.substring(lastMatchEnd), style: style));
       }
     }
 
@@ -2788,10 +2899,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   }
 }
 
-
 class VerseActionLogic {
   static void _showFeedback(
-      BuildContext context, ThemeData theme, String message, {IconData? icon}) {
+      BuildContext context, ThemeData theme, String message,
+      {IconData? icon}) {
     DynamicToast.show(context, message, icon: icon);
   }
 
@@ -2965,7 +3076,9 @@ class VerseActionLogic {
         isRemoving
             ? '$count Highlight(s) removed'
             : '$count verse(s) highlighted',
-        icon: isRemoving ? Icons.format_paint_outlined : Icons.format_paint_rounded);
+        icon: isRemoving
+            ? Icons.format_paint_outlined
+            : Icons.format_paint_rounded);
   }
 
   static void handleBookmark(
@@ -2992,7 +3105,9 @@ class VerseActionLogic {
         isAllBookmarked
             ? '${targetVerses.length} verse(s) removed from bookmarks'
             : '${targetVerses.length} verse(s) bookmarked!',
-        icon: isAllBookmarked ? Icons.bookmark_outline_rounded : Icons.bookmark_rounded);
+        icon: isAllBookmarked
+            ? Icons.bookmark_outline_rounded
+            : Icons.bookmark_rounded);
   }
 
   static Future<void> handleNote(

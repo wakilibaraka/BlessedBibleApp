@@ -398,15 +398,20 @@ class TranslationDownloader {
             if (itemMap['type'] == 'verse') {
               final verseNum = itemMap['number'] as int;
               final verseContent = itemMap['content'] as List<dynamic>;
-              final rawText = verseContent.map((e) {
-                if (e is String) return e;
-                if (e is Map) {
-                  if (e['text'] != null) return e['text'].toString();
-                  if (e['content'] != null && e['content'] is String) return e['content'].toString();
-                }
-                return '';
-              }).where((s) => s.isNotEmpty).join(' ');
-              
+              final rawText = verseContent
+                  .map((e) {
+                    if (e is String) return e;
+                    if (e is Map) {
+                      if (e['text'] != null) return e['text'].toString();
+                      if (e['content'] != null && e['content'] is String) {
+                        return e['content'].toString();
+                      }
+                    }
+                    return '';
+                  })
+                  .where((s) => s.isNotEmpty)
+                  .join(' ');
+
               final text = rawText
                   .replaceAll(' ,', ',')
                   .replaceAll(' .', '.')

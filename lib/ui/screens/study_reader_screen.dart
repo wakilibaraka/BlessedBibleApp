@@ -44,7 +44,7 @@ class StudySessionPayload {
   final String? planId;
   final int? dayNum;
   final int? initialPassageIndex;
-  
+
   // Deep dive fields
   final String? deepDiveBook;
   final int? deepDiveChapter;
@@ -55,21 +55,21 @@ class StudySessionPayload {
     required this.planId,
     required this.dayNum,
     this.initialPassageIndex = 0,
-  }) : mode = StudyMode.plan,
-       deepDiveBook = null,
-       deepDiveChapter = null,
-       deepDiveVerse = null,
-       deepDiveVerseText = null;
-       
+  })  : mode = StudyMode.plan,
+        deepDiveBook = null,
+        deepDiveChapter = null,
+        deepDiveVerse = null,
+        deepDiveVerseText = null;
+
   const StudySessionPayload.deepDive({
     required this.deepDiveBook,
     required this.deepDiveChapter,
     required this.deepDiveVerse,
     required this.deepDiveVerseText,
-  }) : mode = StudyMode.deepDive,
-       planId = null,
-       dayNum = null,
-       initialPassageIndex = null;
+  })  : mode = StudyMode.deepDive,
+        planId = null,
+        dayNum = null,
+        initialPassageIndex = null;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -120,7 +120,8 @@ class _ParsedRef {
 
 List<_ParsedRef> _parseRef(String ref) {
   // Matches: Book C, Book C:V, Book C:V-V, Book C:V-C:V, Book C-C
-  final re = RegExp(r'^([\d\sA-Za-z]+)\s+(\d+)(?::(\d+))?(?:\s*-\s*(\d+)?(?::(\d+))?)?$');
+  final re = RegExp(
+      r'^([\d\sA-Za-z]+)\s+(\d+)(?::(\d+))?(?:\s*-\s*(\d+)?(?::(\d+))?)?$');
   final m = re.firstMatch(ref.trim());
   if (m == null) return [];
 
@@ -136,7 +137,10 @@ List<_ParsedRef> _parseRef(String ref) {
   if (endC1 != null && endC2 != null) {
     endC = endC1;
     endV = endC2;
-  } else if (endC1 != null && endC2 == null && startV != null && ref.contains(':')) {
+  } else if (endC1 != null &&
+      endC2 == null &&
+      startV != null &&
+      ref.contains(':')) {
     endC = startC;
     endV = endC1;
   } else if (endC1 != null && endC2 == null) {
@@ -205,24 +209,25 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
     if (widget.payload.mode == StudyMode.deepDive) {
       final bName = widget.payload.deepDiveBook!;
       final cNum = widget.payload.deepDiveChapter!;
-      
+
       BibleBook? book;
       try {
-        book = flatChapters.map((fc) => fc.book).firstWhere(
-            (b) => b.name.toLowerCase() == bName.toLowerCase());
+        book = flatChapters
+            .map((fc) => fc.book)
+            .firstWhere((b) => b.name.toLowerCase() == bName.toLowerCase());
       } catch (_) {
         try {
-          book = flatChapters.map((fc) => fc.book).firstWhere((b) =>
-              b.name.toLowerCase().startsWith(bName.toLowerCase()));
+          book = flatChapters.map((fc) => fc.book).firstWhere(
+              (b) => b.name.toLowerCase().startsWith(bName.toLowerCase()));
         } catch (_) {
           return;
         }
       }
-      
+
       final chapIdx = cNum - 1;
       if (chapIdx < 0 || chapIdx >= book.chapters.length) return;
       final chapter = book.chapters[chapIdx];
-      
+
       resolved.add(_PassageData(
         label: '$bName $cNum',
         book: book,
@@ -231,7 +236,8 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
       ));
     } else {
       final planState = ref.read(readingPlanProvider(widget.payload.planId!));
-      if (planState.planData.isEmpty || widget.payload.dayNum! > planState.planData.length) {
+      if (planState.planData.isEmpty ||
+          widget.payload.dayNum! > planState.planData.length) {
         return;
       }
       final dayData = planState.planData[widget.payload.dayNum! - 1];
@@ -241,40 +247,42 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
           final parsedList = _parseRef(refStr);
           for (final parsed in parsedList) {
             BibleBook? book;
-        try {
-          book = flatChapters.map((fc) => fc.book).firstWhere(
-              (b) => b.name.toLowerCase() == parsed.bookName.toLowerCase());
-        } catch (_) {
-          try {
-            book = flatChapters.map((fc) => fc.book).firstWhere((b) =>
-                b.name.toLowerCase().startsWith(parsed.bookName.toLowerCase()));
-          } catch (_) {
-            continue;
-          }
-        }
+            try {
+              book = flatChapters.map((fc) => fc.book).firstWhere(
+                  (b) => b.name.toLowerCase() == parsed.bookName.toLowerCase());
+            } catch (_) {
+              try {
+                book = flatChapters.map((fc) => fc.book).firstWhere((b) => b
+                    .name
+                    .toLowerCase()
+                    .startsWith(parsed.bookName.toLowerCase()));
+              } catch (_) {
+                continue;
+              }
+            }
 
-        final chapIdx = parsed.chapter - 1;
-        if (chapIdx < 0 || chapIdx >= book.chapters.length) continue;
-        final chapter = book.chapters[chapIdx];
+            final chapIdx = parsed.chapter - 1;
+            if (chapIdx < 0 || chapIdx >= book.chapters.length) continue;
+            final chapter = book.chapters[chapIdx];
 
-        String label;
-        if (parsed.startVerse != null && parsed.endVerse != null) {
-          label =
-              '${book.name} ${parsed.chapter}:${parsed.startVerse}–${parsed.endVerse}';
-        } else if (parsed.startVerse != null) {
-          label = '${book.name} ${parsed.chapter}:${parsed.startVerse}';
-        } else {
-          label = '${book.name} ${parsed.chapter}';
-        }
+            String label;
+            if (parsed.startVerse != null && parsed.endVerse != null) {
+              label =
+                  '${book.name} ${parsed.chapter}:${parsed.startVerse}–${parsed.endVerse}';
+            } else if (parsed.startVerse != null) {
+              label = '${book.name} ${parsed.chapter}:${parsed.startVerse}';
+            } else {
+              label = '${book.name} ${parsed.chapter}';
+            }
 
-        resolved.add(_PassageData(
-          label: label,
-          book: book,
-          chapter: chapter,
-          chapterNum: parsed.chapter,
-          startVerse: parsed.startVerse,
-          endVerse: parsed.endVerse,
-        ));
+            resolved.add(_PassageData(
+              label: label,
+              book: book,
+              chapter: chapter,
+              chapterNum: parsed.chapter,
+              startVerse: parsed.startVerse,
+              endVerse: parsed.endVerse,
+            ));
           }
         }
       }
@@ -331,8 +339,6 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
 
   void _clearSelection() => setState(() => _selectedVerses.clear());
 
-
-
   void _showCommentary(
       int verseNum, String verseText, String bookName, int chapterNum) {
     showCommentaryBottomSheet(
@@ -353,9 +359,10 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
     final surfaceStyle = ref.watch(surfaceStyleProvider);
     ref.watch(pericopesProvider);
     final pericopesNotifier = ref.read(pericopesProvider.notifier);
-    
+
     final isDone = widget.payload.mode == StudyMode.plan
-        ? ref.watch(readingPlanProvider(widget.payload.planId!))
+        ? ref
+            .watch(readingPlanProvider(widget.payload.planId!))
             .completedReadings
             .contains(widget.payload.dayNum)
         : false;
@@ -649,9 +656,12 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                                     theme.scaffoldBackgroundColor);
                           }
 
-                          final activeTransId = ref.watch(activeTranslationProvider);
-                          final chapterPericopes = pericopesNotifier.getPericopesForChapter(
-                              passage.book.name, passage.chapterNum, translationId: activeTransId);
+                          final activeTransId =
+                              ref.watch(activeTranslationProvider);
+                          final chapterPericopes =
+                              pericopesNotifier.getPericopesForChapter(
+                                  passage.book.name, passage.chapterNum,
+                                  translationId: activeTransId);
                           PericopeEntry? pericopeHeading;
                           for (final p in chapterPericopes) {
                             if (p.startVerse == verse.number) {
@@ -663,20 +673,24 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                           final finalHeadingText = pericopeHeading?.title;
 
                           Widget? topCommentary;
-                          if (i == 0 && widget.payload.mode == StudyMode.deepDive) {
+                          if (i == 0 &&
+                              widget.payload.mode == StudyMode.deepDive) {
                             topCommentary = Container(
-                              margin: const EdgeInsets.only(bottom: 24.0, top: 8.0),
+                              margin:
+                                  const EdgeInsets.only(bottom: 24.0, top: 8.0),
                               padding: const EdgeInsets.all(16.0),
                               decoration: BoxDecoration(
                                 color: gold.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(16),
-                                border: Border.all(color: gold.withValues(alpha: 0.3)),
+                                border: Border.all(
+                                    color: gold.withValues(alpha: 0.3)),
                               ),
                               child: CommentaryView(
                                 book: widget.payload.deepDiveBook!,
                                 chapter: widget.payload.deepDiveChapter!,
                                 verse: widget.payload.deepDiveVerse,
-                                verseText: widget.payload.deepDiveVerseText ?? '',
+                                verseText:
+                                    widget.payload.deepDiveVerseText ?? '',
                               ),
                             );
                           }
@@ -685,12 +699,14 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               if (topCommentary != null) topCommentary,
-                              if (finalHeadingText != null && finalHeadingText.isNotEmpty) ...[
+                              if (finalHeadingText != null &&
+                                  finalHeadingText.isNotEmpty) ...[
                                 Padding(
                                   padding: const EdgeInsets.only(
                                     top: 16.0,
                                     bottom: 8.0,
-                                    left: 4.0, // Indent less than main reader since passage is padded
+                                    left:
+                                        4.0, // Indent less than main reader since passage is padded
                                     right: 4.0,
                                   ),
                                   child: Text(
@@ -708,116 +724,124 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                                 ),
                               ],
                               GestureDetector(
-                            onTap: () => _toggleVerseSelection(verse.number),
-                            onDoubleTap: () {
-                              HapticFeedback.lightImpact();
-                              VerseActionLogic.handleBookmark(
-                                  context,
-                                  theme,
-                                  ref,
-                                  passage.book.name,
-                                  passage.chapterNum,
-                                  [verse.number]);
-                            },
-                            onLongPress: () {
-                              HapticFeedback.mediumImpact();
-                              showModalBottomSheet(
-                                context: context,
-                                backgroundColor: Colors.transparent,
-                                useRootNavigator: true,
-                                builder: (ctx) => VerseContextMenuSheet(
-                                  verseNumber: verse.number,
-                                  bookName: passage.book.name,
-                                  chapterNum: passage.chapterNum,
-                                  bookNumber: ref.read(bibleProvider).books.indexOf(passage.book) + 1,
-                                  onCustomSelection: () {},
-                                ),
-                              );
-                            },
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 7),
-                              margin: const EdgeInsets.only(bottom: 2),
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? (highlightColor != null
-                                        ? highlightColor.withValues(alpha: 0.4)
-                                        : theme.primaryColor
-                                            .withValues(alpha: 0.15))
-                                    : (highlightColor != null
-                                        ? highlightColor.withValues(alpha: 0.3)
-                                        : Colors.transparent),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Builder(builder: (ctx) {
-                                final fontStyle = TextStyle(
-                                  fontFamily: typography.fontFamily,
-                                  fontStyle: typography.fontStyle,
-                                  fontSize: typography.fontSize,
-                                  height: typography.lineHeight,
-                                  letterSpacing: 0.15,
-                                  color: theme.textTheme.bodyLarge?.color,
-                                  decoration: isBookmarked
-                                      ? TextDecoration.underline
-                                      : null,
-                                  decorationColor:
-                                      isBookmarked ? theme.primaryColor : null,
-                                  decorationThickness: 2.0,
-                                );
-
-                                final List<TextSpan> spans = [];
-                                final redStyle =
-                                    fontStyle.copyWith(color: redLetterColor);
-                                String text = verse.text;
-                                int cur = 0;
-                                while (cur < text.length) {
-                                  final s = text.indexOf('‹', cur);
-                                  if (s == -1) {
-                                    spans.add(TextSpan(
-                                        text: text.substring(cur),
-                                        style: fontStyle));
-                                    break;
-                                  }
-                                  if (s > cur) {
-                                    spans.add(TextSpan(
-                                        text: text.substring(cur, s),
-                                        style: fontStyle));
-                                  }
-                                  final e = text.indexOf('›', s + 1);
-                                  if (e == -1) {
-                                    spans.add(TextSpan(
-                                        text: text.substring(s + 1),
-                                        style: redStyle));
-                                    break;
-                                  }
-                                  spans.add(TextSpan(
-                                      text: text.substring(s + 1, e),
-                                      style: redStyle));
-                                  cur = e + 1;
-                                }
-
-                                return RichText(
-                                  text: TextSpan(
-                                    style: fontStyle,
-                                    children: [
-                                      TextSpan(
-                                          text: '${verse.number}  ',
-                                          style: fontStyle.copyWith(
-                                            color: theme.primaryColor,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize:
-                                                typography.fontSize * 0.75,
-                                          ),
-                                        ),
-                                      ...spans,
-                                    ],
+                                onTap: () =>
+                                    _toggleVerseSelection(verse.number),
+                                onDoubleTap: () {
+                                  HapticFeedback.lightImpact();
+                                  VerseActionLogic.handleBookmark(
+                                      context,
+                                      theme,
+                                      ref,
+                                      passage.book.name,
+                                      passage.chapterNum,
+                                      [verse.number]);
+                                },
+                                onLongPress: () {
+                                  HapticFeedback.mediumImpact();
+                                  showModalBottomSheet(
+                                    context: context,
+                                    backgroundColor: Colors.transparent,
+                                    useRootNavigator: true,
+                                    builder: (ctx) => VerseContextMenuSheet(
+                                      verseNumber: verse.number,
+                                      bookName: passage.book.name,
+                                      chapterNum: passage.chapterNum,
+                                      bookNumber: ref
+                                              .read(bibleProvider)
+                                              .books
+                                              .indexOf(passage.book) +
+                                          1,
+                                      onCustomSelection: () {},
+                                    ),
+                                  );
+                                },
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 7),
+                                  margin: const EdgeInsets.only(bottom: 2),
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? (highlightColor != null
+                                            ? highlightColor.withValues(
+                                                alpha: 0.4)
+                                            : theme.primaryColor
+                                                .withValues(alpha: 0.15))
+                                        : (highlightColor != null
+                                            ? highlightColor.withValues(
+                                                alpha: 0.3)
+                                            : Colors.transparent),
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
-                                );
-                              }),
-                            ),
-                          ),
-                          ],
+                                  child: Builder(builder: (ctx) {
+                                    final fontStyle = TextStyle(
+                                      fontFamily: typography.fontFamily,
+                                      fontStyle: typography.fontStyle,
+                                      fontSize: typography.fontSize,
+                                      height: typography.lineHeight,
+                                      letterSpacing: 0.15,
+                                      color: theme.textTheme.bodyLarge?.color,
+                                      decoration: isBookmarked
+                                          ? TextDecoration.underline
+                                          : null,
+                                      decorationColor: isBookmarked
+                                          ? theme.primaryColor
+                                          : null,
+                                      decorationThickness: 2.0,
+                                    );
+
+                                    final List<TextSpan> spans = [];
+                                    final redStyle = fontStyle.copyWith(
+                                        color: redLetterColor);
+                                    String text = verse.text;
+                                    int cur = 0;
+                                    while (cur < text.length) {
+                                      final s = text.indexOf('‹', cur);
+                                      if (s == -1) {
+                                        spans.add(TextSpan(
+                                            text: text.substring(cur),
+                                            style: fontStyle));
+                                        break;
+                                      }
+                                      if (s > cur) {
+                                        spans.add(TextSpan(
+                                            text: text.substring(cur, s),
+                                            style: fontStyle));
+                                      }
+                                      final e = text.indexOf('›', s + 1);
+                                      if (e == -1) {
+                                        spans.add(TextSpan(
+                                            text: text.substring(s + 1),
+                                            style: redStyle));
+                                        break;
+                                      }
+                                      spans.add(TextSpan(
+                                          text: text.substring(s + 1, e),
+                                          style: redStyle));
+                                      cur = e + 1;
+                                    }
+
+                                    return RichText(
+                                      text: TextSpan(
+                                        style: fontStyle,
+                                        children: [
+                                          TextSpan(
+                                            text: '${verse.number}  ',
+                                            style: fontStyle.copyWith(
+                                              color: theme.primaryColor,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize:
+                                                  typography.fontSize * 0.75,
+                                            ),
+                                          ),
+                                          ...spans,
+                                        ],
+                                      ),
+                                    );
+                                  }),
+                                ),
+                              ),
+                            ],
                           );
                         },
                       ),
@@ -937,63 +961,63 @@ class _VerseActionBar extends ConsumerWidget {
           fit: BoxFit.scaleDown,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Text('${selectedVerses.length} selected',
-                  style: theme.textTheme.labelMedium),
-            ),
-            // Highlight — opens color palette sheet
-            GestureDetector(
-              onLongPress: onHighlightLongPress,
-              child: IconButton(
-                tooltip: 'Highlight',
-                icon: Icon(Icons.highlight_rounded, color: gold),
-                onPressed: onHighlight,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Text('${selectedVerses.length} selected',
+                    style: theme.textTheme.labelMedium),
               ),
-            ),
-            // Bookmark
-            IconButton(
-              tooltip: 'Bookmark',
-              icon: Icon(Icons.bookmark_rounded, color: gold),
-              onPressed: () {
-                VerseActionLogic.handleBookmark(
-                    context, theme, ref, bookName, chapterNum, selectedVerses);
-                onDismiss();
-              },
-            ),
-            // Note
-            IconButton(
-              tooltip: 'Add Note',
-              icon: Icon(Icons.note_add_rounded, color: gold),
-              onPressed: () async {
-                await VerseActionLogic.handleNote(
-                    context, ref, theme, bookName, chapterNum, selectedVerses);
-                onDismiss();
-              },
-            ),
-            // Commentary (first selected verse)
-            IconButton(
-              tooltip: 'Commentary',
-              icon: Icon(Icons.star_rounded, color: gold),
-              onPressed: () => onCommentary(selectedVerses.first),
-            ),
-            // Share
-            IconButton(
-              tooltip: 'Share',
-              icon: Icon(Icons.share_rounded, color: gold),
-              onPressed: () async {
-                await VerseActionLogic.handleShare(
-                    context, ref, bookName, chapterNum, selectedVerses);
-                onDismiss();
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.close_rounded, size: 20),
-              onPressed: onDismiss,
-            ),
-          ],
-        ),
+              // Highlight — opens color palette sheet
+              GestureDetector(
+                onLongPress: onHighlightLongPress,
+                child: IconButton(
+                  tooltip: 'Highlight',
+                  icon: Icon(Icons.highlight_rounded, color: gold),
+                  onPressed: onHighlight,
+                ),
+              ),
+              // Bookmark
+              IconButton(
+                tooltip: 'Bookmark',
+                icon: Icon(Icons.bookmark_rounded, color: gold),
+                onPressed: () {
+                  VerseActionLogic.handleBookmark(context, theme, ref, bookName,
+                      chapterNum, selectedVerses);
+                  onDismiss();
+                },
+              ),
+              // Note
+              IconButton(
+                tooltip: 'Add Note',
+                icon: Icon(Icons.note_add_rounded, color: gold),
+                onPressed: () async {
+                  await VerseActionLogic.handleNote(context, ref, theme,
+                      bookName, chapterNum, selectedVerses);
+                  onDismiss();
+                },
+              ),
+              // Commentary (first selected verse)
+              IconButton(
+                tooltip: 'Commentary',
+                icon: Icon(Icons.star_rounded, color: gold),
+                onPressed: () => onCommentary(selectedVerses.first),
+              ),
+              // Share
+              IconButton(
+                tooltip: 'Share',
+                icon: Icon(Icons.share_rounded, color: gold),
+                onPressed: () async {
+                  await VerseActionLogic.handleShare(
+                      context, ref, bookName, chapterNum, selectedVerses);
+                  onDismiss();
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.close_rounded, size: 20),
+                onPressed: onDismiss,
+              ),
+            ],
+          ),
         ),
       ),
     );

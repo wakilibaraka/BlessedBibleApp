@@ -23,8 +23,7 @@ void main() {
         preferencesProvider.overrideWithValue(PreferencesService(prefs)),
       ],
     );
-    final start =
-        DateTime.now().subtract(const Duration(days: 9));
+    final start = DateTime.now().subtract(const Duration(days: 9));
     container.read(preferencesProvider).saveReadingPlanState(
       'chronological_1yr',
       {

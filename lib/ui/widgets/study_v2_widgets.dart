@@ -49,8 +49,7 @@ class V2PageShell extends StatelessWidget {
 class V2PillTabs extends StatelessWidget {
   final TabController controller;
   final List<String> tabs;
-  const V2PillTabs(
-      {super.key, required this.controller, required this.tabs});
+  const V2PillTabs({super.key, required this.controller, required this.tabs});
 
   @override
   Widget build(BuildContext context) {
@@ -280,9 +279,7 @@ class _RingPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_RingPainter old) =>
-      old.fraction != fraction ||
-      old.track != track ||
-      old.accent != accent;
+      old.fraction != fraction || old.track != track || old.accent != accent;
 }
 
 /// Accent pill badge, e.g. "42%" / "SCHEDULED" / "2 BEHIND".
@@ -351,8 +348,7 @@ class V2ProgressBar extends StatelessWidget {
       child: LinearProgressIndicator(
         value: fraction.clamp(0.0, 1.0),
         minHeight: 8,
-        backgroundColor:
-            theme.colorScheme.onSurface.withValues(alpha: 0.08),
+        backgroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.08),
         valueColor: AlwaysStoppedAnimation(theme.primaryColor),
       ),
     );

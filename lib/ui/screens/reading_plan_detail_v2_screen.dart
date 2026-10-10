@@ -58,9 +58,7 @@ class _ReadingPlanDetailV2ScreenState
       if (p.id == widget.planId) return p.title;
     }
     try {
-      final custom = ref
-          .read(preferencesProvider)
-          .getCustomPlan(widget.planId);
+      final custom = ref.read(preferencesProvider).getCustomPlan(widget.planId);
       final t = custom?['title'] as String?;
       if (t != null && t.isNotEmpty) return t;
     } catch (_) {}
@@ -125,9 +123,7 @@ class _ReadingPlanDetailV2ScreenState
         moved++;
       }
     }
-    ref
-        .read(readingPlanProvider(widget.planId).notifier)
-        .setStartDate(shifted);
+    ref.read(readingPlanProvider(widget.planId).notifier).setStartDate(shifted);
     if (!mounted) return;
     HapticFeedback.mediumImpact();
     ScaffoldMessenger.of(context).showSnackBar(
@@ -143,8 +139,7 @@ class _ReadingPlanDetailV2ScreenState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final plan = ref.watch(readingPlanProvider(widget.planId));
-    final notifier =
-        ref.read(readingPlanProvider(widget.planId).notifier);
+    final notifier = ref.read(readingPlanProvider(widget.planId).notifier);
     final appThemeMode = ref.watch(themeProvider);
 
     if (plan.isLoading) {
@@ -153,8 +148,7 @@ class _ReadingPlanDetailV2ScreenState
         page: Scaffold(
           backgroundColor: Colors.transparent,
           appBar: const SharedAppBar(title: Text('Plan')),
-          body:
-              const Center(child: CircularProgressIndicator()),
+          body: const Center(child: CircularProgressIndicator()),
         ),
       );
     }
@@ -178,8 +172,8 @@ class _ReadingPlanDetailV2ScreenState
                   ),
                   const SizedBox(height: 16),
                   FilledButton.tonal(
-                    onPressed: () => ref.invalidate(
-                        readingPlanProvider(widget.planId)),
+                    onPressed: () =>
+                        ref.invalidate(readingPlanProvider(widget.planId)),
                     child: const Text('Retry'),
                   ),
                 ],
@@ -201,82 +195,82 @@ class _ReadingPlanDetailV2ScreenState
           backgroundColor: Colors.transparent,
           appBar: const SharedAppBar(title: Text('Plan')),
           body: SafeArea(
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 60),
-            children: [
-              Text(_title(),
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  )),
-              const SizedBox(height: 4),
-              Text(
-                total == 0
-                    ? 'This plan has no readings yet.'
-                    : '$total reading days · ~${(total / 7).ceil()} weeks',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 60),
+              children: [
+                Text(_title(),
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    )),
+                const SizedBox(height: 4),
+                Text(
+                  total == 0
+                      ? 'This plan has no readings yet.'
+                      : '$total reading days · ~${(total / 7).ceil()} weeks',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 14),
-              V2Card(
-                featured: true,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const V2Eyebrow('Begin plan'),
-                    const SizedBox(height: 8),
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: const Icon(Icons.calendar_month_rounded),
-                      title: const Text('Start date'),
-                      subtitle: Text(
-                          '${start.year}-${start.month.toString().padLeft(2, '0')}-${start.day.toString().padLeft(2, '0')}'),
-                      trailing: const Icon(Icons.chevron_right_rounded),
-                      onTap: () async {
-                        final picked = await showDatePicker(
-                          context: context,
-                          initialDate: start,
-                          firstDate: DateTime.now().subtract(
-                              const Duration(days: 365)),
-                          lastDate: DateTime.now()
-                              .add(const Duration(days: 365)),
-                        );
-                        if (picked != null) {
-                          setState(() => _pendingStartDate = picked);
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      width: double.infinity,
-                      child: FilledButton(
-                        onPressed: total == 0
-                            ? null
-                            : () {
-                                notifier.startPlan(
-                                  planId: widget.planId,
-                                  paceMode: 'scheduled',
-                                  startDate: start,
-                                );
-                                HapticFeedback.mediumImpact();
-                              },
-                        child: const Text('Start Day 1 →'),
+                const SizedBox(height: 14),
+                V2Card(
+                  featured: true,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const V2Eyebrow('Begin plan'),
+                      const SizedBox(height: 8),
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: const Icon(Icons.calendar_month_rounded),
+                        title: const Text('Start date'),
+                        subtitle: Text(
+                            '${start.year}-${start.month.toString().padLeft(2, '0')}-${start.day.toString().padLeft(2, '0')}'),
+                        trailing: const Icon(Icons.chevron_right_rounded),
+                        onTap: () async {
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: start,
+                            firstDate: DateTime.now()
+                                .subtract(const Duration(days: 365)),
+                            lastDate:
+                                DateTime.now().add(const Duration(days: 365)),
+                          );
+                          if (picked != null) {
+                            setState(() => _pendingStartDate = picked);
+                          }
+                        },
                       ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'The chosen date is passed into startPlan — it is honoured, not replaced with today.',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.55),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton(
+                          onPressed: total == 0
+                              ? null
+                              : () {
+                                  notifier.startPlan(
+                                    planId: widget.planId,
+                                    paceMode: 'scheduled',
+                                    startDate: start,
+                                  );
+                                  HapticFeedback.mediumImpact();
+                                },
+                          child: const Text('Start Day 1 →'),
+                        ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 6),
+                      Text(
+                        'The chosen date is passed into startPlan — it is honoured, not replaced with today.',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.55),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
         ),
       );
     }
@@ -284,8 +278,7 @@ class _ReadingPlanDetailV2ScreenState
     final current = plan.todayReadingDay ?? total;
     final behind = plan.missedDays.length;
     final selected = _selectedDay ?? current;
-    final dateMap =
-        _dateMap(plan.planStartedOn!, plan.isRestWeekday, total);
+    final dateMap = _dateMap(plan.planStartedOn!, plan.isRestWeekday, total);
     final dateForSelected = dateMap[selected];
     final isRestSelected = dateForSelected == null && selected > 0;
 
@@ -295,236 +288,332 @@ class _ReadingPlanDetailV2ScreenState
         backgroundColor: Colors.transparent,
         appBar: SharedAppBar(
           title: Text(_title()),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.more_horiz_rounded),
-            onPressed: () => _showPlanSettings(plan),
-          ),
-        ],
-      ),
-      body: SafeArea(
-        bottom: false,
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 800),
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 140),
-              children: [
-                // ── Progress hero ─────────────────────────────
-                V2Card(
-                  textured: true,
-                  featured: true,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          V2ProgressRing(
-                              fraction: plan.percentComplete, size: 92),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'SCHEDULE',
-                                  style: theme
-                                      .textTheme.labelSmall
-                                      ?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: 1.4,
-                                    fontSize: 10,
-                                    color: theme
-                                        .colorScheme.onSurface
-                                        .withValues(alpha: 0.55),
-                                  ),
-                                ),
-                                Text(
-                                  total == 0
-                                      ? 'No readings'
-                                      : 'Day $current of $total',
-                                  style: theme.textTheme.titleMedium
-                                      ?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                                const SizedBox(height: 6),
-                                V2ProgressBar(
-                                    fraction: plan.percentComplete),
-                                const SizedBox(height: 4),
-                                Text(
-                                  '${(plan.percentComplete * 100).round()}% complete',
-                                  style: theme.textTheme.labelSmall
-                                      ?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                    color: theme
-                                        .colorScheme.onSurface
-                                        .withValues(alpha: 0.6),
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Wrap(
-                                  spacing: 6,
-                                  runSpacing: 6,
-                                  children: [
-                                    V2MetaChip(plan.paceMode == 'flexible'
-                                        ? 'Flexible'
-                                        : 'Scheduled'),
-                                    if (plan.restDay != null ||
-                                        plan.restDays.isNotEmpty)
-                                      V2MetaChip(_restChipLabel(
-                                          plan.restDays,
-                                          plan.restDay)),
-                                    if (behind > 0)
-                                      V2MetaChip('⚠ $behind behind')
-                                    else
-                                      const V2MetaChip('On track ✓'),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      // Pace segmented control
-                      Container(
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.surface,
-                          borderRadius:
-                              BorderRadius.circular(999),
-                          border: Border.all(
-                              color: theme.dividerColor),
-                        ),
-                        child: Row(
-                          children: ['scheduled', 'flexible'].map((m) {
-                            final on = plan.paceMode == m;
-                            return Expanded(
-                              child: GestureDetector(
-                                onTap: () {
-                                  HapticFeedback.selectionClick();
-                                  notifier.setPaceMode(m);
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 10),
-                                  decoration: BoxDecoration(
-                                    color: on
-                                        ? theme
-                                            .colorScheme.onSurface
-                                        : Colors.transparent,
-                                    borderRadius:
-                                        BorderRadius.circular(999),
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    m == 'scheduled'
-                                        ? 'Scheduled'
-                                        : 'Flexible',
-                                    style: theme.textTheme.labelLarge
-                                        ?.copyWith(
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.more_horiz_rounded),
+              onPressed: () => _showPlanSettings(plan),
+            ),
+          ],
+        ),
+        body: SafeArea(
+          bottom: false,
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 800),
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 140),
+                children: [
+                  // ── Progress hero ─────────────────────────────
+                  V2Card(
+                    textured: true,
+                    featured: true,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            V2ProgressRing(
+                                fraction: plan.percentComplete, size: 92),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'SCHEDULE',
+                                    style: theme.textTheme.labelSmall?.copyWith(
                                       fontWeight: FontWeight.w800,
+                                      letterSpacing: 1.4,
+                                      fontSize: 10,
+                                      color: theme.colorScheme.onSurface
+                                          .withValues(alpha: 0.55),
+                                    ),
+                                  ),
+                                  Text(
+                                    total == 0
+                                        ? 'No readings'
+                                        : 'Day $current of $total',
+                                    style:
+                                        theme.textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  V2ProgressBar(fraction: plan.percentComplete),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '${(plan.percentComplete * 100).round()}% complete',
+                                    style: theme.textTheme.labelSmall?.copyWith(
+                                      fontWeight: FontWeight.w700,
+                                      color: theme.colorScheme.onSurface
+                                          .withValues(alpha: 0.6),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Wrap(
+                                    spacing: 6,
+                                    runSpacing: 6,
+                                    children: [
+                                      V2MetaChip(plan.paceMode == 'flexible'
+                                          ? 'Flexible'
+                                          : 'Scheduled'),
+                                      if (plan.restDay != null ||
+                                          plan.restDays.isNotEmpty)
+                                        V2MetaChip(_restChipLabel(
+                                            plan.restDays, plan.restDay)),
+                                      if (behind > 0)
+                                        V2MetaChip('⚠ $behind behind')
+                                      else
+                                        const V2MetaChip('On track ✓'),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        // Pace segmented control
+                        Container(
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surface,
+                            borderRadius: BorderRadius.circular(999),
+                            border: Border.all(color: theme.dividerColor),
+                          ),
+                          child: Row(
+                            children: ['scheduled', 'flexible'].map((m) {
+                              final on = plan.paceMode == m;
+                              return Expanded(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    HapticFeedback.selectionClick();
+                                    notifier.setPaceMode(m);
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 10),
+                                    decoration: BoxDecoration(
                                       color: on
-                                          ? theme
-                                              .colorScheme.surface
-                                          : theme
-                                              .colorScheme.onSurface
-                                              .withValues(
-                                                  alpha: 0.7),
+                                          ? theme.colorScheme.onSurface
+                                          : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(999),
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      m == 'scheduled'
+                                          ? 'Scheduled'
+                                          : 'Flexible',
+                                      style:
+                                          theme.textTheme.labelLarge?.copyWith(
+                                        fontWeight: FontWeight.w800,
+                                        color: on
+                                            ? theme.colorScheme.surface
+                                            : theme.colorScheme.onSurface
+                                                .withValues(alpha: 0.7),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            );
-                          }).toList(),
+                              );
+                            }).toList(),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        plan.paceMode == 'flexible'
-                            ? 'Flexible: work oldest-unread first. No missed days accrue.'
-                            : 'Scheduled: each date maps to a reading day. Missed days accrue as behind — catch up below.',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.onSurface
-                              .withValues(alpha: 0.6),
+                        const SizedBox(height: 6),
+                        Text(
+                          plan.paceMode == 'flexible'
+                              ? 'Flexible: work oldest-unread first. No missed days accrue.'
+                              : 'Scheduled: each date maps to a reading day. Missed days accrue as behind — catch up below.',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.6),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
 
-                // ── Catch-up ──────────────────────────────────
-                if (behind > 0)
+                  // ── Catch-up ──────────────────────────────────
+                  if (behind > 0)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12),
+                      child: V2Card(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const V2Eyebrow('Catch up'),
+                            const SizedBox(height: 6),
+                            Text(
+                              'Behind by $behind — oldest unread is Day ${plan.oldestUnread}.',
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Backfilling marks progress. Rebase shifts the remaining schedule forward instead.',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurface
+                                    .withValues(alpha: 0.6),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: [
+                                FilledButton(
+                                  onPressed: () => setState(
+                                      () => _selectedDay = plan.oldestUnread),
+                                  child: const Text('Go to oldest'),
+                                ),
+                                FilledButton.tonal(
+                                  onPressed: () {
+                                    notifier
+                                        .markReadingComplete(plan.oldestUnread);
+                                    HapticFeedback.mediumImpact();
+                                  },
+                                  child: const Text('Mark oldest done'),
+                                ),
+                                FilledButton.tonal(
+                                  onPressed: () {
+                                    final newly = List.generate(
+                                            current - 1, (i) => i + 1)
+                                        .where((d) =>
+                                            !plan.completedReadings.contains(d))
+                                        .length;
+                                    notifier.markAllPreviousRead(current);
+                                    HapticFeedback.mediumImpact();
+                                    if (!mounted) return;
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(newly == 0
+                                            ? 'Everything before today is already done.'
+                                            : '$newly previous day${newly == 1 ? '' : 's'} marked as read.'),
+                                        behavior: SnackBarBehavior.floating,
+                                      ),
+                                    );
+                                  },
+                                  child: const Text('Mark all previous done'),
+                                ),
+                                OutlinedButton(
+                                  onPressed: () => _rebase(behind),
+                                  child: Text('Rebase +$behind days'),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                  // ── Readings list ─────────────────────────────
+                  // Day-by-day rows (done / today / missed / upcoming)
+                  // replace the old month calendar: same states, scannable
+                  // at a glance. Tapping a row selects the day below.
                   Padding(
                     padding: const EdgeInsets.only(top: 12),
                     child: V2Card(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const V2Eyebrow('Catch up'),
-                          const SizedBox(height: 6),
-                          Text(
-                            'Behind by $behind — oldest unread is Day ${plan.oldestUnread}.',
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Backfilling marks progress. Rebase shifts the remaining schedule forward instead.',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.6),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
+                          Row(
                             children: [
-                              FilledButton(
-                                onPressed: () => setState(() =>
-                                    _selectedDay = plan.oldestUnread),
-                                child: const Text('Go to oldest'),
+                              Expanded(
+                                child: Text(
+                                  'READINGS · $total DAYS',
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 1.5,
+                                    color: theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.65),
+                                  ),
+                                ),
                               ),
-                              FilledButton.tonal(
+                              IconButton(
+                                visualDensity: VisualDensity.compact,
+                                icon: const Icon(Icons.map_rounded),
+                                tooltip: 'Journey map view',
                                 onPressed: () {
-                                  notifier.markReadingComplete(
-                                      plan.oldestUnread);
-                                  HapticFeedback.mediumImpact();
-                                },
-                                child: const Text('Mark oldest done'),
-                              ),
-                              FilledButton.tonal(
-                                onPressed: () {
-                                  final newly = List.generate(
-                                          current - 1, (i) => i + 1)
-                                      .where((d) => !plan.completedReadings
-                                          .contains(d))
-                                      .length;
-                                  notifier
-                                      .markAllPreviousRead(current);
-                                  HapticFeedback.mediumImpact();
-                                  if (!mounted) return;
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(
-                                    SnackBar(
-                                      content: Text(newly == 0
-                                          ? 'Everything before today is already done.'
-                                          : '$newly previous day${newly == 1 ? '' : 's'} marked as read.'),
-                                      behavior:
-                                          SnackBarBehavior.floating,
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => JourneyMapScreen(
+                                          planId: widget.planId),
                                     ),
                                   );
                                 },
-                                child:
-                                    const Text('Mark all previous done'),
                               ),
-                              OutlinedButton(
-                                onPressed: () => _rebase(behind),
-                                child: Text('Rebase +$behind days'),
+                              IconButton(
+                                visualDensity: VisualDensity.compact,
+                                icon: const Icon(Icons.today_rounded),
+                                tooltip: 'Jump to today',
+                                onPressed: () {
+                                  setState(() => _selectedDay = current);
+                                  _reveal(_todayRowKey);
+                                  _reveal(_dayDetailKey);
+                                },
                               ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          // Flexible plans accrue no missed days, so the
+                          // catch-up card never appears for them — offer
+                          // the same one-tap catch-up here instead.
+                          if (plan.paceMode == 'flexible' &&
+                              plan.oldestUnread > 1)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: FilledButton.tonal(
+                                onPressed: () {
+                                  notifier
+                                      .markAllPreviousRead(plan.oldestUnread);
+                                  HapticFeedback.mediumImpact();
+                                },
+                                child: const Text('Mark all previous done'),
+                              ),
+                            ),
+                          for (var day = 1; day <= total; day++)
+                            Builder(builder: (_) {
+                              final done = plan.completedReadings.contains(day);
+                              final missed = plan.missedDays.contains(day);
+                              final isToday = day == current;
+                              final date = dateMap[day];
+                              final dateLabel = date == null
+                                  ? 'Day $day'
+                                  : 'Day $day · ${_weekdayName(appWeekday(date))} ${date.month}/${date.day}';
+                              final summary = plan.planData[day - 1].passages
+                                  .map((p) => p.label)
+                                  .join(', ');
+                              return _DayRow(
+                                key: isToday ? _todayRowKey : null,
+                                day: day,
+                                dateLabel: dateLabel,
+                                summary: summary,
+                                done: done,
+                                isToday: isToday,
+                                isMissed: missed && !done,
+                                isSelected: day == selected,
+                                onTap: () {
+                                  setState(() => _selectedDay = day);
+                                  _reveal(_dayDetailKey);
+                                },
+                                onToggle: () {
+                                  HapticFeedback.mediumImpact();
+                                  if (done) {
+                                    notifier.markReadingIncomplete(day);
+                                  } else {
+                                    notifier.markReadingComplete(day);
+                                  }
+                                },
+                              );
+                            }),
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 12,
+                            runSpacing: 4,
+                            children: [
+                              _Legend(theme.primaryColor, 'Done'),
+                              _Legend(null, 'Today = ring', ring: true),
+                              _Legend(theme.colorScheme.error, 'Missed'),
                             ],
                           ),
                         ],
@@ -532,226 +621,85 @@ class _ReadingPlanDetailV2ScreenState
                     ),
                   ),
 
-                // ── Readings list ─────────────────────────────
-                // Day-by-day rows (done / today / missed / upcoming)
-                // replace the old month calendar: same states, scannable
-                // at a glance. Tapping a row selects the day below.
-                Padding(
-                  padding: const EdgeInsets.only(top: 12),
-                  child: V2Card(
-                    child: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                'READINGS · $total DAYS',
-                                style: theme.textTheme.labelSmall
-                                    ?.copyWith(
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 1.5,
-                                  color: theme
-                                      .colorScheme.onSurface
-                                      .withValues(alpha: 0.65),
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              visualDensity:
-                                  VisualDensity.compact,
-                              icon: const Icon(
-                                  Icons.map_rounded),
-                              tooltip: 'Journey map view',
-                              onPressed: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        JourneyMapScreen(
-                                            planId:
-                                                widget.planId),
+                  // ── Day detail ────────────────────────────────
+                  Padding(
+                    key: _dayDetailKey,
+                    padding: const EdgeInsets.only(top: 12),
+                    child: _DayDetailCard(
+                      key: ValueKey(
+                          '${widget.planId}:$selected:${plan.completedReadings.contains(selected)}'),
+                      planId: widget.planId,
+                      day: selected,
+                      isRest: isRestSelected,
+                      restDate: isRestSelected
+                          ? _restDateForSelected(
+                              dateMap, plan.restDay, selected)
+                          : dateForSelected,
+                      date: dateForSelected,
+                    ),
+                  ),
+
+                  // ── Reminder ──────────────────────────────────
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: V2Card(
+                      child: Row(
+                        children: [
+                          Icon(Icons.notifications_outlined,
+                              color: theme.primaryColor),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  plan.reminderEnabled
+                                      ? 'Reminder · ${_fmtTime(plan.reminderTimeHour, plan.reminderTimeMinute)}'
+                                      : 'Reminder off',
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w700,
                                   ),
+                                ),
+                                Text(
+                                  'Per-plan notification — skips the rest day automatically.',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.6),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Switch(
+                            value: plan.reminderEnabled,
+                            onChanged: (v) async {
+                              if (v) {
+                                final picked = await showTimePicker(
+                                  context: context,
+                                  initialTime: TimeOfDay(
+                                      hour: plan.reminderTimeHour,
+                                      minute: plan.reminderTimeMinute),
                                 );
-                              },
-                            ),
-                            IconButton(
-                              visualDensity:
-                                  VisualDensity.compact,
-                              icon: const Icon(
-                                  Icons.today_rounded),
-                              tooltip: 'Jump to today',
-                              onPressed: () {
-                                setState(() =>
-                                    _selectedDay = current);
-                                _reveal(_todayRowKey);
-                                _reveal(_dayDetailKey);
-                              },
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        // Flexible plans accrue no missed days, so the
-                        // catch-up card never appears for them — offer
-                        // the same one-tap catch-up here instead.
-                        if (plan.paceMode == 'flexible' &&
-                            plan.oldestUnread > 1)
-                          Padding(
-                            padding:
-                                const EdgeInsets.only(bottom: 8),
-                            child: FilledButton.tonal(
-                              onPressed: () {
-                                notifier.markAllPreviousRead(
-                                    plan.oldestUnread);
-                                HapticFeedback.mediumImpact();
-                              },
-                              child: const Text(
-                                  'Mark all previous done'),
-                            ),
+                                if (picked == null) return;
+                                notifier.setReminder(
+                                    true, picked.hour, picked.minute);
+                              } else {
+                                notifier.setReminder(
+                                    false,
+                                    plan.reminderTimeHour,
+                                    plan.reminderTimeMinute);
+                              }
+                            },
                           ),
-                        for (var day = 1; day <= total; day++)
-                          Builder(builder: (_) {
-                            final done = plan.completedReadings
-                                .contains(day);
-                            final missed = plan.missedDays
-                                .contains(day);
-                            final isToday = day == current;
-                            final date = dateMap[day];
-                            final dateLabel = date == null
-                                ? 'Day $day'
-                                : 'Day $day · ${_weekdayName(appWeekday(date))} ${date.month}/${date.day}';
-                            final summary = plan
-                                .planData[day - 1].passages
-                                .map((p) => p.label)
-                                .join(', ');
-                            return _DayRow(
-                              key: isToday ? _todayRowKey : null,
-                              day: day,
-                              dateLabel: dateLabel,
-                              summary: summary,
-                              done: done,
-                              isToday: isToday,
-                              isMissed: missed && !done,
-                              isSelected: day == selected,
-                              onTap: () {
-                                setState(
-                                    () => _selectedDay = day);
-                                _reveal(_dayDetailKey);
-                              },
-                              onToggle: () {
-                                HapticFeedback.mediumImpact();
-                                if (done) {
-                                  notifier.markReadingIncomplete(
-                                      day);
-                                } else {
-                                  notifier.markReadingComplete(
-                                      day);
-                                }
-                              },
-                            );
-                          }),
-                        const SizedBox(height: 8),
-                        Wrap(
-                          spacing: 12,
-                          runSpacing: 4,
-                          children: [
-                            _Legend(
-                                theme.primaryColor, 'Done'),
-                            _Legend(null, 'Today = ring',
-                                ring: true),
-                            _Legend(
-                                theme.colorScheme.error,
-                                'Missed'),
-                          ],
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-
-                // ── Day detail ────────────────────────────────
-                Padding(
-                  key: _dayDetailKey,
-                  padding: const EdgeInsets.only(top: 12),
-                  child: _DayDetailCard(
-                    key: ValueKey(
-                        '${widget.planId}:$selected:${plan.completedReadings.contains(selected)}'),
-                    planId: widget.planId,
-                    day: selected,
-                    isRest: isRestSelected,
-                    restDate: isRestSelected
-                        ? _restDateForSelected(
-                            dateMap, plan.restDay, selected)
-                        : dateForSelected,
-                    date: dateForSelected,
-                  ),
-                ),
-
-                // ── Reminder ──────────────────────────────────
-                Padding(
-                  padding: const EdgeInsets.only(top: 12),
-                  child: V2Card(
-                    child: Row(
-                      children: [
-                        Icon(Icons.notifications_outlined,
-                            color: theme.primaryColor),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment:
-                                CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                plan.reminderEnabled
-                                    ? 'Reminder · ${_fmtTime(plan.reminderTimeHour, plan.reminderTimeMinute)}'
-                                    : 'Reminder off',
-                                style: theme.textTheme.titleSmall
-                                    ?.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              Text(
-                                'Per-plan notification — skips the rest day automatically.',
-                                style: theme.textTheme.bodySmall
-                                    ?.copyWith(
-                                  color: theme.colorScheme.onSurface
-                                      .withValues(alpha: 0.6),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Switch(
-                          value: plan.reminderEnabled,
-                          onChanged: (v) async {
-                            if (v) {
-                              final picked = await showTimePicker(
-                                context: context,
-                                initialTime: TimeOfDay(
-                                    hour: plan.reminderTimeHour,
-                                    minute:
-                                        plan.reminderTimeMinute),
-                              );
-                              if (picked == null) return;
-                              notifier.setReminder(
-                                  true, picked.hour, picked.minute);
-                            } else {
-                              notifier.setReminder(
-                                  false,
-                                  plan.reminderTimeHour,
-                                  plan.reminderTimeMinute);
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -818,8 +766,7 @@ class _ReadingPlanDetailV2ScreenState
                 HapticFeedback.selectionClick();
                 Navigator.of(ctx).pop(Set<int>.from(selected));
               },
-              child: Text(
-                  selected.isEmpty ? 'No rest days' : 'Save'),
+              child: Text(selected.isEmpty ? 'No rest days' : 'Save'),
             ),
           ],
         );
@@ -841,8 +788,7 @@ class _ReadingPlanDetailV2ScreenState
   }
 
   void _showPlanSettings(dynamic plan) {
-    final notifier =
-        ref.read(readingPlanProvider(widget.planId).notifier);
+    final notifier = ref.read(readingPlanProvider(widget.planId).notifier);
     final meta = _metadata();
     showModalBottomSheet(
       context: context,
@@ -853,8 +799,7 @@ class _ReadingPlanDetailV2ScreenState
         return Container(
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(24)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           padding: const EdgeInsets.fromLTRB(8, 8, 8, 32),
           child: Column(
@@ -874,8 +819,7 @@ class _ReadingPlanDetailV2ScreenState
                         content: SingleChildScrollView(
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment:
-                                CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               if ((meta?.description ?? '').isNotEmpty)
                                 Text(meta!.description),
@@ -883,21 +827,17 @@ class _ReadingPlanDetailV2ScreenState
                                 const SizedBox(height: 12),
                                 Text(
                                   meta!.attribution!,
-                                  style: Theme.of(d)
-                                      .textTheme
-                                      .bodySmall,
+                                  style: Theme.of(d).textTheme.bodySmall,
                                 ),
                               ],
                               if ((meta?.license ?? '').isNotEmpty) ...[
                                 const SizedBox(height: 8),
                                 Text(
                                   meta!.license!,
-                                  style: Theme.of(d)
-                                      .textTheme
-                                      .bodySmall
-                                      ?.copyWith(
-                                        fontStyle: FontStyle.italic,
-                                      ),
+                                  style:
+                                      Theme.of(d).textTheme.bodySmall?.copyWith(
+                                            fontStyle: FontStyle.italic,
+                                          ),
                                 ),
                               ],
                             ],
@@ -905,8 +845,7 @@ class _ReadingPlanDetailV2ScreenState
                         ),
                         actions: [
                           TextButton(
-                            onPressed: () =>
-                                Navigator.of(d).pop(),
+                            onPressed: () => Navigator.of(d).pop(),
                             child: const Text('Close'),
                           ),
                         ],
@@ -922,10 +861,9 @@ class _ReadingPlanDetailV2ScreenState
                   final picked = await showDatePicker(
                     context: context,
                     initialDate: p.planStartedOn ?? DateTime.now(),
-                    firstDate: DateTime.now()
-                        .subtract(const Duration(days: 730)),
-                    lastDate:
-                        DateTime.now().add(const Duration(days: 365)),
+                    firstDate:
+                        DateTime.now().subtract(const Duration(days: 730)),
+                    lastDate: DateTime.now().add(const Duration(days: 365)),
                   );
                   if (picked != null) notifier.setStartDate(picked);
                 },
@@ -933,8 +871,7 @@ class _ReadingPlanDetailV2ScreenState
               ListTile(
                 leading: const Icon(Icons.bedtime_rounded),
                 title: Text('Rest days: ${_restSummary(p)}'),
-                subtitle:
-                    const Text('Tap to choose any weekdays'),
+                subtitle: const Text('Tap to choose any weekdays'),
                 onTap: () async {
                   final picked = await _pickRestDays(context, p);
                   if (!ctx.mounted) return;
@@ -946,25 +883,21 @@ class _ReadingPlanDetailV2ScreenState
                 leading: Icon(Icons.restart_alt_rounded,
                     color: theme.colorScheme.error),
                 title: Text('Restart from Day 1…',
-                    style: TextStyle(
-                        color: theme.colorScheme.error)),
+                    style: TextStyle(color: theme.colorScheme.error)),
                 onTap: () async {
                   Navigator.of(ctx).pop();
                   final confirm = await showDialog<bool>(
                     context: context,
                     builder: (d) => AlertDialog(
                       title: const Text('Restart plan?'),
-                      content: const Text(
-                          'Completed days will be cleared.'),
+                      content: const Text('Completed days will be cleared.'),
                       actions: [
                         TextButton(
-                          onPressed: () =>
-                              Navigator.of(d).pop(false),
+                          onPressed: () => Navigator.of(d).pop(false),
                           child: const Text('Cancel'),
                         ),
                         TextButton(
-                          onPressed: () =>
-                              Navigator.of(d).pop(true),
+                          onPressed: () => Navigator.of(d).pop(true),
                           child: const Text('Restart'),
                         ),
                       ],
@@ -1028,8 +961,7 @@ class _DayRow extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           onTap: onTap,
           child: Padding(
-            padding:
-                const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
             child: Row(
               children: [
                 Container(
@@ -1037,8 +969,7 @@ class _DayRow extends StatelessWidget {
                   height: 40,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color:
-                        done ? theme.primaryColor : Colors.transparent,
+                    color: done ? theme.primaryColor : Colors.transparent,
                     border: Border.all(
                       color: statusColor,
                       width: (isToday || done) ? 2 : 1.5,
@@ -1082,8 +1013,7 @@ class _DayRow extends StatelessWidget {
                         summary,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style:
-                            theme.textTheme.bodyMedium?.copyWith(
+                        style: theme.textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -1094,13 +1024,10 @@ class _DayRow extends StatelessWidget {
                   visualDensity: VisualDensity.compact,
                   tooltip: done ? 'Mark unread' : 'Mark read',
                   icon: Icon(
-                    done
-                        ? Icons.check_circle_rounded
-                        : Icons.circle_outlined,
+                    done ? Icons.check_circle_rounded : Icons.circle_outlined,
                     color: done
                         ? theme.primaryColor
-                        : theme.colorScheme.onSurface
-                            .withValues(alpha: 0.35),
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.35),
                   ),
                   onPressed: onToggle,
                 ),
@@ -1112,7 +1039,6 @@ class _DayRow extends StatelessWidget {
     );
   }
 }
-
 
 class _Legend extends StatelessWidget {
   final Color? color;
@@ -1143,8 +1069,7 @@ class _Legend extends StatelessWidget {
         Text(
           text,
           style: theme.textTheme.labelSmall?.copyWith(
-            color:
-                theme.colorScheme.onSurface.withValues(alpha: 0.6),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),
       ],
@@ -1180,8 +1105,7 @@ class _DayDetailCardState extends ConsumerState<_DayDetailCard> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final plan = ref.watch(readingPlanProvider(widget.planId));
-    final notifier =
-        ref.read(readingPlanProvider(widget.planId).notifier);
+    final notifier = ref.read(readingPlanProvider(widget.planId).notifier);
     final done = plan.completedReadings.contains(widget.day);
 
     final dayData = plan.planData.length >= widget.day && widget.day >= 1
@@ -1223,8 +1147,7 @@ class _DayDetailCardState extends ConsumerState<_DayDetailCard> {
           Text(
             'Tap a passage to open it. Check each one off as you read.',
             style: theme.textTheme.bodySmall?.copyWith(
-              color:
-                  theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ),
           for (var i = 0; i < dayData.passages.length; i++)
@@ -1235,8 +1158,7 @@ class _DayDetailCardState extends ConsumerState<_DayDetailCard> {
                 onTap: () async {
                   // Open the passage in the shared study reader; the
                   // checkbox below tracks it as read for this plan day.
-                  final markedComplete =
-                      await Navigator.of(context).push<bool>(
+                  final markedComplete = await Navigator.of(context).push<bool>(
                     MaterialPageRoute(
                       builder: (_) => StudyReaderScreen(
                         payload: StudySessionPayload.plan(
@@ -1258,8 +1180,7 @@ class _DayDetailCardState extends ConsumerState<_DayDetailCard> {
                   decoration: BoxDecoration(
                     color: _checked.contains(i)
                         ? theme.primaryColor.withValues(alpha: 0.1)
-                        : theme.colorScheme.onSurface
-                            .withValues(alpha: 0.03),
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.03),
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                       color: _checked.contains(i)
@@ -1286,8 +1207,7 @@ class _DayDetailCardState extends ConsumerState<_DayDetailCard> {
                         ),
                         child: _checked.contains(i)
                             ? Icon(Icons.check_rounded,
-                                size: 16,
-                                color: theme.colorScheme.surface)
+                                size: 16, color: theme.colorScheme.surface)
                             : null,
                       ),
                       const SizedBox(width: 12),
@@ -1321,8 +1241,7 @@ class _DayDetailCardState extends ConsumerState<_DayDetailCard> {
                   notifier.markReadingIncomplete(widget.day);
                 } else {
                   notifier.markReadingComplete(widget.day);
-                  final completed =
-                      plan.completedReadings.length + 1;
+                  final completed = plan.completedReadings.length + 1;
                   if (completed % 30 == 0 && mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(

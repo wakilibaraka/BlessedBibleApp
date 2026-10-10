@@ -34,9 +34,11 @@ class _JourneyMapScreenState extends ConsumerState<JourneyMapScreen> {
   Widget build(BuildContext context) {
     final planState = ref.watch(readingPlanProvider(widget.planId));
     final theme = Theme.of(context);
-    
+
     if (planState.isLoading) {
-      return Scaffold(body: Center(child: CircularProgressIndicator(color: AppColors.goldAccent)));
+      return Scaffold(
+          body: Center(
+              child: CircularProgressIndicator(color: AppColors.goldAccent)));
     }
 
     final totalDays = planState.planData.length;
@@ -75,9 +77,11 @@ class _JourneyMapScreenState extends ConsumerState<JourneyMapScreen> {
         itemCount: totalWeeks,
         itemBuilder: (context, weekIndex) {
           final startDay = weekIndex * 7;
-          final daysInWeek = (startDay + 7 <= totalDays) ? 7 : totalDays - startDay;
-          final weekDays = planState.planData.sublist(startDay, startDay + daysInWeek);
-          
+          final daysInWeek =
+              (startDay + 7 <= totalDays) ? 7 : totalDays - startDay;
+          final weekDays =
+              planState.planData.sublist(startDay, startDay + daysInWeek);
+
           return _WeeklyJourneyPath(
             weekDays: weekDays,
             planState: planState,
@@ -119,13 +123,15 @@ class _WeeklyJourneyPath extends StatelessWidget {
             itemBuilder: (context, index) {
               final dayData = weekDays[index];
               final isLeft = index % 2 == 0;
-              final isCompleted = planState.completedReadings.contains(dayData.day);
+              final isCompleted =
+                  planState.completedReadings.contains(dayData.day);
               final isToday = planState.currentDay == dayData.day;
 
               return Container(
                 margin: const EdgeInsets.only(bottom: 64),
                 child: Row(
-                  mainAxisAlignment: isLeft ? MainAxisAlignment.start : MainAxisAlignment.end,
+                  mainAxisAlignment:
+                      isLeft ? MainAxisAlignment.start : MainAxisAlignment.end,
                   children: [
                     if (!isLeft) const Spacer(),
                     _buildNode(context, dayData, isCompleted, isToday),
@@ -140,16 +146,16 @@ class _WeeklyJourneyPath extends StatelessWidget {
     );
   }
 
-  Widget _buildNode(BuildContext context, PlanDayData dayData, bool isCompleted, bool isToday) {
+  Widget _buildNode(BuildContext context, PlanDayData dayData, bool isCompleted,
+      bool isToday) {
     final bool isMilestone = dayData.day % 7 == 0;
-    
+
     return GestureDetector(
       onTap: () {
         // The per-day screen shipped with the retired plan browser; the
         // V2 plan detail is the live equivalent for this plan.
         Navigator.of(context).push(CupertinoPageRoute(
-          builder: (_) =>
-              ReadingPlanDetailV2Screen(planId: planId),
+          builder: (_) => ReadingPlanDetailV2Screen(planId: planId),
         ));
       },
       child: Stack(
@@ -160,39 +166,57 @@ class _WeeklyJourneyPath extends StatelessWidget {
             width: 80,
             height: 80, // fixed height helps path calculation
             decoration: BoxDecoration(
-              color: isCompleted 
-                  ? AppColors.goldAccent 
-                  : (isToday ? AppColors.goldAccent.withValues(alpha: 0.15) : theme.colorScheme.surface),
+              color: isCompleted
+                  ? AppColors.goldAccent
+                  : (isToday
+                      ? AppColors.goldAccent.withValues(alpha: 0.15)
+                      : theme.colorScheme.surface),
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: isCompleted 
-                      ? AppColors.goldAccent.withValues(alpha: 0.4) 
-                      : (isToday ? AppColors.goldAccent.withValues(alpha: 0.4) : theme.shadowColor.withValues(alpha: 0.05)),
+                  color: isCompleted
+                      ? AppColors.goldAccent.withValues(alpha: 0.4)
+                      : (isToday
+                          ? AppColors.goldAccent.withValues(alpha: 0.4)
+                          : theme.shadowColor.withValues(alpha: 0.05)),
                   blurRadius: isToday ? 20 : 12,
                   offset: const Offset(0, 6),
                 ),
               ],
               border: Border.all(
-                color: isCompleted 
-                    ? AppColors.goldAccent 
-                    : (isToday ? AppColors.goldAccent : theme.dividerColor.withValues(alpha: 0.15)), 
+                color: isCompleted
+                    ? AppColors.goldAccent
+                    : (isToday
+                        ? AppColors.goldAccent
+                        : theme.dividerColor.withValues(alpha: 0.15)),
                 width: isCompleted ? 0 : 4,
               ),
             ),
             child: Center(
               child: isCompleted
-                  ? Icon(isMilestone ? Icons.emoji_events_rounded : Icons.check_rounded, color: Colors.white, size: 40)
-                  : (isMilestone 
-                      ? Icon(Icons.emoji_events_rounded, color: isToday ? AppColors.goldAccent : theme.colorScheme.onSurface.withValues(alpha: 0.3), size: 36)
+                  ? Icon(
+                      isMilestone
+                          ? Icons.emoji_events_rounded
+                          : Icons.check_rounded,
+                      color: Colors.white,
+                      size: 40)
+                  : (isMilestone
+                      ? Icon(Icons.emoji_events_rounded,
+                          color: isToday
+                              ? AppColors.goldAccent
+                              : theme.colorScheme.onSurface
+                                  .withValues(alpha: 0.3),
+                          size: 36)
                       : Text(
                           '${dayData.day}',
                           style: theme.textTheme.titleLarge?.copyWith(
-                            color: isToday ? AppColors.goldAccent : theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                            color: isToday
+                                ? AppColors.goldAccent
+                                : theme.colorScheme.onSurface
+                                    .withValues(alpha: 0.4),
                             fontWeight: FontWeight.bold,
                           ),
-                        )
-                    ),
+                        )),
             ),
           ),
           Positioned(
@@ -202,7 +226,9 @@ class _WeeklyJourneyPath extends StatelessWidget {
               textAlign: TextAlign.center,
               style: theme.textTheme.labelMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: (isToday || isCompleted) ? AppColors.goldAccent : theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                color: (isToday || isCompleted)
+                    ? AppColors.goldAccent
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.5),
               ),
             ),
           ),
@@ -228,7 +254,7 @@ class _JourneyPathPainter extends CustomPainter {
     final double nodeHeight = 80.0; // matched to new node height
     final double nodeMargin = 64.0;
     final double totalHeightPerItem = nodeHeight + nodeMargin;
-    
+
     final double topOffset = 48.0; // padding top of ListView
 
     final double leftX = 24.0 + (80.0 / 2); // padding + half node width
@@ -239,26 +265,32 @@ class _JourneyPathPainter extends CustomPainter {
     for (int i = 0; i < weekDays.length - 1; i++) {
       final isLeft = i % 2 == 0;
       final startY = topOffset + (i * totalHeightPerItem) + (nodeHeight / 2);
-      final endY = topOffset + ((i + 1) * totalHeightPerItem) + (nodeHeight / 2);
-      
+      final endY =
+          topOffset + ((i + 1) * totalHeightPerItem) + (nodeHeight / 2);
+
       final currentX = isLeft ? leftX : rightX;
       final nextX = isLeft ? rightX : leftX;
-      
+
       final path = Path();
       path.moveTo(currentX, startY);
 
       // Control points for a smooth S-curve
       path.cubicTo(
-        currentX, startY + (nodeMargin / 2),
-        nextX, endY - (nodeMargin / 2),
-        nextX, endY,
+        currentX,
+        startY + (nodeMargin / 2),
+        nextX,
+        endY - (nodeMargin / 2),
+        nextX,
+        endY,
       );
 
       // A segment is completed if the origin node is completed
       final isSegmentCompleted = completedDays.contains(weekDays[i].day);
 
       final paint = Paint()
-        ..color = isSegmentCompleted ? AppColors.goldAccent : theme.dividerColor.withValues(alpha: 0.1)
+        ..color = isSegmentCompleted
+            ? AppColors.goldAccent
+            : theme.dividerColor.withValues(alpha: 0.1)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 20
         ..strokeCap = StrokeCap.round;

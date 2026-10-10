@@ -41,8 +41,10 @@ class WidgetSettingsSheet extends ConsumerWidget {
             settings.backgroundStyle != WidgetBackgroundStyle.glassLight);
 
     final primaryTextColor = isDark ? Colors.white : const Color(0xFF18181B);
-    final secondaryTextColor = isDark ? const Color(0xFFD4D4D8) : const Color(0xFF52525B);
-    final labelColor = isDark ? const Color(0xFFFDE047) : const Color(0xFFD97706);
+    final secondaryTextColor =
+        isDark ? const Color(0xFFD4D4D8) : const Color(0xFF52525B);
+    final labelColor =
+        isDark ? const Color(0xFFFDE047) : const Color(0xFFD97706);
     final dividerColor = isDark ? Colors.white24 : Colors.black12;
 
     return Container(
@@ -87,7 +89,8 @@ class WidgetSettingsSheet extends ConsumerWidget {
                       color: theme.primaryColor.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: Icon(Icons.widgets_rounded, color: theme.primaryColor, size: 24),
+                    child: Icon(Icons.widgets_rounded,
+                        color: theme.primaryColor, size: 24),
                   ),
                   const SizedBox(width: 14),
                   Expanded(
@@ -96,12 +99,14 @@ class WidgetSettingsSheet extends ConsumerWidget {
                       children: [
                         Text(
                           'Home Screen Widgets',
-                          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                          style: theme.textTheme.titleLarge
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         Text(
                           'Live preview & style customization',
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.6),
                           ),
                         ),
                       ],
@@ -148,7 +153,9 @@ class WidgetSettingsSheet extends ConsumerWidget {
                               'Streak Active! • Daily Goal',
                               style: TextStyle(
                                 fontSize: 11,
-                                color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF16A34A),
+                                color: isDark
+                                    ? const Color(0xFF4ADE80)
+                                    : const Color(0xFF16A34A),
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -274,7 +281,8 @@ class WidgetSettingsSheet extends ConsumerWidget {
                                 ? Colors.grey.withValues(alpha: 0.3)
                                 : null),
                         border: Border.all(
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.2),
                           width: 1,
                         ),
                       ),
@@ -313,7 +321,9 @@ class WidgetSettingsSheet extends ConsumerWidget {
                     label: Text(
                       mode == WidgetTextMode.auto
                           ? 'Auto ✨'
-                          : (mode == WidgetTextMode.light ? 'Dark Text ☀️' : 'White Text 🌙'),
+                          : (mode == WidgetTextMode.light
+                              ? 'Dark Text ☀️'
+                              : 'White Text 🌙'),
                     ),
                   );
                 }).toList(),
@@ -334,7 +344,9 @@ class WidgetSettingsSheet extends ConsumerWidget {
                 child: FilledButton.icon(
                   onPressed: () async {
                     HapticFeedback.mediumImpact();
-                    await ref.read(widgetUpdateServiceProvider).syncAllWidgets();
+                    await ref
+                        .read(widgetUpdateServiceProvider)
+                        .syncAllWidgets();
                     if (context.mounted) {
                       DynamicToast.show(
                         context,

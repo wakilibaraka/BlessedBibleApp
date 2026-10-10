@@ -64,9 +64,8 @@ List<StudyCardConfig> _orderedCards(List<StudyCardConfig> stored) {
   for (final c in stored) {
     // Merged widget: the old reading_plan + plans cards become one
     // plans_live card at the first of their positions.
-    final id = (c.id == 'reading_plan' || c.id == 'plans')
-        ? 'plans_live'
-        : c.id;
+    final id =
+        (c.id == 'reading_plan' || c.id == 'plans') ? 'plans_live' : c.id;
     if (!_v2CardIds.contains(id)) continue;
     if (id == 'plans_live') {
       if (plansLiveAdded) continue;
@@ -121,12 +120,9 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
 
   /// Long-press card sheet: size (Large, Extra Large, Half) + reorder.
   /// The only customization UI — no persistent handles, no edit mode.
-  void _showCardSize(
-      StudyCardConfig card, List<StudyCardConfig> cards) {
-    final isLarge =
-        card.span == CardSpan.full && !card.expanded;
-    final isXLarge =
-        card.span == CardSpan.full && card.expanded;
+  void _showCardSize(StudyCardConfig card, List<StudyCardConfig> cards) {
+    final isLarge = card.span == CardSpan.full && !card.expanded;
+    final isXLarge = card.span == CardSpan.full && card.expanded;
     final isHalf = card.span == CardSpan.half;
     final index = cards.indexWhere((c) => c.id == card.id);
     final canUp = index > 0;
@@ -148,14 +144,12 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
               icon,
               color: selected
                   ? theme.primaryColor
-                  : theme.colorScheme.onSurface
-                      .withValues(alpha: 0.5),
+                  : theme.colorScheme.onSurface.withValues(alpha: 0.5),
             ),
             title: Text(label),
             subtitle: Text(hint),
             trailing: selected
-                ? Icon(Icons.check_rounded,
-                    color: theme.primaryColor)
+                ? Icon(Icons.check_rounded, color: theme.primaryColor)
                 : null,
             onTap: () {
               HapticFeedback.selectionClick();
@@ -168,8 +162,7 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
         return Container(
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(24)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           padding: const EdgeInsets.fromLTRB(8, 8, 8, 32),
           child: Column(
@@ -182,8 +175,7 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                   height: 5,
                   margin: const EdgeInsets.only(top: 6, bottom: 2),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.onSurface
-                        .withValues(alpha: 0.25),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
                     borderRadius: BorderRadius.circular(3),
                   ),
                 ),
@@ -199,8 +191,7 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                 selected: isLarge,
                 onPick: () => ref
                     .read(studyLayoutProvider.notifier)
-                    .setCardSize(card.id,
-                        span: CardSpan.full, expanded: false),
+                    .setCardSize(card.id, span: CardSpan.full, expanded: false),
               ),
               option(
                 label: 'Extra Large',
@@ -209,8 +200,7 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                 selected: isXLarge,
                 onPick: () => ref
                     .read(studyLayoutProvider.notifier)
-                    .setCardSize(card.id,
-                        span: CardSpan.full, expanded: true),
+                    .setCardSize(card.id, span: CardSpan.full, expanded: true),
               ),
               option(
                 label: 'Half',
@@ -219,8 +209,7 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                 selected: isHalf,
                 onPick: () => ref
                     .read(studyLayoutProvider.notifier)
-                    .setCardSize(card.id,
-                        span: CardSpan.half, expanded: false),
+                    .setCardSize(card.id, span: CardSpan.half, expanded: false),
               ),
               const Padding(
                 padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
@@ -252,7 +241,6 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
       },
     );
   }
-
 
   @override
   @override
@@ -328,11 +316,9 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                 LayoutBuilder(
                   builder: (context, constraints) {
                     const gap = 12.0;
-                    final halfW =
-                        (constraints.maxWidth - gap) / 2;
+                    final halfW = (constraints.maxWidth - gap) / 2;
 
-                    Widget cardBox(StudyCardConfig card,
-                        {double? width}) {
+                    Widget cardBox(StudyCardConfig card, {double? width}) {
                       final body = _CardBody(
                         id: card.id,
                         span: card.span,
@@ -350,8 +336,7 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                           _showCardSize(card, cards);
                         },
                         child: Padding(
-                          padding:
-                              const EdgeInsets.only(bottom: 12),
+                          padding: const EdgeInsets.only(bottom: 12),
                           child: framed,
                         ),
                       );
@@ -385,18 +370,15 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                         for (final row in rows)
                           if (row.length == 2)
                             Padding(
-                              padding: const EdgeInsets.only(
-                                  bottom: 12),
+                              padding: const EdgeInsets.only(bottom: 12),
                               child: IntrinsicHeight(
                                 child: Row(
                                   crossAxisAlignment:
                                       CrossAxisAlignment.stretch,
                                   children: [
-                                    Expanded(
-                                        child: cardBox(row[0])),
+                                    Expanded(child: cardBox(row[0])),
                                     const SizedBox(width: gap),
-                                    Expanded(
-                                        child: cardBox(row[1])),
+                                    Expanded(child: cardBox(row[1])),
                                   ],
                                 ),
                               ),
@@ -444,8 +426,7 @@ class _CardBody extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     switch (id) {
       case 'your_space':
-        return _YourSpaceCard(
-            span: span, expanded: expanded, onOpen: onOpen);
+        return _YourSpaceCard(span: span, expanded: expanded, onOpen: onOpen);
       case 'plans_live':
         return _PlansLiveCard(
             span: span,
@@ -459,11 +440,9 @@ class _CardBody extends ConsumerWidget {
           icon: Icons.library_books_rounded,
           eyebrow: 'Commentary',
           title: 'Verse-by-verse insight',
-          snippet:
-              'Historicist commentary with chapter + verse filters.',
+          snippet: 'Historicist commentary with chapter + verse filters.',
           cta: 'Open Commentary',
-          onTap: () => onOpen(
-              const CommentaryLibraryV2Screen()),
+          onTap: () => onOpen(const CommentaryLibraryV2Screen()),
         );
       case 'dictionary':
         return _ToolCard(
@@ -474,8 +453,7 @@ class _CardBody extends ConsumerWidget {
           title: 'Words defined',
           snippet: 'Easton & Smith, offline, with saved words.',
           cta: 'Look up',
-          onTap: () =>
-              onOpen(const DictionaryV2Screen()),
+          onTap: () => onOpen(const DictionaryV2Screen()),
         );
       case 'bible_stories':
         return _ToolCard(
@@ -486,8 +464,7 @@ class _CardBody extends ConsumerWidget {
           title: 'Narratives retold',
           snippet: '66 stories across every book.',
           cta: 'Read stories',
-          onTap: () =>
-              onOpen(const BibleStoriesScreen()),
+          onTap: () => onOpen(const BibleStoriesScreen()),
         );
       case 'concordance':
         return _ToolCard(
@@ -498,15 +475,12 @@ class _CardBody extends ConsumerWidget {
           title: 'Every occurrence',
           snippet: 'Find each verse where a word appears.',
           cta: 'Search words',
-          onTap: () =>
-              onOpen(const ConcordanceScreen()),
+          onTap: () => onOpen(const ConcordanceScreen()),
         );
       case 'votd_archive':
-        return _VotdArchiveCard(
-            span: span, expanded: expanded, onOpen: onOpen);
+        return _VotdArchiveCard(span: span, expanded: expanded, onOpen: onOpen);
       case 'streak':
-        return _StreakCard(
-            span: span, expanded: expanded, onOpen: onOpen);
+        return _StreakCard(span: span, expanded: expanded, onOpen: onOpen);
       default:
         return const SizedBox.shrink();
     }
@@ -525,24 +499,14 @@ class _YourSpaceCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final counts = [
-      (
-        Icons.bookmark_rounded,
-        'Saved',
-        ref.watch(bookmarksProvider).length,
-        1
-      ),
+      (Icons.bookmark_rounded, 'Saved', ref.watch(bookmarksProvider).length, 1),
       (
         Icons.highlight_rounded,
         'Marked',
         ref.watch(highlightsProvider).length,
         0
       ),
-      (
-        Icons.note_alt_rounded,
-        'Notes',
-        ref.watch(notesProvider).length,
-        2
-      ),
+      (Icons.note_alt_rounded, 'Notes', ref.watch(notesProvider).length, 2),
       (
         Icons.menu_book_rounded,
         'Journal',
@@ -550,8 +514,7 @@ class _YourSpaceCard extends ConsumerWidget {
         3
       ),
     ];
-    void go(int tab) =>
-        onOpen(YourSpaceScreen(initialTab: tab));
+    void go(int tab) => onOpen(YourSpaceScreen(initialTab: tab));
 
     final tiles = [
       for (final c in counts)
@@ -569,8 +532,7 @@ class _YourSpaceCard extends ConsumerWidget {
               ),
               child: Column(
                 children: [
-                  Icon(c.$1,
-                      size: 18, color: theme.primaryColor),
+                  Icon(c.$1, size: 18, color: theme.primaryColor),
                   const SizedBox(height: 4),
                   Text('${c.$3}',
                       style: theme.textTheme.titleSmall?.copyWith(
@@ -579,8 +541,8 @@ class _YourSpaceCard extends ConsumerWidget {
                   Text(c.$2,
                       style: theme.textTheme.labelSmall?.copyWith(
                         fontSize: 10,
-                        color: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.65),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.65),
                       )),
                 ],
               ),
@@ -601,8 +563,7 @@ class _YourSpaceCard extends ConsumerWidget {
             children: [
               const Expanded(child: V2Eyebrow('Your Space')),
               Icon(Icons.chevron_right_rounded,
-                  color: theme.colorScheme.onSurface
-                      .withValues(alpha: 0.5)),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
             ],
           ),
           const SizedBox(height: 4),
@@ -675,9 +636,7 @@ class _PlansLiveCardState extends ConsumerState<_PlansLiveCard> {
 
     final hasActive = activeIds.isNotEmpty;
     final planId = hasActive ? activeIds.first : null;
-    final plan = planId == null
-        ? null
-        : ref.watch(readingPlanProvider(planId));
+    final plan = planId == null ? null : ref.watch(readingPlanProvider(planId));
     final total = plan?.planData.length ?? 0;
     final current = plan?.todayReadingDay ?? total;
     final behind = plan?.missedDays.length ?? 0;
@@ -686,8 +645,7 @@ class _PlansLiveCardState extends ConsumerState<_PlansLiveCard> {
       if (!hasActive) {
         return Row(
           children: [
-            Icon(Icons.menu_book_rounded,
-                size: 32, color: theme.primaryColor),
+            Icon(Icons.menu_book_rounded, size: 32, color: theme.primaryColor),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -732,18 +690,15 @@ class _PlansLiveCardState extends ConsumerState<_PlansLiveCard> {
                 Row(
                   children: [
                     Expanded(
-                      child: V2ProgressBar(
-                          fraction: plan.percentComplete),
+                      child: V2ProgressBar(fraction: plan.percentComplete),
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      total == 0
-                          ? '…'
-                          : 'Day $current of $total',
+                      total == 0 ? '…' : 'Day $current of $total',
                       style: theme.textTheme.labelSmall?.copyWith(
                         fontWeight: FontWeight.w800,
-                        color: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.6),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                   ],
@@ -782,8 +737,7 @@ class _PlansLiveCardState extends ConsumerState<_PlansLiveCard> {
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontStyle: FontStyle.italic,
-                      color: theme.colorScheme.onSurface
-                          .withValues(alpha: 0.6),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     )),
               ],
             ),
@@ -828,22 +782,19 @@ class _PlansLiveCardState extends ConsumerState<_PlansLiveCard> {
                 Container(
                   width: 6,
                   height: 6,
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 3),
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: i == _page
                         ? theme.primaryColor
-                        : theme.colorScheme.onSurface
-                            .withValues(alpha: 0.25),
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.25),
                   ),
                 ),
             ],
           ),
           if (widget.expanded && hasActive && total > 0) ...[
             const SizedBox(height: 12),
-            _TodayRow(
-                planId: planId!, current: current, total: total),
+            _TodayRow(planId: planId!, current: current, total: total),
           ],
         ],
       ),
@@ -867,9 +818,8 @@ class _TodayRow extends ConsumerWidget {
     final plan = ref.watch(readingPlanProvider(planId));
     String label = 'Ready to begin';
     if (total > 0 && current >= 1 && current <= total) {
-      label = plan.planData[current - 1].passages
-          .map((p) => p.label)
-          .join(' · ');
+      label =
+          plan.planData[current - 1].passages.map((p) => p.label).join(' · ');
     }
     return Container(
       padding: const EdgeInsets.all(12),
@@ -894,13 +844,11 @@ class _TodayRow extends ConsumerWidget {
           FilledButton.tonal(
             onPressed: () {
               Navigator.of(context).push(CupertinoPageRoute(
-                builder: (_) =>
-                    ReadingPlanDetailV2Screen(planId: planId),
+                builder: (_) => ReadingPlanDetailV2Screen(planId: planId),
               ));
             },
-            child: Text(plan.completedReadings.contains(current)
-                ? 'Review'
-                : 'Read'),
+            child: Text(
+                plan.completedReadings.contains(current) ? 'Review' : 'Read'),
           ),
         ],
       ),
@@ -951,9 +899,8 @@ class _ToolCard extends StatelessWidget {
                 color: theme.primaryColor.withValues(alpha: 0.3),
               ),
             ),
-            child: Icon(icon,
-                size: expanded ? 24 : 18,
-                color: theme.primaryColor),
+            child:
+                Icon(icon, size: expanded ? 24 : 18, color: theme.primaryColor),
           ),
           const SizedBox(height: 8),
           V2Eyebrow(eyebrow),
@@ -972,8 +919,7 @@ class _ToolCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.bodySmall?.copyWith(
                   fontStyle: FontStyle.italic,
-                  color: theme.colorScheme.onSurface
-                      .withValues(alpha: 0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 )),
           ],
           const SizedBox(height: 6),
@@ -1023,8 +969,7 @@ class _VotdArchiveCard extends ConsumerWidget {
               ),
             ),
             child: Icon(Icons.spellcheck_rounded,
-                size: expanded ? 24 : 18,
-                color: theme.primaryColor),
+                size: expanded ? 24 : 18, color: theme.primaryColor),
           ),
           const SizedBox(height: 8),
           const V2Eyebrow('Word of the day'),
@@ -1045,8 +990,7 @@ class _VotdArchiveCard extends ConsumerWidget {
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.bodySmall?.copyWith(
                   fontStyle: FontStyle.italic,
-                  color: theme.colorScheme.onSurface
-                      .withValues(alpha: 0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 )),
           ],
           const SizedBox(height: 6),
@@ -1067,8 +1011,7 @@ class _VotdArchiveCard extends ConsumerWidget {
             featured: span == CardSpan.full,
             onTap: open,
             padding: EdgeInsets.all(expanded ? 20 : 15),
-            child: body('Word of the day', null,
-                showSnippet: false),
+            child: body('Word of the day', null, showSnippet: false),
           );
         }
         return V2Card(
@@ -1077,8 +1020,7 @@ class _VotdArchiveCard extends ConsumerWidget {
           onTap: open,
           padding: EdgeInsets.all(expanded ? 20 : 15),
           child: body(wotd.word, wotd.snippet,
-              showSnippet:
-                  span == CardSpan.full || expanded),
+              showSnippet: span == CardSpan.full || expanded),
         );
       },
       loading: () => V2Card(
@@ -1087,8 +1029,7 @@ class _VotdArchiveCard extends ConsumerWidget {
         padding: const EdgeInsets.all(15),
         child: Text('Loading…',
             style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface
-                  .withValues(alpha: 0.6),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
             )),
       ),
       error: (_, __) => V2Card(
@@ -1144,8 +1085,7 @@ class _StreakCard extends ConsumerWidget {
                 size: expanded ? 24 : 18,
                 color: count > 0
                     ? theme.primaryColor
-                    : theme.colorScheme.onSurface
-                        .withValues(alpha: 0.4)),
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.4)),
           ),
           const SizedBox(height: 8),
           const V2Eyebrow('Reading streak'),
@@ -1170,8 +1110,7 @@ class _StreakCard extends ConsumerWidget {
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.bodySmall?.copyWith(
                   fontStyle: FontStyle.italic,
-                  color: theme.colorScheme.onSurface
-                      .withValues(alpha: 0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 )),
           ],
           const SizedBox(height: 6),

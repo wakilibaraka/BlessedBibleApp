@@ -95,8 +95,7 @@ class PlanDayData {
         for (var ch = r.startChapter; ch <= r.endChapter; ch++) {
           final id = '${r.book}_$ch';
           if (seen.add(id)) {
-            out.add(PlanChapter(
-                bookName: r.book, chapterNum: ch, id: id));
+            out.add(PlanChapter(bookName: r.book, chapterNum: ch, id: id));
           }
         }
       }
@@ -158,17 +157,16 @@ class ReadingPlanState {
 
   /// Rest-day rule (app weekday 1=Sun..7=Sat): the set wins when non-empty,
   /// otherwise the legacy single day; nothing set means no rest days.
-  bool isRestWeekday(int appWeekday) =>
-      restDays.isNotEmpty ? restDays.contains(appWeekday) : restDay == appWeekday;
+  bool isRestWeekday(int appWeekday) => restDays.isNotEmpty
+      ? restDays.contains(appWeekday)
+      : restDay == appWeekday;
 
   /// Effective day completion: the atom rule when atoms exist for the
   /// day (and any atom is recorded at all), otherwise the legacy
   /// day-number rule. During the additive migration both sets are kept.
   bool isDayComplete(int day) {
     final atoms = dayAtoms[day];
-    if (completedAtomIds.isNotEmpty &&
-        atoms != null &&
-        atoms.isNotEmpty) {
+    if (completedAtomIds.isNotEmpty && atoms != null && atoms.isNotEmpty) {
       for (final a in atoms) {
         if (!completedAtomIds.contains(a)) return false;
       }
@@ -302,9 +300,9 @@ class ReadingPlanState {
       planData: planData ?? this.planData,
       completedAtomIds: completedAtomIds ?? this.completedAtomIds,
       // New readings invalidate cached atoms (rebuilt on next load).
-      dayAtoms: planData != null ? (dayAtoms ?? {}) : (dayAtoms ?? this.dayAtoms),
-      error:
-          identical(error, _keepError) ? this.error : error as String?,
+      dayAtoms:
+          planData != null ? (dayAtoms ?? {}) : (dayAtoms ?? this.dayAtoms),
+      error: identical(error, _keepError) ? this.error : error as String?,
       reminderEnabled: reminderEnabled ?? this.reminderEnabled,
       reminderTimeHour: reminderTimeHour ?? this.reminderTimeHour,
       reminderTimeMinute: reminderTimeMinute ?? this.reminderTimeMinute,
@@ -341,8 +339,9 @@ class ReadingPlanState {
         final ev = int.tryParse(parts[4]);
         if (sc == null || sv == null || ec == null || ev == null) continue;
         if (sc != ec) continue;
-        touching.putIfAbsent('${parts[0]}|$sc', () => []).add(
-            _CoverRange(sv, ev, completedAtomIds.contains(a)));
+        touching
+            .putIfAbsent('${parts[0]}|$sc', () => [])
+            .add(_CoverRange(sv, ev, completedAtomIds.contains(a)));
       }
     }
     touching.forEach((key, ranges) {
@@ -350,8 +349,7 @@ class ReadingPlanState {
       for (final r in ranges) {
         if (r.hi > planMax) planMax = r.hi;
       }
-      final sorted = ranges.toList()
-        ..sort((a, b) => a.lo.compareTo(b.lo));
+      final sorted = ranges.toList()..sort((a, b) => a.lo.compareTo(b.lo));
       var covered = 1;
       var complete = false;
       for (final r in sorted) {
@@ -408,11 +406,13 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
     try {
       List<PlanDayData> planData = [];
       final bool isBundled = kBundledPlanIds.contains(targetPlanId);
-      
+
       if (isBundled) {
-        final jsonString = await rootBundle.loadString('assets/reading_plans/$targetPlanId.json');
-        final Map<String, dynamic> decoded = await compute<String, Map<String, dynamic>>(
-          (s) => jsonDecode(s) as Map<String, dynamic>, jsonString);
+        final jsonString = await rootBundle
+            .loadString('assets/reading_plans/$targetPlanId.json');
+        final Map<String, dynamic> decoded =
+            await compute<String, Map<String, dynamic>>(
+                (s) => jsonDecode(s) as Map<String, dynamic>, jsonString);
         final rawReadings = decoded['readings'] as List;
         planData = rawReadings.map((e) => PlanDayData.fromJson(e)).toList();
       }
@@ -474,7 +474,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
             for (final dayMap in schedule) {
               final dayNum = dayMap['dayNumber'] as int;
               final portions = dayMap['portions'] as List;
-              
+
               List<PlanPassage> passages = [];
               for (final portionMap in portions) {
                 final book = portionMap['book'] as String;
@@ -482,30 +482,30 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
                 final startV = portionMap['startVerse'] as int;
                 final endCh = portionMap['endChapter'] as int;
                 final endV = portionMap['endVerse'] as int;
-                
+
                 List<String> refs = [];
                 for (int ch = startCh; ch <= endCh; ch++) {
                   if (startCh == endCh) {
-                     refs.add('$book $ch:$startV-$endV');
+                    refs.add('$book $ch:$startV-$endV');
                   } else if (ch == startCh) {
-                     refs.add('$book $ch:$startV');
+                    refs.add('$book $ch:$startV');
                   } else if (ch == endCh) {
-                     refs.add('$book $ch:1-$endV');
+                    refs.add('$book $ch:1-$endV');
                   } else {
-                     refs.add('$book $ch');
+                    refs.add('$book $ch');
                   }
                 }
-                
+
                 String label;
                 if (startCh == endCh) {
                   label = '$book $startCh:$startV-$endV';
                 } else {
                   label = '$book $startCh:$startV–$endCh:$endV';
                 }
-                
+
                 passages.add(PlanPassage(label: label, refs: refs));
               }
-              
+
               finalPlanData.add(PlanDayData(
                 day: dayNum,
                 week: ((dayNum - 1) ~/ 7) + 1,
@@ -603,11 +603,11 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
     decoded.forEach((book, chapters) {
       final chMap = <int, List<int>>{};
       (chapters as Map<String, dynamic>).forEach((ch, info) {
-        chMap[int.parse(ch)] = (((info as Map<String, dynamic>)['verses'])
-                as Map<String, dynamic>)
-            .keys
-            .map(int.parse)
-            .toList();
+        chMap[int.parse(ch)] =
+            (((info as Map<String, dynamic>)['verses']) as Map<String, dynamic>)
+                .keys
+                .map(int.parse)
+                .toList();
       });
       canon[book] = chMap;
     });
@@ -637,8 +637,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
   }
 
   /// Content atom ids per 1-based day from already-parsed passages.
-  Map<int, List<String>> _dayAtomsFromParsed(
-      List<PlanDayData> planData) {
+  Map<int, List<String>> _dayAtomsFromParsed(List<PlanDayData> planData) {
     final out = <int, List<String>>{};
     for (var i = 0; i < planData.length; i++) {
       out[i + 1] = [
@@ -670,9 +669,8 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
     ref.invalidateSelf();
   }
 
-
-  void startPlan({
-      String? planId,
+  void startPlan(
+      {String? planId,
       String paceMode = 'scheduled',
       int? restDay,
       DateTime? startDate,
@@ -777,7 +775,6 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
   /// Always use this helper instead of setRestDay(null).
   void setRestDayOrNone(int? day) => setRestDay(day ?? -1);
 
-
   void setStartDate(DateTime startDate) {
     final next = state.copyWith(planStartedOn: startDate);
     state = next;
@@ -827,9 +824,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
     final newCompleted = <int>{};
     for (var d = 1; d <= state.planData.length; d++) {
       final atoms = state.dayAtoms[d];
-      if (atoms != null &&
-          atoms.isNotEmpty &&
-          atoms.every(newAtoms.contains)) {
+      if (atoms != null && atoms.isNotEmpty && atoms.every(newAtoms.contains)) {
         newCompleted.add(d);
       } else if (state.completedReadings.contains(d)) {
         newCompleted.add(d);
@@ -860,10 +855,8 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
 
       final wcs = ref.read(wordCountServiceProvider);
       await wcs.init();
-      final pJson =
-          await rootBundle.loadString('assets/data/pericopes.json');
-      final allPericopes =
-          await compute(parsePericopesJson, pJson);
+      final pJson = await rootBundle.loadString('assets/data/pericopes.json');
+      final allPericopes = await compute(parsePericopesJson, pJson);
 
       final remapSvc = PaceRemapService(
         wordCountService: wcs,
@@ -886,7 +879,8 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
       prefs.saveCustomPlan(_planId, result.newPlan.toJson());
 
       // Persist updated progress
-      final next = state.copyWith(completedReadings: result.newCompletedReadings);
+      final next =
+          state.copyWith(completedReadings: result.newCompletedReadings);
       state = next;
       _saveToPrefs(next);
 

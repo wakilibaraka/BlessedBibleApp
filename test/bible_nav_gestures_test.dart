@@ -27,9 +27,7 @@ void main() {
     final first = ProviderContainer();
     addTearDown(first.dispose);
 
-    await first
-        .read(bibleNavSettingsProvider.notifier)
-        .setHomePullDown(false);
+    await first.read(bibleNavSettingsProvider.notifier).setHomePullDown(false);
     await first
         .read(bibleNavSettingsProvider.notifier)
         .setHomePullDownTarget(HomePullDownTarget.settings);
@@ -45,8 +43,7 @@ void main() {
     expect(state.homePullDownTarget, HomePullDownTarget.settings);
   });
 
-  test('a stored Settings choice survives the Appearance default',
-      () async {
+  test('a stored Settings choice survives the Appearance default', () async {
     // Regression guard: flipping the default must not rewrite an
     // explicit user choice.
     SharedPreferences.setMockInitialValues({

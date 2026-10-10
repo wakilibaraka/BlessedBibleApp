@@ -39,8 +39,7 @@ SearchEngine testEngine() {
     'psalm': [1],
   };
   return SearchEngine(
-    baseIndexFuture:
-        Future.value(IndexData(corpus, index)),
+    baseIndexFuture: Future.value(IndexData(corpus, index)),
   );
 }
 
@@ -55,17 +54,13 @@ void main() {
     final engine = testEngine();
     final results = await engine.search('jhon', fuzzyMatch: true);
     expect(results, isNotEmpty);
-    expect(
-        results.any((r) => r.title.contains('John 3:16')), isTrue);
+    expect(results.any((r) => r.title.contains('John 3:16')), isTrue);
   });
 
   test('exact queries are unaffected by the fuzzy flag', () async {
     final engine = testEngine();
-    final plain =
-        await engine.search('shepherd', fuzzyMatch: false);
-    final fuzzy =
-        await engine.search('shepherd', fuzzyMatch: true);
-    expect(plain.map((r) => r.title),
-        containsAll(fuzzy.map((r) => r.title)));
+    final plain = await engine.search('shepherd', fuzzyMatch: false);
+    final fuzzy = await engine.search('shepherd', fuzzyMatch: true);
+    expect(plain.map((r) => r.title), containsAll(fuzzy.map((r) => r.title)));
   });
 }

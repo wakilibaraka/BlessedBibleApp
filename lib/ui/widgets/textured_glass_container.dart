@@ -44,7 +44,7 @@ class TexturedGlassContainer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final appTheme = ref.watch(themeProvider);
     final surfaceStyle = ref.watch(surfaceStyleProvider);
-    
+
     final is3D = surfaceStyle == SurfaceStyle.threeDimensional;
     final isPaperlike = surfaceStyle == SurfaceStyle.paperlike;
     final isClaymorphic = surfaceStyle == SurfaceStyle.claymorphic;
@@ -151,7 +151,8 @@ class TexturedGlassContainer extends ConsumerWidget {
         ),
       ];
     } else if (isFrutigerAero) {
-      final glassBlue = Colors.lightBlue.withValues(alpha: isDarkBg ? 0.30 : 0.20);
+      final glassBlue =
+          Colors.lightBlue.withValues(alpha: isDarkBg ? 0.30 : 0.20);
       shadows = [
         BoxShadow(
           color: Colors.black.withValues(alpha: isDarkBg ? 0.45 : 0.18),
@@ -239,7 +240,11 @@ class TexturedGlassContainer extends ConsumerWidget {
     } else {
       containerBorder = Border.all(
         width: is3D ? 0.0 : (isPaperlike ? 0.8 : 0.5),
-        color: is3D ? Colors.transparent : (isPaperlike ? tokens.readingBorder.withValues(alpha: 0.4) : tokens.readingBorder),
+        color: is3D
+            ? Colors.transparent
+            : (isPaperlike
+                ? tokens.readingBorder.withValues(alpha: 0.4)
+                : tokens.readingBorder),
       );
     }
 
@@ -307,8 +312,12 @@ class TexturedGlassContainer extends ConsumerWidget {
           child: (useBlur || isFrutigerAero)
               ? BackdropFilter(
                   filter: ImageFilter.blur(
-                    sigmaX: isFrutigerAero ? (isScrollable ? 0.001 : 16.0) : (useBlur ? sigmaX : 0.001),
-                    sigmaY: isFrutigerAero ? (isScrollable ? 0.001 : 16.0) : (useBlur ? sigmaY : 0.001),
+                    sigmaX: isFrutigerAero
+                        ? (isScrollable ? 0.001 : 16.0)
+                        : (useBlur ? sigmaX : 0.001),
+                    sigmaY: isFrutigerAero
+                        ? (isScrollable ? 0.001 : 16.0)
+                        : (useBlur ? sigmaY : 0.001),
                   ),
                   child: content,
                 )
@@ -403,7 +412,6 @@ class _RimAndNoisePainter extends CustomPainter {
       old.rimAlpha != rimAlpha || old.isDark != isDark;
 }
 
-
 class _ClaymorphicPainter extends CustomPainter {
   final BorderRadius borderRadius;
   final bool isDark;
@@ -432,8 +440,8 @@ class _ClaymorphicPainter extends CustomPainter {
         stops: const [0.0, 1.0],
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height * 0.50));
     canvas.drawRRect(
-      borderRadius.toRRect(
-          Rect.fromLTWH(1.5, 1.5, size.width - 3, size.height - 3)),
+      borderRadius
+          .toRRect(Rect.fromLTWH(1.5, 1.5, size.width - 3, size.height - 3)),
       topHighlightPaint,
     );
 

@@ -1,5 +1,3 @@
-
-
 class BookmarkFolder {
   final String id;
   final String name;
@@ -67,7 +65,7 @@ class BookmarkData {
             ?.map((e) => BookmarkFolder.fromJson(e as Map<String, dynamic>))
             .toList() ??
         [];
-        
+
     final nodesMap = <String, BookmarkNode>{};
     if (json['nodes'] != null) {
       final map = json['nodes'] as Map<String, dynamic>;

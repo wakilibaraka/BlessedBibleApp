@@ -33,8 +33,7 @@ List<BibleBook> parseBibleRows(List<Map<String, dynamic>> rows) {
           : 'Book $bookNum';
       book = BibleBook(
         name: name,
-        abbreviation:
-            name, // Fixed from substring(0, 3) to prevent collisions
+        abbreviation: name, // Fixed from substring(0, 3) to prevent collisions
         chapters: [],
       );
       books.add(book);
@@ -87,4 +86,3 @@ List<PericopeEntry> parsePericopesJson(String jsonString) {
       .map((e) => PericopeEntry.fromJson(e as Map<String, dynamic>))
       .toList();
 }
-

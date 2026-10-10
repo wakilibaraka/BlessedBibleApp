@@ -85,7 +85,7 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
   @override
   Widget build(BuildContext context) {
     ref.watch(widgetUpdateServiceProvider); // Initialize widget background sync
-    
+
     final themeMode = ref.watch(themeProvider);
     final surfaceStyle = ref.watch(surfaceStyleProvider);
     final isBibleLoading = ref.watch(bibleProvider.select((s) => s.isLoading));
@@ -120,15 +120,16 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
                         isAmoled: themeMode == AppThemeMode.oled);
 
     final prefsService = ref.watch(preferencesProvider);
-    final hasExplicitSurface = prefsService.prefs.containsKey('app_surface_style');
+    final hasExplicitSurface =
+        prefsService.prefs.containsKey('app_surface_style');
     final applyPaperlikeToLight = surfaceStyle == SurfaceStyle.paperlike;
-    final applyPaperlikeToDark = surfaceStyle == SurfaceStyle.paperlike || 
-                                (themeMode == AppThemeMode.automatic && !hasExplicitSurface);
+    final applyPaperlikeToDark = surfaceStyle == SurfaceStyle.paperlike ||
+        (themeMode == AppThemeMode.automatic && !hasExplicitSurface);
 
     if (applyPaperlikeToLight) {
       lightBase = lightBase.applyPaperlike();
     }
-    
+
     if (applyPaperlikeToDark) {
       darkBase = themeMode == AppThemeMode.fresh
           ? darkBase.applyFreshPaperlike()
@@ -162,7 +163,9 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
       darkTheme: darkBase,
       home: !hasCompletedOnboarding
           ? const OnboardingScreen()
-          : (isBibleLoading ? const SplashLoadingScreen() : const MainNavScreen()),
+          : (isBibleLoading
+              ? const SplashLoadingScreen()
+              : const MainNavScreen()),
     );
   }
 }

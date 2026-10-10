@@ -12,8 +12,18 @@ import '../../state/devotional_provider.dart';
 /// colors (it is an illustration, not chrome).
 
 const List<String> _monthNames = [
-  'January', 'February', 'March', 'April', 'May', 'June', 'July',
-  'August', 'September', 'October', 'November', 'December',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
 String libraryDateHeader(DateTime day) =>
     '${_monthNames[day.month - 1]} ${day.day}, ${day.year}';
@@ -81,8 +91,8 @@ class LibraryGreetingHeader extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               onTap: onReadPressed,
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 14, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: theme.dividerColor),
@@ -102,8 +112,8 @@ class LibraryGreetingHeader extends StatelessWidget {
                     Text(
                       remainingLabel,
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.6),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                   ],
@@ -283,9 +293,8 @@ class PlanCoverPlaceholder extends StatelessWidget {
 
 /// Derives 1-2 stable initials from a plan title.
 String planInitials(String title) {
-  final words =
-      title.replaceAll(RegExp(r'[^\w\s]'), '').split(RegExp(r'\s+'))
-        ..removeWhere((w) => w.isEmpty);
+  final words = title.replaceAll(RegExp(r'[^\w\s]'), '').split(RegExp(r'\s+'))
+    ..removeWhere((w) => w.isEmpty);
   if (words.isEmpty) return 'BB';
   if (words.length == 1) {
     final w = words.first;

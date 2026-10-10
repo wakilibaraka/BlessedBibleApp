@@ -148,9 +148,7 @@ class PlanRefSpec {
       final c2 = int.parse(cendS!);
       checkChapter(c2);
       if (c2 < c1) throw FormatException('reversed range: $raw');
-      final hi = vendS == null
-          ? chapters[c2]!.last
-          : int.parse(vendS);
+      final hi = vendS == null ? chapters[c2]!.last : int.parse(vendS);
       checkVerse(c2, hi);
       return PlanRefSpec(
           book: book,
@@ -334,8 +332,8 @@ class PlanSpec {
           for (final r in (p['refs'] as List))
             PlanRefSpec.parse(r as String, canon),
         ];
-        passages.add(
-            PlanPassageSpec(label: p['label'] as String, refs: parsed));
+        passages
+            .add(PlanPassageSpec(label: p['label'] as String, refs: parsed));
         trackRanges.putIfAbsent(j, () => []).addAll(parsed);
       }
       days.add(PlanSpecDay(
@@ -367,7 +365,8 @@ class PlanSpec {
       ],
       days: days,
       cadenceDays: days.length,
-      sourceDigest: sha256.convert(utf8.encode(jsonEncode(readings))).toString(),
+      sourceDigest:
+          sha256.convert(utf8.encode(jsonEncode(readings))).toString(),
     );
   }
 

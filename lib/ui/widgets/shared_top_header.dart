@@ -72,7 +72,8 @@ class SharedTopHeader extends ConsumerWidget {
     return Center(
       child: GestureDetector(
         onTap: () {
-          AppearanceSettingsSheet.show(context, initialTab: AppearanceTab.theme);
+          AppearanceSettingsSheet.show(context,
+              initialTab: AppearanceTab.theme);
         },
         child: AnimatedSwitcher(
           duration: const Duration(milliseconds: 350),

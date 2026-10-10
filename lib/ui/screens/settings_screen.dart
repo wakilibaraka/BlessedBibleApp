@@ -26,7 +26,6 @@ import 'onboarding_screen.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../sheets/widget_settings_sheet.dart';
 
-
 final packageInfoProvider = FutureProvider<PackageInfo>((ref) async {
   return await PackageInfo.fromPlatform();
 });
@@ -134,7 +133,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               color: Theme.of(context).primaryColor,
             ),
             title: const Text('Home Screen Widgets'),
-            subtitle: const Text('Customize gradients, transparency, and live preview'),
+            subtitle: const Text(
+                'Customize gradients, transparency, and live preview'),
             trailing: const Icon(Icons.chevron_right_rounded),
             onTap: () {
               HapticFeedback.selectionClick();
@@ -164,11 +164,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               },
             );
           }),
-
-
         ],
       ),
-
       SettingsPillCard(
         children: [
           Consumer(builder: (context, ref, _) {
@@ -240,8 +237,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             // no duplicate error surface).
             final hasStrongsPack =
                 ref.watch(availableTranslationsProvider).when(
-                      data: (list) => list.any(
-                          (t) => t.translationId == 'kjv_strongs'),
+                      data: (list) =>
+                          list.any((t) => t.translationId == 'kjv_strongs'),
                       loading: () => true,
                       error: (_, __) => true,
                     );
@@ -269,15 +266,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                           child: Text(
                             "Requires the “KJV with Strong's” pack "
                             '(7.7 MB download).',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurface
-                                      .withValues(alpha: 0.6),
-                                ),
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withValues(alpha: 0.6),
+                                    ),
                           ),
                         ),
                         TextButton(
@@ -288,8 +283,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                               isScrollControlled: true,
                               useRootNavigator: true,
                               backgroundColor: Colors.transparent,
-                              builder: (ctx) =>
-                                  const TranslationPickerSheet(),
+                              builder: (ctx) => const TranslationPickerSheet(),
                             );
                           },
                           child: const Text('Get it'),
@@ -299,7 +293,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                   ),
                 if (showStrongs)
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 8.0),
                     child: SegmentedButton<StrongsIndicatorStyle>(
                       segments: const [
                         ButtonSegment(
@@ -331,14 +326,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             );
           }),
           Consumer(builder: (context, ref, _) {
-            final wpm = ref.watch(
-                readSettingsProvider.select((s) => s.readingWpm));
+            final wpm =
+                ref.watch(readSettingsProvider.select((s) => s.readingWpm));
             return Column(
               children: [
                 ListTile(
                   title: const Text('Reading speed'),
-                  subtitle: const Text(
-                      'Pace estimates for plans (words per minute)'),
+                  subtitle:
+                      const Text('Pace estimates for plans (words per minute)'),
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(
@@ -375,15 +370,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           }),
         ],
       ),
-
       SettingsPillCard(
         children: [
           Consumer(builder: (context, ref, _) {
-            final isEnabled = ref.watch(
-                readSettingsProvider.select((s) => s.dictionaryUnderlinesEnabled));
+            final isEnabled = ref.watch(readSettingsProvider
+                .select((s) => s.dictionaryUnderlinesEnabled));
             return SwitchListTile(
               title: const Text('Dictionary Underlines'),
-              subtitle: const Text('Dotted underlines on biblical terms and archaic words'),
+              subtitle: const Text(
+                  'Dotted underlines on biblical terms and archaic words'),
               value: isEnabled,
               onChanged: (val) {
                 HapticFeedback.selectionClick();
@@ -395,11 +390,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           }),
           const Divider(height: 1, indent: 16),
           Consumer(builder: (context, ref, _) {
-            final scope = ref.watch(
-                readSettingsProvider.select((s) => s.dictionaryScope));
-            final isEnabled = ref.watch(
-                readSettingsProvider.select((s) => s.dictionaryUnderlinesEnabled));
-            
+            final scope = ref
+                .watch(readSettingsProvider.select((s) => s.dictionaryScope));
+            final isEnabled = ref.watch(readSettingsProvider
+                .select((s) => s.dictionaryUnderlinesEnabled));
+
             if (!isEnabled) return const SizedBox.shrink();
 
             return Column(
@@ -407,7 +402,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               children: [
                 const Padding(
                   padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
-                  child: Text('Underline Scope', style: TextStyle(fontSize: 16)),
+                  child:
+                      Text('Underline Scope', style: TextStyle(fontSize: 16)),
                 ),
                 _buildDictScopeTile(
                   context,
@@ -417,29 +413,37 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                   groupValue: scope,
                   onTap: (val) {
                     HapticFeedback.selectionClick();
-                    ref.read(readSettingsProvider.notifier).setDictionaryScope(val);
+                    ref
+                        .read(readSettingsProvider.notifier)
+                        .setDictionaryScope(val);
                   },
                 ),
                 _buildDictScopeTile(
                   context,
                   title: 'Names + tricky words (Recommended)',
-                  subtitle: 'Includes archaic words with changed meanings (e.g., let, prevent)',
+                  subtitle:
+                      'Includes archaic words with changed meanings (e.g., let, prevent)',
                   value: DictionaryScope.termAndTricky,
                   groupValue: scope,
                   onTap: (val) {
                     HapticFeedback.selectionClick();
-                    ref.read(readSettingsProvider.notifier).setDictionaryScope(val);
+                    ref
+                        .read(readSettingsProvider.notifier)
+                        .setDictionaryScope(val);
                   },
                 ),
                 _buildDictScopeTile(
                   context,
                   title: 'Everything',
-                  subtitle: 'Highlights all archaic grammar (e.g., thee, thou, hath, unto)',
+                  subtitle:
+                      'Highlights all archaic grammar (e.g., thee, thou, hath, unto)',
                   value: DictionaryScope.everything,
                   groupValue: scope,
                   onTap: (val) {
                     HapticFeedback.selectionClick();
-                    ref.read(readSettingsProvider.notifier).setDictionaryScope(val);
+                    ref
+                        .read(readSettingsProvider.notifier)
+                        .setDictionaryScope(val);
                   },
                 ),
                 _buildDictScopeTile(
@@ -451,7 +455,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                   groupValue: scope,
                   onTap: (val) {
                     HapticFeedback.selectionClick();
-                    ref.read(readSettingsProvider.notifier).setDictionaryScope(val);
+                    ref
+                        .read(readSettingsProvider.notifier)
+                        .setDictionaryScope(val);
                   },
                 ),
                 _buildDictScopeTile(
@@ -463,7 +469,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                   groupValue: scope,
                   onTap: (val) {
                     HapticFeedback.selectionClick();
-                    ref.read(readSettingsProvider.notifier).setDictionaryScope(val);
+                    ref
+                        .read(readSettingsProvider.notifier)
+                        .setDictionaryScope(val);
                   },
                 ),
               ],
@@ -473,8 +481,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           Consumer(builder: (context, ref, _) {
             final mode = ref.watch(
                 readSettingsProvider.select((s) => s.nonKjvDictionaryMode));
-            final isEnabled = ref.watch(
-                readSettingsProvider.select((s) => s.dictionaryUnderlinesEnabled));
+            final isEnabled = ref.watch(readSettingsProvider
+                .select((s) => s.dictionaryUnderlinesEnabled));
 
             if (!isEnabled) return const SizedBox.shrink();
 
@@ -503,8 +511,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 _buildRadioTile<NonKjvDictionaryMode>(
                   context,
                   title: 'Follow underline scope',
-                  subtitle:
-                      'Same marking as KJV in every English version',
+                  subtitle: 'Same marking as KJV in every English version',
                   value: NonKjvDictionaryMode.followScope,
                   groupValue: mode,
                   onTap: (val) {
@@ -532,11 +539,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           }),
           const Divider(height: 1, indent: 16),
           Consumer(builder: (context, ref, _) {
-            final popupStyle = ref.watch(
-                readSettingsProvider.select((s) => s.popupStyle));
+            final popupStyle =
+                ref.watch(readSettingsProvider.select((s) => s.popupStyle));
             return AnimatedSegmentedTile<PopupStyle>(
               title: 'Popup Style',
-              subtitle: 'How dictionary definitions and Strong\'s numbers are displayed',
+              subtitle:
+                  'How dictionary definitions and Strong\'s numbers are displayed',
               selectedValue: popupStyle,
               options: const [
                 MapEntry(PopupStyle.floating, 'Floating'),
@@ -630,7 +638,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               },
             );
           }),
-
         ],
       ),
       SettingsPillCard(
@@ -688,8 +695,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               color: Theme.of(context).primaryColor,
             ),
             title: const Text('Appearance & text'),
-            subtitle: const Text(
-                'Theme, fonts, sizes and reading colors'),
+            subtitle: const Text('Theme, fonts, sizes and reading colors'),
             trailing: const Icon(Icons.chevron_right_rounded),
             onTap: () {
               HapticFeedback.selectionClick();
@@ -990,8 +996,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           }),
           const Divider(height: 1, indent: 16),
           Consumer(builder: (context, ref, _) {
-            final fuzzy = ref.watch(
-                searchSettingsProvider.select((s) => s.fuzzySearch));
+            final fuzzy =
+                ref.watch(searchSettingsProvider.select((s) => s.fuzzySearch));
             return SwitchListTile(
               title: const Text('Forgiving search'),
               subtitle: const Text(
@@ -1066,8 +1072,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             child: Text('Gestures', style: TextStyle(fontSize: 16)),
           ),
           Consumer(builder: (context, ref, _) {
-            final pullDown = ref.watch(bibleNavSettingsProvider
-                .select((s) => s.homePullDownEnabled));
+            final pullDown = ref.watch(
+                bibleNavSettingsProvider.select((s) => s.homePullDownEnabled));
             return SwitchListTile(
               title: const Text('Pull down on Home'),
               subtitle: const Text(
@@ -1082,8 +1088,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             );
           }),
           Consumer(builder: (context, ref, _) {
-            final target = ref.watch(bibleNavSettingsProvider
-                .select((s) => s.homePullDownTarget));
+            final target = ref.watch(
+                bibleNavSettingsProvider.select((s) => s.homePullDownTarget));
             return AnimatedSegmentedTile<HomePullDownTarget>(
               title: 'Pull-down opens',
               subtitle: 'Destination of the Home pull-down gesture',
@@ -1102,8 +1108,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           }),
           const Divider(height: 1, indent: 16),
           Consumer(builder: (context, ref, _) {
-            final swipeLeft = ref.watch(bibleNavSettingsProvider
-                .select((s) => s.homeSwipeLeftEnabled));
+            final swipeLeft = ref.watch(
+                bibleNavSettingsProvider.select((s) => s.homeSwipeLeftEnabled));
             return SwitchListTile(
               title: const Text('Swipe left on Home'),
               subtitle: const Text('Swipe left to jump to the Read tab'),
@@ -1476,7 +1482,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
       },
     );
   }
-
 
   Widget _buildDictScopeTile(
     BuildContext context, {

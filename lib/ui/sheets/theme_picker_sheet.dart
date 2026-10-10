@@ -37,20 +37,20 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
     final readSettings = ref.watch(readSettingsProvider);
 
     return GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onVerticalDragEnd: (details) {
-          // Swipe down quickly → dismiss the sheet
-          if ((details.primaryVelocity ?? 0) > 400) {
-            HapticFeedback.lightImpact();
-            Navigator.of(context).pop();
-          }
-        },
-        child: Container(
-          constraints: BoxConstraints(
-            maxHeight:
-                MediaQuery.of(context).size.height * kAppearanceSheetHeightFactor,
-          ),
-          child: TexturedGlassContainer(
+      behavior: HitTestBehavior.opaque,
+      onVerticalDragEnd: (details) {
+        // Swipe down quickly → dismiss the sheet
+        if ((details.primaryVelocity ?? 0) > 400) {
+          HapticFeedback.lightImpact();
+          Navigator.of(context).pop();
+        }
+      },
+      child: Container(
+        constraints: BoxConstraints(
+          maxHeight:
+              MediaQuery.of(context).size.height * kAppearanceSheetHeightFactor,
+        ),
+        child: TexturedGlassContainer(
           sigmaX: 45.0,
           sigmaY: 45.0,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
@@ -90,262 +90,272 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                              Consumer(builder: (context, ref, _) {
-                                final surfaceStyle = ref.watch(earthHeavenStyleProvider);
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    _SurfaceStyleGrid(
-                                      selectedStyle: surfaceStyle,
-                                      onChanged: (val) {
-                                        HapticFeedback.selectionClick();
-                                        ref.read(earthHeavenStyleProvider.notifier).setStyle(val);
-                                      },
-                                    ),
-                                    const SizedBox(height: 8),
-                                    SwitchListTile(
-                                      contentPadding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
-                                      title: const Text('Enable Background Glow', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                                      subtitle: const Text('Renders a subtle animated light behind the reader', style: TextStyle(fontSize: 12)),
-                                      value: readSettings.isGlowEnabled,
-                                      onChanged: (value) {
-                                        HapticFeedback.selectionClick();
-                                        ref.read(readSettingsProvider.notifier).setGlowEnabled(value);
-                                      },
-                                    ),
-                                  ],
-                                );
-                              }),
-                              const SizedBox(height: 24),
-                                Text(
-                                  'FOUNDATIONS',
-                                  style: theme.textTheme.labelSmall?.copyWith(
-                                    color: theme.primaryColor,
-                                    letterSpacing: 1.2,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 10,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: _ThemePill(
-                                        label: 'Dawn',
-                                        mode: AppThemeMode.light,
-                                        currentMode: currentMode,
-                                        fillColor: AppColors.lightBackground,
-                                        textColor: AppColors.lightTextPrimary,
-                                        swatchColors: const [
-                                          AppColors.lightBackground,
-                                          AppColors.lightSurface,
-                                          AppColors.lightAccent
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: _ThemePill(
-                                        label: 'Fresh',
-                                        mode: AppThemeMode.sepia,
-                                        currentMode: currentMode,
-                                        fillColor: AppColors.sepiaBackground,
-                                        textColor: AppColors.sepiaTextPrimary,
-                                        swatchColors: const [
-                                          AppColors.sepiaBackground,
-                                          AppColors.sepiaSurface,
-                                          AppColors.sepiaTextPrimary
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: _DarkThemePill(
-                                          currentMode: currentMode),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  'FIRMAMENT',
-                                  style: theme.textTheme.labelSmall?.copyWith(
-                                    color: theme.primaryColor,
-                                    letterSpacing: 1.2,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 10,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: _ThemePill(
-                                        label: 'Sun',
-                                        mode: AppThemeMode.dawn,
-                                        currentMode: currentMode,
-                                        fillColor: AppColors.dawnBackground,
-                                        textColor: AppColors.dawnTextPrimary,
-                                        swatchColors: const [
-                                          AppColors.dawnPrimary,
-                                          AppColors.dawnAccent,
-                                          AppColors.dawnBackground
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: _ThemePill(
-                                        label: 'Moon',
-                                        mode: AppThemeMode.fresh,
-                                        currentMode: currentMode,
-                                        fillColor: AppColors.freshBackground,
-                                        textColor: AppColors.freshTextPrimary,
-                                        swatchColors: const [
-                                          AppColors.freshPrimary,
-                                          AppColors.freshAccent,
-                                          AppColors.freshBackground
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: _ThemePill(
-                                        label: 'Stars',
-                                        mode: AppThemeMode.dusk,
-                                        currentMode: currentMode,
-                                        fillColor: AppColors.duskBackground,
-                                        textColor: AppColors.duskTextPrimary,
-                                        swatchColors: const [
-                                          AppColors.duskPrimary,
-                                          AppColors.duskAccent,
-                                          AppColors.duskBackground
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  'EDEN',
-                                  style: theme.textTheme.labelSmall?.copyWith(
-                                    color: theme.primaryColor,
-                                    letterSpacing: 1.2,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 10,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: _ThemePill(
-                                        label: 'Lilies',
-                                        mode: AppThemeMode.lilies,
-                                        currentMode: currentMode,
-                                        fillColor: AppColors.liliesBackground,
-                                        textColor: AppColors.liliesTextPrimary,
-                                        swatchColors: const [
-                                          AppColors.liliesPrimary,
-                                          AppColors.liliesAccent,
-                                          AppColors.liliesBackground
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: _ThemePill(
-                                        label: 'Roses',
-                                        mode: AppThemeMode.roses,
-                                        currentMode: currentMode,
-                                        fillColor: AppColors.rosesBackground,
-                                        textColor: AppColors.rosesTextPrimary,
-                                        swatchColors: const [
-                                          AppColors.rosesPrimary,
-                                          AppColors.rosesAccent,
-                                          AppColors.rosesBackground
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: _ThemePill(
-                                        label: 'Olives',
-                                        mode: AppThemeMode.olives,
-                                        currentMode: currentMode,
-                                        fillColor: AppColors.olivesBackground,
-                                        textColor: AppColors.olivesTextPrimary,
-                                        swatchColors: const [
-                                          AppColors.olivesPrimary,
-                                          AppColors.olivesAccent,
-                                          AppColors.olivesBackground
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  'SANCTUARY',
-                                  style: theme.textTheme.labelSmall?.copyWith(
-                                    color: theme.primaryColor,
-                                    letterSpacing: 1.2,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 10,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: _ThemePill(
-                                        label: 'Priestly\nPurple',
-                                        mode: AppThemeMode.priestlyPurple,
-                                        currentMode: currentMode,
-                                        fillColor: AppColors.lightBackground,
-                                        textColor: const Color(0xFF673AB7),
-                                        swatchColors: const [
-                                          Color(0xFF673AB7),
-                                          Color(0xFF9575CD),
-                                          AppColors.lightBackground
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: _ThemePill(
-                                        label: 'Galilee\nBlue',
-                                        mode: AppThemeMode.galileeBlue,
-                                        currentMode: currentMode,
-                                        fillColor: AppColors.lightBackground,
-                                        textColor: const Color(0xFF2196F3),
-                                        swatchColors: const [
-                                          Color(0xFF2196F3),
-                                          Color(0xFF64B5F6),
-                                          AppColors.lightBackground
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: _ThemePill(
-                                        label: 'Scarlet\nRed',
-                                        mode: AppThemeMode.scarletRed,
-                                        currentMode: currentMode,
-                                        fillColor: AppColors.lightBackground,
-                                        textColor: const Color(0xFFE53935),
-                                        swatchColors: const [
-                                          Color(0xFFE53935),
-                                          Color(0xFFEF5350),
-                                          AppColors.lightBackground
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                      Consumer(builder: (context, ref, _) {
+                        final surfaceStyle =
+                            ref.watch(earthHeavenStyleProvider);
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _SurfaceStyleGrid(
+                              selectedStyle: surfaceStyle,
+                              onChanged: (val) {
+                                HapticFeedback.selectionClick();
+                                ref
+                                    .read(earthHeavenStyleProvider.notifier)
+                                    .setStyle(val);
+                              },
+                            ),
+                            const SizedBox(height: 8),
+                            SwitchListTile(
+                              contentPadding: const EdgeInsets.only(
+                                  left: 16, right: 16, bottom: 8),
+                              title: const Text('Enable Background Glow',
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold)),
+                              subtitle: const Text(
+                                  'Renders a subtle animated light behind the reader',
+                                  style: TextStyle(fontSize: 12)),
+                              value: readSettings.isGlowEnabled,
+                              onChanged: (value) {
+                                HapticFeedback.selectionClick();
+                                ref
+                                    .read(readSettingsProvider.notifier)
+                                    .setGlowEnabled(value);
+                              },
+                            ),
+                          ],
+                        );
+                      }),
+                      const SizedBox(height: 24),
+                      Text(
+                        'FOUNDATIONS',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.primaryColor,
+                          letterSpacing: 1.2,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _ThemePill(
+                              label: 'Dawn',
+                              mode: AppThemeMode.light,
+                              currentMode: currentMode,
+                              fillColor: AppColors.lightBackground,
+                              textColor: AppColors.lightTextPrimary,
+                              swatchColors: const [
+                                AppColors.lightBackground,
+                                AppColors.lightSurface,
+                                AppColors.lightAccent
                               ],
                             ),
                           ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: _ThemePill(
+                              label: 'Fresh',
+                              mode: AppThemeMode.sepia,
+                              currentMode: currentMode,
+                              fillColor: AppColors.sepiaBackground,
+                              textColor: AppColors.sepiaTextPrimary,
+                              swatchColors: const [
+                                AppColors.sepiaBackground,
+                                AppColors.sepiaSurface,
+                                AppColors.sepiaTextPrimary
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: _DarkThemePill(currentMode: currentMode),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'FIRMAMENT',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.primaryColor,
+                          letterSpacing: 1.2,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _ThemePill(
+                              label: 'Sun',
+                              mode: AppThemeMode.dawn,
+                              currentMode: currentMode,
+                              fillColor: AppColors.dawnBackground,
+                              textColor: AppColors.dawnTextPrimary,
+                              swatchColors: const [
+                                AppColors.dawnPrimary,
+                                AppColors.dawnAccent,
+                                AppColors.dawnBackground
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: _ThemePill(
+                              label: 'Moon',
+                              mode: AppThemeMode.fresh,
+                              currentMode: currentMode,
+                              fillColor: AppColors.freshBackground,
+                              textColor: AppColors.freshTextPrimary,
+                              swatchColors: const [
+                                AppColors.freshPrimary,
+                                AppColors.freshAccent,
+                                AppColors.freshBackground
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: _ThemePill(
+                              label: 'Stars',
+                              mode: AppThemeMode.dusk,
+                              currentMode: currentMode,
+                              fillColor: AppColors.duskBackground,
+                              textColor: AppColors.duskTextPrimary,
+                              swatchColors: const [
+                                AppColors.duskPrimary,
+                                AppColors.duskAccent,
+                                AppColors.duskBackground
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'EDEN',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.primaryColor,
+                          letterSpacing: 1.2,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _ThemePill(
+                              label: 'Lilies',
+                              mode: AppThemeMode.lilies,
+                              currentMode: currentMode,
+                              fillColor: AppColors.liliesBackground,
+                              textColor: AppColors.liliesTextPrimary,
+                              swatchColors: const [
+                                AppColors.liliesPrimary,
+                                AppColors.liliesAccent,
+                                AppColors.liliesBackground
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: _ThemePill(
+                              label: 'Roses',
+                              mode: AppThemeMode.roses,
+                              currentMode: currentMode,
+                              fillColor: AppColors.rosesBackground,
+                              textColor: AppColors.rosesTextPrimary,
+                              swatchColors: const [
+                                AppColors.rosesPrimary,
+                                AppColors.rosesAccent,
+                                AppColors.rosesBackground
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: _ThemePill(
+                              label: 'Olives',
+                              mode: AppThemeMode.olives,
+                              currentMode: currentMode,
+                              fillColor: AppColors.olivesBackground,
+                              textColor: AppColors.olivesTextPrimary,
+                              swatchColors: const [
+                                AppColors.olivesPrimary,
+                                AppColors.olivesAccent,
+                                AppColors.olivesBackground
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'SANCTUARY',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.primaryColor,
+                          letterSpacing: 1.2,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _ThemePill(
+                              label: 'Priestly\nPurple',
+                              mode: AppThemeMode.priestlyPurple,
+                              currentMode: currentMode,
+                              fillColor: AppColors.lightBackground,
+                              textColor: const Color(0xFF673AB7),
+                              swatchColors: const [
+                                Color(0xFF673AB7),
+                                Color(0xFF9575CD),
+                                AppColors.lightBackground
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: _ThemePill(
+                              label: 'Galilee\nBlue',
+                              mode: AppThemeMode.galileeBlue,
+                              currentMode: currentMode,
+                              fillColor: AppColors.lightBackground,
+                              textColor: const Color(0xFF2196F3),
+                              swatchColors: const [
+                                Color(0xFF2196F3),
+                                Color(0xFF64B5F6),
+                                AppColors.lightBackground
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: _ThemePill(
+                              label: 'Scarlet\nRed',
+                              mode: AppThemeMode.scarletRed,
+                              currentMode: currentMode,
+                              fillColor: AppColors.lightBackground,
+                              textColor: const Color(0xFFE53935),
+                              swatchColors: const [
+                                Color(0xFFE53935),
+                                Color(0xFFEF5350),
+                                AppColors.lightBackground
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -353,8 +363,6 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
       ),
     );
   }
-
-
 }
 
 /// Public widget rendering theme-picker content without sheet chrome.
@@ -383,9 +391,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
             onPressed: () {
               HapticFeedback.mediumImpact();
               ref.read(themeProvider.notifier).shuffleTheme();
-              ref
-                  .read(earthHeavenStyleProvider.notifier)
-                  .shuffleStyle();
+              ref.read(earthHeavenStyleProvider.notifier).shuffleStyle();
             },
             icon: const Icon(Icons.shuffle_rounded, size: 18),
             label: const Text('Surprise me'),
@@ -413,54 +419,203 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
               ),
               const SizedBox(height: 8),
               SwitchListTile(
-                contentPadding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
-                title: const Text('Enable Background Glow', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                subtitle: const Text('Renders a subtle animated light behind the reader', style: TextStyle(fontSize: 12)),
+                contentPadding:
+                    const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+                title: const Text('Enable Background Glow',
+                    style:
+                        TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                subtitle: const Text(
+                    'Renders a subtle animated light behind the reader',
+                    style: TextStyle(fontSize: 12)),
                 value: readSettings.isGlowEnabled,
-                onChanged: (value) { HapticFeedback.selectionClick(); ref.read(readSettingsProvider.notifier).setGlowEnabled(value); },
+                onChanged: (value) {
+                  HapticFeedback.selectionClick();
+                  ref.read(readSettingsProvider.notifier).setGlowEnabled(value);
+                },
               ),
             ],
           );
         }),
         const SizedBox(height: 24),
-        Text('FOUNDATIONS', style: theme.textTheme.labelSmall?.copyWith(color: theme.primaryColor, letterSpacing: 1.2, fontWeight: FontWeight.bold, fontSize: 10)),
+        Text('FOUNDATIONS',
+            style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.primaryColor,
+                letterSpacing: 1.2,
+                fontWeight: FontWeight.bold,
+                fontSize: 10)),
         const SizedBox(height: 8),
         Row(children: [
-          Expanded(child: _ThemePill(label: 'Dawn',  mode: AppThemeMode.light, currentMode: currentMode, fillColor: AppColors.lightBackground, textColor: AppColors.lightTextPrimary, swatchColors: const [AppColors.lightBackground, AppColors.lightSurface, AppColors.lightAccent])),
+          Expanded(
+              child: _ThemePill(
+                  label: 'Dawn',
+                  mode: AppThemeMode.light,
+                  currentMode: currentMode,
+                  fillColor: AppColors.lightBackground,
+                  textColor: AppColors.lightTextPrimary,
+                  swatchColors: const [
+                AppColors.lightBackground,
+                AppColors.lightSurface,
+                AppColors.lightAccent
+              ])),
           const SizedBox(width: 8),
-          Expanded(child: _ThemePill(label: 'Fresh', mode: AppThemeMode.sepia, currentMode: currentMode, fillColor: AppColors.sepiaBackground, textColor: AppColors.sepiaTextPrimary, swatchColors: const [AppColors.sepiaBackground, AppColors.sepiaSurface, AppColors.sepiaTextPrimary])),
+          Expanded(
+              child: _ThemePill(
+                  label: 'Fresh',
+                  mode: AppThemeMode.sepia,
+                  currentMode: currentMode,
+                  fillColor: AppColors.sepiaBackground,
+                  textColor: AppColors.sepiaTextPrimary,
+                  swatchColors: const [
+                AppColors.sepiaBackground,
+                AppColors.sepiaSurface,
+                AppColors.sepiaTextPrimary
+              ])),
           const SizedBox(width: 8),
           Expanded(child: _DarkThemePill(currentMode: currentMode)),
         ]),
         const SizedBox(height: 16),
-        Text('FIRMAMENT', style: theme.textTheme.labelSmall?.copyWith(color: theme.primaryColor, letterSpacing: 1.2, fontWeight: FontWeight.bold, fontSize: 10)),
+        Text('FIRMAMENT',
+            style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.primaryColor,
+                letterSpacing: 1.2,
+                fontWeight: FontWeight.bold,
+                fontSize: 10)),
         const SizedBox(height: 8),
         Row(children: [
-          Expanded(child: _ThemePill(label: 'Sun',   mode: AppThemeMode.dawn,  currentMode: currentMode, fillColor: AppColors.dawnBackground,  textColor: AppColors.dawnTextPrimary,  swatchColors: const [AppColors.dawnPrimary,   AppColors.dawnAccent,   AppColors.dawnBackground])),
+          Expanded(
+              child: _ThemePill(
+                  label: 'Sun',
+                  mode: AppThemeMode.dawn,
+                  currentMode: currentMode,
+                  fillColor: AppColors.dawnBackground,
+                  textColor: AppColors.dawnTextPrimary,
+                  swatchColors: const [
+                AppColors.dawnPrimary,
+                AppColors.dawnAccent,
+                AppColors.dawnBackground
+              ])),
           const SizedBox(width: 8),
-          Expanded(child: _ThemePill(label: 'Moon',  mode: AppThemeMode.fresh, currentMode: currentMode, fillColor: AppColors.freshBackground, textColor: AppColors.freshTextPrimary, swatchColors: const [AppColors.freshPrimary,  AppColors.freshAccent,  AppColors.freshBackground])),
+          Expanded(
+              child: _ThemePill(
+                  label: 'Moon',
+                  mode: AppThemeMode.fresh,
+                  currentMode: currentMode,
+                  fillColor: AppColors.freshBackground,
+                  textColor: AppColors.freshTextPrimary,
+                  swatchColors: const [
+                AppColors.freshPrimary,
+                AppColors.freshAccent,
+                AppColors.freshBackground
+              ])),
           const SizedBox(width: 8),
-          Expanded(child: _ThemePill(label: 'Stars', mode: AppThemeMode.dusk,  currentMode: currentMode, fillColor: AppColors.duskBackground,  textColor: AppColors.duskTextPrimary,  swatchColors: const [AppColors.duskPrimary,   AppColors.duskAccent,   AppColors.duskBackground])),
+          Expanded(
+              child: _ThemePill(
+                  label: 'Stars',
+                  mode: AppThemeMode.dusk,
+                  currentMode: currentMode,
+                  fillColor: AppColors.duskBackground,
+                  textColor: AppColors.duskTextPrimary,
+                  swatchColors: const [
+                AppColors.duskPrimary,
+                AppColors.duskAccent,
+                AppColors.duskBackground
+              ])),
         ]),
         const SizedBox(height: 16),
-        Text('EDEN', style: theme.textTheme.labelSmall?.copyWith(color: theme.primaryColor, letterSpacing: 1.2, fontWeight: FontWeight.bold, fontSize: 10)),
+        Text('EDEN',
+            style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.primaryColor,
+                letterSpacing: 1.2,
+                fontWeight: FontWeight.bold,
+                fontSize: 10)),
         const SizedBox(height: 8),
         Row(children: [
-          Expanded(child: _ThemePill(label: 'Lilies', mode: AppThemeMode.lilies, currentMode: currentMode, fillColor: AppColors.liliesBackground, textColor: AppColors.liliesTextPrimary, swatchColors: const [AppColors.liliesPrimary, AppColors.liliesAccent, AppColors.liliesBackground])),
+          Expanded(
+              child: _ThemePill(
+                  label: 'Lilies',
+                  mode: AppThemeMode.lilies,
+                  currentMode: currentMode,
+                  fillColor: AppColors.liliesBackground,
+                  textColor: AppColors.liliesTextPrimary,
+                  swatchColors: const [
+                AppColors.liliesPrimary,
+                AppColors.liliesAccent,
+                AppColors.liliesBackground
+              ])),
           const SizedBox(width: 8),
-          Expanded(child: _ThemePill(label: 'Roses',  mode: AppThemeMode.roses,  currentMode: currentMode, fillColor: AppColors.rosesBackground,  textColor: AppColors.rosesTextPrimary,  swatchColors: const [AppColors.rosesPrimary,  AppColors.rosesAccent,  AppColors.rosesBackground])),
+          Expanded(
+              child: _ThemePill(
+                  label: 'Roses',
+                  mode: AppThemeMode.roses,
+                  currentMode: currentMode,
+                  fillColor: AppColors.rosesBackground,
+                  textColor: AppColors.rosesTextPrimary,
+                  swatchColors: const [
+                AppColors.rosesPrimary,
+                AppColors.rosesAccent,
+                AppColors.rosesBackground
+              ])),
           const SizedBox(width: 8),
-          Expanded(child: _ThemePill(label: 'Olives', mode: AppThemeMode.olives, currentMode: currentMode, fillColor: AppColors.olivesBackground, textColor: AppColors.olivesTextPrimary, swatchColors: const [AppColors.olivesPrimary, AppColors.olivesAccent, AppColors.olivesBackground])),
+          Expanded(
+              child: _ThemePill(
+                  label: 'Olives',
+                  mode: AppThemeMode.olives,
+                  currentMode: currentMode,
+                  fillColor: AppColors.olivesBackground,
+                  textColor: AppColors.olivesTextPrimary,
+                  swatchColors: const [
+                AppColors.olivesPrimary,
+                AppColors.olivesAccent,
+                AppColors.olivesBackground
+              ])),
         ]),
         const SizedBox(height: 16),
-        Text('SANCTUARY', style: theme.textTheme.labelSmall?.copyWith(color: theme.primaryColor, letterSpacing: 1.2, fontWeight: FontWeight.bold, fontSize: 10)),
+        Text('SANCTUARY',
+            style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.primaryColor,
+                letterSpacing: 1.2,
+                fontWeight: FontWeight.bold,
+                fontSize: 10)),
         const SizedBox(height: 8),
         Row(children: [
-          Expanded(child: _ThemePill(label: 'Priestly\nPurple', mode: AppThemeMode.priestlyPurple, currentMode: currentMode, fillColor: AppColors.lightBackground, textColor: const Color(0xFF673AB7), swatchColors: const [Color(0xFF673AB7), Color(0xFF9575CD), AppColors.lightBackground])),
+          Expanded(
+              child: _ThemePill(
+                  label: 'Priestly\nPurple',
+                  mode: AppThemeMode.priestlyPurple,
+                  currentMode: currentMode,
+                  fillColor: AppColors.lightBackground,
+                  textColor: const Color(0xFF673AB7),
+                  swatchColors: const [
+                Color(0xFF673AB7),
+                Color(0xFF9575CD),
+                AppColors.lightBackground
+              ])),
           const SizedBox(width: 8),
-          Expanded(child: _ThemePill(label: 'Galilee\nBlue',    mode: AppThemeMode.galileeBlue,    currentMode: currentMode, fillColor: AppColors.lightBackground, textColor: const Color(0xFF2196F3), swatchColors: const [Color(0xFF2196F3), Color(0xFF64B5F6), AppColors.lightBackground])),
+          Expanded(
+              child: _ThemePill(
+                  label: 'Galilee\nBlue',
+                  mode: AppThemeMode.galileeBlue,
+                  currentMode: currentMode,
+                  fillColor: AppColors.lightBackground,
+                  textColor: const Color(0xFF2196F3),
+                  swatchColors: const [
+                Color(0xFF2196F3),
+                Color(0xFF64B5F6),
+                AppColors.lightBackground
+              ])),
           const SizedBox(width: 8),
-          Expanded(child: _ThemePill(label: 'Scarlet\nRed',     mode: AppThemeMode.scarletRed,     currentMode: currentMode, fillColor: AppColors.lightBackground, textColor: const Color(0xFFE53935), swatchColors: const [Color(0xFFE53935), Color(0xFFEF5350), AppColors.lightBackground])),
+          Expanded(
+              child: _ThemePill(
+                  label: 'Scarlet\nRed',
+                  mode: AppThemeMode.scarletRed,
+                  currentMode: currentMode,
+                  fillColor: AppColors.lightBackground,
+                  textColor: const Color(0xFFE53935),
+                  swatchColors: const [
+                Color(0xFFE53935),
+                Color(0xFFEF5350),
+                AppColors.lightBackground
+              ])),
         ]),
       ],
     );

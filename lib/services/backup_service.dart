@@ -141,8 +141,8 @@ class BackupService {
           } else if (value is bool) {
             await prefs.setBool(key, value);
           } else if (value is List) {
-            await prefs.setStringList(
-                key, [for (final e in value) e.toString()]);
+            await prefs
+                .setStringList(key, [for (final e in value) e.toString()]);
           } else if (value == null) {
             await prefs.remove(key);
           } else {
@@ -183,8 +183,7 @@ class BackupService {
         installedIds = {for (final t in installed) t.translationId};
       } catch (_) {}
       final backedPacks = [
-        for (final e in (decoded['packs'] as List? ?? const []))
-          e.toString()
+        for (final e in (decoded['packs'] as List? ?? const [])) e.toString()
       ].where((id) => !installedIds.contains(id)).toList();
 
       if (context.mounted) {

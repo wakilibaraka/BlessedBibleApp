@@ -17,7 +17,8 @@ class StrongsEntry {
   });
 }
 
-final strongsProvider = FutureProvider.family<StrongsEntry?, String>((ref, id) async {
+final strongsProvider =
+    FutureProvider.family<StrongsEntry?, String>((ref, id) async {
   final db = await bibleDbService.database;
 
   // Query the strongs_lexicon table

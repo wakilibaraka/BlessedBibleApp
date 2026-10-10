@@ -95,16 +95,14 @@ void showAccountMenu(BuildContext context) {
       return Container(
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
-          borderRadius:
-              const BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         padding: const EdgeInsets.fromLTRB(8, 8, 8, 32),
         // Material ancestor so ListTile ink splashes paint above the
         // decorated sheet background (debug assertion otherwise).
         child: Material(
           color: Colors.transparent,
-          borderRadius:
-              const BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           child: Consumer(
             builder: (ctx, ref, _) {
               // Scrollable so the menu never overflows short screens;
@@ -130,130 +128,120 @@ class _AccountMenuBody extends ConsumerWidget {
     final name = user?.displayName?.trim() ?? '';
     final email = user?.email?.trim() ?? '';
     return Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    width: 36,
-                    height: 5,
-                    margin:
-                        const EdgeInsets.only(top: 6, bottom: 10),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.onSurface
-                          .withValues(alpha: 0.25),
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                  ),
-                ),
-                // ── Header ────────────────────────────────
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-                  child: Row(
-                    children: [
-                      const AccountAvatar(size: 48),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment:
-                              CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              name.isNotEmpty ? name : 'Guest',
-                              style: theme.textTheme.titleMedium
-                                  ?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              email.isNotEmpty
-                                  ? email
-                                  : 'Sign in to sync across devices',
-                              style: theme.textTheme.bodySmall
-                                  ?.copyWith(
-                                color: theme
-                                    .colorScheme.onSurface
-                                    .withValues(alpha: 0.6),
-                              ),
-                            ),
-                          ],
-                        ),
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Center(
+          child: Container(
+            width: 36,
+            height: 5,
+            margin: const EdgeInsets.only(top: 6, bottom: 10),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
+              borderRadius: BorderRadius.circular(3),
+            ),
+          ),
+        ),
+        // ── Header ────────────────────────────────
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+          child: Row(
+            children: [
+              const AccountAvatar(size: 48),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name.isNotEmpty ? name : 'Guest',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      email.isNotEmpty
+                          ? email
+                          : 'Sign in to sync across devices',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                      ),
+                    ),
+                  ],
                 ),
-                const Divider(height: 1, indent: 16, endIndent: 16),
-                _MenuTile(
-                  icon: Icons.person_outline_rounded,
-                  label: 'Account',
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    _showAccountSheet(context);
-                  },
-                ),
-                _MenuTile(
-                  icon: Icons.settings_outlined,
-                  label: 'Settings',
-                  onTap: () {
-                    HapticFeedback.selectionClick();
-                    Navigator.of(context).pop();
-                    ref.read(navProvider.notifier).setIndex(4);
-                  },
-                ),
-                _MenuTile(
-                  icon: Icons.upload_file_outlined,
-                  label: 'Back up data',
-                  subtitle: 'Export notes, highlights and settings',
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    BackupService.exportData(context, ref);
-                  },
-                ),
-                _MenuTile(
-                  icon: Icons.download_outlined,
-                  label: 'Restore data',
-                  subtitle: 'Import from a backup file',
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    _showRestoreDialog(context, ref);
-                  },
-                ),
-                if (user == null) ...[
-                  _MenuTile(
-                    icon: Icons.account_circle_outlined,
-                    label: 'Sign in with Google',
-                    onTap: () =>
-                        _signIn(context, context, ref, google: true),
-                  ),
-                  _MenuTile(
-                    icon: Icons.apple,
-                    label: 'Sign in with Apple',
-                    onTap: () =>
-                        _signIn(context, context, ref, google: false),
-                  ),
-                ] else ...[
-                  _MenuTile(
-                    icon: Icons.logout_rounded,
-                    label: 'Sign Out',
-                    destructive: true,
-                    onTap: () async {
-                      await ref
-                          .read(authActionsProvider)
-                          .signOut();
-                      if (context.mounted) Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-                _MenuTile(
-                  icon: Icons.delete_sweep_outlined,
-                  label: 'Reset app',
-                  subtitle: 'Erase all on-device data',
-                  destructive: true,
-                  onTap: () => _confirmReset(context, context, ref),
-                ),
-              ],
-            );
+              ),
+            ],
+          ),
+        ),
+        const Divider(height: 1, indent: 16, endIndent: 16),
+        _MenuTile(
+          icon: Icons.person_outline_rounded,
+          label: 'Account',
+          onTap: () {
+            Navigator.of(context).pop();
+            _showAccountSheet(context);
+          },
+        ),
+        _MenuTile(
+          icon: Icons.settings_outlined,
+          label: 'Settings',
+          onTap: () {
+            HapticFeedback.selectionClick();
+            Navigator.of(context).pop();
+            ref.read(navProvider.notifier).setIndex(4);
+          },
+        ),
+        _MenuTile(
+          icon: Icons.upload_file_outlined,
+          label: 'Back up data',
+          subtitle: 'Export notes, highlights and settings',
+          onTap: () {
+            Navigator.of(context).pop();
+            BackupService.exportData(context, ref);
+          },
+        ),
+        _MenuTile(
+          icon: Icons.download_outlined,
+          label: 'Restore data',
+          subtitle: 'Import from a backup file',
+          onTap: () {
+            Navigator.of(context).pop();
+            _showRestoreDialog(context, ref);
+          },
+        ),
+        if (user == null) ...[
+          _MenuTile(
+            icon: Icons.account_circle_outlined,
+            label: 'Sign in with Google',
+            onTap: () => _signIn(context, context, ref, google: true),
+          ),
+          _MenuTile(
+            icon: Icons.apple,
+            label: 'Sign in with Apple',
+            onTap: () => _signIn(context, context, ref, google: false),
+          ),
+        ] else ...[
+          _MenuTile(
+            icon: Icons.logout_rounded,
+            label: 'Sign Out',
+            destructive: true,
+            onTap: () async {
+              await ref.read(authActionsProvider).signOut();
+              if (context.mounted) Navigator.of(context).pop();
+            },
+          ),
+        ],
+        _MenuTile(
+          icon: Icons.delete_sweep_outlined,
+          label: 'Reset app',
+          subtitle: 'Erase all on-device data',
+          destructive: true,
+          onTap: () => _confirmReset(context, context, ref),
+        ),
+      ],
+    );
   }
 }
 
@@ -274,21 +262,18 @@ class _MenuTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final color = destructive
-        ? theme.colorScheme.error
-        : theme.colorScheme.onSurface;
+    final color =
+        destructive ? theme.colorScheme.error : theme.colorScheme.onSurface;
     return ListTile(
       leading: Icon(icon, color: color),
       title: Text(label,
           style: TextStyle(
-              color: destructive ? color : null,
-              fontWeight: FontWeight.w600)),
+              color: destructive ? color : null, fontWeight: FontWeight.w600)),
       subtitle: subtitle == null
           ? null
           : Text(subtitle!,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface
-                    .withValues(alpha: 0.6),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               )),
       trailing: Icon(Icons.chevron_right_rounded,
           color: theme.colorScheme.onSurface.withValues(alpha: 0.35)),
@@ -314,8 +299,8 @@ void _showAccountSheet(BuildContext context) {
             child: Container(
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.surface,
-                borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(24)),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(24)),
               ),
               padding: const EdgeInsets.fromLTRB(8, 8, 8, 32),
               child: Column(
@@ -324,9 +309,7 @@ void _showAccountSheet(BuildContext context) {
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Text(
-                      currentAuthState.value != null
-                          ? 'Account'
-                          : 'Sign In',
+                      currentAuthState.value != null ? 'Account' : 'Sign In',
                       style: const TextStyle(
                           fontSize: 20, fontWeight: FontWeight.bold),
                     ),
@@ -339,18 +322,16 @@ void _showAccountSheet(BuildContext context) {
                         final result = await ref
                             .read(authActionsProvider)
                             .signInWithGoogle();
-                        if (context.mounted &&
-                            result == SignInResult.failed) {
+                        if (context.mounted && result == SignInResult.failed) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text(
-                                  'Sign in failed. Please try again.'),
+                              content:
+                                  Text('Sign in failed. Please try again.'),
                               behavior: SnackBarBehavior.floating,
                             ),
                           );
                         }
-                        if (context.mounted &&
-                            result == SignInResult.success) {
+                        if (context.mounted && result == SignInResult.success) {
                           Navigator.pop(context);
                         }
                       },
@@ -362,18 +343,16 @@ void _showAccountSheet(BuildContext context) {
                         final result = await ref
                             .read(authActionsProvider)
                             .signInWithApple();
-                        if (context.mounted &&
-                            result == SignInResult.failed) {
+                        if (context.mounted && result == SignInResult.failed) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text(
-                                  'Sign in failed. Please try again.'),
+                              content:
+                                  Text('Sign in failed. Please try again.'),
                               behavior: SnackBarBehavior.floating,
                             ),
                           );
                         }
-                        if (context.mounted &&
-                            result == SignInResult.success) {
+                        if (context.mounted && result == SignInResult.success) {
                           Navigator.pop(context);
                         }
                       },
@@ -382,21 +361,19 @@ void _showAccountSheet(BuildContext context) {
                     ListTile(
                       leading: CircleAvatar(
                         radius: 12,
-                        backgroundImage:
-                            currentAuthState.value?.photoURL != null
-                                ? NetworkImage(currentAuthState
-                                    .value!.photoURL!)
-                                : null,
+                        backgroundImage: currentAuthState.value?.photoURL !=
+                                null
+                            ? NetworkImage(currentAuthState.value!.photoURL!)
+                            : null,
                         child: currentAuthState.value?.photoURL == null
                             ? const Icon(Icons.person, size: 16)
                             : null,
                       ),
-                      title: Text(currentAuthState.value?.displayName ??
-                          'Signed In'),
+                      title: Text(
+                          currentAuthState.value?.displayName ?? 'Signed In'),
                     ),
                     ListTile(
-                      leading: const Icon(Icons.logout,
-                          color: Colors.orange),
+                      leading: const Icon(Icons.logout, color: Colors.orange),
                       title: const Text('Sign Out',
                           style: TextStyle(color: Colors.orange)),
                       onTap: () async {
@@ -405,8 +382,8 @@ void _showAccountSheet(BuildContext context) {
                       },
                     ),
                     ListTile(
-                      leading: const Icon(Icons.delete_forever,
-                          color: Colors.red),
+                      leading:
+                          const Icon(Icons.delete_forever, color: Colors.red),
                       title: const Text('Delete Account',
                           style: TextStyle(color: Colors.red)),
                       onTap: () async {
@@ -423,16 +400,13 @@ void _showAccountSheet(BuildContext context) {
                                 '• All on-device study data (bookmarks, highlights, history)'),
                             actions: [
                               TextButton(
-                                onPressed: () =>
-                                    Navigator.pop(ctx, false),
+                                onPressed: () => Navigator.pop(ctx, false),
                                 child: const Text('Cancel'),
                               ),
                               TextButton(
-                                onPressed: () =>
-                                    Navigator.pop(ctx, true),
+                                onPressed: () => Navigator.pop(ctx, true),
                                 child: const Text('Delete',
-                                    style:
-                                        TextStyle(color: Colors.red)),
+                                    style: TextStyle(color: Colors.red)),
                               ),
                             ],
                           ),
@@ -440,14 +414,12 @@ void _showAccountSheet(BuildContext context) {
 
                         if (confirm == true && context.mounted) {
                           try {
-                            await ref
-                                .read(authActionsProvider)
-                                .deleteAccount();
+                            await ref.read(authActionsProvider).deleteAccount();
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                    content: Text(
-                                        'Account deleted successfully.')),
+                                    content:
+                                        Text('Account deleted successfully.')),
                               );
                             }
                           } on ReauthCancelledException catch (_) {
@@ -458,8 +430,7 @@ void _showAccountSheet(BuildContext context) {
                                 SnackBar(
                                   content: Text(
                                       'Failed to delete account: ${e.toString().replaceAll("Exception: ", "")}'),
-                                  duration:
-                                      const Duration(seconds: 4),
+                                  duration: const Duration(seconds: 4),
                                 ),
                               );
                             }
@@ -542,8 +513,7 @@ void _confirmReset(
     context: context,
     builder: (ctx) => AlertDialog(
       title: const Text('Reset app?'),
-      content: const Text(
-          'This erases all on-device data:\n'
+      content: const Text('This erases all on-device data:\n'
           '• Bookmarks, highlights, notes & journal\n'
           '• Reading plans, progress & custom plans\n'
           '• Downloaded translations & streaks\n\n'

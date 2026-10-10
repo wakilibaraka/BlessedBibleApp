@@ -17,7 +17,7 @@ class OnboardingScreen extends ConsumerWidget {
     const Color sepiaInk = AppColors.warmGoldTextPrimary; // 0xFF2C221E
     const Color sepiaMuted = AppColors.sepiaTextPrimary; // 0xFF4A3B32
     const Color sepiaAccent = AppColors.warmGoldAccent; // 0xFF9E6B00
-    
+
     // Harmonized tile colors
     const Color amberGold = Color(0xFFD49A36);
     const Color terracotta = Color(0xFFB56553);
@@ -45,7 +45,7 @@ class OnboardingScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: 48),
-                  
+
                   // Decorative Motif + Title Block
                   Center(
                     child: Stack(
@@ -89,7 +89,7 @@ class OnboardingScreen extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 56),
-                  
+
                   // Feature List
                   Expanded(
                     child: ListView(
@@ -98,7 +98,8 @@ class OnboardingScreen extends ConsumerWidget {
                         _FeatureRow(
                           icon: Icons.menu_book_rounded,
                           title: 'The Pure Word',
-                          subtitle: 'Read the Scriptures without distraction. Customize fonts and translations as you read.',
+                          subtitle:
+                              'Read the Scriptures without distraction. Customize fonts and translations as you read.',
                           tileColor: amberGold,
                           iconColor: tileGlyph,
                           titleColor: sepiaInk,
@@ -108,7 +109,8 @@ class OnboardingScreen extends ConsumerWidget {
                         _FeatureRow(
                           icon: Icons.calendar_month_rounded,
                           title: 'Curated Plans',
-                          subtitle: 'Follow chronological or custom reading plans built to keep you consistent.',
+                          subtitle:
+                              'Follow chronological or custom reading plans built to keep you consistent.',
                           tileColor: terracotta,
                           iconColor: tileGlyph,
                           titleColor: sepiaInk,
@@ -118,7 +120,8 @@ class OnboardingScreen extends ConsumerWidget {
                         _FeatureRow(
                           icon: Icons.lightbulb_rounded,
                           title: 'Deep Insights',
-                          subtitle: 'Access integrated commentary, maps, and pericopes seamlessly as you study.',
+                          subtitle:
+                              'Access integrated commentary, maps, and pericopes seamlessly as you study.',
                           tileColor: oliveSage,
                           iconColor: tileGlyph,
                           titleColor: sepiaInk,
@@ -127,21 +130,25 @@ class OnboardingScreen extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  
+
                   // CTA
                   Padding(
                     padding: const EdgeInsets.only(bottom: 16.0, top: 16.0),
                     child: FilledButton(
                       onPressed: () {
                         HapticFeedback.mediumImpact();
-                        ref.read(preferencesProvider).setOnboardingComplete(true);
+                        ref
+                            .read(preferencesProvider)
+                            .setOnboardingComplete(true);
                         Navigator.of(context).pushReplacement(
                           PageRouteBuilder(
                             pageBuilder: (_, __, ___) => const MainNavScreen(),
                             transitionsBuilder: (_, animation, __, child) {
-                              return FadeTransition(opacity: animation, child: child);
+                              return FadeTransition(
+                                  opacity: animation, child: child);
                             },
-                            transitionDuration: const Duration(milliseconds: 400),
+                            transitionDuration:
+                                const Duration(milliseconds: 400),
                           ),
                         );
                       },

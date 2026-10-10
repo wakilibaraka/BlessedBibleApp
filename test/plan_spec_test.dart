@@ -51,11 +51,11 @@ CanonIndex loadCanon() {
   jsonMap.forEach((book, chapters) {
     final chMap = <int, List<int>>{};
     (chapters as Map<String, dynamic>).forEach((ch, info) {
-      chMap[int.parse(ch)] = ((info as Map<String, dynamic>)['verses']
-              as Map<String, dynamic>)
-          .keys
-          .map(int.parse)
-          .toList();
+      chMap[int.parse(ch)] =
+          ((info as Map<String, dynamic>)['verses'] as Map<String, dynamic>)
+              .keys
+              .map(int.parse)
+              .toList();
     });
     canon[book] = chMap;
   });
@@ -109,11 +109,10 @@ void main() {
   group('curated asset round-trip', () {
     test('all assets convert and reproduce exactly', () {
       for (final id in _assets) {
-        final source = jsonDecode(
-                File('assets/reading_plans/$id.json').readAsStringSync())
-            as Map<String, dynamic>;
-        final spec =
-            PlanSpec.fromCuratedJson(source, canon: canon);
+        final source =
+            jsonDecode(File('assets/reading_plans/$id.json').readAsStringSync())
+                as Map<String, dynamic>;
+        final spec = PlanSpec.fromCuratedJson(source, canon: canon);
         expect(spec.id, id);
         expect(spec.days.length, (source['readings'] as List).length);
         expect(spec.tracks.isNotEmpty, isTrue);
@@ -126,16 +125,14 @@ void main() {
     });
 
     test('spec carries structure the scheduler can use', () {
-      final source = jsonDecode(File(
-                  'assets/reading_plans/mccheyne_1yr.json')
-              .readAsStringSync()) as Map<String, dynamic>;
+      final source = jsonDecode(
+              File('assets/reading_plans/mccheyne_1yr.json').readAsStringSync())
+          as Map<String, dynamic>;
       final spec = PlanSpec.fromCuratedJson(source, canon: canon);
       // M'Cheyne reads 4 passages a day -> 4 parallel tracks.
       expect(spec.tracks.length, 4);
-      final totalRefs =
-          spec.days.fold<int>(0, (n, d) => n + d.passages.length);
-      final trackRefs =
-          spec.tracks.fold<int>(0, (n, t) => n + t.ranges.length);
+      final totalRefs = spec.days.fold<int>(0, (n, d) => n + d.passages.length);
+      final trackRefs = spec.tracks.fold<int>(0, (n, t) => n + t.ranges.length);
       expect(trackRefs, totalRefs);
       // Every ref has parsed bounds.
       for (final t in spec.tracks) {

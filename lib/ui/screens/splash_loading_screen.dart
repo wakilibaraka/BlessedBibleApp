@@ -53,8 +53,8 @@ class SplashLoadingScreen extends StatelessWidget {
                     Text(
                       'Preparing offline Bible… ${(progress * 100).round()}%',
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.6),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                   ],

@@ -60,7 +60,8 @@ class ShareService {
     String? secondaryTag,
     bool whatsapp = false,
   }) {
-    final cleaned = texts.map(cleanVerseText).where((t) => t.isNotEmpty).toList();
+    final cleaned =
+        texts.map(cleanVerseText).where((t) => t.isNotEmpty).toList();
     if (cleaned.isEmpty) return '';
     final body = cleaned.length > 1
         ? cleaned
@@ -142,13 +143,14 @@ class ShareService {
   /// (missing secondary verses fall back to primary-only, silently).
   /// Pass already-loaded primary [texts] when the caller has them
   /// (avoids a redundant chapter fetch).
-  static Future<({
-    List<String> texts,
-    String reference,
-    String tag,
-    List<String> secondaryTexts,
-    String secondaryTag,
-  })> collectVerseShare(
+  static Future<
+      ({
+        List<String> texts,
+        String reference,
+        String tag,
+        List<String> secondaryTexts,
+        String secondaryTag,
+      })> collectVerseShare(
     WidgetRef ref, {
     required String bookName,
     required int chapterNum,
@@ -180,8 +182,7 @@ class ShareService {
           ];
           if (secondaryTexts.isNotEmpty) {
             final infos = await bibleDbService.getTranslations();
-            final match =
-                infos.where((t) => t.translationId == secondaryId);
+            final match = infos.where((t) => t.translationId == secondaryId);
             secondaryTag = match.isNotEmpty
                 ? match.first.abbreviation.toUpperCase()
                 : secondaryId.toUpperCase();
@@ -234,8 +235,7 @@ class ShareService {
           as RenderRepaintBoundary?;
       if (boundary == null) return;
       final image = await boundary.toImage(pixelRatio: 1.0);
-      final bytes =
-          await image.toByteData(format: ui.ImageByteFormat.png);
+      final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
       if (bytes == null) return;
       final dir = await getTemporaryDirectory();
       final file = File(

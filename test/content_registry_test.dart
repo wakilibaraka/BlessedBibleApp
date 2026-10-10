@@ -20,8 +20,7 @@ void main() {
       expect((t['license'] as String?)?.isNotEmpty ?? false, isTrue,
           reason: '$id missing license');
       final size = t['sizeMB'];
-      expect(size is num && size > 0, isTrue,
-          reason: '$id missing sizeMB');
+      expect(size is num && size > 0, isTrue, reason: '$id missing sizeMB');
       final source = t['source'] as String?;
       if (source == 'bundled') {
         // Offline restore: must be a shipped bundled pack.
@@ -32,8 +31,7 @@ void main() {
         final sha = t['sha256'] as String?;
         expect(url != null && url.startsWith('https://'), isTrue,
             reason: '$id has no valid storageUrl');
-        expect(
-            sha != null && RegExp(r'^[0-9a-f]{64}$').hasMatch(sha), isTrue,
+        expect(sha != null && RegExp(r'^[0-9a-f]{64}$').hasMatch(sha), isTrue,
             reason: '$id has no valid sha256');
       } else {
         // helloao JSON flow needs a download id (verified reachable).

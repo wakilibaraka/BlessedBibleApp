@@ -14,10 +14,12 @@ final widgetUpdateServiceProvider = Provider<WidgetUpdateService>((ref) {
 
 class WidgetUpdateService {
   final Ref _ref;
-  static const String appGroupId = 'group.com.yourdomain.blessedbible'; // iOS App Group ID
-  
+  static const String appGroupId =
+      'group.com.yourdomain.blessedbible'; // iOS App Group ID
+
   // Widget Names
-  static const String votdWidgetName = 'VotdWidgetProvider'; // Android class name
+  static const String votdWidgetName =
+      'VotdWidgetProvider'; // Android class name
   static const String streakWidgetName = 'StreakWidgetProvider';
 
   WidgetUpdateService(this._ref) {
@@ -58,7 +60,8 @@ class WidgetUpdateService {
         if (wotd != null) {
           HomeWidget.saveWidgetData<String>('wotd_word', wotd.word);
           HomeWidget.saveWidgetData<String>('wotd_snippet', wotd.snippet);
-          HomeWidget.updateWidget(name: streakWidgetName, iOSName: 'StreakWidget');
+          HomeWidget.updateWidget(
+              name: streakWidgetName, iOSName: 'StreakWidget');
         }
       });
     });
@@ -82,8 +85,10 @@ class WidgetUpdateService {
     final wotdAsync = _ref.read(wordOfTheDayProvider);
 
     // 1. Save customization settings
-    await HomeWidget.saveWidgetData<String>('widget_bg_style', settings.backgroundStyle.id);
-    await HomeWidget.saveWidgetData<String>('widget_text_mode', settings.textMode.id);
+    await HomeWidget.saveWidgetData<String>(
+        'widget_bg_style', settings.backgroundStyle.id);
+    await HomeWidget.saveWidgetData<String>(
+        'widget_text_mode', settings.textMode.id);
 
     // 2. Save VOTD data
     final votd = homeData.verseOfTheDay;

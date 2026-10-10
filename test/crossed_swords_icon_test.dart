@@ -6,7 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:the_blessed_bible/ui/widgets/crossed_swords_icon.dart';
 
 Widget host({Color? primary, Widget? child}) => MaterialApp(
-      theme: ThemeData(colorScheme: ColorScheme.fromSeed(
+      theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
         seedColor: primary ?? Colors.teal,
         brightness: Brightness.dark,
       )),
@@ -27,24 +28,23 @@ void main() {
       (tester) async {
     await tester.pumpWidget(host());
     await tester.pump(kSwordsDuration);
-    final a = tester.widget<CustomPaint>(
-        find.descendant(
-            of: find.byType(CrossedSwordsIcon), matching: find.byType(CustomPaint)));
+    final a = tester.widget<CustomPaint>(find.descendant(
+        of: find.byType(CrossedSwordsIcon),
+        matching: find.byType(CustomPaint)));
     await tester.pump(const Duration(seconds: 2));
-    final b = tester.widget<CustomPaint>(
-        find.descendant(
-            of: find.byType(CrossedSwordsIcon), matching: find.byType(CustomPaint)));
-    expect(
-        (a.painter! as dynamic).progress, (b.painter! as dynamic).progress);
+    final b = tester.widget<CustomPaint>(find.descendant(
+        of: find.byType(CrossedSwordsIcon),
+        matching: find.byType(CustomPaint)));
+    expect((a.painter! as dynamic).progress, (b.painter! as dynamic).progress);
   });
 
   testWidgets('inherits the theme primary color', (tester) async {
     const seed = Colors.deepPurple;
     await tester.pumpWidget(host(primary: seed));
     await tester.pump(kSwordsDuration);
-    final paint = tester.widget<CustomPaint>(
-        find.descendant(
-            of: find.byType(CrossedSwordsIcon), matching: find.byType(CustomPaint)));
+    final paint = tester.widget<CustomPaint>(find.descendant(
+        of: find.byType(CrossedSwordsIcon),
+        matching: find.byType(CustomPaint)));
     final painterColor = (paint.painter! as dynamic).color as Color;
     // The painter falls back to Theme.of(context).primaryColor.
     final themePrimary =
@@ -57,9 +57,9 @@ void main() {
       child: const CrossedSwordsIcon(color: Colors.amber),
     ));
     await tester.pump(kSwordsDuration);
-    final paint = tester.widget<CustomPaint>(
-        find.descendant(
-            of: find.byType(CrossedSwordsIcon), matching: find.byType(CustomPaint)));
+    final paint = tester.widget<CustomPaint>(find.descendant(
+        of: find.byType(CrossedSwordsIcon),
+        matching: find.byType(CustomPaint)));
     expect((paint.painter! as dynamic).color, Colors.amber);
   });
 

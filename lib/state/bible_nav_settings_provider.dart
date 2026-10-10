@@ -45,8 +45,7 @@ class BibleNavSettingsState {
       swipeDownToNav: swipeDownToNav ?? this.swipeDownToNav,
       homePullDownEnabled: homePullDownEnabled ?? this.homePullDownEnabled,
       homePullDownTarget: homePullDownTarget ?? this.homePullDownTarget,
-      homeSwipeLeftEnabled:
-          homeSwipeLeftEnabled ?? this.homeSwipeLeftEnabled,
+      homeSwipeLeftEnabled: homeSwipeLeftEnabled ?? this.homeSwipeLeftEnabled,
     );
   }
 }
@@ -84,8 +83,8 @@ class BibleNavSettingsNotifier extends Notifier<BibleNavSettingsState> {
       autoCloseOnFinalSelection: autoClose,
       swipeDownToNav: swipeDown,
       homePullDownEnabled: homePull,
-      homePullDownTarget: HomePullDownTarget
-          .values[pullTargetIndex.clamp(0, HomePullDownTarget.values.length - 1)],
+      homePullDownTarget: HomePullDownTarget.values[
+          pullTargetIndex.clamp(0, HomePullDownTarget.values.length - 1)],
       homeSwipeLeftEnabled: homeSwipe,
     );
   }

@@ -305,8 +305,7 @@ class BibleDatabaseService {
     final out = File(dbPath).openWrite();
     try {
       for (var off = 0; off < bytes.length; off += chunk) {
-        final end =
-            (off + chunk > bytes.length) ? bytes.length : off + chunk;
+        final end = (off + chunk > bytes.length) ? bytes.length : off + chunk;
         out.add(bytes.sublist(off, end));
         // Copy phase reports 0..0.75; packs take it to ~0.95.
         _emitProgress(0.75 * end / bytes.length);
@@ -332,8 +331,7 @@ class BibleDatabaseService {
       tmp = await openDatabase(dbPath, readOnly: true);
       final qc = await tmp.rawQuery('PRAGMA quick_check');
       final ok = qc.isNotEmpty && '${qc.first.values.first}' == 'ok';
-      final problems =
-          ok ? await _probeCore(tmp) : ['integrity check failed'];
+      final problems = ok ? await _probeCore(tmp) : ['integrity check failed'];
       if (problems.isNotEmpty) {
         throw StateError(
             'Copied database failed verification: ${problems.join('; ')}');
@@ -352,8 +350,8 @@ class BibleDatabaseService {
   Future<List<String>> _probeCore(Database db) async {
     final problems = <String>[];
     try {
-      final rows = await db.rawQuery(
-          "SELECT name FROM sqlite_master WHERE type = 'table'");
+      final rows = await db
+          .rawQuery("SELECT name FROM sqlite_master WHERE type = 'table'");
       final tables = <String>{};
       for (final r in rows) {
         final n = r['name'];
@@ -414,8 +412,7 @@ class BibleDatabaseService {
   /// legacy single-file database into standalone pack files, then slims the
   /// core database down to the KJV backbone + reference tables. Stamps
   /// content version 2 on success. Throws on failure (caller reinstalls).
-  Future<void> _migrateToPacks(
-      String dbPath, SharedPreferences prefs) async {
+  Future<void> _migrateToPacks(String dbPath, SharedPreferences prefs) async {
     Database? db;
     try {
       db = await _openGuarded(dbPath);
@@ -432,8 +429,8 @@ class BibleDatabaseService {
       );
       if (extracted.isNotEmpty) {
         const keep = "'kjv','kjv_strongs'";
-        await db.execute(
-            'DELETE FROM verses WHERE translation_id NOT IN ($keep)');
+        await db
+            .execute('DELETE FROM verses WHERE translation_id NOT IN ($keep)');
         await db.execute(
             'DELETE FROM translations WHERE translation_id NOT IN ($keep)');
         // One-time compaction (~50 MB rewrite). Cannot report progress.
@@ -477,20 +474,17 @@ class BibleDatabaseService {
       db = await _openGuarded(dbPath);
 
       // Step 1: move KJV-Strong's out of the core into its pack file.
-      final packFile =
-          File(join(dirname(dbPath), 'packs', 'kjv_strongs.db'));
-      final coreIds = await db
-          .query('translations', columns: ['translation_id']);
-      final inCore = {
-        for (final r in coreIds) r['translation_id'] as String
-      };
+      final packFile = File(join(dirname(dbPath), 'packs', 'kjv_strongs.db'));
+      final coreIds =
+          await db.query('translations', columns: ['translation_id']);
+      final inCore = {for (final r in coreIds) r['translation_id'] as String};
       if (inCore.contains('kjv_strongs') && !await packFile.exists()) {
         await _packStore.extractFromDatabase(
           db,
           shouldExtract: (id) => id == 'kjv_strongs',
         );
-        await db.execute(
-            "DELETE FROM verses WHERE translation_id = 'kjv_strongs'");
+        await db
+            .execute("DELETE FROM verses WHERE translation_id = 'kjv_strongs'");
         await db.execute(
             "DELETE FROM translations WHERE translation_id = 'kjv_strongs'");
         changed = true;
@@ -499,7 +493,7 @@ class BibleDatabaseService {
       // Step 2: ensure BBE lives in the core.
       if (!inCore.contains('bbe') ||
           (await db.rawQuery(
-                  "SELECT COUNT(*) AS c FROM verses WHERE translation_id = 'bbe'"))
+                      "SELECT COUNT(*) AS c FROM verses WHERE translation_id = 'bbe'"))
                   .first['c'] ==
               0) {
         await _seedBbeIntoCore(db, dbPath);
@@ -545,8 +539,8 @@ class BibleDatabaseService {
         seedPath = packFile.path;
       } else {
         final data = await rootBundle.load('assets/bible/$_dbName');
-        final bytes = data.buffer
-            .asUint8List(data.offsetInBytes, data.lengthInBytes);
+        final bytes =
+            data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
         tmpAsset = File(join(dirname(dbPath), 'bbe_seed.tmp.db'));
         await tmpAsset.writeAsBytes(bytes, flush: true);
         seedPath = tmpAsset.path;
@@ -556,16 +550,14 @@ class BibleDatabaseService {
       try {
         final cols = await db.rawQuery('PRAGMA table_info(translations)');
         final names = {for (final c in cols) c['name'] as String};
-        final extra =
-            names.contains('is_downloaded') ? ', is_downloaded' : '';
+        final extra = names.contains('is_downloaded') ? ', is_downloaded' : '';
         // Idempotent: clear first so re-runs never duplicate verses.
         await db.execute("DELETE FROM verses WHERE translation_id = 'bbe'");
-        await db.execute(
-            'INSERT INTO verses SELECT translation_id, language_code, '
-            'book_number, chapter, verse, text FROM bbeseed.verses '
-            "WHERE translation_id = 'bbe'");
-        await db.execute(
-            'INSERT OR REPLACE INTO translations (translation_id, '
+        await db
+            .execute('INSERT INTO verses SELECT translation_id, language_code, '
+                'book_number, chapter, verse, text FROM bbeseed.verses '
+                "WHERE translation_id = 'bbe'");
+        await db.execute('INSERT OR REPLACE INTO translations (translation_id, '
             'language_code, language_name, translation_name, abbreviation, '
             'license, is_complete$extra) '
             'SELECT translation_id, language_code, language_name, '
@@ -593,8 +585,7 @@ class BibleDatabaseService {
   /// translation rows — i.e. a pack-layout migration is pending.
   Future<bool> _hasLegacyTranslationRows(Database db) async {
     try {
-      final rows =
-          await db.query('translations', columns: ['translation_id']);
+      final rows = await db.query('translations', columns: ['translation_id']);
       for (final r in rows) {
         final tid = r['translation_id'] as String?;
         if (tid != null &&
@@ -606,7 +597,6 @@ class BibleDatabaseService {
     } catch (_) {}
     return false;
   }
-
 
   /// Opens the installed database. Hooks are fully guarded so a partial or
   /// corrupt file can never throw here — [_initDB] verifies and repairs via
@@ -622,8 +612,8 @@ class BibleDatabaseService {
       },
       onOpen: (db) async {
         try {
-          final rows = await db.rawQuery(
-              "SELECT name FROM sqlite_master WHERE type = 'table'");
+          final rows = await db
+              .rawQuery("SELECT name FROM sqlite_master WHERE type = 'table'");
           final tables = <String>{};
           for (final r in rows) {
             final n = r['name'];
@@ -749,8 +739,7 @@ class BibleDatabaseService {
   Future<void> insertTranslationPack(
       TranslationInfo info, List<Map<String, dynamic>> verses) async {
     if (TranslationPackStore.isCoreId(info.translationId)) {
-      throw StateError(
-          "'${info.translationId}' is part of the app backbone.");
+      throw StateError("'${info.translationId}' is part of the app backbone.");
     }
     await _packStore.installPackFromRows(info, verses);
   }
@@ -768,12 +757,10 @@ class BibleDatabaseService {
 
   /// Installs a prebuilt pack database downloaded over the network
   /// (Firebase Storage flow), hash-verified when [expectedSha256] is given.
-  Future<void> installPrebuiltPack(
-      String translationId, List<int> bytes,
+  Future<void> installPrebuiltPack(String translationId, List<int> bytes,
       {String? expectedSha256}) async {
     if (TranslationPackStore.isCoreId(translationId)) {
-      throw StateError(
-          "'$translationId' is part of the app backbone.");
+      throw StateError("'$translationId' is part of the app backbone.");
     }
     await _packStore.installPackFromBytes(translationId, bytes,
         expectedSha256: expectedSha256);
@@ -798,11 +785,14 @@ class BibleDatabaseService {
               for (final dayObj in completedDaysList) {
                 final dayNumber = int.tryParse(dayObj.toString());
                 if (dayNumber != null) {
-                  await txn.insert('user_plan_progress', {
-                    'plan_id': id,
-                    'day_number': dayNumber,
-                    'completed_at': DateTime.now().millisecondsSinceEpoch,
-                  }, conflictAlgorithm: ConflictAlgorithm.ignore);
+                  await txn.insert(
+                      'user_plan_progress',
+                      {
+                        'plan_id': id,
+                        'day_number': dayNumber,
+                        'completed_at': DateTime.now().millisecondsSinceEpoch,
+                      },
+                      conflictAlgorithm: ConflictAlgorithm.ignore);
                 }
               }
             }

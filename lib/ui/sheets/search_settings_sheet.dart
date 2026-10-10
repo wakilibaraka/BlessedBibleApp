@@ -59,13 +59,15 @@ class SearchSettingsSheet extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                     child: Text(
                       'MATCH TYPE',
                       style: theme.textTheme.labelSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1.2,
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.5),
                       ),
                     ),
                   ),
@@ -80,39 +82,56 @@ class SearchSettingsSheet extends ConsumerWidget {
                   ),
                   const Divider(height: 1),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16).copyWith(bottom: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 24, vertical: 16)
+                            .copyWith(bottom: 8),
                     child: Text(
                       'SCOPE',
                       style: theme.textTheme.labelSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1.2,
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.5),
                       ),
                     ),
                   ),
                   SwitchListTile(
                     title: const Text('Old Testament'),
-                    subtitle: searchState.filterBook != null ? const Text('Disabled (Book Filter Active)') : null,
+                    subtitle: searchState.filterBook != null
+                        ? const Text('Disabled (Book Filter Active)')
+                        : null,
                     value: searchState.filterOt,
-                    onChanged: searchState.filterBook != null ? null : (val) {
-                      ref.read(searchStateProvider.notifier).toggleOtFilter();
-                    },
+                    onChanged: searchState.filterBook != null
+                        ? null
+                        : (val) {
+                            ref
+                                .read(searchStateProvider.notifier)
+                                .toggleOtFilter();
+                          },
                     secondary: const Icon(Icons.history_edu_rounded),
                   ),
                   SwitchListTile(
                     title: const Text('New Testament'),
-                    subtitle: searchState.filterBook != null ? const Text('Disabled (Book Filter Active)') : null,
+                    subtitle: searchState.filterBook != null
+                        ? const Text('Disabled (Book Filter Active)')
+                        : null,
                     value: searchState.filterNt,
-                    onChanged: searchState.filterBook != null ? null : (val) {
-                      ref.read(searchStateProvider.notifier).toggleNtFilter();
-                    },
+                    onChanged: searchState.filterBook != null
+                        ? null
+                        : (val) {
+                            ref
+                                .read(searchStateProvider.notifier)
+                                .toggleNtFilter();
+                          },
                     secondary: const Icon(Icons.menu_book_rounded),
                   ),
                   SwitchListTile(
                     title: const Text('Commentary'),
                     value: searchState.filterCommentary,
                     onChanged: (val) {
-                      ref.read(searchStateProvider.notifier).toggleCommentaryFilter();
+                      ref
+                          .read(searchStateProvider.notifier)
+                          .toggleCommentaryFilter();
                     },
                     secondary: const Icon(Icons.library_books_rounded),
                   ),
@@ -120,28 +139,36 @@ class SearchSettingsSheet extends ConsumerWidget {
                     title: const Text('My Notes'),
                     value: searchState.filterNotes,
                     onChanged: (val) {
-                      ref.read(searchStateProvider.notifier).toggleNotesFilter();
+                      ref
+                          .read(searchStateProvider.notifier)
+                          .toggleNotesFilter();
                     },
                     secondary: const Icon(Icons.sticky_note_2_outlined),
                   ),
                   const Divider(height: 1),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16).copyWith(bottom: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 24, vertical: 16)
+                            .copyWith(bottom: 8),
                     child: Text(
                       'BEHAVIOR',
                       style: theme.textTheme.labelSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1.2,
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.5),
                       ),
                     ),
                   ),
                   SwitchListTile(
                     title: const Text('Auto-open Single Result'),
-                    subtitle: const Text('Jump directly if only one result is found'),
+                    subtitle:
+                        const Text('Jump directly if only one result is found'),
                     value: searchSettings.autoOpenSingleSearchResult,
                     onChanged: (val) {
-                      ref.read(searchSettingsProvider.notifier).toggleAutoOpen(val);
+                      ref
+                          .read(searchSettingsProvider.notifier)
+                          .toggleAutoOpen(val);
                     },
                     secondary: const Icon(Icons.bolt_rounded),
                   ),

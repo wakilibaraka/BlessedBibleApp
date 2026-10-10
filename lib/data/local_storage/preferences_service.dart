@@ -110,8 +110,6 @@ class PreferencesService {
     await prefs.setStringList(_searchQueriesKey, queries);
   }
 
-
-
   /// Share-card typography/alignment overrides (JSON string).
   String? getShareCardStyleJson() => prefs.getString('share_card_style');
 
@@ -416,7 +414,6 @@ class PreferencesService {
   String? getSabbathLocationName() => prefs.getString(_sabbathLocationNameKey);
   void setSabbathLocationName(String val) =>
       prefs.setString(_sabbathLocationNameKey, val);
-
 
   // Prayer
   static const _prayerReminderEnabledKey = "prayer_reminder_enabled";

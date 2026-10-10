@@ -1,4 +1,3 @@
-
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/commentary_entry.dart';
@@ -24,7 +23,7 @@ class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
     try {
       final jsonString =
           await rootBundle.loadString('assets/commentary/commentary.json');
-      
+
       final entries = await compute(parseCommentaryJson, jsonString);
 
       final verses = <String>{};
@@ -32,12 +31,12 @@ class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
       final vDevoSet = <String>{};
       final vNoteSet = <String>{};
       final cSet = <String>{};
-      
+
       for (final e in entries) {
         final b = e.scope.book;
         final c = e.scope.chapter;
         final v = e.scope.verse;
-        
+
         if (b != null && c != null) {
           if (e.scope.type == 'chapter') {
             cSet.add('$b|$c');
@@ -55,13 +54,13 @@ class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
           }
         }
       }
-      
+
       _cachedChapters = cSet;
       _cachedVersesWithCommentary = vCommSet;
       _cachedVersesWithDevotionals = vDevoSet;
       _cachedVersesWithNotes = vNoteSet;
       _cachedFormattedVerses = verses.toList()..sort();
-      
+
       return entries;
     } catch (e) {
       // Never fail silently: providers surface the error so screens render
@@ -188,4 +187,3 @@ final commentaryForChapterProvider =
   final notifier = ref.watch(commentaryProvider.notifier);
   return notifier.hasCommentary(book, chapter, null);
 });
-

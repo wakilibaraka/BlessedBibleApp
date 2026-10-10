@@ -7,7 +7,8 @@ class PericopeEntry {
   final int endVerse;
   final String title;
   final String confidence;
-  final String? translationId; // Null means it's a shared/curated pericope for all translations
+  final String?
+      translationId; // Null means it's a shared/curated pericope for all translations
   final bool isPlanBreak;
   final String source;
 
@@ -42,7 +43,6 @@ class PericopeEntry {
     final expectedId = buildId(book, sc, sv);
     return PericopeEntry(
       id: (storedId != null && storedId.isNotEmpty) ? storedId : expectedId,
-
       book: json['book'] as String,
       startChapter: json['startChapter'] as int,
       startVerse: json['startVerse'] as int,

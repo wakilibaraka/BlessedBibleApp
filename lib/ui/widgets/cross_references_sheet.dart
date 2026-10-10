@@ -6,7 +6,6 @@ import '../../state/bible_provider.dart';
 import '../../state/translation_provider.dart';
 import '../../services/bible_database_service.dart';
 
-
 /// A bottom sheet showing all cross-references for a given verse.
 class CrossReferencesSheet extends ConsumerWidget {
   final int bookNumber;
@@ -91,13 +90,15 @@ class CrossReferencesSheet extends ConsumerWidget {
                           Icon(
                             Icons.link_off_rounded,
                             size: 40,
-                            color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.2),
                           ),
                           const SizedBox(height: 12),
                           Text(
                             'No cross-references found for this verse.',
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                              color: theme.colorScheme.onSurface
+                                  .withValues(alpha: 0.4),
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -105,7 +106,8 @@ class CrossReferencesSheet extends ConsumerWidget {
                           Text(
                             'Cross-references will be available\nafter the next app update.',
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+                              color: theme.colorScheme.onSurface
+                                  .withValues(alpha: 0.3),
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -116,13 +118,16 @@ class CrossReferencesSheet extends ConsumerWidget {
                 }
                 return ListView.separated(
                   shrinkWrap: true,
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   itemCount: refs.length,
-                  separatorBuilder: (_, __) => const Divider(height: 1, indent: 16),
+                  separatorBuilder: (_, __) =>
+                      const Divider(height: 1, indent: 16),
                   itemBuilder: (context, index) {
                     final cr = refs[index];
                     final targetBookName = _bookName(ref, cr.toBookNumber);
-                    final refLabel = '$targetBookName ${cr.toChapter}:${cr.toVerse}';
+                    final refLabel =
+                        '$targetBookName ${cr.toChapter}:${cr.toVerse}';
 
                     return _CrossRefTile(
                       refLabel: refLabel,
@@ -150,8 +155,8 @@ class CrossReferencesSheet extends ConsumerWidget {
                     ),
                     const SizedBox(height: 12),
                     TextButton.icon(
-                      onPressed: () => ref.invalidate(
-                          crossReferencesProvider(key)),
+                      onPressed: () =>
+                          ref.invalidate(crossReferencesProvider(key)),
                       icon: const Icon(Icons.refresh_rounded),
                       label: const Text('Retry'),
                     ),
@@ -268,7 +273,8 @@ class _CrossRefTileState extends ConsumerState<_CrossRefTile> {
                   ? Container(
                       height: 12,
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.08),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(4),
                       ),
                     )

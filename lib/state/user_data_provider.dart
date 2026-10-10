@@ -96,9 +96,11 @@ class BookmarkDataNotifier extends Notifier<BookmarkData> {
 
         if (!verificationPassed) {
           prefs.removeBookmarksV2();
-          logDebug('MIGRATION READ-BACK FAILED. Legacy data untouched. Migration reverted.');
+          logDebug(
+              'MIGRATION READ-BACK FAILED. Legacy data untouched. Migration reverted.');
         } else {
-          logDebug('MIGRATION SUCCESS: Read-back verified ${nodes.length} bookmarks.');
+          logDebug(
+              'MIGRATION SUCCESS: Read-back verified ${nodes.length} bookmarks.');
         }
       });
     }
@@ -148,7 +150,7 @@ class BookmarkDataNotifier extends Notifier<BookmarkData> {
   void deleteFolder(String id) {
     // Remove the folder
     final newFolders = state.folders.where((f) => f.id != id).toList();
-    
+
     // Move all bookmarks in this folder to Unfiled (folderId = null)
     final newNodes = Map<String, BookmarkNode>.from(state.nodes);
     for (final entry in newNodes.entries) {
@@ -160,7 +162,7 @@ class BookmarkDataNotifier extends Notifier<BookmarkData> {
         );
       }
     }
-    
+
     final newData = BookmarkData(folders: newFolders, nodes: newNodes);
     state = newData;
     ref.read(preferencesProvider).saveBookmarksV2(jsonEncode(newData.toJson()));
@@ -177,13 +179,16 @@ class BookmarkDataNotifier extends Notifier<BookmarkData> {
       );
       final newData = BookmarkData(folders: state.folders, nodes: newNodes);
       state = newData;
-      ref.read(preferencesProvider).saveBookmarksV2(jsonEncode(newData.toJson()));
+      ref
+          .read(preferencesProvider)
+          .saveBookmarksV2(jsonEncode(newData.toJson()));
     }
   }
 }
 
 final bookmarkDataProvider =
-    NotifierProvider<BookmarkDataNotifier, BookmarkData>(BookmarkDataNotifier.new);
+    NotifierProvider<BookmarkDataNotifier, BookmarkData>(
+        BookmarkDataNotifier.new);
 
 class BookmarksNotifier extends Notifier<Set<String>> {
   @override
@@ -252,4 +257,3 @@ class HighlightsNotifier extends Notifier<Map<String, int>> {
 final highlightsProvider =
     NotifierProvider<HighlightsNotifier, Map<String, int>>(
         HighlightsNotifier.new);
-

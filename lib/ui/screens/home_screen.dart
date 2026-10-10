@@ -164,7 +164,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 }
                 if (dy > 0) {
                   _overscrollAccum = dy;
-                  if (_overscrollAccum >= _kOverscrollThreshold && !_hasFiredArmedHaptic) {
+                  if (_overscrollAccum >= _kOverscrollThreshold &&
+                      !_hasFiredArmedHaptic) {
                     _hasFiredArmedHaptic = true;
                     HapticFeedback.mediumImpact();
                   }
@@ -176,9 +177,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 if (_overscrollAccum >= _kOverscrollThreshold &&
                     ref.read(bibleNavSettingsProvider).homePullDownEnabled) {
                   HapticFeedback.mediumImpact();
-                  if (ref
-                          .read(bibleNavSettingsProvider)
-                          .homePullDownTarget ==
+                  if (ref.read(bibleNavSettingsProvider).homePullDownTarget ==
                       HomePullDownTarget.appearance) {
                     AppearanceSettingsSheet.show(context,
                         initialTab: AppearanceTab.typography);
@@ -255,11 +254,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     // Parse VOTD reference for availability check
     final votdRef = data.verseOfTheDay.reference;
     final votdLastSpace = votdRef.lastIndexOf(' ');
-    final votdBook = votdLastSpace != -1 ? votdRef.substring(0, votdLastSpace) : votdRef;
-    final votdChapterStr = votdLastSpace != -1 ? votdRef.substring(votdLastSpace + 1).split(':').first : '1';
+    final votdBook =
+        votdLastSpace != -1 ? votdRef.substring(0, votdLastSpace) : votdRef;
+    final votdChapterStr = votdLastSpace != -1
+        ? votdRef.substring(votdLastSpace + 1).split(':').first
+        : '1';
     final votdChapter = int.tryParse(votdChapterStr) ?? 1;
-    final hasVotdCommentary = ref.watch(
-        commentaryForChapterProvider((votdBook, votdChapter)));
+    final hasVotdCommentary =
+        ref.watch(commentaryForChapterProvider((votdBook, votdChapter)));
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -288,7 +290,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             behavior: HitTestBehavior.opaque,
             onTap: () {
               final refParts = votdRef.split(':');
-              final verseNum = refParts.length > 1 ? int.tryParse(refParts.last) : 1;
+              final verseNum =
+                  refParts.length > 1 ? int.tryParse(refParts.last) : 1;
               openReaderAtVerse(
                 ref,
                 bookName: votdBook,
@@ -417,7 +420,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                   ? refStr.substring(0, lastSpaceIdx)
                                   : refStr;
                               final refParts = lastSpaceIdx != -1
-                                  ? refStr.substring(lastSpaceIdx + 1).split(':')
+                                  ? refStr
+                                      .substring(lastSpaceIdx + 1)
+                                      .split(':')
                                   : [];
                               final chapterNum = refParts.isNotEmpty
                                   ? (int.tryParse(refParts[0]) ?? 1)
@@ -445,7 +450,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           onPressed: () => _shareVotd(data.verseOfTheDay),
                         ),
                       ),
-
                     ],
                   ),
                 ],
@@ -533,8 +537,6 @@ class _PillButton extends StatelessWidget {
   }
 }
 
-
-
 class WordOfTheDaySection extends ConsumerWidget {
   const WordOfTheDaySection({super.key});
 
@@ -542,7 +544,7 @@ class WordOfTheDaySection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final wotdAsync = ref.watch(wordOfTheDayProvider);
-    
+
     return wotdAsync.when(
       data: (wotd) {
         if (wotd == null) {
@@ -550,7 +552,7 @@ class WordOfTheDaySection extends ConsumerWidget {
             'No word picked for today yet — try again later.',
           );
         }
-        
+
         return BouncyEntrance(
           delay: const Duration(milliseconds: 500),
           child: Column(
@@ -578,7 +580,8 @@ class WordOfTheDaySection extends ConsumerWidget {
               GlassContainer(
                 isScrollable: false,
                 borderRadius: BorderRadius.circular(24),
-                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 20.0, vertical: 14.0),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -589,7 +592,8 @@ class WordOfTheDaySection extends ConsumerWidget {
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.bodySmall?.copyWith(
                         height: 1.60,
-                        color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.82),
+                        color: theme.textTheme.bodyMedium?.color
+                            ?.withValues(alpha: 0.82),
                       ),
                     ),
                     const SizedBox(height: 14),
@@ -630,8 +634,7 @@ class WordOfTheDaySection extends ConsumerWidget {
                                   sourceName: 'Word of the day',
                                 ),
                                 imageFilename: 'wotd',
-                                buildCard: (backdrop, style) =>
-                                    ShareCard.word(
+                                buildCard: (backdrop, style) => ShareCard.word(
                                   eyebrow: 'Word of the day',
                                   word: wotd.word,
                                   definition: wotd.snippet,

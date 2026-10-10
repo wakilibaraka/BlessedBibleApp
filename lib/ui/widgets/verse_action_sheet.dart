@@ -58,8 +58,8 @@ Future<bool> showVerseActionSheet(BuildContext context, WidgetRef ref) async {
     backgroundColor: Colors.transparent,
     barrierColor: Colors.black.withValues(alpha: 0.32),
     builder: (ctx) => VerseActionSheet(
-      contextLabel: verseSelectionContextLabel(
-          readLoc.bookName, readLoc.chapter, verses),
+      contextLabel:
+          verseSelectionContextLabel(readLoc.bookName, readLoc.chapter, verses),
       actionCount: verses.length,
       actions: [
         SheetAction(
@@ -69,8 +69,8 @@ Future<bool> showVerseActionSheet(BuildContext context, WidgetRef ref) async {
           label: allBookmarked ? 'Saved' : 'Save',
           active: allBookmarked,
           onTap: () {
-            VerseActionLogic.handleBookmark(ctx, theme, ref,
-                readLoc.bookName, readLoc.chapter, verses);
+            VerseActionLogic.handleBookmark(
+                ctx, theme, ref, readLoc.bookName, readLoc.chapter, verses);
           },
         ),
         SheetAction(
@@ -88,9 +88,8 @@ Future<bool> showVerseActionSheet(BuildContext context, WidgetRef ref) async {
         SheetAction(
           icon: Icons.menu_book_rounded,
           label: 'Study',
-          onTap: () => VerseActionLogic.handleCommentary(
-              ctx, ref, readLoc.bookName, readLoc.chapter, verses.first,
-              verses),
+          onTap: () => VerseActionLogic.handleCommentary(ctx, ref,
+              readLoc.bookName, readLoc.chapter, verses.first, verses),
         ),
         SheetAction(
           icon: Icons.ios_share_rounded,
@@ -183,8 +182,8 @@ class VerseActionSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final maxHeight = MediaQuery.sizeOf(context).height *
-        kVerseSheetMaxHeightFactor;
+    final maxHeight =
+        MediaQuery.sizeOf(context).height * kVerseSheetMaxHeightFactor;
 
     return Container(
       // The cap applies to the card itself; the dock clearance is added
@@ -198,47 +197,46 @@ class VerseActionSheet extends StatelessWidget {
       child: ConstrainedBox(
         constraints: BoxConstraints(maxHeight: maxHeight),
         child: TexturedGlassContainer(
-        borderRadius: BorderRadius.circular(22),
-        padding: const EdgeInsets.fromLTRB(8, 10, 8, 12),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Center(
-              child: Container(
-                width: 36,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
-                  borderRadius: BorderRadius.circular(3),
+          borderRadius: BorderRadius.circular(22),
+          padding: const EdgeInsets.fromLTRB(8, 10, 8, 12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Text(
-                contextLabel,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.labelMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Text(
+                  contextLabel,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 6),
-            // Apple-standard proportions: 56pt targets, 20pt icons,
-            // 11pt labels, even spacing.
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  for (final a in actions)
-                    _SheetActionButton(action: a),
-                ],
+              const SizedBox(height: 6),
+              // Apple-standard proportions: 56pt targets, 20pt icons,
+              // 11pt labels, even spacing.
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    for (final a in actions) _SheetActionButton(action: a),
+                  ],
+                ),
               ),
-            ),
             ],
           ),
         ),
@@ -254,9 +252,8 @@ class _SheetActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final color = action.active
-        ? theme.primaryColor
-        : theme.colorScheme.onSurface;
+    final color =
+        action.active ? theme.primaryColor : theme.colorScheme.onSurface;
     return Semantics(
       button: true,
       label: action.label,

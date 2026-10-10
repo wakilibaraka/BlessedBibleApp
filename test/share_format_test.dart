@@ -144,8 +144,8 @@ void main() {
       expect(ShareService.referenceFor('John', 3, [16]), 'John 3:16');
     });
     test('contiguous becomes a range', () {
-      expect(ShareService.referenceFor('John', 3, [16, 17, 18]),
-          'John 3:16-18');
+      expect(
+          ShareService.referenceFor('John', 3, [16, 17, 18]), 'John 3:16-18');
     });
     test('non-contiguous lists verses', () {
       expect(ShareService.referenceFor('John', 3, [16, 18, 19]),

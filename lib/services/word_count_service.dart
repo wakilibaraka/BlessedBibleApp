@@ -16,7 +16,8 @@ class WordCountService {
   /// Loads and parses the word_counts.json asset off the main isolate.
   Future<void> init() async {
     if (_data != null) return;
-    final jsonString = await rootBundle.loadString('assets/data/word_counts.json');
+    final jsonString =
+        await rootBundle.loadString('assets/data/word_counts.json');
     await initFromJson(jsonString);
   }
 
@@ -63,21 +64,21 @@ class WordCountService {
   /// Note: The range can span across multiple chapters.
   int wordsInRange(String book, int startCh, int startV, int endCh, int endV) {
     _ensureInitialized();
-    
+
     final bookData = _data![book];
     if (bookData == null) return 0;
 
     int total = 0;
-    
+
     for (int c = startCh; c <= endCh; c++) {
       final chapterData = bookData[c.toString()];
       if (chapterData == null) continue;
-      
+
       final verses = chapterData['verses'] as Map<String, dynamic>;
-      
+
       // If we are in the start chapter, start from startV, else start from verse 1
       int firstVerseInChapter = (c == startCh) ? startV : 1;
-      
+
       // If we are in the end chapter, end at endV, else go to the end of the chapter
       int lastVerseInChapter = -1;
       if (c == endCh) {
@@ -91,7 +92,7 @@ class WordCountService {
         total += count;
       }
     }
-    
+
     return total;
   }
 
@@ -117,7 +118,8 @@ class WordCountService {
 
   void _ensureInitialized() {
     if (_data == null) {
-      throw StateError('WordCountService is not initialized. Call init() first.');
+      throw StateError(
+          'WordCountService is not initialized. Call init() first.');
     }
   }
 }

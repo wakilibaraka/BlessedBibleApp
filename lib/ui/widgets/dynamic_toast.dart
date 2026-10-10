@@ -4,7 +4,7 @@ import 'textured_glass_container.dart';
 
 class DynamicToast {
   static void show(
-    BuildContext context, 
+    BuildContext context,
     String message, {
     IconData? icon,
     Duration duration = const Duration(milliseconds: 2500),
@@ -44,7 +44,8 @@ class _ToastOverlay extends StatefulWidget {
   State<_ToastOverlay> createState() => _ToastOverlayState();
 }
 
-class _ToastOverlayState extends State<_ToastOverlay> with SingleTickerProviderStateMixin {
+class _ToastOverlayState extends State<_ToastOverlay>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _slideAnimation;
   late Animation<double> _fadeAnimation;
@@ -59,11 +60,17 @@ class _ToastOverlayState extends State<_ToastOverlay> with SingleTickerProviderS
     );
 
     _slideAnimation = Tween<double>(begin: -100, end: 64).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.elasticOut, reverseCurve: Curves.easeInBack),
+      CurvedAnimation(
+          parent: _controller,
+          curve: Curves.elasticOut,
+          reverseCurve: Curves.easeInBack),
     );
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn, reverseCurve: Curves.easeOut),
+      CurvedAnimation(
+          parent: _controller,
+          curve: Curves.easeIn,
+          reverseCurve: Curves.easeOut),
     );
 
     _controller.forward();
@@ -109,15 +116,16 @@ class _ToastOverlayState extends State<_ToastOverlay> with SingleTickerProviderS
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (widget.icon != null) ...[
-                    Icon(widget.icon, size: 20, color: Theme.of(context).primaryColor),
+                    Icon(widget.icon,
+                        size: 20, color: Theme.of(context).primaryColor),
                     const SizedBox(width: 12),
                   ],
                   Flexible(
                     child: Text(
                       widget.message,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                            fontWeight: FontWeight.w600,
+                          ),
                       textAlign: TextAlign.center,
                     ),
                   ),

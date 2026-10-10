@@ -31,7 +31,11 @@ class VotdArchiveScreen extends ConsumerWidget {
     final appThemeMode = ref.watch(themeProvider);
     final is3DTheme = appThemeMode.is3DTheme;
 
-    Color getThemeBackgroundColor() { return appThemeMode.is3DTheme ? appThemeMode.backgroundColor : theme.scaffoldBackgroundColor; }
+    Color getThemeBackgroundColor() {
+      return appThemeMode.is3DTheme
+          ? appThemeMode.backgroundColor
+          : theme.scaffoldBackgroundColor;
+    }
 
     return Scaffold(
       backgroundColor: getThemeBackgroundColor(),
@@ -79,9 +83,8 @@ class VotdArchiveScreen extends ConsumerWidget {
                   // Compute VotD for this specific date
                   final dayIndex = date.difference(epoch).inDays % pool.length;
                   // Handle negative modulo correctly just in case
-                  final validDayIndex = dayIndex < 0
-                      ? dayIndex + pool.length
-                      : dayIndex;
+                  final validDayIndex =
+                      dayIndex < 0 ? dayIndex + pool.length : dayIndex;
                   final votdEntry = pool[validDayIndex];
                   final reference = votdEntry.reference;
                   final text = votdEntry.text;
@@ -191,8 +194,7 @@ class VotdArchiveScreen extends ConsumerWidget {
                                   book: bookName,
                                   chapter: chapterNum,
                                   verse: verseNum,
-                                  verseText:
-                                      null,
+                                  verseText: null,
                                 ),
                               ));
                             },

@@ -15,7 +15,7 @@ class TranslationNotifier extends Notifier<String> {
     final prefs = ref.read(preferencesProvider);
     await prefs.setActiveTranslation(translationId);
     state = translationId;
-    
+
     // Guard: Prevent primary and secondary from being equal
     final secondaryId = ref.read(secondaryTranslationProvider);
     if (secondaryId == translationId) {
@@ -33,10 +33,11 @@ class SecondaryTranslationNotifier extends Notifier<String?> {
 
   Future<void> setTranslation(String? translationId) async {
     // Guard: Prevent secondary from being equal to primary
-    if (translationId != null && translationId == ref.read(activeTranslationProvider)) {
-      return; 
+    if (translationId != null &&
+        translationId == ref.read(activeTranslationProvider)) {
+      return;
     }
-    
+
     final prefs = ref.read(preferencesProvider);
     await prefs.setSecondaryTranslation(translationId);
     state = translationId;
