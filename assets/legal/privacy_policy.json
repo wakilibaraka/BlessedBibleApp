@@ -49,7 +49,7 @@
     {
       "heading": "Downloading content",
       "paragraphs": [
-        "When you download a Bible translation or the app refreshes study content, it requests files from Google Firebase (Firestore and Cloud Storage) and from the Free Use Bible API (bible.helloao.org). As with any internet request, these servers receive your device's IP address. No account information is sent."
+        "When you download a Bible translation, the app requests it from the Free Use Bible API (bible.helloao.org) or, for KJV with Strong's numbers, from GitHub. When the app refreshes study content, it reads from Google Cloud Firestore. As with any internet request, these servers receive your device's IP address. No account information is sent."
       ]
     },
     {
@@ -61,7 +61,7 @@
     {
       "heading": "Who we share data with",
       "paragraphs": [
-        "We use service providers only to run the features above: Google (Firebase Authentication, Cloud Firestore, Cloud Storage, Crashlytics, App Check, Play Integrity), Apple (Sign in with Apple, App Attest / DeviceCheck), and the Free Use Bible API for translation downloads. We do not sell personal data or share it for marketing or advertising."
+        "We use service providers only to run the features above: Google (Firebase Authentication, Cloud Firestore, Crashlytics, App Check, Play Integrity), Apple (Sign in with Apple, App Attest / DeviceCheck), and the Free Use Bible API and GitHub for translation downloads. We do not sell personal data or share it for marketing or advertising."
       ]
     },
     {

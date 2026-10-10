@@ -1,6 +1,6 @@
 // Download-registry integrity: every translation not on device must be
-// fetchable through exactly one working path (offline restore, verified
-// Firebase Storage pack, or reachable helloao endpoint) with complete
+// fetchable through exactly one working path (offline restore, a
+// hash-verified prebuilt pack, or the Free Use Bible API) with complete
 // display metadata. Pure unit test — no providers, no platform channels.
 
 import 'package:flutter_test/flutter_test.dart';
@@ -26,18 +26,21 @@ void main() {
         // Offline restore: must be a shipped bundled pack.
         expect(TranslationPackStore.bundledPackIds.contains(id), isTrue,
             reason: '$id marked bundled but not shipped in assets/packs');
-      } else if (source == 'storage') {
-        final url = t['storageUrl'] as String?;
+      } else if (source == 'prebuilt') {
+        final url = t['url'] as String?;
         final sha = t['sha256'] as String?;
         expect(url != null && url.startsWith('https://'), isTrue,
-            reason: '$id has no valid storageUrl');
+            reason: '$id has no valid url');
         expect(sha != null && RegExp(r'^[0-9a-f]{64}$').hasMatch(sha), isTrue,
             reason: '$id has no valid sha256');
       } else {
-        // helloao JSON flow needs a download id (verified reachable).
-        expect(((t['id']) as String?)?.isNotEmpty ?? false, isTrue,
-            reason: '$id missing helloao id');
+        expect(source, 'helloao', reason: '$id has unknown source $source');
+        expect(
+            t['url'], 'https://bible.helloao.org/api/${t['id']}/complete.json',
+            reason: '$id has a malformed download url');
       }
+      expect(TranslationPackStore.retiredPackIds.contains(id), isFalse,
+          reason: 'retired pack $id is still offered');
     }
     // Backbone translations live in core: never downloadable, never
     // deletable, always on device.

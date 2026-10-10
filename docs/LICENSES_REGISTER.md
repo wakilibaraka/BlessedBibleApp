@@ -10,7 +10,7 @@ Status: ✅ OK to ship · ⚠️ verify before release · ⛔ do not ship as-is
 
 | # | Item | Why | Action |
 | --- | --- | --- | --- |
-| 1 | ⛔ **Romanian BTF** (`ron_btf`), bundled in `assets/packs/` | Marked "Public Domain" in the app, but Bible.com lists *Biblia Traducerea Fidelă 2015* as "Copyright © 2015 Dr. Brian J. Nibbe, Sr. All rights reserved. Used by permission." | Remove from the bundle and the download catalog, **or** get written permission from the copyright holder (Fidela.BibleCluj.ro). Then fix its `license` label everywhere: `content_packs/manifest.json`, `lib/services/translation_downloader.dart`, `tool/build_bible_db.dart`, and the pack DB's `translations` row. |
+| 1 | ✅ **Romanian BTF** (`ron_btf`) — *resolved 2026-10-10* | Copyrighted (© 2015 Dr. Brian J. Nibbe, Sr., all rights reserved), not public domain as labelled. | Removed from the bundle, the catalog and the build scripts. Devices that installed it purge it on the next start (`TranslationPackStore.retiredPackIds`), and a saved selection falls back to KJV. A public-domain Romanian replacement is pending a decision (see PR notes). |
 | 2 | ⚠️ **M. L. Andreasen, *The Book of Hebrews*** (Review and Herald, 1948), 319 commentary entries | US works from 1948 stayed protected only if renewed in 1975–76. Renewal status not confirmed. | Search the US Copyright Office renewal records (Andreasen / Review and Herald, 1975–76). If renewed, it's protected until 2043: remove it or license it. |
 | 3 | ⚠️ **The Graham Bible narrative summaries** (Bible Stories devotional, 500 stories) | Fetched from the project's public Supabase endpoint. A public API key isn't a license, and no license terms were found. | Get written permission or confirm an open license from grahambible.com. Keep the in-app attribution either way. |
 | 4 | ⚠️ **Reading plans from other publishers**: 5 `esv_*` plans (Crossway, incl. "Every Day in the Word"), `heartlight_ot_nt`, `chronological_1yr` (George Guthrie) | Published schedules reproduced without attribution. "ESV" is a Crossway trademark. | Get permission or replace with original/public-domain schedules. At minimum, add attribution and drop "ESV" from ids and titles. M'Cheyne (1842) is public domain. Horner's 10-list is a method and is already credited. |
@@ -33,11 +33,14 @@ Status: ✅ OK to ship · ⚠️ verify before release · ⛔ do not ship as-is
 | Dutch Bible 1917 | `content_packs/nld_.db` | Public domain | ✅ |
 | Louis Segond 1910 | `assets/packs/fra_lsg.db` | Public domain | ✅ |
 | Diodati 1885 | `assets/packs/ita_dio.db` | Public domain | ✅ |
-| Russian Synodal, Chinese Union Version, Arabic Van Dyck, Korean 1910, Ukrainian Kulish | downloaded via bible.helloao.org | Public domain | ✅ |
+| Russian Synodal, Chinese Union Version, Arabic Van Dyck, Korean 1910, Ukrainian Kulish | downloaded | Public domain | ✅ |
+
+**Download source:** every downloadable translation except KJV with Strong's comes from the [Free Use Bible API](https://bible.helloao.org) (`/api/{id}/complete.json`; MIT tooling, texts from eBible.org). KJV with Strong's is served from this repository's own Git LFS copy (`content_packs/kjv_strongs.db`, sha256-verified). CI (`tool/check_translation_sources.py`) checks that every catalog entry resolves to a complete 66-book text.
+
 | Swahili ULB, Tagalog ULB | `assets/packs/swh_ulb.db`, `tgl_ulb.db` | CC BY-SA 4.0: attribution + share-alike; credited in app | ✅ |
 | Hindi Indian Revised Version | downloaded | CC BY-SA 4.0; credited in app | ✅ |
 | Bíblia Livre | `content_packs/por_blj.db` | CC BY (version: item 5) | ⚠️ |
-| Romanian BTF 2015 | `assets/packs/ron_btf.db` | © 2015 Dr. Brian J. Nibbe, Sr., all rights reserved (item 1) | ⛔ |
+| ~~Romanian BTF 2015~~ | removed | © 2015 Dr. Brian J. Nibbe, Sr., all rights reserved (item 1) | removed |
 
 ## Commentary (`assets/commentary/commentary.json`, 4,724 entries)
 

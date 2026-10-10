@@ -80,7 +80,6 @@ CREATE TABLE translations (
     {'id': 'fra_lsg', 'db_id': 'fra_lsg', 'lang': 'fr', 'langName': 'French', 'name': 'Louis Segond 1910', 'abbr': 'LSG', 'license': 'Public Domain'},
     {'id': 'deu_l12', 'db_id': 'deu_l12', 'lang': 'de', 'langName': 'German', 'name': 'Luther Bible 1912', 'abbr': 'L1912', 'license': 'Public Domain'},
     {'id': 'ita_dio', 'db_id': 'ita_dio', 'lang': 'it', 'langName': 'Italian', 'name': 'Diodati 1885', 'abbr': 'DIO', 'license': 'Public Domain'},
-    {'id': 'ron_btf', 'db_id': 'ron_btf', 'lang': 'ro', 'langName': 'Romanian', 'name': 'Romanian BTF Bible', 'abbr': 'BTF', 'license': 'Public Domain'},
     {'id': 'nld_',    'db_id': 'nld_', 'lang': 'nl', 'langName': 'Dutch', 'name': 'Dutch Bible 1917', 'abbr': 'NLD', 'license': 'Public Domain'},
     {'id': 'swh_ulb', 'db_id': 'swh_ulb', 'lang': 'sw', 'langName': 'Swahili', 'name': 'Swahili Unlocked Literal Bible', 'abbr': 'ULB', 'license': 'CC BY-SA 4.0'},
     {'id': 'tgl_ulb', 'db_id': 'tgl_ulb', 'lang': 'tl', 'langName': 'Tagalog', 'name': 'Tagalog Unlocked Literal Bible', 'abbr': 'ULB', 'license': 'CC BY-SA 4.0'},

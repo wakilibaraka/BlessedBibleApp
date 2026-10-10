@@ -8,67 +8,55 @@ class TranslationDownloader {
   static const int _maxRetries = 3;
   static const Duration _retryDelay = Duration(seconds: 2);
 
-  // Downloadable translation definitions
+  /// Free Use Bible API (bible.helloao.org): free, no key, texts sourced
+  /// from eBible.org. Each translation is one `complete.json` file.
+  static const String _helloaoApi = 'https://bible.helloao.org/api';
+
+  /// KJV with Strong's isn't on the Free Use Bible API; it's served from
+  /// this repository's Git LFS copy (content_packs/) and hash-verified.
+  static const String _repoPacksBase =
+      'https://media.githubusercontent.com/media/wakilibaraka/BlessedBibleApp/main/content_packs';
+
+  // Downloadable translation definitions. `id` is the download id (the
+  // API's translation id); `db_id` the on-device id when it differs.
+  // CI verifies every helloao id resolves (tool/check_translation_sources.py).
   static final List<Map<String, dynamic>> downloadableTranslations = [
+    ..._helloao('rus_syn', 'ru', 'Russian', 'Russian Synodal Bible', 'SYN',
+        'Public Domain', 5.3),
+    ..._helloao('cmn_cuv', 'zh', 'Chinese', 'Chinese Union Version', 'CUV',
+        'Public Domain', 2.4),
+    ..._helloao('arb_vdv', 'ar', 'Arabic', 'Arabic Van Dyck Bible', 'VDV',
+        'Public Domain', 7.1),
+    ..._helloao('kor_old', 'ko', 'Korean', 'Korean Bible 1910', 'KOR',
+        'Public Domain', 4.2),
+    ..._helloao('ukr_pan', 'uk', 'Ukrainian', 'Ukrainian Bible by P. Kulish',
+        'UKR', 'Public Domain', 5.4),
+    ..._helloao('HINIRV', 'hi', 'Hindi', 'Hindi Indian Revised Version', 'IRV',
+        'CC BY-SA 4.0', 8.0,
+        dbId: 'hinirv'),
+    ..._helloao('ENGWEBP', 'en', 'English', 'World English Bible', 'WEB',
+        'Public Domain', 5.0,
+        dbId: 'web'),
+    ..._helloao('deu_l12', 'de', 'German', 'Luther Bible 1912', 'L1912',
+        'Public Domain', 4.9),
+    ..._helloao(
+        'nld_', 'nl', 'Dutch', 'Dutch Bible 1917', 'NLD', 'Public Domain', 5.3),
+    ..._helloao('por_blj', 'pt', 'Portuguese', 'Bíblia Livre', 'BLIVRE',
+        'CC BY 4.0', 5.0),
+    ..._helloao('spa_r09', 'es', 'Spanish', 'Reina Valera 1909', 'RV1909',
+        'Public Domain', 5.0),
     {
-      'id': 'rus_syn',
-      'db_id': 'rus_syn',
-      'lang': 'ru',
-      'langName': 'Russian',
-      'name': 'Russian Synodal Bible',
-      'abbr': 'SYN',
+      'id': 'kjv_strongs',
+      'lang': 'en',
+      'langName': 'English',
+      'name': "KJV with Strong's",
+      'abbr': 'KJVS',
       'license': 'Public Domain',
-      'sizeMB': 5.3
-    },
-    {
-      'id': 'cmn_cuv',
-      'db_id': 'cmn_cuv',
-      'lang': 'zh',
-      'langName': 'Chinese',
-      'name': 'Chinese Union Version',
-      'abbr': 'CUV',
-      'license': 'Public Domain',
-      'sizeMB': 2.4
-    },
-    {
-      'id': 'arb_vdv',
-      'db_id': 'arb_vdv',
-      'lang': 'ar',
-      'langName': 'Arabic',
-      'name': 'Arabic Van Dyck Bible',
-      'abbr': 'VDV',
-      'license': 'Public Domain',
-      'sizeMB': 7.1
-    },
-    {
-      'id': 'kor_old',
-      'db_id': 'kor_old',
-      'lang': 'ko',
-      'langName': 'Korean',
-      'name': 'Korean Bible 1910',
-      'abbr': 'KOR',
-      'license': 'Public Domain',
-      'sizeMB': 4.2
-    },
-    {
-      'id': 'ukr_pan',
-      'db_id': 'ukr_pan',
-      'lang': 'uk',
-      'langName': 'Ukrainian',
-      'name': 'Ukrainian Bible by P. Kulish',
-      'abbr': 'UKR',
-      'license': 'Public Domain',
-      'sizeMB': 5.4
-    },
-    {
-      'id': 'HINIRV',
-      'db_id': 'hinirv',
-      'lang': 'hi',
-      'langName': 'Hindi',
-      'name': 'Hindi Indian Revised Version',
-      'abbr': 'IRV',
-      'license': 'CC BY-SA 4.0',
-      'sizeMB': 8.0
+      'sizeMB': 7.7,
+      'source': 'prebuilt',
+      'url': '$_repoPacksBase/kjv_strongs.db',
+      'sha256':
+          '1adece5cf1de520059216e1aaef8cd94ea268966570353e776546d8034425cfa',
     },
     // Bundled packs the user deleted: restored from the APK (instant,
     // offline) instead of downloaded. Sizes measured from built packs.
@@ -93,16 +81,6 @@ class TranslationDownloader {
       'source': 'bundled',
     },
     {
-      'id': 'ron_btf',
-      'lang': 'ro',
-      'langName': 'Romanian',
-      'name': 'Romanian BTF Bible',
-      'abbr': 'BTF',
-      'license': 'Public Domain',
-      'sizeMB': 5.4,
-      'source': 'bundled',
-    },
-    {
       'id': 'ita_dio',
       'lang': 'it',
       'langName': 'Italian',
@@ -122,103 +100,31 @@ class TranslationDownloader {
       'sizeMB': 4.1,
       'source': 'bundled',
     },
-    // Prebuilt packs hosted in Firebase Storage (see content_packs/ +
-    // content_packs/manifest.json for sha256). Upload once with:
-    // gsutil cp content_packs/<id>.db gs://blessedbibleapp.firebasestorage.app/packs/
-    ..._storagePack(
-      id: 'kjv_strongs',
-      lang: 'en',
-      langName: 'English',
-      name: "KJV with Strong's",
-      abbr: 'KJVS',
-      license: 'Public Domain',
-      sizeMB: 7.7,
-      sha256:
-          '1adece5cf1de520059216e1aaef8cd94ea268966570353e776546d8034425cfa',
-    ),
-    ..._storagePack(
-      id: 'web',
-      lang: 'en',
-      langName: 'English',
-      name: 'World English Bible',
-      abbr: 'WEB',
-      license: 'Public Domain',
-      sizeMB: 5.0,
-      sha256:
-          'e9e3907aedc0515ffb76a85cf0c18d0bd4f7d208894f09e0539ba70fbcc05415',
-    ),
-    ..._storagePack(
-      id: 'deu_l12',
-      lang: 'de',
-      langName: 'German',
-      name: 'Luther Bible 1912',
-      abbr: 'L1912',
-      license: 'Public Domain',
-      sizeMB: 4.9,
-      sha256:
-          'f3cc52a2e35060dfea078807fd67b8b2c43b353bc6034edb2f1962ad4d2af250',
-    ),
-    ..._storagePack(
-      id: 'nld_',
-      lang: 'nl',
-      langName: 'Dutch',
-      name: 'Dutch Bible 1917',
-      abbr: 'NLD',
-      license: 'Public Domain',
-      sizeMB: 5.3,
-      sha256:
-          '3a6d4631581887d7b7cb17d1f094c65cef703ce450c82bc1b79347c9f834ed96',
-    ),
-    ..._storagePack(
-      id: 'por_blj',
-      lang: 'pt',
-      langName: 'Portuguese',
-      name: 'Bíblia Livre',
-      abbr: 'BLIVRE',
-      license: 'CC BY 4.0',
-      sizeMB: 5.0,
-      sha256:
-          '0a6145db735f7fa95317979cc7d1a963616ec2a6429a6f5adccae065fee03477',
-    ),
-    ..._storagePack(
-      id: 'spa_r09',
-      lang: 'es',
-      langName: 'Spanish',
-      name: 'Reina Valera 1909',
-      abbr: 'RV1909',
-      license: 'Public Domain',
-      sizeMB: 5.0,
-      sha256:
-          'c1783150ae84f10c76379aa4dc8e8c856b35e3d211134c97628c9e04161dc453',
-    ),
   ];
 
-  static const String _storageBucket = 'blessedbibleapp.firebasestorage.app';
-
-  /// Registry entry for one Firebase-Storage-hosted prebuilt pack.
-  static List<Map<String, dynamic>> _storagePack({
-    required String id,
-    required String lang,
-    required String langName,
-    required String name,
-    required String abbr,
-    required String license,
-    required double sizeMB,
-    required String sha256,
+  /// Registry entry for one Free Use Bible API translation.
+  static List<Map<String, dynamic>> _helloao(
+    String id,
+    String lang,
+    String langName,
+    String name,
+    String abbr,
+    String license,
+    double sizeMB, {
+    String? dbId,
   }) {
     return [
       {
         'id': id,
+        if (dbId != null) 'db_id': dbId,
         'lang': lang,
         'langName': langName,
         'name': name,
         'abbr': abbr,
         'license': license,
         'sizeMB': sizeMB,
-        'source': 'storage',
-        'storageUrl': 'https://firebasestorage.googleapis.com/v0/b/'
-            '$_storageBucket/o/packs%2F$id.db?alt=media',
-        'sha256': sha256,
+        'source': 'helloao',
+        'url': '$_helloaoApi/$id/complete.json',
       }
     ];
   }
@@ -228,16 +134,13 @@ class TranslationDownloader {
     final meta = downloadableTranslations
         .firstWhere((t) => (t['db_id'] ?? t['id']) == translationId);
 
-    // Prebuilt pack flow (Firebase Storage): exact bytes, hash-verified.
-    final storageUrl = meta['storageUrl'] as String?;
-    if (storageUrl != null) {
-      await _downloadPrebuiltPack(meta, storageUrl, onProgress);
+    final url = meta['url'] as String;
+
+    // Prebuilt pack database: exact bytes, hash-verified.
+    if (meta['source'] == 'prebuilt') {
+      await _downloadPrebuiltPack(meta, url, onProgress);
       return;
     }
-
-    // Primary endpoint (actual helloao structure)
-    final primaryUrl =
-        "https://bible.helloao.org/api/\${meta['id']}/complete.json";
 
     String? jsonString;
     Exception? lastError;
@@ -245,7 +148,7 @@ class TranslationDownloader {
     // Retry logic
     for (int i = 0; i < _maxRetries; i++) {
       try {
-        final request = http.Request('GET', Uri.parse(primaryUrl));
+        final request = http.Request('GET', Uri.parse(url));
         final response = await request.send();
 
         if (response.statusCode == 200) {
@@ -263,7 +166,7 @@ class TranslationDownloader {
           jsonString = utf8.decode(bytes);
           break; // Success
         } else {
-          throw Exception('HTTP \${response.statusCode}');
+          throw Exception('HTTP ${response.statusCode}');
         }
       } catch (e) {
         lastError = e as Exception;
@@ -288,7 +191,7 @@ class TranslationDownloader {
         parsedData.info, parsedData.verses);
   }
 
-  /// Downloads a prebuilt pack database (Firebase Storage) with retries,
+  /// Downloads a prebuilt pack database with retries,
   /// verifies its sha256, and installs it as a standalone pack file.
   static Future<void> _downloadPrebuiltPack(
     Map<String, dynamic> meta,
@@ -340,9 +243,6 @@ class TranslationDownloader {
   // Runs in an isolate
   static _ParsedData _parseTranslationJson(
       String jsonString, Map<String, dynamic> meta) {
-    final parsed = jsonDecode(jsonString) as Map<String, dynamic>;
-    final versesList = parsed['verses'] as List<dynamic>? ?? [];
-
     final info = TranslationInfo(
       translationId: (meta['db_id'] ?? meta['id']) as String,
       languageCode: meta['lang'] as String,
@@ -353,88 +253,79 @@ class TranslationDownloader {
       isComplete: true,
       isDownloaded: true,
     );
+    final verses = versesFromCompleteJson(
+      jsonDecode(jsonString) as Map<String, dynamic>,
+      translationId: info.translationId,
+      languageCode: info.languageCode,
+    );
+    return _ParsedData(info, verses);
+  }
 
-    final List<Map<String, dynamic>> dbVerses = [];
+  /// Protestant canon in order, by USFM book id (book_number = index + 1).
+  static const List<String> _usfmBooks = [
+    'GEN', 'EXO', 'LEV', 'NUM', 'DEU', 'JOS', 'JDG', 'RUT', '1SA', '2SA', //
+    '1KI', '2KI', '1CH', '2CH', 'EZR', 'NEH', 'EST', 'JOB', 'PSA', 'PRO',
+    'ECC', 'SNG', 'ISA', 'JER', 'LAM', 'EZK', 'DAN', 'HOS', 'JOL', 'AMO',
+    'OBA', 'JON', 'MIC', 'NAM', 'HAB', 'ZEP', 'HAG', 'ZEC', 'MAL', 'MAT',
+    'MRK', 'LUK', 'JHN', 'ACT', 'ROM', '1CO', '2CO', 'GAL', 'EPH', 'PHP',
+    'COL', '1TH', '2TH', '1TI', '2TI', 'TIT', 'PHM', 'HEB', 'JAS', '1PE',
+    '2PE', '1JN', '2JN', '3JN', 'JUD', 'REV',
+  ];
 
-    if (versesList.isNotEmpty) {
-      // old format
-      for (final v in versesList) {
-        final m = v as Map<String, dynamic>;
-        final bookNum = m['book'] as int;
-        final chapter = m['chapter'] as int;
-        final verse = m['verse'] as int;
-        final String text = (m['text'] as String)
-            .replaceAll('¶ ', '')
-            .replaceAll('¶', '')
-            .trim()
-            .replaceAll('\u2019', "'")
-            .replaceAll('\u2018', "'");
-        dbVerses.add({
-          'translation_id': info.translationId,
-          'language_code': info.languageCode,
-          'book_number': bookNum,
-          'chapter': chapter,
-          'verse': verse,
-          'text': text,
-        });
-      }
-    } else if (parsed['books'] != null) {
-      // new structure
-      final books = parsed['books'] as List<dynamic>;
-      for (final bWrap in books) {
-        final bMap = bWrap as Map<String, dynamic>;
-        final bookData = bMap['book'] as Map<String, dynamic>;
-        final bookNum = bookData['number'] as int;
-        final chapters = bookData['chapters'] as List<dynamic>;
-
-        for (final chWrap in chapters) {
-          final chMap = chWrap as Map<String, dynamic>;
-          final chData = chMap['chapter'] as Map<String, dynamic>;
-          final chapter = chData['number'] as int;
-          final content = chData['content'] as List<dynamic>;
-
-          for (final item in content) {
-            final itemMap = item as Map<String, dynamic>;
-            if (itemMap['type'] == 'verse') {
-              final verseNum = itemMap['number'] as int;
-              final verseContent = itemMap['content'] as List<dynamic>;
-              final rawText = verseContent
-                  .map((e) {
-                    if (e is String) return e;
-                    if (e is Map) {
-                      if (e['text'] != null) return e['text'].toString();
-                      if (e['content'] != null && e['content'] is String) {
-                        return e['content'].toString();
-                      }
-                    }
-                    return '';
-                  })
-                  .where((s) => s.isNotEmpty)
-                  .join(' ');
-
-              final text = rawText
-                  .replaceAll(' ,', ',')
-                  .replaceAll(' .', '.')
-                  .replaceAll(' ;', ';')
-                  .replaceAll(' :', ':')
-                  .trim()
-                  .replaceAll('\u2019', "'")
-                  .replaceAll('\u2018', "'");
-              dbVerses.add({
-                'translation_id': info.translationId,
-                'language_code': info.languageCode,
-                'book_number': bookNum,
-                'chapter': chapter,
-                'verse': verseNum,
-                'text': text,
-              });
-            }
-          }
+  /// Converts a Free Use Bible API `complete.json` document
+  /// (`{translation, books: [{id, chapters: [{chapter: {number, content}}]}]}`)
+  /// into verse rows. Books outside the 66-book canon (apocrypha) are skipped;
+  /// headings, line breaks and footnote markers are dropped from verse text.
+  static List<Map<String, dynamic>> versesFromCompleteJson(
+    Map<String, dynamic> json, {
+    required String translationId,
+    required String languageCode,
+  }) {
+    final rows = <Map<String, dynamic>>[];
+    for (final book in (json['books'] as List).cast<Map<String, dynamic>>()) {
+      final bookNumber = _usfmBooks.indexOf(book['id'] as String) + 1;
+      if (bookNumber == 0) continue;
+      for (final ch
+          in (book['chapters'] as List).cast<Map<String, dynamic>>()) {
+        final chapter = ch['chapter'] as Map<String, dynamic>;
+        final chapterNumber = chapter['number'] as int;
+        for (final item
+            in (chapter['content'] as List).cast<Map<String, dynamic>>()) {
+          if (item['type'] != 'verse') continue;
+          final text = _verseText(item['content'] as List);
+          if (text.isEmpty) continue;
+          rows.add({
+            'translation_id': translationId,
+            'language_code': languageCode,
+            'book_number': bookNumber,
+            'chapter': chapterNumber,
+            'verse': item['number'] as int,
+            'text': text,
+          });
         }
       }
     }
+    return rows;
+  }
 
-    return _ParsedData(info, dbVerses);
+  /// Joins a verse's content parts: plain strings and `{text}` runs are
+  /// kept; `{heading}`, `{lineBreak}` and `{noteId}` parts are dropped.
+  static String _verseText(List<dynamic> parts) {
+    final pieces = <String>[];
+    for (final part in parts) {
+      if (part is String) {
+        pieces.add(part);
+      } else if (part is Map && part['text'] is String) {
+        pieces.add(part['text'] as String);
+      }
+    }
+    return pieces
+        .join(' ')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .replaceAllMapped(RegExp(r' ([,.;:!?])'), (m) => m.group(1)!)
+        .replaceAll('\u2019', "'")
+        .replaceAll('\u2018', "'")
+        .trim();
   }
 }
 

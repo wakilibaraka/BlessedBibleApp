@@ -88,9 +88,12 @@ class TranslationPackStore {
     'swh_ulb',
     'ita_dio',
     'fra_lsg',
-    'ron_btf',
     'tgl_ulb',
   ];
+
+  /// Packs withdrawn from the app (e.g. found to be under copyright).
+  /// Removed from devices that installed them on the next start.
+  static const List<String> retiredPackIds = ['ron_btf'];
 
   static bool isCoreId(String id) => coreIds.contains(id);
 
@@ -219,6 +222,9 @@ class TranslationPackStore {
     void Function(double progress)? onProgress,
     Set<String>? skipIds,
   }) async {
+    for (final id in retiredPackIds) {
+      await forgetPack(id);
+    }
     final skipped = skipIds ?? await deletedPackIds();
     final catalog = await readCatalog();
     var changed = false;

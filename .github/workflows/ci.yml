@@ -43,6 +43,11 @@ jobs:
       - name: Analyze
         run: flutter analyze --fatal-infos
 
+      - name: Fetch a live translation for the parser test
+        run: |
+          mkdir -p build/helloao
+          curl -fsSL --retry 3 https://bible.helloao.org/api/deu_l12/complete.json -o build/helloao/deu_l12.complete.json
+
       - name: Test
         run: flutter test
 
@@ -110,6 +115,6 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - name: Find candidate translations (temporary)
-        run: python3 tool/check_translation_sources.py --find deu ron rus cmn zho arb kor ukr hin nld por spa eng
+      - name: Every catalog translation downloads and is complete
+        run: python3 tool/check_translation_sources.py
 

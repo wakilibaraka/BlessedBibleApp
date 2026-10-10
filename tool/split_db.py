@@ -7,7 +7,7 @@ DB_PATH = os.path.join(BASE_DIR, 'assets', 'bible', 'bible.db')
 
 KEEP_TRANSLATIONS = [
     'kjv', 'web', 'bbe', 'kjv_strongs', 
-    'swh_ulb', 'ita_dio', 'ron_btf', 'fra_lsg', 'tgl_ulb'
+    'swh_ulb', 'ita_dio', 'fra_lsg', 'tgl_ulb'
 ]
 
 def main():

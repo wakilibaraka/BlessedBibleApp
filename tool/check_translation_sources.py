@@ -7,9 +7,11 @@ Usage:
   python3 tool/check_translation_sources.py --find ron deu   # list API
       translations for these ISO 639-3 language codes (id, name, license)
 
-The catalog is read from lib/services/translation_downloader.dart: entries
-with 'source': 'helloao' and their 'id'. CI runs the verify mode.
+The catalog is read from lib/services/translation_downloader.dart: the
+`_helloao('<id>', ...)` entries, plus 'prebuilt' packs (downloaded and
+sha256-checked). CI runs the verify mode.
 """
+import hashlib
 import json
 import os
 import re
@@ -28,13 +30,22 @@ def get_json(url):
 
 
 def catalog_ids():
+    """Download ids of the `_helloao('<id>', ...)` catalog entries."""
     src = open(CATALOG, encoding="utf-8").read()
-    ids = []
-    for block in re.findall(r"\{[^{}]*'source':\s*'helloao'[^{}]*\}", src):
-        m = re.search(r"'id':\s*'([^']+)'", block)
-        if m:
-            ids.append(m.group(1))
-    return ids
+    return re.findall(r"_helloao\(\s*'([^']+)'", src)
+
+
+def prebuilt_packs():
+    """(id, url, sha256) for 'prebuilt' entries, resolving the Dart const."""
+    src = open(CATALOG, encoding="utf-8").read()
+    base = re.search(r"_repoPacksBase =\s*'([^']+)'", src).group(1)
+    packs = []
+    for block in re.findall(r"\{[^{}]*'source':\s*'prebuilt'[^{}]*\}", src):
+        pid = re.search(r"'id':\s*'([^']+)'", block).group(1)
+        url = re.search(r"'url':\s*'([^']+)'", block).group(1).replace("$_repoPacksBase", base)
+        sha = re.search(r"'sha256':\s*'([0-9a-f]{64})'", block).group(1)
+        packs.append((pid, url, sha))
+    return packs
 
 
 def find(langs):
@@ -71,6 +82,13 @@ def verify():
         ok = len(books) == 66 and verses > 30000
         failed |= not ok
         print(f"{'OK  ' if ok else 'FAIL'} {tid}: {meta.get('englishName')} | books={len(books)} verses={verses} | {meta.get('licenseUrl')}")
+    for pid, url, sha in prebuilt_packs():
+        req = urllib.request.Request(url, headers={"User-Agent": "blessed-bible-ci/1.0"})
+        with urllib.request.urlopen(req, timeout=300) as r:
+            digest = hashlib.sha256(r.read()).hexdigest()
+        ok = digest == sha
+        failed |= not ok
+        print(f"{'OK  ' if ok else 'FAIL'} {pid}: prebuilt pack sha256 {'matches' if ok else 'is ' + digest}")
     if failed:
         sys.exit(1)
 

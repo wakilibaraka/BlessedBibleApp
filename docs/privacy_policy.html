@@ -37,11 +37,11 @@
     <h2>App integrity checks</h2>
     <p>To protect our servers from abuse, the app uses Firebase App Check, which asks Google Play Integrity (Android) or Apple App Attest / DeviceCheck (iOS) to confirm that requests come from a genuine copy of the app. These services process device attestation data under Google&#x27;s and Apple&#x27;s own privacy policies.</p>
     <h2>Downloading content</h2>
-    <p>When you download a Bible translation or the app refreshes study content, it requests files from Google Firebase (Firestore and Cloud Storage) and from the Free Use Bible API (bible.helloao.org). As with any internet request, these servers receive your device&#x27;s IP address. No account information is sent.</p>
+    <p>When you download a Bible translation, the app requests it from the Free Use Bible API (bible.helloao.org) or, for KJV with Strong&#x27;s numbers, from GitHub. When the app refreshes study content, it reads from Google Cloud Firestore. As with any internet request, these servers receive your device&#x27;s IP address. No account information is sent.</p>
     <h2>Notifications and widgets</h2>
     <p>Reading reminders and home-screen widgets are scheduled and updated on your device. We do not use a push-notification server.</p>
     <h2>Who we share data with</h2>
-    <p>We use service providers only to run the features above: Google (Firebase Authentication, Cloud Firestore, Cloud Storage, Crashlytics, App Check, Play Integrity), Apple (Sign in with Apple, App Attest / DeviceCheck), and the Free Use Bible API for translation downloads. We do not sell personal data or share it for marketing or advertising.</p>
+    <p>We use service providers only to run the features above: Google (Firebase Authentication, Cloud Firestore, Crashlytics, App Check, Play Integrity), Apple (Sign in with Apple, App Attest / DeviceCheck), and the Free Use Bible API and GitHub for translation downloads. We do not sell personal data or share it for marketing or advertising.</p>
     <h2>How long we keep data</h2>
     <p>Account data and cloud copies of your reading plans are kept until you delete your account. Crashlytics keeps crash reports for 90 days. Data on your device stays until you delete it or uninstall the app.</p>
     <h2>Deleting your account</h2>

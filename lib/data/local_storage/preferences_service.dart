@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../services/translation_pack_store.dart';
 import '../../state/search_engine.dart';
 
 class PreferencesService {
@@ -71,7 +72,11 @@ class PreferencesService {
   }
 
   String getActiveTranslation() {
-    return prefs.getString(_activeTranslationKey) ?? 'kjv';
+    final id = prefs.getString(_activeTranslationKey);
+    if (id == null || TranslationPackStore.retiredPackIds.contains(id)) {
+      return 'kjv';
+    }
+    return id;
   }
 
   Future<void> setActiveTranslation(String translationId) async {
@@ -79,7 +84,8 @@ class PreferencesService {
   }
 
   String? getSecondaryTranslation() {
-    return prefs.getString(_secondaryTranslationKey) ?? 'swh_ulb';
+    final id = prefs.getString(_secondaryTranslationKey) ?? 'swh_ulb';
+    return TranslationPackStore.retiredPackIds.contains(id) ? null : id;
   }
 
   Future<void> setSecondaryTranslation(String? translationId) async {
