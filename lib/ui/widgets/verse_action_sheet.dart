@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../../l10n/l10n.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -59,15 +60,18 @@ Future<bool> showVerseActionSheet(BuildContext context, WidgetRef ref) async {
     backgroundColor: Colors.transparent,
     barrierColor: Colors.black.withValues(alpha: 0.32),
     builder: (ctx) => VerseActionSheet(
-      contextLabel:
-          verseSelectionContextLabel(readLoc.bookName, readLoc.chapter, verses),
+      contextLabel: verseSelectionContextLabel(
+          readLoc.bookName, readLoc.chapter, verses,
+          l10n: context.l10n),
       actionCount: verses.length,
       actions: [
         SheetAction(
           icon: allBookmarked
               ? Icons.bookmark_rounded
               : Icons.bookmark_border_rounded,
-          label: allBookmarked ? 'Saved' : 'Save',
+          label: allBookmarked
+              ? context.l10n.readActionSaved
+              : context.l10n.commonSave,
           active: allBookmarked,
           onTap: () {
             VerseActionLogic.handleBookmark(
@@ -76,25 +80,25 @@ Future<bool> showVerseActionSheet(BuildContext context, WidgetRef ref) async {
         ),
         SheetAction(
           icon: Icons.color_lens_rounded,
-          label: 'Highlight',
+          label: context.l10n.readActionHighlight,
           onTap: () =>
               ref.read(readSettingsProvider.notifier).cycleHighlightColor(),
         ),
         SheetAction(
           icon: Icons.note_add_outlined,
-          label: 'Note',
+          label: context.l10n.readActionNote,
           onTap: () => VerseActionLogic.handleNote(
               ctx, ref, theme, readLoc.bookName, readLoc.chapter, verses),
         ),
         SheetAction(
           icon: Icons.menu_book_rounded,
-          label: 'Study',
+          label: context.l10n.readActionStudy,
           onTap: () => VerseActionLogic.handleCommentary(ctx, ref,
               readLoc.bookName, readLoc.chapter, verses.first, verses),
         ),
         SheetAction(
           icon: Icons.ios_share_rounded,
-          label: 'Share',
+          label: context.l10n.commonShare,
           onTap: () async {
             await VerseActionLogic.handleShareOptions(
                 ctx, ref, readLoc.bookName, readLoc.chapter, verses);
@@ -113,10 +117,10 @@ Future<bool> showVerseActionSheet(BuildContext context, WidgetRef ref) async {
 
 /// "3 verses selected · John 3:16-18" (any contiguous run becomes a
 /// range; non-contiguous selections fall back to the chapter).
-String verseSelectionContextLabel(String book, int chapter, List<int> verses) {
+String verseSelectionContextLabel(String book, int chapter, List<int> verses,
+    {AppLocalizations? l10n}) {
   final sorted = verses.toList()..sort();
   final count = sorted.length;
-  final noun = count == 1 ? 'verse' : 'verses';
   String where;
   if (count == 1) {
     where = '$book $chapter:${sorted.first}';
@@ -132,7 +136,8 @@ String verseSelectionContextLabel(String book, int chapter, List<int> verses) {
         ? '$book $chapter:${sorted.first}-${sorted.last}'
         : '$book $chapter';
   }
-  return '$count $noun selected · $where';
+  return (l10n ?? lookupAppLocalizations(const Locale('en')))
+      .readVersesSelected(count, where);
 }
 
 String _bookAbbrev(WidgetRef ref, String bookName) {

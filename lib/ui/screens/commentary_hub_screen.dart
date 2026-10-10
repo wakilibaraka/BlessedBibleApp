@@ -9,6 +9,7 @@ import '../../models/commentary_entry.dart';
 import '../../models/study_content_category.dart';
 import '../../state/typography_provider.dart';
 import 'dart:ui';
+import '../../l10n/l10n.dart';
 
 class CommentaryHubScreen extends ConsumerStatefulWidget {
   final String book;
@@ -106,13 +107,13 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Could not load commentary.\n$e',
+                  Text(context.l10n.studyCommentaryLoadErrorDetail('$e'),
                       textAlign: TextAlign.center),
                   const SizedBox(height: 12),
                   TextButton.icon(
                     onPressed: () => ref.invalidate(commentaryProvider),
                     icon: const Icon(Icons.refresh_rounded),
-                    label: const Text('Retry'),
+                    label: Text(context.l10n.commonRetry),
                   ),
                 ],
               ),
@@ -154,7 +155,7 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
               if (filtered.isEmpty) {
                 return SliverFillRemaining(
                   child: Center(
-                    child: Text('No content found for these filters.',
+                    child: Text(context.l10n.studyNoContentForFilters,
                         style: theme.textTheme.bodyLarge
                             ?.copyWith(color: tokens.readingInkMuted)),
                   ),
@@ -179,6 +180,27 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
         ],
       ),
     );
+  }
+
+  /// Display label for a filter option; the option strings themselves are
+  /// identifiers used by the filtering logic.
+  String _optionLabel(String value) {
+    final l10n = context.l10n;
+    switch (value) {
+      case 'All':
+        return l10n.studyFilterAll;
+      case 'Commentary':
+        return l10n.studyCategoryCommentary;
+      case 'Devotionals':
+        return l10n.studyFilterDevotionals;
+      case 'All Contexts':
+        return l10n.studyFilterAllContexts;
+      case 'Chapter Level':
+        return l10n.studyFilterChapterLevel;
+      case 'Verse Level':
+        return l10n.studyFilterVerseLevel;
+    }
+    return value;
   }
 
   Widget _buildFilters(ThemeData theme, ReadingTokens tokens) {
@@ -231,7 +253,7 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
                 value: value,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Text(value),
+                  child: Text(_optionLabel(value)),
                 ),
               );
             }).toList(),
@@ -322,7 +344,9 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  entry.source.isNotEmpty ? entry.source : 'Commentary',
+                  entry.source.isNotEmpty
+                      ? entry.source
+                      : context.l10n.studyCommentaryEyebrow,
                   style: theme.textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.1,
@@ -339,8 +363,8 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
                 ),
                 child: Text(
                   entry.scope.type == 'verse'
-                      ? 'Verse ${entry.scope.verse}'
-                      : 'Chapter View',
+                      ? context.l10n.studyVerseLabel('${entry.scope.verse}')
+                      : context.l10n.studyChapterView,
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: tokens.readingAccent,
                     fontWeight: FontWeight.bold,

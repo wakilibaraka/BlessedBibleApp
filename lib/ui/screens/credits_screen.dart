@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/credits.dart';
 import 'settings_screen.dart' show packageInfoProvider;
+import '../../l10n/l10n.dart';
 
 /// Sources, licenses and attributions for bundled content, plus the
 /// open-source licenses page.
@@ -16,7 +17,7 @@ class CreditsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Credits & sources'),
+        title: Text(context.l10n.creditsTitle),
         centerTitle: true,
       ),
       body: ListView(
@@ -48,8 +49,8 @@ class CreditsScreen extends ConsumerWidget {
             const Divider(height: 1, indent: 16),
           ],
           ListTile(
-            title: const Text('Open-source licenses'),
-            subtitle: const Text('Fonts and software packages'),
+            title: Text(context.l10n.creditsLicenses),
+            subtitle: Text(context.l10n.creditsLicensesSubtitle),
             trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
             onTap: () => showLicensePage(
               context: context,

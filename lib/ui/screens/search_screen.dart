@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../l10n/l10n.dart';
 import '../sheets/search_settings_sheet.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -261,8 +262,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                         },
                                         style: theme.textTheme.titleMedium,
                                         decoration: InputDecoration(
-                                          hintText:
-                                              'Search verses, commentary…',
+                                          hintText: context.l10n.searchHint,
                                           hintStyle: theme.textTheme.titleMedium
                                               ?.copyWith(
                                             color: theme.colorScheme.onSurface
@@ -310,7 +310,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                     children: [
                                       _buildFilterChip(
                                         label: searchState.filterBook ??
-                                            'All Books',
+                                            context.l10n.searchAllBooks,
                                         icon: Icons.menu_book_rounded,
                                         isActive:
                                             searchState.filterBook != null,
@@ -354,7 +354,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                       if (searchState.filterBook == null) ...[
                                         const SizedBox(width: 8),
                                         _buildFilterChip(
-                                          label: 'OT',
+                                          label: context.l10n.readOtShort,
                                           icon: Icons.history_edu_rounded,
                                           isActive: searchState.filterOt,
                                           onTap: () => ref
@@ -367,7 +367,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                       if (searchState.filterBook == null) ...[
                                         const SizedBox(width: 8),
                                         _buildFilterChip(
-                                          label: 'NT',
+                                          label: context.l10n.readNtShort,
                                           icon: Icons.menu_book_rounded,
                                           isActive: searchState.filterNt,
                                           onTap: () => ref
@@ -379,7 +379,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                       ],
                                       const SizedBox(width: 8),
                                       _buildFilterChip(
-                                        label: 'Commentary',
+                                        label:
+                                            context.l10n.readActionCommentary,
                                         icon: Icons.library_books_rounded,
                                         isActive: searchState.filterCommentary,
                                         onTap: () => ref
@@ -396,7 +397,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                           return const SizedBox.shrink();
                                         }
                                         return _buildFilterChip(
-                                          label: 'My Notes',
+                                          label:
+                                              context.l10n.searchFilterMyNotes,
                                           icon: Icons.sticky_note_2_outlined,
                                           isActive: searchState.filterNotes,
                                           onTap: () => ref
@@ -528,7 +530,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
             ),
             const SizedBox(height: 16),
             Text(
-              'Search the Bible, commentary\nand your notes',
+              context.l10n.searchEmptyPrompt,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.45),
@@ -550,7 +552,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'RECENT SEARCHES',
+                context.l10n.searchRecentSearches,
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                   fontWeight: FontWeight.bold,
@@ -561,7 +563,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                 onTap: () =>
                     ref.read(searchStateProvider.notifier).clearRecentQueries(),
                 child: Text(
-                  'CLEAR',
+                  context.l10n.searchClear,
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: theme.primaryColor,
                     fontWeight: FontWeight.bold,
@@ -618,7 +620,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
         ],
         if (state.recentPlaces.isNotEmpty) ...[
           Text(
-            'RECENT PLACES',
+            context.l10n.searchRecentPlaces,
             style: theme.textTheme.labelSmall?.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
               fontWeight: FontWeight.bold,
@@ -631,7 +633,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
         ],
         if (showMostRead) ...[
           Text(
-            'MOST READ',
+            context.l10n.searchMostRead,
             style: theme.textTheme.labelSmall?.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
               fontWeight: FontWeight.bold,
@@ -671,7 +673,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
             ),
             const SizedBox(height: 12),
             Text(
-              'No results found',
+              context.l10n.searchNoResults,
               style: theme.textTheme.bodyLarge?.copyWith(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
               ),
@@ -708,8 +710,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
           padding: const EdgeInsets.only(bottom: 16.0, left: 4.0),
           child: Text(
             state.results.length >= 100
-                ? 'Showing top 100 results'
-                : '${state.results.length} results found',
+                ? context.l10n.searchTopResults
+                : context.l10n.searchResultsFound(state.results.length),
             style: theme.textTheme.labelMedium?.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
               fontStyle: FontStyle.italic,
@@ -718,38 +720,44 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
         ),
         if (dictionaryResults.isNotEmpty) ...[
           _buildSectionHeader(
-              'DICTIONARY (${dictionaryResults.length})', theme),
+              context.l10n.searchSectionDictionary(dictionaryResults.length),
+              theme),
           ...dictionaryResults
               .map((r) => _buildResultItem(r, theme, state.query)),
           const SizedBox(height: 12),
         ],
 
         if (pericopeResults.isNotEmpty) ...[
-          _buildSectionHeader('STORIES (${pericopeResults.length})', theme),
+          _buildSectionHeader(
+              context.l10n.searchSectionStories(pericopeResults.length), theme),
           ...pericopeResults
               .map((r) => _buildResultItem(r, theme, state.query)),
           const SizedBox(height: 12),
         ],
         if (referenceResults.isNotEmpty) ...[
-          _buildSectionHeader('JUMP TO (${referenceResults.length})', theme),
+          _buildSectionHeader(
+              context.l10n.searchSectionJumpTo(referenceResults.length), theme),
           ...referenceResults
               .map((r) => _buildResultItem(r, theme, state.query)),
           const SizedBox(height: 12),
         ],
         if (bibleResults.isNotEmpty) ...[
-          _buildSectionHeader('VERSES (${bibleResults.length})', theme),
+          _buildSectionHeader(
+              context.l10n.searchSectionVerses(bibleResults.length), theme),
           ...bibleResults.map((r) => _buildResultItem(r, theme, state.query)),
           const SizedBox(height: 12),
         ],
         if (commentaryResults.isNotEmpty) ...[
           _buildSectionHeader(
-              'COMMENTARY (${commentaryResults.length})', theme),
+              context.l10n.searchSectionCommentary(commentaryResults.length),
+              theme),
           ...commentaryResults
               .map((r) => _buildResultItem(r, theme, state.query)),
           const SizedBox(height: 12),
         ],
         if (noteResults.isNotEmpty) ...[
-          _buildSectionHeader('MY NOTES (${noteResults.length})', theme),
+          _buildSectionHeader(
+              context.l10n.searchSectionMyNotes(noteResults.length), theme),
           ...noteResults.map((r) => _buildResultItem(r, theme, state.query)),
           const SizedBox(height: 12),
         ],
@@ -799,7 +807,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
               text:
                   '${result.title}\n${result.snippet.replaceAll('...', '')}'));
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Copied to clipboard')),
+            SnackBar(content: Text(context.l10n.searchCopied)),
           );
         },
         child: TexturedGlassContainer(

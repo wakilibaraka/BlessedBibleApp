@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import '../../l10n/l10n.dart';
 import 'package:flutter/cupertino.dart';
 import '../../theme/app_colors.dart';
 
@@ -103,20 +104,20 @@ class MainNavScreen extends ConsumerWidget {
             context: context,
             builder: (dialogContext) {
               return AlertDialog(
-                title: const Text('Exit The Blessed Bible?'),
-                content: const Text('Are you sure you want to exit the app?'),
+                title: Text(dialogContext.l10n.navExitTitle),
+                content: Text(dialogContext.l10n.navExitMessage),
                 backgroundColor:
                     Theme.of(dialogContext).scaffoldBackgroundColor,
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.of(dialogContext).pop(false),
-                    child: Text('Cancel',
+                    child: Text(dialogContext.l10n.commonCancel,
                         style: TextStyle(
                             color: Theme.of(dialogContext).primaryColor)),
                   ),
                   TextButton(
                     onPressed: () => Navigator.of(dialogContext).pop(true),
-                    child: Text('Exit',
+                    child: Text(dialogContext.l10n.navExit,
                         style: TextStyle(
                             color: Theme.of(dialogContext).primaryColor)),
                   ),
@@ -741,7 +742,7 @@ class MainNavScreen extends ConsumerWidget {
 
     Widget buildIcon() {
       if (!isAction) {
-        if (navLabel == 'Study') {
+        if (navIndex == 3) {
           return TweenAnimationBuilder<double>(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeOutCubic,
@@ -750,7 +751,7 @@ class MainNavScreen extends ConsumerWidget {
                 Transform.rotate(angle: rotation, child: child),
             child: Icon(Icons.school, color: currentColor, size: 24),
           );
-        } else if (navLabel == 'Search') {
+        } else if (navIndex == 2) {
           return TweenAnimationBuilder<double>(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeOutBack,
@@ -897,7 +898,7 @@ class MainNavScreen extends ConsumerWidget {
                     generateVerseKey(readLoc.bookName, readLoc.chapter, v)))
                 ? Icons.bookmark_rounded
                 : Icons.bookmark_border_rounded,
-            'Bookmark',
+            context.l10n.readActionBookmark,
             selectedVerses.every((v) => bookmarks.contains(
                     generateVerseKey(readLoc.bookName, readLoc.chapter, v)))
                 ? theme.primaryColor
@@ -911,7 +912,7 @@ class MainNavScreen extends ConsumerWidget {
           const SizedBox(height: 2),
           _buildActionIcon(
             Icons.copy_rounded,
-            'Copy',
+            context.l10n.commonCopy,
             theme.colorScheme.onSurface,
             () {
               VerseActionLogic.handleCopy(context, ref, readLoc.bookName,
@@ -922,7 +923,7 @@ class MainNavScreen extends ConsumerWidget {
           const SizedBox(height: 2),
           _buildActionIcon(
             Icons.note_add_outlined,
-            'Note',
+            context.l10n.readActionNote,
             theme.colorScheme.onSurface,
             () async {
               await VerseActionLogic.handleNote(context, ref, theme,
@@ -933,7 +934,7 @@ class MainNavScreen extends ConsumerWidget {
           const SizedBox(height: 2),
           _buildActionIcon(
             Icons.lightbulb_outline_rounded,
-            'Commentary',
+            context.l10n.readActionCommentary,
             theme.colorScheme.onSurface,
             () {
               VerseActionLogic.handleCommentary(context, ref, readLoc.bookName,
@@ -943,7 +944,7 @@ class MainNavScreen extends ConsumerWidget {
           const SizedBox(height: 2),
           _buildActionIcon(
             Icons.ios_share_rounded,
-            'Share',
+            context.l10n.commonShare,
             theme.colorScheme.onSurface,
             () async {
               await VerseActionLogic.handleShare(context, ref, readLoc.bookName,
@@ -1028,8 +1029,8 @@ class MainNavScreen extends ConsumerWidget {
         logDebug('Casting lots error: $e\n$st');
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Could not cast lots — please try again.'),
+            SnackBar(
+              content: Text(context.l10n.navCastLotsError),
               behavior: SnackBarBehavior.floating,
             ),
           );
@@ -1078,11 +1079,11 @@ class MainNavScreen extends ConsumerWidget {
                     isAction: isMinimalAction,
                     navIcon: Icons.home_outlined,
                     navActiveIcon: Icons.home,
-                    navLabel: 'Home',
+                    navLabel: context.l10n.navHome,
                     navIndex: 0,
                     currentIndex: currentIndex,
                     actionIcon: Icons.copy_rounded,
-                    actionLabel: 'Copy',
+                    actionLabel: context.l10n.commonCopy,
                     actionColor: actionIconColor,
                     onActionTap: () {
                       VerseActionLogic.handleCopy(
@@ -1096,11 +1097,11 @@ class MainNavScreen extends ConsumerWidget {
                     isAction: isMinimalAction,
                     navIcon: Icons.menu_book_outlined,
                     navActiveIcon: Icons.menu_book,
-                    navLabel: 'Read',
+                    navLabel: context.l10n.navRead,
                     navIndex: 1,
                     currentIndex: currentIndex,
                     actionIcon: Icons.edit_document,
-                    actionLabel: 'Notes',
+                    actionLabel: context.l10n.readActionNotes,
                     actionColor: actionIconColor,
                     onActionTap: () async {
                       await VerseActionLogic.handleNote(context, ref, theme,
@@ -1112,11 +1113,11 @@ class MainNavScreen extends ConsumerWidget {
                       isAction: isMinimalAction,
                       navIcon: Icons.school_outlined,
                       navActiveIcon: Icons.school,
-                      navLabel: 'Study',
+                      navLabel: context.l10n.navStudy,
                       navIndex: 3,
                       currentIndex: currentIndex,
                       actionIcon: Icons.highlight_rounded,
-                      actionLabel: 'Highlight',
+                      actionLabel: context.l10n.readActionHighlight,
                       actionColor: actionIconColor, onActionTap: () {
                     VerseActionLogic.handleHighlightInteraction(
                       context: context,
@@ -1148,11 +1149,11 @@ class MainNavScreen extends ConsumerWidget {
                     isAction: isMinimalAction,
                     navIcon: Icons.search,
                     navActiveIcon: Icons.search,
-                    navLabel: 'Search',
+                    navLabel: context.l10n.navSearch,
                     navIndex: 2,
                     currentIndex: currentIndex,
                     actionIcon: Icons.ios_share_rounded,
-                    actionLabel: 'Share',
+                    actionLabel: context.l10n.commonShare,
                     actionColor: actionIconColor,
                     onActionTap: () async {
                       await VerseActionLogic.handleShare(
@@ -1369,7 +1370,7 @@ class _CastingLotsDialogState extends State<CastingLotsDialog>
               ),
               const SizedBox(height: 24),
               Text(
-                'Casting lots...',
+                context.l10n.navCastingLots,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: AppColors.goldAccent,

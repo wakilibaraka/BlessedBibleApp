@@ -4,6 +4,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../state/strongs_provider.dart';
 import '../../state/typography_provider.dart';
 import '../../state/read_settings_provider.dart';
+import '../../l10n/l10n.dart';
 
 void showStrongsEntrySheet(BuildContext context, String strongsId) {
   final ref = ProviderScope.containerOf(context);
@@ -78,7 +79,7 @@ class _StrongsEntrySheet extends ConsumerWidget {
                     onPressed: () => Navigator.of(context).pop(),
                     icon: Icon(Icons.arrow_back_ios_new_rounded,
                         size: 18, color: theme.primaryColor),
-                    label: Text('Back',
+                    label: Text(context.l10n.commonBack,
                         style:
                             TextStyle(fontSize: 16, color: theme.primaryColor)),
                     style: TextButton.styleFrom(
@@ -87,11 +88,16 @@ class _StrongsEntrySheet extends ConsumerWidget {
                     ),
                   ),
                   IconButton(
+                    tooltip: context.l10n.commonShare,
                     onPressed: () {
                       final entry = entryAsync.asData?.value;
                       if (entry != null) {
-                        final textToShare =
-                            "${entry.id} - ${entry.lemma}\n\nTransliteration: ${entry.transliteration}\nPronunciation: ${entry.pronunciation}\n\nDefinition:\n${entry.definition}";
+                        final textToShare = context.l10n.studyStrongsShareText(
+                            entry.id,
+                            entry.lemma,
+                            entry.transliteration,
+                            entry.pronunciation,
+                            entry.definition);
                         SharePlus.instance
                             .share(ShareParams(text: textToShare));
                       }
@@ -112,7 +118,7 @@ class _StrongsEntrySheet extends ConsumerWidget {
                   if (entry == null) {
                     return Padding(
                       padding: const EdgeInsets.all(32.0),
-                      child: Text('No entry found for $strongsId.'),
+                      child: Text(context.l10n.studyNoStrongsEntry(strongsId)),
                     );
                   }
 
@@ -207,7 +213,7 @@ class _StrongsEntrySheet extends ConsumerWidget {
                       const SizedBox(height: 32),
 
                       Text(
-                        'STRONG\'S LEXICON',
+                        context.l10n.studyStrongsLexicon,
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: theme.colorScheme.onSurface
                               .withValues(alpha: 0.4),
@@ -242,7 +248,8 @@ class _StrongsEntrySheet extends ConsumerWidget {
                   padding: EdgeInsets.all(40.0),
                   child: CircularProgressIndicator(),
                 )),
-                error: (e, __) => Center(child: Text('Failed to load: $e')),
+                error: (e, __) =>
+                    Center(child: Text(context.l10n.studyFailedToLoad('$e'))),
               ),
             ),
           ],

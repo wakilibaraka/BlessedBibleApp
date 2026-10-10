@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:confetti/confetti.dart';
+import '../../l10n/l10n.dart';
 
 class DayCompleteCelebration extends StatefulWidget {
   final int day;
@@ -114,7 +115,8 @@ class _DayCompleteCelebrationState extends State<DayCompleteCelebration>
                               color: Theme.of(context).primaryColor, size: 64),
                           const SizedBox(height: 16),
                           Text(
-                            'Reading Plan\nDay ${widget.day} Complete!',
+                            context.l10n
+                                .plansDayCompleteCelebration(widget.day),
                             textAlign: TextAlign.center,
                             style: Theme.of(context)
                                 .textTheme

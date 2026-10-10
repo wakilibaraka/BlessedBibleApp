@@ -8,6 +8,7 @@ import '../../state/read_location_provider.dart';
 import '../../state/theme_provider.dart';
 import '../widgets/shared_app_bar.dart';
 import '../widgets/study_v2_widgets.dart';
+import '../../l10n/l10n.dart';
 
 /// Standalone concordance (V2): word -> every KJV verse containing it.
 ///
@@ -127,7 +128,7 @@ class _ConcordanceScreenState extends ConsumerState<ConcordanceScreen> {
       appThemeMode: appThemeMode,
       page: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: const SharedAppBar(title: Text('Concordance')),
+        appBar: SharedAppBar(title: Text(context.l10n.studyConcordanceEyebrow)),
         body: SafeArea(
           bottom: false,
           child: Center(
@@ -140,7 +141,7 @@ class _ConcordanceScreenState extends ConsumerState<ConcordanceScreen> {
                     controller: _controller,
                     textInputAction: TextInputAction.search,
                     decoration: InputDecoration(
-                      hintText: 'Type a word (e.g., grace, covenant)…',
+                      hintText: context.l10n.studyConcordanceHint,
                       prefixIcon: const Icon(Icons.search_rounded),
                       filled: true,
                       fillColor: theme.colorScheme.surface,
@@ -157,7 +158,7 @@ class _ConcordanceScreenState extends ConsumerState<ConcordanceScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'KJV occurrences — tap a verse to read it in context.',
+                    context.l10n.studyConcordanceIntro,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
@@ -173,8 +174,8 @@ class _ConcordanceScreenState extends ConsumerState<ConcordanceScreen> {
                       padding: const EdgeInsets.only(top: 24),
                       child: Text(
                         _searched.isEmpty
-                            ? 'Every verse containing your word, in canonical order.'
-                            : 'Enter a single English word to search.',
+                            ? context.l10n.studyConcordanceEmpty
+                            : context.l10n.studyConcordanceSingleWord,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurface
                               .withValues(alpha: 0.6),
@@ -185,7 +186,7 @@ class _ConcordanceScreenState extends ConsumerState<ConcordanceScreen> {
                     Padding(
                       padding: const EdgeInsets.only(top: 24),
                       child: Text(
-                        'No verses contain "$_searched".',
+                        context.l10n.studyConcordanceNoVerses(_searched),
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurface
                               .withValues(alpha: 0.6),
@@ -194,7 +195,10 @@ class _ConcordanceScreenState extends ConsumerState<ConcordanceScreen> {
                     )
                   else ...[
                     Text(
-                      '${_hits!.length} verse${_hits!.length == 1 ? '' : 's'}${_truncated ? ' (first $_limit shown)' : ''}',
+                      _truncated
+                          ? context.l10n.studyConcordanceCountTruncated(
+                              _hits!.length, _limit)
+                          : context.l10n.studyConcordanceCount(_hits!.length),
                       style: theme.textTheme.labelSmall?.copyWith(
                         fontWeight: FontWeight.w800,
                         color: theme.primaryColor,

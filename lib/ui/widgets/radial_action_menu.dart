@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import '../../l10n/l10n.dart';
 import 'package:flutter/services.dart';
 
 /// Pure geometry for the radial verse menu, kept separate from painting
@@ -105,7 +106,7 @@ class RadialActionMenu extends StatefulWidget {
     return showGeneralDialog(
       context: context,
       barrierDismissible: true,
-      barrierLabel: 'Verse actions',
+      barrierLabel: context.l10n.readVerseActions,
       barrierColor: Colors.black.withValues(alpha: 0.28),
       transitionDuration: const Duration(milliseconds: 180),
       pageBuilder: (_, __, ___) => RadialActionMenu(

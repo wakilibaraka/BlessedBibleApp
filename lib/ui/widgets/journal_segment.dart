@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/l10n.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/journal_provider.dart';
 
@@ -11,18 +12,19 @@ class JournalSegment extends ConsumerWidget {
     showDialog<void>(
       context: context,
       builder: (c) => AlertDialog(
-        title: const Text('New Journal Entry'),
+        title: Text(context.l10n.notesNewJournalEntry),
         content: TextField(
           controller: controller,
           maxLines: 5,
           autofocus: true,
-          decoration: const InputDecoration(
-            hintText: 'How are you feeling today? Pour your heart out...',
+          decoration: InputDecoration(
+            hintText: context.l10n.notesJournalHint,
           ),
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(c), child: const Text('Cancel')),
+              onPressed: () => Navigator.pop(c),
+              child: Text(context.l10n.commonCancel)),
           FilledButton(
             onPressed: () {
               if (controller.text.trim().isNotEmpty) {
@@ -30,7 +32,7 @@ class JournalSegment extends ConsumerWidget {
               }
               Navigator.pop(c);
             },
-            child: const Text('Save & Analyze'),
+            child: Text(context.l10n.notesSaveAndAnalyze),
           ),
         ],
       ),
@@ -48,12 +50,13 @@ class JournalSegment extends ConsumerWidget {
           children: [
             const Icon(Icons.book, size: 64, color: Colors.grey),
             const SizedBox(height: 16),
-            Text('No journal entries yet.', style: theme.textTheme.titleMedium),
+            Text(context.l10n.notesNoJournalEntries,
+                style: theme.textTheme.titleMedium),
             const SizedBox(height: 16),
             FilledButton.icon(
               onPressed: () => _showAddJournalDialog(context, ref),
               icon: const Icon(Icons.add),
-              label: const Text('Write Entry'),
+              label: Text(context.l10n.notesWriteEntry),
             ),
           ],
         ),
@@ -92,17 +95,21 @@ class JournalSegment extends ConsumerWidget {
                           Icon(Icons.auto_awesome,
                               size: 16, color: theme.primaryColor),
                           const SizedBox(width: 8),
-                          Text('AI Reflection',
+                          Text(context.l10n.notesAiReflection,
                               style: theme.textTheme.labelMedium?.copyWith(
                                   color: theme.primaryColor,
                                   fontWeight: FontWeight.bold)),
                         ],
                       ),
                       const SizedBox(height: 8),
-                      Text('Detected Emotion: ${entry.detectedEmotions.first}',
+                      Text(
+                          context.l10n.notesDetectedEmotion(
+                              entry.detectedEmotions.first),
                           style: theme.textTheme.bodySmall),
                       const SizedBox(height: 8),
-                      Text('Verses: ${entry.recommendedVerses.join(', ')}',
+                      Text(
+                          context.l10n.notesVersesList(
+                              entry.recommendedVerses.join(', ')),
                           style: theme.textTheme.bodySmall),
                       const SizedBox(height: 8),
                       ...entry.prayerPoints.map((p) => Padding(

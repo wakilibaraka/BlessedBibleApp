@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import '../../l10n/l10n.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
@@ -128,12 +129,12 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
 
   Future<void> _clearCache() async {
     final confirmed = await _confirm(
-      title: 'Clear cache?',
-      body: 'Removes temporary files (generated share cards, thumbnails). '
-          'Your notes, bookmarks, highlights and downloads are untouched.',
-      confirmLabel: 'Clear cache',
+      title: context.l10n.spaceClearCacheTitle,
+      body: context.l10n.spaceClearCacheBody,
+      confirmLabel: context.l10n.spaceClearCache,
     );
-    if (!confirmed) return;
+    if (!confirmed || !mounted) return;
+    final success = context.l10n.spaceCacheCleared;
     await _run(() async {
       var freed = 0;
       final dir = await getTemporaryDirectory();
@@ -149,31 +150,32 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
         }
       }
       return freed;
-    }, success: 'Cache cleared');
+    }, success: success);
   }
 
   Future<void> _deletePack(_PackRow pack) async {
     final confirmed = await _confirm(
-      title: 'Delete ${pack.name}?',
+      title: context.l10n.spaceDeletePackTitle(pack.name),
       body: pack.bundled
-          ? 'Frees ${_mb(pack.sizeBytes)}. You can restore it offline from the app at any time.'
-          : 'Frees ${_mb(pack.sizeBytes)}. You can download it again later.',
-      confirmLabel: 'Delete',
+          ? context.l10n.spaceDeletePackBundled(_mb(pack.sizeBytes))
+          : context.l10n.spaceDeletePackDownloaded(_mb(pack.sizeBytes)),
+      confirmLabel: context.l10n.commonDelete,
       destructive: true,
     );
-    if (!confirmed) return;
+    if (!confirmed || !mounted) return;
+    final success = context.l10n.spacePackDeleted(pack.abbr);
     await _run(() async {
       final before = pack.sizeBytes;
       await TranslationPackStore().deletePack(pack.id);
       return before;
-    }, success: '${pack.abbr} deleted');
+    }, success: success);
   }
 
   Future<void> _download(_PackRow pack) async {
     await _run(() async {
       await TranslationDownloader.downloadAndInstall(pack.id, (_) {});
       return pack.sizeBytes;
-    }, success: '${pack.abbr} downloaded');
+    }, success: context.l10n.spacePackDownloaded(pack.abbr));
   }
 
   /// Runs a destructive/IO op with a busy flag, honest errors, and a
@@ -201,8 +203,8 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
       behavior: SnackBarBehavior.floating,
       content: Text(
         error != null
-            ? 'Could not finish: $error'
-            : '$success · freed ${_mb(freed)}',
+            ? context.l10n.spaceCouldNotFinish(error)
+            : context.l10n.spaceFreed(success, _mb(freed)),
       ),
     ));
   }
@@ -221,7 +223,7 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+            child: Text(context.l10n.commonCancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
@@ -250,7 +252,7 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
       appThemeMode: appThemeMode,
       page: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: const SharedAppBar(title: Text('Storage')),
+        appBar: SharedAppBar(title: Text(context.l10n.spaceStorageTitle)),
         body: SafeArea(
           bottom: false,
           child: Center(
@@ -270,16 +272,18 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const V2Eyebrow('On this device'),
+                        V2Eyebrow(context.l10n.spaceOnThisDevice),
                         const SizedBox(height: 10),
                         _StatRow(
-                          label: 'Bible content (always kept)',
+                          label: context.l10n.spaceBibleContent,
                           value: _mb(_contentBytes),
                         ),
                         _StatRow(
-                            label: 'Downloaded packs',
+                            label: context.l10n.spaceDownloadedPacks,
                             value: _mb(_downloadBytes)),
-                        _StatRow(label: 'Cache', value: _mb(_cacheBytes)),
+                        _StatRow(
+                            label: context.l10n.spaceCache,
+                            value: _mb(_cacheBytes)),
                       ],
                     ),
                   ),
@@ -289,11 +293,10 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const V2Eyebrow('Cache'),
+                        V2Eyebrow(context.l10n.spaceCache),
                         const SizedBox(height: 6),
                         Text(
-                          'Temporary files only — generated share cards and '
-                          'thumbnails. Safe to clear at any time.',
+                          context.l10n.spaceCacheExplain,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurface
                                 .withValues(alpha: 0.7),
@@ -305,7 +308,7 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
                           child: OutlinedButton.icon(
                             onPressed: _busy ? null : _clearCache,
                             icon: const Icon(Icons.cleaning_services_rounded),
-                            label: const Text('Clear cache'),
+                            label: Text(context.l10n.spaceClearCache),
                           ),
                         ),
                       ],
@@ -313,7 +316,7 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
                   ),
                   const SizedBox(height: 14),
                   // ── Downloads / packs ───────────────────────
-                  const V2Eyebrow('Translations & downloads'),
+                  V2Eyebrow(context.l10n.spaceTranslationsDownloads),
                   const SizedBox(height: 8),
                   for (final pack in _packs)
                     Padding(
@@ -338,7 +341,7 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
                                   Text(
                                     '${pack.abbr} · '
                                     '${_mb(pack.sizeBytes)}'
-                                    '${pack.bundled ? " · bundled" : ""}',
+                                    '${pack.bundled ? context.l10n.spaceBundledSuffix : ""}',
                                     style: theme.textTheme.labelSmall?.copyWith(
                                       color: theme.colorScheme.onSurface
                                           .withValues(alpha: 0.6),
@@ -359,7 +362,7 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
                     ),
                   const SizedBox(height: 6),
                   Text(
-                    'Core KJV and BBE are part of the app and can\'t be removed.',
+                    context.l10n.spaceCoreNotRemovable,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color:
                           theme.colorScheme.onSurface.withValues(alpha: 0.55),
@@ -441,11 +444,11 @@ class _PackAction extends StatelessWidget {
       return TextButton.icon(
         onPressed: busy ? null : onDownload,
         icon: const Icon(Icons.download_rounded, size: 18),
-        label: const Text('Get'),
+        label: Text(context.l10n.spaceGet),
       );
     }
     return IconButton(
-      tooltip: 'Delete ${pack.name}',
+      tooltip: context.l10n.spaceDeletePackTooltip(pack.name),
       onPressed: busy ? null : onDelete,
       icon: const Icon(Icons.delete_outline_rounded),
     );

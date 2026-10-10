@@ -8,6 +8,7 @@ import '../sheets/appearance_settings_sheet.dart';
 
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import '../../l10n/l10n.dart';
 import '../../theme/app_colors.dart';
 
 import 'package:flutter/rendering.dart';
@@ -233,31 +234,31 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         actions: [
           RadialAction(
             icon: Icons.copy_rounded,
-            label: 'Copy',
+            label: context.l10n.commonCopy,
             onTap: () => VerseActionLogic.handleCopy(
                 context, ref, bookName, chapterNumber, [verseNumber]),
           ),
           RadialAction(
             icon: Icons.bookmark_border_rounded,
-            label: 'Bookmark',
+            label: context.l10n.readActionBookmark,
             onTap: () => VerseActionLogic.handleBookmark(
                 context, theme, ref, bookName, chapterNumber, [verseNumber]),
           ),
           RadialAction(
             icon: Icons.note_add_outlined,
-            label: 'Note',
+            label: context.l10n.readActionNote,
             onTap: () => VerseActionLogic.handleNote(
                 context, ref, theme, bookName, chapterNumber, [verseNumber]),
           ),
           RadialAction(
             icon: Icons.menu_book_rounded,
-            label: 'Commentary',
+            label: context.l10n.readActionCommentary,
             onTap: () => VerseActionLogic.handleCommentary(context, ref,
                 bookName, chapterNumber, verseNumber, [verseNumber]),
           ),
           RadialAction(
             icon: Icons.link_rounded,
-            label: 'Related',
+            label: context.l10n.readActionRelated,
             onTap: () => showCrossReferencesSheet(
               context,
               bookNumber: bookNumber,
@@ -268,7 +269,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           ),
           RadialAction(
             icon: Icons.ios_share_rounded,
-            label: 'Share',
+            label: context.l10n.commonShare,
             onTap: () => VerseActionLogic.handleShareOptions(
                 context, ref, bookName, chapterNumber, [verseNumber]),
           ),
@@ -424,8 +425,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
           final hints = ref.read(hintsProvider);
           if (!hints.contains('seen_commentary_hint')) {
-            _tryShowHint('seen_commentary_hint',
-                'Tap the bulb icon next to a verse for commentary');
+            _tryShowHint(
+                'seen_commentary_hint', context.l10n.readCommentaryHint);
           }
         });
       }
@@ -728,7 +729,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
             context,
             tokens,
             Text(
-              'Done',
+              context.l10n.commonDone,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: tokens.readingInk,
@@ -942,7 +943,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                         )
                       : flatChapters.isEmpty
                           ? Center(
-                              child: Text('Passage not found.',
+                              child: Text(context.l10n.readPassageNotFound,
                                   style: theme.textTheme.bodyLarge),
                             )
                           : MediaQuery(
@@ -1852,7 +1853,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                       child: FilledButton.icon(
                         onPressed: _exitPageSelection,
                         icon: const Icon(Icons.check, size: 20),
-                        label: const Text('Done'),
+                        label: Text(context.l10n.commonDone),
                         style: FilledButton.styleFrom(
                           backgroundColor: theme.primaryColor,
                           foregroundColor: theme.colorScheme.onPrimary,
@@ -2630,7 +2631,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                     ? (tokens?.readingAccent ?? theme.primaryColor)
                     : theme.disabledColor),
             label: Text(
-              'Read commentary on this chapter',
+              context.l10n.readChapterCommentary,
               style: theme.textTheme.titleSmall?.copyWith(
                 color: hasChapterCommentary
                     ? (tokens?.readingInk ?? Colors.black)
@@ -2663,7 +2664,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 12),
                   ),
-                  child: Text('‹ Previous',
+                  child: Text(context.l10n.readPreviousChapter,
                       style: theme.textTheme.titleMedium?.copyWith(
                           color: tokens?.readingAccent ?? theme.primaryColor)),
                 )
@@ -2681,7 +2682,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 12),
                   ),
-                  child: Text('Next ›',
+                  child: Text(context.l10n.readNextChapter,
                       style: theme.textTheme.titleMedium?.copyWith(
                           color: tokens?.readingAccent ?? theme.primaryColor)),
                 )
@@ -2732,7 +2733,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                   child: Column(
                     children: [
                       Text(
-                        'Reading Plan · Day $activePlanDay',
+                        context.l10n.readPlanDay(activePlanDay),
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: theme.colorScheme.onSurface
                               .withValues(alpha: 0.6),
@@ -2770,6 +2771,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                 Navigator.of(dialogContext);
                                             final messenger =
                                                 ScaffoldMessenger.of(context);
+                                            final planCompletedMsg =
+                                                context.l10n.readPlanCompleted;
 
                                             nav.pop();
                                             if (!mounted) return;
@@ -2781,9 +2784,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                 readingPlanProvider(
                                                     primaryPlanId));
                                             if (finalState.isPlanComplete) {
-                                              messenger.showSnackBar(const SnackBar(
-                                                  content: Text(
-                                                      'Plan completed! Congratulations! 🎉')));
+                                              messenger.showSnackBar(SnackBar(
+                                                  content:
+                                                      Text(planCompletedMsg)));
                                             } else {
                                               final nextDay =
                                                   finalState.currentDay;
@@ -2883,7 +2886,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                 borderRadius: BorderRadius.circular(16)),
                           ),
                           label: Text(
-                              'Mark ${fc.book.name} ${fc.chapter.number} done & continue',
+                              context.l10n.readMarkDoneContinue(
+                                  fc.book.name, fc.chapter.number),
                               style: const TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.w600)),
                         ),
@@ -2972,7 +2976,7 @@ class VerseActionLogic {
                                   .withValues(alpha: 0.6)),
                         ),
                         const SizedBox(height: 6),
-                        Text('None',
+                        Text(context.l10n.readNone,
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: theme.colorScheme.onSurface
                                   .withValues(alpha: 0.7),

@@ -1,3 +1,4 @@
+import '../../l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
@@ -79,7 +80,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Appearance',
+                  context.l10n.settingsAppearance,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -110,12 +111,12 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                             SwitchListTile(
                               contentPadding: const EdgeInsets.only(
                                   left: 16, right: 16, bottom: 8),
-                              title: const Text('Enable Background Glow',
+                              title: Text(context.l10n.settingsBackgroundGlow,
                                   style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold)),
-                              subtitle: const Text(
-                                  'Renders a subtle animated light behind the reader',
+                              subtitle: Text(
+                                  context.l10n.settingsBackgroundGlowSubtitle,
                                   style: TextStyle(fontSize: 12)),
                               value: readSettings.isGlowEnabled,
                               onChanged: (value) {
@@ -130,7 +131,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                       }),
                       const SizedBox(height: 24),
                       Text(
-                        'FOUNDATIONS',
+                        context.l10n.settingsThemeGroupFoundations,
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: theme.primaryColor,
                           letterSpacing: 1.2,
@@ -143,7 +144,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                         children: [
                           Expanded(
                             child: _ThemePill(
-                              label: 'Dawn',
+                              label: context.l10n.settingsThemeDawn,
                               mode: AppThemeMode.light,
                               currentMode: currentMode,
                               fillColor: AppColors.lightBackground,
@@ -158,7 +159,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: _ThemePill(
-                              label: 'Fresh',
+                              label: context.l10n.settingsThemeFresh,
                               mode: AppThemeMode.sepia,
                               currentMode: currentMode,
                               fillColor: AppColors.sepiaBackground,
@@ -178,7 +179,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'FIRMAMENT',
+                        context.l10n.settingsThemeGroupFirmament,
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: theme.primaryColor,
                           letterSpacing: 1.2,
@@ -191,7 +192,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                         children: [
                           Expanded(
                             child: _ThemePill(
-                              label: 'Sun',
+                              label: context.l10n.settingsThemeSun,
                               mode: AppThemeMode.dawn,
                               currentMode: currentMode,
                               fillColor: AppColors.dawnBackground,
@@ -206,7 +207,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: _ThemePill(
-                              label: 'Moon',
+                              label: context.l10n.settingsThemeMoon,
                               mode: AppThemeMode.fresh,
                               currentMode: currentMode,
                               fillColor: AppColors.freshBackground,
@@ -221,7 +222,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: _ThemePill(
-                              label: 'Stars',
+                              label: context.l10n.settingsThemeStars,
                               mode: AppThemeMode.dusk,
                               currentMode: currentMode,
                               fillColor: AppColors.duskBackground,
@@ -237,7 +238,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'EDEN',
+                        context.l10n.settingsThemeGroupEden,
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: theme.primaryColor,
                           letterSpacing: 1.2,
@@ -250,7 +251,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                         children: [
                           Expanded(
                             child: _ThemePill(
-                              label: 'Lilies',
+                              label: context.l10n.settingsThemeLilies,
                               mode: AppThemeMode.lilies,
                               currentMode: currentMode,
                               fillColor: AppColors.liliesBackground,
@@ -265,7 +266,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: _ThemePill(
-                              label: 'Roses',
+                              label: context.l10n.settingsThemeRoses,
                               mode: AppThemeMode.roses,
                               currentMode: currentMode,
                               fillColor: AppColors.rosesBackground,
@@ -280,7 +281,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: _ThemePill(
-                              label: 'Olives',
+                              label: context.l10n.settingsThemeOlives,
                               mode: AppThemeMode.olives,
                               currentMode: currentMode,
                               fillColor: AppColors.olivesBackground,
@@ -296,7 +297,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'SANCTUARY',
+                        context.l10n.settingsThemeGroupSanctuary,
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: theme.primaryColor,
                           letterSpacing: 1.2,
@@ -309,7 +310,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                         children: [
                           Expanded(
                             child: _ThemePill(
-                              label: 'Priestly\nPurple',
+                              label: context.l10n.settingsThemePurple,
                               mode: AppThemeMode.priestlyPurple,
                               currentMode: currentMode,
                               fillColor: AppColors.lightBackground,
@@ -324,7 +325,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: _ThemePill(
-                              label: 'Galilee\nBlue',
+                              label: context.l10n.settingsThemeBlue,
                               mode: AppThemeMode.galileeBlue,
                               currentMode: currentMode,
                               fillColor: AppColors.lightBackground,
@@ -339,7 +340,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: _ThemePill(
-                              label: 'Scarlet\nRed',
+                              label: context.l10n.settingsThemeRed,
                               mode: AppThemeMode.scarletRed,
                               currentMode: currentMode,
                               fillColor: AppColors.lightBackground,
@@ -394,7 +395,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
               ref.read(earthHeavenStyleProvider.notifier).shuffleStyle();
             },
             icon: const Icon(Icons.shuffle_rounded, size: 18),
-            label: const Text('Surprise me'),
+            label: Text(context.l10n.settingsSurpriseMe),
             style: OutlinedButton.styleFrom(
               minimumSize: const Size.fromHeight(48),
               shape: RoundedRectangleBorder(
@@ -421,11 +422,10 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
               SwitchListTile(
                 contentPadding:
                     const EdgeInsets.only(left: 16, right: 16, bottom: 8),
-                title: const Text('Enable Background Glow',
+                title: Text(context.l10n.settingsBackgroundGlow,
                     style:
                         TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                subtitle: const Text(
-                    'Renders a subtle animated light behind the reader',
+                subtitle: Text(context.l10n.settingsBackgroundGlowSubtitle,
                     style: TextStyle(fontSize: 12)),
                 value: readSettings.isGlowEnabled,
                 onChanged: (value) {
@@ -437,7 +437,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
           );
         }),
         const SizedBox(height: 24),
-        Text('FOUNDATIONS',
+        Text(context.l10n.settingsThemeGroupFoundations,
             style: theme.textTheme.labelSmall?.copyWith(
                 color: theme.primaryColor,
                 letterSpacing: 1.2,
@@ -447,7 +447,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
         Row(children: [
           Expanded(
               child: _ThemePill(
-                  label: 'Dawn',
+                  label: context.l10n.settingsThemeDawn,
                   mode: AppThemeMode.light,
                   currentMode: currentMode,
                   fillColor: AppColors.lightBackground,
@@ -460,7 +460,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
           const SizedBox(width: 8),
           Expanded(
               child: _ThemePill(
-                  label: 'Fresh',
+                  label: context.l10n.settingsThemeFresh,
                   mode: AppThemeMode.sepia,
                   currentMode: currentMode,
                   fillColor: AppColors.sepiaBackground,
@@ -474,7 +474,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
           Expanded(child: _DarkThemePill(currentMode: currentMode)),
         ]),
         const SizedBox(height: 16),
-        Text('FIRMAMENT',
+        Text(context.l10n.settingsThemeGroupFirmament,
             style: theme.textTheme.labelSmall?.copyWith(
                 color: theme.primaryColor,
                 letterSpacing: 1.2,
@@ -484,7 +484,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
         Row(children: [
           Expanded(
               child: _ThemePill(
-                  label: 'Sun',
+                  label: context.l10n.settingsThemeSun,
                   mode: AppThemeMode.dawn,
                   currentMode: currentMode,
                   fillColor: AppColors.dawnBackground,
@@ -497,7 +497,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
           const SizedBox(width: 8),
           Expanded(
               child: _ThemePill(
-                  label: 'Moon',
+                  label: context.l10n.settingsThemeMoon,
                   mode: AppThemeMode.fresh,
                   currentMode: currentMode,
                   fillColor: AppColors.freshBackground,
@@ -510,7 +510,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
           const SizedBox(width: 8),
           Expanded(
               child: _ThemePill(
-                  label: 'Stars',
+                  label: context.l10n.settingsThemeStars,
                   mode: AppThemeMode.dusk,
                   currentMode: currentMode,
                   fillColor: AppColors.duskBackground,
@@ -522,7 +522,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
               ])),
         ]),
         const SizedBox(height: 16),
-        Text('EDEN',
+        Text(context.l10n.settingsThemeGroupEden,
             style: theme.textTheme.labelSmall?.copyWith(
                 color: theme.primaryColor,
                 letterSpacing: 1.2,
@@ -532,7 +532,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
         Row(children: [
           Expanded(
               child: _ThemePill(
-                  label: 'Lilies',
+                  label: context.l10n.settingsThemeLilies,
                   mode: AppThemeMode.lilies,
                   currentMode: currentMode,
                   fillColor: AppColors.liliesBackground,
@@ -545,7 +545,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
           const SizedBox(width: 8),
           Expanded(
               child: _ThemePill(
-                  label: 'Roses',
+                  label: context.l10n.settingsThemeRoses,
                   mode: AppThemeMode.roses,
                   currentMode: currentMode,
                   fillColor: AppColors.rosesBackground,
@@ -558,7 +558,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
           const SizedBox(width: 8),
           Expanded(
               child: _ThemePill(
-                  label: 'Olives',
+                  label: context.l10n.settingsThemeOlives,
                   mode: AppThemeMode.olives,
                   currentMode: currentMode,
                   fillColor: AppColors.olivesBackground,
@@ -570,7 +570,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
               ])),
         ]),
         const SizedBox(height: 16),
-        Text('SANCTUARY',
+        Text(context.l10n.settingsThemeGroupSanctuary,
             style: theme.textTheme.labelSmall?.copyWith(
                 color: theme.primaryColor,
                 letterSpacing: 1.2,
@@ -580,7 +580,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
         Row(children: [
           Expanded(
               child: _ThemePill(
-                  label: 'Priestly\nPurple',
+                  label: context.l10n.settingsThemePurple,
                   mode: AppThemeMode.priestlyPurple,
                   currentMode: currentMode,
                   fillColor: AppColors.lightBackground,
@@ -593,7 +593,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
           const SizedBox(width: 8),
           Expanded(
               child: _ThemePill(
-                  label: 'Galilee\nBlue',
+                  label: context.l10n.settingsThemeBlue,
                   mode: AppThemeMode.galileeBlue,
                   currentMode: currentMode,
                   fillColor: AppColors.lightBackground,
@@ -606,7 +606,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
           const SizedBox(width: 8),
           Expanded(
               child: _ThemePill(
-                  label: 'Scarlet\nRed',
+                  label: context.l10n.settingsThemeRed,
                   mode: AppThemeMode.scarletRed,
                   currentMode: currentMode,
                   fillColor: AppColors.lightBackground,
@@ -937,8 +937,8 @@ class _DarkThemePillState extends ConsumerState<_DarkThemePill>
                 alignment: Alignment.center,
                 child: Text(
                   activeVariant == AppThemeMode.oled
-                      ? 'OLED\nDark'
-                      : 'Dusk\nOLED',
+                      ? context.l10n.settingsThemeOledDark
+                      : context.l10n.settingsThemeDuskOled,
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.visible,
@@ -1097,26 +1097,26 @@ class _SurfaceStyleGrid extends StatelessWidget {
   static const _kTiles = [
     _StyleMeta(
       style: EarthHeavenStyle.earth,
-      label: 'Earth',
-      subtitle: 'Flat surface',
+      label: _lEarth,
+      subtitle: _sEarth,
       icon: Icons.layers_outlined,
     ),
     _StyleMeta(
       style: EarthHeavenStyle.heaven,
-      label: 'Heaven',
-      subtitle: 'Frosted depth',
+      label: _lHeaven,
+      subtitle: _sHeaven,
       icon: Icons.blur_on_rounded,
     ),
     _StyleMeta(
       style: EarthHeavenStyle.paperlike,
-      label: 'Paper',
-      subtitle: 'Warm e-reader',
+      label: _lPaper,
+      subtitle: _sPaper,
       icon: Icons.menu_book_rounded,
     ),
     _StyleMeta(
       style: EarthHeavenStyle.claymorphic,
-      label: 'Clay',
-      subtitle: 'Pillowy 3-D',
+      label: _lClay,
+      subtitle: _sClay,
       icon: Icons.interests_rounded,
     ),
   ];
@@ -1130,7 +1130,7 @@ class _SurfaceStyleGrid extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Surface Style',
+            context.l10n.settingsSurfaceStyle,
             style: theme.textTheme.labelSmall?.copyWith(
               color: theme.primaryColor,
               letterSpacing: 1.2,
@@ -1140,7 +1140,7 @@ class _SurfaceStyleGrid extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Visual depth and material rendering',
+            context.l10n.settingsSurfaceStyleSubtitle,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
               fontSize: 11,
@@ -1167,11 +1167,20 @@ class _SurfaceStyleGrid extends StatelessWidget {
   }
 }
 
+String _lEarth(AppLocalizations l) => l.settingsSurfaceEarth;
+String _sEarth(AppLocalizations l) => l.settingsSurfaceEarthSubtitle;
+String _lHeaven(AppLocalizations l) => l.settingsSurfaceHeaven;
+String _sHeaven(AppLocalizations l) => l.settingsSurfaceHeavenSubtitle;
+String _lPaper(AppLocalizations l) => l.settingsSurfacePaper;
+String _sPaper(AppLocalizations l) => l.settingsSurfacePaperSubtitle;
+String _lClay(AppLocalizations l) => l.settingsSurfaceClay;
+String _sClay(AppLocalizations l) => l.settingsSurfaceClaySubtitle;
+
 @immutable
 class _StyleMeta {
   final EarthHeavenStyle style;
-  final String label;
-  final String subtitle;
+  final String Function(AppLocalizations) label;
+  final String Function(AppLocalizations) subtitle;
   final IconData icon;
 
   const _StyleMeta({
@@ -1236,7 +1245,7 @@ class _SurfaceStyleTile extends StatelessWidget {
             ),
             const SizedBox(height: 5),
             Text(
-              meta.label,
+              meta.label(context.l10n),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 10.5,
@@ -1247,7 +1256,7 @@ class _SurfaceStyleTile extends StatelessWidget {
             ),
             const SizedBox(height: 2),
             Text(
-              meta.subtitle,
+              meta.subtitle(context.l10n),
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

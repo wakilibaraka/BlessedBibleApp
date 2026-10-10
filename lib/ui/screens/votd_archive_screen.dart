@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import '../../state/home_provider.dart';
 import '../../state/votd_tracker_provider.dart';
@@ -8,6 +9,7 @@ import '../../state/theme_provider.dart';
 import 'commentary_hub_screen.dart';
 import '../../state/commentary_provider.dart';
 import '../../theme/reading_tokens.dart';
+import '../../l10n/l10n.dart';
 
 class VotdArchiveScreen extends ConsumerWidget {
   const VotdArchiveScreen({super.key});
@@ -50,7 +52,7 @@ class VotdArchiveScreen extends ConsumerWidget {
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsets.only(left: 16, bottom: 16),
               title: Text(
-                'Daily Verses',
+                context.l10n.plansDailyVerses,
                 style: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: theme.primaryColor,
@@ -91,28 +93,15 @@ class VotdArchiveScreen extends ConsumerWidget {
 
                   String displayDate;
                   if (index == 0) {
-                    displayDate = 'Today';
+                    displayDate = context.l10n.plansToday;
                   } else if (index == 1) {
-                    displayDate = 'Yesterday';
+                    displayDate = context.l10n.plansYesterday;
                   } else if (index == 2) {
-                    displayDate = '2 days ago';
+                    displayDate = context.l10n.plansDaysAgo(2);
                   } else {
-                    final months = [
-                      'Jan',
-                      'Feb',
-                      'Mar',
-                      'Apr',
-                      'May',
-                      'Jun',
-                      'Jul',
-                      'Aug',
-                      'Sep',
-                      'Oct',
-                      'Nov',
-                      'Dec'
-                    ];
-                    displayDate =
-                        '${months[date.month - 1]} ${date.day}, ${date.year}';
+                    displayDate = DateFormat.yMMMd(
+                      Localizations.localeOf(context).toString(),
+                    ).format(date);
                   }
 
                   final bookName = reference.split(' ').first;

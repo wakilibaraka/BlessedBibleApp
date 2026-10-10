@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import '../../services/devotional_service.dart';
 import '../../state/devotional_provider.dart';
+import '../../l10n/l10n.dart';
 
 /// Presentation widgets for the Plans Library redesign.
 ///
@@ -11,22 +13,10 @@ import '../../state/devotional_provider.dart';
 /// dark and gold. Only the mascot character keeps its own fixed friendly
 /// colors (it is an illustration, not chrome).
 
-const List<String> _monthNames = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
-String libraryDateHeader(DateTime day) =>
-    '${_monthNames[day.month - 1]} ${day.day}, ${day.year}';
+/// Long date for the library header, e.g. "November 10, 2025", formatted
+/// for [locale] (intl's default locale when null).
+String libraryDateHeader(DateTime day, [String? locale]) =>
+    DateFormat.yMMMMd(locale).format(day);
 
 /// Greeting row: "Hello," + name on the left, a year-progress / verse
 /// button on the right. Both blocks share a baseline so the row reads as
@@ -61,7 +51,7 @@ class LibraryGreetingHeader extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Hello,',
+                context.l10n.plansHello,
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w800,
                   height: 1.1,
@@ -332,7 +322,7 @@ class LibraryPlateBand extends ConsumerWidget {
         if (p == null) return const SizedBox.shrink();
         return Semantics(
           button: true,
-          label: 'Open story: ${p.caption}',
+          label: context.l10n.plansOpenStory(p.caption),
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: () => onOpen(p),
@@ -372,7 +362,7 @@ class LibraryPlateBand extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Text(
-                            'Bible story',
+                            context.l10n.plansBibleStory,
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: Colors.white.withValues(alpha: 0.75),
                               letterSpacing: 1.6,

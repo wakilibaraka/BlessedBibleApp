@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import '../../l10n/l10n.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -526,7 +527,7 @@ class _ShareCardSheetState extends ConsumerState<_ShareCardSheet> {
               ),
             ),
             const SizedBox(height: 14),
-            Text('Backdrop',
+            Text(context.l10n.shareBackdrop,
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.w800,
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -537,14 +538,16 @@ class _ShareCardSheetState extends ConsumerState<_ShareCardSheet> {
                 ShareCardBackdrop.values,
                 _backdrop,
                 (b) => switch (b) {
-                      ShareCardBackdrop.dawn => 'Dawn',
-                      ShareCardBackdrop.dusk => 'Dusk',
-                      ShareCardBackdrop.artwork => 'Artwork',
-                      ShareCardBackdrop.gradient => 'Gradient',
+                      ShareCardBackdrop.dawn => context.l10n.shareBackdropDawn,
+                      ShareCardBackdrop.dusk => context.l10n.shareBackdropDusk,
+                      ShareCardBackdrop.artwork =>
+                        context.l10n.shareBackdropArtwork,
+                      ShareCardBackdrop.gradient =>
+                        context.l10n.shareBackdropGradient,
                     },
                 (b) => setState(() => _backdrop = b)),
             const SizedBox(height: 12),
-            Text('Font',
+            Text(context.l10n.shareFont,
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.w800,
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -554,7 +557,7 @@ class _ShareCardSheetState extends ConsumerState<_ShareCardSheet> {
             chips<String>(
               ['', ...kShareCardFonts],
               _style.fontFamily ?? '',
-              (f) => f.isEmpty ? 'Theme' : f,
+              (f) => f.isEmpty ? context.l10n.shareFontTheme : f,
               (f) => _set(_style.copyWith(
                   fontFamily: f.isEmpty ? null : f, clearFont: f.isEmpty)),
             ),
@@ -565,7 +568,7 @@ class _ShareCardSheetState extends ConsumerState<_ShareCardSheet> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const _ControlLabel('Size'),
+                      _ControlLabel(context.l10n.shareSize),
                       chips<double>(
                           const [0.85, 1.0, 1.2],
                           _style.scale,
@@ -579,11 +582,13 @@ class _ShareCardSheetState extends ConsumerState<_ShareCardSheet> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const _ControlLabel('Spacing'),
+                      _ControlLabel(context.l10n.shareSpacing),
                       chips<double>(
                           const [0, 1, 2],
                           _style.letterSpacing,
-                          (v) => v == 0 ? 'Normal' : 'Wide ${v.toInt()}',
+                          (v) => v == 0
+                              ? context.l10n.shareSpacingNormal
+                              : context.l10n.shareSpacingWide('${v.toInt()}'),
                           (v) => _set(_style.copyWith(letterSpacing: v))),
                     ],
                   ),
@@ -597,7 +602,7 @@ class _ShareCardSheetState extends ConsumerState<_ShareCardSheet> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const _ControlLabel('Line height'),
+                      _ControlLabel(context.l10n.shareLineHeight),
                       chips<double>(
                           const [1.3, 1.45, 1.6],
                           _style.lineHeight,
@@ -611,11 +616,13 @@ class _ShareCardSheetState extends ConsumerState<_ShareCardSheet> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const _ControlLabel('Alignment'),
+                      _ControlLabel(context.l10n.shareAlignment),
                       chips<TextAlign>(
                           const [TextAlign.left, TextAlign.center],
                           _style.align,
-                          (v) => v == TextAlign.center ? 'Center' : 'Left',
+                          (v) => v == TextAlign.center
+                              ? context.l10n.shareAlignCenter
+                              : context.l10n.shareAlignLeft,
                           (v) => _set(_style.copyWith(align: v))),
                     ],
                   ),
@@ -642,7 +649,9 @@ class _ShareCardSheetState extends ConsumerState<_ShareCardSheet> {
                         }
                       },
                 icon: const Icon(Icons.ios_share_rounded),
-                label: Text(_sharing ? 'Preparing…' : 'Share image'),
+                label: Text(_sharing
+                    ? context.l10n.sharePreparing
+                    : context.l10n.shareImage),
                 style: FilledButton.styleFrom(
                   minimumSize: const Size.fromHeight(52),
                   shape: RoundedRectangleBorder(
@@ -725,7 +734,7 @@ Future<void> showShareOptionsSheet({
             ),
             row(
               icon: Icons.copy_rounded,
-              label: 'Copy text',
+              label: context.l10n.spaceCopyText,
               onTap: () {
                 Navigator.of(ctx).pop();
                 ShareService.copyText(context, copyText);
@@ -733,7 +742,7 @@ Future<void> showShareOptionsSheet({
             ),
             row(
               icon: Icons.ios_share_rounded,
-              label: 'Share text',
+              label: context.l10n.shareText,
               onTap: () {
                 Navigator.of(ctx).pop();
                 ShareService.shareText(body: shareText);
@@ -742,7 +751,7 @@ Future<void> showShareOptionsSheet({
             if (buildCard != null)
               row(
                 icon: Icons.image_rounded,
-                label: 'Share image card',
+                label: context.l10n.shareImageCard,
                 onTap: () {
                   Navigator.of(ctx).pop();
                   showShareCardSheet(

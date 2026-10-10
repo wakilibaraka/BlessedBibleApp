@@ -5,7 +5,7 @@ Each chunk ends with `flutter analyze` clean, `flutter test` green, one commit, 
 | # | Chunk | What | Done when |
 |---|---|---|---|
 | 1 ✅ | Localization foundation + onboarding | gen-l10n, 6 languages (en, fr, it, ro, sw, tl), language picker in Settings, 4-step onboarding | Pushed (d3e7066) |
-| 2 ⏳ | Translate every screen | All UI strings into ARB fragments (`tool/l10n/parts/`), plurals/placeholders, locale-aware dates | No English literals left in `lib/ui`; a guard test fails CI if new ones appear |
+| 2 ✅ | Translate every screen | All UI strings into ARB fragments (`tool/l10n/parts/`), plurals/placeholders, locale-aware dates | No English literals left in `lib/ui`; a guard test fails CI if new ones appear |
 | 3 | Non-UI strings | Notifications, reminders, toasts from services, home widget labels, share text, error messages, plan/day labels | Reminders and the widget show in the chosen language |
 | 4 | Onboarding completion | Optional reminders step (permission asked after explaining why), optional sign-in step ("works fully offline"), resume after app kill | Widget tests for skip/back/resume |
 | 5 | Theme tokens | `ThemeExtension` for semantic colours, spacing, radii and text styles; replace `Color(0x…)`/`Colors.*`/`fontSize:` screen by screen (reader → settings → the rest) | Hard-coded counts down to a justified list; a lint script reports regressions |

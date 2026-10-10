@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/read_location_provider.dart';
 import '../../state/translation_provider.dart';
 import '../../state/nav_provider.dart';
+import '../../l10n/l10n.dart';
 
 class ContinueReadingCard extends ConsumerWidget {
   final ThemeData theme;
@@ -40,7 +41,7 @@ class ContinueReadingCard extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Continue Reading',
+                  context.l10n.plansContinueReading,
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     fontWeight: FontWeight.w600,
@@ -77,9 +78,9 @@ class ContinueReadingCard extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(18),
               ),
             ),
-            child: const Text(
-              'Resume',
-              style: TextStyle(
+            child: Text(
+              context.l10n.plansResume,
+              style: const TextStyle(
                 fontWeight: FontWeight.w600,
               ),
             ),

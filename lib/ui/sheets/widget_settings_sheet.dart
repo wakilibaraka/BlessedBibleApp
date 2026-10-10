@@ -1,3 +1,4 @@
+import '../../l10n/l10n.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -99,12 +100,12 @@ class WidgetSettingsSheet extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Home Screen Widgets',
+                          context.l10n.settingsWidgetsTitle,
                           style: theme.textTheme.titleLarge
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          'Live preview & style customization',
+                          context.l10n.settingsWidgetsLivePreview,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurface
                                 .withValues(alpha: 0.6),
@@ -120,7 +121,7 @@ class WidgetSettingsSheet extends ConsumerWidget {
 
               // Section: Live Previews
               Text(
-                'LIVE WIDGET PREVIEW',
+                context.l10n.settingsWidgetPreviewHeader,
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.2,
@@ -151,7 +152,7 @@ class WidgetSettingsSheet extends ConsumerWidget {
                               ),
                             ),
                             Text(
-                              'Streak Active! • Daily Goal',
+                              context.l10n.settingsWidgetStreak,
                               style: TextStyle(
                                 fontSize: 11,
                                 color: isDark
@@ -169,7 +170,7 @@ class WidgetSettingsSheet extends ConsumerWidget {
                       child: Divider(height: 1, color: dividerColor),
                     ),
                     Text(
-                      'WORD OF THE DAY',
+                      context.l10n.settingsWidgetWotd,
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
@@ -210,7 +211,7 @@ class WidgetSettingsSheet extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'VERSE OF THE DAY',
+                      context.l10n.settingsWidgetVotd,
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
@@ -253,7 +254,7 @@ class WidgetSettingsSheet extends ConsumerWidget {
 
               // Section: Style Selection
               Text(
-                'BACKGROUND THEME & GRADIENTS',
+                context.l10n.settingsWidgetBackgroundHeader,
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.2,
@@ -306,7 +307,7 @@ class WidgetSettingsSheet extends ConsumerWidget {
 
               // Section: Text Contrast Mode
               Text(
-                'TEXT CONTRAST',
+                context.l10n.settingsWidgetContrastHeader,
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.2,
@@ -321,10 +322,10 @@ class WidgetSettingsSheet extends ConsumerWidget {
                     value: mode,
                     label: Text(
                       mode == WidgetTextMode.auto
-                          ? 'Auto ✨'
+                          ? context.l10n.settingsWidgetTextAuto
                           : (mode == WidgetTextMode.light
-                              ? 'Dark Text ☀️'
-                              : 'White Text 🌙'),
+                              ? context.l10n.settingsWidgetTextDark
+                              : context.l10n.settingsWidgetTextWhite),
                     ),
                   );
                 }).toList(),
@@ -351,14 +352,14 @@ class WidgetSettingsSheet extends ConsumerWidget {
                     if (context.mounted) {
                       DynamicToast.show(
                         context,
-                        'Widgets synced with new style! ✨',
+                        context.l10n.settingsWidgetSynced,
                         icon: Icons.check_circle_rounded,
                       );
                       Navigator.of(context).pop();
                     }
                   },
                   icon: const Icon(Icons.sync_rounded),
-                  label: const Text('Apply & Sync to Home Screen'),
+                  label: Text(context.l10n.settingsWidgetApply),
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(

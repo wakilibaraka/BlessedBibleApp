@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../l10n/l10n.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/pericopes_provider.dart';
@@ -26,7 +27,7 @@ class NotesListScreen extends ConsumerWidget {
       appBar: SharedAppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text('My Notes',
+        title: Text(context.l10n.notesMyNotes,
             style: theme.textTheme.titleMedium
                 ?.copyWith(fontWeight: FontWeight.bold)),
       ),
@@ -40,7 +41,7 @@ class NotesListScreen extends ConsumerWidget {
                       color: theme.primaryColor.withValues(alpha: 0.5)),
                   const SizedBox(height: 16),
                   Text(
-                    'No notes yet',
+                    context.l10n.notesEmptyTitle,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -48,7 +49,7 @@ class NotesListScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Tap the + button to add your first note.',
+                    context.l10n.notesEmptyBody,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
@@ -332,9 +333,9 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
                 _insertText(insertedText);
 
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: const Text('Verse inserted'),
+                    content: Text(context.l10n.notesVerseInserted),
                     action: SnackBarAction(
-                        label: 'Add Commentary',
+                        label: context.l10n.notesAddCommentary,
                         onPressed: () {
                           final commentaryList =
                               ref.read(commentaryProvider).value ?? [];
@@ -375,21 +376,7 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
       _showSlashMenu = false;
     });
     final now = DateTime.now();
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec'
-    ];
-    _insertText('${months[now.month - 1]} ${now.day}, ${now.year} ');
+    _insertText('${MaterialLocalizations.of(context).formatMediumDate(now)} ');
   }
 
   void _insertChapterTitle() {
@@ -419,7 +406,7 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
         }
       }
     }
-    _insertText('Chapter Title ');
+    _insertText('${context.l10n.notesChapterTitlePlaceholder} ');
   }
 
   @override
@@ -440,10 +427,10 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
           children: [
             Text(
               widget.editingNote != null
-                  ? 'Edit Note'
+                  ? context.l10n.notesEditNote
                   : (widget.initialReference != null
-                      ? 'New Note on ${widget.initialReference}'
-                      : 'New Note'),
+                      ? context.l10n.notesNewNoteOn(widget.initialReference!)
+                      : context.l10n.notesNewNote),
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: theme.primaryColor,
@@ -454,7 +441,7 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
               controller: titleController,
               style: TextStyle(color: theme.colorScheme.onSurface),
               decoration: InputDecoration(
-                hintText: 'Note Title',
+                hintText: context.l10n.notesTitleHint,
                 hintStyle: TextStyle(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
                 filled: true,
@@ -491,7 +478,7 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
                 maxLines: null,
                 keyboardType: TextInputType.multiline,
                 decoration: InputDecoration(
-                  hintText: 'Start typing... (type / for commands)',
+                  hintText: context.l10n.notesContentHint,
                   hintStyle: TextStyle(
                       color:
                           theme.colorScheme.onSurface.withValues(alpha: 0.5)),
@@ -536,17 +523,17 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
                   children: [
                     ListTile(
                       leading: const Icon(Icons.book),
-                      title: const Text('Insert verse'),
+                      title: Text(context.l10n.notesInsertVerse),
                       onTap: _insertVerse,
                     ),
                     ListTile(
                       leading: const Icon(Icons.calendar_today),
-                      title: const Text('Insert date'),
+                      title: Text(context.l10n.notesInsertDate),
                       onTap: _insertDate,
                     ),
                     ListTile(
                       leading: const Icon(Icons.title),
-                      title: const Text('Insert chapter title'),
+                      title: Text(context.l10n.notesInsertChapterTitle),
                       onTap: _insertChapterTitle,
                     ),
                   ],
@@ -604,11 +591,13 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
                 Navigator.pop(context);
 
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Note saved!')),
+                  SnackBar(content: Text(context.l10n.notesSaved)),
                 );
               },
               child: Text(
-                  widget.editingNote != null ? 'Save Changes' : 'Save Note',
+                  widget.editingNote != null
+                      ? context.l10n.notesSaveChanges
+                      : context.l10n.notesSaveNote,
                   style: const TextStyle(fontWeight: FontWeight.bold)),
             ),
             if (widget.editingId != null) ...[
@@ -622,10 +611,10 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
                   ref.read(notesProvider.notifier).remove(widget.editingId!);
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Note deleted')),
+                    SnackBar(content: Text(context.l10n.notesDeleted)),
                   );
                 },
-                child: const Text('Delete Note',
+                child: Text(context.l10n.notesDeleteNote,
                     style: TextStyle(fontWeight: FontWeight.bold)),
               ),
             ],

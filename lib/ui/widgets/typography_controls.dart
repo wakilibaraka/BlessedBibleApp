@@ -1,3 +1,4 @@
+import '../../l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,7 +13,12 @@ const _fontGroups = [
   ['Lexend', 'Source Sans 3', 'OpenDyslexic'],
 ];
 
-const _weightLabels = ['Light', 'Regular', 'Medium', 'Bold'];
+List<String> _weightLabels(AppLocalizations l10n) => [
+      l10n.settingsWeightLight,
+      l10n.settingsWeightRegular,
+      l10n.settingsWeightMedium,
+      l10n.settingsWeightBold,
+    ];
 const _weightValues = [300, 400, 500, 700];
 
 class TypographyControls extends ConsumerWidget {
@@ -46,7 +52,8 @@ class TypographyControls extends ConsumerWidget {
             Row(children: [
               Icon(Icons.text_increase_rounded, size: 16, color: iconColor),
               const SizedBox(width: 8),
-              Text('FONT SIZE', style: sectionLabelStyle),
+              Text(context.l10n.settingsFontSizeHeader,
+                  style: sectionLabelStyle),
             ]),
             Text('${typography.fontSize.clamp(12.0, 32.0).round()}',
                 style: valueStyle),
@@ -116,12 +123,15 @@ class TypographyControls extends ConsumerWidget {
             Row(children: [
               Icon(Icons.line_weight_rounded, size: 16, color: iconColor),
               const SizedBox(width: 8),
-              Text('FONT WEIGHT', style: sectionLabelStyle),
+              Text(context.l10n.settingsFontWeightHeader,
+                  style: sectionLabelStyle),
             ]),
             Text(
               () {
                 final idx = _weightValues.indexOf(typography.fontWeightValue);
-                return idx >= 0 ? _weightLabels[idx] : 'Regular';
+                return idx >= 0
+                    ? _weightLabels(context.l10n)[idx]
+                    : context.l10n.settingsWeightRegular;
               }(),
               style: valueStyle,
             ),
@@ -151,7 +161,7 @@ class TypographyControls extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
-                      _weightLabels[i],
+                      _weightLabels(context.l10n)[i],
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.values.firstWhere(
@@ -179,19 +189,26 @@ class TypographyControls extends ConsumerWidget {
               Icon(Icons.format_line_spacing_rounded,
                   size: 16, color: iconColor),
               const SizedBox(width: 8),
-              Text('LINE SPACING', style: sectionLabelStyle),
+              Text(context.l10n.settingsLineSpacingHeader,
+                  style: sectionLabelStyle),
             ]),
             Text(
                 typography.lineHeight <= 1.4
-                    ? 'Compact'
-                    : (typography.lineHeight >= 1.8 ? 'Relaxed' : 'Normal'),
+                    ? context.l10n.settingsSpacingCompact
+                    : (typography.lineHeight >= 1.8
+                        ? context.l10n.settingsSpeedRelaxed
+                        : context.l10n.settingsSpacingNormal),
                 style: valueStyle),
           ],
         ),
         const SizedBox(height: 8),
         Center(
           child: PillSegmentedControl(
-            segments: const ['Compact', 'Normal', 'Relaxed'],
+            segments: [
+              context.l10n.settingsSpacingCompact,
+              context.l10n.settingsSpacingNormal,
+              context.l10n.settingsSpeedRelaxed
+            ],
             selectedIndex: typography.lineHeight <= 1.4
                 ? 0
                 : (typography.lineHeight >= 1.8 ? 2 : 1),
@@ -210,7 +227,8 @@ class TypographyControls extends ConsumerWidget {
             Row(children: [
               Icon(Icons.padding_rounded, size: 16, color: iconColor),
               const SizedBox(width: 8),
-              Text('MARGINS', style: sectionLabelStyle),
+              Text(context.l10n.settingsMarginsHeader,
+                  style: sectionLabelStyle),
             ]),
             Text('${typography.marginPercent.toStringAsFixed(0)}%',
                 style: valueStyle),
@@ -249,14 +267,16 @@ class TypographyControls extends ConsumerWidget {
             Row(children: [
               Icon(Icons.format_align_left_rounded, size: 16, color: iconColor),
               const SizedBox(width: 8),
-              Text('ALIGNMENT', style: sectionLabelStyle),
+              Text(context.l10n.settingsAlignmentHeader,
+                  style: sectionLabelStyle),
             ]),
             Text(
                 switch (typography.textAlignMode) {
-                  TextAlignMode.left => 'Left',
-                  TextAlignMode.center => 'Center',
-                  TextAlignMode.right => 'Right',
-                  TextAlignMode.justified => 'Justified',
+                  TextAlignMode.left => context.l10n.settingsAlignLeft,
+                  TextAlignMode.center => context.l10n.settingsAlignCenter,
+                  TextAlignMode.right => context.l10n.settingsAlignRight,
+                  TextAlignMode.justified =>
+                    context.l10n.settingsAlignJustified,
                 },
                 style: valueStyle),
           ],
@@ -304,7 +324,7 @@ class TypographyControls extends ConsumerWidget {
         Row(children: [
           Icon(Icons.font_download_rounded, size: 16, color: iconColor),
           const SizedBox(width: 8),
-          Text('FONT FAMILY', style: sectionLabelStyle),
+          Text(context.l10n.settingsFontFamilyHeader, style: sectionLabelStyle),
         ]),
         const SizedBox(height: 8),
         for (final group in _fontGroups)
@@ -386,7 +406,8 @@ class TypographyControls extends ConsumerWidget {
               title: Row(children: [
                 Icon(Icons.format_italic_rounded, size: 16, color: iconColor),
                 const SizedBox(width: 8),
-                Text('ITALIC READING TEXT', style: sectionLabelStyle),
+                Text(context.l10n.settingsItalicHeader,
+                    style: sectionLabelStyle),
               ]),
               value: typography.italicEnabled,
               onChanged: (val) {

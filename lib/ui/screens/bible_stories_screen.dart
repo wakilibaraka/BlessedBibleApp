@@ -7,6 +7,7 @@ import '../../data/models/devotional_story.dart';
 import '../../state/devotional_provider.dart';
 import '../../theme/app_colors.dart';
 import 'bible_story_reader_screen.dart';
+import '../../l10n/l10n.dart';
 
 /// Entry point: "Bible Stories" — an illustrated journey through Scripture.
 class BibleStoriesScreen extends ConsumerStatefulWidget {
@@ -48,7 +49,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsets.only(left: 20, bottom: 14),
               title: Text(
-                'Bible Stories',
+                context.l10n.storiesTitle,
                 style: theme.textTheme.titleLarge?.copyWith(
                   fontFamily: 'Playfair Display',
                   fontWeight: FontWeight.w700,
@@ -70,7 +71,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
             actions: [
               IconButton(
                 icon: const Icon(Icons.tune_rounded),
-                tooltip: 'Filters',
+                tooltip: context.l10n.storiesFilters,
                 onPressed: () => _openFilters(context),
               ),
               const SizedBox(width: 8),
@@ -83,7 +84,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '500 illustrated moments from Genesis to Revelation',
+                    context.l10n.storiesSubtitle,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
@@ -94,11 +95,12 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                     onChanged: (v) =>
                         ref.read(devotionalFilterProvider.notifier).setQuery(v),
                     decoration: InputDecoration(
-                      hintText: 'Search title, book, or reference…',
+                      hintText: context.l10n.storiesSearchHint,
                       prefixIcon: const Icon(Icons.search_rounded),
                       suffixIcon: filter.query.isEmpty
                           ? null
                           : IconButton(
+                              tooltip: context.l10n.storiesClearSearch,
                               icon: const Icon(Icons.close_rounded, size: 18),
                               onPressed: () {
                                 _searchController.clear();
@@ -123,7 +125,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                     children: [
                       Expanded(
                         child: _FilterPill(
-                          label: 'All',
+                          label: context.l10n.storiesFilterAll,
                           selected: filter.testament == TestamentFilter.all &&
                               filter.bookPrefix == null,
                           onTap: () => ref
@@ -134,7 +136,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: _FilterPill(
-                          label: 'OT',
+                          label: context.l10n.storiesFilterOt,
                           selected: filter.testament == TestamentFilter.ot &&
                               filter.bookPrefix == null,
                           onTap: () => ref
@@ -145,7 +147,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: _FilterPill(
-                          label: 'NT',
+                          label: context.l10n.storiesFilterNt,
                           selected: filter.testament == TestamentFilter.nt &&
                               filter.bookPrefix == null,
                           onTap: () => ref
@@ -171,7 +173,8 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                   Row(
                     children: [
                       Text(
-                        '${stories.length} of ${totalAsync.value?.length ?? 0} stories',
+                        context.l10n.storiesCountOfTotal(
+                            stories.length, totalAsync.value?.length ?? 0),
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: theme.colorScheme.onSurface
                               .withValues(alpha: 0.55),
@@ -181,7 +184,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                       _filterToggleButton(
                         context,
                         icon: Icons.favorite_rounded,
-                        label: 'Favorites',
+                        label: context.l10n.storiesFavorites,
                         active: filter.favoritesOnly,
                         onTap: () => ref
                             .read(devotionalFilterProvider.notifier)
@@ -191,7 +194,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                       _filterToggleButton(
                         context,
                         icon: Icons.check_circle_outline_rounded,
-                        label: 'Unread',
+                        label: context.l10n.storiesUnread,
                         active: filter.unreadOnly,
                         onTap: () => ref
                             .read(devotionalFilterProvider.notifier)
@@ -209,7 +212,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
             ),
             error: (e, _) => SliverFillRemaining(
               child: Center(
-                  child: Text('Could not load stories:\n$e',
+                  child: Text(context.l10n.storiesLoadError('$e'),
                       textAlign: TextAlign.center)),
             ),
             data: (_) => stories.isEmpty
@@ -244,11 +247,11 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
 
   /// Display label for the Books pill: the chosen book, else "Books".
   String _bookLabel(List<DevotionalBookInfo> books, String? prefix) {
-    if (prefix == null) return 'Books';
+    if (prefix == null) return context.l10n.storiesBooks;
     for (final b in books) {
       if (b.prefix == prefix) return b.book;
     }
-    return 'Books';
+    return context.l10n.storiesBooks;
   }
 
   /// Book dropdown: search + scoped book list + All-books reset.
@@ -296,7 +299,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: TextField(
                       decoration: InputDecoration(
-                        hintText: 'Search books…',
+                        hintText: context.l10n.storiesSearchBooks,
                         prefixIcon: const Icon(Icons.search_rounded),
                         isDense: true,
                         filled: true,
@@ -315,7 +318,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                       children: [
                         ListTile(
                           leading: const Icon(Icons.menu_book_outlined),
-                          title: const Text('All books'),
+                          title: Text(context.l10n.storiesAllBooks),
                           onTap: () {
                             ref
                                 .read(devotionalFilterProvider.notifier)
@@ -466,22 +469,23 @@ class _EmptyStories extends ConsumerWidget {
     final filter = ref.watch(devotionalFilterProvider);
     final favorites = ref.watch(devotionalFavoritesProvider);
 
-    String title = 'No stories match these filters.';
+    final l10n = context.l10n;
+    String title = l10n.storiesNoMatch;
     String? actionLabel;
     VoidCallback? action;
 
     if (filter.favoritesOnly && favorites.isEmpty) {
-      title = 'No favorites yet.';
-      actionLabel = 'Browse all stories';
+      title = l10n.storiesNoFavorites;
+      actionLabel = l10n.storiesBrowseAll;
       action = onClearFilters;
     } else if (filter.unreadOnly) {
-      title = "You're all caught up.";
-      actionLabel = 'Show read stories';
+      title = l10n.storiesAllCaughtUp;
+      actionLabel = l10n.storiesShowRead;
       action = onShowRead;
     } else if (filter.query.isNotEmpty ||
         filter.bookPrefix != null ||
         filter.testament != TestamentFilter.all) {
-      actionLabel = 'Clear filters';
+      actionLabel = l10n.storiesClearFilters;
       action = onClearFilters;
     }
 
@@ -508,7 +512,7 @@ class _EmptyStories extends ConsumerWidget {
           if (filter.favoritesOnly && favorites.isEmpty) ...[
             const SizedBox(height: 4),
             Text(
-              'Tap ♥ on any story to save it here.',
+              l10n.storiesFavoritesHint,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -705,9 +709,7 @@ class DevotionalAttribution extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Text(
-      'Scripture from the King James Version (public domain). Narrative summaries '
-      'adapted from The Graham Bible (grahambible.com), AI-assisted and human reviewed. '
-      'Artwork: Gustave Doré (1832–1883), public domain, via Wikimedia Commons.',
+      context.l10n.storiesAttribution,
       style: theme.textTheme.labelSmall?.copyWith(
         color: theme.colorScheme.onSurface.withValues(alpha: 0.45),
         height: 1.5,

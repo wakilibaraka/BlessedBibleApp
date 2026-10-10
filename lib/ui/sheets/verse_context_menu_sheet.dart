@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/l10n.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../widgets/textured_glass_container.dart';
 import '../../state/notes_provider.dart';
@@ -79,7 +80,7 @@ class _VerseContextMenuSheetState extends ConsumerState<VerseContextMenuSheet> {
                             child: _MenuButton(
                               icon: const Icon(Icons.comment_bank_outlined,
                                   size: 24),
-                              label: 'Commentary',
+                              label: context.l10n.readActionCommentary,
                               onTap: () {
                                 Navigator.of(context).pop();
                                 Navigator.of(context)
@@ -96,7 +97,9 @@ class _VerseContextMenuSheetState extends ConsumerState<VerseContextMenuSheet> {
                         Expanded(
                           child: _MenuButton(
                             icon: Icon(Icons.edit_document, size: 24),
-                            label: hasNote ? 'Edit Note' : 'Note',
+                            label: hasNote
+                                ? context.l10n.readActionEditNote
+                                : context.l10n.readActionNote,
                             color: hasNote ? Colors.blue.shade600 : null,
                             onTap: () {
                               Navigator.of(context).pop();
@@ -114,7 +117,7 @@ class _VerseContextMenuSheetState extends ConsumerState<VerseContextMenuSheet> {
                         Expanded(
                           child: _MenuButton(
                             icon: Icon(Icons.ios_share_rounded, size: 24),
-                            label: 'Share',
+                            label: context.l10n.commonShare,
                             onTap: () {
                               Navigator.of(context).pop();
                               VerseActionLogic.handleShareOptions(
@@ -130,7 +133,7 @@ class _VerseContextMenuSheetState extends ConsumerState<VerseContextMenuSheet> {
                         Expanded(
                           child: _MenuButton(
                             icon: const Icon(Icons.link_rounded, size: 24),
-                            label: 'Related',
+                            label: context.l10n.readActionRelated,
                             onTap: () {
                               Navigator.of(context).pop();
                               showCrossReferencesSheet(
@@ -146,7 +149,7 @@ class _VerseContextMenuSheetState extends ConsumerState<VerseContextMenuSheet> {
                         Expanded(
                           child: _MenuButton(
                             icon: Icon(Icons.crop_free_rounded, size: 24),
-                            label: 'Select Text',
+                            label: context.l10n.readActionSelectText,
                             onTap: () {
                               Navigator.of(context).pop();
                               widget.onCustomSelection();

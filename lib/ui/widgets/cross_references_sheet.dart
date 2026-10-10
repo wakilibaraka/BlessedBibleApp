@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/l10n.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/cross_references_provider.dart';
@@ -21,10 +22,10 @@ class CrossReferencesSheet extends ConsumerWidget {
     required this.bookName,
   });
 
-  String _bookName(WidgetRef ref, int num) {
+  String _bookName(BuildContext context, WidgetRef ref, int num) {
     final books = ref.watch(bibleProvider).books;
     if (num >= 1 && num <= books.length) return books[num - 1].name;
-    return 'Book $num';
+    return context.l10n.readBookFallback(num);
   }
 
   @override
@@ -61,7 +62,7 @@ class CrossReferencesSheet extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Related Verses',
+                  context.l10n.readRelatedVerses,
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -95,7 +96,7 @@ class CrossReferencesSheet extends ConsumerWidget {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'No cross-references found for this verse.',
+                            context.l10n.readNoCrossRefs,
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: theme.colorScheme.onSurface
                                   .withValues(alpha: 0.4),
@@ -104,7 +105,7 @@ class CrossReferencesSheet extends ConsumerWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Cross-references will be available\nafter the next app update.',
+                            context.l10n.readCrossRefsComingSoon,
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onSurface
                                   .withValues(alpha: 0.3),
@@ -125,7 +126,8 @@ class CrossReferencesSheet extends ConsumerWidget {
                       const Divider(height: 1, indent: 16),
                   itemBuilder: (context, index) {
                     final cr = refs[index];
-                    final targetBookName = _bookName(ref, cr.toBookNumber);
+                    final targetBookName =
+                        _bookName(context, ref, cr.toBookNumber);
                     final refLabel =
                         '$targetBookName ${cr.toChapter}:${cr.toVerse}';
 
@@ -150,7 +152,7 @@ class CrossReferencesSheet extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Could not load cross-references.\n$e',
+                      context.l10n.readCrossRefsLoadError('$e'),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 12),
@@ -158,7 +160,7 @@ class CrossReferencesSheet extends ConsumerWidget {
                       onPressed: () =>
                           ref.invalidate(crossReferencesProvider(key)),
                       icon: const Icon(Icons.refresh_rounded),
-                      label: const Text('Retry'),
+                      label: Text(context.l10n.commonRetry),
                     ),
                   ],
                 ),
@@ -238,7 +240,7 @@ class _CrossRefTileState extends ConsumerState<_CrossRefTile> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Close'),
+                  child: Text(context.l10n.commonClose),
                 ),
               ],
             ),
@@ -279,7 +281,7 @@ class _CrossRefTileState extends ConsumerState<_CrossRefTile> {
                       ),
                     )
                   : Text(
-                      _verseText ?? 'Verse not available',
+                      _verseText ?? context.l10n.readVerseUnavailable,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         height: 1.4,
                         color: _verseText == null
