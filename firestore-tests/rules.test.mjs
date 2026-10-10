@@ -127,6 +127,18 @@ describe('per-item sync collections', () => {
       { ...item('b', { createdAt: 1 }), role: 'admin' }));
   });
 
+  test('plans, progress, active plans and reading days', async () => {
+    await assertSucceeds(setDoc(ref(ALICE, 'custom_plans', 'p1'), item('p1', { json: '{"id":"p1"}' })));
+    await assertSucceeds(setDoc(ref(ALICE, 'plan_progress', 'p1'), item('p1', { json: '{}' })));
+    await assertSucceeds(setDoc(ref(ALICE, 'meta', 'active_plans'), item('active_plans', { ids: ['p1'] })));
+    await assertSucceeds(setDoc(ref(ALICE, 'reading_days', '2026-10-10'), item('2026-10-10', {})));
+    await assertFails(setDoc(ref(ALICE, 'custom_plans', 'p1'), item('p1', { json: 5 })));
+    await assertFails(setDoc(ref(ALICE, 'meta', 'other'), item('other', { ids: [] })));
+    await assertFails(setDoc(ref(ALICE, 'meta', 'active_plans'), item('active_plans', { ids: Array(21).fill('x') })));
+    await assertFails(setDoc(ref(ALICE, 'reading_days', 'yesterday'), item('yesterday', {})));
+    await assertFails(setDoc(ref(ALICE, 'reading_days', '2026-10-10'), item('2026-10-10', { x: 1 })));
+  });
+
   test('other users, signed-out clients and unknown collections are denied', async () => {
     await assertFails(setDoc(ref(BOB, 'notes', 'n'), item('n', { title: 't', content: 'c', date: 'd' })));
     await assertFails(getDoc(ref(BOB, 'notes', 'n')));

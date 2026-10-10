@@ -508,7 +508,7 @@ Future<void> _signOut(BuildContext context, WidgetRef ref) async {
   final sync = ref.read(syncControllerProvider.notifier);
   await sync.prepareSignOut(forget: remove);
   await ref.read(authActionsProvider).signOut();
-  if (remove) sync.clearLocalData();
+  if (remove) await sync.clearLocalData();
   if (context.mounted) Navigator.of(context).pop();
 }
 
