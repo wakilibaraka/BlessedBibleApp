@@ -4,7 +4,9 @@ Audit of `main` @ `9ad360f` against *Blessed Bible App: Production Readiness Che
 
 Legend: ✅ done · 🟡 partial · ❌ not done · 🔍 needs manual or device verification (can't be judged from code)
 
-**How this was checked:** static reading of the repo only. The Flutter SDK was not available, so `flutter analyze` and the 171 tests in `test/` were **not run**. The clone is shallow (last 50 commits), so the secrets-in-history check covers those commits only.
+**Update (Phases 1 and 2 done):** repo cleanup and the dead-code sweep are complete. Verified with Flutter 3.47.7: `flutter analyze` reports 0 errors, 0 warnings, 6 infos (deprecations and one async `BuildContext`, left for Phase 3); `flutter test` passes 174/174; `dart format` is clean. `flutter build apk` was not run (no Android SDK in the audit environment).
+
+**How the original audit was checked:** static reading of the repo. The clone is shallow (last 50 commits), so the secrets-in-history check covers those commits only.
 
 ---
 
@@ -13,9 +15,9 @@ Legend: ✅ done · 🟡 partial · ❌ not done · 🔍 needs manual or device 
 | Section | Status | Key gaps |
 | --- | --- | --- |
 | 1. Known blockers | 🟡 3 of 8 | iOS not configured, licensing unverified, privacy policy not hosted, root not clean |
-| 2. Code clean sweep | 🟡 | ~22 orphan files, 2 unused fonts, 1 unused dependency, no strict analyzer, no crash reporting, no FVM pin |
-| 3. Repo hygiene | ❌ mostly | stray root files, `tool/` + `tools/`, 3 loose markdown docs, desktop/web folders, wrong README clone URL, no LICENSE, no CI |
-| 4. Feature inventory | 🔍 | needs a device test pass. Notes are not cloud-synced. |
+| 2. Code clean sweep | 🟡 | ✅ orphans, unused fonts/dependency/providers removed, formatted. Still: no strict analyzer, no crash reporting, no FVM pin |
+| 3. Repo hygiene | 🟡 | ✅ root, tooling, docs, platforms, README, LICENSE done. Still: no CI, branch protection, PR template |
+| 4. Feature inventory | 🔍 | needs a device test pass. **Cloud sync is not wired into the live app** (see section 4). |
 | 5. Onboarding | 🟡 | single screen, not the multi-step flow the checklist describes |
 | 6–9. Gestures, settings, themes, consistency | 🔍 | manual matrices. Code signals: 212 `Color(0x`, 636 `Colors.`, 121 literal `fontSize:` |
 | 10. Bible essentials | 🟡 | most features present. Credits/sources screen and doctrinal-perspective statement missing. |
@@ -40,7 +42,7 @@ Legend: ✅ done · 🟡 partial · ❌ not done · 🔍 needs manual or device 
 | P0 Firestore rules owner-only | ✅ | `firestore.rules`: `users/{userId}/**` requires `auth.uid == userId`. CMS collections are world-readable and admin-write by a hardcoded UID. Missing: field validation and size limits, emulator tests. |
 | P0 No secrets in git | 🟡 | No keystores, `key.properties`, `google-services.json`, `firebase_options.dart`, or `AIza…` keys in the visible history, and `.gitignore` covers them. **Re-run on a full clone** (`git log --all` with gitleaks or trufflehog) because this clone was shallow. |
 | P0 Privacy policy at a public URL | 🟡 | In-app `privacy_policy_screen.dart` and `docs/privacy_policy.{md,html}` exist, but there's no public URL in the code. Policy says Crashlytics is used, but Crashlytics is **not** a dependency. Fix the text or add Crashlytics. |
-| P1 Clean repo root | ❌ | See section 3. |
+| P1 Clean repo root | ✅ | Done in Phase 1. See section 3. |
 
 ## 2. Code stability and clean sweep
 
@@ -48,19 +50,19 @@ Legend: ✅ done · 🟡 partial · ❌ not done · 🔍 needs manual or device 
 - ❌ `analysis_options.yaml` is the default `flutter_lints` with no extra rules and no `strict-casts`, `strict-inference`, or `strict-raw-types`.
 - 🔍 `flutter analyze`, `dart fix`, and `dart format` weren't run here. CI doesn't enforce them because there's no CI.
 - ✅ No `TODO`/`FIXME`/`HACK`/`XXX` and no bare `print(` in `lib/`.
-- 🟡 21 `debugPrint(` calls: route them through a logger that's silent in release. 5 `// ignore` comments: justify or remove each.
+- ✅ `debugPrint` calls now go through `logDebug` (`lib/utils/log.dart`), silent in release. 5 `// ignore` comments: justify or remove each.
 
 ### 2.2 Dead code
-- ❌ **Files never imported from `lib/` or `test/`** (delete or wire up):
+- ✅ **Done in Phase 2.** 26 orphan Dart files deleted (the list below plus `plans_hub_v3_screen`, `mesh_gradient_bg`, `note_editor_screen`, `startup_stopwatch`), 4 unused providers removed. `cloud_sync_service.dart` kept pending a product decision. Original findings:
   - `ui/sheets/`: `custom_plan_action_sheet`, `curated_plan_action_sheet`, `quick_note_sheet`
   - `ui/screens/`: `bookmarks_screen`, `dictionary_screen`, `commentary_library_screen`, `highlights_screen`
   - `ui/widgets/`: `search_field`, `note_card`, `jiggle_animator`, `your_space_hero`, `pinch_to_zoom_font_wrapper`, `study_progress_card`, `bible_stories_banner`, `ghost_button`, `account_sync_card`, `account_button`, `primary_button`, `verse_card`
   - `data/curated/rest_day_reflections`, `state/rest_day_provider`, `state/dynamic_reading_plan_provider`
   - Note: `account_sync_card` and `account_button` are dead duplicates of `account_menu` (they also contain the delete flow).
-- ❌ Unused fonts: **Bonheur Royale** and **Shadows Into Light** are declared in `pubspec.yaml` but never referenced in `lib/`.
-- ❌ Unused dependency: **`flutter_timezone`** (no imports).
+- ✅ Unused fonts: **Bonheur Royale** and **Shadows Into Light** are declared in `pubspec.yaml` but never referenced in `lib/`.
+- ✅ Unused dependency: **`flutter_timezone`** removed. Also removed: undeclared Light/Medium font files and the unreferenced lighthouse images.
 - 🔍 Still to run: DCM `check-unused-code`, unused providers, unused assets per file, unreachable routes.
-- ❌ `design-previews/study-redesign-v1`: decide to keep, branch, or delete. Legacy Study was retired in `27125fb`.
+- ✅ `design-previews/` deleted (recoverable from git history).
 
 ### 2.3 Duplicates
 - 🟡 Account UI exists three times (`account_menu`, `account_sync_card`, `account_button`), so keep only `account_menu`. `primary_button`/`ghost_button` are unused parallel button styles.
@@ -70,7 +72,7 @@ Legend: ✅ done · 🟡 partial · ❌ not done · 🔍 needs manual or device 
 ### 2.4 Architecture and stability
 - 🟡 Layering: direct Firestore/SQL access in widgets in `concordance_screen.dart`, `custom_plan_builder_v2_screen.dart`, and `account_menu.dart`. Move it into services or providers.
 - 🟡 Global handlers are installed (`main.dart:27–60`) with a branded `ErrorWidget`, but they write `crash_log.txt` to a **relative path**, which fails silently on mobile. There's no crash reporter.
-- ❌ Empty `if (kStartupTrace) {}` blocks in `main.dart` (dead leftovers).
+- ✅ Empty `kStartupTrace` blocks removed.
 - 🟡 Bundled Bible DB opened `readOnly` in some paths (`bible_database_service.dart:332,398`) but `readOnly: false` at `:617`. Confirm user data lives outside the content DB. No visible versioned `onUpgrade` migrations.
 - ❌ No Flutter version pin (`.fvmrc`). `.metadata` shows stable `84fc5cb`.
 - ✅ `pubspec.lock` committed. 🔍 `flutter pub outdated` review.
@@ -83,22 +85,22 @@ Legend: ✅ done · 🟡 partial · ❌ not done · 🔍 needs manual or device 
 
 | Item | Status |
 | --- | --- |
-| Root `test_db.dart` (empty), `test_script.dart` (empty), `test_devotional.dart` (scratch) | ❌ delete |
-| `tool/` and `tools/` merge | ❌ both exist (`tools/` has Hebrews JSON, Doré fetchers, commentary studio) |
-| `evaluate_headings.jq` into `tool/` | ❌ |
-| `OVERNIGHT_CHANGELOG.md`, `RELEASE_NOTES_prerelease-1.md`, `PROJECT_RULES.md` into `CHANGELOG.md` + `CONTRIBUTING.md` | ❌ |
-| `linux/`, `macos/`, `windows/`, `web/` removed or documented | ❌ |
+| Root `test_db.dart`, `test_script.dart`, `test_devotional.dart` | ✅ deleted |
+| `tool/` and `tools/` merge | ✅ `tools/` and `scripts/` merged into `tool/`, with `tool/README.md` |
+| `evaluate_headings.jq` into `tool/` | ✅ |
+| `OVERNIGHT_CHANGELOG.md`, `RELEASE_NOTES_prerelease-1.md`, `PROJECT_RULES.md` into `CHANGELOG.md` + `CONTRIBUTING.md` | ✅ |
+| `linux/`, `macos/`, `windows/`, `web/` removed or documented | ✅ removed (also `design-previews/`, and their `firebase.json` entries) |
 | `.gitignore` covers secrets and build output | ✅ (also has a long list of agent scratch filenames that can be trimmed) |
 | Large binaries in LFS | ✅ `.gitattributes` covers `bible.db`, `assets/packs/*.db`, `content_packs/*.db` |
-| README clone URL | ❌ points at `Baraka254/BlessedBibleApp`. Repo is `wakilibaraka/BlessedBibleApp`. |
+| README clone URL | ✅ fixed |
 | README feature list accurate | 🔍 after the sweep. Platform line still says "iOS planned". |
-| LICENSE file | ❌ none. README says "All rights reserved". Add a `LICENSE` stating proprietary. |
+| LICENSE file | ✅ proprietary `LICENSE` added; README links it |
 | Branch protection, CI checks, PR template | ❌ no `.github/` directory |
 | Tagged releases | 🔍 README links Releases. Version is `1.0.2+9`. |
 
 ## 4. Feature inventory
 Needs a device pass on both platforms. Notes from the code:
-- Cloud sync covers **bookmarks, highlights, streak, and custom plans only**. **Notes are not synced**, but the README implies backup of all personal data. Either add notes to sync or narrow the claim.
+- **Cloud sync is not reachable from the live UI.** `lib/services/cloud_sync_service.dart` (bookmarks, highlights, streak) was only called from `account_sync_card.dart`, which was itself dead and has been removed. Today only custom plans are written to Firestore (`custom_plan_builder_v2_screen.dart`). Decide: wire sync into `account_menu.dart` (and add notes), or delete the service and narrow the README and privacy-policy claims.
 - Backup is also available as a JSON share export (`backup_service.dart`).
 - Present beyond the README: dictionary, concordance, Strong's (`kjv_strongs`), cross-references, share-as-image, home widget, notifications, Bible Stories devotional. Record ship/defer/cut decisions for the store listing.
 
@@ -158,15 +160,15 @@ Blocked on sections 1, 11, and 14. Nothing store-side is verifiable from the rep
 
 Ordered so each phase unblocks the next. Each phase is roughly one PR.
 
-### Phase 1: Repo clean sweep (low risk, 1 PR)
+### Phase 1: Repo clean sweep ✅ done
 1. Delete `test_db.dart`, `test_script.dart`, `test_devotional.dart`.
 2. Merge `tools/` into `tool/`. Move `evaluate_headings.jq` there and add `tool/README.md`.
 3. Fold `OVERNIGHT_CHANGELOG.md` and `RELEASE_NOTES_prerelease-1.md` into `CHANGELOG.md`. Rename `PROJECT_RULES.md` to `CONTRIBUTING.md`.
 4. Fix the README clone URL. Add a proprietary `LICENSE`.
 5. Decide on `linux/`, `macos/`, `windows/`, `web/`, and `design-previews/` (delete or document as unsupported).
-6. Trim the `.gitignore` scratch-file list.
+6. Trim the `.gitignore` scratch-file list. *(Skipped: harmless, and it keeps local scratch files out of `git status`.)*
 
-### Phase 2: Dead code and dependencies (1 PR)
+### Phase 2: Dead code and dependencies ✅ done
 1. Delete the ~22 orphan files listed in 2.2, after a final check with DCM or `flutter analyze`.
 2. Remove the Bonheur Royale and Shadows Into Light fonts and the `flutter_timezone` dependency.
 3. Remove the empty `kStartupTrace` blocks. Replace `debugPrint` with a release-silent logger.
