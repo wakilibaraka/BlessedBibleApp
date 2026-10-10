@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
@@ -629,7 +630,7 @@ class _ShareCardSheetState extends ConsumerState<_ShareCardSheet> {
                     ? null
                     : () async {
                         setState(() => _sharing = true);
-                        HapticFeedback.mediumImpact();
+                        unawaited(HapticFeedback.mediumImpact());
                         await ShareService.shareImageFromBoundary(
                           boundaryKey: _boundaryKey,
                           filename: widget.filename,

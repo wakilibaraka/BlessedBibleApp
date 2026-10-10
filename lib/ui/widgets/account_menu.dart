@@ -87,7 +87,7 @@ class AccountAvatar extends ConsumerWidget {
 /// Opens the account menu bottom sheet (avatar menu): account header,
 /// Account, Settings, Backup, Restore, Reset and Sign in/out rows.
 void showAccountMenu(BuildContext context) {
-  showModalBottomSheet(
+  showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
     builder: (ctx) {
@@ -288,7 +288,7 @@ class _MenuTile extends StatelessWidget {
 /// Existing account sheet (sign in/out, delete account), shared with the
 /// account button. See account_button.dart for the source of truth.
 void _showAccountSheet(BuildContext context) {
-  showModalBottomSheet(
+  showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
     builder: (BuildContext context) {
@@ -474,7 +474,7 @@ Future<void> _signIn(
 /// Restore dialog: paste a backup JSON (same format as Settings).
 void _showRestoreDialog(BuildContext context, WidgetRef ref) {
   final controller = TextEditingController();
-  showDialog(
+  showDialog<void>(
     context: context,
     builder: (ctx) => AlertDialog(
       title: const Text('Restore from Backup'),
@@ -509,7 +509,7 @@ void _showRestoreDialog(BuildContext context, WidgetRef ref) {
 /// Destructive confirmation, then wipe all on-device user data.
 void _confirmReset(
     BuildContext sheetContext, BuildContext context, WidgetRef ref) {
-  showDialog(
+  showDialog<void>(
     context: context,
     builder: (ctx) => AlertDialog(
       title: const Text('Reset app?'),

@@ -41,7 +41,7 @@ class StreakNotifier extends Notifier<StreakState> {
     }
 
     // Calculate consecutive days
-    final sortedDates = dates.map((d) => DateTime.parse(d)).toList()
+    final sortedDates = dates.map(DateTime.parse).toList()
       ..sort((a, b) => b.compareTo(a));
 
     int consecutive = 0;

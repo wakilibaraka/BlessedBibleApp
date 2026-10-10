@@ -141,7 +141,7 @@ class OnboardingScreen extends ConsumerWidget {
                             .read(preferencesProvider)
                             .setOnboardingComplete(true);
                         Navigator.of(context).pushReplacement(
-                          PageRouteBuilder(
+                          PageRouteBuilder<void>(
                             pageBuilder: (_, __, ___) => const MainNavScreen(),
                             transitionsBuilder: (_, animation, __, child) {
                               return FadeTransition(

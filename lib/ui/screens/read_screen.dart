@@ -188,7 +188,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     final isFloating = style == PopupStyle.floating;
 
     if (isFloating) {
-      showDialog(
+      showDialog<void>(
         context: context,
         builder: (context) => DictionaryEntrySheet(
           normalizedWord: normalizedWord,
@@ -196,7 +196,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         ),
       );
     } else {
-      showModalBottomSheet(
+      showModalBottomSheet<void>(
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
@@ -278,7 +278,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     }
 
     HapticFeedback.mediumImpact();
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       useRootNavigator: true,
@@ -537,7 +537,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   }
 
   void _showSelectorBottomSheet(List<BibleBook> allBooks) {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
@@ -551,7 +551,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           selectedChapter: loc.chapter,
           onSelectionChanged: (abbrev, name, chapter, verse,
               {bool autoClose = true}) {
-            bool changedChapter =
+            final bool changedChapter =
                 loc.bookAbbrev != abbrev || loc.chapter != chapter;
             ref.read(readLocationProvider.notifier).updateLocation(
                   bookAbbrev: abbrev,
@@ -713,7 +713,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                     color: tokens.readingInk,
                   ),
                 ), () {
-              showModalBottomSheet(
+              showModalBottomSheet<void>(
                 context: context,
                 isScrollControlled: true,
                 useRootNavigator: true,
@@ -1329,7 +1329,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                           )));
                                                           if (index ==
                                                               verses.length) {
-                                                            bool
+                                                            final bool
                                                                 hasChapterCommentary =
                                                                 chaptersWithCommentary
                                                                     .contains(
@@ -1445,17 +1445,17 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                             _) {
                                                                   final verseKey =
                                                                       '${fc.book.name}|${fc.chapter.number}|${verse.number}';
-                                                                  bool
+                                                                  final bool
                                                                       hasCommentary =
                                                                       versesWithCommentary
                                                                           .contains(
                                                                               verseKey);
-                                                                  bool
+                                                                  final bool
                                                                       hasDevotional =
                                                                       versesWithDevotionals
                                                                           .contains(
                                                                               verseKey);
-                                                                  bool
+                                                                  final bool
                                                                       hasStudyNote =
                                                                       versesWithNotes
                                                                           .contains(
@@ -1530,8 +1530,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                             .text),
                                                                     onDevotionalTap:
                                                                         () async {
-                                                                      HapticFeedback
-                                                                          .selectionClick();
+                                                                      unawaited(
+                                                                          HapticFeedback
+                                                                              .selectionClick());
                                                                       final refStr =
                                                                           '${fc.book.name} ${fc.chapter.number}:${verse.number}';
                                                                       final service =
@@ -1547,7 +1548,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                           context
                                                                               .mounted) {
                                                                         Navigator.of(context)
-                                                                            .push(MaterialPageRoute(
+                                                                            .push(MaterialPageRoute<void>(
                                                                           builder: (_) =>
                                                                               BibleStoryReaderScreen(initialStory: story),
                                                                         ));
@@ -2161,7 +2162,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                               }
                             } else {
                               // Uninstalled: Prompt download by opening picker
-                              showModalBottomSheet(
+                              showModalBottomSheet<void>(
                                 context: context,
                                 isScrollControlled: true,
                                 useRootNavigator: true,
@@ -2306,7 +2307,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     }
 
     final redLetterStyle = fontStyle.copyWith(color: redLetterColor);
-    List<InlineSpan> textSpans = [];
+    final List<InlineSpan> textSpans = [];
 
     String text = verse.text;
 
@@ -2423,7 +2424,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     }
 
     while (currentIndex < text.length) {
-      int startIndex = text.indexOf('‹', currentIndex);
+      final int startIndex = text.indexOf('‹', currentIndex);
       if (startIndex == -1) {
         processChunk(text.substring(currentIndex), fontStyle);
         break;
@@ -2433,7 +2434,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         processChunk(text.substring(currentIndex, startIndex), fontStyle);
       }
 
-      int endIndex = text.indexOf('›', startIndex + 1);
+      final int endIndex = text.indexOf('›', startIndex + 1);
       if (endIndex == -1) {
         processChunk(text.substring(startIndex + 1), redLetterStyle);
         break;
@@ -2758,7 +2759,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                               ref
                                   .read(activePlanContextProvider.notifier)
                                   .setContext(null);
-                              showDialog(
+                              showDialog<void>(
                                   context: context,
                                   barrierDismissible: false,
                                   builder: (dialogContext) =>
@@ -2914,7 +2915,7 @@ class VerseActionLogic {
       int chapterNum,
       List<int> targetVerses,
       VoidCallback onClearSelection) {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       useRootNavigator: true,
@@ -3056,7 +3057,7 @@ class VerseActionLogic {
       int chapterNum,
       List<int> targetVerses,
       int activeIndex) {
-    bool isRemoving = targetVerses.every((v) {
+    final bool isRemoving = targetVerses.every((v) {
       final refStr = generateVerseKey(bookAbbrev, chapterNum, v);
       return ref.read(highlightsProvider)[refStr] == activeIndex;
     });
@@ -3122,7 +3123,7 @@ class VerseActionLogic {
     await showAddNoteSheet(context, ref, theme, initialReference: refStr);
   }
 
-  static dynamic getChapterData(
+  static BibleChapter? getChapterData(
       WidgetRef ref, String bookName, int chapterNum) {
     final flatChapters = ref.read(flatChaptersProvider);
     if (flatChapters.isNotEmpty) {
@@ -3142,11 +3143,10 @@ class VerseActionLogic {
   static List<String> primaryShareTexts(
       WidgetRef ref, String bookName, int chapterNum, List<int> sorted) {
     final chapterData = getChapterData(ref, bookName, chapterNum);
-    final verses = chapterData?.verses as List? ?? [];
+    final verses = chapterData?.verses ?? const <BibleVerse>[];
     return [
       for (final v in sorted)
-        if (v - 1 >= 0 && v - 1 < verses.length)
-          (verses[v - 1].text as String? ?? ''),
+        if (v - 1 >= 0 && v - 1 < verses.length) verses[v - 1].text,
     ];
   }
 
@@ -3168,6 +3168,7 @@ class VerseActionLogic {
       secondaryReference: share.reference,
       secondaryTag: share.secondaryTag,
     );
+    if (!context.mounted) return;
     await ShareService.copyText(context, text);
   }
 

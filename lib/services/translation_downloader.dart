@@ -249,8 +249,8 @@ class TranslationDownloader {
         final response = await request.send();
 
         if (response.statusCode == 200) {
-          int totalBytes =
-              response.contentLength ?? (meta['sizeMB'] * 1024 * 1024).toInt();
+          final int totalBytes = response.contentLength ??
+              ((meta['sizeMB'] as num) * 1024 * 1024).toInt();
           int receivedBytes = 0;
           final List<int> bytes = [];
 
@@ -268,7 +268,7 @@ class TranslationDownloader {
       } catch (e) {
         lastError = e as Exception;
         if (i < _maxRetries - 1) {
-          await Future.delayed(_retryDelay * (i + 1));
+          await Future<void>.delayed(_retryDelay * (i + 1));
         }
       }
     }
@@ -304,7 +304,7 @@ class TranslationDownloader {
         final request = http.Request('GET', Uri.parse(url));
         final response = await request.send();
         if (response.statusCode == 200) {
-          int totalBytes = response.contentLength ??
+          final int totalBytes = response.contentLength ??
               ((meta['sizeMB'] as num) * 1024 * 1024).toInt();
           int receivedBytes = 0;
           final chunks = <int>[];
@@ -321,7 +321,7 @@ class TranslationDownloader {
       } catch (e) {
         lastError = e as Exception;
         if (i < _maxRetries - 1) {
-          await Future.delayed(_retryDelay * (i + 1));
+          await Future<void>.delayed(_retryDelay * (i + 1));
         }
       }
     }
@@ -363,7 +363,7 @@ class TranslationDownloader {
         final bookNum = m['book'] as int;
         final chapter = m['chapter'] as int;
         final verse = m['verse'] as int;
-        String text = (m['text'] as String)
+        final String text = (m['text'] as String)
             .replaceAll('¶ ', '')
             .replaceAll('¶', '')
             .trim()

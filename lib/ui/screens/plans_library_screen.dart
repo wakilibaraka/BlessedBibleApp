@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -105,7 +106,7 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
 
   void _push(Widget page) {
     HapticFeedback.selectionClick();
-    Navigator.of(context).push(CupertinoPageRoute(builder: (_) => page));
+    Navigator.of(context).push(CupertinoPageRoute<void>(builder: (_) => page));
   }
 
   String _planTitle(String id) {
@@ -196,7 +197,7 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
 
   /// Header date tap: pick any date, then slide the rail to that week.
   Future<void> _pickDateAndScroll() async {
-    HapticFeedback.selectionClick();
+    unawaited(HapticFeedback.selectionClick());
     final now = DateTime.now();
     final picked = await showDatePicker(
       context: context,
@@ -213,7 +214,7 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
     final now = DateTime.now();
     HapticFeedback.selectionClick();
     final verse = verseForDay(ref.read(votdPoolProvider), now);
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -231,12 +232,12 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
 
   /// Opens the story that owns the day's artwork plate.
   Future<void> _openPlate(StoryPlate plate) async {
-    HapticFeedback.selectionClick();
+    unawaited(HapticFeedback.selectionClick());
     final story = await ref
         .read(devotionalServiceProvider)
         .firstStoryForPrefix(plate.prefix);
     if (story == null || !mounted) return;
-    await Navigator.of(context).push(CupertinoPageRoute(
+    await Navigator.of(context).push(CupertinoPageRoute<void>(
       builder: (_) => BibleStoryReaderScreen(initialStory: story),
     ));
   }

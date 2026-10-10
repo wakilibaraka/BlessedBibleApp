@@ -45,14 +45,14 @@ class SearchResult {
       };
 
   factory SearchResult.fromJson(Map<String, dynamic> json) => SearchResult(
-        title: json['title'],
-        subtitle: json['subtitle'],
-        snippet: json['snippet'],
+        title: json['title'] as String,
+        subtitle: json['subtitle'] as String,
+        snippet: json['snippet'] as String,
         type: SearchResultType.values.firstWhere(
           (e) => e.name == json['type'],
           orElse: () => SearchResultType.bible,
         ),
-        metadata: json['metadata'] ?? {},
+        metadata: (json['metadata'] as Map<String, dynamic>?) ?? {},
       );
 }
 
@@ -240,7 +240,7 @@ IndexData buildIndexIsolate(IndexBuildArgs args) {
       final chapterNum = scope.chapter;
       final verseNum = scope.verse;
 
-      String authorLabel =
+      final String authorLabel =
           entry.author.isNotEmpty ? '${entry.author} Commentary' : 'Commentary';
       String locTitle = bookName;
       if (chapterNum != null) locTitle += ' $chapterNum';
@@ -475,7 +475,7 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
         int startIndex = sortedKeys.length;
 
         while (low <= high) {
-          int mid = (low + high) >> 1;
+          final int mid = (low + high) >> 1;
           if (sortedKeys[mid].compareTo(token) >= 0) {
             startIndex = mid;
             high = mid - 1;
@@ -676,7 +676,7 @@ final baseSearchIndexProvider = FutureProvider<IndexData>((ref) async {
     pericopes,
     [], // Notes handled dynamically
   );
-  return await compute(buildIndexIsolate, args);
+  return compute(buildIndexIsolate, args);
 });
 
 final searchEngineProvider = Provider<SearchEngine>((ref) {

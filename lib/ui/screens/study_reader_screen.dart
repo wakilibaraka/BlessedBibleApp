@@ -156,8 +156,8 @@ List<_ParsedRef> _parseRef(String ref) {
 
   final results = <_ParsedRef>[];
   for (int c = startC; c <= endC; c++) {
-    int? sV = (c == startC) ? startV : null;
-    int? eV = (c == endC) ? endV : null;
+    final int? sV = (c == startC) ? startV : null;
+    final int? eV = (c == endC) ? endV : null;
     results.add(_ParsedRef(
       bookName: bookName,
       chapter: c,
@@ -337,7 +337,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
     });
   }
 
-  void _clearSelection() => setState(() => _selectedVerses.clear());
+  void _clearSelection() => setState(_selectedVerses.clear);
 
   void _showCommentary(
       int verseNum, String verseText, String bookName, int chapterNum) {
@@ -738,7 +738,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                                 },
                                 onLongPress: () {
                                   HapticFeedback.mediumImpact();
-                                  showModalBottomSheet(
+                                  showModalBottomSheet<void>(
                                     context: context,
                                     backgroundColor: Colors.transparent,
                                     useRootNavigator: true,
@@ -793,7 +793,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                                     final List<TextSpan> spans = [];
                                     final redStyle = fontStyle.copyWith(
                                         color: redLetterColor);
-                                    String text = verse.text;
+                                    final String text = verse.text;
                                     int cur = 0;
                                     while (cur < text.length) {
                                       final s = text.indexOf('‹', cur);

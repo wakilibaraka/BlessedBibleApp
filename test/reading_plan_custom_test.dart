@@ -69,7 +69,7 @@ void main() {
     // Trigger provider creation (starts async load).
     container.read(readingPlanProvider('custom-1'));
     // Let the async load finish.
-    await Future.delayed(const Duration(milliseconds: 200));
+    await Future<void>.delayed(const Duration(milliseconds: 200));
 
     final loaded = container.read(readingPlanProvider('custom-1'));
     expect(loaded.error, isNull);
@@ -101,7 +101,7 @@ void main() {
           testCustomPlan(),
         );
     container.read(readingPlanProvider('custom-1'));
-    await Future.delayed(const Duration(milliseconds: 200));
+    await Future<void>.delayed(const Duration(milliseconds: 200));
 
     final state = container.read(readingPlanProvider('custom-1'));
     expect(state.error, isNull);
@@ -127,7 +127,7 @@ void main() {
           testCustomPlan(),
         );
     container.read(readingPlanProvider('custom-1'));
-    await Future.delayed(const Duration(milliseconds: 200));
+    await Future<void>.delayed(const Duration(milliseconds: 200));
 
     final notifier = container.read(readingPlanProvider('custom-1').notifier);
     notifier.markReadingComplete(2);
@@ -163,7 +163,7 @@ void main() {
           testCustomPlan(),
         );
     container.read(readingPlanProvider('custom-1'));
-    await Future.delayed(const Duration(milliseconds: 200));
+    await Future<void>.delayed(const Duration(milliseconds: 200));
 
     final notifier = container.read(readingPlanProvider('custom-1').notifier);
     notifier.markReadingComplete(1);
@@ -203,7 +203,7 @@ void main() {
           testCustomPlan(),
         );
     container.read(readingPlanProvider('custom-1'));
-    await Future.delayed(const Duration(milliseconds: 200));
+    await Future<void>.delayed(const Duration(milliseconds: 200));
 
     final notifier = container.read(readingPlanProvider('custom-1').notifier);
     // Legacy single day still works when the set is empty.
@@ -239,7 +239,7 @@ void main() {
           testCustomPlan(),
         );
     container.read(readingPlanProvider('custom-1'));
-    await Future.delayed(const Duration(milliseconds: 200));
+    await Future<void>.delayed(const Duration(milliseconds: 200));
 
     final notifier = container.read(readingPlanProvider('custom-1').notifier);
     notifier.markAllPreviousRead(2);
@@ -260,7 +260,7 @@ void main() {
     addTearDown(container.dispose);
 
     container.read(readingPlanProvider('chronological_1yr'));
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future<void>.delayed(const Duration(milliseconds: 500));
 
     final state = container.read(readingPlanProvider('chronological_1yr'));
     expect(state.error, isNull);
@@ -288,7 +288,7 @@ void main() {
           testCustomPlan(),
         );
     container.read(readingPlanProvider('custom-1'));
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future<void>.delayed(const Duration(milliseconds: 500));
 
     var notifier = container.read(readingPlanProvider('custom-1').notifier);
     notifier
@@ -300,7 +300,7 @@ void main() {
     // Partial multi-chapter day: marking one chapter stays honest —
     // atoms spanning beyond the chapter are correctly left alone.
     container.read(readingPlanProvider('chronological_1yr'));
-    await Future.delayed(const Duration(milliseconds: 800));
+    await Future<void>.delayed(const Duration(milliseconds: 800));
     notifier =
         container.read(readingPlanProvider('chronological_1yr').notifier);
     notifier
@@ -332,7 +332,7 @@ void main() {
       final pericopes =
           (jsonDecode(File('assets/data/pericopes.json').readAsStringSync())
                   as List)
-              .map((j) => PericopeEntry.fromJson(j))
+              .map((j) => PericopeEntry.fromJson(j as Map<String, dynamic>))
               .toList();
       final generator =
           PlanGenerator(wordCountService: wcs, allPericopes: pericopes);
@@ -364,7 +364,7 @@ void main() {
       for (var i = 0; i < 100; i++) {
         final s = container.read(readingPlanProvider('pace-test'));
         if (!s.isLoading) break;
-        await Future.delayed(const Duration(milliseconds: 100));
+        await Future<void>.delayed(const Duration(milliseconds: 100));
       }
     });
     var state = container.read(readingPlanProvider('pace-test'));
@@ -389,7 +389,7 @@ void main() {
       for (var i = 0; i < 100; i++) {
         final s = container.read(readingPlanProvider('pace-test'));
         if (!s.isLoading) break;
-        await Future.delayed(const Duration(milliseconds: 100));
+        await Future<void>.delayed(const Duration(milliseconds: 100));
       }
     });
     expect(err, isNull);

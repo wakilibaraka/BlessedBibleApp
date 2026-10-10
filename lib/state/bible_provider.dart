@@ -66,7 +66,7 @@ final flatChaptersProvider = Provider<List<FlatChapter>>((ref) {
   final bibleState = ref.watch(bibleProvider);
   if (bibleState.isLoading || bibleState.books.isEmpty) return [];
 
-  List<FlatChapter> chapters = [];
+  final List<FlatChapter> chapters = [];
   for (int i = 0; i < bibleState.books.length; i++) {
     final book = bibleState.books[i];
     final bookNum = i + 1;
@@ -86,6 +86,6 @@ typedef ChapterKey = ({
 final translationChapterProvider =
     FutureProvider.family<List<BibleVerse>, ChapterKey>((ref, key) async {
   // If kjv, we could technically still use the loaded JSON, but DB is consistent.
-  return await bibleDbService.getChapter(
+  return bibleDbService.getChapter(
       key.translationId, key.bookNumber, key.chapterNumber);
 });

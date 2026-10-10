@@ -255,7 +255,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
   void _openBookPicker(List<DevotionalBookInfo> books) {
     final theme = Theme.of(context);
     final query = TextEditingController();
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
@@ -580,7 +580,7 @@ class _StoryCard extends ConsumerWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
         onTap: () {
-          Navigator.of(context).push(CupertinoPageRoute(
+          Navigator.of(context).push(CupertinoPageRoute<void>(
             builder: (_) => BibleStoryReaderScreen(initialStory: story),
           ));
         },

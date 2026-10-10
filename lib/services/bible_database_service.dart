@@ -674,7 +674,7 @@ class BibleDatabaseService {
       'translations',
       orderBy: 'language_name ASC, translation_name ASC',
     );
-    final infos = maps.map((map) => TranslationInfo.fromMap(map)).toList();
+    final infos = maps.map(TranslationInfo.fromMap).toList();
     for (final meta in await _packStore.installedPacks()) {
       infos.add(meta.toInfo());
     }
@@ -724,7 +724,7 @@ class BibleDatabaseService {
 
   Future<List<Map<String, dynamic>>> getAllVerses(String translationId) async {
     final db = await _dbForTranslation(translationId);
-    return await db.query(
+    return db.query(
       'verses',
       columns: ['book_number', 'chapter', 'verse', 'text'],
       where: 'translation_id = ?',

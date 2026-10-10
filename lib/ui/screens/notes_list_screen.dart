@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -141,7 +142,7 @@ Future<void> showAddNoteSheet(
     {String? initialReference,
     PersonalNote? editingNote,
     String? editingId}) async {
-  await showModalBottomSheet(
+  await showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
@@ -286,7 +287,7 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
     });
     final books = ref.read(bibleProvider).books;
 
-    showModalBottomSheet(
+    unawaited(showModalBottomSheet<void>(
         context: context,
         backgroundColor: Colors.transparent,
         isScrollControlled: true,
@@ -366,7 +367,7 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
                           }
                         })));
               },
-            ));
+            )));
   }
 
   void _insertDate() {

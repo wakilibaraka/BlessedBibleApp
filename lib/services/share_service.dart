@@ -215,8 +215,7 @@ class ShareService {
   /// Shares text via native share sheet using share_plus.
   static Future<void> shareText({required String body, String? subject}) async {
     try {
-      // ignore: deprecated_member_use
-      await Share.share(body, subject: subject);
+      await SharePlus.instance.share(ShareParams(text: body, subject: subject));
     } catch (e) {
       logDebug('Share failed: $e');
     }
@@ -241,8 +240,8 @@ class ShareService {
       final file = File(
           '${dir.path}/$filename-${DateTime.now().millisecondsSinceEpoch}.png');
       await file.writeAsBytes(bytes.buffer.asUint8List());
-      // ignore: deprecated_member_use
-      await Share.shareXFiles([XFile(file.path)], text: caption);
+      await SharePlus.instance
+          .share(ShareParams(files: [XFile(file.path)], text: caption));
     } catch (e) {
       logDebug('Share image failed: $e');
     }

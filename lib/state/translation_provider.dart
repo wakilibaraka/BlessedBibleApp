@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/local_storage/preferences_service.dart';
 import '../data/models/translation_model.dart';
@@ -19,7 +20,8 @@ class TranslationNotifier extends Notifier<String> {
     // Guard: Prevent primary and secondary from being equal
     final secondaryId = ref.read(secondaryTranslationProvider);
     if (secondaryId == translationId) {
-      ref.read(secondaryTranslationProvider.notifier).setTranslation(null);
+      unawaited(
+          ref.read(secondaryTranslationProvider.notifier).setTranslation(null));
     }
   }
 }
@@ -52,7 +54,7 @@ final secondaryTranslationProvider =
 
 final availableTranslationsProvider =
     FutureProvider<List<TranslationInfo>>((ref) async {
-  return await bibleDbService.getTranslations();
+  return bibleDbService.getTranslations();
 });
 
 typedef VerseRequest = ({
@@ -64,7 +66,7 @@ typedef VerseRequest = ({
 
 final verseTranslationProvider =
     FutureProvider.family<BibleVerse?, VerseRequest>((ref, request) async {
-  return await bibleDbService.getVerse(
+  return bibleDbService.getVerse(
     request.translationId,
     request.bookNumber,
     request.chapter,

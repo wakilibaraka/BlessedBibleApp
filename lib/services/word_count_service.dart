@@ -35,9 +35,9 @@ class WordCountService {
   int wordsInVerse(String book, int chapter, int verse) {
     _ensureInitialized();
     try {
-      final bookData = _data![book];
+      final bookData = _data![book] as Map<String, dynamic>?;
       if (bookData == null) return 0;
-      final chapterData = bookData[chapter.toString()];
+      final chapterData = bookData[chapter.toString()] as Map<String, dynamic>?;
       if (chapterData == null) return 0;
       final verses = chapterData['verses'] as Map<String, dynamic>;
       return (verses[verse.toString()] as num?)?.toInt() ?? 0;
@@ -50,9 +50,9 @@ class WordCountService {
   int wordsInChapter(String book, int chapter) {
     _ensureInitialized();
     try {
-      final bookData = _data![book];
+      final bookData = _data![book] as Map<String, dynamic>?;
       if (bookData == null) return 0;
-      final chapterData = bookData[chapter.toString()];
+      final chapterData = bookData[chapter.toString()] as Map<String, dynamic>?;
       if (chapterData == null) return 0;
       return (chapterData['total'] as num).toInt();
     } catch (e) {
@@ -65,19 +65,19 @@ class WordCountService {
   int wordsInRange(String book, int startCh, int startV, int endCh, int endV) {
     _ensureInitialized();
 
-    final bookData = _data![book];
+    final bookData = _data![book] as Map<String, dynamic>?;
     if (bookData == null) return 0;
 
     int total = 0;
 
     for (int c = startCh; c <= endCh; c++) {
-      final chapterData = bookData[c.toString()];
+      final chapterData = bookData[c.toString()] as Map<String, dynamic>?;
       if (chapterData == null) continue;
 
       final verses = chapterData['verses'] as Map<String, dynamic>;
 
       // If we are in the start chapter, start from startV, else start from verse 1
-      int firstVerseInChapter = (c == startCh) ? startV : 1;
+      final int firstVerseInChapter = (c == startCh) ? startV : 1;
 
       // If we are in the end chapter, end at endV, else go to the end of the chapter
       int lastVerseInChapter = -1;
@@ -100,9 +100,9 @@ class WordCountService {
   int maxVerseInChapter(String book, int chapter) {
     _ensureInitialized();
     try {
-      final bookData = _data![book];
+      final bookData = _data![book] as Map<String, dynamic>?;
       if (bookData == null) return 0;
-      final chapterData = bookData[chapter.toString()];
+      final chapterData = bookData[chapter.toString()] as Map<String, dynamic>?;
       if (chapterData == null) return 0;
       final verses = chapterData['verses'] as Map<String, dynamic>;
       int maxV = 0;

@@ -23,7 +23,9 @@ void main() {
     // 2. Load Pericopes
     final pFile = File('assets/data/pericopes.json');
     final pList = jsonDecode(pFile.readAsStringSync()) as List;
-    allPericopes = pList.map((j) => PericopeEntry.fromJson(j)).toList();
+    allPericopes = pList
+        .map((j) => PericopeEntry.fromJson(j as Map<String, dynamic>))
+        .toList();
 
     generator = PlanGenerator(
       wordCountService: wordCountService,
@@ -134,14 +136,14 @@ void main() {
       final portion = day.portions.first;
 
       // Look for a pericope that matches the exact END of this portion
-      bool endsOnPericope = allPericopes.any((p) =>
+      final bool endsOnPericope = allPericopes.any((p) =>
           p.book == portion.book &&
           p.endChapter == portion.endChapter &&
           p.endVerse == portion.endVerse);
 
       if (!endsOnPericope) {
         // Did it end on a chapter boundary?
-        int maxV = wordCountService.maxVerseInChapter(
+        final int maxV = wordCountService.maxVerseInChapter(
             portion.book, portion.endChapter);
         if (portion.endVerse == maxV) {
           chapterBreaks++;
@@ -220,8 +222,8 @@ void main() {
       cadence: 7,
     );
 
-    int totalWords = wordCountService.wordsInRange('John', 1, 1, 21, 25);
-    int maxDays = (totalWords / 130).floor();
+    final int totalWords = wordCountService.wordsInRange('John', 1, 1, 21, 25);
+    final int maxDays = (totalWords / 130).floor();
 
     debugPrint('John total words: $totalWords');
     debugPrint('John in 2000 days clamped to actual days: ${plan.days}');
@@ -309,12 +311,12 @@ void main() {
       'Revelation'
     ];
 
-    List<PlanRange> ranges = [];
+    final List<PlanRange> ranges = [];
     for (var book in allBooks) {
       final bookP = allPericopes.where((p) => p.book == book).toList();
       if (bookP.isNotEmpty) {
-        int endCh = bookP.last.endChapter;
-        int endV = bookP.last.endVerse;
+        final int endCh = bookP.last.endChapter;
+        final int endV = bookP.last.endVerse;
         ranges.add(PlanRange(
             book: book,
             startChapter: 1,
@@ -413,7 +415,7 @@ void main() {
       'Revelation'
     ];
 
-    List<PlanRange> ranges = [];
+    final List<PlanRange> ranges = [];
     for (var book in allBooks) {
       // Find max chapter and max verse
       // We can just use large bounds and clamp, but we have maxVerseInChapter
@@ -422,8 +424,8 @@ void main() {
       // Better: we can extract bounds from allPericopes!
       final bookP = allPericopes.where((p) => p.book == book).toList();
       if (bookP.isNotEmpty) {
-        int endCh = bookP.last.endChapter;
-        int endV = bookP.last.endVerse;
+        final int endCh = bookP.last.endChapter;
+        final int endV = bookP.last.endVerse;
         ranges.add(PlanRange(
             book: book,
             startChapter: 1,

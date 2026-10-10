@@ -7,7 +7,7 @@ import '../models/pericope_entry.dart';
 import '../utils/log.dart';
 
 Map<String, List<PericopeEntry>> _parsePericopes(String jsonString) {
-  final List<dynamic> data = jsonDecode(jsonString);
+  final data = jsonDecode(jsonString) as List<dynamic>;
   final map = <String, List<PericopeEntry>>{};
   for (final item in data) {
     final entry = PericopeEntry.fromJson(item as Map<String, dynamic>);

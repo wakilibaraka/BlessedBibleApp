@@ -35,7 +35,7 @@ class DictionaryEntrySheet extends ConsumerWidget {
         ref.watch(bookmarkedWordsProvider).asData?.value ?? {};
     final isBookmarked = bookmarkedWords.contains(normalizedWord);
 
-    Widget content = Container(
+    final Widget content = Container(
       width:
           isFloating ? MediaQuery.sizeOf(context).width * 0.9 : double.infinity,
       constraints: BoxConstraints(
@@ -179,9 +179,10 @@ class DictionaryEntrySheet extends ConsumerWidget {
 
                       // Definition Blocks
                       ...defs.expand((def) {
-                        String formattedDef = def.definition.replaceAllMapped(
-                            RegExp(r'\s(\(\d+\.?\)|\d+\.|[IVX]+\.)\s'),
-                            (match) => '\n\n${match.group(1)} ');
+                        final String formattedDef = def.definition
+                            .replaceAllMapped(
+                                RegExp(r'\s(\(\d+\.?\)|\d+\.|[IVX]+\.)\s'),
+                                (match) => '\n\n${match.group(1)} ');
                         final paragraphs = formattedDef
                             .split(RegExp(r'\n+'))
                             .map((p) => p.trim())
@@ -285,7 +286,7 @@ class DictionaryEntrySheet extends ConsumerWidget {
               // Since we can't tell, let's just pass 'G$strongsId' as most Smith dictionary references are NT.
               // Actually, maybe it's fine to just show the DictionaryEntrySheet for the word instead of Strongs!
               // Let's launch DictionaryEntrySheet for 'word'
-              showDialog(
+              showDialog<void>(
                 context: context,
                 builder: (ctx) => DictionaryEntrySheet(
                     normalizedWord: word.toLowerCase(), isFloating: true),
@@ -313,7 +314,7 @@ class DictionaryEntrySheet extends ConsumerWidget {
                 final bookAbbrev = parts.sublist(0, parts.length - 1).join(' ');
 
                 if (ch != null && v != null) {
-                  showDialog(
+                  showDialog<void>(
                     context: context,
                     builder: (ctx) => VersePreviewDialog(
                       reference: verseRef,

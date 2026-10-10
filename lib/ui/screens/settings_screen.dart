@@ -27,7 +27,7 @@ import '../../data/local_storage/preferences_service.dart';
 import '../sheets/widget_settings_sheet.dart';
 
 final packageInfoProvider = FutureProvider<PackageInfo>((ref) async {
-  return await PackageInfo.fromPlatform();
+  return PackageInfo.fromPlatform();
 });
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -278,7 +278,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                         TextButton(
                           onPressed: () {
                             HapticFeedback.selectionClick();
-                            showModalBottomSheet(
+                            showModalBottomSheet<void>(
                               context: context,
                               isScrollControlled: true,
                               useRootNavigator: true,
@@ -651,7 +651,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                   Icon(Icons.restart_alt_rounded, color: theme.primaryColor),
               onTap: () {
                 HapticFeedback.selectionClick();
-                showDialog(
+                showDialog<void>(
                   context: context,
                   builder: (ctx) => AlertDialog(
                     title: const Text('Restart onboarding?'),
@@ -669,7 +669,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                               .read(preferencesProvider)
                               .setOnboardingComplete(false);
                           Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
+                            MaterialPageRoute<void>(
                                 builder: (_) => const OnboardingScreen()),
                             (route) => false,
                           );
@@ -818,7 +818,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                         '${_weekdayName(remindersState.customWeeklyDay)} at ${remindersState.customWeeklyHour.toString().padLeft(2, '0')}:${remindersState.customWeeklyMinute.toString().padLeft(2, '0')}'),
                     trailing: const Icon(Icons.edit_calendar_rounded),
                     onTap: () async {
-                      int? selectedDay = await showDialog<int>(
+                      final int? selectedDay = await showDialog<int>(
                         context: context,
                         builder: (ctx) => SimpleDialog(
                           title: const Text('Choose Day'),
@@ -1189,7 +1189,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             subtitle: const Text('Import your data from a backup JSON'),
             onTap: () {
               final controller = TextEditingController();
-              showDialog(
+              showDialog<void>(
                 context: context,
                 builder: (ctx) => AlertDialog(
                   title: const Text('Restore from Backup'),
@@ -1244,7 +1244,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             subtitle:
                 const Text('Restore original app settings (content is kept)'),
             onTap: () {
-              showDialog(
+              showDialog<void>(
                 context: context,
                 builder: (ctx) => AlertDialog(
                   title: const Text('Reset settings?'),
@@ -1351,7 +1351,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               },
             ),
             onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const StorageScreen()),
+              MaterialPageRoute<void>(builder: (_) => const StorageScreen()),
             ),
           ),
           const Divider(height: 1, indent: 16),
@@ -1373,7 +1373,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             onTap: () {
               Navigator.push(
                   context,
-                  MaterialPageRoute(
+                  MaterialPageRoute<void>(
                       builder: (_) => const PrivacyPolicyScreen()));
             },
           ),
@@ -1409,7 +1409,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
   }
 
   void _showLocationPicker(BuildContext context, RemindersNotifier notifier) {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Theme.of(context).colorScheme.surface,

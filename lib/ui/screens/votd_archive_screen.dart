@@ -175,7 +175,7 @@ class VotdArchiveScreen extends ConsumerWidget {
                                   ? refStr
                                       .substring(lastSpaceIdx + 1)
                                       .split(':')
-                                  : [];
+                                  : <String>[];
                               final chapterNum = refParts.isNotEmpty
                                   ? (int.tryParse(refParts[0]) ?? 1)
                                   : 1;
@@ -189,7 +189,8 @@ class VotdArchiveScreen extends ConsumerWidget {
                                       (bookName, chapterNum)));
                               if (!hasComm) return;
 
-                              Navigator.of(context).push(CupertinoPageRoute(
+                              Navigator.of(context)
+                                  .push(CupertinoPageRoute<void>(
                                 builder: (_) => CommentaryHubScreen(
                                   book: bookName,
                                   chapter: chapterNum,

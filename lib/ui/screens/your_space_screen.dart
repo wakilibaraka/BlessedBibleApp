@@ -321,7 +321,7 @@ class _HighlightsSegment extends ConsumerWidget {
 
 void _showAddFolderDialog(BuildContext context, WidgetRef ref) {
   final nameController = TextEditingController();
-  showDialog(
+  showDialog<void>(
     context: context,
     builder: (context) {
       return AlertDialog(
@@ -356,7 +356,7 @@ void _showAddFolderDialog(BuildContext context, WidgetRef ref) {
 void _showRenameFolderDialog(
     BuildContext context, WidgetRef ref, String folderId, String currentName) {
   final nameController = TextEditingController(text: currentName);
-  showDialog(
+  showDialog<void>(
     context: context,
     builder: (context) {
       return AlertDialog(
@@ -390,7 +390,7 @@ void _showRenameFolderDialog(
 
 void _showDeleteFolderDialog(
     BuildContext context, WidgetRef ref, String folderId, String folderName) {
-  showDialog(
+  showDialog<void>(
     context: context,
     builder: (context) {
       return AlertDialog(
@@ -420,7 +420,7 @@ void _showMoveToFolderSheet(
   final bookmarkData = ref.read(bookmarkDataProvider);
   final currentFolderId = bookmarkData.nodes[refStr]?.folderId;
 
-  showModalBottomSheet(
+  showModalBottomSheet<void>(
     context: context,
     backgroundColor: theme.scaffoldBackgroundColor,
     shape: const RoundedRectangleBorder(
@@ -510,7 +510,7 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
     filteredNodes.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
     // For grouping
-    Map<String, List<BookmarkNode>> groups = {};
+    final Map<String, List<BookmarkNode>> groups = {};
     if (_viewType == _BookmarkViewType.byDate) {
       final now = DateTime.now();
       for (final n in filteredNodes) {
@@ -1434,7 +1434,7 @@ void _showHighlightColorSheet(
   int? currentIndex,
 ) {
   HapticFeedback.mediumImpact();
-  showModalBottomSheet(
+  showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
     builder: (ctx) => SafeArea(

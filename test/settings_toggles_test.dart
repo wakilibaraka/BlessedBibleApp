@@ -34,7 +34,7 @@ Future<T> reloaded<T>(T Function(ProviderContainer c) read) async {
   c.read(bibleNavSettingsProvider);
   c.read(readSettingsProvider);
   c.read(searchSettingsProvider);
-  await Future.delayed(const Duration(milliseconds: 300));
+  await Future<void>.delayed(const Duration(milliseconds: 300));
   return read(c);
 }
 

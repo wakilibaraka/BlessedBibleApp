@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
@@ -102,7 +103,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   /// Verse-of-the-day share: text flavors plus an image card whose
   /// artwork option reuses today's bundled Doré plate.
   Future<void> _shareVotd(VerseOfTheDay votd) async {
-    HapticFeedback.selectionClick();
+    unawaited(HapticFeedback.selectionClick());
     final plate =
         await ref.read(devotionalServiceProvider).plateForDay(DateTime.now());
     if (!mounted) return;
@@ -201,7 +202,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   StrictHorizontalDragGestureRecognizer:
                       GestureRecognizerFactoryWithHandlers<
                           StrictHorizontalDragGestureRecognizer>(
-                    () => StrictHorizontalDragGestureRecognizer(),
+                    StrictHorizontalDragGestureRecognizer.new,
                     (StrictHorizontalDragGestureRecognizer instance) {
                       instance
                         ..onUpdate = (details) {}
@@ -224,7 +225,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   backgroundColor: Theme.of(context).colorScheme.surface,
                   onRefresh: () async {
                     // CMS: fetch remote content here in future
-                    await Future.delayed(const Duration(milliseconds: 500));
+                    await Future<void>.delayed(
+                        const Duration(milliseconds: 500));
                     ref.invalidate(homeProvider);
                   },
                   child: SingleChildScrollView(
@@ -249,7 +251,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final theme = Theme.of(context);
 
     // Get dynamic commentary snippet for VOTD
-    String? excerpt = data.verseOfTheDay.commentarySnippet;
+    final String? excerpt = data.verseOfTheDay.commentarySnippet;
 
     // Parse VOTD reference for availability check
     final votdRef = data.verseOfTheDay.reference;
@@ -423,7 +425,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                   ? refStr
                                       .substring(lastSpaceIdx + 1)
                                       .split(':')
-                                  : [];
+                                  : <String>[];
                               final chapterNum = refParts.isNotEmpty
                                   ? (int.tryParse(refParts[0]) ?? 1)
                                   : 1;
@@ -604,7 +606,7 @@ class WordOfTheDaySection extends ConsumerWidget {
                             label: 'Read Full Definition',
                             filled: true,
                             onPressed: () {
-                              showModalBottomSheet(
+                              showModalBottomSheet<void>(
                                 context: context,
                                 isScrollControlled: true,
                                 backgroundColor: Colors.transparent,

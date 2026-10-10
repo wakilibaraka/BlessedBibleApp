@@ -23,7 +23,7 @@ class _DictionaryV2ScreenState extends ConsumerState<DictionaryV2Screen> {
   bool _savedOnly = false;
 
   void _openEntry(String normalizedWord) {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,

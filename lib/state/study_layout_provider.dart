@@ -115,7 +115,7 @@ class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
     final prefsJson = ref.read(preferencesProvider).getStudyLayout();
     if (prefsJson != null) {
       try {
-        final List<dynamic> decoded = jsonDecode(prefsJson);
+        final List<dynamic> decoded = jsonDecode(prefsJson) as List<dynamic>;
         final loaded = decoded
             .map((e) => StudyCardConfig.fromJson(e as Map<String, dynamic>))
             .toList();

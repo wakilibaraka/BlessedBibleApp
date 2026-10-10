@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -182,7 +183,7 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
     required String success,
   }) async {
     if (_busy) return;
-    HapticFeedback.mediumImpact();
+    unawaited(HapticFeedback.mediumImpact());
     setState(() => _busy = true);
     int freed = 0;
     String? error;

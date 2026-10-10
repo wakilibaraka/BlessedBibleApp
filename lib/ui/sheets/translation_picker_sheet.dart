@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -271,8 +272,8 @@ class _TranslationPickerSheetState
   List<String> _sortedLangs(Iterable<String> langs) {
     final sortedKeys = langs.toList()
       ..sort((a, b) {
-        int pA = _getLanguagePriority(a);
-        int pB = _getLanguagePriority(b);
+        final int pA = _getLanguagePriority(a);
+        final int pB = _getLanguagePriority(b);
         if (pA != pB) return pA.compareTo(pB);
         return a.compareTo(b); // Alphabetical fallback
       });
@@ -492,7 +493,7 @@ class _DownloadableTileState extends ConsumerState<_DownloadableTile> {
       _progress = 0.0;
     });
 
-    final tid = widget.item['db_id'] ?? widget.item['id'];
+    final tid = (widget.item['db_id'] ?? widget.item['id']) as String;
     try {
       if (_isRestore) {
         // Bundled pack the user removed: re-copy from the APK (instant,
@@ -513,9 +514,12 @@ class _DownloadableTileState extends ConsumerState<_DownloadableTile> {
 
         // Auto-select after download
         if (widget.isSecondary) {
-          ref.read(secondaryTranslationProvider.notifier).setTranslation(tid);
+          unawaited(ref
+              .read(secondaryTranslationProvider.notifier)
+              .setTranslation(tid));
         } else {
-          ref.read(activeTranslationProvider.notifier).setTranslation(tid);
+          unawaited(
+              ref.read(activeTranslationProvider.notifier).setTranslation(tid));
         }
 
         Navigator.of(context).pop();

@@ -64,7 +64,9 @@ void main() {
     final pList =
         jsonDecode(File('assets/data/pericopes.json').readAsStringSync())
             as List;
-    allPericopes = pList.map((j) => PericopeEntry.fromJson(j)).toList();
+    allPericopes = pList
+        .map((j) => PericopeEntry.fromJson(j as Map<String, dynamic>))
+        .toList();
 
     generator = PlanGenerator(
       wordCountService: wordCountService,

@@ -294,7 +294,7 @@ class _CustomPlanBuilderV2ScreenState
     final allBooks = ref.read(bibleProvider).books;
     if (allBooks.isEmpty) return;
     final draft = _drafts[index];
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       useRootNavigator: true,
@@ -330,7 +330,7 @@ class _CustomPlanBuilderV2ScreenState
     final draft = _drafts[index];
     if (draft.startBook == null) return;
     final startIndex = allBooks.indexOf(draft.startBook!);
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       useRootNavigator: true,

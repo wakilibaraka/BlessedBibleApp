@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -125,7 +126,7 @@ class _ReadingPlanDetailV2ScreenState
     }
     ref.read(readingPlanProvider(widget.planId).notifier).setStartDate(shifted);
     if (!mounted) return;
-    HapticFeedback.mediumImpact();
+    unawaited(HapticFeedback.mediumImpact());
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -535,7 +536,7 @@ class _ReadingPlanDetailV2ScreenState
                                 tooltip: 'Journey map view',
                                 onPressed: () {
                                   Navigator.of(context).push(
-                                    MaterialPageRoute(
+                                    MaterialPageRoute<void>(
                                       builder: (_) => JourneyMapScreen(
                                           planId: widget.planId),
                                     ),
@@ -790,7 +791,7 @@ class _ReadingPlanDetailV2ScreenState
   void _showPlanSettings(dynamic plan) {
     final notifier = ref.read(readingPlanProvider(widget.planId).notifier);
     final meta = _metadata();
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (ctx) {
@@ -812,7 +813,7 @@ class _ReadingPlanDetailV2ScreenState
                   title: const Text('About this plan…'),
                   onTap: () {
                     Navigator.of(ctx).pop();
-                    showDialog(
+                    showDialog<void>(
                       context: context,
                       builder: (d) => AlertDialog(
                         title: Text(meta?.title ?? 'About this plan'),

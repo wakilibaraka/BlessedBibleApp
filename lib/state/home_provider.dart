@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/content_sync_service.dart';
 import '../data/models/home_data.dart';
@@ -103,9 +104,9 @@ class VotdOverrideNotifier extends AsyncNotifier<Map<String, String>> {
     final localCache = await _syncService.loadLocalCache();
 
     // Fire and forget background sync
-    _syncService.syncDeltas((newCache) {
+    unawaited(_syncService.syncDeltas((newCache) {
       state = AsyncData(newCache);
-    });
+    }));
 
     return localCache;
   }

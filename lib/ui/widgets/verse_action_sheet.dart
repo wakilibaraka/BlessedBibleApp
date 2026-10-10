@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -51,7 +52,7 @@ Future<bool> showVerseActionSheet(BuildContext context, WidgetRef ref) async {
   final allBookmarked = verses.every((v) =>
       bookmarks.contains(generateVerseKey(bookAbbrev, readLoc.chapter, v)));
 
-  HapticFeedback.lightImpact();
+  unawaited(HapticFeedback.lightImpact());
   final keepOpen = await showModalBottomSheet<bool>(
     context: context,
     isScrollControlled: true,
@@ -164,7 +165,7 @@ class VerseActionSheet extends StatelessWidget {
     required int actionCount,
     required List<SheetAction> actions,
   }) async {
-    HapticFeedback.lightImpact();
+    unawaited(HapticFeedback.lightImpact());
     final keepOpen = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,

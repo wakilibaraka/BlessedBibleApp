@@ -76,7 +76,7 @@ List<String> expandRef(Map<String, Map<int, List<int>>> canon, String ref) {
     book = alias;
   }
   final chapters = canon[book]!;
-  int c1 = int.parse(m.group(2)!);
+  final int c1 = int.parse(m.group(2)!);
   final v1s = m.group(3);
   final c2s = m.group(4);
   final v2s = m.group(5);

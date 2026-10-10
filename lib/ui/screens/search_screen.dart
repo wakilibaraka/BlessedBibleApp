@@ -88,14 +88,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
         result.type == SearchResultType.pericope) {
       ref.read(navProvider.notifier).setIndex(1);
       ref.read(readLocationProvider.notifier).updateLocation(
-            bookAbbrev: result.metadata['bookAbbrev'],
-            bookName: result.metadata['bookName'] ?? result.metadata['book'],
-            chapter: result.metadata['chapter'],
-            verse: result.metadata['verse'],
+            bookAbbrev: result.metadata['bookAbbrev'] as String?,
+            bookName: (result.metadata['bookName'] ?? result.metadata['book'])
+                as String?,
+            chapter: result.metadata['chapter'] as int?,
+            verse: result.metadata['verse'] as int?,
           );
     } else if (result.type == SearchResultType.dictionary) {
       final normWord = result.metadata['normalized_word'] as String;
-      showModalBottomSheet(
+      showModalBottomSheet<void>(
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
@@ -111,8 +112,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
       ref.read(readLocationProvider.notifier).updateLocation(
             bookAbbrev: book.abbreviation,
             bookName: bookName,
-            chapter: result.metadata['chapter'],
-            verse: result.metadata['verse'],
+            chapter: result.metadata['chapter'] as int?,
+            verse: result.metadata['verse'] as int?,
             openCommentary: true,
           );
     } else if (result.type == SearchResultType.note) {
@@ -328,7 +329,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                           // For now, let's just make it a chip that opens a modal.
                                           final books =
                                               ref.read(bibleProvider).books;
-                                          showModalBottomSheet(
+                                          unawaited(showModalBottomSheet<void>(
                                             context: context,
                                             backgroundColor:
                                                 theme.scaffoldBackgroundColor,
@@ -346,7 +347,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                                 },
                                               ),
                                             ),
-                                          );
+                                          ));
                                         },
                                         theme: theme,
                                       ),
@@ -415,7 +416,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                             horizontal: 8, vertical: 4),
                                         constraints: const BoxConstraints(),
                                         onPressed: () {
-                                          showModalBottomSheet(
+                                          showModalBottomSheet<void>(
                                             context: context,
                                             backgroundColor: Colors.transparent,
                                             isScrollControlled: true,
@@ -877,7 +878,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
       backgroundColor: highlightColor.withValues(alpha: 0.12),
     );
 
-    List<InlineSpan> spans = [];
+    final List<InlineSpan> spans = [];
     int start = 0;
     int idx;
 

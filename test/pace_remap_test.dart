@@ -48,7 +48,9 @@ void main() {
     final pList =
         jsonDecode(File('assets/data/pericopes.json').readAsStringSync())
             as List;
-    allPericopes = pList.map((j) => PericopeEntry.fromJson(j)).toList();
+    allPericopes = pList
+        .map((j) => PericopeEntry.fromJson(j as Map<String, dynamic>))
+        .toList();
 
     generator =
         PlanGenerator(wordCountService: wcs, allPericopes: allPericopes);
@@ -149,8 +151,7 @@ void main() {
     final completedVersesAfter = remapService.buildCompletedVerseSetPublic(
         result.newPlan.schedule, result.newCompletedReadings);
     // The after set should be a SUBSET of the before set.
-    expect(completedVersesAfter.every((v) => completedVersesBefore.contains(v)),
-        isTrue,
+    expect(completedVersesAfter.every(completedVersesBefore.contains), isTrue,
         reason:
             'Progress remap added verses that were not previously complete');
   });
@@ -183,8 +184,7 @@ void main() {
     // ── The after completed set must not exceed the before set ───────────────
     final completedVersesAfter = remapService.buildCompletedVerseSetPublic(
         result.newPlan.schedule, result.newCompletedReadings);
-    expect(completedVersesAfter.every((v) => completedVersesBefore.contains(v)),
-        isTrue);
+    expect(completedVersesAfter.every(completedVersesBefore.contains), isTrue);
 
     // ── There must be at least one incomplete day in the new plan ─────────────
     // (the straddle day or days beyond the progress frontier)

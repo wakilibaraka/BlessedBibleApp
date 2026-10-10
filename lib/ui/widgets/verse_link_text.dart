@@ -154,7 +154,7 @@ class _VerseLinkTextState extends State<VerseLinkText> {
         ? int.parse(endVerseStr!)
         : (midChapterStr != null ? int.parse(midChapterStr) : null);
 
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,

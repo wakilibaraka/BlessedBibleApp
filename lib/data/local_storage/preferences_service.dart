@@ -93,8 +93,10 @@ class PreferencesService {
     final jsonString = prefs.getString(_searchHistoryKey);
     if (jsonString != null) {
       try {
-        final List<dynamic> jsonList = jsonDecode(jsonString);
-        return jsonList.map((e) => SearchResult.fromJson(e)).toList();
+        final List<dynamic> jsonList = jsonDecode(jsonString) as List<dynamic>;
+        return jsonList
+            .map((e) => SearchResult.fromJson(e as Map<String, dynamic>))
+            .toList();
       } catch (e) {
         return [];
       }
@@ -161,7 +163,8 @@ class PreferencesService {
     final jsonString = prefs.getString(_highlightsKey);
     if (jsonString != null) {
       try {
-        final Map<String, dynamic> jsonMap = jsonDecode(jsonString);
+        final Map<String, dynamic> jsonMap =
+            jsonDecode(jsonString) as Map<String, dynamic>;
         return jsonMap.map((key, value) => MapEntry(key, value as int));
       } catch (e) {
         return {};
@@ -295,7 +298,7 @@ class PreferencesService {
     prefs.setString('$_customPlansKeyPrefix$id', jsonEncode(data));
 
     // Add to the list of IDs if not present
-    List<String> ids = getCustomPlanIds();
+    final List<String> ids = getCustomPlanIds();
     if (!ids.contains(id)) {
       ids.add(id);
       prefs.setStringList(_customPlanIdsKey, ids);
@@ -320,7 +323,7 @@ class PreferencesService {
 
   void deleteCustomPlan(String id) {
     prefs.remove('$_customPlansKeyPrefix$id');
-    List<String> ids = getCustomPlanIds();
+    final List<String> ids = getCustomPlanIds();
     if (ids.contains(id)) {
       ids.remove(id);
       prefs.setStringList(_customPlanIdsKey, ids);
@@ -357,7 +360,7 @@ class PreferencesService {
     Map<String, dynamic> map = {};
     if (jsonString != null) {
       try {
-        map = jsonDecode(jsonString);
+        map = jsonDecode(jsonString) as Map<String, dynamic>;
       } catch (_) {}
     }
 
@@ -468,7 +471,8 @@ class PreferencesService {
     final jsonString = prefs.getString(_verseVisitsKey);
     if (jsonString != null) {
       try {
-        final Map<String, dynamic> jsonMap = jsonDecode(jsonString);
+        final Map<String, dynamic> jsonMap =
+            jsonDecode(jsonString) as Map<String, dynamic>;
         return jsonMap.map((key, value) => MapEntry(key, value as int));
       } catch (e) {
         return {};

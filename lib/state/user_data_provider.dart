@@ -45,7 +45,7 @@ class BookmarkDataNotifier extends Notifier<BookmarkData> {
     if (jsonStr != null && jsonStr.isNotEmpty) {
       try {
         final decoded = jsonDecode(jsonStr);
-        return BookmarkData.fromJson(decoded);
+        return BookmarkData.fromJson(decoded as Map<String, dynamic>);
       } catch (e) {
         logDebug('Error parsing bookmarks_v2: $e');
       }
@@ -85,7 +85,8 @@ class BookmarkDataNotifier extends Notifier<BookmarkData> {
         bool verificationPassed = false;
         if (readBackStr != null) {
           try {
-            final readBack = BookmarkData.fromJson(jsonDecode(readBackStr));
+            final readBack = BookmarkData.fromJson(
+                jsonDecode(readBackStr) as Map<String, dynamic>);
             if (readBack.nodes.length == legacyMerged.length) {
               verificationPassed = true;
             }

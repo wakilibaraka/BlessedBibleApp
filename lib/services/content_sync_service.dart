@@ -48,7 +48,10 @@ class ContentSyncService<T> {
       final dir = await getApplicationDocumentsDirectory();
       final file = File('${dir.path}/$cacheFileName');
 
-      Map<String, dynamic> currentCache = {'lastSync': 0, 'data': {}};
+      Map<String, dynamic> currentCache = {
+        'lastSync': 0,
+        'data': <String, dynamic>{}
+      };
       if (await file.exists()) {
         final jsonString = await file.readAsString();
         currentCache = await compute(_parseJsonMap, jsonString);

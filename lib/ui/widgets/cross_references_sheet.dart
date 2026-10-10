@@ -230,7 +230,7 @@ class _CrossRefTileState extends ConsumerState<_CrossRefTile> {
       onTap: () {
         HapticFeedback.selectionClick();
         if (_verseText != null) {
-          showDialog(
+          showDialog<void>(
             context: context,
             builder: (_) => AlertDialog(
               title: Text(widget.refLabel),
@@ -305,7 +305,7 @@ void showCrossReferencesSheet(
   required int verse,
   required String bookName,
 }) {
-  showModalBottomSheet(
+  showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,

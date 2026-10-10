@@ -8,7 +8,7 @@ class JournalSegment extends ConsumerWidget {
 
   void _showAddJournalDialog(BuildContext context, WidgetRef ref) {
     final controller = TextEditingController();
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (c) => AlertDialog(
         title: const Text('New Journal Entry'),

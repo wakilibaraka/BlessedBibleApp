@@ -46,7 +46,7 @@ class PlanPassage {
   factory PlanPassage.fromJson(Map<String, dynamic> json) {
     return PlanPassage(
       label: json['label'] as String,
-      refs: List<String>.from(json['refs']),
+      refs: List<String>.from(json['refs'] as List),
     );
   }
   Map<String, dynamic> toJson() => {
@@ -73,7 +73,7 @@ class PlanDayData {
       week: json['week'] as int,
       title: json['title'] as String,
       passages: (json['passages'] as List)
-          .map((e) => PlanPassage.fromJson(e))
+          .map((e) => PlanPassage.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
@@ -414,7 +414,9 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
             await compute<String, Map<String, dynamic>>(
                 (s) => jsonDecode(s) as Map<String, dynamic>, jsonString);
         final rawReadings = decoded['readings'] as List;
-        planData = rawReadings.map((e) => PlanDayData.fromJson(e)).toList();
+        planData = rawReadings
+            .map((e) => PlanDayData.fromJson(e as Map<String, dynamic>))
+            .toList();
       }
 
       final prefsState =
@@ -471,19 +473,19 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
           if (customPlan.containsKey('schedule')) {
             final schedule = customPlan['schedule'] as List;
             finalPlanData = [];
-            for (final dayMap in schedule) {
+            for (final dayMap in schedule.cast<Map<String, dynamic>>()) {
               final dayNum = dayMap['dayNumber'] as int;
               final portions = dayMap['portions'] as List;
 
-              List<PlanPassage> passages = [];
-              for (final portionMap in portions) {
+              final List<PlanPassage> passages = [];
+              for (final portionMap in portions.cast<Map<String, dynamic>>()) {
                 final book = portionMap['book'] as String;
                 final startCh = portionMap['startChapter'] as int;
                 final startV = portionMap['startVerse'] as int;
                 final endCh = portionMap['endChapter'] as int;
                 final endV = portionMap['endVerse'] as int;
 
-                List<String> refs = [];
+                final List<String> refs = [];
                 for (int ch = startCh; ch <= endCh; ch++) {
                   if (startCh == endCh) {
                     refs.add('$book $ch:$startV-$endV');
@@ -515,8 +517,9 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
             }
           } else {
             final rawReadings = customPlan['readings'] as List;
-            finalPlanData =
-                rawReadings.map((e) => PlanDayData.fromJson(e)).toList();
+            finalPlanData = rawReadings
+                .map((e) => PlanDayData.fromJson(e as Map<String, dynamic>))
+                .toList();
           }
 
           // Restore paceMode and restDay saved inside the plan definition
@@ -895,7 +898,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
 
 final readingPlanProvider =
     NotifierProvider.family<ReadingPlanNotifier, ReadingPlanState, String>(
-  (planId) => ReadingPlanNotifier(planId),
+  ReadingPlanNotifier.new,
 );
 
 class ActivePlanIdsNotifier extends Notifier<List<String>> {

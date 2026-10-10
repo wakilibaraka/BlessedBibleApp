@@ -37,7 +37,7 @@ void main() {
     addTearDown(second.dispose);
     // First read builds (starting the async load); second read observes it.
     second.read(bibleNavSettingsProvider);
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future<void>.delayed(const Duration(milliseconds: 300));
     final state = second.read(bibleNavSettingsProvider);
     expect(state.homePullDownEnabled, isFalse);
     expect(state.homePullDownTarget, HomePullDownTarget.settings);
@@ -52,7 +52,7 @@ void main() {
     final container = ProviderContainer();
     addTearDown(container.dispose);
     container.read(bibleNavSettingsProvider);
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future<void>.delayed(const Duration(milliseconds: 300));
     expect(container.read(bibleNavSettingsProvider).homePullDownTarget,
         HomePullDownTarget.settings);
   });

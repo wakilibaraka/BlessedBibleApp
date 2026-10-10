@@ -11,7 +11,7 @@ final authStateProvider = StreamProvider<User?>((ref) {
 });
 
 /// Provides sign-in/out actions (no state, just methods).
-final authActionsProvider = Provider<AuthActions>((ref) => AuthActions(ref));
+final authActionsProvider = Provider<AuthActions>(AuthActions.new);
 
 class ReauthCancelledException implements Exception {
   final String message;

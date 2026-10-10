@@ -61,13 +61,12 @@ class BackupService {
 
       if (context.mounted) {
         final box = context.findRenderObject() as RenderBox?;
-        // ignore: deprecated_member_use
-        await Share.shareXFiles(
-          [XFile(file.path)],
+        await SharePlus.instance.share(ShareParams(
+          files: [XFile(file.path)],
           subject: 'The Blessed Bible Backup',
           sharePositionOrigin:
               box != null ? box.localToGlobal(Offset.zero) & box.size : null,
-        );
+        ));
       }
     } catch (e) {
       if (context.mounted) {
@@ -94,7 +93,7 @@ class BackupService {
       }
 
       final data = decoded['data'];
-      if (data is! Map) {
+      if (data is! Map<String, dynamic>) {
         throw const FormatException('Invalid backup data structure');
       }
 

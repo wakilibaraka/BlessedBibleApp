@@ -154,7 +154,7 @@ class _WeeklyJourneyPath extends StatelessWidget {
       onTap: () {
         // The per-day screen shipped with the retired plan browser; the
         // V2 plan detail is the live equivalent for this plan.
-        Navigator.of(context).push(CupertinoPageRoute(
+        Navigator.of(context).push(CupertinoPageRoute<void>(
           builder: (_) => ReadingPlanDetailV2Screen(planId: planId),
         ));
       },

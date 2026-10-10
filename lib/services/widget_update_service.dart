@@ -31,7 +31,7 @@ class WidgetUpdateService {
     await HomeWidget.setAppGroupId(appGroupId);
 
     // Initial sync
-    syncAllWidgets();
+    unawaited(syncAllWidgets());
 
     // Listen to HomeProvider for VOTD
     _ref.listen(homeProvider, (previous, next) {

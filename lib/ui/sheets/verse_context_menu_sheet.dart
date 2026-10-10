@@ -82,7 +82,8 @@ class _VerseContextMenuSheetState extends ConsumerState<VerseContextMenuSheet> {
                               label: 'Commentary',
                               onTap: () {
                                 Navigator.of(context).pop();
-                                Navigator.of(context).push(CupertinoPageRoute(
+                                Navigator.of(context)
+                                    .push(CupertinoPageRoute<void>(
                                   builder: (_) => CommentaryHubScreen(
                                     book: widget.bookName,
                                     chapter: widget.chapterNum,

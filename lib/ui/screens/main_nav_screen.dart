@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -125,7 +126,7 @@ class MainNavScreen extends ConsumerWidget {
           );
 
           if (shouldExit == true) {
-            SystemNavigator.pop();
+            unawaited(SystemNavigator.pop());
           }
         },
         child: Scaffold(
@@ -692,7 +693,7 @@ class MainNavScreen extends ConsumerWidget {
         break;
       case 2:
         // Search tab: open Search Settings
-        showModalBottomSheet(
+        showModalBottomSheet<void>(
           context: context,
           isScrollControlled: true,
           backgroundColor: Colors.transparent,
@@ -993,7 +994,7 @@ class MainNavScreen extends ConsumerWidget {
         // Guard: verse index must be within the chapter's verse list.
         if (verseNum < 1 || verseNum > fc.chapter.verses.length) return;
 
-        showDialog(
+        showDialog<void>(
           context: context,
           barrierDismissible: false,
           builder: (context) => const CastingLotsDialog(),
@@ -1012,7 +1013,7 @@ class MainNavScreen extends ConsumerWidget {
               .read(activeStudyVerseProvider.notifier)
               .setVerse('$bookName $chapter:$verseNum');
 
-          Navigator.of(context).push(CupertinoPageRoute(
+          Navigator.of(context).push(CupertinoPageRoute<void>(
               builder: (_) => Scaffold(
                     body: CommentaryView(
                       book: bookName,

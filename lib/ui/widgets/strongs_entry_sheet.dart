@@ -11,13 +11,13 @@ void showStrongsEntrySheet(BuildContext context, String strongsId) {
   final isFloating = style == PopupStyle.floating;
 
   if (isFloating) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) =>
           _StrongsEntrySheet(strongsId: strongsId, isFloating: true),
     );
   } else {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -39,7 +39,7 @@ class _StrongsEntrySheet extends ConsumerWidget {
     final entryAsync = ref.watch(strongsProvider(strongsId));
     final typography = ref.watch(typographyProvider);
 
-    Widget content = Container(
+    final Widget content = Container(
       width:
           isFloating ? MediaQuery.sizeOf(context).width * 0.9 : double.infinity,
       constraints: BoxConstraints(
@@ -92,7 +92,8 @@ class _StrongsEntrySheet extends ConsumerWidget {
                       if (entry != null) {
                         final textToShare =
                             "${entry.id} - ${entry.lemma}\n\nTransliteration: ${entry.transliteration}\nPronunciation: ${entry.pronunciation}\n\nDefinition:\n${entry.definition}";
-                        Share.share(textToShare);
+                        SharePlus.instance
+                            .share(ShareParams(text: textToShare));
                       }
                     },
                     icon: Icon(Icons.ios_share_rounded,

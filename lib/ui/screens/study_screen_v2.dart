@@ -106,7 +106,8 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
   void _push(Widget page) {
     HapticFeedback.selectionClick();
     try {
-      Navigator.of(context).push(CupertinoPageRoute(builder: (_) => page));
+      Navigator.of(context)
+          .push(CupertinoPageRoute<void>(builder: (_) => page));
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -127,7 +128,7 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
     final index = cards.indexWhere((c) => c.id == card.id);
     final canUp = index > 0;
     final canDown = index >= 0 && index < cards.length - 1;
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (ctx) {
@@ -843,7 +844,7 @@ class _TodayRow extends ConsumerWidget {
           const SizedBox(width: 8),
           FilledButton.tonal(
             onPressed: () {
-              Navigator.of(context).push(CupertinoPageRoute(
+              Navigator.of(context).push(CupertinoPageRoute<void>(
                 builder: (_) => ReadingPlanDetailV2Screen(planId: planId),
               ));
             },

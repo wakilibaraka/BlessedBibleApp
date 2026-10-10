@@ -45,13 +45,14 @@ class CloudSyncService {
   Future<void> _syncBookmarks(String uid) async {
     final prefs = await SharedPreferences.getInstance();
     final localJson = prefs.getString('bookmarks_v2');
-    Map<String, dynamic> localData = {};
+    final Map<String, dynamic> localData = {};
     BookmarkData? currentLocalBookmarkData;
 
     if (localJson != null && localJson.isNotEmpty) {
       try {
         final decoded = jsonDecode(localJson);
-        currentLocalBookmarkData = BookmarkData.fromJson(decoded);
+        currentLocalBookmarkData =
+            BookmarkData.fromJson(decoded as Map<String, dynamic>);
         for (final entry in currentLocalBookmarkData.nodes.entries) {
           final bm = entry.value;
           localData[entry.key] = bm.createdAt.millisecondsSinceEpoch;
@@ -72,7 +73,7 @@ class CloudSyncService {
     }
 
     bool hasRemoteNewer = false;
-    Map<String, dynamic> merged = {...remoteData};
+    final Map<String, dynamic> merged = {...remoteData};
 
     for (final entry in localData.entries) {
       final key = entry.key;
@@ -119,7 +120,8 @@ class CloudSyncService {
     Map<String, int> localData = {};
     if (localJson != null && localJson.isNotEmpty) {
       try {
-        final Map<String, dynamic> jsonMap = jsonDecode(localJson);
+        final Map<String, dynamic> jsonMap =
+            jsonDecode(localJson) as Map<String, dynamic>;
         localData = jsonMap.map((key, value) => MapEntry(key, value as int));
       } catch (_) {}
     }
@@ -138,7 +140,7 @@ class CloudSyncService {
     }
 
     bool hasRemoteNewer = false;
-    Map<String, dynamic> merged = {...remoteData};
+    final Map<String, dynamic> merged = {...remoteData};
 
     final now = DateTime.now().millisecondsSinceEpoch;
 
@@ -212,8 +214,8 @@ class CloudSyncService {
     int remoteLastRead = 0;
     if (docSnap.exists) {
       final data = docSnap.data() as Map<String, dynamic>;
-      remoteCount = data['count'] ?? 0;
-      remoteLastRead = data['last_read'] ?? 0;
+      remoteCount = (data['count'] as int?) ?? 0;
+      remoteLastRead = (data['last_read'] as int?) ?? 0;
     }
 
     if (localLastRead > remoteLastRead) {

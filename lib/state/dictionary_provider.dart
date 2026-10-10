@@ -12,7 +12,8 @@ final dictionaryWordsProvider =
   try {
     final jsonString =
         await rootBundle.loadString('assets/data/dictionary_words.json');
-    final Map<String, dynamic> jsonMap = json.decode(jsonString);
+    final Map<String, dynamic> jsonMap =
+        json.decode(jsonString) as Map<String, dynamic>;
     return jsonMap.map((key, value) => MapEntry(key, value.toString()));
   } catch (e) {
     return {};
@@ -26,7 +27,7 @@ final dictionaryNamesProvider = FutureProvider<Set<String>>((ref) async {
   try {
     final jsonString =
         await rootBundle.loadString('assets/data/dictionary_names.json');
-    final List<dynamic> list = json.decode(jsonString);
+    final List<dynamic> list = json.decode(jsonString) as List<dynamic>;
     return list.map((e) => e.toString()).toSet();
   } catch (e) {
     return {};
@@ -41,7 +42,8 @@ final dictionaryAliasesProvider =
   try {
     final jsonString =
         await rootBundle.loadString('assets/data/dictionary_aliases.json');
-    final Map<String, dynamic> jsonMap = json.decode(jsonString);
+    final Map<String, dynamic> jsonMap =
+        json.decode(jsonString) as Map<String, dynamic>;
     return jsonMap.map((key, value) => MapEntry(key, value.toString()));
   } catch (e) {
     return {};

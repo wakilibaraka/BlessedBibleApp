@@ -428,8 +428,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
               SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
-                    final key =
-                        _entryKeys.putIfAbsent(index, () => GlobalKey());
+                    final key = _entryKeys.putIfAbsent(index, GlobalKey.new);
                     return KeyedSubtree(
                       key: key,
                       child: _buildEntryCard(
@@ -691,7 +690,7 @@ void showCommentaryBottomSheet(
   int? verse,
   String? verseText,
 }) {
-  showModalBottomSheet(
+  showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
@@ -752,7 +751,7 @@ void showCommentaryBottomSheet(
                           onExpand: () {
                             Navigator.of(context).pop(); // dismiss sheet
                             Navigator.of(context).push(
-                              CupertinoPageRoute(
+                              CupertinoPageRoute<void>(
                                 builder: (_) => CommentaryHubScreen(
                                   book: book,
                                   chapter: chapter,

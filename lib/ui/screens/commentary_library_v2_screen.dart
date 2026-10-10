@@ -31,7 +31,7 @@ class _CommentaryLibraryV2ScreenState
 
   void _openBook(String book, Map<int, int> chapterCounts) {
     final chapters = chapterCounts.keys.toList()..sort();
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (ctx) {
@@ -72,7 +72,7 @@ class _CommentaryLibraryV2ScreenState
                       borderRadius: BorderRadius.circular(12),
                       onTap: () {
                         Navigator.of(ctx).pop();
-                        Navigator.of(context).push(CupertinoPageRoute(
+                        Navigator.of(context).push(CupertinoPageRoute<void>(
                           builder: (_) =>
                               CommentaryHubV2Screen(book: book, chapter: ch),
                         ));

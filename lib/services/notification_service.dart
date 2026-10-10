@@ -182,8 +182,8 @@ class NotificationService {
     }
 
     for (int i = 0; i < 4; i++) {
-      DateTime targetFriday = friday.add(Duration(days: 7 * i));
-      DateTime? targetSunset = SunsetCalculator.getSunset(
+      final DateTime targetFriday = friday.add(Duration(days: 7 * i));
+      final DateTime targetSunset = SunsetCalculator.getSunset(
               lat, lng, targetFriday) ??
           DateTime(
               targetFriday.year, targetFriday.month, targetFriday.day, 18, 0);

@@ -43,7 +43,7 @@ void main() {
       for (var i = 0; i < 100; i++) {
         final s = container.read(readingPlanProvider('chronological_1yr'));
         if (!s.isLoading) break;
-        await Future.delayed(const Duration(milliseconds: 100));
+        await Future<void>.delayed(const Duration(milliseconds: 100));
       }
     });
     final loaded = container.read(readingPlanProvider('chronological_1yr'));

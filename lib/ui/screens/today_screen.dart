@@ -127,7 +127,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                 backgroundColor: theme.colorScheme.surface,
                 onRefresh: () async {
                   // CMS: fetch remote content here in future
-                  await Future.delayed(const Duration(milliseconds: 500));
+                  await Future<void>.delayed(const Duration(milliseconds: 500));
                   ref.invalidate(streakProvider);
                   ref.invalidate(notesProvider);
                 },
@@ -428,7 +428,7 @@ class _LatestNoteCard extends ConsumerWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
+                  MaterialPageRoute<void>(
                       builder: (context) => const NotesListScreen()),
                 );
               },
@@ -593,7 +593,7 @@ class _QuickActionsRow extends ConsumerWidget {
               final fc = flatChapters.firstWhere((c) =>
                   c.book.name == bookName && c.chapter.number == chapter);
 
-              showDialog(
+              showDialog<void>(
                 context: context,
                 barrierDismissible: false,
                 builder: (context) => const CastingLotsDialog(),
@@ -611,7 +611,7 @@ class _QuickActionsRow extends ConsumerWidget {
                     .read(activeStudyVerseProvider.notifier)
                     .setVerse('$bookName $chapter:$verseNum');
 
-                Navigator.of(context).push(CupertinoPageRoute(
+                Navigator.of(context).push(CupertinoPageRoute<void>(
                     builder: (_) => CommentaryHubScreen(
                           book: bookName,
                           chapter: chapter,
@@ -629,7 +629,8 @@ class _QuickActionsRow extends ConsumerWidget {
         color: theme.colorScheme.primary,
         onTap: () {
           Navigator.of(context).push(
-            CupertinoPageRoute(builder: (_) => const PlansLibraryScreen()),
+            CupertinoPageRoute<void>(
+                builder: (_) => const PlansLibraryScreen()),
           );
         },
       ),
@@ -639,7 +640,7 @@ class _QuickActionsRow extends ConsumerWidget {
         color: theme.colorScheme.primary,
         onTap: () {
           Navigator.of(context).push(
-            CupertinoPageRoute(
+            CupertinoPageRoute<void>(
                 builder: (_) => const YourSpaceScreen(initialTab: 0)),
           );
         },
@@ -733,7 +734,8 @@ class _VotdArchiveBanner extends StatelessWidget {
           borderRadius: BorderRadius.circular(24),
           onTap: () {
             Navigator.of(context).push(
-              CupertinoPageRoute(builder: (_) => const VotdArchiveScreen()),
+              CupertinoPageRoute<void>(
+                  builder: (_) => const VotdArchiveScreen()),
             );
           },
           child: Padding(

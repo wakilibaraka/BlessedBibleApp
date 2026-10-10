@@ -123,7 +123,7 @@ class ReminderSettingsCard extends ConsumerWidget {
       ),
       trailing: Switch.adaptive(
         value: enabled,
-        activeColor: theme.colorScheme.primary,
+        activeThumbColor: theme.colorScheme.primary,
         onChanged: onToggle,
       ),
     );
