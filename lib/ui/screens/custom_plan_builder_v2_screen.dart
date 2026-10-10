@@ -397,7 +397,7 @@ class _CustomPlanBuilderV2ScreenState
       ref
           .read(preferencesProvider)
           .saveCustomPlan(finalPlan.id, finalPlan.toJson());
-      final uid = ref.read(authStateProvider).value?.uid;
+      final uid = ref.read(accountUserProvider).value?.uid;
       if (uid != null) unawaited(backupCustomPlan(uid, finalPlan));
       ref.read(activePlanIdsProvider.notifier).addPlan(finalPlan.id);
       // Start inline with the chosen date/rest — no post-start hunt.

@@ -6,7 +6,7 @@ import {
   assertSucceeds,
   initializeTestEnvironment,
 } from '@firebase/rules-unit-testing';
-import { deleteDoc, doc, getDoc, setDoc } from 'firebase/firestore';
+import { deleteDoc, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 
 const ADMIN = 'dx78nhHTHMNnCLlryAWIwGqqAh23';
 const ALICE = 'alice';
@@ -100,11 +100,37 @@ describe('users/{uid}/sync_data', () => {
 });
 
 describe('users/{uid} root and unknown paths', () => {
-  test('owner can read and delete the root doc but not write it', async () => {
+  // Shape written by blessed_account's SharedProfileRepository.
+  const profile = (overrides = {}) => ({
+    displayName: 'Ruth', avatar: null, createdAt: 1000, updatedAt: 1000, ...overrides,
+  });
+
+  test('owner can create, read, update and delete their profile', async () => {
     const ref = doc(db(ALICE), 'users', ALICE);
+    await assertSucceeds(setDoc(ref, profile()));
     await assertSucceeds(getDoc(ref));
+    await assertSucceeds(updateDoc(ref, { displayName: 'Naomi', avatar: '🕊️', updatedAt: 2000 }));
     await assertSucceeds(deleteDoc(ref));
+  });
+
+  test('profile rejects unknown fields, bad types and createdAt changes', async () => {
+    const ref = doc(db(ALICE), 'users', ALICE);
     await assertFails(setDoc(ref, { role: 'admin' }));
+    await assertFails(setDoc(ref, profile({ role: 'admin' })));
+    await assertFails(setDoc(ref, profile({ displayName: '' })));
+    await assertFails(setDoc(ref, profile({ displayName: 'x'.repeat(101) })));
+    await assertFails(setDoc(ref, profile({ avatar: 42 })));
+    await assertFails(setDoc(ref, profile({ updatedAt: 'now' })));
+    await assertSucceeds(setDoc(ref, profile()));
+    await assertFails(updateDoc(ref, { createdAt: 5 }));
+  });
+
+  test('other users and signed-out clients cannot touch a profile', async () => {
+    await env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), 'users', ALICE), profile()));
+    await assertFails(getDoc(doc(db(BOB), 'users', ALICE)));
+    await assertFails(setDoc(doc(db(BOB), 'users', ALICE), profile()));
+    await assertFails(updateDoc(doc(db(BOB), 'users', ALICE), { displayName: 'Bob' }));
+    await assertFails(getDoc(doc(db(null), 'users', ALICE)));
   });
 
   test('unknown subcollections are denied even for the owner', async () => {

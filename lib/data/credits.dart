@@ -36,6 +36,8 @@ const List<CreditSection> kCreditSections = [
         'Public domain.'),
     CreditItem('Swahili and Tagalog Unlocked Literal Bible',
         'Licensed under CC BY-SA 4.0 (creativecommons.org/licenses/by-sa/4.0).'),
+    CreditItem('Romanian BTF Bible (2015)',
+        '© 2015 Dr. Brian J. Nibbe, Sr. All rights reserved.'),
     CreditItem('Hindi Indian Revised Version',
         'Licensed under CC BY-SA 4.0 (creativecommons.org/licenses/by-sa/4.0).'),
     CreditItem(

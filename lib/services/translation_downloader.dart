@@ -119,6 +119,16 @@ class TranslationDownloader {
       'source': 'bundled',
     },
     {
+      'id': 'ron_btf',
+      'lang': 'ro',
+      'langName': 'Romanian',
+      'name': 'Romanian BTF Bible',
+      'abbr': 'BTF',
+      'license': '© 2015 Brian J. Nibbe, Sr.',
+      'sizeMB': 5.4,
+      'source': 'bundled',
+    },
+    {
       'id': 'fra_lsg',
       'lang': 'fr',
       'langName': 'French',

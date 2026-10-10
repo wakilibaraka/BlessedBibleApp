@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:blessed_account/blessed_account.dart';
 import 'firebase_options.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -38,12 +38,14 @@ void main() async {
     return AppErrorFallback(details: details);
   };
 
-  await GoogleSignIn.instance.initialize();
+  final authGateway = FirebaseAuthGateway();
+  await authGateway.initialize();
 
   runApp(
     ProviderScope(
       overrides: [
         preferencesProvider.overrideWithValue(prefs),
+        authGatewayProvider.overrideWithValue(authGateway),
       ],
       child: const TheBlessedBibleApp(),
     ),

@@ -30,6 +30,23 @@ Future<void> initCrashReporting({required bool enabled}) async {
   };
 }
 
+/// Records a handled problem (no personal data) as a non-fatal Crashlytics
+/// report, e.g. why a sign-in failed. Release builds only; respects the
+/// user's crash-report choice.
+void reportNonFatal(String reason, {String? code}) {
+  logDebug('$reason (${code ?? '-'})');
+  if (kDebugMode) return;
+  try {
+    FirebaseCrashlytics.instance.recordError(
+      Exception(code == null ? reason : '$reason: $code'),
+      StackTrace.current,
+      reason: reason,
+    );
+  } catch (_) {
+    // Reporting must never break the caller.
+  }
+}
+
 /// Applies the user's "Send crash reports" choice immediately.
 Future<void> setCrashReportingEnabled(bool enabled) =>
     FirebaseCrashlytics.instance
