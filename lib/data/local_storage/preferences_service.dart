@@ -579,8 +579,15 @@ class PreferencesService {
       _searchHistoryKey,
       _searchQueriesKey,
       _lastReadLocKey,
+      'user_notes',
+      'user_journal_entries',
     ];
     for (final key in keys) {
+      await prefs.remove(key);
+    }
+    // Sync bookkeeping (lib/sync/): per-account ledgers and last account.
+    for (final key
+        in prefs.getKeys().where((k) => k.startsWith('sync_')).toList()) {
       await prefs.remove(key);
     }
   }

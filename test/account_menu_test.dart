@@ -100,6 +100,31 @@ void main() {
     expect(find.text('Sign Out'), findsOneWidget);
   });
 
+  testWidgets('sign-out asks whether to keep data, then signs out',
+      (tester) async {
+    final gateway = FakeAuthGateway(
+        user: const AccountUser(uid: 'u1', displayName: 'Ruth'));
+    await pumpHub(tester, gateway: gateway);
+    await tester.pump();
+    await openMenu(tester);
+    expect(
+        find.byIcon(Icons.cloud_done_outlined).evaluate().isNotEmpty ||
+            find.text('Syncing…').evaluate().isNotEmpty,
+        isTrue,
+        reason: 'signed-in menu shows the sync row');
+
+    await tester.ensureVisible(find.text('Sign Out'));
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(find.text('Sign Out'));
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.text('Sign out?'), findsOneWidget);
+    await tester.tap(find.text('Keep on device'));
+    await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 100)));
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(gateway.calls, contains('signOut'));
+  });
+
   testWidgets('failed sign-in explains why and keeps the menu open',
       (tester) async {
     final gateway = FakeAuthGateway()

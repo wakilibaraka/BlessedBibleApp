@@ -21,6 +21,7 @@ import 'ui/widgets/app_error_fallback.dart';
 import 'data/credits.dart';
 import 'services/firebase_setup.dart';
 import 'services/widget_update_service.dart';
+import 'sync/bible_sync.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -63,6 +64,9 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
   @override
   Widget build(BuildContext context) {
     ref.watch(widgetUpdateServiceProvider); // Initialize widget background sync
+    // Account sync (bookmarks, highlights, notes): kept alive for the app's
+    // lifetime without rebuilding it on every status change.
+    ref.listen(syncControllerProvider, (_, __) {});
 
     final themeMode = ref.watch(themeProvider);
     final surfaceStyle = ref.watch(surfaceStyleProvider);

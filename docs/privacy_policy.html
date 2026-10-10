@@ -30,7 +30,7 @@
     <p>If you use Export backup, the app creates a file and hands it to the share destination you pick. Where that file goes is up to you.</p>
     <h2>If you sign in (optional)</h2>
     <p>You can sign in with Google or Apple. Google Firebase Authentication then receives your name, email address (Apple may provide a private relay address) and an account identifier, which we use only to manage your account.</p>
-    <p>While signed in, a small profile (your display name, an optional avatar and when it was created or changed) and the reading plans you create are saved to your account in Google Cloud Firestore so they can be restored. No other personal content is uploaded at this time.</p>
+    <p>While signed in, the following are saved to your account in Google Cloud Firestore so they sync between your devices and can be restored: a small profile (your display name, an optional avatar and when it was created or changed), your bookmarks and bookmark folders, highlights, notes, and the reading plans you create. Each synced item also records when it last changed and a random identifier for the device that changed it. Your journal, settings and reading history stay on your device.</p>
     <p>The same account works in our game Blessed Arcade: if you sign in there with the same Google or Apple account, both apps share that profile. Each app&#x27;s own data stays separate.</p>
     <h2>Crash reports</h2>
     <p>If the app crashes, Firebase Crashlytics collects technical details: the error and where in the code it happened, device model, operating system and app version, and a random installation identifier. Crash reports do not include your Bible reading, notes or other personal content.</p>
@@ -44,7 +44,7 @@
     <h2>Who we share data with</h2>
     <p>We use service providers only to run the features above: Google (Firebase Authentication, Cloud Firestore, Crashlytics, App Check, Play Integrity), Apple (Sign in with Apple, App Attest / DeviceCheck), and the Free Use Bible API and GitHub for translation downloads. We do not sell personal data or share it for marketing or advertising.</p>
     <h2>How long we keep data</h2>
-    <p>Account data and cloud copies of your reading plans are kept until you delete your account. Crashlytics keeps crash reports for 90 days. Data on your device stays until you delete it or uninstall the app.</p>
+    <p>Account data and synced items are kept until you delete your account; a deleted item leaves a small marker (its identifier and deletion time, no content) so other devices remove it too. Crashlytics keeps crash reports for 90 days. Data on your device stays until you delete it or uninstall the app.</p>
     <h2>Deleting your account</h2>
     <p>In the app, go to the Study tab, tap your avatar at the top, then Account &gt; Delete Account. This deletes your sign-in record and all data stored in your account in the cloud (for both The Blessed Bible and Blessed Arcade, since they share the account), and clears your personal data from that device. You can also email us to request deletion; we will complete it within 30 days.</p>
     <h2>Your rights</h2>

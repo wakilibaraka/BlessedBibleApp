@@ -24,11 +24,20 @@ service cloud.firestore {
         allow create, update: if isOwner(userId) && validPlan(planId);
       }
 
-      // Cloud sync payloads (lib/services/cloud_sync_service.dart).
+      // Legacy pre-5B sync payloads: no longer written; owners may read
+      // and delete them (account deletion).
       match /sync_data/{docId} {
+        allow read, delete: if isOwner(userId);
+      }
+
+      // Per-item sync (blessed_account SyncEngine, lib/sync/bible_sync.dart):
+      // {id, data, updatedAt, deleted, device, syncedAt}.
+      match /{col}/{itemId} {
         allow read, delete: if isOwner(userId)
-          && docId in ['bookmarks', 'highlights', 'streak'];
-        allow create, update: if isOwner(userId) && validSyncDoc(docId);
+          && col in ['bookmarks', 'folders', 'highlights', 'notes'];
+        allow create, update: if isOwner(userId)
+          && col in ['bookmarks', 'folders', 'highlights', 'notes']
+          && validSyncItem(col);
       }
     }
 
@@ -67,14 +76,40 @@ service cloud.firestore {
         && d.createdAt is int && d.updatedAt is int;
     }
 
-    function validSyncDoc(docId) {
+    function validSyncItem(col) {
       let d = request.resource.data;
-      return (docId == 'streak'
-          && d.keys().hasOnly(['count', 'last_read'])
-          && (!('count' in d) || (d.count is int && d.count >= 0))
-          && (!('last_read' in d) || d.last_read is int))
-        || (docId in ['bookmarks', 'highlights']
-          && d.keys().size() <= 20000);
+      return d.keys().hasOnly(['id', 'data', 'updatedAt', 'deleted', 'device', 'syncedAt'])
+        && d.keys().hasAll(['id', 'data', 'updatedAt', 'deleted', 'device', 'syncedAt'])
+        && d.id is string && d.id.size() >= 1 && d.id.size() <= 200
+        && d.updatedAt is int
+        && d.deleted is bool
+        && d.device is string && d.device.size() <= 64
+        && d.syncedAt == request.time
+        && ((d.deleted == true && d.data == null)
+          || (d.deleted == false && d.data is map && validItemData(col, d.data)));
+    }
+
+    function optString(m, key, max) {
+      return !(key in m) || m[key] == null || (m[key] is string && m[key].size() <= max);
+    }
+
+    function validItemData(col, x) {
+      return (col == 'bookmarks'
+          && x.keys().hasOnly(['createdAt', 'folderId'])
+          && x.createdAt is int
+          && optString(x, 'folderId', 200))
+        || (col == 'folders'
+          && x.keys().hasOnly(['name'])
+          && x.name is string && x.name.size() <= 200)
+        || (col == 'highlights'
+          && x.keys().hasOnly(['color'])
+          && x.color is int && x.color >= 0 && x.color <= 20)
+        || (col == 'notes'
+          && x.keys().hasOnly(['title', 'content', 'date', 'reference'])
+          && x.title is string && x.title.size() <= 1000
+          && x.content is string && x.content.size() <= 100000
+          && x.date is string && x.date.size() <= 100
+          && optString(x, 'reference', 500));
     }
   }
 }

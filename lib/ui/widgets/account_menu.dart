@@ -17,6 +17,7 @@ import '../../state/streak_provider.dart';
 import '../../state/translation_provider.dart';
 import '../../state/user_data_provider.dart'
     show bookmarkDataProvider, highlightsProvider;
+import '../../sync/bible_sync.dart';
 
 /// Shared account avatar: photo → initial → person icon, themed.
 /// Extracted from the account button so every surface matches.
@@ -225,14 +226,12 @@ class _AccountMenuBody extends ConsumerWidget {
               onTap: () => _signIn(context, ref, google: false),
             ),
         ] else ...[
+          const _SyncTile(),
           _MenuTile(
             icon: Icons.logout_rounded,
             label: 'Sign Out',
             destructive: true,
-            onTap: () async {
-              await ref.read(authActionsProvider).signOut();
-              if (context.mounted) Navigator.of(context).pop();
-            },
+            onTap: () => _signOut(context, ref),
           ),
         ],
         _MenuTile(
@@ -346,10 +345,7 @@ void _showAccountSheet(BuildContext context) {
                       leading: const Icon(Icons.logout, color: Colors.orange),
                       title: const Text('Sign Out',
                           style: TextStyle(color: Colors.orange)),
-                      onTap: () async {
-                        await ref.read(authActionsProvider).signOut();
-                        if (context.mounted) Navigator.pop(context);
-                      },
+                      onTap: () => _signOut(context, ref),
                     ),
                     ListTile(
                       leading:
@@ -438,7 +434,12 @@ Future<void> _signIn(
   if (!sheetContext.mounted) return;
   switch (result.status) {
     case SignInStatus.success:
-      Navigator.of(sheetContext).pop();
+      final sync = ref.read(syncControllerProvider.notifier);
+      if (await sync.afterSignIn() == SyncPhase.needsAccountChoice &&
+          sheetContext.mounted) {
+        await _askAccountChoice(sheetContext, ref);
+      }
+      if (sheetContext.mounted) Navigator.of(sheetContext).pop();
     case SignInStatus.failed:
       reportNonFatal('Sign-in failed: ${result.failure?.name}',
           code: result.code);
@@ -446,6 +447,122 @@ Future<void> _signIn(
     case SignInStatus.cancelled:
       break;
   }
+}
+
+/// Signing in to a different account than this device's data came from:
+/// merge that data into the account, or clear the device and download.
+Future<void> _askAccountChoice(BuildContext context, WidgetRef ref) async {
+  final startFresh = await showDialog<bool>(
+    context: context,
+    barrierDismissible: false,
+    builder: (ctx) => AlertDialog(
+      title: const Text('This device has data from another account'),
+      content: const Text(
+          'Your bookmarks, highlights and notes on this device came from a '
+          'different account. What should happen to them?'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, true),
+          child: const Text('Start fresh on this device'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, false),
+          child: const Text('Merge into this account'),
+        ),
+      ],
+    ),
+  );
+  if (startFresh == null) return;
+  await ref
+      .read(syncControllerProvider.notifier)
+      .resolveAccountChoice(startFresh: startFresh);
+}
+
+/// Asks whether to keep this device's data, uploads pending changes, then
+/// signs out.
+Future<void> _signOut(BuildContext context, WidgetRef ref) async {
+  final remove = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: const Text('Sign out?'),
+      content: const Text(
+          'Your bookmarks, highlights and notes stay safe in your account. '
+          'Keep a copy on this device?'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, true),
+          child: const Text('Remove from device'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, false),
+          child: const Text('Keep on device'),
+        ),
+      ],
+    ),
+  );
+  if (remove == null) return;
+  final sync = ref.read(syncControllerProvider.notifier);
+  await sync.prepareSignOut(forget: remove);
+  await ref.read(authActionsProvider).signOut();
+  if (remove) sync.clearLocalData();
+  if (context.mounted) Navigator.of(context).pop();
+}
+
+/// Sync status for the signed-in account; tap to sync now (or, after
+/// signing in to a different account, to choose what to do).
+class _SyncTile extends ConsumerWidget {
+  const _SyncTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final status = ref.watch(syncControllerProvider);
+    final (icon, label, subtitle) = switch (status.phase) {
+      SyncPhase.syncing => (Icons.sync_rounded, 'Syncing…', null),
+      SyncPhase.error => (
+          Icons.sync_problem_rounded,
+          'Couldn\'t sync',
+          'Tap to try again'
+        ),
+      SyncPhase.needsAccountChoice => (
+          Icons.sync_problem_rounded,
+          'Sync paused',
+          'Choose what to do with this device\'s data'
+        ),
+      _ => (
+          Icons.cloud_done_outlined,
+          'Sync now',
+          syncedLabel(status.lastSyncedAt, DateTime.now())
+        ),
+    };
+    return _MenuTile(
+      icon: icon,
+      label: label,
+      subtitle: subtitle,
+      onTap: () {
+        final sync = ref.read(syncControllerProvider.notifier);
+        if (status.phase == SyncPhase.needsAccountChoice) {
+          _askAccountChoice(context, ref);
+        } else {
+          sync.syncNow();
+        }
+      },
+    );
+  }
+}
+
+/// "Synced just now", "Synced 5 min ago", ...
+@visibleForTesting
+String syncedLabel(DateTime? at, DateTime now) {
+  if (at == null) return 'Not synced yet';
+  final d = now.difference(at);
+  if (d.inMinutes < 1) return 'Synced just now';
+  if (d.inMinutes < 60) return 'Synced ${d.inMinutes} min ago';
+  if (d.inHours < 24) return 'Synced ${d.inHours} h ago';
+  return 'Synced ${at.day}/${at.month}/${at.year}';
 }
 
 void _showError(BuildContext context, String message) {

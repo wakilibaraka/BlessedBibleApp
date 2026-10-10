@@ -15,6 +15,8 @@ All notable changes to The Blessed Bible. Newest first.
 - "Sign in with Apple" is shown only on iPhone and iPad, where it works.
 - Failed sign-ins say why (no connection, app not set up for this sign-in method, email already used with another method, account disabled) instead of a generic error; the reason is reported to Crashlytics without personal data.
 - Deleting the account also removes its Blessed Arcade cloud data.
+- **Sync:** while signed in, bookmarks, folders, highlights and notes sync between devices (per item; the newer change wins; deletions sync too). The account menu shows when it last synced and has **Sync now**. Signing out asks whether to keep the data on the device. Signing in to a different account asks whether to merge this device's data or start fresh.
+- Deleting the account now also clears notes and journal entries from the device.
 
 ### Fixed
 - Signed-in users can create custom reading plans again (the cloud copy used nested arrays, which Firestore rejects, and failed before the local save). Plans now save locally first and back up in the background.

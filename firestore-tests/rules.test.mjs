@@ -6,7 +6,7 @@ import {
   assertSucceeds,
   initializeTestEnvironment,
 } from '@firebase/rules-unit-testing';
-import { deleteDoc, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { deleteDoc, doc, getDoc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
 
 const ADMIN = 'dx78nhHTHMNnCLlryAWIwGqqAh23';
 const ALICE = 'alice';
@@ -70,32 +70,68 @@ describe('users/{uid}/plans', () => {
   });
 });
 
-describe('users/{uid}/sync_data', () => {
-  test('owner can write streak with int fields', async () => {
+describe('users/{uid}/sync_data (legacy)', () => {
+  test('owner can read and delete but no longer write', async () => {
+    await env.withSecurityRulesDisabled((ctx) =>
+      setDoc(doc(ctx.firestore(), 'users', ALICE, 'sync_data', 'streak'), { count: 3 }));
     const ref = doc(db(ALICE), 'users', ALICE, 'sync_data', 'streak');
-    await assertSucceeds(setDoc(ref, { count: 3, last_read: 1760000000000 }));
-    await assertSucceeds(setDoc(ref, { count: 4 }, { merge: true }));
     await assertSucceeds(getDoc(ref));
+    await assertFails(setDoc(ref, { count: 4 }));
+    await assertSucceeds(deleteDoc(ref));
+    await assertFails(getDoc(doc(db(BOB), 'users', ALICE, 'sync_data', 'streak')));
+  });
+});
+
+describe('per-item sync collections', () => {
+  // Shape written by blessed_account's FirestoreSyncRepository.
+  const item = (id, data, overrides = {}) => ({
+    id, data, updatedAt: 1760000000000, deleted: false, device: 'device-1',
+    syncedAt: serverTimestamp(), ...overrides,
+  });
+  const ref = (uid, col, id) => doc(db(uid), 'users', ALICE, col, id);
+
+  test('owner can write valid items in each collection', async () => {
+    await assertSucceeds(setDoc(ref(ALICE, 'bookmarks', 'JHN_3:16'),
+      item('JHN_3:16', { createdAt: 1, folderId: null })));
+    await assertSucceeds(setDoc(ref(ALICE, 'bookmarks', 'ROM_8:28'),
+      item('ROM_8:28', { createdAt: 1, folderId: 'folder_study' })));
+    await assertSucceeds(setDoc(ref(ALICE, 'folders', 'folder_study'),
+      item('folder_study', { name: 'Study' })));
+    await assertSucceeds(setDoc(ref(ALICE, 'highlights', 'PSA_23:1'),
+      item('PSA_23:1', { color: 2 })));
+    await assertSucceeds(setDoc(ref(ALICE, 'notes', 'n1'),
+      item('n1', { title: 'Hope', content: 'Text', date: '2026-10-10', reference: 'ROM_5:5' })));
+    await assertSucceeds(getDoc(ref(ALICE, 'notes', 'n1')));
+    await assertSucceeds(deleteDoc(ref(ALICE, 'notes', 'n1')));
   });
 
-  test('streak rejects bad types, negatives and extra fields', async () => {
-    const ref = doc(db(ALICE), 'users', ALICE, 'sync_data', 'streak');
-    await assertFails(setDoc(ref, { count: -1 }));
-    await assertFails(setDoc(ref, { count: '3' }));
-    await assertFails(setDoc(ref, { count: 1, extra: true }));
+  test('tombstones have null data', async () => {
+    await assertSucceeds(setDoc(ref(ALICE, 'highlights', 'PSA_23:1'),
+      item('PSA_23:1', null, { deleted: true })));
+    await assertFails(setDoc(ref(ALICE, 'highlights', 'PSA_23:1'),
+      item('PSA_23:1', { color: 1 }, { deleted: true })));
+    await assertFails(setDoc(ref(ALICE, 'highlights', 'PSA_23:1'),
+      item('PSA_23:1', null)));
   });
 
-  test('owner can write bookmarks and highlights maps', async () => {
-    await assertSucceeds(setDoc(doc(db(ALICE), 'users', ALICE, 'sync_data', 'bookmarks'),
-      { 'John 3:16': 1760000000000 }));
-    await assertSucceeds(setDoc(doc(db(ALICE), 'users', ALICE, 'sync_data', 'highlights'),
-      { 'John 3:16': { colorIndex: 2, ts: 1760000000000 } }));
+  test('rejects bad shapes', async () => {
+    await assertFails(setDoc(ref(ALICE, 'highlights', 'x'), item('x', { color: 99 })));
+    await assertFails(setDoc(ref(ALICE, 'highlights', 'x'), item('x', { color: 1, extra: 1 })));
+    await assertFails(setDoc(ref(ALICE, 'folders', 'f'), item('f', { name: 'x'.repeat(201) })));
+    await assertFails(setDoc(ref(ALICE, 'notes', 'n'),
+      item('n', { title: 't', content: 'x'.repeat(100001), date: 'd' })));
+    await assertFails(setDoc(ref(ALICE, 'bookmarks', 'b'), item('b', { createdAt: 'now' })));
+    await assertFails(setDoc(ref(ALICE, 'bookmarks', 'b'),
+      item('b', { createdAt: 1 }, { syncedAt: 5 })));
+    await assertFails(setDoc(ref(ALICE, 'bookmarks', 'b'),
+      { ...item('b', { createdAt: 1 }), role: 'admin' }));
   });
 
-  test('unknown sync docs and other users are denied', async () => {
-    await assertFails(setDoc(doc(db(ALICE), 'users', ALICE, 'sync_data', 'notes'), { a: 1 }));
-    await assertFails(setDoc(doc(db(BOB), 'users', ALICE, 'sync_data', 'streak'), { count: 1 }));
-    await assertFails(getDoc(doc(db(BOB), 'users', ALICE, 'sync_data', 'bookmarks')));
+  test('other users, signed-out clients and unknown collections are denied', async () => {
+    await assertFails(setDoc(ref(BOB, 'notes', 'n'), item('n', { title: 't', content: 'c', date: 'd' })));
+    await assertFails(getDoc(ref(BOB, 'notes', 'n')));
+    await assertFails(getDoc(ref(null, 'notes', 'n')));
+    await assertFails(setDoc(ref(ALICE, 'journal', 'j'), item('j', { text: 'x' })));
   });
 });
 
