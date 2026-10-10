@@ -29,9 +29,9 @@ class ContentSyncService<T> {
       final decoded = await compute(_parseJsonMap, jsonString);
 
       final Map<String, T> result = {};
-      final entries = decoded['data'] as Map<String, dynamic>? ?? {};
+      final entries = _asMap(decoded['data']);
       for (final entry in entries.entries) {
-        result[entry.key] = fromJson(entry.value as Map<String, dynamic>);
+        result[entry.key] = fromJson(_asMap(entry.value));
       }
       return result;
     } catch (e) {
@@ -72,7 +72,7 @@ class ContentSyncService<T> {
       }
 
       // Merge new data
-      final dataMap = currentCache['data'] as Map<String, dynamic>? ?? {};
+      final dataMap = _asMap(currentCache['data']);
       for (final doc in querySnapshot.docs) {
         dataMap[doc.id] = doc.data();
       }
@@ -82,7 +82,7 @@ class ContentSyncService<T> {
 
       for (final entry in dataMap.entries) {
         try {
-          final parsed = fromJson(entry.value as Map<String, dynamic>);
+          final parsed = fromJson(_asMap(entry.value));
           parsedResult[entry.key] = parsed;
           cleanDataMap[entry.key] = toJson(parsed);
         } catch (e) {
@@ -112,3 +112,9 @@ class ContentSyncService<T> {
 Map<String, dynamic> _parseJsonMap(String jsonStr) =>
     jsonDecode(jsonStr) as Map<String, dynamic>;
 String _encodeJsonMap(Map<String, dynamic> data) => jsonEncode(data);
+
+/// JSON maps can come back from `compute` (and from Firestore) typed
+/// `Map<dynamic, dynamic>`; copy them into the shape the parsers expect.
+Map<String, dynamic> _asMap(Object? value) => value is Map
+    ? value.map((k, v) => MapEntry(k.toString(), v))
+    : <String, dynamic>{};

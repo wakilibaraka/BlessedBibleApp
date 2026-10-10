@@ -11,6 +11,8 @@ import '../data/models/bookmark_model.dart';
 import '../data/models/home_data.dart';
 import '../services/firebase_setup.dart';
 import '../state/notes_provider.dart';
+import '../state/reading_plan_provider.dart';
+import '../state/streak_provider.dart';
 import '../state/user_data_provider.dart';
 
 // ---------------------------------------------------------------------------
@@ -111,6 +113,122 @@ class NotesSync implements SyncCollection {
   }
 }
 
+/// Custom reading plans (`custom_plan_<id>` JSON + `custom_plan_ids`).
+/// Stored as the JSON string so nested arrays survive Firestore.
+class CustomPlansSync implements SyncCollection {
+  final Ref ref;
+  CustomPlansSync(this.ref);
+  @override
+  String get name => 'custom_plans';
+  SharedPreferences get _p => ref.read(preferencesProvider).prefs;
+
+  @override
+  Map<String, Map<String, Object?>> read() => {
+        for (final id in _p.getStringList('custom_plan_ids') ?? <String>[])
+          if (_p.getString('custom_plan_$id') case final json?)
+            id: {'json': json},
+      };
+
+  @override
+  Future<void> write(Map<String, Map<String, Object?>> items) async {
+    final old = _p.getStringList('custom_plan_ids') ?? <String>[];
+    for (final id in old) {
+      if (!items.containsKey(id)) await _p.remove('custom_plan_$id');
+    }
+    for (final MapEntry(key: id, value: d) in items.entries) {
+      await _p.setString('custom_plan_$id', d['json'] as String? ?? '{}');
+    }
+    await _p.setStringList('custom_plan_ids', [
+      ...old.where(items.containsKey),
+      ...items.keys.where((id) => !old.contains(id)),
+    ]);
+    ref.invalidate(readingPlanProvider);
+  }
+}
+
+/// Per-plan progress (`reading_plan_state_<id>` JSON).
+class PlanProgressSync implements SyncCollection {
+  static const _prefix = 'reading_plan_state_';
+  final Ref ref;
+  PlanProgressSync(this.ref);
+  @override
+  String get name => 'plan_progress';
+  SharedPreferences get _p => ref.read(preferencesProvider).prefs;
+
+  @override
+  Map<String, Map<String, Object?>> read() => {
+        for (final key in _p.getKeys())
+          if (key.startsWith(_prefix))
+            if (_p.getString(key) case final json?)
+              key.substring(_prefix.length): {'json': json},
+      };
+
+  @override
+  Future<void> write(Map<String, Map<String, Object?>> items) async {
+    for (final key in _p.getKeys().toList()) {
+      if (key.startsWith(_prefix) &&
+          !items.containsKey(key.substring(_prefix.length))) {
+        await _p.remove(key);
+      }
+    }
+    for (final MapEntry(key: id, value: d) in items.entries) {
+      await _p.setString('$_prefix$id', d['json'] as String? ?? '{}');
+    }
+    ref.invalidate(readingPlanProvider);
+  }
+}
+
+/// The active plans list, as one item in `meta`.
+class ActivePlansSync implements SyncCollection {
+  static const _id = 'active_plans';
+  final Ref ref;
+  ActivePlansSync(this.ref);
+  @override
+  String get name => 'meta';
+
+  @override
+  Map<String, Map<String, Object?>> read() {
+    // No item while empty, so a fresh install's empty list never competes
+    // with the account's real one.
+    final ids = ref.read(preferencesProvider).getActivePlanIds();
+    return ids.isEmpty
+        ? {}
+        : {
+            _id: {'ids': ids}
+          };
+  }
+
+  @override
+  Future<void> write(Map<String, Map<String, Object?>> items) async {
+    final ids = (items[_id]?['ids'] as List?)?.whereType<String>().toList();
+    ref.read(preferencesProvider).saveActivePlanIds(ids ?? []);
+    ref.invalidate(activePlanIdsProvider);
+  }
+}
+
+/// Days the app was used (streak), one item per `yyyy-mm-dd`, so days
+/// from every device add up rather than overwrite each other.
+class ReadingDaysSync implements SyncCollection {
+  final Ref ref;
+  ReadingDaysSync(this.ref);
+  @override
+  String get name => 'reading_days';
+
+  @override
+  Map<String, Map<String, Object?>> read() => {
+        for (final d in ref.read(preferencesProvider).getAppUsageDates())
+          d: <String, Object?>{},
+      };
+
+  @override
+  Future<void> write(Map<String, Map<String, Object?>> items) async {
+    ref
+        .read(preferencesProvider)
+        .saveAppUsageDates(items.keys.toList()..sort());
+    ref.invalidate(streakProvider);
+  }
+}
+
 class PrefsSyncStore implements SyncStore {
   final SharedPreferences prefs;
   PrefsSyncStore(this.prefs);
@@ -183,8 +301,17 @@ class SyncController extends Notifier<SyncStatus> {
       BookmarksSync(ref),
       HighlightsSync(ref),
       NotesSync(ref),
+      CustomPlansSync(ref),
+      PlanProgressSync(ref),
+      ActivePlansSync(ref),
+      ReadingDaysSync(ref),
     ];
-    final lifecycle = AppLifecycleListener(onResume: () {
+    final lifecycle = AppLifecycleListener(
+        // Plans, progress and reading days are read from storage at sync
+        // time, so also sync when the app goes to the background.
+        onPause: () {
+      if (state.phase == SyncPhase.idle) unawaited(syncNow());
+    }, onResume: () {
       if (state.phase == SyncPhase.idle || state.phase == SyncPhase.error) {
         unawaited(syncNow());
       }
@@ -196,6 +323,8 @@ class SyncController extends Notifier<SyncStatus> {
     ref.listen(bookmarkDataProvider, (_, __) => _onLocalChange());
     ref.listen(highlightsProvider, (_, __) => _onLocalChange());
     ref.listen(notesProvider, (_, __) => _onLocalChange());
+    ref.listen(activePlanIdsProvider, (_, __) => _onLocalChange());
+    ref.listen(streakProvider, (_, __) => _onLocalChange());
     ref.listen(accountUserProvider, (_, next) {
       if (!next.isLoading) _onUser(next.value);
     });
@@ -212,8 +341,8 @@ class SyncController extends Notifier<SyncStatus> {
             last == null ? null : DateTime.fromMillisecondsSinceEpoch(last));
   }
 
-  bool get _hasLocalData =>
-      _collections.any((c) => c is! FoldersSync && c.read().isNotEmpty);
+  bool get _hasLocalData => _collections.any(
+      (c) => c is! FoldersSync && c is! ActivePlansSync && c.read().isNotEmpty);
 
   void _onUser(AccountUser? user) {
     _timer?.cancel();
@@ -252,19 +381,24 @@ class SyncController extends Notifier<SyncStatus> {
   Future<void> resolveAccountChoice({required bool startFresh}) async {
     final uid = _uid;
     if (uid == null || state.phase != SyncPhase.needsAccountChoice) return;
-    if (startFresh) clearLocalData();
+    if (startFresh) await clearLocalData();
     await _prefs.setString(lastUidKey, uid);
     state = SyncStatus(SyncPhase.idle, lastSyncedAt: state.lastSyncedAt);
     await syncNow();
   }
 
-  /// Empties bookmarks, folders, highlights and notes on this device. Call
+  /// Empties synced data (bookmarks, folders, highlights, notes, plans,
+  /// plan progress, reading days) on this device. Call
   /// only while signed out or awaiting the account choice, so the
   /// deletions aren't uploaded.
-  void clearLocalData() {
+  Future<void> clearLocalData() async {
     ref.read(bookmarkDataProvider.notifier).clear();
     ref.read(highlightsProvider.notifier).applySynced({});
     ref.read(notesProvider.notifier).applySynced({});
+    await CustomPlansSync(ref).write({});
+    await PlanProgressSync(ref).write({});
+    await ActivePlansSync(ref).write({});
+    await ReadingDaysSync(ref).write({});
   }
 
   /// Called before signing out: uploads pending changes (best effort).

@@ -30,7 +30,7 @@
       "heading": "If you sign in (optional)",
       "paragraphs": [
         "You can sign in with Google or Apple. Google Firebase Authentication then receives your name, email address (Apple may provide a private relay address) and an account identifier, which we use only to manage your account.",
-        "While signed in, the following are saved to your account in Google Cloud Firestore so they sync between your devices and can be restored: a small profile (your display name, an optional avatar and when it was created or changed), your bookmarks and bookmark folders, highlights, notes, and the reading plans you create. Each synced item also records when it last changed and a random identifier for the device that changed it. Your journal, settings and reading history stay on your device.",
+        "While signed in, the following are saved to your account in Google Cloud Firestore so they sync between your devices and can be restored: a small profile (your display name, an optional avatar and when it was created or changed), your bookmarks and bookmark folders, highlights, notes, the reading plans you create, your progress in reading plans, which plans are active, and the dates you used the app (for your reading streak). Each synced item also records when it last changed and a random identifier for the device that changed it. Your journal, settings and reading history stay on your device.",
         "The same account works in our game Blessed Arcade: if you sign in there with the same Google or Apple account, both apps share that profile. Each app's own data stays separate."
       ]
     },

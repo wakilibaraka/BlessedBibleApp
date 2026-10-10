@@ -40,7 +40,7 @@ dependencies:
   blessed_account:
     git:
       url: https://github.com/wakilibaraka/blessed-account
-      ref: 3caa76e53a40a584f271c1ffcc21d63c65f953fa
+      ref: b6e43ac708d5853227f033710a836ffd1b2bec36
 
 dev_dependencies:
   flutter_test:

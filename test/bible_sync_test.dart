@@ -125,6 +125,48 @@ void main() {
     expect((await col('highlights').get()).docs, isEmpty);
   });
 
+  test('plans, progress, active plans and reading days reach a new device',
+      () async {
+    final a = await device(prefs: {
+      'custom_plan_ids': ['c1'],
+      'custom_plan_c1': '{"id":"c1","title":"Romans"}',
+      'reading_plan_state_c1': '{"completedReadings":[1,2]}',
+      'active_plan_ids': ['c1'],
+      'app_usage_dates': ['2026-10-09', '2026-10-10'],
+    });
+    await settle(a);
+
+    final b = await device(prefs: {
+      'app_usage_dates': ['2026-10-08'],
+    });
+    await settle(b);
+    final p = b.read(preferencesProvider);
+    expect(p.getCustomPlanIds(), ['c1']);
+    expect(p.getCustomPlan('c1')?['title'], 'Romans');
+    expect(p.getReadingPlanState('c1')?['completedReadings'], [1, 2]);
+    expect(p.getActivePlanIds(), ['c1']);
+    expect(p.getAppUsageDates(), ['2026-10-08', '2026-10-09', '2026-10-10'],
+        reason: 'reading days from both devices add up');
+  });
+
+  test('start fresh also clears plans and reading days', () async {
+    final c = await device(prefs: {
+      SyncController.lastUidKey: 'someone-else',
+      'custom_plan_ids': ['c1'],
+      'custom_plan_c1': '{"id":"c1"}',
+      'active_plan_ids': ['c1'],
+      'app_usage_dates': ['2026-10-10'],
+    });
+    await c
+        .read(syncControllerProvider.notifier)
+        .resolveAccountChoice(startFresh: true);
+    await pumpEventQueue();
+    final p = c.read(preferencesProvider);
+    expect(p.getCustomPlanIds(), isEmpty);
+    expect(p.getActivePlanIds(), isEmpty);
+    expect(p.getAppUsageDates(), isEmpty);
+  });
+
   test('synced label', () {
     final now = DateTime(2026, 10, 10, 12);
     expect(syncedLabel(null, now), 'Not synced yet');
