@@ -1547,11 +1547,11 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                               null &&
                                                                           context
                                                                               .mounted) {
-                                                                        Navigator.of(context)
-                                                                            .push(MaterialPageRoute<void>(
+                                                                        unawaited(
+                                                                            Navigator.of(context).push(MaterialPageRoute<void>(
                                                                           builder: (_) =>
                                                                               BibleStoryReaderScreen(initialStory: story),
-                                                                        ));
+                                                                        )));
                                                                       } else {
                                                                         _showCommentaryBottomSheet(
                                                                             verse.number,

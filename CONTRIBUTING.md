@@ -1,5 +1,11 @@
 # Contributing: Project Rules & Workflow
 
+## Toolchain & CI
+- The Flutter version is pinned in `.fvmrc` (currently 3.44.9). With [FVM](https://fvm.app): `fvm install && fvm flutter ...`. Without FVM, install that version manually. `pubspec.lock` is resolved against it.
+- CI (`.github/workflows/ci.yml`) runs on every PR and push to `main`: `dart format` check, `flutter analyze --fatal-infos` (strict modes, see `analysis_options.yaml`), `flutter test`, and an Android debug build. It uses stub Firebase config from `tool/ci/`, so it never needs real credentials.
+- Run the same checks locally before pushing:
+  `dart format lib test && flutter analyze && flutter test`
+
 ## 1. Always Verify Build Before Done
 After making ANY code change, before reporting a task or prompt as complete, the agent/developer MUST:
 1. Run `flutter analyze` and confirm zero errors (fix any errors found).

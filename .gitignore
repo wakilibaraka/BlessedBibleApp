@@ -97,3 +97,6 @@ macos/Runner/GoogleService-Info.plist
 *.db.bak
 assets/bible/bible_*.db
 .tmp.driveupload/
+
+# FVM (Flutter version is pinned in .fvmrc)
+.fvm/
