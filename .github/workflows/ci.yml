@@ -37,6 +37,9 @@ jobs:
       - name: Check formatting
         run: dart format --output=none --set-exit-if-changed lib test
 
+      - name: Check generated privacy policy pages are current
+        run: python3 tool/build_privacy_policy.py --check
+
       - name: Analyze
         run: flutter analyze --fatal-infos
 

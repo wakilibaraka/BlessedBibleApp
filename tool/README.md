@@ -37,3 +37,9 @@ everything from the repo root.
 | `fetch_dore_art.py`, `fetch_remaining_plates.py` | Download Gustave Doré plates (public domain) from Wikimedia Commons. |
 | `devotional_common.py` | Shared helpers for the scripts above. |
 | `data/` | Caches and credits for the fetchers (`dore_credits.json` holds source URLs and attribution). |
+
+## Legal and CI
+| File | Purpose |
+| --- | --- |
+| `build_privacy_policy.py` | Generates `docs/privacy_policy.md` and `.html` from `assets/legal/privacy_policy.json` (the source the app renders). `--check` fails if they are stale; CI runs it. |
+| `ci/` | Stub `firebase_options.dart` and `google-services.json` so CI can analyze, test and build without credentials. |

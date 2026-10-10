@@ -64,6 +64,7 @@ flutter:
     - assets/devotional/stories/
     - assets/devotional/art/
     - assets/licenses/
+    - assets/legal/
   fonts:
     - family: Inter
       fonts:
