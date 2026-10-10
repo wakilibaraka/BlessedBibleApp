@@ -3,7 +3,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'firebase_options.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'dart:io' as dart_io;
 
 import 'state/theme_provider.dart';
 import 'state/surface_style_provider.dart';
@@ -19,39 +18,17 @@ import 'ui/screens/onboarding_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'ui/widgets/app_error_fallback.dart';
 
+import 'services/firebase_setup.dart';
 import 'services/widget_update_service.dart';
-import 'utils/log.dart';
 
 void main() async {
-  // Global Flutter framework error handling
-  FlutterError.onError = (FlutterErrorDetails details) {
-    if (kDebugMode) {
-      FlutterError.presentError(details);
-    } else {
-      FlutterError.dumpErrorToConsole(details);
-    }
-    try {
-      final file = dart_io.File('crash_log.txt');
-      file.writeAsStringSync(
-          'FlutterError: ${details.exception}\n${details.stack}\n',
-          mode: dart_io.FileMode.append);
-    } catch (_) {}
-  };
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  final prefs = PreferencesService(await SharedPreferences.getInstance());
+  await initCrashReporting(enabled: prefs.crashReportsEnabled);
+  await activateAppCheck();
 
-  // Global Platform/Async uncaught error handling
-  PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
-    if (kDebugMode) {
-      logDebug('Uncaught async error: $error\n$stack');
-    }
-    try {
-      final file = dart_io.File('crash_log.txt');
-      file.writeAsStringSync('Uncaught async error: $error\n$stack\n',
-          mode: dart_io.FileMode.append);
-    } catch (_) {}
-    return true; // Handled, prevent process termination
-  };
-
-  // Override ErrorWidget.builder to render branded fallback in release mode
+  // Branded fallback instead of the red error screen in release builds.
   ErrorWidget.builder = (FlutterErrorDetails details) {
     if (kDebugMode) {
       return ErrorWidget(details.exception);
@@ -59,15 +36,12 @@ void main() async {
     return AppErrorFallback(details: details);
   };
 
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await GoogleSignIn.instance.initialize();
-  final prefs = await SharedPreferences.getInstance();
 
   runApp(
     ProviderScope(
       overrides: [
-        preferencesProvider.overrideWithValue(PreferencesService(prefs)),
+        preferencesProvider.overrideWithValue(prefs),
       ],
       child: const TheBlessedBibleApp(),
     ),

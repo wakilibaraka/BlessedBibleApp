@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+    The Crashlytics Gradle plugin is not applied yet, so no build ID is
+    injected. Without this flag the Crashlytics SDK throws at startup.
+    Dart/Flutter crash reports work without it. Running `flutterfire configure`
+    adds the plugin (needed for R8 mapping / native symbol upload); after
+    that this file can be deleted.
+    -->
+    <bool name="com.crashlytics.RequireBuildId">false</bool>
+</resources>

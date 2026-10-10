@@ -1,0 +1,13 @@
+{
+  "name": "blessed-bible-firestore-rules-tests",
+  "private": true,
+  "description": "Emulator tests for ../firestore.rules",
+  "scripts": {
+    "test": "firebase emulators:exec --config ../firebase.json --only firestore --project demo-blessed-bible \"node --test\""
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^6.0.0",
+    "firebase": "^13.0.0",
+    "firebase-tools": "^15.33.0"
+  }
+}

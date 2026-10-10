@@ -34,6 +34,8 @@ dependencies:
   cloud_firestore: ^6.8.0
   sign_in_with_apple: ^8.1.0
   home_widget: ^0.10.0
+  firebase_app_check: ^0.4.8
+  firebase_crashlytics: ^5.4.0
 
 dev_dependencies:
   flutter_test:

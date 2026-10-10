@@ -11,6 +11,7 @@ import '../../state/translation_provider.dart';
 import '../sheets/translation_picker_sheet.dart';
 import '../../state/read_settings_provider.dart';
 import '../../state/bbe_substitutions_provider.dart';
+import '../../services/firebase_setup.dart';
 import '../../services/backup_service.dart';
 import '../../services/bible_database_service.dart';
 import '../../state/reminders_provider.dart';
@@ -1366,6 +1367,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               }
             },
           ),
+          const Divider(height: 1, indent: 16),
+          StatefulBuilder(builder: (context, setTileState) {
+            final prefs = ref.read(preferencesProvider);
+            return SwitchListTile(
+              title: const Text('Send crash reports'),
+              subtitle: const Text(
+                  'Anonymous crash details help fix bugs. No Bible reading, notes or personal content is included.'),
+              value: prefs.crashReportsEnabled,
+              onChanged: (value) async {
+                await prefs.setCrashReportsEnabled(value);
+                await setCrashReportingEnabled(value);
+                setTileState(() {});
+              },
+            );
+          }),
           const Divider(height: 1, indent: 16),
           ListTile(
             title: const Text('Privacy Policy'),

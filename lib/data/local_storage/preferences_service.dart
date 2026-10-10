@@ -46,6 +46,7 @@ class PreferencesService {
 
   // Reading tips
   static const String _showReadingTipsKey = 'show_reading_tips';
+  static const String _crashReportsEnabledKey = 'crash_reports_enabled';
 
   // Reminder settings
   static const String _sabbathReminderEnabledKey = 'sabbath_reminder_enabled';
@@ -537,6 +538,12 @@ class PreferencesService {
   bool get showReadingTips => prefs.getBool(_showReadingTipsKey) ?? true;
   void setShowReadingTips(bool value) =>
       prefs.setBool(_showReadingTipsKey, value);
+
+  /// User opt-out for Crashlytics. On by default.
+  bool get crashReportsEnabled =>
+      prefs.getBool(_crashReportsEnabledKey) ?? true;
+  Future<void> setCrashReportsEnabled(bool value) =>
+      prefs.setBool(_crashReportsEnabledKey, value);
 
   // --- Onboarding ---
   static const String _onboardingCompleteKey = 'onboarding_complete';
