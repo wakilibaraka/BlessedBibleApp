@@ -60,6 +60,22 @@ class NotesNotifier extends Notifier<List<PersonalNote>> {
     _save();
   }
 
+  /// Replaces notes with the synced set (see lib/sync/), keeping this
+  /// device's order and putting notes new to it first.
+  void applySynced(Map<String, PersonalNote> byId) {
+    final kept = [
+      for (final n in state)
+        if (byId.containsKey(n.id)) byId[n.id]!,
+    ];
+    final known = kept.map((n) => n.id).toSet();
+    state = [
+      for (final n in byId.values)
+        if (!known.contains(n.id)) n,
+      ...kept,
+    ];
+    _save();
+  }
+
   void remove(String id) {
     final index = state.indexWhere((n) => n.id == id);
     if (index == -1) return;

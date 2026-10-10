@@ -45,11 +45,11 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "6fa86ee3d510f2fe31b95a193616296dcc55cd43"
-      resolved-ref: "6fa86ee3d510f2fe31b95a193616296dcc55cd43"
+      ref: "3caa76e53a40a584f271c1ffcc21d63c65f953fa"
+      resolved-ref: "3caa76e53a40a584f271c1ffcc21d63c65f953fa"
       url: "https://github.com/wakilibaraka/blessed-account"
     source: git
-    version: "0.2.0"
+    version: "0.3.0"
   boolean_selector:
     dependency: transitive
     description:

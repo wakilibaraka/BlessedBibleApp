@@ -2,6 +2,9 @@ import 'package:blessed_account/blessed_account.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/local_storage/preferences_service.dart';
+import 'journal_provider.dart';
+import 'notes_provider.dart';
+import 'user_data_provider.dart';
 
 export 'package:blessed_account/blessed_account.dart'
     show
@@ -34,6 +37,13 @@ class AuthActions {
   /// Deletes the account, both apps' cloud data and this device's study
   /// data. Throws [SignInCancelledException] if the user dismisses the
   /// re-authentication prompt (nothing is deleted).
-  Future<void> deleteAccount() => _account.deleteAccount(
-      clearLocalData: () => ref.read(preferencesProvider).clearAllUserData());
+  Future<void> deleteAccount() =>
+      _account.deleteAccount(clearLocalData: () async {
+        await ref.read(preferencesProvider).clearAllUserData();
+        ref
+          ..invalidate(bookmarkDataProvider)
+          ..invalidate(highlightsProvider)
+          ..invalidate(notesProvider)
+          ..invalidate(journalProvider);
+      });
 }

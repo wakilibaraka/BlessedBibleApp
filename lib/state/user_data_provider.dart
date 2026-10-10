@@ -66,12 +66,7 @@ class BookmarkDataNotifier extends Notifier<BookmarkData> {
       );
     }
 
-    final folders = [
-      BookmarkFolder(id: 'folder_sermon', name: 'Sermon prep'),
-      BookmarkFolder(id: 'folder_memorize', name: 'Memorize'),
-      BookmarkFolder(id: 'folder_comfort', name: 'Comfort'),
-      BookmarkFolder(id: 'folder_study', name: 'Study'),
-    ];
+    final folders = _defaultFolders();
 
     final newData = BookmarkData(folders: folders, nodes: nodes);
 
@@ -169,6 +164,46 @@ class BookmarkDataNotifier extends Notifier<BookmarkData> {
     ref.read(preferencesProvider).saveBookmarksV2(jsonEncode(newData.toJson()));
   }
 
+  /// Replaces bookmarks with the synced set (see lib/sync/).
+  void applySyncedNodes(Map<String, BookmarkNode> nodes) {
+    _set(BookmarkData(folders: state.folders, nodes: nodes));
+  }
+
+  /// Replaces folders with the synced set, keeping this device's order for
+  /// folders it already has and appending new ones by id (ids embed their
+  /// creation time).
+  void applySyncedFolders(Map<String, String> namesById) {
+    final kept = [
+      for (final f in state.folders)
+        if (namesById.containsKey(f.id))
+          BookmarkFolder(id: f.id, name: namesById[f.id]!),
+    ];
+    final known = kept.map((f) => f.id).toSet();
+    final added = namesById.keys.where((id) => !known.contains(id)).toList()
+      ..sort();
+    _set(BookmarkData(folders: [
+      ...kept,
+      for (final id in added) BookmarkFolder(id: id, name: namesById[id]!),
+    ], nodes: state.nodes));
+  }
+
+  /// Empties bookmarks and restores the default folders.
+  void clear() {
+    _set(BookmarkData(folders: _defaultFolders(), nodes: {}));
+  }
+
+  void _set(BookmarkData data) {
+    state = data;
+    ref.read(preferencesProvider).saveBookmarksV2(jsonEncode(data.toJson()));
+  }
+
+  static List<BookmarkFolder> _defaultFolders() => [
+        BookmarkFolder(id: 'folder_sermon', name: 'Sermon prep'),
+        BookmarkFolder(id: 'folder_memorize', name: 'Memorize'),
+        BookmarkFolder(id: 'folder_comfort', name: 'Comfort'),
+        BookmarkFolder(id: 'folder_study', name: 'Study'),
+      ];
+
   void moveBookmark(String reference, String? newFolderId) {
     final newNodes = Map<String, BookmarkNode>.from(state.nodes);
     final existing = newNodes[reference];
@@ -243,6 +278,12 @@ class HighlightsNotifier extends Notifier<Map<String, int>> {
     }
     state = current;
     ref.read(preferencesProvider).saveHighlights(current);
+  }
+
+  /// Replaces highlights with the synced set (see lib/sync/).
+  void applySynced(Map<String, int> highlights) {
+    state = Map<String, int>.from(highlights);
+    ref.read(preferencesProvider).saveHighlights(state);
   }
 
   void removeHighlight(String reference) {
