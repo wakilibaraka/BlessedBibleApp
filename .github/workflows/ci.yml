@@ -103,3 +103,13 @@ jobs:
         run: |
           npm ci
           npm test
+
+  translation-sources:
+    name: Downloadable translations resolve
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Find candidate translations (temporary)
+        run: python3 tool/check_translation_sources.py --find deu ron rus cmn zho arb kor ukr hin nld por spa eng
+
