@@ -940,8 +940,29 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                         )
                       : flatChapters.isEmpty
                           ? Center(
-                              child: Text('Passage not found.',
-                                  style: theme.textTheme.bodyLarge),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 32),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      bibleState.error.isNotEmpty
+                                          ? 'The Bible text could not be loaded.'
+                                          : 'Passage not found.',
+                                      textAlign: TextAlign.center,
+                                      style: theme.textTheme.bodyLarge,
+                                    ),
+                                    const SizedBox(height: 16),
+                                    OutlinedButton(
+                                      onPressed: () => ref
+                                          .read(bibleProvider.notifier)
+                                          .reload(),
+                                      child: const Text('Try again'),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             )
                           : MediaQuery(
                               data: mqHighSlop,
@@ -2202,7 +2223,12 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     List<InlineSpan> textSpans = [];
     
     String text = verse.text;
-    
+    // Never render a bare verse number: some translations genuinely omit
+    // verses (e.g. Luke 17:36, Acts 8:37).
+    if (text.trim().isEmpty) {
+      text = '[This verse is not included in this translation.]';
+    }
+
     // If not showing strongs, simply strip the tags
     if (!showStrongsNumbers) {
       text = text.replaceAll(RegExp(r'\[[HG]\d+\]'), '');

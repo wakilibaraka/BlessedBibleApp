@@ -6,6 +6,7 @@ import '../state/commentary_provider.dart';
 import '../state/bible_provider.dart';
 import '../models/study_content_category.dart';
 import 'package:collection/collection.dart'; // for firstOrNull
+import '../data/content_fallbacks.dart';
 
 String _extractSnippet(String text) {
   final matches = RegExp(r'[^.!?]+[.!?]').allMatches(text);
@@ -16,19 +17,27 @@ String _extractSnippet(String text) {
   return sentences.take(takeCount).join(' ');
 }
 
+/// Strips red-letter (‹ ›), KJV italic ([ ]) and paragraph (¶) markers
+/// for plain-text surfaces (Home card, share text, home-screen widget).
+String cleanVerseForDisplay(String text) {
+  return text
+      .replaceAll(RegExp('[\u00b6\u2039\u203a\\[\\]]'), '')
+      .replaceAll(RegExp(r'\s+'), ' ')
+      .trim();
+}
+
 final votdPoolProvider = Provider<List<VerseOfTheDay>>((ref) {
   final commentaryState = ref.watch(commentaryProvider);
   final bibleState = ref.watch(bibleProvider);
   
-  final defaultFallback = [
-    VerseOfTheDay(
-      'Revelation 14:12', 
-      'Here is the patience of the saints: here are they that keep the commandments of God, and the faith of Jesus.',
-      commentarySnippet: 'Here is the patience of the saints.',
-    )
-  ];
+  // Compile-time pool of real verse + commentary pairs (generated from the
+  // bundled assets). Only reachable if the startup gate was bypassed.
+  final defaultFallback = kFallbackVotdPool;
 
-  if (commentaryState.isLoading || bibleState.isLoading || bibleState.books.isEmpty) {
+  if (commentaryState.isLoading ||
+      commentaryState.hasError ||
+      bibleState.isLoading ||
+      bibleState.books.isEmpty) {
     return defaultFallback;
   }
   
@@ -59,8 +68,8 @@ final votdPoolProvider = Provider<List<VerseOfTheDay>>((ref) {
              final snippet = _extractSnippet(entry.text);
              if (snippet.trim().isNotEmpty) {
                pool.add(VerseOfTheDay(
-                 refStr, 
-                 verse.text,
+                 refStr,
+                 cleanVerseForDisplay(verse.text),
                  commentarySnippet: snippet,
                  author: entry.author,
                  sourceTitle: entry.source,
@@ -149,7 +158,26 @@ class HomeNotifier extends Notifier<HomeData> {
                  if (chapter != null) {
                    final verse = chapter.verses.firstWhereOrNull((v) => v.number == verseNum);
                    if (verse != null && verse.text.isNotEmpty) {
-                     votd = VerseOfTheDay(overrideRef, verse.text);
+                     // Carry a real commentary excerpt when one exists so
+                     // the reflection card is never empty for overrides.
+                     final entry = (ref.read(commentaryProvider).value ?? [])
+                         .firstWhereOrNull((e) =>
+                             e.scope.type == 'verse' &&
+                             e.scope.book?.toLowerCase() ==
+                                 bookName.toLowerCase() &&
+                             e.scope.chapter == chapterNum &&
+                             e.scope.verse == verseNum &&
+                             e.text.trim().isNotEmpty);
+                     votd = VerseOfTheDay(
+                       overrideRef,
+                       cleanVerseForDisplay(verse.text),
+                       commentarySnippet:
+                           entry != null ? _extractSnippet(entry.text) : null,
+                       author: entry?.author,
+                       sourceTitle: entry?.source,
+                       isDevotional: entry?.category ==
+                           StudyContentCategory.devotional,
+                     );
                    }
                  }
                }

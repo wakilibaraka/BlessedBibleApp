@@ -35,9 +35,12 @@ final crossReferencesProvider =
 
     final rows = await db.rawQuery(
       '''
-      SELECT to_book_number, to_chapter, to_verse, votes
+      SELECT to_book_number, to_chapter, to_verse, MAX(votes) AS votes
       FROM cross_references
       WHERE from_book_number = ? AND from_chapter = ? AND from_verse = ?
+      -- The bundled table stores every row twice; collapse duplicates so
+      -- the sheet shows 20 distinct references, not 10 shown twice.
+      GROUP BY to_book_number, to_chapter, to_verse
       ORDER BY votes DESC
       LIMIT 20
       ''',

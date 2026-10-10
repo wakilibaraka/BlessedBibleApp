@@ -33,16 +33,23 @@ The Blessed Bible focuses on the reading experience: legible typography, a wide 
 - **State management:** Riverpod
 - **Storage:** Local SQLite (bundled Bible database) + SharedPreferences — fully offline, no account required. Optional sign-in (Google/Apple) unlocks cloud backup.
 - **Cloud (optional):** Firebase Auth + cloud backup of personal data.
-- **Platforms:** Android (iOS planned)
+- **Platforms:** Android (iOS in testing)
 
 ## 🚀 Getting Started
 
 ```bash
-git clone https://github.com/Baraka254/BlessedBibleApp.git
+git lfs install            # once per machine — the Bible databases live in Git LFS
+git clone https://github.com/wakilibaraka/BlessedBibleApp.git
 cd BlessedBibleApp
+git lfs pull               # make sure assets/bible/bible.db is the real ~50 MB file
+./scripts/verify_content_assets.sh
 flutter pub get
 flutter run
 ```
+
+> ⚠️ Without Git LFS, `assets/bible/bible.db` and `assets/packs/*.db` are tiny
+> pointer files. The Android build now fails fast on this, and the app shows a
+> recovery screen instead of opening with no Bible text.
 
 **Requirements:** Flutter SDK (stable), Android Studio (Android) or Xcode (iOS).
 
@@ -52,4 +59,4 @@ Early beta. Actively developed — expect ongoing changes.
 
 ## 🔒 License
 
-Public repository. All rights reserved.
+Proprietary — see [LICENSE](LICENSE). Bundled texts, fonts and packages keep their own licenses.

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/local_storage/preferences_service.dart';
 import 'main_nav_screen.dart';
+import 'content_gate.dart';
 import '../../theme/app_colors.dart';
 
 class OnboardingScreen extends ConsumerWidget {
@@ -137,7 +138,10 @@ class OnboardingScreen extends ConsumerWidget {
                         ref.read(preferencesProvider).setOnboardingComplete(true);
                         Navigator.of(context).pushReplacement(
                           PageRouteBuilder(
-                            pageBuilder: (_, __, ___) => const MainNavScreen(),
+                            // Through the gate: a fresh install must not open the app
+                            // before its offline content is verified.
+                            pageBuilder: (_, __, ___) =>
+                                const ContentGate(child: MainNavScreen()),
                             transitionsBuilder: (_, animation, __, child) {
                               return FadeTransition(opacity: animation, child: child);
                             },

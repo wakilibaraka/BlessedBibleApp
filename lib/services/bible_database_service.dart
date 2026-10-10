@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -8,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import '../data/models/bible_model.dart';
 import '../data/models/translation_model.dart';
+import 'content_asset_guard.dart';
 import 'translation_pack_store.dart';
 
 /// Offline-first content store for the bundled Bible database.
@@ -159,10 +161,9 @@ class BibleDatabaseService {
 
     // Bundled packs must be present (fresh installs, repairs, or packs
     // lost outside the app). Cheap no-op when everything is in place;
-    // never resurrects packs the user deleted.
-    await _packStore.ensureBundledPacks(
-      skipIds: await _packStore.deletedPackIds(),
-    );
+    // never resurrects packs the user deleted. Best effort: an optional
+    // translation pack must never block the KJV/BBE backbone.
+    await _ensureBundledPacksBestEffort();
 
     var db = await _openGuarded(dbPath);
     // Converge interrupted migrations: legacy translation rows must not
@@ -185,9 +186,7 @@ class BibleDatabaseService {
         await _recordRepairAttempt(prefs);
         await _installFromAsset(dbPath, prefs, preservePacks: true);
       }
-      await _packStore.ensureBundledPacks(
-        skipIds: await _packStore.deletedPackIds(),
-      );
+      await _ensureBundledPacksBestEffort();
       db = await _openGuarded(dbPath);
     }
 
@@ -257,12 +256,6 @@ class BibleDatabaseService {
       if (backupForPreserve != null) {
         await _preserveDownloadedPacks(dbPath, backupForPreserve);
       }
-      // Bundled packs must be present on every fresh install / repair.
-      // Skips packs the user deleted; no-op when everything is in place.
-      await _packStore.ensureBundledPacks(
-        skipIds: await _packStore.deletedPackIds(),
-        onProgress: (p) => _emitProgress(0.8 + 0.15 * p),
-      );
       // Backbone translations live in the core DB only: drop any stale
       // pack files for them so there is never a duplicate copy.
       for (final id in TranslationPackStore.coreIds) {
@@ -289,9 +282,61 @@ class BibleDatabaseService {
       if (await backupFile.exists()) await backupFile.delete();
     } catch (_) {}
 
+    // The verified core is in place: stamp it before touching optional
+    // packs, so a broken pack can never force a 50 MB re-copy every launch.
     await prefs.setInt(_contentVersionKey, contentVersion);
     await prefs.setInt('db_version', _legacyRequiredDbVersion);
+
+    // Bundled packs must be present on every fresh install / repair.
+    // Skips packs the user deleted; no-op when everything is in place.
+    await _ensureBundledPacksBestEffort(
+      onProgress: (p) => _emitProgress(0.8 + 0.15 * p),
+    );
     _emitProgress(1.0);
+  }
+
+  /// Installs any missing bundled translation packs without ever throwing.
+  /// Packs are optional content; the KJV/BBE backbone lives in the core
+  /// database and must stay usable even when a pack asset is broken.
+  Future<void> _ensureBundledPacksBestEffort(
+      {void Function(double progress)? onProgress}) async {
+    try {
+      await _packStore.ensureBundledPacks(
+        skipIds: await _packStore.deletedPackIds(),
+        onProgress: onProgress,
+      );
+    } catch (e) {
+      stderr.writeln('Bundled translation packs unavailable: $e');
+    }
+  }
+
+  /// User-initiated "Repair content" from the startup recovery screen:
+  /// closes the database, deletes the on-disk copy and its journals, and
+  /// clears the version stamp + repair counter so the next [database]
+  /// access re-seeds deterministically from the bundled asset.
+  Future<void> resetForRepair() async {
+    try {
+      await _db?.close();
+    } catch (_) {}
+    _db = null;
+    _installing = null;
+    final dbDir = await getApplicationSupportDirectory();
+    final base = join(dbDir.path, _dbName);
+    for (final path in [
+      base,
+      '$base-wal',
+      '$base-shm',
+      '$base-journal',
+      join(dbDir.path, 'bible_backup.db'),
+    ]) {
+      try {
+        final f = File(path);
+        if (await f.exists()) await f.delete();
+      } catch (_) {}
+    }
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_contentVersionKey);
+    await prefs.remove(_repairAttemptsKey);
   }
 
   /// Streams the bundled asset to [dbPath] in chunks so first-run UI can
@@ -301,13 +346,18 @@ class BibleDatabaseService {
     final data = await rootBundle.load('assets/bible/$_dbName');
     final bytes =
         data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+    // Fail fast (and clearly) on a Git LFS pointer or truncated asset.
+    assertBundledSqlite('assets/bible/$_dbName', bytes,
+        minBytes: 10 * 1024 * 1024);
     const chunk = 1024 * 1024;
     final out = File(dbPath).openWrite();
     try {
       for (var off = 0; off < bytes.length; off += chunk) {
         final end =
             (off + chunk > bytes.length) ? bytes.length : off + chunk;
-        out.add(bytes.sublist(off, end));
+        final part = bytes.sublist(off, end);
+        if (off == 0) forceRollbackJournalHeader(part);
+        out.add(part);
         // Copy phase reports 0..0.75; packs take it to ~0.95.
         _emitProgress(0.75 * end / bytes.length);
       }
@@ -548,7 +598,9 @@ class BibleDatabaseService {
         final bytes = data.buffer
             .asUint8List(data.offsetInBytes, data.lengthInBytes);
         tmpAsset = File(join(dirname(dbPath), 'bbe_seed.tmp.db'));
-        await tmpAsset.writeAsBytes(bytes, flush: true);
+        final copy = Uint8List.fromList(bytes);
+        forceRollbackJournalHeader(copy);
+        await tmpAsset.writeAsBytes(copy, flush: true);
         seedPath = tmpAsset.path;
       }
       final escaped = seedPath.replaceAll("'", "''");

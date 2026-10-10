@@ -12,15 +12,14 @@ import 'ui/screens/main_nav_screen.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'data/local_storage/preferences_service.dart';
-import 'ui/screens/splash_loading_screen.dart';
-import 'state/bible_provider.dart';
+import 'ui/screens/content_gate.dart';
+import 'state/content_gate_provider.dart';
 import 'ui/screens/onboarding_screen.dart';
 
 import 'package:flutter/foundation.dart';
 import 'ui/widgets/app_error_fallback.dart';
 
 import 'utils/startup_stopwatch.dart';
-import 'services/widget_update_service.dart';
 
 void main() async {
   // Global Flutter framework error handling
@@ -62,8 +61,23 @@ void main() async {
   if (kStartupTrace) {
   }
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await GoogleSignIn.instance.initialize();
+  // Cloud services are optional for an offline-first Bible: a failure or
+  // hang here (airplane mode, bad config) must never keep the app stuck
+  // on the native launch screen, because runApp() would never be reached.
+  try {
+    await Firebase.initializeApp(
+            options: DefaultFirebaseOptions.currentPlatform)
+        .timeout(const Duration(seconds: 8));
+  } catch (e) {
+    debugPrint('Firebase init failed (continuing offline): $e');
+  }
+  try {
+    await GoogleSignIn.instance
+        .initialize()
+        .timeout(const Duration(seconds: 5));
+  } catch (e) {
+    debugPrint('GoogleSignIn init failed (continuing offline): $e');
+  }
   if (kStartupTrace) {
   }
   final prefs = await SharedPreferences.getInstance();
@@ -91,19 +105,17 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
   @override
   void initState() {
     super.initState();
+    // Start preparing content immediately, so it runs in parallel with
+    // onboarding on a fresh install.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (kStartupTrace) {
-      }
+      if (mounted) ref.read(contentReadyProvider);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    ref.watch(widgetUpdateServiceProvider); // Initialize widget background sync
-    
     final themeMode = ref.watch(themeProvider);
     final surfaceStyle = ref.watch(surfaceStyleProvider);
-    final isBibleLoading = ref.watch(bibleProvider.select((s) => s.isLoading));
 
     ThemeData lightBase = themeMode == AppThemeMode.lilies
         ? AppTheme.liliesTheme(14.0)
@@ -177,7 +189,7 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
       darkTheme: darkBase,
       home: !hasCompletedOnboarding
           ? const OnboardingScreen()
-          : (isBibleLoading ? const SplashLoadingScreen() : const MainNavScreen()),
+          : const ContentGate(child: MainNavScreen()),
     );
   }
 }

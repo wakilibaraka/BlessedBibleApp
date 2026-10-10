@@ -249,7 +249,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final theme = Theme.of(context);
 
     // Get dynamic commentary snippet for VOTD
-    String? excerpt = data.verseOfTheDay.commentarySnippet;
+    final rawExcerpt = data.verseOfTheDay.commentarySnippet?.trim();
+    final String? excerpt =
+        (rawExcerpt == null || rawExcerpt.isEmpty) ? null : rawExcerpt;
 
     // Parse VOTD reference for availability check
     final votdRef = data.verseOfTheDay.reference;
@@ -270,7 +272,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           // ── Header Row ────────────────────────────────────────────────
           SharedTopHeader(
             centerContent: Text(
-              'Wednesday · July 22',
+              _todayLabel(),
               textAlign: TextAlign.center,
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w500,
@@ -540,17 +542,16 @@ class WordOfTheDaySection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    // The startup gate resolves this before Home is shown. If it is ever
+    // re-evaluating (e.g. day rollover) or failed, render the compiled-in
+    // word instead of an empty box or a raw exception string.
     final wotdAsync = ref.watch(wordOfTheDayProvider);
-    
-    return wotdAsync.when(
-      data: (wotd) {
-        if (wotd == null) {
-          return const _WotdFallback(
-            'No word picked for today yet — try again later.',
-          );
-        }
-        
-        return BouncyEntrance(
+    if (wotdAsync.hasError) {
+      debugPrint('wordOfTheDayProvider error: ${wotdAsync.error}');
+    }
+    final wotd = wotdAsync.value ?? fallbackWordOfTheDay();
+
+    return BouncyEntrance(
           delay: const Duration(milliseconds: 500),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -650,51 +651,19 @@ class WordOfTheDaySection extends ConsumerWidget {
             ],
           ),
         );
-      },
-      loading: () => const SizedBox.shrink(),
-      error: (e, st) {
-        debugPrint('wordOfTheDayProvider error: $e\n$st');
-        return _WotdFallback('Word of the day unavailable ($e).');
-      },
-    );
   }
 }
 
-/// Quiet, visible fallback so a Word of the Day failure is never silent.
-class _WotdFallback extends StatelessWidget {
-  final String message;
-  const _WotdFallback(this.message);
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          'WORD OF THE DAY',
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: theme.primaryColor,
-            letterSpacing: 2.0,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 12),
-        GlassContainer(
-          isScrollable: false,
-          borderRadius: BorderRadius.circular(24),
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
-          child: Text(
-            message,
-            textAlign: TextAlign.center,
-            style: theme.textTheme.bodySmall?.copyWith(
-              height: 1.60,
-              color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.82),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+/// "Saturday · October 10" for the Home header (no intl dependency).
+String _todayLabel() {
+  const weekdays = [
+    'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday',
+    'Sunday',
+  ];
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June', 'July',
+    'August', 'September', 'October', 'November', 'December',
+  ];
+  final now = DateTime.now();
+  return '${weekdays[now.weekday - 1]} · ${months[now.month - 1]} ${now.day}';
 }

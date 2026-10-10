@@ -69,3 +69,28 @@ flutter {
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }
+
+// Fail the build if a bundled database is a Git LFS pointer (or otherwise
+// not SQLite). Without this, a clone made without `git lfs pull` builds a
+// "working" APK that opens to empty Bible text.
+val verifyContentAssets by tasks.registering {
+    val root = file("../..")
+    doLast {
+        val magic = "SQLite format 3\u0000".toByteArray(Charsets.US_ASCII)
+        val packs = File(root, "assets/packs")
+            .listFiles { f -> f.name.endsWith(".db") }?.toList() ?: emptyList()
+        for (f in listOf(File(root, "assets/bible/bible.db")) + packs) {
+            val head = ByteArray(16)
+            val n = if (f.exists()) f.inputStream().use { it.read(head) } else -1
+            if (n < 16 || !head.contentEquals(magic)) {
+                throw GradleException(
+                    "${f.path} is not a SQLite database (Git LFS pointer?). " +
+                        "Run: git lfs install && git lfs pull"
+                )
+            }
+        }
+    }
+}
+tasks.matching { it.name == "preBuild" }.configureEach {
+    dependsOn(verifyContentAssets)
+}

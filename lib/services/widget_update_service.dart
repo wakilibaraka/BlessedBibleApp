@@ -55,11 +55,9 @@ class WidgetUpdateService {
     // Listen to Word of the Day (WOTD)
     _ref.listen(wordOfTheDayProvider, (previous, next) {
       next.whenData((wotd) {
-        if (wotd != null) {
-          HomeWidget.saveWidgetData<String>('wotd_word', wotd.word);
-          HomeWidget.saveWidgetData<String>('wotd_snippet', wotd.snippet);
-          HomeWidget.updateWidget(name: streakWidgetName, iOSName: 'StreakWidget');
-        }
+        HomeWidget.saveWidgetData<String>('wotd_word', wotd.word);
+        HomeWidget.saveWidgetData<String>('wotd_snippet', wotd.snippet);
+        HomeWidget.updateWidget(name: streakWidgetName, iOSName: 'StreakWidget');
       });
     });
 
@@ -96,17 +94,9 @@ class WidgetUpdateService {
     await HomeWidget.saveWidgetData<bool>('streak_is_lit', isLit);
 
     // 4. Save Word of the Day data
-    final wotd = wotdAsync.value;
-    if (wotd != null) {
-      await HomeWidget.saveWidgetData<String>('wotd_word', wotd.word);
-      await HomeWidget.saveWidgetData<String>('wotd_snippet', wotd.snippet);
-    } else {
-      await HomeWidget.saveWidgetData<String>('wotd_word', 'Grace (Charis)');
-      await HomeWidget.saveWidgetData<String>(
-        'wotd_snippet',
-        'The unmerited favor and divine love of God bestowed upon humanity.',
-      );
-    }
+    final wotd = wotdAsync.value ?? fallbackWordOfTheDay();
+    await HomeWidget.saveWidgetData<String>('wotd_word', wotd.word);
+    await HomeWidget.saveWidgetData<String>('wotd_snippet', wotd.snippet);
 
     // 5. Trigger Native Widget Renders
     await HomeWidget.updateWidget(

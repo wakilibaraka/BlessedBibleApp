@@ -647,7 +647,18 @@ final baseSearchIndexProvider = FutureProvider<IndexData>((ref) async {
   }
 
   // Fetch verses from the database for the current translation
-  final dbVerses = await bibleDbService.getAllVerses(activeTranslation);
+  // A missing/broken translation pack must not leave search empty: fall
+  // back to the always-present KJV backbone.
+  List<Map<String, dynamic>> dbVerses;
+  try {
+    dbVerses = await bibleDbService.getAllVerses(activeTranslation);
+    if (dbVerses.isEmpty && activeTranslation != 'kjv') {
+      dbVerses = await bibleDbService.getAllVerses('kjv');
+    }
+  } catch (e) {
+    if (activeTranslation == 'kjv') rethrow;
+    dbVerses = await bibleDbService.getAllVerses('kjv');
+  }
 
   // Commentary is optional — use whatever is already available without blocking
   final commentaryAsync = ref.watch(commentaryProvider);

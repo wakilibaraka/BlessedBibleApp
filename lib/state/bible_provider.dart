@@ -1,8 +1,8 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/models/bible_model.dart';
 import '../utils/isolate_parsers.dart';
-import '../utils/startup_stopwatch.dart'; // For startupStopwatch
 import '../services/bible_database_service.dart';
 
 class BibleState {
@@ -30,10 +30,33 @@ class BibleState {
 }
 
 class BibleNotifier extends Notifier<BibleState> {
+  Completer<void> _loaded = _newCompleter();
+
+  static Completer<void> _newCompleter() {
+    final c = Completer<void>();
+    // Errors are surfaced via [loaded] / [BibleState.error]; never report
+    // them as unhandled when nobody is awaiting.
+    c.future.ignore();
+    return c;
+  }
+
+  /// Completes when the KJV backbone is in memory; completes with an error
+  /// when it could not be loaded. The startup content gate awaits this so
+  /// the app never opens on top of an empty Bible.
+  Future<void> get loaded => _loaded.future;
+
   @override
   BibleState build() {
     _loadBible();
     return BibleState(isLoading: true);
+  }
+
+  /// Re-runs the load (used by the startup recovery screen's Retry).
+  Future<void> reload() {
+    if (_loaded.isCompleted) _loaded = _newCompleter();
+    state = BibleState(isLoading: true);
+    _loadBible();
+    return loaded;
   }
 
   Future<void> _loadBible() async {
@@ -42,17 +65,21 @@ class BibleNotifier extends Notifier<BibleState> {
       // network). The query below also drives DB install/verify/repair, so
       // the splash screen stays active until content is fully ready.
       final rows = await bibleDbService.getAllVerses('kjv');
-      if (kStartupTrace) {
-      }
 
       final booksList = await compute(parseBibleRows, rows);
-      if (kStartupTrace) {
+
+      // A partial backbone is as bad as none: refuse to open on it.
+      if (booksList.length != 66) {
+        throw StateError(
+            'KJV backbone incomplete (${booksList.length}/66 books).');
       }
 
-      state = state.copyWith(isLoading: false, books: booksList);
-    } catch (e) {
+      state = state.copyWith(isLoading: false, books: booksList, error: '');
+      if (!_loaded.isCompleted) _loaded.complete();
+    } catch (e, st) {
       state =
           state.copyWith(isLoading: false, error: 'Failed to load Bible: $e');
+      if (!_loaded.isCompleted) _loaded.completeError(e, st);
     }
   }
 }

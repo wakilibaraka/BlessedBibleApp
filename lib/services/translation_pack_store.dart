@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
@@ -7,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import '../data/models/translation_model.dart';
+import 'content_asset_guard.dart';
 
 /// Metadata for one installed translation pack.
 class PackMeta {
@@ -231,9 +233,14 @@ class TranslationPackStore {
       }
       final file = await _packFile(id);
       if (!await file.exists()) {
-        await _copyAssetPack(id, file);
-        catalog[id] = await _metaFromPackFile(id, file, source: 'bundled');
-        changed = true;
+        // One broken pack must not stop the remaining packs installing.
+        try {
+          await _copyAssetPack(id, file);
+          catalog[id] = await _metaFromPackFile(id, file, source: 'bundled');
+          changed = true;
+        } catch (e) {
+          stderr.writeln('Bundled pack $id could not be installed: $e');
+        }
       } else if (!catalog.containsKey(id)) {
         try {
           catalog[id] = await _metaFromPackFile(id, file, source: 'bundled');
@@ -249,10 +256,20 @@ class TranslationPackStore {
     final data = await rootBundle.load('assets/packs/$id.db');
     final bytes =
         data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+    assertBundledSqlite('assets/packs/$id.db', bytes);
+    final copy = Uint8List.fromList(bytes);
+    forceRollbackJournalHeader(copy);
     final tmp = File('${dest.path}.tmp');
-    await tmp.writeAsBytes(bytes, flush: true);
-    await _verifyPackFile(id, tmp.path);
-    await tmp.rename(dest.path);
+    try {
+      await tmp.writeAsBytes(copy, flush: true);
+      await _verifyPackFile(id, tmp.path);
+      await tmp.rename(dest.path);
+    } catch (_) {
+      try {
+        if (await tmp.exists()) await tmp.delete();
+      } catch (_) {}
+      rethrow;
+    }
   }
 
   Future<void> _verifyPackFile(String id, String path) async {

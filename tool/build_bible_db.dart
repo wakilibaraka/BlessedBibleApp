@@ -88,6 +88,7 @@ CREATE TABLE translations (
   ];
 
   final report = <String, Map<String, dynamic>>{};
+  final emptyVerses = <String>[];
   
   for (final t in apiTranslations) {
     final apiId = t['id']!;
@@ -127,9 +128,20 @@ CREATE TABLE translations (
             final verseNum = itemMap['number'] as int;
             final verseContent = itemMap['content'] as List<dynamic>;
 
+            // Poetry lines arrive as {"text": ..., "poem": n} objects and
+            // line breaks as {"lineBreak": true}; keeping only Strings
+            // silently blanked most of Psalms/Job/Proverbs in some packs.
             final text = verseContent
-                .whereType<String>()
-                .join('')
+                .map((p) {
+                  if (p is String) return p;
+                  if (p is Map && p['text'] is String) return p['text'] as String;
+                  if (p is Map && p['lineBreak'] == true) return ' ';
+                  return '';
+                })
+                .where((s) => s.trim().isNotEmpty)
+                .map((s) => s.trim())
+                .join(' ')
+                .replaceAll(RegExp(r'\s+'), ' ')
                 .trim()
                 .replaceAll('\u2019', "'")
                 .replaceAll('\u2018', "'")
@@ -138,6 +150,7 @@ CREATE TABLE translations (
                 .replaceAll('\u2014', '--')
                 .replaceAll('\u2013', '-');
 
+            if (text.isEmpty) emptyVerses.add('$apiId $bookOrder:$ch:$verseNum');
             final escapedText = text.replaceAll("'", "''");
             buf.writeln("INSERT INTO verses VALUES('$dbId','$langCode',$bookOrder,$ch,$verseNum,'$escapedText');");
             tCount++;
@@ -170,6 +183,13 @@ CREATE TABLE translations (
     buf.writeln("INSERT OR REPLACE INTO translations VALUES('$dbId','$langCode','$langName','$name','$abbr','$license',1);");
   }
 
+  // A handful of empty verses is normal (textual variants such as
+  // Luke 17:36); hundreds means the extraction is dropping content.
+  print('\nEmpty verses: ${emptyVerses.length}');
+  if (emptyVerses.length > 100) {
+    print('ERROR: too many empty verses, first few: ${emptyVerses.take(10)}');
+    exit(1);
+  }
   buf.writeln('COMMIT;');
   buf.writeln('.quit');
 

@@ -27,13 +27,12 @@ class WidgetSettingsSheet extends ConsumerWidget {
     final homeData = ref.watch(homeProvider);
     final streak = ref.watch(streakProvider);
     final wotdAsync = ref.watch(wordOfTheDayProvider);
-    final wotd = wotdAsync.value;
+    final wotd = wotdAsync.value ?? fallbackWordOfTheDay();
 
     final votdRef = homeData.verseOfTheDay.reference;
     final votdText = homeData.verseOfTheDay.text;
-    final wotdWord = wotd?.word ?? 'Grace (Charis)';
-    final wotdSnippet = wotd?.snippet ??
-        'The unmerited favor and divine love of God bestowed upon humanity.';
+    final wotdWord = wotd.word;
+    final wotdSnippet = wotd.snippet;
 
     final isDark = settings.textMode == WidgetTextMode.dark ||
         (settings.textMode == WidgetTextMode.auto &&

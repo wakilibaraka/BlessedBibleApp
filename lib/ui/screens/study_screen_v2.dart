@@ -1059,46 +1059,16 @@ class _VotdArchiveCard extends ConsumerWidget {
       );
     }
 
-    return wotdAsync.when(
-      data: (wotd) {
-        if (wotd == null) {
-          return V2Card(
-            textured: true,
-            featured: span == CardSpan.full,
-            onTap: open,
-            padding: EdgeInsets.all(expanded ? 20 : 15),
-            child: body('Word of the day', null,
-                showSnippet: false),
-          );
-        }
-        return V2Card(
-          textured: true,
-          featured: span == CardSpan.full,
-          onTap: open,
-          padding: EdgeInsets.all(expanded ? 20 : 15),
-          child: body(wotd.word, wotd.snippet,
-              showSnippet:
-                  span == CardSpan.full || expanded),
-        );
-      },
-      loading: () => V2Card(
-        textured: true,
-        featured: span == CardSpan.full,
-        padding: const EdgeInsets.all(15),
-        child: Text('Loading…',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface
-                  .withValues(alpha: 0.6),
-            )),
-      ),
-      error: (_, __) => V2Card(
-        textured: true,
-        featured: span == CardSpan.full,
-        onTap: open,
-        padding: const EdgeInsets.all(15),
-        child: body('Word of the day', 'Unavailable right now',
-            showSnippet: false),
-      ),
+    // Never a blank/“Unavailable” card: the provider resolves at startup
+    // and falls back to compiled-in content on any failure.
+    final wotd = wotdAsync.value ?? fallbackWordOfTheDay();
+    return V2Card(
+      textured: true,
+      featured: span == CardSpan.full,
+      onTap: open,
+      padding: EdgeInsets.all(expanded ? 20 : 15),
+      child: body(wotd.word, wotd.snippet,
+          showSnippet: span == CardSpan.full || expanded),
     );
   }
 }
