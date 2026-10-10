@@ -1,3 +1,4 @@
+import '../widgets/language_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
@@ -127,6 +128,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
   // --- Page 1: General ---
   Widget _buildGeneralPage(BuildContext context, WidgetRef ref) {
     return _buildPageContainer(context, [
+      const SettingsPillCard(children: [LanguageSettingsTile()]),
       SettingsPillCard(
         children: [
           ListTile(

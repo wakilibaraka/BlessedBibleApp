@@ -1,0 +1,63 @@
+{
+  "@@locale": "en",
+  "appTitle": "The Blessed Bible",
+  "commonCancel": "Cancel",
+  "commonContinue": "Continue",
+  "commonSkip": "Skip",
+  "commonBack": "Back",
+  "commonDone": "Done",
+  "commonSave": "Save",
+  "commonDelete": "Delete",
+  "commonClose": "Close",
+  "commonOk": "OK",
+  "commonRetry": "Try again",
+  "commonShare": "Share",
+  "commonCopy": "Copy",
+  "commonEdit": "Edit",
+  "commonSearch": "Search",
+  "languageTitle": "Language",
+  "languageSystem": "Same as device",
+  "languageSubtitle": "The language of menus and buttons. Your Bible translation is chosen separately.",
+  "onboardingTagline": "Scripture, without distraction.",
+  "onboardingPickLanguage": "Choose your language",
+  "onboardingLanguageHint": "You can change this any time in Settings.",
+  "onboardingBibleTitle": "Your Bible",
+  "onboardingBibleBody": "Pick the translation you read most. You can show a second one side by side.",
+  "onboardingParallel": "Also show {name} alongside",
+  "@onboardingParallel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "onboardingLookTitle": "Make it comfortable",
+  "onboardingLookBody": "Choose a page colour and text size. Everything can be fine-tuned later.",
+  "onboardingThemeLight": "Light",
+  "onboardingThemeSepia": "Sepia",
+  "onboardingThemeDark": "Dark",
+  "onboardingTextSize": "Text size",
+  "onboardingPreviewVerse": "In the beginning was the Word, and the Word was with God, and the Word was God.",
+  "onboardingPreviewRef": "John 1:1",
+  "onboardingFeaturesTitle": "Everything for your daily walk",
+  "onboardingFeatureWordTitle": "The Pure Word",
+  "onboardingFeatureWordBody": "Read without distraction, with highlights, notes and bookmarks.",
+  "onboardingFeaturePlansTitle": "Reading Plans",
+  "onboardingFeaturePlansBody": "Chronological, thematic or your own — with gentle reminders.",
+  "onboardingFeatureStudyTitle": "Deep Study",
+  "onboardingFeatureStudyBody": "Commentary, dictionary, Strong's and maps, right beside the text.",
+  "onboardingFeatureSyncTitle": "Kept safe",
+  "onboardingFeatureSyncBody": "Sign in any time to sync across your devices. No account needed to read.",
+  "onboardingBegin": "Begin reading",
+  "onboardingStep": "Step {current} of {total}",
+  "@onboardingStep": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  }
+}
