@@ -1,11 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../models/reading_plan.dart';
+import '../../services/plan_cloud_backup.dart';
 import '../../services/plan_generator.dart';
 import '../../services/word_count_service.dart';
 import '../../utils/isolate_parsers.dart';
@@ -392,18 +394,11 @@ class _CustomPlanBuilderV2ScreenState
         days: _days.toInt().clamp(1, 730),
         cadence: 7,
       );
-      final uid = ref.read(authStateProvider).value?.uid;
-      if (uid != null) {
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(uid)
-            .collection('plans')
-            .doc(finalPlan.id)
-            .set(finalPlan.toJson());
-      }
       ref
           .read(preferencesProvider)
           .saveCustomPlan(finalPlan.id, finalPlan.toJson());
+      final uid = ref.read(authStateProvider).value?.uid;
+      if (uid != null) unawaited(backupCustomPlan(uid, finalPlan));
       ref.read(activePlanIdsProvider.notifier).addPlan(finalPlan.id);
       // Start inline with the chosen date/rest — no post-start hunt.
       ref.read(readingPlanProvider(finalPlan.id).notifier).startPlan(
