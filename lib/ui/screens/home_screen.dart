@@ -27,17 +27,22 @@ import '../../utils/log.dart';
 class StrictHorizontalDragGestureRecognizer
     extends HorizontalDragGestureRecognizer {
   Offset _totalDelta = Offset.zero;
+  bool _rejected = false;
 
   StrictHorizontalDragGestureRecognizer();
 
   @override
   void addAllowedPointer(PointerDownEvent event) {
     _totalDelta = Offset.zero;
+    _rejected = false;
     super.addAllowedPointer(event);
   }
 
   @override
   void handleEvent(PointerEvent event) {
+    // Once rejected, the drag recognizer is back in its ready state and
+    // must not see more events for this pointer (it asserts otherwise).
+    if (_rejected) return;
     if (event is PointerMoveEvent) {
       _totalDelta += event.delta;
       final dy = _totalDelta.dy.abs();
@@ -45,7 +50,10 @@ class StrictHorizontalDragGestureRecognizer
 
       // Strict threshold: mostly horizontal (at least 45 deg angle)
       if (dy > 3 && dy >= dx * 1.2) {
+        _rejected = true;
         resolve(GestureDisposition.rejected);
+        stopTrackingPointer(event.pointer);
+        return;
       }
     }
     super.handleEvent(event);
