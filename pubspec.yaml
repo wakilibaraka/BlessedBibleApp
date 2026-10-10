@@ -63,6 +63,7 @@ flutter:
     - assets/commentary/
     - assets/devotional/stories/
     - assets/devotional/art/
+    - assets/licenses/
   fonts:
     - family: Inter
       fonts:

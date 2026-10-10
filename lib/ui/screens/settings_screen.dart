@@ -21,6 +21,7 @@ import '../widgets/settings_pill_card.dart';
 import '../sheets/appearance_settings_sheet.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'credits_screen.dart';
 import 'privacy_policy_screen.dart';
 import 'storage_screen.dart';
 import 'onboarding_screen.dart';
@@ -1394,14 +1395,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             },
           ),
           const Divider(height: 1, indent: 16),
-          const ListTile(
-            title: Text('Bible Translations'),
-            subtitle: Text(
-                'Most translations (KJV, WEB, Spanish RV1909, French LSG, German Luther, Italian Diodati, Romanian BTF, Russian Synodal, Chinese CUV, Arabic Van Dyck, Korean 1910, Dutch 1917, Ukrainian Kulish) are in the Public Domain.\n\n'
-                'Creative Commons:\n'
-                '• Swahili ULB & Tagalog ULB (CC BY-SA 4.0)\n'
-                '• Portuguese Bíblia Livre (CC BY 4.0)\n'
-                '• Hindi Indian Revised Version (CC BY-SA 4.0)'),
+          ListTile(
+            title: const Text('Credits & sources'),
+            subtitle: const Text(
+                'Bible translations, commentary, study data, fonts and licenses'),
+            trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const CreditsScreen()),
+            ),
           ),
         ],
       ),

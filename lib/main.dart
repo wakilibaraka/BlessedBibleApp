@@ -18,6 +18,7 @@ import 'ui/screens/onboarding_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'ui/widgets/app_error_fallback.dart';
 
+import 'data/credits.dart';
 import 'services/firebase_setup.dart';
 import 'services/widget_update_service.dart';
 
@@ -27,6 +28,7 @@ void main() async {
   final prefs = PreferencesService(await SharedPreferences.getInstance());
   await initCrashReporting(enabled: prefs.crashReportsEnabled);
   await activateAppCheck();
+  registerFontLicenses();
 
   // Branded fallback instead of the red error screen in release builds.
   ErrorWidget.builder = (FlutterErrorDetails details) {
