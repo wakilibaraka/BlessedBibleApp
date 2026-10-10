@@ -35,15 +35,18 @@ void main() {
     });
 
     test('does not falsely match plain times or numbers', () {
-      final spans = VerseLinker.parse("I woke up at 3:00 and saw 10:45 on the clock. Then I read 4:5.");
+      final spans = VerseLinker.parse(
+          "I woke up at 3:00 and saw 10:45 on the clock. Then I read 4:5.");
       // It should not find any matches, so it returns 1 span with the whole text.
       expect(spans.length, 1);
-      expect((spans[0] as TextSpan).text, "I woke up at 3:00 and saw 10:45 on the clock. Then I read 4:5.");
+      expect((spans[0] as TextSpan).text,
+          "I woke up at 3:00 and saw 10:45 on the clock. Then I read 4:5.");
     });
 
     test('multiple references in one string', () {
       final spans = VerseLinker.parse("See Genesis 1:1 and Revelation 22:21.");
-      expect(spans.length, 5); // "See ", "Genesis 1:1", " and ", "Revelation 22:21", "."
+      expect(spans.length,
+          5); // "See ", "Genesis 1:1", " and ", "Revelation 22:21", "."
       expect((spans[1] as TextSpan).toPlainText(), "Genesis 1:1");
       expect((spans[3] as TextSpan).toPlainText(), "Revelation 22:21");
     });

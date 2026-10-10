@@ -178,8 +178,9 @@ class _BookChapterSelectorSheetState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final settings = ref.watch(bibleNavSettingsProvider);
-    final selectorHeightSetting = ref.watch(readSettingsProvider.select((s) => s.selectorHeight));
-    
+    final selectorHeightSetting =
+        ref.watch(readSettingsProvider.select((s) => s.selectorHeight));
+
     final heightFactor = switch (selectorHeightSetting) {
       SelectorHeight.quarter => 0.50,
       SelectorHeight.half => 0.75,
@@ -215,7 +216,8 @@ class _BookChapterSelectorSheetState
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -253,11 +255,15 @@ class _BookChapterSelectorSheetState
                   SelectionMode.testament, mode, theme);
             }),
           Consumer(builder: (context, ref, _) {
-            final bookName =
-                ref.watch(_sheetStateProvider.select((s) => s.book?.name ?? ''));
+            final bookName = ref
+                .watch(_sheetStateProvider.select((s) => s.book?.name ?? ''));
             final mode = ref.watch(_sheetStateProvider.select((s) => s.mode));
             return _buildBreadcrumbSegment(
-                'Book', bookName.isEmpty ? 'Select Book' : bookName, SelectionMode.book, mode, theme);
+                'Book',
+                bookName.isEmpty ? 'Select Book' : bookName,
+                SelectionMode.book,
+                mode,
+                theme);
           }),
           Consumer(builder: (context, ref, _) {
             final chapter =
@@ -529,8 +535,10 @@ class _BookChapterSelectorSheetState
         itemBuilder: (context, index) {
           final chapter = index + 1;
           final isSel = chapter == selectedChapter;
-          final chapterPericopes = pericopesNotifier.getPericopesForChapter(book.name, chapter);
-          final v1Pericope = chapterPericopes.where((p) => p.startVerse == 1).firstOrNull;
+          final chapterPericopes =
+              pericopesNotifier.getPericopesForChapter(book.name, chapter);
+          final v1Pericope =
+              chapterPericopes.where((p) => p.startVerse == 1).firstOrNull;
           final subtitle = v1Pericope?.title;
 
           return _buildGridTile(
@@ -558,10 +566,16 @@ class _BookChapterSelectorSheetState
     return Consumer(builder: (context, ref, _) {
       final selectedVerse =
           ref.watch(_sheetStateProvider.select((s) => s.verse));
-          
+
       final activeTrans = ref.watch(activeTranslationProvider);
-      final chapterPericopes = ref.watch(pericopesProvider).values.expand((e) => e)
-          .where((p) => p.book == book.name && p.startChapter == selectedChapter && (p.translationId == activeTrans || p.translationId == null))
+      final chapterPericopes = ref
+          .watch(pericopesProvider)
+          .values
+          .expand((e) => e)
+          .where((p) =>
+              p.book == book.name &&
+              p.startChapter == selectedChapter &&
+              (p.translationId == activeTrans || p.translationId == null))
           .toList();
 
       return CustomScrollView(
@@ -590,10 +604,14 @@ class _BookChapterSelectorSheetState
                       borderRadius: BorderRadius.circular(12),
                       onTap: () => _onVerseSelected(p.startVerse, settings),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
                         margin: const EdgeInsets.only(bottom: 8),
                         decoration: BoxDecoration(
-                          color: isSel ? theme.primaryColor : theme.colorScheme.onSurface.withValues(alpha: 0.05),
+                          color: isSel
+                              ? theme.primaryColor
+                              : theme.colorScheme.onSurface
+                                  .withValues(alpha: 0.05),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
@@ -602,7 +620,9 @@ class _BookChapterSelectorSheetState
                               child: Text(
                                 p.title,
                                 style: theme.textTheme.titleSmall?.copyWith(
-                                  color: isSel ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
+                                  color: isSel
+                                      ? theme.colorScheme.onPrimary
+                                      : theme.colorScheme.onSurface,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -611,7 +631,10 @@ class _BookChapterSelectorSheetState
                             Text(
                               'v. ${p.startVerse}',
                               style: theme.textTheme.labelMedium?.copyWith(
-                                color: isSel ? theme.colorScheme.onPrimary.withValues(alpha: 0.7) : theme.colorScheme.primary,
+                                color: isSel
+                                    ? theme.colorScheme.onPrimary
+                                        .withValues(alpha: 0.7)
+                                    : theme.colorScheme.primary,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -638,7 +661,8 @@ class _BookChapterSelectorSheetState
             ),
           ],
           SliverPadding(
-            padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 24),
+            padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).padding.bottom + 24),
             sliver: SliverGrid(
               gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                 maxCrossAxisExtent: 64,
@@ -704,7 +728,9 @@ class _BookChapterSelectorSheetState
             subtitle,
             style: theme.textTheme.bodySmall?.copyWith(
               fontSize: 9,
-              color: isSelected ? Colors.white.withValues(alpha: 0.9) : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              color: isSelected
+                  ? Colors.white.withValues(alpha: 0.9)
+                  : theme.colorScheme.onSurface.withValues(alpha: 0.6),
               height: 1.1,
             ),
             maxLines: 2,
@@ -717,10 +743,12 @@ class _BookChapterSelectorSheetState
 
     final textWidget = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 6.0),
-      child: subtitle != null ? content : FittedBox(
-        fit: BoxFit.scaleDown,
-        child: content,
-      ),
+      child: subtitle != null
+          ? content
+          : FittedBox(
+              fit: BoxFit.scaleDown,
+              child: content,
+            ),
     );
 
     if (!isSelected) {
@@ -765,4 +793,3 @@ class _BookChapterSelectorSheetState
     );
   }
 }
-

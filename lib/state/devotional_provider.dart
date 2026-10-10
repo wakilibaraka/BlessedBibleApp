@@ -170,23 +170,6 @@ final filteredDevotionalStoriesProvider =
   return out.toList(growable: false);
 });
 
-/// Groupings available for the active testament filter.
-final devotionalGroupingsProvider = Provider<List<String>>((ref) {
-  final filter = ref.watch(devotionalFilterProvider);
-  final all = ref.watch(devotionalStoriesProvider).value ?? const [];
-  final test = switch (filter.testament) {
-    TestamentFilter.ot => 'OT',
-    TestamentFilter.nt => 'NT',
-    TestamentFilter.all => null,
-  };
-  final seen = <String>[];
-  for (final s in all) {
-    if (test != null && s.testament != test) continue;
-    if (!seen.contains(s.grouping)) seen.add(s.grouping);
-  }
-  return seen;
-});
-
 /// Books available for the active testament/grouping filter.
 final devotionalBooksProvider = Provider<List<DevotionalBookInfo>>((ref) {
   final filter = ref.watch(devotionalFilterProvider);
@@ -202,27 +185,3 @@ final devotionalBooksProvider = Provider<List<DevotionalBookInfo>>((ref) {
     return true;
   }).toList(growable: false);
 });
-
-/// Devotional books the user has saved to their library (bookmarks).
-class DevotionalLibraryNotifier extends Notifier<Set<String>> {
-  static const String _key = 'devotional_library';
-
-  @override
-  Set<String> build() {
-    final prefs = ref.watch(preferencesProvider);
-    return (prefs.prefs.getStringList(_key) ?? const []).toSet();
-  }
-
-  void toggle(String id) {
-    final next = {...state};
-    if (!next.remove(id)) next.add(id);
-    state = next;
-    ref.read(preferencesProvider).prefs.setStringList(_key, state.toList());
-  }
-
-  bool isSaved(String id) => state.contains(id);
-}
-
-final devotionalLibraryProvider =
-    NotifierProvider<DevotionalLibraryNotifier, Set<String>>(
-        DevotionalLibraryNotifier.new);

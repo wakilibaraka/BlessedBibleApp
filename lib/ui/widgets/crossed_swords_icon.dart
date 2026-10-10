@@ -94,8 +94,10 @@ class _CrossedSwordsPainter extends CustomPainter {
       // Swords point away from each other along their own diagonal.
       canvas.scale(1, dir.toDouble());
       final matrix = Matrix4.identity()
-        ..translate(0.0, -blade.length * (0.15 + 0.85 * progress))
-        ..scale(0.55 + 0.45 * progress);
+        ..translateByDouble(
+            0.0, -blade.length * (0.15 + 0.85 * progress), 0.0, 1.0)
+        ..scaleByDouble(0.55 + 0.45 * progress, 0.55 + 0.45 * progress,
+            0.55 + 0.45 * progress, 1.0);
       canvas.transform(matrix.storage);
       blade.paint(canvas, color);
       canvas.restore();

@@ -79,8 +79,12 @@ class CommentaryEntry {
     if (id.isEmpty) {
       // Generate stable deterministic ID if missing (Dart hashCode is not persistent across runs)
       final slugLen = text.length > 20 ? 20 : text.length;
-      final slug = text.substring(0, slugLen).replaceAll(RegExp(r'[^a-zA-Z0-9]'), '').toLowerCase();
-      id = 'c_${scope.type}_${scope.book ?? "x"}_${scope.chapter ?? 0}_${scope.verse ?? 0}_$slug';
+      final slug = text
+          .substring(0, slugLen)
+          .replaceAll(RegExp(r'[^a-zA-Z0-9]'), '')
+          .toLowerCase();
+      id =
+          'c_${scope.type}_${scope.book ?? "x"}_${scope.chapter ?? 0}_${scope.verse ?? 0}_$slug';
     }
 
     return CommentaryEntry(

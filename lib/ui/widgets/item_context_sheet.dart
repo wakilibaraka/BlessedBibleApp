@@ -93,15 +93,16 @@ class ItemContextSheet extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.6),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                   ],
                 ],
               ),
             ),
-            Divider(height: 1, color: theme.dividerColor.withValues(alpha: 0.5)),
+            Divider(
+                height: 1, color: theme.dividerColor.withValues(alpha: 0.5)),
             // Actions
             Flexible(
               child: ListView.builder(
@@ -118,8 +119,7 @@ class ItemContextSheet extends StatelessWidget {
                       if (i == destructiveIndex && i > 0)
                         Divider(
                           height: 1,
-                          color:
-                              theme.dividerColor.withValues(alpha: 0.5),
+                          color: theme.dividerColor.withValues(alpha: 0.5),
                         ),
                       // 50pt row: comfortably above the 44pt minimum.
                       InkWell(
@@ -140,8 +140,7 @@ class ItemContextSheet extends StatelessWidget {
                               Expanded(
                                 child: Text(
                                   a.label,
-                                  style: theme.textTheme.bodyLarge
-                                      ?.copyWith(
+                                  style: theme.textTheme.bodyLarge?.copyWith(
                                     color: color,
                                     fontWeight:
                                         a.destructive ? FontWeight.w600 : null,
@@ -159,7 +158,8 @@ class ItemContextSheet extends StatelessWidget {
               ),
             ),
             // Cancel
-            Divider(height: 1, color: theme.dividerColor.withValues(alpha: 0.5)),
+            Divider(
+                height: 1, color: theme.dividerColor.withValues(alpha: 0.5)),
             InkWell(
               onTap: () => Navigator.of(context).pop(),
               child: SizedBox(

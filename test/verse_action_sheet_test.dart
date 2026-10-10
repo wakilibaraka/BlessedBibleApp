@@ -19,7 +19,8 @@ void main() {
             label: 'Highlight',
             onTap: () => hits++),
         SheetAction(icon: Icons.note_add_outlined, label: 'Note', onTap: () {}),
-        SheetAction(icon: Icons.menu_book_rounded, label: 'Study', onTap: () {}),
+        SheetAction(
+            icon: Icons.menu_book_rounded, label: 'Study', onTap: () {}),
         SheetAction(
             icon: Icons.ios_share_rounded, label: 'Share', onTap: () {}),
       ];
@@ -32,7 +33,7 @@ void main() {
   }) async {
     // TexturedGlassContainer reads theme/surface providers.
     await tester.pumpWidget(ProviderScope(
-      child: MaterialApp(
+        child: MaterialApp(
       theme: AppTheme.lightTheme(1.0),
       home: Builder(
         builder: (context) => Scaffold(
@@ -54,10 +55,8 @@ void main() {
     }
   }
 
-  testWidgets('renders the five actions and the context label',
-      (tester) async {
-    await openSheet(tester,
-        label: verseSelectionContextLabel('John', 3, [16]));
+  testWidgets('renders the five actions and the context label', (tester) async {
+    await openSheet(tester, label: verseSelectionContextLabel('John', 3, [16]));
 
     expect(find.text('1 verse selected · John 3:16'), findsOneWidget);
     for (final label in ['Save', 'Highlight', 'Note', 'Study', 'Share']) {

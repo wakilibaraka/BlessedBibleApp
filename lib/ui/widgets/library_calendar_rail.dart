@@ -5,7 +5,13 @@ import '../../state/reading_plan_provider.dart';
 import 'study_v2_widgets.dart';
 
 const List<String> _weekdayNames = [
-  'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN',
+  'MON',
+  'TUE',
+  'WED',
+  'THU',
+  'FRI',
+  'SAT',
+  'SUN',
 ];
 
 /// Monday-first week containing [day].
@@ -45,8 +51,8 @@ class LibraryCalendarRailState extends State<LibraryCalendarRail> {
   void initState() {
     super.initState();
     _anchor = libraryWeekDays(widget.today).first;
-    _index = _weeksBetween(_anchor, widget.today)
-        .clamp(0, kCalendarWeekWindow * 2);
+    _index =
+        _weeksBetween(_anchor, widget.today).clamp(0, kCalendarWeekWindow * 2);
     _controller = PageController(initialPage: _index);
   }
 
@@ -56,8 +62,8 @@ class LibraryCalendarRailState extends State<LibraryCalendarRail> {
     // Plan changes only affect the dots (a plain rebuild). A new "today"
     // (app resumed next day) re-centers the rail.
     if (oldWidget.today != widget.today) {
-      final next =
-          _weeksBetween(_anchor, widget.today).clamp(0, kCalendarWeekWindow * 2);
+      final next = _weeksBetween(_anchor, widget.today)
+          .clamp(0, kCalendarWeekWindow * 2);
       if (_controller.hasClients) _controller.jumpToPage(next);
     }
   }
@@ -70,8 +76,8 @@ class LibraryCalendarRailState extends State<LibraryCalendarRail> {
 
   static int _weeksBetween(DateTime a, DateTime b) =>
       (DateTime(b.year, b.month, b.day)
-              .difference(DateTime(a.year, a.month, a.day))
-              .inDays) ~/
+          .difference(DateTime(a.year, a.month, a.day))
+          .inDays) ~/
       7;
 
   int get _lastIndex => kCalendarWeekWindow * 2;
@@ -116,14 +122,14 @@ class LibraryCalendarRailState extends State<LibraryCalendarRail> {
         _StepButton(
           icon: Icons.chevron_left_rounded,
           enabled: _index > 0,
-          onTap: () => _goTo(
-              _visibleWeekStart.subtract(const Duration(days: 7))),
+          onTap: () =>
+              _goTo(_visibleWeekStart.subtract(const Duration(days: 7))),
         ),
         Expanded(
           // Deliberately flat: this is header chrome in a fixed-height
-            // rail, and the surface container's 300ms fade would fight
-            // page snapping.
-            child: V2Card(
+          // rail, and the surface container's 300ms fade would fight
+          // page snapping.
+          child: V2Card(
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
             child: SizedBox(
               height: 64,
@@ -161,8 +167,7 @@ class LibraryCalendarRailState extends State<LibraryCalendarRail> {
         _StepButton(
           icon: Icons.chevron_right_rounded,
           enabled: _index < _lastIndex,
-          onTap: () =>
-              _goTo(_visibleWeekStart.add(const Duration(days: 7))),
+          onTap: () => _goTo(_visibleWeekStart.add(const Duration(days: 7))),
         ),
       ],
     );
@@ -230,8 +235,8 @@ class _DayCell extends StatelessWidget {
                 color: complete ? theme.primaryColor : Colors.transparent,
                 border: (planDay != null && !complete)
                     ? Border.all(
-                        color: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.28),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.28),
                         width: 1,
                       )
                     : null,

@@ -1,4 +1,3 @@
-
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/commentary_entry.dart';
@@ -6,6 +5,7 @@ import '../models/study_content_category.dart';
 import '../data/local_storage/preferences_service.dart';
 import 'package:flutter/foundation.dart';
 import '../utils/isolate_parsers.dart';
+import '../utils/log.dart';
 
 class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
   List<String> _cachedFormattedVerses = [];
@@ -23,7 +23,7 @@ class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
     try {
       final jsonString =
           await rootBundle.loadString('assets/commentary/commentary.json');
-      
+
       final entries = await compute(parseCommentaryJson, jsonString);
 
       final verses = <String>{};
@@ -31,12 +31,12 @@ class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
       final vDevoSet = <String>{};
       final vNoteSet = <String>{};
       final cSet = <String>{};
-      
+
       for (final e in entries) {
         final b = e.scope.book;
         final c = e.scope.chapter;
         final v = e.scope.verse;
-        
+
         if (b != null && c != null) {
           if (e.scope.type == 'chapter') {
             cSet.add('$b|$c');
@@ -54,18 +54,18 @@ class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
           }
         }
       }
-      
+
       _cachedChapters = cSet;
       _cachedVersesWithCommentary = vCommSet;
       _cachedVersesWithDevotionals = vDevoSet;
       _cachedVersesWithNotes = vNoteSet;
       _cachedFormattedVerses = verses.toList()..sort();
-      
+
       return entries;
     } catch (e) {
       // Never fail silently: providers surface the error so screens render
       // an honest error + retry instead of a permanently blank library.
-      debugPrint('commentaryProvider failed to load bundled commentary: $e');
+      logDebug('commentaryProvider failed to load bundled commentary: $e');
       throw StateError('Could not load commentary ($e).');
     }
   }
@@ -186,13 +186,4 @@ final commentaryForChapterProvider =
   final (book, chapter) = args;
   final notifier = ref.watch(commentaryProvider.notifier);
   return notifier.hasCommentary(book, chapter, null);
-});
-
-/// Returns the set of books that have ANY commentary — used by Library.
-final commentaryAvailableBooksProvider = Provider<Set<String>>((ref) {
-  final list = ref.watch(commentaryProvider).value ?? [];
-  return list
-      .where((e) => e.scope.book != null)
-      .map((e) => e.scope.book!)
-      .toSet();
 });

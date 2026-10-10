@@ -92,11 +92,12 @@ final readLocationProvider =
 /// Reusable trigger to jump to a specific verse in the reader.
 /// Opens the reader tab (index 1), loads the requested book/chapter,
 /// and sets the requestedVerse to trigger the scrolling/highlighting logic.
-void openReaderAtVerse(WidgetRef ref, {required String bookName, required int chapter, int? verse}) {
+void openReaderAtVerse(WidgetRef ref,
+    {required String bookName, required int chapter, int? verse}) {
   ref.read(readLocationProvider.notifier).updateLocation(
-    bookName: bookName,
-    chapter: chapter,
-    verse: verse,
-  );
+        bookName: bookName,
+        chapter: chapter,
+        verse: verse,
+      );
   ref.read(navProvider.notifier).setIndex(1);
 }

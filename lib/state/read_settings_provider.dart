@@ -3,7 +3,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 enum ReadingViewMode { full, partial, pinned }
 
-
 /// Layout for verse actions when verses are selected.
 /// - [classic]: compact Apple-style bottom sheet (dock stays 64pt).
 /// - [classicInline]: the previous tall in-dock stack (400pt), kept as an
@@ -17,7 +16,13 @@ enum ReadingLayout { single, interleaved, sideBySide, chips }
 
 enum SelectorHeight { quarter, half, full }
 
-enum DictionaryScope { term, termAndTricky, everything, difficult, difficultAndNames }
+enum DictionaryScope {
+  term,
+  termAndTricky,
+  everything,
+  difficult,
+  difficultAndNames
+}
 
 /// Underline behavior for non-KJV English versions (BBE, WEB, ...).
 /// KJV always follows [DictionaryScope]; other English versions default
@@ -67,7 +72,7 @@ class ReadSettingsState {
     this.readingLayout = ReadingLayout.single,
     this.fabLongPressToNav = true,
     // Note: SelectorHeight.half currently maps to initialChildSize 0.75 (labeled "3/4" in UI)
-    // Quarter maps to 0.5 ("Half") and Full maps to 1.0. 
+    // Quarter maps to 0.5 ("Half") and Full maps to 1.0.
     this.selectorHeight = SelectorHeight.half,
     this.syncSavedItemsLanguage = true,
     this.showChipsOnSavedItems = false,
@@ -113,13 +118,17 @@ class ReadSettingsState {
       readingLayout: readingLayout ?? this.readingLayout,
       fabLongPressToNav: fabLongPressToNav ?? this.fabLongPressToNav,
       selectorHeight: selectorHeight ?? this.selectorHeight,
-      syncSavedItemsLanguage: syncSavedItemsLanguage ?? this.syncSavedItemsLanguage,
-      showChipsOnSavedItems: showChipsOnSavedItems ?? this.showChipsOnSavedItems,
-      dictionaryUnderlinesEnabled: dictionaryUnderlinesEnabled ?? this.dictionaryUnderlinesEnabled,
+      syncSavedItemsLanguage:
+          syncSavedItemsLanguage ?? this.syncSavedItemsLanguage,
+      showChipsOnSavedItems:
+          showChipsOnSavedItems ?? this.showChipsOnSavedItems,
+      dictionaryUnderlinesEnabled:
+          dictionaryUnderlinesEnabled ?? this.dictionaryUnderlinesEnabled,
       dictionaryScope: dictionaryScope ?? this.dictionaryScope,
       nonKjvDictionaryMode: nonKjvDictionaryMode ?? this.nonKjvDictionaryMode,
       showStrongsNumbers: showStrongsNumbers ?? this.showStrongsNumbers,
-      strongsIndicatorStyle: strongsIndicatorStyle ?? this.strongsIndicatorStyle,
+      strongsIndicatorStyle:
+          strongsIndicatorStyle ?? this.strongsIndicatorStyle,
       popupStyle: popupStyle ?? this.popupStyle,
       readingWpm: readingWpm ?? this.readingWpm,
     );
@@ -155,9 +164,12 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     final layoutString = prefs.getString(_readingLayoutKey);
     final fabLongPressToNav = prefs.getBool('fab_long_press_to_nav') ?? true;
     final selectorHeightString = prefs.getString(_selectorHeightKey);
-    final syncSavedItemsLanguage = prefs.getBool('sync_saved_items_language') ?? true;
-    final showChipsOnSavedItems = prefs.getBool('show_chips_on_saved_items') ?? false;
-    final dictionaryUnderlinesEnabled = prefs.getBool('dictionaryUnderlinesEnabled') ?? true;
+    final syncSavedItemsLanguage =
+        prefs.getBool('sync_saved_items_language') ?? true;
+    final showChipsOnSavedItems =
+        prefs.getBool('show_chips_on_saved_items') ?? false;
+    final dictionaryUnderlinesEnabled =
+        prefs.getBool('dictionaryUnderlinesEnabled') ?? true;
     final dictScopeString = prefs.getString('dictionaryScope');
     final showStrongsNumbers = prefs.getBool('show_strongs_numbers') ?? false;
     DictionaryScope dictScope = DictionaryScope.termAndTricky;
@@ -183,7 +195,6 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
         orElse: () => ReadingViewMode.pinned,
       );
     }
-
 
     VerseActionStyle verseStyle = VerseActionStyle.horizontal;
     if (verseStyleString != null) {
@@ -272,9 +283,10 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
   Future<void> setReadingViewMode(ReadingViewMode mode) async {
     state = state.copyWith(
         readingViewMode: mode,
-        isManualNavHidden: mode == ReadingViewMode.full || mode == ReadingViewMode.partial
-            ? false
-            : state.isManualNavHidden);
+        isManualNavHidden:
+            mode == ReadingViewMode.full || mode == ReadingViewMode.partial
+                ? false
+                : state.isManualNavHidden);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_readingViewModeKey, mode.name);
     if (mode == ReadingViewMode.full || mode == ReadingViewMode.partial) {
@@ -282,13 +294,11 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     }
   }
 
-
   Future<void> setGlowEnabled(bool isEnabled) async {
     state = state.copyWith(isGlowEnabled: isEnabled);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_isGlowEnabledKey, isEnabled);
   }
-
 
   Future<void> setVerseActionStyle(VerseActionStyle style) async {
     state = state.copyWith(verseActionStyle: style);
@@ -316,8 +326,6 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     await prefs.setBool(_isManualNavHiddenKey, isHidden);
   }
 
-
-
   Future<void> setKeepScreenAwake(bool value) async {
     state = state.copyWith(keepScreenAwake: value);
     final prefs = await SharedPreferences.getInstance();
@@ -342,7 +350,6 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     await prefs.setBool('sync_saved_items_language', value);
   }
 
-
   Future<void> setDictionaryUnderlinesEnabled(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('dictionaryUnderlinesEnabled', value);
@@ -360,7 +367,6 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
     await prefs.setString('nonKjvDictionaryMode', mode.name);
     state = state.copyWith(nonKjvDictionaryMode: mode);
   }
-
 
   Future<void> setShowChipsOnSavedItems(bool value) async {
     state = state.copyWith(showChipsOnSavedItems: value);

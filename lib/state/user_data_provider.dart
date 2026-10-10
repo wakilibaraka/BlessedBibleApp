@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:convert';
 import '../data/models/bookmark_model.dart';
 import '../data/local_storage/preferences_service.dart';
+import '../utils/log.dart';
 
 /// Canonical key for persistent verse data (bookmarks, highlights, etc.).
 /// Uses the 3-letter abbreviation (e.g. 'GEN', '1CO') which is unique and
@@ -44,9 +45,9 @@ class BookmarkDataNotifier extends Notifier<BookmarkData> {
     if (jsonStr != null && jsonStr.isNotEmpty) {
       try {
         final decoded = jsonDecode(jsonStr);
-        return BookmarkData.fromJson(decoded);
+        return BookmarkData.fromJson(decoded as Map<String, dynamic>);
       } catch (e) {
-        debugPrint('Error parsing bookmarks_v2: $e');
+        logDebug('Error parsing bookmarks_v2: $e');
       }
     }
 
@@ -84,20 +85,23 @@ class BookmarkDataNotifier extends Notifier<BookmarkData> {
         bool verificationPassed = false;
         if (readBackStr != null) {
           try {
-            final readBack = BookmarkData.fromJson(jsonDecode(readBackStr));
+            final readBack = BookmarkData.fromJson(
+                jsonDecode(readBackStr) as Map<String, dynamic>);
             if (readBack.nodes.length == legacyMerged.length) {
               verificationPassed = true;
             }
           } catch (e) {
-            debugPrint('Migration verification failed parsing: $e');
+            logDebug('Migration verification failed parsing: $e');
           }
         }
 
         if (!verificationPassed) {
           prefs.removeBookmarksV2();
-          debugPrint('MIGRATION READ-BACK FAILED. Legacy data untouched. Migration reverted.');
+          logDebug(
+              'MIGRATION READ-BACK FAILED. Legacy data untouched. Migration reverted.');
         } else {
-          debugPrint('MIGRATION SUCCESS: Read-back verified ${nodes.length} bookmarks.');
+          logDebug(
+              'MIGRATION SUCCESS: Read-back verified ${nodes.length} bookmarks.');
         }
       });
     }
@@ -147,7 +151,7 @@ class BookmarkDataNotifier extends Notifier<BookmarkData> {
   void deleteFolder(String id) {
     // Remove the folder
     final newFolders = state.folders.where((f) => f.id != id).toList();
-    
+
     // Move all bookmarks in this folder to Unfiled (folderId = null)
     final newNodes = Map<String, BookmarkNode>.from(state.nodes);
     for (final entry in newNodes.entries) {
@@ -159,7 +163,7 @@ class BookmarkDataNotifier extends Notifier<BookmarkData> {
         );
       }
     }
-    
+
     final newData = BookmarkData(folders: newFolders, nodes: newNodes);
     state = newData;
     ref.read(preferencesProvider).saveBookmarksV2(jsonEncode(newData.toJson()));
@@ -176,13 +180,16 @@ class BookmarkDataNotifier extends Notifier<BookmarkData> {
       );
       final newData = BookmarkData(folders: state.folders, nodes: newNodes);
       state = newData;
-      ref.read(preferencesProvider).saveBookmarksV2(jsonEncode(newData.toJson()));
+      ref
+          .read(preferencesProvider)
+          .saveBookmarksV2(jsonEncode(newData.toJson()));
     }
   }
 }
 
 final bookmarkDataProvider =
-    NotifierProvider<BookmarkDataNotifier, BookmarkData>(BookmarkDataNotifier.new);
+    NotifierProvider<BookmarkDataNotifier, BookmarkData>(
+        BookmarkDataNotifier.new);
 
 class BookmarksNotifier extends Notifier<Set<String>> {
   @override
@@ -251,4 +258,3 @@ class HighlightsNotifier extends Notifier<Map<String, int>> {
 final highlightsProvider =
     NotifierProvider<HighlightsNotifier, Map<String, int>>(
         HighlightsNotifier.new);
-

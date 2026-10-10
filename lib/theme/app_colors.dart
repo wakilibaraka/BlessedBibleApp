@@ -106,15 +106,16 @@ class AppColors {
   static Color getRenderedHighlightColor(
       Color baseColor, Brightness brightness, Color scaffoldBackgroundColor) {
     Color finalColor = baseColor;
-    
+
     if (baseColor == const Color(0xFFFEF08A)) {
       if (scaffoldBackgroundColor == sepiaBackground ||
           scaffoldBackgroundColor == warmGoldBackground) {
-        finalColor = Colors.amber.shade700; // Deeper, more saturated yellow-gold for sepia themes
+        finalColor = Colors.amber
+            .shade700; // Deeper, more saturated yellow-gold for sepia themes
       }
     }
-    
-    // Reduce the intensity for readability. 
+
+    // Reduce the intensity for readability.
     // In dark themes, bright pastels need very low opacity to not wash out the white text.
     // In light themes, they need moderate opacity so the dark text remains readable.
     if (brightness == Brightness.dark) {

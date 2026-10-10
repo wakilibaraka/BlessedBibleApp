@@ -130,19 +130,15 @@ void main() {
       expect(shareTapped, isTrue);
     });
 
-    testWidgets('every action is a labelled semantics button',
-        (tester) async {
+    testWidgets('every action is a labelled semantics button', (tester) async {
       final handle = tester.ensureSemantics();
       await tester.pumpWidget(MaterialApp(
         home: RadialActionMenu(
           anchor: const Offset(200, 300),
           actions: [
+            RadialAction(icon: Icons.copy_rounded, label: 'Copy', onTap: () {}),
             RadialAction(
-                icon: Icons.copy_rounded, label: 'Copy', onTap: () {}),
-            RadialAction(
-                icon: Icons.note_add_outlined,
-                label: 'Note',
-                onTap: () {}),
+                icon: Icons.note_add_outlined, label: 'Note', onTap: () {}),
           ],
         ),
       ));
@@ -159,8 +155,7 @@ void main() {
         home: RadialActionMenu(
           anchor: const Offset(200, 300),
           actions: [
-            RadialAction(
-                icon: Icons.copy_rounded, label: 'Copy', onTap: () {}),
+            RadialAction(icon: Icons.copy_rounded, label: 'Copy', onTap: () {}),
           ],
         ),
       ));

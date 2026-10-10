@@ -103,9 +103,7 @@ class SearchNotifier extends Notifier<SearchState> {
     state = state.copyWith(query: query, isSearching: true);
 
     if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(milliseconds: 300), () {
-      _performSearch();
-    });
+    _debounce = Timer(const Duration(milliseconds: 300), _performSearch);
   }
 
   void toggleFilters() {
@@ -127,7 +125,6 @@ class SearchNotifier extends Notifier<SearchState> {
     _performSearch();
   }
 
-  
   void toggleDictionaryFilter() {
     state = state.copyWith(filterDictionary: !state.filterDictionary);
     if (state.query.trim().isNotEmpty) {
@@ -141,7 +138,8 @@ class SearchNotifier extends Notifier<SearchState> {
   }
 
   void setFilterBook(String? bookName) {
-    state = state.copyWith(filterBook: bookName, clearFilterBook: bookName == null);
+    state =
+        state.copyWith(filterBook: bookName, clearFilterBook: bookName == null);
     _performSearch();
   }
 
@@ -189,7 +187,7 @@ class SearchNotifier extends Notifier<SearchState> {
     final query = state.query;
     final engine = ref.read(searchEngineProvider);
     final settings = ref.read(searchSettingsProvider);
-    
+
     final engineFuture = engine.search(
       query,
       includeOt: state.filterOt,
@@ -221,11 +219,16 @@ class SearchNotifier extends Notifier<SearchState> {
     try {
       final db = await bibleDbService.database;
       final q = query.trim();
-      final likeTerm = '%${q}%';
-      
+      final likeTerm = '%$q%';
+
       final rows = await db.query(
         'dictionary',
-        columns: ['display_headword', 'source', 'definition', 'normalized_word'],
+        columns: [
+          'display_headword',
+          'source',
+          'definition',
+          'normalized_word'
+        ],
         where: 'normalized_word LIKE ? OR display_headword LIKE ?',
         whereArgs: [likeTerm, likeTerm],
         orderBy: 'display_headword ASC',
@@ -234,7 +237,7 @@ class SearchNotifier extends Notifier<SearchState> {
 
       // Group by headword to combine sources
       final Map<String, Map<String, dynamic>> grouped = {};
-      
+
       for (final row in rows) {
         final headword = row['display_headword'] as String;
         if (!grouped.containsKey(headword)) {
@@ -245,7 +248,8 @@ class SearchNotifier extends Notifier<SearchState> {
             'definition': row['definition'] as String, // preview first
           };
         }
-        (grouped[headword]!['sources'] as List<String>).add(row['source'] as String);
+        (grouped[headword]!['sources'] as List<String>)
+            .add(row['source'] as String);
       }
 
       return grouped.values.map((g) {
@@ -253,14 +257,14 @@ class SearchNotifier extends Notifier<SearchState> {
         final preview = g['definition'] as String;
         final normWord = g['normalized_word'] as String;
         final sourceList = (g['sources'] as List<String>).join(', ');
-        
+
         // Strip out any HTML-like tags or line breaks for snippet
         var cleanSnippet = preview.replaceAll(RegExp(r'<[^>]*>'), '');
         cleanSnippet = cleanSnippet.replaceAll('\n', ' ');
         if (cleanSnippet.length > 80) {
           cleanSnippet = '${cleanSnippet.substring(0, 80)}...';
         }
-        
+
         return SearchResult(
           title: headword,
           subtitle: 'Dictionary ($sourceList)',

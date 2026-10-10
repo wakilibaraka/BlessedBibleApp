@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
@@ -6,10 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/local_storage/preferences_service.dart';
-import '../../services/devotional_service.dart';
 import '../../services/share_service.dart';
-import '../../state/devotional_provider.dart';
-import '../../state/read_settings_provider.dart';
 
 /// Shareable image cards (1080x1350, WhatsApp-Status-friendly 4:5).
 ///
@@ -72,13 +70,21 @@ class ShareCardStyle {
 /// The app's reading fonts, offered for card typography. Mirrors the
 /// reader's font list so a card can match what the user was reading in.
 const List<String> kShareCardFonts = [
-  'EB Garamond', 'Gentium Book Plus', 'Literata', 'Lora', 'Bitter', 'Cardo',
-  'Noto Serif', 'Alegreya', 'Inter', 'Lexend', 'Source Sans 3', 'OpenDyslexic',
+  'EB Garamond',
+  'Gentium Book Plus',
+  'Literata',
+  'Lora',
+  'Bitter',
+  'Cardo',
+  'Noto Serif',
+  'Alegreya',
+  'Inter',
+  'Lexend',
+  'Source Sans 3',
+  'OpenDyslexic',
 ];
 
 class ShareCardStyleNotifier extends Notifier<ShareCardStyle> {
-  static const _key = 'share_card_style';
-
   @override
   ShareCardStyle build() {
     _load();
@@ -190,7 +196,11 @@ class ShareCard extends StatelessWidget {
     final theme = Theme.of(context);
     final s = style;
     final titleSize = (body == null
-            ? (title.length <= 140 ? 64.0 : title.length <= 320 ? 52.0 : 44.0)
+            ? (title.length <= 140
+                ? 64.0
+                : title.length <= 320
+                    ? 52.0
+                    : 44.0)
             : 92.0) *
         s.scale;
 
@@ -225,9 +235,8 @@ class ShareCard extends StatelessWidget {
                 // fit the frame instead of overflowing or clipping.
                 Expanded(
                   child: Align(
-                    alignment: body == null
-                        ? Alignment.centerLeft
-                        : Alignment.topLeft,
+                    alignment:
+                        body == null ? Alignment.centerLeft : Alignment.topLeft,
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
                       alignment: body == null
@@ -240,11 +249,8 @@ class ShareCard extends StatelessWidget {
                           textAlign: s.align,
                           maxLines: body == null ? 12 : 20,
                           overflow: TextOverflow.ellipsis,
-                          style: textStyle(
-                              titleSize,
-                              body == null
-                                  ? FontWeight.w500
-                                  : FontWeight.w800),
+                          style: textStyle(titleSize,
+                              body == null ? FontWeight.w500 : FontWeight.w800),
                         ),
                       ),
                     ),
@@ -252,8 +258,7 @@ class ShareCard extends StatelessWidget {
                 ),
                 if (body != null) ...[
                   const SizedBox(height: 40),
-                  Container(
-                      height: 3, width: 140, color: theme.primaryColor),
+                  Container(height: 3, width: 140, color: theme.primaryColor),
                   const SizedBox(height: 40),
                 ],
                 Flexible(
@@ -376,7 +381,9 @@ class _Backdrop extends StatelessWidget {
               ),
             ),
           ),
-          Opacity(opacity: topAlpha.clamp(0.0, 1.0), child: const CustomPaint(painter: _GrainPainter())),
+          Opacity(
+              opacity: topAlpha.clamp(0.0, 1.0),
+              child: const CustomPaint(painter: _GrainPainter())),
         ],
       );
 }
@@ -391,8 +398,7 @@ class _GrainPainter extends CustomPainter {
     final paint = Paint()..color = Colors.white.withValues(alpha: 0.05);
     for (var i = 0; i < 2200; i++) {
       canvas.drawCircle(
-        Offset(rand.nextDouble() * size.width,
-            rand.nextDouble() * size.height),
+        Offset(rand.nextDouble() * size.width, rand.nextDouble() * size.height),
         rand.nextDouble() * 2.2,
         paint,
       );
@@ -488,12 +494,11 @@ class _ShareCardSheetState extends ConsumerState<_ShareCardSheet> {
     }
 
     return Container(
-      constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.92),
+      constraints:
+          BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.92),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius:
-            const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
       child: SingleChildScrollView(
@@ -524,25 +529,25 @@ class _ShareCardSheetState extends ConsumerState<_ShareCardSheet> {
             Text('Backdrop',
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.w800,
-                  color: theme.colorScheme.onSurface
-                      .withValues(alpha: 0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   letterSpacing: 1.2,
                 )),
             const SizedBox(height: 6),
             chips<ShareCardBackdrop>(
-                ShareCardBackdrop.values, _backdrop,
+                ShareCardBackdrop.values,
+                _backdrop,
                 (b) => switch (b) {
-                  ShareCardBackdrop.dawn => 'Dawn',
-                  ShareCardBackdrop.dusk => 'Dusk',
-                  ShareCardBackdrop.artwork => 'Artwork',
-                  ShareCardBackdrop.gradient => 'Gradient',
-                }, (b) => setState(() => _backdrop = b)),
+                      ShareCardBackdrop.dawn => 'Dawn',
+                      ShareCardBackdrop.dusk => 'Dusk',
+                      ShareCardBackdrop.artwork => 'Artwork',
+                      ShareCardBackdrop.gradient => 'Gradient',
+                    },
+                (b) => setState(() => _backdrop = b)),
             const SizedBox(height: 12),
             Text('Font',
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.w800,
-                  color: theme.colorScheme.onSurface
-                      .withValues(alpha: 0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   letterSpacing: 1.2,
                 )),
             const SizedBox(height: 6),
@@ -551,8 +556,7 @@ class _ShareCardSheetState extends ConsumerState<_ShareCardSheet> {
               _style.fontFamily ?? '',
               (f) => f.isEmpty ? 'Theme' : f,
               (f) => _set(_style.copyWith(
-                  fontFamily: f.isEmpty ? null : f,
-                  clearFont: f.isEmpty)),
+                  fontFamily: f.isEmpty ? null : f, clearFont: f.isEmpty)),
             ),
             const SizedBox(height: 12),
             Row(
@@ -562,7 +566,9 @@ class _ShareCardSheetState extends ConsumerState<_ShareCardSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const _ControlLabel('Size'),
-                      chips<double>(const [0.85, 1.0, 1.2], _style.scale,
+                      chips<double>(
+                          const [0.85, 1.0, 1.2],
+                          _style.scale,
                           (v) => '${(v * 100).round()}%',
                           (v) => _set(_style.copyWith(scale: v))),
                     ],
@@ -574,7 +580,9 @@ class _ShareCardSheetState extends ConsumerState<_ShareCardSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const _ControlLabel('Spacing'),
-                      chips<double>(const [0, 1, 2], _style.letterSpacing,
+                      chips<double>(
+                          const [0, 1, 2],
+                          _style.letterSpacing,
                           (v) => v == 0 ? 'Normal' : 'Wide ${v.toInt()}',
                           (v) => _set(_style.copyWith(letterSpacing: v))),
                     ],
@@ -590,7 +598,9 @@ class _ShareCardSheetState extends ConsumerState<_ShareCardSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const _ControlLabel('Line height'),
-                      chips<double>(const [1.3, 1.45, 1.6], _style.lineHeight,
+                      chips<double>(
+                          const [1.3, 1.45, 1.6],
+                          _style.lineHeight,
                           (v) => v.toStringAsFixed(2),
                           (v) => _set(_style.copyWith(lineHeight: v))),
                     ],
@@ -620,7 +630,7 @@ class _ShareCardSheetState extends ConsumerState<_ShareCardSheet> {
                     ? null
                     : () async {
                         setState(() => _sharing = true);
-                        HapticFeedback.mediumImpact();
+                        unawaited(HapticFeedback.mediumImpact());
                         await ShareService.shareImageFromBoundary(
                           boundaryKey: _boundaryKey,
                           filename: widget.filename,
@@ -698,8 +708,7 @@ Future<void> showShareOptionsSheet({
       return Container(
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
-          borderRadius:
-              const BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         padding: const EdgeInsets.fromLTRB(8, 8, 8, 32),
         child: Column(
@@ -710,8 +719,7 @@ Future<void> showShareOptionsSheet({
               height: 5,
               margin: const EdgeInsets.only(top: 6, bottom: 6),
               decoration: BoxDecoration(
-                color: theme.colorScheme.onSurface
-                    .withValues(alpha: 0.25),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
                 borderRadius: BorderRadius.circular(3),
               ),
             ),

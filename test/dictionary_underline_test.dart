@@ -29,8 +29,7 @@ List<BibleVerse> get _verses => [
       BibleVerse(
           number: 1,
           text: 'In the beginning God created, saith Jesus unto David'),
-      BibleVerse(
-          number: 2, text: 'Thou shalt not prevent the Lord of hosts'),
+      BibleVerse(number: 2, text: 'Thou shalt not prevent the Lord of hosts'),
     ];
 
 Future<ProviderContainer> makeContainer() async {
@@ -49,8 +48,7 @@ Future<ProviderContainer> makeContainer() async {
   return container;
 }
 
-ChapterUnderlineArgs argsFor(String translationId) =>
-    ChapterUnderlineArgs(
+ChapterUnderlineArgs argsFor(String translationId) => ChapterUnderlineArgs(
       bookNumber: 1,
       chapterNumber: 1,
       verses: _verses,
@@ -78,8 +76,7 @@ void main() {
   // Asset-bundle reads need a binding in plain unit tests.
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test('classic termAndTricky: terms + tricky + contested-as-term',
-      () async {
+  test('classic termAndTricky: terms + tricky + contested-as-term', () async {
     final c = await makeContainer();
     addTearDown(c.dispose);
 
@@ -91,8 +88,7 @@ void main() {
     expect(marked[2], isNot(contains('thou')));
   });
 
-  test('difficult: archaic + tricky + contested, never easy terms',
-      () async {
+  test('difficult: archaic + tricky + contested, never easy terms', () async {
     final c = await makeContainer();
     addTearDown(c.dispose);
     await c
@@ -105,8 +101,7 @@ void main() {
     expect(marked[2], containsAll(['thou', 'prevent', 'lord']));
   });
 
-  test('difficultAndNames adds proper names, still skips easy nouns',
-      () async {
+  test('difficultAndNames adds proper names, still skips easy nouns', () async {
     final c = await makeContainer();
     addTearDown(c.dispose);
     await c
@@ -150,13 +145,18 @@ void main() {
     expect(c.read(chapterUnderlineMapProvider(argsFor('bbe'))), isEmpty);
   });
 
-  test('shipped assets: contested tiers, names, aliases resolve',
-      () async {
-    final wordsJson =
-        json.decode(await rootBundle.loadString('assets/data/dictionary_words.json'))
-            as Map<String, dynamic>;
+  test('shipped assets: contested tiers, names, aliases resolve', () async {
+    final wordsJson = json.decode(
+            await rootBundle.loadString('assets/data/dictionary_words.json'))
+        as Map<String, dynamic>;
     for (final w in [
-      'hell', 'baptism', 'easter', 'ghost', 'lord', 'baptize', 'kingdom'
+      'hell',
+      'baptism',
+      'easter',
+      'ghost',
+      'lord',
+      'baptize',
+      'kingdom'
     ]) {
       expect(wordsJson[w], 'contested', reason: w);
     }
@@ -170,8 +170,9 @@ void main() {
     expect(names, containsAll(['jesus', 'david', 'moses', 'jerusalem']));
     expect(names, isNot(contains('god')));
     expect(names, isNot(contains('brother')));
-    final aliases = json.decode(await rootBundle
-        .loadString('assets/data/dictionary_aliases.json')) as Map<String, dynamic>;
+    final aliases = json.decode(
+            await rootBundle.loadString('assets/data/dictionary_aliases.json'))
+        as Map<String, dynamic>;
     expect(aliases, {
       'baptize': 'baptism',
       'gentile': 'gentiles',

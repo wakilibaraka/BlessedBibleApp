@@ -1,4 +1,3 @@
-
 class PlanRange {
   final String book;
   final int startChapter;
@@ -101,7 +100,8 @@ class PlanDay {
             .toList(),
         totalWords: json['totalWords'] as int,
         estimatedMinutes: json['estimatedMinutes'] as int? ?? 0,
-        estimatedTimeDisplay: json['estimatedTimeDisplay'] as String? ?? '<1 min',
+        estimatedTimeDisplay:
+            json['estimatedTimeDisplay'] as String? ?? '<1 min',
       );
 }
 
@@ -156,8 +156,10 @@ class ReadingPlan {
         'wasClamped': wasClamped,
         'clampReason': clampReason,
         'schedule': schedule.map((d) => d.toJson()).toList(),
-        if (tracks != null) 
-          'tracks': tracks!.map((track) => track.map((r) => r.toJson()).toList()).toList(),
+        if (tracks != null)
+          'tracks': tracks!
+              .map((track) => track.map((r) => r.toJson()).toList())
+              .toList(),
       };
 
   factory ReadingPlan.fromJson(Map<String, dynamic> json) => ReadingPlan(

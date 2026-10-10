@@ -74,7 +74,7 @@ class _VerseContextMenuSheetState extends ConsumerState<VerseContextMenuSheet> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         if (ref.watch(commentaryForChapterProvider(
-                              (widget.bookName, widget.chapterNum))))
+                            (widget.bookName, widget.chapterNum))))
                           Expanded(
                             child: _MenuButton(
                               icon: const Icon(Icons.comment_bank_outlined,
@@ -82,7 +82,8 @@ class _VerseContextMenuSheetState extends ConsumerState<VerseContextMenuSheet> {
                               label: 'Commentary',
                               onTap: () {
                                 Navigator.of(context).pop();
-                                Navigator.of(context).push(CupertinoPageRoute(
+                                Navigator.of(context)
+                                    .push(CupertinoPageRoute<void>(
                                   builder: (_) => CommentaryHubScreen(
                                     book: widget.bookName,
                                     chapter: widget.chapterNum,
@@ -127,21 +128,21 @@ class _VerseContextMenuSheetState extends ConsumerState<VerseContextMenuSheet> {
                           ),
                         ),
                         Expanded(
-                            child: _MenuButton(
-                              icon: const Icon(Icons.link_rounded, size: 24),
-                              label: 'Related',
-                              onTap: () {
-                                Navigator.of(context).pop();
-                                showCrossReferencesSheet(
-                                  context,
-                                  bookNumber: widget.bookNumber,
-                                  chapter: widget.chapterNum,
-                                  verse: widget.verseNumber,
-                                  bookName: widget.bookName,
-                                );
-                              },
-                            ),
+                          child: _MenuButton(
+                            icon: const Icon(Icons.link_rounded, size: 24),
+                            label: 'Related',
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              showCrossReferencesSheet(
+                                context,
+                                bookNumber: widget.bookNumber,
+                                chapter: widget.chapterNum,
+                                verse: widget.verseNumber,
+                                bookName: widget.bookName,
+                              );
+                            },
                           ),
+                        ),
                         Expanded(
                           child: _MenuButton(
                             icon: Icon(Icons.crop_free_rounded, size: 24),

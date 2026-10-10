@@ -64,24 +64,6 @@
         "is_downloaded": 0
       }
     },
-    "ron_btf": {
-      "file": "ron_btf.db",
-      "bytes": 5619712,
-      "sizeMB": 5.36,
-      "sha256": "c6a58081226e7918fee38440e664395f76f49e9e7f0dbe9d573cdcbbd6496052",
-      "id": "ron_btf",
-      "verses": 31102,
-      "meta": {
-        "translation_id": "ron_btf",
-        "language_code": "ro",
-        "language_name": "Romanian",
-        "translation_name": "Romanian BTF Bible",
-        "abbreviation": "BTF",
-        "license": "Public Domain",
-        "is_complete": 1,
-        "is_downloaded": 0
-      }
-    },
     "tgl_ulb": {
       "file": "tgl_ulb.db",
       "bytes": 6299648,

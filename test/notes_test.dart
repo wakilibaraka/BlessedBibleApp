@@ -9,7 +9,7 @@ void main() {
   test('Notes persist to SharedPreferences', () async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
-    
+
     final container = ProviderContainer(
       overrides: [
         preferencesProvider.overrideWithValue(PreferencesService(prefs)),
@@ -21,7 +21,8 @@ void main() {
     expect(initialNotes, isEmpty);
 
     // Add a note
-    final newNote = PersonalNote('test-id-123', 'Test Note', 'This is a test content', 'Jan 01, 2026');
+    final newNote = PersonalNote(
+        'test-id-123', 'Test Note', 'This is a test content', 'Jan 01, 2026');
     container.read(notesProvider.notifier).add(newNote);
 
     // Verify state changed
@@ -40,7 +41,7 @@ void main() {
         preferencesProvider.overrideWithValue(PreferencesService(prefs)),
       ],
     );
-    
+
     final reloadedNotes = container2.read(notesProvider);
     expect(reloadedNotes.length, 1);
     expect(reloadedNotes.first.title, 'Test Note');

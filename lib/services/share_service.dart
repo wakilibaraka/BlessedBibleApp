@@ -12,6 +12,7 @@ import 'package:share_plus/share_plus.dart';
 import '../data/bible_books.dart';
 import '../state/translation_provider.dart';
 import 'bible_database_service.dart';
+import '../utils/log.dart';
 
 /// A centralized service for formatting and sharing Bible content.
 ///
@@ -59,7 +60,8 @@ class ShareService {
     String? secondaryTag,
     bool whatsapp = false,
   }) {
-    final cleaned = texts.map(cleanVerseText).where((t) => t.isNotEmpty).toList();
+    final cleaned =
+        texts.map(cleanVerseText).where((t) => t.isNotEmpty).toList();
     if (cleaned.isEmpty) return '';
     final body = cleaned.length > 1
         ? cleaned
@@ -141,13 +143,14 @@ class ShareService {
   /// (missing secondary verses fall back to primary-only, silently).
   /// Pass already-loaded primary [texts] when the caller has them
   /// (avoids a redundant chapter fetch).
-  static Future<({
-    List<String> texts,
-    String reference,
-    String tag,
-    List<String> secondaryTexts,
-    String secondaryTag,
-  })> collectVerseShare(
+  static Future<
+      ({
+        List<String> texts,
+        String reference,
+        String tag,
+        List<String> secondaryTexts,
+        String secondaryTag,
+      })> collectVerseShare(
     WidgetRef ref, {
     required String bookName,
     required int chapterNum,
@@ -179,8 +182,7 @@ class ShareService {
           ];
           if (secondaryTexts.isNotEmpty) {
             final infos = await bibleDbService.getTranslations();
-            final match =
-                infos.where((t) => t.translationId == secondaryId);
+            final match = infos.where((t) => t.translationId == secondaryId);
             secondaryTag = match.isNotEmpty
                 ? match.first.abbreviation.toUpperCase()
                 : secondaryId.toUpperCase();
@@ -213,10 +215,9 @@ class ShareService {
   /// Shares text via native share sheet using share_plus.
   static Future<void> shareText({required String body, String? subject}) async {
     try {
-      // ignore: deprecated_member_use
-      await Share.share(body, subject: subject);
+      await SharePlus.instance.share(ShareParams(text: body, subject: subject));
     } catch (e) {
-      debugPrint('Share failed: $e');
+      logDebug('Share failed: $e');
     }
   }
 
@@ -233,17 +234,16 @@ class ShareService {
           as RenderRepaintBoundary?;
       if (boundary == null) return;
       final image = await boundary.toImage(pixelRatio: 1.0);
-      final bytes =
-          await image.toByteData(format: ui.ImageByteFormat.png);
+      final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
       if (bytes == null) return;
       final dir = await getTemporaryDirectory();
       final file = File(
           '${dir.path}/$filename-${DateTime.now().millisecondsSinceEpoch}.png');
       await file.writeAsBytes(bytes.buffer.asUint8List());
-      // ignore: deprecated_member_use
-      await Share.shareXFiles([XFile(file.path)], text: caption);
+      await SharePlus.instance
+          .share(ShareParams(files: [XFile(file.path)], text: caption));
     } catch (e) {
-      debugPrint('Share image failed: $e');
+      logDebug('Share image failed: $e');
     }
   }
 }

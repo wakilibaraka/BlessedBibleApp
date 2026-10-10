@@ -12,8 +12,7 @@ TextStyle dictionaryWordStyle(BuildContext context, TextStyle? base) {
   return (base ?? const TextStyle()).copyWith(
     decoration: TextDecoration.underline,
     decorationStyle: TextDecorationStyle.dotted,
-    decorationColor:
-        theme.colorScheme.onSurface.withValues(alpha: 0.5),
+    decorationColor: theme.colorScheme.onSurface.withValues(alpha: 0.5),
   );
 }
 
@@ -145,19 +144,17 @@ class _VerseLinkTextState extends State<VerseLinkText> {
     final chapter = int.parse(match.group(2)!);
     final startVerseStr = match.group(3);
     final wholeChapter = startVerseStr == null;
-    final startVerse =
-        startVerseStr == null ? 1 : int.parse(startVerseStr);
+    final startVerse = startVerseStr == null ? 1 : int.parse(startVerseStr);
     final midChapterStr = match.group(4);
     final endVerseStr = match.group(5);
-    final int? endChapter =
-        midChapterStr != null && endVerseStr != null
-            ? int.parse(midChapterStr)
-            : null;
+    final int? endChapter = midChapterStr != null && endVerseStr != null
+        ? int.parse(midChapterStr)
+        : null;
     final int? endVerse = endChapter != null
         ? int.parse(endVerseStr!)
         : (midChapterStr != null ? int.parse(midChapterStr) : null);
 
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,

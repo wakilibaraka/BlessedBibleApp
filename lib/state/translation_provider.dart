@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/local_storage/preferences_service.dart';
 import '../data/models/translation_model.dart';
@@ -15,11 +16,12 @@ class TranslationNotifier extends Notifier<String> {
     final prefs = ref.read(preferencesProvider);
     await prefs.setActiveTranslation(translationId);
     state = translationId;
-    
+
     // Guard: Prevent primary and secondary from being equal
     final secondaryId = ref.read(secondaryTranslationProvider);
     if (secondaryId == translationId) {
-      ref.read(secondaryTranslationProvider.notifier).setTranslation(null);
+      unawaited(
+          ref.read(secondaryTranslationProvider.notifier).setTranslation(null));
     }
   }
 }
@@ -33,10 +35,11 @@ class SecondaryTranslationNotifier extends Notifier<String?> {
 
   Future<void> setTranslation(String? translationId) async {
     // Guard: Prevent secondary from being equal to primary
-    if (translationId != null && translationId == ref.read(activeTranslationProvider)) {
-      return; 
+    if (translationId != null &&
+        translationId == ref.read(activeTranslationProvider)) {
+      return;
     }
-    
+
     final prefs = ref.read(preferencesProvider);
     await prefs.setSecondaryTranslation(translationId);
     state = translationId;
@@ -51,7 +54,7 @@ final secondaryTranslationProvider =
 
 final availableTranslationsProvider =
     FutureProvider<List<TranslationInfo>>((ref) async {
-  return await bibleDbService.getTranslations();
+  return bibleDbService.getTranslations();
 });
 
 typedef VerseRequest = ({
@@ -63,7 +66,7 @@ typedef VerseRequest = ({
 
 final verseTranslationProvider =
     FutureProvider.family<BibleVerse?, VerseRequest>((ref, request) async {
-  return await bibleDbService.getVerse(
+  return bibleDbService.getVerse(
     request.translationId,
     request.bookNumber,
     request.chapter,

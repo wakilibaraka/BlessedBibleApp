@@ -1,7 +1,53 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
-class PrivacyPolicyScreen extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:url_launcher/url_launcher.dart';
+
+/// Privacy policy parsed from assets/legal/privacy_policy.json, the same
+/// source that generates the hosted docs/privacy_policy.html.
+class PrivacyPolicy {
+  final String title;
+  final String effectiveDate;
+  final String url;
+  final List<(String heading, List<String> paragraphs)> sections;
+
+  const PrivacyPolicy({
+    required this.title,
+    required this.effectiveDate,
+    required this.url,
+    required this.sections,
+  });
+
+  factory PrivacyPolicy.fromJson(Map<String, dynamic> json) => PrivacyPolicy(
+        title: json['title'] as String,
+        effectiveDate: json['effectiveDate'] as String,
+        url: json['url'] as String,
+        sections: [
+          for (final s
+              in (json['sections'] as List).cast<Map<String, dynamic>>())
+            (
+              s['heading'] as String,
+              (s['paragraphs'] as List).cast<String>(),
+            ),
+        ],
+      );
+
+  static Future<PrivacyPolicy> load() async =>
+      PrivacyPolicy.fromJson(jsonDecode(
+              await rootBundle.loadString('assets/legal/privacy_policy.json'))
+          as Map<String, dynamic>);
+}
+
+class PrivacyPolicyScreen extends StatefulWidget {
   const PrivacyPolicyScreen({super.key});
+
+  @override
+  State<PrivacyPolicyScreen> createState() => _PrivacyPolicyScreenState();
+}
+
+class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
+  late final Future<PrivacyPolicy> _policy = PrivacyPolicy.load();
 
   @override
   Widget build(BuildContext context) {
@@ -12,58 +58,44 @@ class PrivacyPolicyScreen extends StatelessWidget {
         title: const Text('Privacy Policy'),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Privacy Policy',
-              style: theme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold, color: theme.primaryColor),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Effective Date: August 26, 2026',
-              style: theme.textTheme.bodySmall?.copyWith(fontStyle: FontStyle.italic),
-            ),
-            const SizedBox(height: 24),
-
-            _buildSection(theme, 'Introduction',
-                'Welcome to The Blessed Bible. We are committed to protecting your privacy and ensuring your personal information is secure. This Privacy Policy explains how your information is collected, used, and stored when you use our application.'),
-
-            _buildSection(theme, 'Information We Collect',
-                'When you use The Blessed Bible, we may collect the following types of information:\n\n'
-                '• Account Information: When you sign in using Google or Apple, we receive your basic profile information (such as your name and email address) necessary to create and manage your account.\n'
-                '• App Activity: We store your reading progress, bookmarks, highlights, notes, and reading plans to provide a seamless experience across your devices.\n'
-                '• Usage & Diagnostics: We may collect anonymized crash reports and performance data to help us improve the app\'s stability and user experience.'),
-
-            _buildSection(theme, 'How We Use Your Information',
-                'We use the collected data strictly to operate and improve the app. Specifically, we use it to:\n\n'
-                '• Sync your reading progress and personal study notes across your devices.\n'
-                '• Provide account management and authentication.\n'
-                '• Identify and fix bugs through crash reporting.\n\n'
-                'We do not sell your personal data, nor do we share it with third parties for marketing or advertising purposes.'),
-
-            _buildSection(theme, 'Data Storage and Security',
-                'Your data is stored securely using Google Firebase, which employs industry-standard encryption both in transit and at rest. We restrict access to personal data to ensure it is only used for the purposes outlined in this policy.'),
-
-            _buildSection(theme, 'Your Rights & Account Deletion',
-                'You retain full ownership of your data. You have the right to access, modify, or delete your personal information at any time. You can delete your account and all associated data directly within the app by navigating to your Account settings and selecting "Delete Account." Upon deletion, your personal data and study records are permanently removed from our active databases.'),
-
-            _buildSection(theme, 'Third-Party Services',
-                'We utilize third-party services, such as Google Firebase (Authentication, Firestore, and Crashlytics) and Apple (Sign in with Apple), to power our app\'s backend and authentication. These services are governed by their respective privacy policies.'),
-
-            _buildSection(theme, 'Changes to This Policy',
-                'We may update this Privacy Policy from time to time to reflect changes in our practices or legal requirements. We encourage you to review it periodically.'),
-
-            _buildSection(theme, 'Contact Us',
-                'If you have any questions, concerns, or requests regarding this Privacy Policy, please contact us at:\n\n'
-                'wakilibar@gmail.com'),
-                
-            const SizedBox(height: 48), // Padding at bottom
-          ],
-        ),
+      body: FutureBuilder<PrivacyPolicy>(
+        future: _policy,
+        builder: (context, snapshot) {
+          final policy = snapshot.data;
+          if (policy == null) {
+            return Center(
+              child: snapshot.hasError
+                  ? const Text('Could not load the privacy policy.')
+                  : const CircularProgressIndicator(),
+            );
+          }
+          return ListView(
+            padding: const EdgeInsets.all(24.0),
+            children: [
+              Text(
+                policy.title,
+                style: theme.textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold, color: theme.primaryColor),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Effective Date: ${policy.effectiveDate}',
+                style: theme.textTheme.bodySmall
+                    ?.copyWith(fontStyle: FontStyle.italic),
+              ),
+              const SizedBox(height: 24),
+              for (final (heading, paragraphs) in policy.sections)
+                _buildSection(theme, heading, paragraphs.join('\n\n')),
+              TextButton.icon(
+                onPressed: () => launchUrl(Uri.parse(policy.url),
+                    mode: LaunchMode.externalApplication),
+                icon: const Icon(Icons.open_in_new_rounded, size: 18),
+                label: const Text('View online'),
+              ),
+              const SizedBox(height: 48),
+            ],
+          );
+        },
       ),
     );
   }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -138,8 +139,10 @@ class NotesListScreen extends ConsumerWidget {
 
 Future<void> showAddNoteSheet(
     BuildContext context, WidgetRef ref, ThemeData theme,
-    {String? initialReference, PersonalNote? editingNote, String? editingId}) async {
-  await showModalBottomSheet(
+    {String? initialReference,
+    PersonalNote? editingNote,
+    String? editingId}) async {
+  await showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
@@ -178,32 +181,44 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
   @override
   void initState() {
     super.initState();
-    titleController = TextEditingController(text: widget.editingNote?.title ?? '');
-    contentController = TextEditingController(text: widget.editingNote?.content ?? '');
+    titleController =
+        TextEditingController(text: widget.editingNote?.title ?? '');
+    contentController =
+        TextEditingController(text: widget.editingNote?.content ?? '');
 
     if (widget.editingNote == null && widget.initialReference != null) {
       final initialReference = widget.initialReference!;
       final lastSpaceIdx = initialReference.lastIndexOf(' ');
       if (lastSpaceIdx != -1) {
         final bookName = initialReference.substring(0, lastSpaceIdx);
-        final refParts = initialReference.substring(lastSpaceIdx + 1).split(':');
+        final refParts =
+            initialReference.substring(lastSpaceIdx + 1).split(':');
         if (refParts.isNotEmpty) {
           final chapterNum = int.tryParse(refParts[0]);
           if (chapterNum != null) {
-            final chapterTitle = ref.read(pericopesProvider.notifier).getPericopesForChapter(bookName, chapterNum).where((p) => p.startVerse == 1).firstOrNull?.title;
+            final chapterTitle = ref
+                .read(pericopesProvider.notifier)
+                .getPericopesForChapter(bookName, chapterNum)
+                .where((p) => p.startVerse == 1)
+                .firstOrNull
+                ?.title;
             if (chapterTitle != null && chapterTitle.isNotEmpty) {
               titleController.text = chapterTitle;
             }
-            final verseNum = refParts.length > 1 ? int.tryParse(refParts[1].split(',')[0]) : null;
+            final verseNum = refParts.length > 1
+                ? int.tryParse(refParts[1].split(',')[0])
+                : null;
             final commentaryList = ref.read(commentaryProvider).value ?? [];
             final matchingCommentaries = commentaryList.where((e) =>
                 e.scope.book?.toLowerCase() == bookName.toLowerCase() &&
                 e.scope.chapter == chapterNum &&
                 (e.scope.verse == verseNum || e.scope.verse == null));
-            
+
             if (matchingCommentaries.isNotEmpty) {
               final contentText = matchingCommentaries.first.text;
-              final firstParagraph = contentText.split('\n').firstWhere((line) => line.trim().isNotEmpty, orElse: () => '');
+              final firstParagraph = contentText.split('\n').firstWhere(
+                  (line) => line.trim().isNotEmpty,
+                  orElse: () => '');
               if (firstParagraph.isNotEmpty) {
                 contentController.text = firstParagraph;
               }
@@ -233,7 +248,7 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
     final textBeforeCursor = text.substring(0, cursorPosition);
     final lines = textBeforeCursor.split('\n');
     if (lines.isEmpty) return;
-    
+
     final currentLine = lines.last;
 
     if (currentLine == '/' || currentLine.endsWith(' /')) {
@@ -256,96 +271,131 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
   void _insertText(String textToInsert) {
     if (_slashIndex != -1) {
       final text = contentController.text;
-      final newText = text.replaceRange(_slashIndex, contentController.selection.baseOffset, textToInsert);
+      final newText = text.replaceRange(
+          _slashIndex, contentController.selection.baseOffset, textToInsert);
       contentController.value = TextEditingValue(
         text: newText,
-        selection: TextSelection.collapsed(offset: _slashIndex + textToInsert.length),
+        selection:
+            TextSelection.collapsed(offset: _slashIndex + textToInsert.length),
       );
     }
   }
 
   void _insertVerse() async {
-    setState(() { _showSlashMenu = false; });
+    setState(() {
+      _showSlashMenu = false;
+    });
     final books = ref.read(bibleProvider).books;
-    
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      useRootNavigator: true,
-      useSafeArea: false,
-      builder: (ctx) => BookChapterSelectorSheet(
-        books: books,
-        selectedBookAbbrev: books.first.abbreviation,
-        selectedChapter: 1,
-        onSelectionChanged: (abbrev, name, chapter, verse, {bool autoClose = true}) {
-          if (autoClose) Navigator.pop(ctx);
-          if (verse == null) return;
-          
-          final bookNum = books.indexWhere((b) => b.abbreviation == abbrev) + 1;
-          final activeTrans = ref.read(activeTranslationProvider);
-          final versesAsync = ref.read(translationChapterProvider((
-            translationId: activeTrans,
-            bookNumber: bookNum,
-            chapterNumber: chapter,
-          )));
-          
-          String verseText = '';
-          if (versesAsync.value != null) {
-            final target = versesAsync.value!.firstWhere((v) => v.number == verse, orElse: () => BibleVerse(number: verse, text: ''));
-            verseText = target.text;
-          }
-          if (verseText.isEmpty) {
-            final flatList = ref.read(flatChaptersProvider);
-            final targetChapter = flatList.firstWhere((fc) => fc.book.abbreviation == abbrev && fc.chapter.number == chapter);
-            final target = targetChapter.chapter.verses.firstWhere((v) => v.number == verse);
-            verseText = target.text;
-          }
-          
-          final insertedText = '"$verseText" - $name $chapter:$verse ';
-          _insertText(insertedText);
-          
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Verse inserted'),
-              action: SnackBarAction(
-                label: 'Add Commentary',
-                onPressed: () {
-                  final commentaryList = ref.read(commentaryProvider).value ?? [];
-                  final matchList = commentaryList.where(
-                    (c) => c.scope.book?.toLowerCase() == name.toLowerCase() && c.scope.chapter == chapter && (c.scope.verse == verse || c.scope.verse == null)
-                  ).toList();
-                  
-                  if (matchList.isNotEmpty) {
-                    final firstPara = matchList.first.text.split('\n').firstWhere((l) => l.trim().isNotEmpty, orElse: () => '');
-                    if (firstPara.isNotEmpty) {
-                       final text = contentController.text;
-                       final cursor = contentController.selection.baseOffset;
-                       final newText = text.replaceRange(cursor, cursor, '\n$firstPara\n');
-                       contentController.value = TextEditingValue(
-                         text: newText,
-                         selection: TextSelection.collapsed(offset: cursor + firstPara.length + 2),
-                       );
-                    }
-                  }
+
+    unawaited(showModalBottomSheet<void>(
+        context: context,
+        backgroundColor: Colors.transparent,
+        isScrollControlled: true,
+        useRootNavigator: true,
+        useSafeArea: false,
+        builder: (ctx) => BookChapterSelectorSheet(
+              books: books,
+              selectedBookAbbrev: books.first.abbreviation,
+              selectedChapter: 1,
+              onSelectionChanged: (abbrev, name, chapter, verse,
+                  {bool autoClose = true}) {
+                if (autoClose) Navigator.pop(ctx);
+                if (verse == null) return;
+
+                final bookNum =
+                    books.indexWhere((b) => b.abbreviation == abbrev) + 1;
+                final activeTrans = ref.read(activeTranslationProvider);
+                final versesAsync = ref.read(translationChapterProvider((
+                  translationId: activeTrans,
+                  bookNumber: bookNum,
+                  chapterNumber: chapter,
+                )));
+
+                String verseText = '';
+                if (versesAsync.value != null) {
+                  final target = versesAsync.value!.firstWhere(
+                      (v) => v.number == verse,
+                      orElse: () => BibleVerse(number: verse, text: ''));
+                  verseText = target.text;
                 }
-              )
-            )
-          );
-        },
-      )
-    );
+                if (verseText.isEmpty) {
+                  final flatList = ref.read(flatChaptersProvider);
+                  final targetChapter = flatList.firstWhere((fc) =>
+                      fc.book.abbreviation == abbrev &&
+                      fc.chapter.number == chapter);
+                  final target = targetChapter.chapter.verses
+                      .firstWhere((v) => v.number == verse);
+                  verseText = target.text;
+                }
+
+                final insertedText = '"$verseText" - $name $chapter:$verse ';
+                _insertText(insertedText);
+
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: const Text('Verse inserted'),
+                    action: SnackBarAction(
+                        label: 'Add Commentary',
+                        onPressed: () {
+                          final commentaryList =
+                              ref.read(commentaryProvider).value ?? [];
+                          final matchList = commentaryList
+                              .where((c) =>
+                                  c.scope.book?.toLowerCase() ==
+                                      name.toLowerCase() &&
+                                  c.scope.chapter == chapter &&
+                                  (c.scope.verse == verse ||
+                                      c.scope.verse == null))
+                              .toList();
+
+                          if (matchList.isNotEmpty) {
+                            final firstPara = matchList.first.text
+                                .split('\n')
+                                .firstWhere((l) => l.trim().isNotEmpty,
+                                    orElse: () => '');
+                            if (firstPara.isNotEmpty) {
+                              final text = contentController.text;
+                              final cursor =
+                                  contentController.selection.baseOffset;
+                              final newText = text.replaceRange(
+                                  cursor, cursor, '\n$firstPara\n');
+                              contentController.value = TextEditingValue(
+                                text: newText,
+                                selection: TextSelection.collapsed(
+                                    offset: cursor + firstPara.length + 2),
+                              );
+                            }
+                          }
+                        })));
+              },
+            )));
   }
 
   void _insertDate() {
-    setState(() { _showSlashMenu = false; });
+    setState(() {
+      _showSlashMenu = false;
+    });
     final now = DateTime.now();
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
     _insertText('${months[now.month - 1]} ${now.day}, ${now.year} ');
   }
 
   void _insertChapterTitle() {
-    setState(() { _showSlashMenu = false; });
+    setState(() {
+      _showSlashMenu = false;
+    });
     final refStr = widget.editingNote?.reference ?? widget.initialReference;
     if (refStr != null) {
       final lastSpaceIdx = refStr.lastIndexOf(' ');
@@ -355,7 +405,12 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
         if (refParts.isNotEmpty) {
           final chapterNum = int.tryParse(refParts[0]);
           if (chapterNum != null) {
-            final chapterTitle = ref.read(pericopesProvider.notifier).getPericopesForChapter(bookName, chapterNum).where((p) => p.startVerse == 1).firstOrNull?.title;
+            final chapterTitle = ref
+                .read(pericopesProvider.notifier)
+                .getPericopesForChapter(bookName, chapterNum)
+                .where((p) => p.startVerse == 1)
+                .firstOrNull
+                ?.title;
             if (chapterTitle != null && chapterTitle.isNotEmpty) {
               _insertText('$chapterTitle ');
               return;
@@ -438,7 +493,8 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
                 decoration: InputDecoration(
                   hintText: 'Start typing... (type / for commands)',
                   hintStyle: TextStyle(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
+                      color:
+                          theme.colorScheme.onSurface.withValues(alpha: 0.5)),
                   filled: true,
                   fillColor: theme.brightness == Brightness.dark
                       ? Colors.black.withValues(alpha: 0.25)
@@ -469,7 +525,10 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
                   color: theme.colorScheme.surface,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 4)),
+                    BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4)),
                   ],
                 ),
                 child: Column(
@@ -511,7 +570,18 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
 
                 final now = DateTime.now();
                 const months = [
-                  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+                  'Jan',
+                  'Feb',
+                  'Mar',
+                  'Apr',
+                  'May',
+                  'Jun',
+                  'Jul',
+                  'Aug',
+                  'Sep',
+                  'Oct',
+                  'Nov',
+                  'Dec'
                 ];
                 final date =
                     '${months[now.month - 1]} ${now.day.toString().padLeft(2, '0')}, ${now.year}';
@@ -520,11 +590,14 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
                   titleController.text.trim(),
                   contentController.text.trim(),
                   date,
-                  reference: widget.editingNote?.reference ?? widget.initialReference,
+                  reference:
+                      widget.editingNote?.reference ?? widget.initialReference,
                 );
 
                 if (widget.editingId != null) {
-                  ref.read(notesProvider.notifier).update(widget.editingId!, note);
+                  ref
+                      .read(notesProvider.notifier)
+                      .update(widget.editingId!, note);
                 } else {
                   ref.read(notesProvider.notifier).add(note);
                 }
@@ -534,7 +607,8 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
                   const SnackBar(content: Text('Note saved!')),
                 );
               },
-              child: Text(widget.editingNote != null ? 'Save Changes' : 'Save Note',
+              child: Text(
+                  widget.editingNote != null ? 'Save Changes' : 'Save Note',
                   style: const TextStyle(fontWeight: FontWeight.bold)),
             ),
             if (widget.editingId != null) ...[

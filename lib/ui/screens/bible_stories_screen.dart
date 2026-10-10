@@ -124,9 +124,8 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                       Expanded(
                         child: _FilterPill(
                           label: 'All',
-                          selected:
-                              filter.testament == TestamentFilter.all &&
-                                  filter.bookPrefix == null,
+                          selected: filter.testament == TestamentFilter.all &&
+                              filter.bookPrefix == null,
                           onTap: () => ref
                               .read(devotionalFilterProvider.notifier)
                               .setTestament(TestamentFilter.all),
@@ -136,9 +135,8 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                       Expanded(
                         child: _FilterPill(
                           label: 'OT',
-                          selected:
-                              filter.testament == TestamentFilter.ot &&
-                                  filter.bookPrefix == null,
+                          selected: filter.testament == TestamentFilter.ot &&
+                              filter.bookPrefix == null,
                           onTap: () => ref
                               .read(devotionalFilterProvider.notifier)
                               .setTestament(TestamentFilter.ot),
@@ -148,9 +146,8 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                       Expanded(
                         child: _FilterPill(
                           label: 'NT',
-                          selected:
-                              filter.testament == TestamentFilter.nt &&
-                                  filter.bookPrefix == null,
+                          selected: filter.testament == TestamentFilter.nt &&
+                              filter.bookPrefix == null,
                           onTap: () => ref
                               .read(devotionalFilterProvider.notifier)
                               .setTestament(TestamentFilter.nt),
@@ -211,16 +208,16 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
               child: Center(child: CupertinoActivityIndicator()),
             ),
             error: (e, _) => SliverFillRemaining(
-              child: Center(child: Text('Could not load stories:\n$e',
-                  textAlign: TextAlign.center)),
+              child: Center(
+                  child: Text('Could not load stories:\n$e',
+                      textAlign: TextAlign.center)),
             ),
             data: (_) => stories.isEmpty
                 ? SliverFillRemaining(
                     child: Center(
                       child: _EmptyStories(
-                        onClearFilters: () => ref
-                            .read(devotionalFilterProvider.notifier)
-                            .reset(),
+                        onClearFilters: () =>
+                            ref.read(devotionalFilterProvider.notifier).reset(),
                         onShowRead: () => ref
                             .read(devotionalFilterProvider.notifier)
                             .toggleUnreadOnly(),
@@ -246,8 +243,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
   }
 
   /// Display label for the Books pill: the chosen book, else "Books".
-  String _bookLabel(
-      List<DevotionalBookInfo> books, String? prefix) {
+  String _bookLabel(List<DevotionalBookInfo> books, String? prefix) {
     if (prefix == null) return 'Books';
     for (final b in books) {
       if (b.prefix == prefix) return b.book;
@@ -259,7 +255,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
   void _openBookPicker(List<DevotionalBookInfo> books) {
     final theme = Theme.of(context);
     final query = TextEditingController();
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
@@ -270,8 +266,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
           ),
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(24)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           padding: const EdgeInsets.fromLTRB(8, 8, 8, 32),
           child: StatefulBuilder(
@@ -280,8 +275,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
               final visible = q.isEmpty
                   ? books
                   : books
-                      .where((b) =>
-                          b.book.toLowerCase().contains(q))
+                      .where((b) => b.book.toLowerCase().contains(q))
                       .toList();
               return Column(
                 mainAxisSize: MainAxisSize.min,
@@ -292,20 +286,18 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                       height: 5,
                       margin: const EdgeInsets.only(top: 6, bottom: 10),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.25),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.25),
                         borderRadius: BorderRadius.circular(3),
                       ),
                     ),
                   ),
                   Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: TextField(
                       decoration: InputDecoration(
                         hintText: 'Search books…',
-                        prefixIcon:
-                            const Icon(Icons.search_rounded),
+                        prefixIcon: const Icon(Icons.search_rounded),
                         isDense: true,
                         filled: true,
                         fillColor: theme.colorScheme.surface,
@@ -322,13 +314,11 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                       shrinkWrap: true,
                       children: [
                         ListTile(
-                          leading: const Icon(
-                              Icons.menu_book_outlined),
+                          leading: const Icon(Icons.menu_book_outlined),
                           title: const Text('All books'),
                           onTap: () {
                             ref
-                                .read(devotionalFilterProvider
-                                    .notifier)
+                                .read(devotionalFilterProvider.notifier)
                                 .setBook(null);
                             Navigator.of(ctx).pop();
                           },
@@ -338,18 +328,14 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                             title: Text(b.book),
                             trailing: Text(
                               '${b.count}',
-                              style: theme.textTheme.labelSmall
-                                  ?.copyWith(
-                                color: theme
-                                    .colorScheme.onSurface
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: theme.colorScheme.onSurface
                                     .withValues(alpha: 0.5),
                               ),
                             ),
                             onTap: () {
                               ref
-                                  .read(
-                                      devotionalFilterProvider
-                                          .notifier)
+                                  .read(devotionalFilterProvider.notifier)
                                   .setBook(b.prefix);
                               Navigator.of(ctx).pop();
                             },
@@ -393,7 +379,9 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
           children: [
             Icon(icon,
                 size: 14,
-                color: active ? theme.primaryColor : theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                color: active
+                    ? theme.primaryColor
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.6)),
             const SizedBox(width: 4),
             Text(label, style: theme.textTheme.labelSmall),
           ],
@@ -401,7 +389,6 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
       ),
     );
   }
-
 }
 
 /// One segment of the All | OT | NT | Books control.
@@ -424,8 +411,7 @@ class _FilterPill extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Container(
-        padding:
-            const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
         decoration: BoxDecoration(
           color: selected
               ? theme.primaryColor.withValues(alpha: 0.15)
@@ -450,10 +436,8 @@ class _FilterPill extends StatelessWidget {
                 style: theme.textTheme.labelMedium?.copyWith(
                   color: selected
                       ? theme.primaryColor
-                      : theme.colorScheme.onSurface
-                          .withValues(alpha: 0.75),
-                  fontWeight:
-                      selected ? FontWeight.w600 : FontWeight.w400,
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.75),
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
                 ),
               ),
             ),
@@ -586,9 +570,8 @@ class _StoryCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final isFavorite = ref
-        .watch(devotionalFavoritesProvider)
-        .contains(story.id);
+    final isFavorite =
+        ref.watch(devotionalFavoritesProvider).contains(story.id);
     final isRead = ref.watch(devotionalReadProvider).contains(story.id);
 
     return Material(
@@ -597,7 +580,7 @@ class _StoryCard extends ConsumerWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
         onTap: () {
-          Navigator.of(context).push(CupertinoPageRoute(
+          Navigator.of(context).push(CupertinoPageRoute<void>(
             builder: (_) => BibleStoryReaderScreen(initialStory: story),
           ));
         },

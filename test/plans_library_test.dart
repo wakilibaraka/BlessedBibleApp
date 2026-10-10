@@ -56,10 +56,10 @@ void main() {
           isTrue,
           reason: 'unknown end book ${p.endBook}',
         );
-        final startIdx = kBibleBookNames.indexWhere(
-            (b) => b.toLowerCase() == p.startBook.toLowerCase());
-        final endIdx = kBibleBookNames.indexWhere(
-            (b) => b.toLowerCase() == p.endBook.toLowerCase());
+        final startIdx = kBibleBookNames
+            .indexWhere((b) => b.toLowerCase() == p.startBook.toLowerCase());
+        final endIdx = kBibleBookNames
+            .indexWhere((b) => b.toLowerCase() == p.endBook.toLowerCase());
         expect(endIdx, greaterThanOrEqualTo(startIdx));
       }
     });
@@ -94,10 +94,9 @@ void main() {
       // readings" labels), and unstarted plans read in words.
       expect(find.text('Not started'), findsWidgets);
       expect(find.text('New readings'), findsNothing);
-      expect(find.text('Not started') , findsWidgets);
+      expect(find.text('Not started'), findsWidgets);
       // Year progress + calendar rail are in the header.
       expect(find.textContaining('Day '), findsWidgets);
-
     });
 
     testWidgets('Books tab shows presets, My Plans shows empty state',

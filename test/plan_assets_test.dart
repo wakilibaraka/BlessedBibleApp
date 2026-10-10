@@ -45,8 +45,7 @@ Map<String, Map<int, List<int>>> loadCanon() {
   return canon;
 }
 
-List<String> wholeBook(
-    Map<String, Map<int, List<int>>> canon, String book) {
+List<String> wholeBook(Map<String, Map<int, List<int>>> canon, String book) {
   final out = <String>[];
   final chapters = canon[book]!.keys.toList()..sort();
   for (final ch in chapters) {
@@ -59,8 +58,7 @@ List<String> wholeBook(
 
 /// Expands one asset ref string to canon keys `Book|chapter|verse`.
 /// Throws [FormatException] on anything unresolvable.
-List<String> expandRef(
-    Map<String, Map<int, List<int>>> canon, String ref) {
+List<String> expandRef(Map<String, Map<int, List<int>>> canon, String ref) {
   final r = ref.trim();
   // Bare book name (with or without abbreviation): whole book.
   for (final name in canon.keys) {
@@ -78,7 +76,7 @@ List<String> expandRef(
     book = alias;
   }
   final chapters = canon[book]!;
-  int c1 = int.parse(m.group(2)!);
+  final int c1 = int.parse(m.group(2)!);
   final v1s = m.group(3);
   final c2s = m.group(4);
   final v2s = m.group(5);
@@ -120,9 +118,7 @@ List<String> expandRef(
     final out = <String>[];
     for (var ch = c1; ch <= c2; ch++) {
       final vs = chapters[ch]!;
-      final hi = (ch == c2 && vendS != null)
-          ? int.parse(vendS)
-          : vs.last;
+      final hi = (ch == c2 && vendS != null) ? int.parse(vendS) : vs.last;
       out.addAll(chapterVerses(ch, 1, hi));
     }
     return out;
@@ -169,9 +165,9 @@ void main() {
     canon = loadCanon();
     assetVerses = {};
     for (final id in _assets) {
-      final decoded = jsonDecode(
-              File('assets/reading_plans/$id.json').readAsStringSync())
-          as Map<String, dynamic>;
+      final decoded =
+          jsonDecode(File('assets/reading_plans/$id.json').readAsStringSync())
+              as Map<String, dynamic>;
       final readings = decoded['readings'] as List;
       // Sequential days starting at 1.
       for (var i = 0; i < readings.length; i++) {

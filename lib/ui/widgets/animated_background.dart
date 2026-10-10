@@ -51,8 +51,7 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground>
 
     final readSettings = ref.watch(readSettingsProvider);
     final isReadTab = widget.tabIndex == 1;
-    final isFull =
-        readSettings.readingViewMode == ReadingViewMode.full;
+    final isFull = readSettings.readingViewMode == ReadingViewMode.full;
     final disableGlow = (isReadTab && isFull) || !readSettings.isGlowEnabled;
 
     final shouldAnimate = isRouteCurrent && isTabActive && !disableGlow;
@@ -68,7 +67,7 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground>
         animation: _bgAnimation,
         builder: (_, __) {
           final hour = DateTime.now().hour;
-          
+
           bool isTopGlow = true;
           double intensity = 0.5;
 

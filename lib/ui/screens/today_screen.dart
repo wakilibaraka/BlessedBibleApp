@@ -16,7 +16,6 @@ import 'package:flutter/cupertino.dart';
 import 'your_space_screen.dart';
 import 'notes_list_screen.dart';
 
-import '../../data/curated_plans.dart';
 import '../widgets/continue_reading_card.dart';
 import '../widgets/reminder_settings_card.dart';
 
@@ -90,7 +89,12 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
     final streak = ref.watch(streakProvider);
     final showNudge = !streak.readToday && streak.count > 0;
 
-    final greetings = ['Good morning', 'Good afternoon', 'Good evening', 'Good night'];
+    final greetings = [
+      'Good morning',
+      'Good afternoon',
+      'Good evening',
+      'Good night'
+    ];
     final hour = now.hour;
     final greeting = hour < 12
         ? greetings[0]
@@ -110,159 +114,169 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: Stack(
-        children: [
-          Positioned.fill(
-            child: AnimatedBackground(
-              appThemeMode: ref.watch(themeProvider),
+          children: [
+            Positioned.fill(
+              child: AnimatedBackground(
+                appThemeMode: ref.watch(themeProvider),
+              ),
             ),
-          ),
-          SafeArea(
-            bottom: false,
-            child: RefreshIndicator.adaptive(
-              color: theme.primaryColor,
-              backgroundColor: theme.colorScheme.surface,
-              onRefresh: () async {
-                // CMS: fetch remote content here in future
-                await Future.delayed(const Duration(milliseconds: 500));
-                ref.invalidate(streakProvider);
-                ref.invalidate(notesProvider);
-              },
-              child: CustomScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: [
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const SizedBox(height: 12),
+            SafeArea(
+              bottom: false,
+              child: RefreshIndicator.adaptive(
+                color: theme.primaryColor,
+                backgroundColor: theme.colorScheme.surface,
+                onRefresh: () async {
+                  // CMS: fetch remote content here in future
+                  await Future<void>.delayed(const Duration(milliseconds: 500));
+                  ref.invalidate(streakProvider);
+                  ref.invalidate(notesProvider);
+                },
+                child: CustomScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const SizedBox(height: 12),
 
-                        // ── Shared top header ──────────────────────────────────
-                        SharedTopHeader(
-                          leading: IconButton(
-                            icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                            color: theme.colorScheme.onSurface,
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(
-                                minWidth: 44, minHeight: 44),
-                            onPressed: () => Navigator.of(context).pop(),
-                          ),
-                          trailing: GestureDetector(
-                            behavior: HitTestBehavior.opaque,
-                            onTap: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(showNudge
-                                      ? 'Read today to save your streak!'
-                                      : 'Notifications coming soon!'),
-                                  behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12)),
-                                ),
-                              );
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(right: 8.0, top: 8.0, bottom: 8.0, left: 8.0),
-                              child: Stack(
-                                alignment: Alignment.topRight,
-                                children: [
-                                  Icon(Icons.notifications_none_rounded,
-                                      size: 26, color: theme.colorScheme.onSurface),
-                                  if (showNudge)
-                                    Container(
-                                      margin: const EdgeInsets.only(top: 2, right: 2),
-                                      width: 8,
-                                      height: 8,
-                                      decoration: const BoxDecoration(
-                                          color: Colors.red,
-                                          shape: BoxShape.circle),
+                            // ── Shared top header ──────────────────────────────────
+                            SharedTopHeader(
+                              leading: IconButton(
+                                icon: const Icon(
+                                    Icons.arrow_back_ios_new_rounded),
+                                color: theme.colorScheme.onSurface,
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(
+                                    minWidth: 44, minHeight: 44),
+                                onPressed: () => Navigator.of(context).pop(),
+                              ),
+                              trailing: GestureDetector(
+                                behavior: HitTestBehavior.opaque,
+                                onTap: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(showNudge
+                                          ? 'Read today to save your streak!'
+                                          : 'Notifications coming soon!'),
+                                      behavior: SnackBarBehavior.floating,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12)),
                                     ),
-                                ],
+                                  );
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      right: 8.0,
+                                      top: 8.0,
+                                      bottom: 8.0,
+                                      left: 8.0),
+                                  child: Stack(
+                                    alignment: Alignment.topRight,
+                                    children: [
+                                      Icon(Icons.notifications_none_rounded,
+                                          size: 26,
+                                          color: theme.colorScheme.onSurface),
+                                      if (showNudge)
+                                        Container(
+                                          margin: const EdgeInsets.only(
+                                              top: 2, right: 2),
+                                          width: 8,
+                                          height: 8,
+                                          decoration: const BoxDecoration(
+                                              color: Colors.red,
+                                              shape: BoxShape.circle),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              centerContent: Text(
+                                dayLabel,
+                                textAlign: TextAlign.center,
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                  letterSpacing: 0.3,
+                                ),
                               ),
                             ),
-                          ),
-                          centerContent: Text(
-                            dayLabel,
-                            textAlign: TextAlign.center,
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w500,
-                              letterSpacing: 0.3,
-                            ),
-                          ),
+
+                            const SizedBox(height: 28),
+
+                            // ═══════════════════════════════════════════════════════
+                            // 1. GREETING / DATE HEADER
+                            // ═══════════════════════════════════════════════════════
+                            _GreetingHeader(greeting: greeting, theme: theme),
+
+                            const SizedBox(height: 20),
+
+                            // ═══════════════════════════════════════════════════════
+                            // 1B. CONTINUE READING
+                            // ═══════════════════════════════════════════════════════
+                            _SectionLabel(label: 'RESUME', theme: theme),
+                            const SizedBox(height: 8),
+                            ContinueReadingCard(theme: theme),
+
+                            const SizedBox(height: 20),
+
+                            // ═══════════════════════════════════════════════════════
+                            // 2. READING STREAK
+                            // ═══════════════════════════════════════════════════════
+                            _SectionLabel(
+                                label: 'READING STREAK', theme: theme),
+                            const SizedBox(height: 8),
+                            _StreakProgressCard(theme: theme),
+
+                            const SizedBox(height: 20),
+
+                            // ═══════════════════════════════════════════════════════
+                            // 3. VOTD ARCHIVE
+                            // ═══════════════════════════════════════════════════════
+                            _VotdArchiveBanner(theme: theme),
+
+                            const SizedBox(height: 20),
+
+                            // ═══════════════════════════════════════════════════════
+                            // 4. LATEST NOTE / HIGHLIGHT
+                            // ═══════════════════════════════════════════════════════
+                            _SectionLabel(label: 'LATEST NOTE', theme: theme),
+                            const SizedBox(height: 8),
+                            _LatestNoteCard(theme: theme),
+
+                            const SizedBox(height: 20),
+
+                            // ═══════════════════════════════════════════════════════
+                            // 5. QUICK ACTIONS
+                            // ═══════════════════════════════════════════════════════
+                            _SectionLabel(label: 'QUICK ACTIONS', theme: theme),
+                            const SizedBox(height: 8),
+                            _QuickActionsRow(theme: theme),
+
+                            const SizedBox(height: 20),
+
+                            // ═══════════════════════════════════════════════════════
+                            // 6. DAILY REMINDERS
+                            // ═══════════════════════════════════════════════════════
+                            _SectionLabel(
+                                label: 'DAILY REMINDERS', theme: theme),
+                            const SizedBox(height: 8),
+                            ReminderSettingsCard(theme: theme),
+
+                            // Bottom padding: clears the floating bottom nav
+                            SizedBox(height: mq.padding.bottom + 40),
+                          ],
                         ),
-
-                        const SizedBox(height: 28),
-
-                        // ═══════════════════════════════════════════════════════
-                        // 1. GREETING / DATE HEADER
-                        // ═══════════════════════════════════════════════════════
-                        _GreetingHeader(greeting: greeting, theme: theme),
-
-                        const SizedBox(height: 20),
-
-                        // ═══════════════════════════════════════════════════════
-                        // 1B. CONTINUE READING
-                        // ═══════════════════════════════════════════════════════
-                        _SectionLabel(label: 'RESUME', theme: theme),
-                        const SizedBox(height: 8),
-                        ContinueReadingCard(theme: theme),
-
-                        const SizedBox(height: 20),
-
-                        // ═══════════════════════════════════════════════════════
-                        // 2. READING STREAK
-                        // ═══════════════════════════════════════════════════════
-                        _SectionLabel(label: 'READING STREAK', theme: theme),
-                        const SizedBox(height: 8),
-                        _StreakProgressCard(theme: theme),
-
-                        const SizedBox(height: 20),
-
-                        // ═══════════════════════════════════════════════════════
-                        // 3. VOTD ARCHIVE
-                        // ═══════════════════════════════════════════════════════
-                        _VotdArchiveBanner(theme: theme),
-
-                        const SizedBox(height: 20),
-
-                        // ═══════════════════════════════════════════════════════
-                        // 4. LATEST NOTE / HIGHLIGHT
-                        // ═══════════════════════════════════════════════════════
-                        _SectionLabel(label: 'LATEST NOTE', theme: theme),
-                        const SizedBox(height: 8),
-                        _LatestNoteCard(theme: theme),
-
-                        const SizedBox(height: 20),
-
-                        // ═══════════════════════════════════════════════════════
-                        // 5. QUICK ACTIONS
-                        // ═══════════════════════════════════════════════════════
-                        _SectionLabel(label: 'QUICK ACTIONS', theme: theme),
-                        const SizedBox(height: 8),
-                        _QuickActionsRow(theme: theme),
-
-                        const SizedBox(height: 20),
-
-                        // ═══════════════════════════════════════════════════════
-                        // 6. DAILY REMINDERS
-                        // ═══════════════════════════════════════════════════════
-                        _SectionLabel(label: 'DAILY REMINDERS', theme: theme),
-                        const SizedBox(height: 8),
-                        ReminderSettingsCard(theme: theme),
-
-                        // Bottom padding: clears the floating bottom nav
-                        SizedBox(height: mq.padding.bottom + 40),
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
-            ),
-          ),
-        ],
-      ),
+          ],
+        ),
       ),
     );
   }
@@ -353,7 +367,6 @@ class _GreetingHeader extends StatelessWidget {
   }
 }
 
-
 // ─────────────────────────────────────────────────────────────────────────────
 // 4. Latest Note card
 // ─────────────────────────────────────────────────────────────────────────────
@@ -415,7 +428,8 @@ class _LatestNoteCard extends ConsumerWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const NotesListScreen()),
+                  MaterialPageRoute<void>(
+                      builder: (context) => const NotesListScreen()),
                 );
               },
               icon: const Icon(Icons.arrow_forward_rounded, size: 14),
@@ -446,12 +460,12 @@ class _StreakProgressCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final streak = ref.watch(streakProvider);
     final streakDays = streak.count;
-    
+
     final now = DateTime.now();
     final year = now.year;
     final isLeapYear = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
     final daysInYear = isLeapYear ? 366 : 365;
-    
+
     final startOfYear = DateTime(year, 1, 1);
     final dayOfYear = now.difference(startOfYear).inDays + 1;
     final progress = dayOfYear / daysInYear;
@@ -579,7 +593,7 @@ class _QuickActionsRow extends ConsumerWidget {
               final fc = flatChapters.firstWhere((c) =>
                   c.book.name == bookName && c.chapter.number == chapter);
 
-              showDialog(
+              showDialog<void>(
                 context: context,
                 barrierDismissible: false,
                 builder: (context) => const CastingLotsDialog(),
@@ -597,7 +611,7 @@ class _QuickActionsRow extends ConsumerWidget {
                     .read(activeStudyVerseProvider.notifier)
                     .setVerse('$bookName $chapter:$verseNum');
 
-                Navigator.of(context).push(CupertinoPageRoute(
+                Navigator.of(context).push(CupertinoPageRoute<void>(
                     builder: (_) => CommentaryHubScreen(
                           book: bookName,
                           chapter: chapter,
@@ -615,7 +629,7 @@ class _QuickActionsRow extends ConsumerWidget {
         color: theme.colorScheme.primary,
         onTap: () {
           Navigator.of(context).push(
-            CupertinoPageRoute(
+            CupertinoPageRoute<void>(
                 builder: (_) => const PlansLibraryScreen()),
           );
         },
@@ -626,7 +640,7 @@ class _QuickActionsRow extends ConsumerWidget {
         color: theme.colorScheme.primary,
         onTap: () {
           Navigator.of(context).push(
-            CupertinoPageRoute(
+            CupertinoPageRoute<void>(
                 builder: (_) => const YourSpaceScreen(initialTab: 0)),
           );
         },
@@ -720,17 +734,20 @@ class _VotdArchiveBanner extends StatelessWidget {
           borderRadius: BorderRadius.circular(24),
           onTap: () {
             Navigator.of(context).push(
-              CupertinoPageRoute(builder: (_) => const VotdArchiveScreen()),
+              CupertinoPageRoute<void>(
+                  builder: (_) => const VotdArchiveScreen()),
             );
           },
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    Icon(Icons.history_rounded, color: theme.primaryColor, size: 24),
+                    Icon(Icons.history_rounded,
+                        color: theme.primaryColor, size: 24),
                     const SizedBox(width: 16),
                     Expanded(
                       child: Column(
@@ -745,12 +762,14 @@ class _VotdArchiveBanner extends StatelessWidget {
                           Text(
                             'Catch up on verses from days you missed.',
                             style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                                color: theme.colorScheme.onSurface
+                                    .withValues(alpha: 0.6)),
                           ),
                         ],
                       ),
                     ),
-                    Icon(Icons.keyboard_arrow_right_rounded, color: theme.primaryColor),
+                    Icon(Icons.keyboard_arrow_right_rounded,
+                        color: theme.primaryColor),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -763,11 +782,13 @@ class _VotdArchiveBanner extends StatelessWidget {
                   child: Row(
                     children: [
                       Icon(Icons.auto_awesome,
-                          color: theme.primaryColor.withValues(alpha: 0.7), size: 16),
+                          color: theme.primaryColor.withValues(alpha: 0.7),
+                          size: 16),
                       const SizedBox(width: 8),
                       Text('Explore your past daily verses',
                           style: theme.textTheme.labelSmall?.copyWith(
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.7))),
+                              color: theme.colorScheme.onSurface
+                                  .withValues(alpha: 0.7))),
                     ],
                   ),
                 ),
@@ -779,4 +800,3 @@ class _VotdArchiveBanner extends StatelessWidget {
     );
   }
 }
-

@@ -30,8 +30,8 @@ void main() {
     );
     // Let the async settings load settle, then switch tabs.
     await tester.pump(const Duration(milliseconds: 400));
-    final container = ProviderScope.containerOf(
-        tester.element(find.byType(MainNavScreen)));
+    final container =
+        ProviderScope.containerOf(tester.element(find.byType(MainNavScreen)));
     container.read(navProvider.notifier).setIndex(index);
     await tester.pump(const Duration(milliseconds: 400));
   }
@@ -46,7 +46,6 @@ void main() {
       (tester) async {
     await pumpAtTab(tester, 4);
     expect(find.byType(CrossedSwordsIcon), findsOneWidget);
-    expect(
-        find.byIcon(Icons.arrow_back_ios_new_rounded), findsNothing);
+    expect(find.byIcon(Icons.arrow_back_ios_new_rounded), findsNothing);
   });
 }

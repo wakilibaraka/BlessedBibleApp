@@ -25,7 +25,9 @@ void main() {
     addTearDown(container.dispose);
 
     final layout = StudyLayoutNotifier.defaultLayoutV2();
-    expect([for (final c in layout) c.id], [
+    expect([
+      for (final c in layout) c.id
+    ], [
       'your_space',
       'plans_live',
       'bible_stories',
@@ -36,13 +38,21 @@ void main() {
       'streak',
     ]);
     final byId = {for (final c in layout) c.id: c};
-    for (final id in
-        ['your_space', 'plans_live', 'concordance', 'commentary']) {
+    for (final id in [
+      'your_space',
+      'plans_live',
+      'concordance',
+      'commentary'
+    ]) {
       expect(byId[id]!.span, CardSpan.full, reason: id);
       expect(byId[id]!.expanded, isFalse, reason: id);
     }
-    for (final id in
-        ['bible_stories', 'dictionary', 'votd_archive', 'streak']) {
+    for (final id in [
+      'bible_stories',
+      'dictionary',
+      'votd_archive',
+      'streak'
+    ]) {
       expect(byId[id]!.span, CardSpan.half, reason: id);
     }
   });
@@ -75,7 +85,9 @@ void main() {
     addTearDown(container.dispose);
 
     final layout = container.read(studyLayoutProvider);
-    expect([for (final c in layout) c.id], [
+    expect([
+      for (final c in layout) c.id
+    ], [
       'your_space',
       'plans_live',
       'bible_stories',
@@ -114,8 +126,7 @@ void main() {
     expect(byId['dictionary']!.span, CardSpan.half);
   });
 
-  test('v5 stored layout gains concordance at the end, customs kept',
-      () async {
+  test('v5 stored layout gains concordance at the end, customs kept', () async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
     final svc = PreferencesService(prefs);
@@ -161,8 +172,7 @@ void main() {
         .setCardSize('dictionary', span: CardSpan.half, expanded: false);
     container
         .read(studyLayoutProvider.notifier)
-        .setCardSize('commentary',
-            span: CardSpan.full, expanded: true);
+        .setCardSize('commentary', span: CardSpan.full, expanded: true);
 
     var layout = container.read(studyLayoutProvider);
     var byId = {for (final c in layout) c.id: c};
@@ -172,18 +182,15 @@ void main() {
     // Quarter is rejected back to full.
     container
         .read(studyLayoutProvider.notifier)
-        .setCardSize('commentary',
-            span: CardSpan.quarter, expanded: false);
+        .setCardSize('commentary', span: CardSpan.quarter, expanded: false);
     layout = container.read(studyLayoutProvider);
     byId = {for (final c in layout) c.id: c};
     expect(byId['commentary']!.span, CardSpan.full);
 
     // Persisted JSON carries version 5.
     final prefs = container.read(preferencesProvider);
-    final decoded =
-        jsonDecode(prefs.getStudyLayout()!) as List;
-    expect(
-        decoded.every((e) => (e as Map)['version'] == 5), isTrue);
+    final decoded = jsonDecode(prefs.getStudyLayout()!) as List;
+    expect(decoded.every((e) => (e as Map)['version'] == 5), isTrue);
   });
 
   test('move swaps cards and persists the order', () async {
@@ -191,18 +198,14 @@ void main() {
     addTearDown(container.dispose);
 
     container.read(studyLayoutProvider);
-    container
-        .read(studyLayoutProvider.notifier)
-        .move('streak', 'votd_archive');
+    container.read(studyLayoutProvider.notifier).move('streak', 'votd_archive');
 
     var layout = container.read(studyLayoutProvider);
     var ids = [for (final c in layout) c.id];
     expect(ids.indexOf('streak'), ids.indexOf('votd_archive') - 1);
 
     // Unknown ids are no-ops.
-    container
-        .read(studyLayoutProvider.notifier)
-        .move('your_space', 'nope');
+    container.read(studyLayoutProvider.notifier).move('your_space', 'nope');
     layout = container.read(studyLayoutProvider);
     ids = [for (final c in layout) c.id];
     expect(ids.first, 'your_space');
@@ -210,7 +213,6 @@ void main() {
     // Order round-trips through storage.
     final prefs = container.read(preferencesProvider);
     final decoded = jsonDecode(prefs.getStudyLayout()!) as List;
-    expect(
-        [for (final e in decoded) (e as Map)['id']], ids);
+    expect([for (final e in decoded) (e as Map)['id']], ids);
   });
 }

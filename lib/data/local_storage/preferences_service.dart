@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../services/translation_pack_store.dart';
 import '../../state/search_engine.dart';
 
 class PreferencesService {
@@ -46,6 +47,7 @@ class PreferencesService {
 
   // Reading tips
   static const String _showReadingTipsKey = 'show_reading_tips';
+  static const String _crashReportsEnabledKey = 'crash_reports_enabled';
 
   // Reminder settings
   static const String _sabbathReminderEnabledKey = 'sabbath_reminder_enabled';
@@ -70,7 +72,11 @@ class PreferencesService {
   }
 
   String getActiveTranslation() {
-    return prefs.getString(_activeTranslationKey) ?? 'kjv';
+    final id = prefs.getString(_activeTranslationKey);
+    if (id == null || TranslationPackStore.retiredPackIds.contains(id)) {
+      return 'kjv';
+    }
+    return id;
   }
 
   Future<void> setActiveTranslation(String translationId) async {
@@ -78,7 +84,8 @@ class PreferencesService {
   }
 
   String? getSecondaryTranslation() {
-    return prefs.getString(_secondaryTranslationKey) ?? 'swh_ulb';
+    final id = prefs.getString(_secondaryTranslationKey) ?? 'swh_ulb';
+    return TranslationPackStore.retiredPackIds.contains(id) ? null : id;
   }
 
   Future<void> setSecondaryTranslation(String? translationId) async {
@@ -93,8 +100,10 @@ class PreferencesService {
     final jsonString = prefs.getString(_searchHistoryKey);
     if (jsonString != null) {
       try {
-        final List<dynamic> jsonList = jsonDecode(jsonString);
-        return jsonList.map((e) => SearchResult.fromJson(e)).toList();
+        final List<dynamic> jsonList = jsonDecode(jsonString) as List<dynamic>;
+        return jsonList
+            .map((e) => SearchResult.fromJson(e as Map<String, dynamic>))
+            .toList();
       } catch (e) {
         return [];
       }
@@ -109,8 +118,6 @@ class PreferencesService {
   Future<void> saveRecentSearchQueries(List<String> queries) async {
     await prefs.setStringList(_searchQueriesKey, queries);
   }
-
-
 
   /// Share-card typography/alignment overrides (JSON string).
   String? getShareCardStyleJson() => prefs.getString('share_card_style');
@@ -163,7 +170,8 @@ class PreferencesService {
     final jsonString = prefs.getString(_highlightsKey);
     if (jsonString != null) {
       try {
-        final Map<String, dynamic> jsonMap = jsonDecode(jsonString);
+        final Map<String, dynamic> jsonMap =
+            jsonDecode(jsonString) as Map<String, dynamic>;
         return jsonMap.map((key, value) => MapEntry(key, value as int));
       } catch (e) {
         return {};
@@ -297,7 +305,7 @@ class PreferencesService {
     prefs.setString('$_customPlansKeyPrefix$id', jsonEncode(data));
 
     // Add to the list of IDs if not present
-    List<String> ids = getCustomPlanIds();
+    final List<String> ids = getCustomPlanIds();
     if (!ids.contains(id)) {
       ids.add(id);
       prefs.setStringList(_customPlanIdsKey, ids);
@@ -322,7 +330,7 @@ class PreferencesService {
 
   void deleteCustomPlan(String id) {
     prefs.remove('$_customPlansKeyPrefix$id');
-    List<String> ids = getCustomPlanIds();
+    final List<String> ids = getCustomPlanIds();
     if (ids.contains(id)) {
       ids.remove(id);
       prefs.setStringList(_customPlanIdsKey, ids);
@@ -359,7 +367,7 @@ class PreferencesService {
     Map<String, dynamic> map = {};
     if (jsonString != null) {
       try {
-        map = jsonDecode(jsonString);
+        map = jsonDecode(jsonString) as Map<String, dynamic>;
       } catch (_) {}
     }
 
@@ -417,7 +425,6 @@ class PreferencesService {
   void setSabbathLocationName(String val) =>
       prefs.setString(_sabbathLocationNameKey, val);
 
-
   // Prayer
   static const _prayerReminderEnabledKey = "prayer_reminder_enabled";
   static const _prayerReminderHourKey = "prayer_reminder_hour";
@@ -471,7 +478,8 @@ class PreferencesService {
     final jsonString = prefs.getString(_verseVisitsKey);
     if (jsonString != null) {
       try {
-        final Map<String, dynamic> jsonMap = jsonDecode(jsonString);
+        final Map<String, dynamic> jsonMap =
+            jsonDecode(jsonString) as Map<String, dynamic>;
         return jsonMap.map((key, value) => MapEntry(key, value as int));
       } catch (e) {
         return {};
@@ -536,6 +544,12 @@ class PreferencesService {
   bool get showReadingTips => prefs.getBool(_showReadingTipsKey) ?? true;
   void setShowReadingTips(bool value) =>
       prefs.setBool(_showReadingTipsKey, value);
+
+  /// User opt-out for Crashlytics. On by default.
+  bool get crashReportsEnabled =>
+      prefs.getBool(_crashReportsEnabledKey) ?? true;
+  Future<void> setCrashReportsEnabled(bool value) =>
+      prefs.setBool(_crashReportsEnabledKey, value);
 
   // --- Onboarding ---
   static const String _onboardingCompleteKey = 'onboarding_complete';

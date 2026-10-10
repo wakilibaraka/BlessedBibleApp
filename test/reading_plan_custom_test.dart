@@ -69,7 +69,7 @@ void main() {
     // Trigger provider creation (starts async load).
     container.read(readingPlanProvider('custom-1'));
     // Let the async load finish.
-    await Future.delayed(const Duration(milliseconds: 200));
+    await Future<void>.delayed(const Duration(milliseconds: 200));
 
     final loaded = container.read(readingPlanProvider('custom-1'));
     expect(loaded.error, isNull);
@@ -101,7 +101,7 @@ void main() {
           testCustomPlan(),
         );
     container.read(readingPlanProvider('custom-1'));
-    await Future.delayed(const Duration(milliseconds: 200));
+    await Future<void>.delayed(const Duration(milliseconds: 200));
 
     final state = container.read(readingPlanProvider('custom-1'));
     expect(state.error, isNull);
@@ -127,10 +127,9 @@ void main() {
           testCustomPlan(),
         );
     container.read(readingPlanProvider('custom-1'));
-    await Future.delayed(const Duration(milliseconds: 200));
+    await Future<void>.delayed(const Duration(milliseconds: 200));
 
-    final notifier =
-        container.read(readingPlanProvider('custom-1').notifier);
+    final notifier = container.read(readingPlanProvider('custom-1').notifier);
     notifier.markReadingComplete(2);
 
     var state = container.read(readingPlanProvider('custom-1'));
@@ -164,10 +163,9 @@ void main() {
           testCustomPlan(),
         );
     container.read(readingPlanProvider('custom-1'));
-    await Future.delayed(const Duration(milliseconds: 200));
+    await Future<void>.delayed(const Duration(milliseconds: 200));
 
-    final notifier =
-        container.read(readingPlanProvider('custom-1').notifier);
+    final notifier = container.read(readingPlanProvider('custom-1').notifier);
     notifier.markReadingComplete(1);
     final state = container.read(readingPlanProvider('custom-1'));
     expect(state.isDayComplete(1), isTrue);
@@ -205,10 +203,9 @@ void main() {
           testCustomPlan(),
         );
     container.read(readingPlanProvider('custom-1'));
-    await Future.delayed(const Duration(milliseconds: 200));
+    await Future<void>.delayed(const Duration(milliseconds: 200));
 
-    final notifier =
-        container.read(readingPlanProvider('custom-1').notifier);
+    final notifier = container.read(readingPlanProvider('custom-1').notifier);
     // Legacy single day still works when the set is empty.
     var state = container.read(readingPlanProvider('custom-1'));
     expect(state.isRestWeekday(1), isFalse);
@@ -242,10 +239,9 @@ void main() {
           testCustomPlan(),
         );
     container.read(readingPlanProvider('custom-1'));
-    await Future.delayed(const Duration(milliseconds: 200));
+    await Future<void>.delayed(const Duration(milliseconds: 200));
 
-    final notifier =
-        container.read(readingPlanProvider('custom-1').notifier);
+    final notifier = container.read(readingPlanProvider('custom-1').notifier);
     notifier.markAllPreviousRead(2);
 
     final state = container.read(readingPlanProvider('custom-1'));
@@ -264,14 +260,13 @@ void main() {
     addTearDown(container.dispose);
 
     container.read(readingPlanProvider('chronological_1yr'));
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future<void>.delayed(const Duration(milliseconds: 500));
 
     final state = container.read(readingPlanProvider('chronological_1yr'));
     expect(state.error, isNull);
     expect(state.planData.length, 365);
     // Day 1 reads Genesis 1-3: three chapter entries for the prompt.
-    final ids =
-        state.planData.first.chapters.map((c) => c.id).toSet();
+    final ids = state.planData.first.chapters.map((c) => c.id).toSet();
     expect(ids.contains('Genesis_1'), isTrue);
     expect(ids.contains('Genesis_2'), isTrue);
     expect(ids.contains('Genesis_3'), isTrue);
@@ -293,12 +288,11 @@ void main() {
           testCustomPlan(),
         );
     container.read(readingPlanProvider('custom-1'));
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future<void>.delayed(const Duration(milliseconds: 500));
 
-    var notifier =
-        container.read(readingPlanProvider('custom-1').notifier);
-    notifier.markChapterComplete(
-        PlanChapter(bookName: 'Genesis', chapterNum: 1));
+    var notifier = container.read(readingPlanProvider('custom-1').notifier);
+    notifier
+        .markChapterComplete(PlanChapter(bookName: 'Genesis', chapterNum: 1));
     var state = container.read(readingPlanProvider('custom-1'));
     expect(state.isDayComplete(1), isTrue);
     expect(state.completedChapters, contains('Genesis_1'));
@@ -306,11 +300,11 @@ void main() {
     // Partial multi-chapter day: marking one chapter stays honest —
     // atoms spanning beyond the chapter are correctly left alone.
     container.read(readingPlanProvider('chronological_1yr'));
-    await Future.delayed(const Duration(milliseconds: 800));
-    notifier = container
-        .read(readingPlanProvider('chronological_1yr').notifier);
-    notifier.markChapterComplete(
-        PlanChapter(bookName: 'Genesis', chapterNum: 1));
+    await Future<void>.delayed(const Duration(milliseconds: 800));
+    notifier =
+        container.read(readingPlanProvider('chronological_1yr').notifier);
+    notifier
+        .markChapterComplete(PlanChapter(bookName: 'Genesis', chapterNum: 1));
     state = container.read(readingPlanProvider('chronological_1yr'));
     expect(state.isDayComplete(1), isFalse);
     // Genesis_1 is NOT claimed: its atom (1:1-3:24) extends beyond it.
@@ -335,10 +329,11 @@ void main() {
       final wcs = WordCountService();
       await wcs.initFromJson(
           File('assets/data/word_counts.json').readAsStringSync());
-      final pericopes = (jsonDecode(
-              File('assets/data/pericopes.json').readAsStringSync()) as List)
-          .map((j) => PericopeEntry.fromJson(j))
-          .toList();
+      final pericopes =
+          (jsonDecode(File('assets/data/pericopes.json').readAsStringSync())
+                  as List)
+              .map((j) => PericopeEntry.fromJson(j as Map<String, dynamic>))
+              .toList();
       final generator =
           PlanGenerator(wordCountService: wcs, allPericopes: pericopes);
       built = generator.generatePlan(
@@ -369,7 +364,7 @@ void main() {
       for (var i = 0; i < 100; i++) {
         final s = container.read(readingPlanProvider('pace-test'));
         if (!s.isLoading) break;
-        await Future.delayed(const Duration(milliseconds: 100));
+        await Future<void>.delayed(const Duration(milliseconds: 100));
       }
     });
     var state = container.read(readingPlanProvider('pace-test'));
@@ -382,8 +377,7 @@ void main() {
         .read(readingPlanProvider('pace-test').notifier)
         .markReadingComplete(2);
     state = container.read(readingPlanProvider('pace-test'));
-    final before =
-        Set<String>.from(state.completedAtomIds);
+    final before = Set<String>.from(state.completedAtomIds);
     expect(before, isNotEmpty);
 
     // Repace 30 -> 15 days.
@@ -395,7 +389,7 @@ void main() {
       for (var i = 0; i < 100; i++) {
         final s = container.read(readingPlanProvider('pace-test'));
         if (!s.isLoading) break;
-        await Future.delayed(const Duration(milliseconds: 100));
+        await Future<void>.delayed(const Duration(milliseconds: 100));
       }
     });
     expect(err, isNull);

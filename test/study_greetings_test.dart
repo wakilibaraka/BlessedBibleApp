@@ -42,11 +42,7 @@ void main() {
     expect(at(2026, 10, 5, 13).title, isNot(a.title));
     // Midday is none of the special pools.
     expect(
-        _morning
-            .union(_evening)
-            .union(_grace)
-            .union(_cheer)
-            .contains(a.title),
+        _morning.union(_evening).union(_grace).union(_cheer).contains(a.title),
         isFalse);
   });
 
@@ -66,26 +62,21 @@ void main() {
   });
 
   test('broken streak with history gets grace words', () {
-    expect(_grace,
-        contains(at(2026, 10, 4, 13, streak: 0, distinct: 5).title));
+    expect(_grace, contains(at(2026, 10, 4, 13, streak: 0, distinct: 5).title));
     // Grace overrides the morning pool too.
-    expect(_grace,
-        contains(at(2026, 10, 4, 8, streak: 0, distinct: 5).title));
+    expect(_grace, contains(at(2026, 10, 4, 8, streak: 0, distinct: 5).title));
   });
 
   test('restarted-today counts as a grace day', () {
-    expect(_grace,
-        contains(at(2026, 10, 4, 13, streak: 1, distinct: 6).title));
+    expect(_grace, contains(at(2026, 10, 4, 13, streak: 1, distinct: 6).title));
     // ...but a genuine day-one user does not get grace words.
     expect(_grace,
         isNot(contains(at(2026, 10, 4, 13, streak: 1, distinct: 1).title)));
   });
 
   test('streak of 3+ gets encouragement, overriding time of day', () {
-    expect(_cheer,
-        contains(at(2026, 10, 4, 8, streak: 5, distinct: 9).title));
-    expect(_cheer,
-        contains(at(2026, 10, 4, 20, streak: 3, distinct: 4).title));
+    expect(_cheer, contains(at(2026, 10, 4, 8, streak: 5, distinct: 9).title));
+    expect(_cheer, contains(at(2026, 10, 4, 20, streak: 3, distinct: 4).title));
   });
 
   test('all 25 titles unique', () {

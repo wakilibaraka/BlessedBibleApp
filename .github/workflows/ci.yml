@@ -1,0 +1,122 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dart:
+    name: Analyze, format, test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read pinned Flutter version
+        id: fvm
+        run: echo "version=$(jq -r .flutter .fvmrc)" >> "$GITHUB_OUTPUT"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ steps.fvm.outputs.version }}
+          cache: true
+
+      - name: Stub generated Firebase options
+        run: test -f lib/firebase_options.dart || cp tool/ci/firebase_options_stub.dart lib/firebase_options.dart
+
+      - name: Install dependencies
+        run: flutter pub get --enforce-lockfile
+
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed lib test
+
+      - name: Check generated privacy policy pages are current
+        run: python3 tool/build_privacy_policy.py --check
+
+      - name: Analyze
+        run: flutter analyze --fatal-infos
+
+      - name: Fetch live translations for the parser tests
+        run: |
+          mkdir -p build/helloao
+          curl -fsSL --retry 3 https://bible.helloao.org/api/deu_l12/complete.json -o build/helloao/deu_l12.complete.json
+          mkdir -p build/open-bibles
+          curl -fsSL --retry 3 https://raw.githubusercontent.com/seven1m/open-bibles/f257a3559025c3f873b48a75019f53a9354ed7de/hun-karoli.osis.xml -o build/open-bibles/hun-karoli.osis.xml
+
+      - name: Test
+        run: flutter test
+
+  android:
+    name: Android debug build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: dart
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Read pinned Flutter version
+        id: fvm
+        run: echo "version=$(jq -r .flutter .fvmrc)" >> "$GITHUB_OUTPUT"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ steps.fvm.outputs.version }}
+          cache: true
+
+      # Compile check only: stub Firebase config, no LFS content, no signing.
+      - name: Stub Firebase config
+        run: |
+          test -f lib/firebase_options.dart || cp tool/ci/firebase_options_stub.dart lib/firebase_options.dart
+          test -f android/app/google-services.json || cp tool/ci/google-services.stub.json android/app/google-services.json
+
+      - name: Build debug APK
+        run: |
+          flutter pub get --enforce-lockfile
+          flutter build apk --debug
+
+  firestore-rules:
+    name: Firestore rules tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: firestore-tests/package-lock.json
+
+      - name: Run rules tests on the emulator
+        working-directory: firestore-tests
+        run: |
+          npm ci
+          npm test
+
+  translation-sources:
+    name: Downloadable translations resolve
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Every catalog translation downloads and is complete
+        run: python3 tool/check_translation_sources.py
+

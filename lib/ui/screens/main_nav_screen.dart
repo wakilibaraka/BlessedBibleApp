@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -30,6 +31,7 @@ import '../../state/read_settings_provider.dart';
 import '../../state/study_provider.dart';
 import '../../state/commentary_provider.dart';
 import '../widgets/commentary_view.dart';
+import '../../utils/log.dart';
 
 const double kBottomDockHeight = 64.0;
 const double kBottomDockInset = 16.0;
@@ -124,7 +126,7 @@ class MainNavScreen extends ConsumerWidget {
           );
 
           if (shouldExit == true) {
-            SystemNavigator.pop();
+            unawaited(SystemNavigator.pop());
           }
         },
         child: Scaffold(
@@ -157,10 +159,6 @@ class MainNavScreen extends ConsumerWidget {
                 final isMinimalAction = currentIndex == 1 &&
                     selectedVerses.isNotEmpty &&
                     style == VerseActionStyle.horizontal;
-                // Compact sheet: actions live in a short sheet, not the dock.
-                final usesActionSheet = currentIndex == 1 &&
-                    selectedVerses.isNotEmpty &&
-                    style == VerseActionStyle.classic;
                 final isRaindropAction = currentIndex == 1 &&
                     selectedVerses.isNotEmpty &&
                     style == VerseActionStyle.raindrop;
@@ -169,13 +167,19 @@ class MainNavScreen extends ConsumerWidget {
                 final double rawWidth = MediaQuery.of(context).size.width;
                 final double availableWidth = rawWidth > 0 ? rawWidth : 360.0;
                 final double maxDockWidth = 450.0;
-                final double dockMaxWidth = math.max(250.0,
-                    math.min(maxDockWidth, availableWidth - 40 - kBottomDockHeight - 16));
-                final double totalExpandedWidth = dockMaxWidth + 12.0 + kBottomDockHeight;
+                final double dockMaxWidth = math.max(
+                    250.0,
+                    math.min(maxDockWidth,
+                        availableWidth - 40 - kBottomDockHeight - 16));
+                final double totalExpandedWidth =
+                    dockMaxWidth + 12.0 + kBottomDockHeight;
                 final double rightOffset =
                     math.max(20.0, (availableWidth - totalExpandedWidth) / 2);
-                final double clampedScale = MediaQuery.textScalerOf(context).clamp(minScaleFactor: 1.0, maxScaleFactor: 1.3).scale(1.0);
-                final double dynamicDockHeight = kBottomDockHeight * clampedScale;
+                final double clampedScale = MediaQuery.textScalerOf(context)
+                    .clamp(minScaleFactor: 1.0, maxScaleFactor: 1.3)
+                    .scale(1.0);
+                final double dynamicDockHeight =
+                    kBottomDockHeight * clampedScale;
                 // Only the inline classic expands the dock; the compact
                 // sheet and the radial menu leave it at its normal height.
                 final double height = (currentIndex == 1 &&
@@ -265,7 +269,14 @@ class MainNavScreen extends ConsumerWidget {
                             ),
                             // ── Dynamic Contextual FAB (Right) ──
                             AnimatedScale(
-                              scale: (currentIndex == 1 && ref.watch(readSettingsProvider).readingViewMode == ReadingViewMode.full && ref.watch(chromeHiddenProvider)) ? 0.0 : 1.0,
+                              scale: (currentIndex == 1 &&
+                                      ref
+                                              .watch(readSettingsProvider)
+                                              .readingViewMode ==
+                                          ReadingViewMode.full &&
+                                      ref.watch(chromeHiddenProvider))
+                                  ? 0.0
+                                  : 1.0,
                               duration: const Duration(milliseconds: 300),
                               curve: Curves.easeOutCubic,
                               child: TweenAnimationBuilder<double>(
@@ -280,230 +291,238 @@ class MainNavScreen extends ConsumerWidget {
                                       : kBottomDockHeight,
                                 ),
                                 builder: (context, height, child) {
-                                final bool isClassicAction =
-                                    currentIndex == 1 &&
-                                        selectedVerses.isNotEmpty &&
-                                        style == VerseActionStyle.classicInline;
-                                final bool isRaindropAction =
-                                    currentIndex == 1 &&
-                                        selectedVerses.isNotEmpty &&
-                                        style == VerseActionStyle.raindrop;
-                                return Stack(
-                                  alignment: Alignment.bottomRight,
-                                  clipBehavior: Clip.none,
-                                  children: [
-                                    // Expand bounds to catch Top Pill hits
-                                    if (isClassicAction)
-                                      SizedBox(width: 250, height: height + 70),
+                                  final bool isClassicAction = currentIndex ==
+                                          1 &&
+                                      selectedVerses.isNotEmpty &&
+                                      style == VerseActionStyle.classicInline;
+                                  final bool isRaindropAction =
+                                      currentIndex == 1 &&
+                                          selectedVerses.isNotEmpty &&
+                                          style == VerseActionStyle.raindrop;
+                                  return Stack(
+                                    alignment: Alignment.bottomRight,
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      // Expand bounds to catch Top Pill hits
+                                      if (isClassicAction)
+                                        SizedBox(
+                                            width: 250, height: height + 70),
 
-                                    // Expand bounds to catch Raindrop Vertical Pill hits
-                                    if (isRaindropAction)
-                                      SizedBox(
-                                          width: kBottomDockHeight,
-                                          height: 260),
+                                      // Expand bounds to catch Raindrop Vertical Pill hits
+                                      if (isRaindropAction)
+                                        SizedBox(
+                                            width: kBottomDockHeight,
+                                            height: 260),
 
-                                    // ── Raindrop Vertical Pill ──
-                                    if (isRaindropAction)
-                                      Positioned(
-                                        bottom: kBottomDockHeight +
-                                            kBottomDockGap, // Above the FAB
-                                        right: 0,
-                                        child: BouncyEntrance(
-                                          isVisible: true,
-                                          delay:
-                                              const Duration(milliseconds: 40),
-                                          child: Stack(
-                                            alignment: Alignment.center,
-                                            children: [
-                                              Positioned.fill(
-                                                child: GestureDetector(
-                                                  behavior:
-                                                      HitTestBehavior.opaque,
-                                                  onTap: () {},
+                                      // ── Raindrop Vertical Pill ──
+                                      if (isRaindropAction)
+                                        Positioned(
+                                          bottom: kBottomDockHeight +
+                                              kBottomDockGap, // Above the FAB
+                                          right: 0,
+                                          child: BouncyEntrance(
+                                            isVisible: true,
+                                            delay: const Duration(
+                                                milliseconds: 40),
+                                            child: Stack(
+                                              alignment: Alignment.center,
+                                              children: [
+                                                Positioned.fill(
+                                                  child: GestureDetector(
+                                                    behavior:
+                                                        HitTestBehavior.opaque,
+                                                    onTap: () {},
+                                                  ),
                                                 ),
-                                              ),
-                                              TexturedGlassContainer(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        kBottomDockHeight / 2),
-                                                padding: EdgeInsets.zero,
-                                                child: SizedBox(
-                                                  width: kBottomDockHeight,
-                                                  child: _buildActionMenuIcons(
-                                                      context,
-                                                      ref,
-                                                      Theme.of(context),
-                                                      showCloseIcon: false),
+                                                TexturedGlassContainer(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          kBottomDockHeight /
+                                                              2),
+                                                  padding: EdgeInsets.zero,
+                                                  child: SizedBox(
+                                                    width: kBottomDockHeight,
+                                                    child:
+                                                        _buildActionMenuIcons(
+                                                            context,
+                                                            ref,
+                                                            Theme.of(context),
+                                                            showCloseIcon:
+                                                                false),
+                                                  ),
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
                                         ),
-                                      ),
 
-                                    // ── Classic Top Pill (Verse + Colors) ──
-                                    Positioned(
-                                      bottom: height + kBottomDockGap,
-                                      left: 16,
-                                      right: 16,
-                                      child: IgnorePointer(
-                                        ignoring: !isClassicAction,
-                                        child: BouncyEntrance(
-                                          isVisible: isClassicAction,
-                                          delay:
-                                              const Duration(milliseconds: 40),
-                                          child: Stack(
-                                            alignment: Alignment.center,
-                                            children: [
-                                              Positioned.fill(
-                                                child: GestureDetector(
+                                      // ── Classic Top Pill (Verse + Colors) ──
+                                      Positioned(
+                                        bottom: height + kBottomDockGap,
+                                        left: 16,
+                                        right: 16,
+                                        child: IgnorePointer(
+                                          ignoring: !isClassicAction,
+                                          child: BouncyEntrance(
+                                            isVisible: isClassicAction,
+                                            delay: const Duration(
+                                                milliseconds: 40),
+                                            child: Stack(
+                                              alignment: Alignment.center,
+                                              children: [
+                                                Positioned.fill(
+                                                  child: GestureDetector(
+                                                    behavior:
+                                                        HitTestBehavior.opaque,
+                                                    onTap:
+                                                        () {}, // Eat taps on the background
+                                                  ),
+                                                ),
+                                                GestureDetector(
                                                   behavior:
                                                       HitTestBehavior.opaque,
                                                   onTap:
-                                                      () {}, // Eat taps on the background
-                                                ),
-                                              ),
-                                              GestureDetector(
-                                                behavior:
-                                                    HitTestBehavior.opaque,
-                                                onTap:
-                                                    () {}, // Also eat taps inside the container bounds
-                                                child: TexturedGlassContainer(
-                                                  borderRadius:
-                                                      BorderRadius.circular(36),
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 16.0,
-                                                      vertical: 12.0),
-                                                  child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      Text(
-                                                        '${selectedVerses.length}',
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .titleSmall
-                                                            ?.copyWith(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              color: Theme.of(
-                                                                      context)
-                                                                  .primaryColor,
-                                                            ),
-                                                      ),
-                                                      const SizedBox(width: 12),
-                                                      ...List.generate(
-                                                          highlightPalette
-                                                              .length, (i) {
-                                                        final color = AppColors
-                                                            .getRenderedHighlightColor(
-                                                                highlightPaletteSwatches[
-                                                                    i],
-                                                                Theme.of(
-                                                                        context)
-                                                                    .brightness,
-                                                                Theme.of(
-                                                                        context)
-                                                                    .scaffoldBackgroundColor);
-                                                        final highlights =
-                                                            ref.watch(
-                                                                highlightsProvider);
-                                                        final allHaveThisColor =
-                                                            selectedVerses
-                                                                .every((v) {
-                                                          final refStr =
-                                                              generateVerseKey(
-                                                                  readLoc
-                                                                      .bookName,
-                                                                  readLoc
-                                                                      .chapter,
-                                                                  v);
-                                                          return highlights
-                                                                  .containsKey(
-                                                                      refStr) &&
-                                                              highlights[
-                                                                      refStr] ==
-                                                                  i;
-                                                        });
+                                                      () {}, // Also eat taps inside the container bounds
+                                                  child: TexturedGlassContainer(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            36),
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 16.0,
+                                                        vertical: 12.0),
+                                                    child: Row(
+                                                      mainAxisSize:
+                                                          MainAxisSize.max,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Text(
+                                                          '${selectedVerses.length}',
+                                                          style:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .titleSmall
+                                                                  ?.copyWith(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color: Theme.of(
+                                                                            context)
+                                                                        .primaryColor,
+                                                                  ),
+                                                        ),
+                                                        const SizedBox(
+                                                            width: 12),
+                                                        ...List.generate(
+                                                            highlightPalette
+                                                                .length, (i) {
+                                                          final color = AppColors
+                                                              .getRenderedHighlightColor(
+                                                                  highlightPaletteSwatches[
+                                                                      i],
+                                                                  Theme.of(
+                                                                          context)
+                                                                      .brightness,
+                                                                  Theme.of(
+                                                                          context)
+                                                                      .scaffoldBackgroundColor);
+                                                          final highlights =
+                                                              ref.watch(
+                                                                  highlightsProvider);
+                                                          final allHaveThisColor =
+                                                              selectedVerses
+                                                                  .every((v) {
+                                                            final refStr =
+                                                                generateVerseKey(
+                                                                    readLoc
+                                                                        .bookName,
+                                                                    readLoc
+                                                                        .chapter,
+                                                                    v);
+                                                            return highlights
+                                                                    .containsKey(
+                                                                        refStr) &&
+                                                                highlights[
+                                                                        refStr] ==
+                                                                    i;
+                                                          });
 
-                                                        return _buildColorDot(
-                                                          color,
-                                                          isSelected:
-                                                              allHaveThisColor,
-                                                          onTap: () {
-                                                            final currentTheme =
-                                                                Theme.of(
-                                                                    context);
-                                                            Future(() {
-                                                              if (!context
-                                                                  .mounted) {
-                                                                return;
-                                                              }
-                                                              ref
-                                                                  .read(readSettingsProvider
-                                                                      .notifier)
-                                                                  .setActiveHighlightColorIndex(
-                                                                      i);
-                                                              VerseActionLogic.handleHighlight(
-                                                                  context,
-                                                                  currentTheme,
-                                                                  ref,
-                                                                  readLoc
-                                                                      .bookName,
-                                                                  readLoc
-                                                                      .chapter,
-                                                                  selectedVerses
-                                                                      .toList(),
-                                                                  i);
-                                                            });
-                                                          },
-                                                        );
-                                                      }),
-                                                    ],
+                                                          return _buildColorDot(
+                                                            color,
+                                                            isSelected:
+                                                                allHaveThisColor,
+                                                            onTap: () {
+                                                              final currentTheme =
+                                                                  Theme.of(
+                                                                      context);
+                                                              Future(() {
+                                                                if (!context
+                                                                    .mounted) {
+                                                                  return;
+                                                                }
+                                                                ref
+                                                                    .read(readSettingsProvider
+                                                                        .notifier)
+                                                                    .setActiveHighlightColorIndex(
+                                                                        i);
+                                                                VerseActionLogic.handleHighlight(
+                                                                    context,
+                                                                    currentTheme,
+                                                                    ref,
+                                                                    readLoc
+                                                                        .bookName,
+                                                                    readLoc
+                                                                        .chapter,
+                                                                    selectedVerses
+                                                                        .toList(),
+                                                                    i);
+                                                              });
+                                                            },
+                                                          );
+                                                        }),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                    // ── Morphing FAB / Bottom Pill ──
-                                    GestureDetector(
-                                      behavior: HitTestBehavior.opaque,
-                                      onTap: () {},
-                                      child: TexturedGlassContainer(
-                                        borderRadius: BorderRadius.circular(
-                                            kBottomDockHeight / 2),
-                                        padding: EdgeInsets.zero,
-                                        child: SizedBox(
-                                          width: kBottomDockHeight,
-                                          height: height,
-                                          child: ClipRect(
-                                            child: OverflowBox(
-                                              minHeight: kBottomDockHeight,
-                                              maxHeight: 400,
-                                              alignment: Alignment.bottomCenter,
-                                              child: AnimatedSwitcher(
-                                                duration: const Duration(
-                                                    milliseconds: 300),
-                                                child: isClassicAction
-                                                    ? _buildActionMenuIcons(
-                                                        context,
-                                                        ref,
-                                                        Theme.of(context))
-                                                    : SizedBox(
-                                                        key: const ValueKey(
-                                                            'fab'),
-                                                        height:
-                                                            kBottomDockHeight,
-                                                        child: Center(
-                                                          child: IconButton(
+                                      // ── Morphing FAB / Bottom Pill ──
+                                      GestureDetector(
+                                        behavior: HitTestBehavior.opaque,
+                                        onTap: () {},
+                                        child: TexturedGlassContainer(
+                                          borderRadius: BorderRadius.circular(
+                                              kBottomDockHeight / 2),
+                                          padding: EdgeInsets.zero,
+                                          child: SizedBox(
+                                            width: kBottomDockHeight,
+                                            height: height,
+                                            child: ClipRect(
+                                              child: OverflowBox(
+                                                minHeight: kBottomDockHeight,
+                                                maxHeight: 400,
+                                                alignment:
+                                                    Alignment.bottomCenter,
+                                                child: AnimatedSwitcher(
+                                                  duration: const Duration(
+                                                      milliseconds: 300),
+                                                  child: isClassicAction
+                                                      ? _buildActionMenuIcons(
+                                                          context,
+                                                          ref,
+                                                          Theme.of(context))
+                                                      : SizedBox(
+                                                          key: const ValueKey(
+                                                              'fab'),
+                                                          height:
+                                                              kBottomDockHeight,
+                                                          child: Center(
+                                                            child: IconButton(
                                                               icon:
                                                                   AnimatedSwitcher(
                                                                 duration:
@@ -564,25 +583,33 @@ class MainNavScreen extends ConsumerWidget {
                                                                 }
                                                               },
                                                               onLongPress: () {
-                                                                if (currentIndex == 1 &&
-                                                                    ref.read(readSettingsProvider).fabLongPressToNav) {
-                                                                  HapticFeedback.heavyImpact();
-                                                                  ref.read(navMenuTriggerProvider)?.call();
+                                                                if (currentIndex ==
+                                                                        1 &&
+                                                                    ref
+                                                                        .read(
+                                                                            readSettingsProvider)
+                                                                        .fabLongPressToNav) {
+                                                                  HapticFeedback
+                                                                      .heavyImpact();
+                                                                  ref
+                                                                      .read(
+                                                                          navMenuTriggerProvider)
+                                                                      ?.call();
                                                                 }
                                                               },
                                                             ),
+                                                          ),
                                                         ),
-                                                      ),
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            ), // TweenAnimationBuilder
+                                    ],
+                                  );
+                                },
+                              ), // TweenAnimationBuilder
                             ), // AnimatedScale
                           ],
                         ),
@@ -666,7 +693,7 @@ class MainNavScreen extends ConsumerWidget {
         break;
       case 2:
         // Search tab: open Search Settings
-        showModalBottomSheet(
+        showModalBottomSheet<void>(
           context: context,
           isScrollControlled: true,
           backgroundColor: Colors.transparent,
@@ -750,7 +777,8 @@ class MainNavScreen extends ConsumerWidget {
         behavior: HitTestBehavior.opaque,
         child: MediaQuery(
           data: MediaQuery.of(context).copyWith(
-            textScaler: MediaQuery.textScalerOf(context).clamp(minScaleFactor: 1.0, maxScaleFactor: 1.3),
+            textScaler: MediaQuery.textScalerOf(context)
+                .clamp(minScaleFactor: 1.0, maxScaleFactor: 1.3),
           ),
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 4),
@@ -966,7 +994,7 @@ class MainNavScreen extends ConsumerWidget {
         // Guard: verse index must be within the chapter's verse list.
         if (verseNum < 1 || verseNum > fc.chapter.verses.length) return;
 
-        showDialog(
+        showDialog<void>(
           context: context,
           barrierDismissible: false,
           builder: (context) => const CastingLotsDialog(),
@@ -985,7 +1013,7 @@ class MainNavScreen extends ConsumerWidget {
               .read(activeStudyVerseProvider.notifier)
               .setVerse('$bookName $chapter:$verseNum');
 
-          Navigator.of(context).push(CupertinoPageRoute(
+          Navigator.of(context).push(CupertinoPageRoute<void>(
               builder: (_) => Scaffold(
                     body: CommentaryView(
                       book: bookName,
@@ -997,7 +1025,7 @@ class MainNavScreen extends ConsumerWidget {
                   )));
         });
       } catch (e, st) {
-        debugPrint('Casting lots error: $e\n$st');
+        logDebug('Casting lots error: $e\n$st');
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -1044,99 +1072,99 @@ class MainNavScreen extends ConsumerWidget {
                 key: const ValueKey('unified_tabs'),
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-              _buildMorphingSlot(
-                context,
-                ref,
-                isAction: isMinimalAction,
-                navIcon: Icons.home_outlined,
-                navActiveIcon: Icons.home,
-                navLabel: 'Home',
-                navIndex: 0,
-                currentIndex: currentIndex,
-                actionIcon: Icons.copy_rounded,
-                actionLabel: 'Copy',
-                actionColor: actionIconColor,
-                onActionTap: () {
-                  VerseActionLogic.handleCopy(
-                      context, ref, bookName, chapterNum, targetVerses);
-                  ref.read(readSelectionProvider.notifier).clear();
-                },
+                  _buildMorphingSlot(
+                    context,
+                    ref,
+                    isAction: isMinimalAction,
+                    navIcon: Icons.home_outlined,
+                    navActiveIcon: Icons.home,
+                    navLabel: 'Home',
+                    navIndex: 0,
+                    currentIndex: currentIndex,
+                    actionIcon: Icons.copy_rounded,
+                    actionLabel: 'Copy',
+                    actionColor: actionIconColor,
+                    onActionTap: () {
+                      VerseActionLogic.handleCopy(
+                          context, ref, bookName, chapterNum, targetVerses);
+                      ref.read(readSelectionProvider.notifier).clear();
+                    },
+                  ),
+                  _buildMorphingSlot(
+                    context,
+                    ref,
+                    isAction: isMinimalAction,
+                    navIcon: Icons.menu_book_outlined,
+                    navActiveIcon: Icons.menu_book,
+                    navLabel: 'Read',
+                    navIndex: 1,
+                    currentIndex: currentIndex,
+                    actionIcon: Icons.edit_document,
+                    actionLabel: 'Notes',
+                    actionColor: actionIconColor,
+                    onActionTap: () async {
+                      await VerseActionLogic.handleNote(context, ref, theme,
+                          bookName, chapterNum, targetVerses);
+                      ref.read(readSelectionProvider.notifier).clear();
+                    },
+                  ),
+                  _buildMorphingSlot(context, ref,
+                      isAction: isMinimalAction,
+                      navIcon: Icons.school_outlined,
+                      navActiveIcon: Icons.school,
+                      navLabel: 'Study',
+                      navIndex: 3,
+                      currentIndex: currentIndex,
+                      actionIcon: Icons.highlight_rounded,
+                      actionLabel: 'Highlight',
+                      actionColor: actionIconColor, onActionTap: () {
+                    VerseActionLogic.handleHighlightInteraction(
+                      context: context,
+                      ref: ref,
+                      theme: theme,
+                      bookAbbrev: readLoc.bookAbbrev,
+                      chapterNum: chapterNum,
+                      targetVerses: targetVerses,
+                      isLongPress: false,
+                      onClearSelection: () =>
+                          ref.read(readSelectionProvider.notifier).clear(),
+                    );
+                  }, onActionLongPress: () {
+                    VerseActionLogic.handleHighlightInteraction(
+                      context: context,
+                      ref: ref,
+                      theme: theme,
+                      bookAbbrev: readLoc.bookAbbrev,
+                      chapterNum: chapterNum,
+                      targetVerses: targetVerses,
+                      isLongPress: true,
+                      onClearSelection: () =>
+                          ref.read(readSelectionProvider.notifier).clear(),
+                    );
+                  }),
+                  _buildMorphingSlot(
+                    context,
+                    ref,
+                    isAction: isMinimalAction,
+                    navIcon: Icons.search,
+                    navActiveIcon: Icons.search,
+                    navLabel: 'Search',
+                    navIndex: 2,
+                    currentIndex: currentIndex,
+                    actionIcon: Icons.ios_share_rounded,
+                    actionLabel: 'Share',
+                    actionColor: actionIconColor,
+                    onActionTap: () async {
+                      await VerseActionLogic.handleShare(
+                          context, ref, bookName, chapterNum, targetVerses);
+                      ref.read(readSelectionProvider.notifier).clear();
+                    },
+                  ),
+                ],
               ),
-              _buildMorphingSlot(
-                context,
-                ref,
-                isAction: isMinimalAction,
-                navIcon: Icons.menu_book_outlined,
-                navActiveIcon: Icons.menu_book,
-                navLabel: 'Read',
-                navIndex: 1,
-                currentIndex: currentIndex,
-                actionIcon: Icons.edit_document,
-                actionLabel: 'Notes',
-                actionColor: actionIconColor,
-                onActionTap: () async {
-                  await VerseActionLogic.handleNote(
-                      context, ref, theme, bookName, chapterNum, targetVerses);
-                  ref.read(readSelectionProvider.notifier).clear();
-                },
-              ),
-              _buildMorphingSlot(context, ref,
-                  isAction: isMinimalAction,
-                  navIcon: Icons.school_outlined,
-                  navActiveIcon: Icons.school,
-                  navLabel: 'Study',
-                  navIndex: 3,
-                  currentIndex: currentIndex,
-                  actionIcon: Icons.highlight_rounded,
-                  actionLabel: 'Highlight',
-                  actionColor: actionIconColor, onActionTap: () {
-                VerseActionLogic.handleHighlightInteraction(
-                  context: context,
-                  ref: ref,
-                  theme: theme,
-                  bookAbbrev: readLoc.bookAbbrev,
-                  chapterNum: chapterNum,
-                  targetVerses: targetVerses,
-                  isLongPress: false,
-                  onClearSelection: () =>
-                      ref.read(readSelectionProvider.notifier).clear(),
-                );
-              }, onActionLongPress: () {
-                VerseActionLogic.handleHighlightInteraction(
-                  context: context,
-                  ref: ref,
-                  theme: theme,
-                  bookAbbrev: readLoc.bookAbbrev,
-                  chapterNum: chapterNum,
-                  targetVerses: targetVerses,
-                  isLongPress: true,
-                  onClearSelection: () =>
-                      ref.read(readSelectionProvider.notifier).clear(),
-                );
-              }),
-              _buildMorphingSlot(
-                context,
-                ref,
-                isAction: isMinimalAction,
-                navIcon: Icons.search,
-                navActiveIcon: Icons.search,
-                navLabel: 'Search',
-                navIndex: 2,
-                currentIndex: currentIndex,
-                actionIcon: Icons.ios_share_rounded,
-                actionLabel: 'Share',
-                actionColor: actionIconColor,
-                onActionTap: () async {
-                  await VerseActionLogic.handleShare(
-                      context, ref, bookName, chapterNum, targetVerses);
-                  ref.read(readSelectionProvider.notifier).clear();
-                },
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
-    );
+        );
       },
     );
   }

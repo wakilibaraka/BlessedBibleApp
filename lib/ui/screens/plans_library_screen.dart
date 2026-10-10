@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -60,14 +61,14 @@ const bookPlanPresets = [
       endBook: 'Matthew',
       days: 28),
   BookPlanPreset(
-      title: 'John in 21 days',
-      startBook: 'John', endBook: 'John', days: 21),
+      title: 'John in 21 days', startBook: 'John', endBook: 'John', days: 21),
   BookPlanPreset(
-      title: 'Acts in 28 days',
-      startBook: 'Acts', endBook: 'Acts', days: 28),
+      title: 'Acts in 28 days', startBook: 'Acts', endBook: 'Acts', days: 28),
   BookPlanPreset(
       title: 'Romans in 16 days',
-      startBook: 'Romans', endBook: 'Romans', days: 16),
+      startBook: 'Romans',
+      endBook: 'Romans',
+      days: 16),
   BookPlanPreset(
       title: 'Gospels in 90 days',
       startBook: 'Matthew',
@@ -82,8 +83,7 @@ class PlansLibraryScreen extends ConsumerStatefulWidget {
   const PlansLibraryScreen({super.key});
 
   @override
-  ConsumerState<PlansLibraryScreen> createState() =>
-      _PlansLibraryScreenState();
+  ConsumerState<PlansLibraryScreen> createState() => _PlansLibraryScreenState();
 }
 
 class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
@@ -106,7 +106,7 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
 
   void _push(Widget page) {
     HapticFeedback.selectionClick();
-    Navigator.of(context).push(CupertinoPageRoute(builder: (_) => page));
+    Navigator.of(context).push(CupertinoPageRoute<void>(builder: (_) => page));
   }
 
   String _planTitle(String id) {
@@ -197,7 +197,7 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
 
   /// Header date tap: pick any date, then slide the rail to that week.
   Future<void> _pickDateAndScroll() async {
-    HapticFeedback.selectionClick();
+    unawaited(HapticFeedback.selectionClick());
     final now = DateTime.now();
     final picked = await showDatePicker(
       context: context,
@@ -214,7 +214,7 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
     final now = DateTime.now();
     HapticFeedback.selectionClick();
     final verse = verseForDay(ref.read(votdPoolProvider), now);
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -232,12 +232,12 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
 
   /// Opens the story that owns the day's artwork plate.
   Future<void> _openPlate(StoryPlate plate) async {
-    HapticFeedback.selectionClick();
+    unawaited(HapticFeedback.selectionClick());
     final story = await ref
         .read(devotionalServiceProvider)
         .firstStoryForPrefix(plate.prefix);
     if (story == null || !mounted) return;
-    await Navigator.of(context).push(CupertinoPageRoute(
+    await Navigator.of(context).push(CupertinoPageRoute<void>(
       builder: (_) => BibleStoryReaderScreen(initialStory: story),
     ));
   }
@@ -271,8 +271,9 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
     // First active plan drives the calendar's completion dots.
     // readingPlanProvider is a Notifier (not Async): it exposes
     // isLoading/error inline, and planData is empty until built.
-    final activePlan =
-        activeIds.isEmpty ? null : ref.watch(readingPlanProvider(activeIds.first));
+    final activePlan = activeIds.isEmpty
+        ? null
+        : ref.watch(readingPlanProvider(activeIds.first));
 
     return V2PageShell(
       appThemeMode: appThemeMode,
@@ -300,8 +301,7 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
                           Flexible(
                             child: Text(
                               libraryDateHeader(now),
-                              style:
-                                  theme.textTheme.titleMedium?.copyWith(
+                              style: theme.textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
@@ -381,8 +381,7 @@ class _LibraryCard extends StatelessWidget {
   final double fraction;
   final bool featured;
   final VoidCallback onOpen;
-  final List<PopupMenuEntry<String>> Function(BuildContext context)
-      menuBuilder;
+  final List<PopupMenuEntry<String>> Function(BuildContext context) menuBuilder;
   final void Function(String action) onMenu;
   const _LibraryCard({
     required this.seed,
@@ -510,9 +509,7 @@ class _ReadingTab extends ConsumerWidget {
             final isActive = activeIds.contains(meta.id);
             final hasProgress = st.completedReadings.isNotEmpty;
             final total = st.planData.length;
-            final current = started
-                ? (st.todayReadingDay ?? total)
-                : 0;
+            final current = started ? (st.todayReadingDay ?? total) : 0;
             final behind = st.missedDays.length;
             final pct = started ? st.percentComplete : 0.0;
             final String status;
@@ -538,12 +535,10 @@ class _ReadingTab extends ConsumerWidget {
               featured: isActive,
               onOpen: () => onOpen(meta.id),
               menuBuilder: (_) => [
-                const PopupMenuItem(
-                    value: 'open', child: Text('Open')),
+                const PopupMenuItem(value: 'open', child: Text('Open')),
                 PopupMenuItem(
-                  value: isActive
-                      ? 'pause'
-                      : (hasProgress ? 'resume' : 'start'),
+                  value:
+                      isActive ? 'pause' : (hasProgress ? 'resume' : 'start'),
                   child: Text(isActive
                       ? 'Pause (keeps progress)'
                       : (hasProgress ? 'Resume' : 'Start')),
@@ -584,8 +579,7 @@ class _BooksTab extends ConsumerWidget {
     final theme = Theme.of(context);
     List<String> customIds = const [];
     try {
-      customIds =
-          ref.watch(preferencesProvider).getCustomPlanIds();
+      customIds = ref.watch(preferencesProvider).getCustomPlanIds();
     } catch (_) {}
     return ListView(
       padding: const EdgeInsets.only(top: 8, bottom: 140),
@@ -610,16 +604,14 @@ class _BooksTab extends ConsumerWidget {
                       children: [
                         Text(
                           preset.title,
-                          style:
-                              theme.textTheme.titleSmall?.copyWith(
+                          style: theme.textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           '${preset.days} days · tap to build',
-                          style:
-                              theme.textTheme.labelSmall?.copyWith(
+                          style: theme.textTheme.labelSmall?.copyWith(
                             fontWeight: FontWeight.w800,
                             color: theme.primaryColor,
                           ),
@@ -629,8 +621,7 @@ class _BooksTab extends ConsumerWidget {
                   ),
                   Icon(
                     Icons.chevron_right_rounded,
-                    color: theme.colorScheme.onSurface
-                        .withValues(alpha: 0.4),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                   ),
                 ],
               ),
@@ -644,8 +635,7 @@ class _BooksTab extends ConsumerWidget {
               style: theme.textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1.5,
-                color: theme.colorScheme.onSurface
-                    .withValues(alpha: 0.6),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
           ),
@@ -654,15 +644,12 @@ class _BooksTab extends ConsumerWidget {
               final st = ref.watch(readingPlanProvider(id));
               final started = st.planStartedOn != null;
               final total = st.planData.length;
-              final current =
-                  started ? (st.todayReadingDay ?? total) : 0;
+              final current = started ? (st.todayReadingDay ?? total) : 0;
               return _LibraryCard(
                 seed: id,
                 title: titleFor(id),
                 statusLine: started
-                    ? (total > 0
-                        ? 'Day $current of $total'
-                        : 'Started')
+                    ? (total > 0 ? 'Day $current of $total' : 'Started')
                     : 'Custom plan',
                 fraction: started ? st.percentComplete : 0,
                 featured: false,
@@ -697,12 +684,10 @@ class _MyPlansTab extends ConsumerWidget {
         padding: const EdgeInsets.only(top: 8, bottom: 140),
         children: [
           V2Card(
-            padding: const EdgeInsets.symmetric(
-                vertical: 34, horizontal: 20),
+            padding: const EdgeInsets.symmetric(vertical: 34, horizontal: 20),
             child: Column(
               children: [
-                Icon(Icons.spa_rounded,
-                    size: 32, color: theme.primaryColor),
+                Icon(Icons.spa_rounded, size: 32, color: theme.primaryColor),
                 const SizedBox(height: 10),
                 Text('No active plans',
                     style: theme.textTheme.titleMedium?.copyWith(
@@ -713,8 +698,7 @@ class _MyPlansTab extends ConsumerWidget {
                   'Browse Reading or Books to start your first plan.',
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface
-                        .withValues(alpha: 0.6),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
               ],
@@ -734,18 +718,14 @@ class _MyPlansTab extends ConsumerWidget {
             return _LibraryCard(
               seed: id,
               title: titleFor(id),
-              statusLine: total > 0
-                  ? 'Day $current of $total'
-                  : 'Started',
+              statusLine: total > 0 ? 'Day $current of $total' : 'Started',
               fraction: st.percentComplete,
               featured: true,
               onOpen: () => onOpen(id),
               menuBuilder: (_) => const [
+                PopupMenuItem(value: 'open', child: Text('Open')),
                 PopupMenuItem(
-                    value: 'open', child: Text('Open')),
-                PopupMenuItem(
-                    value: 'pause',
-                    child: Text('Pause (keeps progress)')),
+                    value: 'pause', child: Text('Pause (keeps progress)')),
               ],
               onMenu: (action) {
                 if (action == 'pause') {
@@ -824,17 +804,17 @@ class _LetReadSheet extends StatelessWidget {
               builder: (context, c) {
                 final parts = dayLabel.split(' ');
                 final day = int.tryParse(parts.length > 1 ? parts[1] : '') ?? 0;
-                final total = int.tryParse(parts.length > 3 ? parts[3] : '') ?? 365;
+                final total =
+                    int.tryParse(parts.length > 3 ? parts[3] : '') ?? 365;
                 final fraction = total == 0 ? 0.0 : day / total;
                 return ClipRRect(
                   borderRadius: BorderRadius.circular(4),
                   child: LinearProgressIndicator(
                     value: fraction.clamp(0.0, 1.0),
                     minHeight: 6,
-                    backgroundColor: theme.colorScheme.onSurface
-                        .withValues(alpha: 0.08),
-                    valueColor:
-                        AlwaysStoppedAnimation(theme.primaryColor),
+                    backgroundColor:
+                        theme.colorScheme.onSurface.withValues(alpha: 0.08),
+                    valueColor: AlwaysStoppedAnimation(theme.primaryColor),
                   ),
                 );
               },

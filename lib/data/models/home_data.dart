@@ -70,7 +70,6 @@ class PersonalNote {
       );
 }
 
-
 class MostReadVerse {
   final String reference;
   final int count;

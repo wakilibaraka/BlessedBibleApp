@@ -11,7 +11,15 @@ import 'translation_provider.dart';
 import 'pericopes_provider.dart';
 import '../services/bible_database_service.dart';
 
-enum SearchResultType { reference, bible, commentary, history, note, pericope, dictionary }
+enum SearchResultType {
+  reference,
+  bible,
+  commentary,
+  history,
+  note,
+  pericope,
+  dictionary
+}
 
 class SearchResult {
   final String title;
@@ -37,14 +45,14 @@ class SearchResult {
       };
 
   factory SearchResult.fromJson(Map<String, dynamic> json) => SearchResult(
-        title: json['title'],
-        subtitle: json['subtitle'],
-        snippet: json['snippet'],
+        title: json['title'] as String,
+        subtitle: json['subtitle'] as String,
+        snippet: json['snippet'] as String,
         type: SearchResultType.values.firstWhere(
           (e) => e.name == json['type'],
           orElse: () => SearchResultType.bible,
         ),
-        metadata: json['metadata'] ?? {},
+        metadata: (json['metadata'] as Map<String, dynamic>?) ?? {},
       );
 }
 
@@ -72,7 +80,8 @@ class IndexData {
   final List<String> sortedKeys;
 
   IndexData(this.corpus, this.invertedIndex, [List<String>? sortedKeys])
-      : sortedKeys = sortedKeys ?? invertedIndex.keys.toList()..sort();
+      : sortedKeys = sortedKeys ?? invertedIndex.keys.toList()
+          ..sort();
 }
 
 class IndexBuildArgs {
@@ -82,8 +91,8 @@ class IndexBuildArgs {
   final List<PericopeEntry>? pericopes;
   final List<PersonalNote> notes;
 
-  IndexBuildArgs(
-      this.bibleBooks, this.dbVerses, this.commentaryData, this.pericopes, this.notes);
+  IndexBuildArgs(this.bibleBooks, this.dbVerses, this.commentaryData,
+      this.pericopes, this.notes);
 }
 
 class SearchQueryArgs {
@@ -231,7 +240,7 @@ IndexData buildIndexIsolate(IndexBuildArgs args) {
       final chapterNum = scope.chapter;
       final verseNum = scope.verse;
 
-      String authorLabel =
+      final String authorLabel =
           entry.author.isNotEmpty ? '${entry.author} Commentary' : 'Commentary';
       String locTitle = bookName;
       if (chapterNum != null) locTitle += ' $chapterNum';
@@ -264,7 +273,8 @@ IndexData buildIndexIsolate(IndexBuildArgs args) {
         id: nextId++,
         type: SearchResultType.pericope,
         title: pericope.title,
-        subtitle: '${pericope.book} ${pericope.startChapter}:${pericope.startVerse}',
+        subtitle:
+            '${pericope.book} ${pericope.startChapter}:${pericope.startVerse}',
         text: pericope.title,
         metadata: {
           'bookName': pericope.book,
@@ -339,8 +349,8 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
 
   // 0. Exact Reference Match (highest priority)
   if ((args.includeOt || args.includeNt) && args.bibleBooks != null) {
-    final regex =
-        RegExp(r'^((?:\d\s*)?[a-z]+(?:\s+[a-z]+)*)\s*(?:(\d+)[\s:.]*(\d+)?(?:-\d+)?)?$');
+    final regex = RegExp(
+        r'^((?:\d\s*)?[a-z]+(?:\s+[a-z]+)*)\s*(?:(\d+)[\s:.]*(\d+)?(?:-\d+)?)?$');
     final match = regex.firstMatch(queryLower);
 
     if (match != null) {
@@ -463,9 +473,9 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
         int low = 0;
         int high = sortedKeys.length - 1;
         int startIndex = sortedKeys.length;
-        
+
         while (low <= high) {
-          int mid = (low + high) >> 1;
+          final int mid = (low + high) >> 1;
           if (sortedKeys[mid].compareTo(token) >= 0) {
             startIndex = mid;
             high = mid - 1;
@@ -473,7 +483,7 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
             low = mid + 1;
           }
         }
-        
+
         for (int i = startIndex; i < sortedKeys.length; i++) {
           final key = sortedKeys[i];
           if (key.startsWith(token)) {
@@ -569,7 +579,8 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
       if (args.exactMatch && !isExact) {
         matchedItems.removeAt(i);
       } else if (isExact) {
-        matchQuality[item.id] = (matchQuality[item.id] ?? 0) + 50; // Exact phrase = 50 pts
+        matchQuality[item.id] =
+            (matchQuality[item.id] ?? 0) + 50; // Exact phrase = 50 pts
       }
     }
 
@@ -652,8 +663,10 @@ final baseSearchIndexProvider = FutureProvider<IndexData>((ref) async {
   // Commentary is optional — use whatever is already available without blocking
   final commentaryAsync = ref.watch(commentaryProvider);
   final pericopesMap = ref.watch(pericopesProvider);
-  final pericopes = pericopesMap.values.expand((e) => e)
-      .where((p) => p.translationId == null || p.translationId == activeTranslation)
+  final pericopes = pericopesMap.values
+      .expand((e) => e)
+      .where((p) =>
+          p.translationId == null || p.translationId == activeTranslation)
       .toList();
 
   final args = IndexBuildArgs(
@@ -663,7 +676,7 @@ final baseSearchIndexProvider = FutureProvider<IndexData>((ref) async {
     pericopes,
     [], // Notes handled dynamically
   );
-  return await compute(buildIndexIsolate, args);
+  return compute(buildIndexIsolate, args);
 });
 
 final searchEngineProvider = Provider<SearchEngine>((ref) {

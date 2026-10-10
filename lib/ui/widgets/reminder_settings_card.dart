@@ -6,7 +6,8 @@ class ReminderSettingsCard extends ConsumerWidget {
   final ThemeData theme;
   const ReminderSettingsCard({super.key, required this.theme});
 
-  Future<void> _pickTime(BuildContext context, WidgetRef ref, bool isReading, TimeOfDay initialTime) async {
+  Future<void> _pickTime(BuildContext context, WidgetRef ref, bool isReading,
+      TimeOfDay initialTime) async {
     final newTime = await showTimePicker(
       context: context,
       initialTime: initialTime,
@@ -25,9 +26,12 @@ class ReminderSettingsCard extends ConsumerWidget {
 
     if (newTime != null) {
       if (isReading) {
-        ref.read(remindersProvider.notifier).setDailyTime(newTime.hour, newTime.minute);
+        ref
+            .read(remindersProvider.notifier)
+            .setDailyTime(newTime.hour, newTime.minute);
       } else {
-        ref.read(remindersProvider.notifier).setCustomWeeklyTime(DateTime.now().weekday, newTime.hour, newTime.minute);
+        ref.read(remindersProvider.notifier).setCustomWeeklyTime(
+            DateTime.now().weekday, newTime.hour, newTime.minute);
       }
     }
   }
@@ -36,8 +40,10 @@ class ReminderSettingsCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(remindersProvider);
 
-    final readingTime = TimeOfDay(hour: state.dailyHour, minute: state.dailyMinute);
-    final prayerTime = TimeOfDay(hour: state.customWeeklyHour, minute: state.customWeeklyMinute);
+    final readingTime =
+        TimeOfDay(hour: state.dailyHour, minute: state.dailyMinute);
+    final prayerTime = TimeOfDay(
+        hour: state.customWeeklyHour, minute: state.customWeeklyMinute);
 
     return Container(
       decoration: BoxDecoration(
@@ -54,10 +60,13 @@ class ReminderSettingsCard extends ConsumerWidget {
             title: 'Daily Reading',
             enabled: state.dailyEnabled,
             time: readingTime,
-            onToggle: (v) => ref.read(remindersProvider.notifier).toggleDaily(v),
+            onToggle: (v) =>
+                ref.read(remindersProvider.notifier).toggleDaily(v),
             onTimeTap: () => _pickTime(context, ref, true, readingTime),
           ),
-          Divider(color: theme.colorScheme.onSurface.withValues(alpha: 0.1), height: 1),
+          Divider(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+              height: 1),
           _buildRow(
             context,
             ref,
@@ -65,7 +74,8 @@ class ReminderSettingsCard extends ConsumerWidget {
             title: 'Custom Reminder',
             enabled: state.customWeeklyEnabled,
             time: prayerTime,
-            onToggle: (v) => ref.read(remindersProvider.notifier).toggleCustomWeekly(v),
+            onToggle: (v) =>
+                ref.read(remindersProvider.notifier).toggleCustomWeekly(v),
             onTimeTap: () => _pickTime(context, ref, false, prayerTime),
           ),
         ],
@@ -73,7 +83,9 @@ class ReminderSettingsCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildRow(BuildContext context, WidgetRef ref, {
+  Widget _buildRow(
+    BuildContext context,
+    WidgetRef ref, {
     required IconData icon,
     required String title,
     required bool enabled,
@@ -93,7 +105,8 @@ class ReminderSettingsCard extends ConsumerWidget {
       ),
       title: Text(
         title,
-        style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+        style:
+            theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
       ),
       subtitle: GestureDetector(
         onTap: onTimeTap,
@@ -110,7 +123,7 @@ class ReminderSettingsCard extends ConsumerWidget {
       ),
       trailing: Switch.adaptive(
         value: enabled,
-        activeColor: theme.colorScheme.primary,
+        activeThumbColor: theme.colorScheme.primary,
         onChanged: onToggle,
       ),
     );

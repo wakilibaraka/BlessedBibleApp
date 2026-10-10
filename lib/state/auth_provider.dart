@@ -11,7 +11,7 @@ final authStateProvider = StreamProvider<User?>((ref) {
 });
 
 /// Provides sign-in/out actions (no state, just methods).
-final authActionsProvider = Provider<AuthActions>((ref) => AuthActions(ref));
+final authActionsProvider = Provider<AuthActions>(AuthActions.new);
 
 class ReauthCancelledException implements Exception {
   final String message;
@@ -91,7 +91,10 @@ class AuthActions {
       final isApple = user.providerData.any((p) => p.providerId == 'apple.com');
       if (isApple) {
         final appleCredential = await SignInWithApple.getAppleIDCredential(
-          scopes: [AppleIDAuthorizationScopes.email, AppleIDAuthorizationScopes.fullName],
+          scopes: [
+            AppleIDAuthorizationScopes.email,
+            AppleIDAuthorizationScopes.fullName
+          ],
         );
         final oauthCredential = OAuthProvider('apple.com').credential(
           idToken: appleCredential.identityToken,
@@ -110,7 +113,8 @@ class AuthActions {
         return true;
       }
     } on GoogleSignInException catch (e) {
-      if (e.code == GoogleSignInExceptionCode.canceled || e.code == GoogleSignInExceptionCode.interrupted) {
+      if (e.code == GoogleSignInExceptionCode.canceled ||
+          e.code == GoogleSignInExceptionCode.interrupted) {
         throw ReauthCancelledException();
       }
       return false;
@@ -131,7 +135,7 @@ class AuthActions {
     // 1. Query users/{uid}/plans and batch-delete every plan document
     final plansRef = firestore.collection('users').doc(uid).collection('plans');
     final plansSnap = await plansRef.get();
-    
+
     if (plansSnap.docs.isNotEmpty) {
       final batch = firestore.batch();
       for (final doc in plansSnap.docs) {
@@ -139,9 +143,10 @@ class AuthActions {
       }
       await batch.commit();
     }
-    
+
     // 1b. Delete sync_data
-    final syncRef = firestore.collection('users').doc(uid).collection('sync_data');
+    final syncRef =
+        firestore.collection('users').doc(uid).collection('sync_data');
     final syncSnap = await syncRef.get();
     if (syncSnap.docs.isNotEmpty) {
       final batch = firestore.batch();
@@ -182,4 +187,3 @@ class AuthActions {
     }
   }
 }
-

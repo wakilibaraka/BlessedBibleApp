@@ -10,12 +10,12 @@ class BibleBook {
   });
 
   factory BibleBook.fromJson(Map<String, dynamic> json) {
-    var chaptersList = json['chapters'] as List;
-    List<BibleChapter> parsedChapters = [];
+    final chaptersList = json['chapters'] as List;
+    final List<BibleChapter> parsedChapters = [];
 
     for (int i = 0; i < chaptersList.length; i++) {
-      var versesList = chaptersList[i] as List;
-      List<BibleVerse> parsedVerses = [];
+      final versesList = chaptersList[i] as List;
+      final List<BibleVerse> parsedVerses = [];
 
       for (int j = 0; j < versesList.length; j++) {
         parsedVerses.add(

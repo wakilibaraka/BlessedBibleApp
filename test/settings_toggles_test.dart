@@ -23,8 +23,7 @@ Future<ProviderContainer> freshContainer() async {
 /// Reads [read] from a fresh container over the SAME mocked prefs
 /// (no reset — otherwise the flipped values would be wiped), after
 /// letting async loads finish.
-Future<T> reloaded<T>(
-    T Function(ProviderContainer c) read) async {
+Future<T> reloaded<T>(T Function(ProviderContainer c) read) async {
   final prefs = await SharedPreferences.getInstance();
   final c = ProviderContainer(
     overrides: [
@@ -35,7 +34,7 @@ Future<T> reloaded<T>(
   c.read(bibleNavSettingsProvider);
   c.read(readSettingsProvider);
   c.read(searchSettingsProvider);
-  await Future.delayed(const Duration(milliseconds: 300));
+  await Future<void>.delayed(const Duration(milliseconds: 300));
   return read(c);
 }
 
@@ -49,21 +48,19 @@ void main() {
         .read(readSettingsProvider.notifier)
         .setPopupStyle(PopupStyle.bottomSheet);
     await c.read(readSettingsProvider.notifier).setDefaultStartTab(1);
-    await c
-        .read(readSettingsProvider.notifier)
-        .setFabLongPressToNav(false);
+    await c.read(readSettingsProvider.notifier).setFabLongPressToNav(false);
 
-    final reloadedWpm = await reloaded(
-        (c) => c.read(readSettingsProvider).readingWpm);
+    final reloadedWpm =
+        await reloaded((c) => c.read(readSettingsProvider).readingWpm);
     expect(reloadedWpm, 200);
-    final reloadedPopup = await reloaded(
-        (c) => c.read(readSettingsProvider).popupStyle);
+    final reloadedPopup =
+        await reloaded((c) => c.read(readSettingsProvider).popupStyle);
     expect(reloadedPopup, PopupStyle.bottomSheet);
-    final reloadedTab = await reloaded(
-        (c) => c.read(readSettingsProvider).defaultStartTab);
+    final reloadedTab =
+        await reloaded((c) => c.read(readSettingsProvider).defaultStartTab);
     expect(reloadedTab, 1);
-    final reloadedFab = await reloaded(
-        (c) => c.read(readSettingsProvider).fabLongPressToNav);
+    final reloadedFab =
+        await reloaded((c) => c.read(readSettingsProvider).fabLongPressToNav);
     expect(reloadedFab, isFalse);
   });
 
@@ -71,17 +68,15 @@ void main() {
     final c = await freshContainer();
     addTearDown(c.dispose);
 
-    await c
-        .read(searchSettingsProvider.notifier)
-        .toggleMatchWholeWords(true);
+    await c.read(searchSettingsProvider.notifier).toggleMatchWholeWords(true);
     await c.read(searchSettingsProvider.notifier).toggleFuzzySearch(true);
     await c.read(searchSettingsProvider.notifier).toggleAutoOpen(true);
 
-    final reloadedWhole = await reloaded(
-        (c) => c.read(searchSettingsProvider).matchWholeWords);
+    final reloadedWhole =
+        await reloaded((c) => c.read(searchSettingsProvider).matchWholeWords);
     expect(reloadedWhole, isTrue);
-    final reloadedFuzzy = await reloaded(
-        (c) => c.read(searchSettingsProvider).fuzzySearch);
+    final reloadedFuzzy =
+        await reloaded((c) => c.read(searchSettingsProvider).fuzzySearch);
     expect(reloadedFuzzy, isTrue);
     final reloadedAuto = await reloaded(
         (c) => c.read(searchSettingsProvider).autoOpenSingleSearchResult);

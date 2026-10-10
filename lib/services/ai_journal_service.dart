@@ -14,18 +14,46 @@ class JournalReflectionResult {
 
 class AiJournalService {
   static const Map<String, String> _keywords = {
-    'anxious': 'anxiety', 'anxiety': 'anxiety', 'worried': 'anxiety', 'stress': 'anxiety',
-    'afraid': 'fear', 'fear': 'fear', 'scared': 'fear', 'panic': 'fear',
-    'sad': 'sadness', 'sadness': 'sadness', 'depressed': 'sadness', 'cry': 'sadness',
-    'lonely': 'loneliness', 'alone': 'loneliness', 'isolated': 'loneliness',
-    'angry': 'anger', 'anger': 'anger', 'frustrated': 'anger', 'mad': 'anger',
-    'tempted': 'temptation', 'sin': 'temptation', 'addicted': 'temptation',
-    'guilty': 'guilt', 'shame': 'guilt', 'regret': 'guilt',
-    'hopeless': 'hopelessness', 'despair': 'hopelessness', 'worthless': 'hopelessness',
-    'confused': 'confusion', 'lost': 'confusion', 'doubt': 'doubt',
-    'tired': 'exhaustion', 'exhausted': 'exhaustion', 'burnout': 'exhaustion',
-    'grateful': 'gratitude', 'thankful': 'gratitude', 'blessed': 'gratitude',
-    'joy': 'joy', 'happy': 'joy', 'excited': 'joy',
+    'anxious': 'anxiety',
+    'anxiety': 'anxiety',
+    'worried': 'anxiety',
+    'stress': 'anxiety',
+    'afraid': 'fear',
+    'fear': 'fear',
+    'scared': 'fear',
+    'panic': 'fear',
+    'sad': 'sadness',
+    'sadness': 'sadness',
+    'depressed': 'sadness',
+    'cry': 'sadness',
+    'lonely': 'loneliness',
+    'alone': 'loneliness',
+    'isolated': 'loneliness',
+    'angry': 'anger',
+    'anger': 'anger',
+    'frustrated': 'anger',
+    'mad': 'anger',
+    'tempted': 'temptation',
+    'sin': 'temptation',
+    'addicted': 'temptation',
+    'guilty': 'guilt',
+    'shame': 'guilt',
+    'regret': 'guilt',
+    'hopeless': 'hopelessness',
+    'despair': 'hopelessness',
+    'worthless': 'hopelessness',
+    'confused': 'confusion',
+    'lost': 'confusion',
+    'doubt': 'doubt',
+    'tired': 'exhaustion',
+    'exhausted': 'exhaustion',
+    'burnout': 'exhaustion',
+    'grateful': 'gratitude',
+    'thankful': 'gratitude',
+    'blessed': 'gratitude',
+    'joy': 'joy',
+    'happy': 'joy',
+    'excited': 'joy',
   };
 
   static const Map<String, List<String>> _emotionVerses = {
@@ -54,11 +82,12 @@ class AiJournalService {
         found.add(entry.value);
       }
     }
-    
+
     if (found.isEmpty) found.add('peace');
-    
+
     final primaryEmotion = found.first;
-    final recommendedVerses = _emotionVerses[primaryEmotion] ?? _emotionVerses['peace']!;
+    final recommendedVerses =
+        _emotionVerses[primaryEmotion] ?? _emotionVerses['peace']!;
 
     final prayerPoints = [
       'Lord, bring comfort and strength as I navigate feelings of $primaryEmotion today.',
@@ -74,4 +103,5 @@ class AiJournalService {
   }
 }
 
-final aiJournalServiceProvider = Provider<AiJournalService>((ref) => AiJournalService());
+final aiJournalServiceProvider =
+    Provider<AiJournalService>((ref) => AiJournalService());

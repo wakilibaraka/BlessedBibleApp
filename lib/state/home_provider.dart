@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/content_sync_service.dart';
 import '../data/models/home_data.dart';
@@ -10,7 +11,7 @@ import 'package:collection/collection.dart'; // for firstOrNull
 String _extractSnippet(String text) {
   final matches = RegExp(r'[^.!?]+[.!?]').allMatches(text);
   if (matches.isEmpty) return text.trim();
-  
+
   final sentences = matches.map((m) => m.group(0)!.trim()).toList();
   final takeCount = sentences.length > 3 ? 3 : sentences.length;
   return sentences.take(takeCount).join(' ');
@@ -19,71 +20,78 @@ String _extractSnippet(String text) {
 final votdPoolProvider = Provider<List<VerseOfTheDay>>((ref) {
   final commentaryState = ref.watch(commentaryProvider);
   final bibleState = ref.watch(bibleProvider);
-  
+
   final defaultFallback = [
     VerseOfTheDay(
-      'Revelation 14:12', 
+      'Revelation 14:12',
       'Here is the patience of the saints: here are they that keep the commandments of God, and the faith of Jesus.',
       commentarySnippet: 'Here is the patience of the saints.',
     )
   ];
 
-  if (commentaryState.isLoading || bibleState.isLoading || bibleState.books.isEmpty) {
+  if (commentaryState.isLoading ||
+      bibleState.isLoading ||
+      bibleState.books.isEmpty) {
     return defaultFallback;
   }
-  
+
   final commentaries = commentaryState.value ?? [];
   final books = bibleState.books;
-  
+
   final List<VerseOfTheDay> pool = [];
-  
+
   for (final entry in commentaries) {
     final isDevotional = entry.category == StudyContentCategory.devotional;
     final isCommentary = entry.category == StudyContentCategory.commentary;
     if (!isDevotional && !isCommentary) continue;
 
-    if (entry.scope.type == 'verse' && entry.scope.book != null && entry.scope.chapter != null && entry.scope.verse != null) {
+    if (entry.scope.type == 'verse' &&
+        entry.scope.book != null &&
+        entry.scope.chapter != null &&
+        entry.scope.verse != null) {
       final bookName = entry.scope.book!;
       final chapterNum = entry.scope.chapter!;
       final verseNum = entry.scope.verse!;
-      
+
       final refStr = '$bookName $chapterNum:$verseNum';
       if (pool.any((v) => v.reference == refStr)) continue;
-      
-      final book = books.firstWhereOrNull((b) => b.name.toLowerCase() == bookName.toLowerCase());
+
+      final book = books.firstWhereOrNull(
+          (b) => b.name.toLowerCase() == bookName.toLowerCase());
       if (book != null) {
-        final chapter = book.chapters.firstWhereOrNull((c) => c.number == chapterNum);
+        final chapter =
+            book.chapters.firstWhereOrNull((c) => c.number == chapterNum);
         if (chapter != null) {
-          final verse = chapter.verses.firstWhereOrNull((v) => v.number == verseNum);
+          final verse =
+              chapter.verses.firstWhereOrNull((v) => v.number == verseNum);
           if (verse != null && verse.text.isNotEmpty) {
-             final snippet = _extractSnippet(entry.text);
-             if (snippet.trim().isNotEmpty) {
-               pool.add(VerseOfTheDay(
-                 refStr, 
-                 verse.text,
-                 commentarySnippet: snippet,
-                 author: entry.author,
-                 sourceTitle: entry.source,
-                 isDevotional: isDevotional,
-               ));
-             }
+            final snippet = _extractSnippet(entry.text);
+            if (snippet.trim().isNotEmpty) {
+              pool.add(VerseOfTheDay(
+                refStr,
+                verse.text,
+                commentarySnippet: snippet,
+                author: entry.author,
+                sourceTitle: entry.source,
+                isDevotional: isDevotional,
+              ));
+            }
           }
         }
       }
     }
   }
-  
+
   if (pool.isEmpty) return defaultFallback;
-  
+
   // Sort to make it deterministic and readable
   pool.sort((a, b) => a.reference.compareTo(b.reference));
   return pool;
 });
 
-
 class VotdOverrideNotifier extends AsyncNotifier<Map<String, String>> {
   late final ContentSyncService<String> _syncService;
-  
+
   @override
   Future<Map<String, String>> build() async {
     _syncService = ContentSyncService<String>(
@@ -92,19 +100,21 @@ class VotdOverrideNotifier extends AsyncNotifier<Map<String, String>> {
       fromJson: (json) => json['reference'] as String,
       toJson: (ref) => {'reference': ref},
     );
-    
+
     final localCache = await _syncService.loadLocalCache();
-    
+
     // Fire and forget background sync
-    _syncService.syncDeltas((newCache) {
-       state = AsyncData(newCache);
-    });
-    
+    unawaited(_syncService.syncDeltas((newCache) {
+      state = AsyncData(newCache);
+    }));
+
     return localCache;
   }
 }
 
-final votdOverrideProvider = AsyncNotifierProvider<VotdOverrideNotifier, Map<String, String>>(VotdOverrideNotifier.new);
+final votdOverrideProvider =
+    AsyncNotifierProvider<VotdOverrideNotifier, Map<String, String>>(
+        VotdOverrideNotifier.new);
 
 class HomeNotifier extends Notifier<HomeData> {
   @override
@@ -121,40 +131,47 @@ class HomeNotifier extends Notifier<HomeData> {
 
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final dayIndex = today.difference(DateTime(2026, 1, 1)).inDays % pool.length;
+    final dayIndex =
+        today.difference(DateTime(2026, 1, 1)).inDays % pool.length;
     VerseOfTheDay votd = pool[dayIndex];
 
-    final todayString = '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    final todayString =
+        '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
 
     if (overrides.containsKey(todayString)) {
       final overrideRef = overrides[todayString]!;
-      
-      final pooledOverride = pool.firstWhereOrNull((v) => v.reference.toLowerCase() == overrideRef.toLowerCase());
+
+      final pooledOverride = pool.firstWhereOrNull(
+          (v) => v.reference.toLowerCase() == overrideRef.toLowerCase());
       if (pooledOverride != null) {
         votd = pooledOverride;
       } else {
         final books = bibleState.books;
         if (books.isNotEmpty) {
-           final lastSpace = overrideRef.lastIndexOf(' ');
-           if (lastSpace != -1) {
-             final bookName = overrideRef.substring(0, lastSpace);
-             final parts = overrideRef.substring(lastSpace + 1).split(':');
-             if (parts.isNotEmpty) {
-               final chapterNum = int.tryParse(parts[0]) ?? 1;
-               final verseNum = int.tryParse(parts.length > 1 ? parts[1] : '1') ?? 1;
-               
-               final book = books.firstWhereOrNull((b) => b.name.toLowerCase() == bookName.toLowerCase());
-               if (book != null) {
-                 final chapter = book.chapters.firstWhereOrNull((c) => c.number == chapterNum);
-                 if (chapter != null) {
-                   final verse = chapter.verses.firstWhereOrNull((v) => v.number == verseNum);
-                   if (verse != null && verse.text.isNotEmpty) {
-                     votd = VerseOfTheDay(overrideRef, verse.text);
-                   }
-                 }
-               }
-             }
-           }
+          final lastSpace = overrideRef.lastIndexOf(' ');
+          if (lastSpace != -1) {
+            final bookName = overrideRef.substring(0, lastSpace);
+            final parts = overrideRef.substring(lastSpace + 1).split(':');
+            if (parts.isNotEmpty) {
+              final chapterNum = int.tryParse(parts[0]) ?? 1;
+              final verseNum =
+                  int.tryParse(parts.length > 1 ? parts[1] : '1') ?? 1;
+
+              final book = books.firstWhereOrNull(
+                  (b) => b.name.toLowerCase() == bookName.toLowerCase());
+              if (book != null) {
+                final chapter = book.chapters
+                    .firstWhereOrNull((c) => c.number == chapterNum);
+                if (chapter != null) {
+                  final verse = chapter.verses
+                      .firstWhereOrNull((v) => v.number == verseNum);
+                  if (verse != null && verse.text.isNotEmpty) {
+                    votd = VerseOfTheDay(overrideRef, verse.text);
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }

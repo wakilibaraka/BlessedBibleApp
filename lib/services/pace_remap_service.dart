@@ -120,7 +120,8 @@ class PaceRemapService {
   Set<int> _buildCompletedVerseSet(
     List<PlanDay> schedule,
     Set<int> completedDayNumbers,
-  ) => buildCompletedVerseSetPublic(schedule, completedDayNumbers);
+  ) =>
+      buildCompletedVerseSetPublic(schedule, completedDayNumbers);
 
   /// Expands content atom ids (`Book|sc|sv|ec|ev`) to absolute verse
   /// indices. Malformed atoms are skipped, never thrown.
@@ -188,20 +189,72 @@ class PaceRemapService {
   /// Ordered list of KJV book names, in canonical order, derived from the
   /// word_counts data. Computed once and cached.
   static const _kjvBookOrder = [
-    'Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy',
-    'Joshua', 'Judges', 'Ruth', '1 Samuel', '2 Samuel',
-    '1 Kings', '2 Kings', '1 Chronicles', '2 Chronicles', 'Ezra',
-    'Nehemiah', 'Esther', 'Job', 'Psalms', 'Proverbs',
-    'Ecclesiastes', 'Song of Solomon', 'Isaiah', 'Jeremiah', 'Lamentations',
-    'Ezekiel', 'Daniel', 'Hosea', 'Joel', 'Amos',
-    'Obadiah', 'Jonah', 'Micah', 'Nahum', 'Habakkuk',
-    'Zephaniah', 'Haggai', 'Zechariah', 'Malachi',
-    'Matthew', 'Mark', 'Luke', 'John', 'Acts',
-    'Romans', '1 Corinthians', '2 Corinthians', 'Galatians', 'Ephesians',
-    'Philippians', 'Colossians', '1 Thessalonians', '2 Thessalonians',
-    '1 Timothy', '2 Timothy', 'Titus', 'Philemon',
-    'Hebrews', 'James', '1 Peter', '2 Peter',
-    '1 John', '2 John', '3 John', 'Jude', 'Revelation',
+    'Genesis',
+    'Exodus',
+    'Leviticus',
+    'Numbers',
+    'Deuteronomy',
+    'Joshua',
+    'Judges',
+    'Ruth',
+    '1 Samuel',
+    '2 Samuel',
+    '1 Kings',
+    '2 Kings',
+    '1 Chronicles',
+    '2 Chronicles',
+    'Ezra',
+    'Nehemiah',
+    'Esther',
+    'Job',
+    'Psalms',
+    'Proverbs',
+    'Ecclesiastes',
+    'Song of Solomon',
+    'Isaiah',
+    'Jeremiah',
+    'Lamentations',
+    'Ezekiel',
+    'Daniel',
+    'Hosea',
+    'Joel',
+    'Amos',
+    'Obadiah',
+    'Jonah',
+    'Micah',
+    'Nahum',
+    'Habakkuk',
+    'Zephaniah',
+    'Haggai',
+    'Zechariah',
+    'Malachi',
+    'Matthew',
+    'Mark',
+    'Luke',
+    'John',
+    'Acts',
+    'Romans',
+    '1 Corinthians',
+    '2 Corinthians',
+    'Galatians',
+    'Ephesians',
+    'Philippians',
+    'Colossians',
+    '1 Thessalonians',
+    '2 Thessalonians',
+    '1 Timothy',
+    '2 Timothy',
+    'Titus',
+    'Philemon',
+    'Hebrews',
+    'James',
+    '1 Peter',
+    '2 Peter',
+    '1 John',
+    '2 John',
+    '3 John',
+    'Jude',
+    'Revelation',
   ];
 
   // Cached offset table: (book, chapter) → first absolute verse index.
@@ -214,7 +267,7 @@ class PaceRemapService {
     for (final book in _kjvBookOrder) {
       _chapterOffsets[book] = {};
       // Chapters are 1-based; iterate until maxVerseInChapter returns 0.
-      for (int ch = 1; ; ch++) {
+      for (int ch = 1;; ch++) {
         final maxV = wordCountService.maxVerseInChapter(book, ch);
         if (maxV == 0) break;
         _chapterOffsets[book]![ch] = current;
@@ -231,13 +284,12 @@ class PaceRemapService {
     return bookMap[chapter] ?? 0;
   }
 
-  void _addVerseRange(
-      Set<int> result, String book, int startCh, int startV, int endCh, int endV) {
+  void _addVerseRange(Set<int> result, String book, int startCh, int startV,
+      int endCh, int endV) {
     for (int ch = startCh; ch <= endCh; ch++) {
       final firstV = (ch == startCh) ? startV : 1;
-      final lastV = (ch == endCh)
-          ? endV
-          : wordCountService.maxVerseInChapter(book, ch);
+      final lastV =
+          (ch == endCh) ? endV : wordCountService.maxVerseInChapter(book, ch);
       final offset = _chapterOffset(book, ch);
       for (int v = firstV; v <= lastV; v++) {
         result.add(offset + v - 1);

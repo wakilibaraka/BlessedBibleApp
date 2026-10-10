@@ -6,7 +6,8 @@ class StreakState {
   final int distinctDaysThisYear;
 
   int get count => consecutiveDays;
-  bool get readToday => false; // Dummy, we can derive this if needed or just return false
+  bool get readToday =>
+      false; // Dummy, we can derive this if needed or just return false
 
   const StreakState({
     required this.consecutiveDays,
@@ -19,7 +20,7 @@ class StreakNotifier extends Notifier<StreakState> {
   StreakState build() {
     final prefs = ref.watch(preferencesProvider);
     final usageDates = prefs.getAppUsageDates();
-    
+
     return _calculateState(usageDates);
   }
 
@@ -40,32 +41,39 @@ class StreakNotifier extends Notifier<StreakState> {
     }
 
     // Calculate consecutive days
-    final sortedDates = dates.map((d) => DateTime.parse(d)).toList()
+    final sortedDates = dates.map(DateTime.parse).toList()
       ..sort((a, b) => b.compareTo(a));
 
     int consecutive = 0;
     DateTime dateToCheck = DateTime(now.year, now.month, now.day);
-    
+
     // Check if today is in the list, if not, maybe yesterday is (streak not broken yet)
     if (sortedDates.isNotEmpty) {
       final latest = sortedDates.first;
-      if (latest.year == dateToCheck.year && latest.month == dateToCheck.month && latest.day == dateToCheck.day) {
+      if (latest.year == dateToCheck.year &&
+          latest.month == dateToCheck.month &&
+          latest.day == dateToCheck.day) {
         // Today is included
       } else {
         final yesterday = dateToCheck.subtract(const Duration(days: 1));
-        if (latest.year == yesterday.year && latest.month == yesterday.month && latest.day == yesterday.day) {
+        if (latest.year == yesterday.year &&
+            latest.month == yesterday.month &&
+            latest.day == yesterday.day) {
           // Started checking from yesterday, streak is maintained but not incremented today yet
           dateToCheck = yesterday;
         } else {
           // Latest is older than yesterday, streak is broken
-          return StreakState(consecutiveDays: 0, distinctDaysThisYear: daysThisYear);
+          return StreakState(
+              consecutiveDays: 0, distinctDaysThisYear: daysThisYear);
         }
       }
     }
 
     // Walk backward to count consecutive days
     for (final date in sortedDates) {
-      if (date.year == dateToCheck.year && date.month == dateToCheck.month && date.day == dateToCheck.day) {
+      if (date.year == dateToCheck.year &&
+          date.month == dateToCheck.month &&
+          date.day == dateToCheck.day) {
         consecutive++;
         dateToCheck = dateToCheck.subtract(const Duration(days: 1));
       } else {

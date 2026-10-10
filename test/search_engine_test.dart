@@ -16,7 +16,10 @@ void main() {
           BibleChapter(
             number: 1,
             verses: [
-              BibleVerse(number: 1, text: "In the beginning God created the heaven and the earth."),
+              BibleVerse(
+                  number: 1,
+                  text:
+                      "In the beginning God created the heaven and the earth."),
             ],
           ),
         ],
@@ -40,7 +43,8 @@ void main() {
         id: 'uriah',
         author: 'Uriah Smith',
         source: 'Daniel and the Revelation',
-        scope: CommentaryScope(type: 'verse', book: 'Daniel', chapter: 1, verse: 1),
+        scope: CommentaryScope(
+            type: 'verse', book: 'Daniel', chapter: 1, verse: 1),
         text: 'This is a test commentary by Uriah.',
         category: StudyContentCategory.commentary,
       ),
@@ -48,7 +52,8 @@ void main() {
         id: 'egw',
         author: 'EGW',
         source: 'Unknown',
-        scope: CommentaryScope(type: 'verse', book: 'Daniel', chapter: 1, verse: 1),
+        scope: CommentaryScope(
+            type: 'verse', book: 'Daniel', chapter: 1, verse: 1),
         text: 'This should also be indexed.',
         category: StudyContentCategory.commentary,
       ),
@@ -56,21 +61,24 @@ void main() {
         id: 'new',
         author: 'New Author',
         source: 'Simulated',
-        scope: CommentaryScope(type: 'verse', book: 'Daniel', chapter: 1, verse: 1),
+        scope: CommentaryScope(
+            type: 'verse', book: 'Daniel', chapter: 1, verse: 1),
         text: 'Simulated new commentary entry.',
         category: StudyContentCategory.commentary,
       ),
     ];
 
     final notes = [
-      PersonalNote('test-id-123', 'My Note', 'This is a test note about creation.', '2026-07-26'),
+      PersonalNote('test-id-123', 'My Note',
+          'This is a test note about creation.', '2026-07-26'),
     ];
 
     final baseIndexFuture = compute(
       buildIndexIsolate,
       IndexBuildArgs(books, null, commentary, [], []),
     );
-    final engine = SearchEngine(bibleBooks: books, baseIndexFuture: baseIndexFuture, notes: notes);
+    final engine = SearchEngine(
+        bibleBooks: books, baseIndexFuture: baseIndexFuture, notes: notes);
 
     // Test 1: Verse text query
     final res1 = await engine.search('beginning');
@@ -91,7 +99,7 @@ void main() {
     final res4 = await engine.search('indexed');
     expect(res4.isNotEmpty, isTrue);
     expect(res4.first.type, SearchResultType.commentary);
-    
+
     // Test 5: Simulated new author commentary
     final resNew = await engine.search('simulated');
     expect(resNew.isNotEmpty, isTrue);

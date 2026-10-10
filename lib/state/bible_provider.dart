@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/models/bible_model.dart';
 import '../utils/isolate_parsers.dart';
-import '../utils/startup_stopwatch.dart'; // For startupStopwatch
 import '../services/bible_database_service.dart';
 
 class BibleState {
@@ -42,12 +41,8 @@ class BibleNotifier extends Notifier<BibleState> {
       // network). The query below also drives DB install/verify/repair, so
       // the splash screen stays active until content is fully ready.
       final rows = await bibleDbService.getAllVerses('kjv');
-      if (kStartupTrace) {
-      }
 
       final booksList = await compute(parseBibleRows, rows);
-      if (kStartupTrace) {
-      }
 
       state = state.copyWith(isLoading: false, books: booksList);
     } catch (e) {
@@ -71,7 +66,7 @@ final flatChaptersProvider = Provider<List<FlatChapter>>((ref) {
   final bibleState = ref.watch(bibleProvider);
   if (bibleState.isLoading || bibleState.books.isEmpty) return [];
 
-  List<FlatChapter> chapters = [];
+  final List<FlatChapter> chapters = [];
   for (int i = 0; i < bibleState.books.length; i++) {
     final book = bibleState.books[i];
     final bookNum = i + 1;
@@ -91,6 +86,6 @@ typedef ChapterKey = ({
 final translationChapterProvider =
     FutureProvider.family<List<BibleVerse>, ChapterKey>((ref, key) async {
   // If kjv, we could technically still use the loaded JSON, but DB is consistent.
-  return await bibleDbService.getChapter(
+  return bibleDbService.getChapter(
       key.translationId, key.bookNumber, key.chapterNumber);
 });

@@ -31,9 +31,12 @@ class JournalEntry {
       id: json['id'] as String?,
       date: json['date'] as String,
       content: json['content'] as String,
-      detectedEmotions: List<String>.from(json['detectedEmotions'] ?? []),
-      prayerPoints: List<String>.from(json['prayerPoints'] ?? []),
-      recommendedVerses: List<String>.from(json['recommendedVerses'] ?? []),
+      detectedEmotions:
+          List<String>.from((json['detectedEmotions'] as List?) ?? const []),
+      prayerPoints:
+          List<String>.from((json['prayerPoints'] as List?) ?? const []),
+      recommendedVerses:
+          List<String>.from((json['recommendedVerses'] as List?) ?? const []),
     );
   }
 }

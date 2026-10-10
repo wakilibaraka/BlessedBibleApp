@@ -89,90 +89,90 @@ class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
       child: Scaffold(
         extendBody: true,
         extendBodyBehindAppBar: true,
-      appBar: SharedAppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Text('Your Space',
-            style: theme.textTheme.titleMedium
-                ?.copyWith(fontWeight: FontWeight.bold)),
-      ),
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: AnimatedBackground(appThemeMode: appThemeMode),
-          ),
-          SafeArea(
-            bottom: false,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // ── Segmented Control Header ──
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: _SegmentTab(
-                          label: 'Highlights',
-                          isSelected: _selectedIndex == 0,
-                          onTap: () => _onTabTapped(0),
-                          theme: theme,
-                        ),
-                      ),
-                      Expanded(
-                        child: _SegmentTab(
-                          label: 'Bookmarks',
-                          isSelected: _selectedIndex == 1,
-                          onTap: () => _onTabTapped(1),
-                          theme: theme,
-                        ),
-                      ),
-                      Expanded(
-                        child: _SegmentTab(
-                          label: 'Notes',
-                          isSelected: _selectedIndex == 2,
-                          onTap: () => _onTabTapped(2),
-                          theme: theme,
-                        ),
-                      ),
-                      Expanded(
-                        child: _SegmentTab(
-                          label: 'Journal',
-                          isSelected: _selectedIndex == 3,
-                          onTap: () => _onTabTapped(3),
-                          theme: theme,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: theme.dividerColor.withValues(alpha: 0.1),
-                ),
-
-                // ── Segment Content ──
-                Expanded(
-                  child: PageView(
-                    controller: _pageController,
-                    onPageChanged: (index) {
-                      setState(() => _selectedIndex = index);
-                    },
-                    children: [
-                      _HighlightsSegment(theme: theme),
-                      _BookmarksSegment(theme: theme),
-                      _NotesSegment(theme: theme),
-                      JournalSegment(theme: theme),
-                    ],
-                  ),
-                ),
-              ],
+        appBar: SharedAppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          title: Text('Your Space',
+              style: theme.textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold)),
+        ),
+        body: Stack(
+          children: [
+            Positioned.fill(
+              child: AnimatedBackground(appThemeMode: appThemeMode),
             ),
-          ),
-        ],
-      ),
+            SafeArea(
+              bottom: false,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // ── Segmented Control Header ──
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: _SegmentTab(
+                            label: 'Highlights',
+                            isSelected: _selectedIndex == 0,
+                            onTap: () => _onTabTapped(0),
+                            theme: theme,
+                          ),
+                        ),
+                        Expanded(
+                          child: _SegmentTab(
+                            label: 'Bookmarks',
+                            isSelected: _selectedIndex == 1,
+                            onTap: () => _onTabTapped(1),
+                            theme: theme,
+                          ),
+                        ),
+                        Expanded(
+                          child: _SegmentTab(
+                            label: 'Notes',
+                            isSelected: _selectedIndex == 2,
+                            onTap: () => _onTabTapped(2),
+                            theme: theme,
+                          ),
+                        ),
+                        Expanded(
+                          child: _SegmentTab(
+                            label: 'Journal',
+                            isSelected: _selectedIndex == 3,
+                            onTap: () => _onTabTapped(3),
+                            theme: theme,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Divider(
+                    height: 1,
+                    thickness: 1,
+                    color: theme.dividerColor.withValues(alpha: 0.1),
+                  ),
+
+                  // ── Segment Content ──
+                  Expanded(
+                    child: PageView(
+                      controller: _pageController,
+                      onPageChanged: (index) {
+                        setState(() => _selectedIndex = index);
+                      },
+                      children: [
+                        _HighlightsSegment(theme: theme),
+                        _BookmarksSegment(theme: theme),
+                        _NotesSegment(theme: theme),
+                        JournalSegment(theme: theme),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -321,7 +321,7 @@ class _HighlightsSegment extends ConsumerWidget {
 
 void _showAddFolderDialog(BuildContext context, WidgetRef ref) {
   final nameController = TextEditingController();
-  showDialog(
+  showDialog<void>(
     context: context,
     builder: (context) {
       return AlertDialog(
@@ -339,7 +339,9 @@ void _showAddFolderDialog(BuildContext context, WidgetRef ref) {
           TextButton(
             onPressed: () {
               if (nameController.text.trim().isNotEmpty) {
-                ref.read(bookmarkDataProvider.notifier).addFolder(nameController.text.trim());
+                ref
+                    .read(bookmarkDataProvider.notifier)
+                    .addFolder(nameController.text.trim());
               }
               Navigator.pop(context);
             },
@@ -351,9 +353,10 @@ void _showAddFolderDialog(BuildContext context, WidgetRef ref) {
   );
 }
 
-void _showRenameFolderDialog(BuildContext context, WidgetRef ref, String folderId, String currentName) {
+void _showRenameFolderDialog(
+    BuildContext context, WidgetRef ref, String folderId, String currentName) {
   final nameController = TextEditingController(text: currentName);
-  showDialog(
+  showDialog<void>(
     context: context,
     builder: (context) {
       return AlertDialog(
@@ -371,7 +374,9 @@ void _showRenameFolderDialog(BuildContext context, WidgetRef ref, String folderI
           TextButton(
             onPressed: () {
               if (nameController.text.trim().isNotEmpty) {
-                ref.read(bookmarkDataProvider.notifier).renameFolder(folderId, nameController.text.trim());
+                ref
+                    .read(bookmarkDataProvider.notifier)
+                    .renameFolder(folderId, nameController.text.trim());
               }
               Navigator.pop(context);
             },
@@ -383,13 +388,15 @@ void _showRenameFolderDialog(BuildContext context, WidgetRef ref, String folderI
   );
 }
 
-void _showDeleteFolderDialog(BuildContext context, WidgetRef ref, String folderId, String folderName) {
-  showDialog(
+void _showDeleteFolderDialog(
+    BuildContext context, WidgetRef ref, String folderId, String folderName) {
+  showDialog<void>(
     context: context,
     builder: (context) {
       return AlertDialog(
         title: const Text('Delete Folder?'),
-        content: Text('Are you sure you want to delete "$folderName"?\n\nYour bookmarks inside this folder will NOT be deleted; they will be moved to Unfiled.'),
+        content: Text(
+            'Are you sure you want to delete "$folderName"?\n\nYour bookmarks inside this folder will NOT be deleted; they will be moved to Unfiled.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -408,14 +415,16 @@ void _showDeleteFolderDialog(BuildContext context, WidgetRef ref, String folderI
   );
 }
 
-void _showMoveToFolderSheet(BuildContext context, WidgetRef ref, String refStr, ThemeData theme) {
+void _showMoveToFolderSheet(
+    BuildContext context, WidgetRef ref, String refStr, ThemeData theme) {
   final bookmarkData = ref.read(bookmarkDataProvider);
   final currentFolderId = bookmarkData.nodes[refStr]?.folderId;
 
-  showModalBottomSheet(
+  showModalBottomSheet<void>(
     context: context,
     backgroundColor: theme.scaffoldBackgroundColor,
-    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+    shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
     builder: (context) {
       return SafeArea(
         child: SingleChildScrollView(
@@ -424,21 +433,31 @@ void _showMoveToFolderSheet(BuildContext context, WidgetRef ref, String refStr, 
             children: [
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Text('Move to Folder', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                child: Text('Move to Folder',
+                    style: theme.textTheme.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.bold)),
               ),
               ListTile(
                 title: const Text('Unfiled'),
-                trailing: currentFolderId == null ? Icon(Icons.check, color: theme.primaryColor) : null,
+                trailing: currentFolderId == null
+                    ? Icon(Icons.check, color: theme.primaryColor)
+                    : null,
                 onTap: () {
-                  ref.read(bookmarkDataProvider.notifier).moveBookmark(refStr, null);
+                  ref
+                      .read(bookmarkDataProvider.notifier)
+                      .moveBookmark(refStr, null);
                   Navigator.pop(context);
                 },
               ),
               ...bookmarkData.folders.map((f) => ListTile(
                     title: Text(f.name),
-                    trailing: currentFolderId == f.id ? Icon(Icons.check, color: theme.primaryColor) : null,
+                    trailing: currentFolderId == f.id
+                        ? Icon(Icons.check, color: theme.primaryColor)
+                        : null,
                     onTap: () {
-                      ref.read(bookmarkDataProvider.notifier).moveBookmark(refStr, f.id);
+                      ref
+                          .read(bookmarkDataProvider.notifier)
+                          .moveBookmark(refStr, f.id);
                       Navigator.pop(context);
                     },
                   )),
@@ -475,18 +494,23 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
     if (_viewType == _BookmarkViewType.all) {
       filteredNodes = bookmarkData.nodes.values.toList();
     } else if (_viewType == _BookmarkViewType.unfiled) {
-      filteredNodes = bookmarkData.nodes.values.where((n) => n.folderId == null).toList();
-    } else if (_viewType == _BookmarkViewType.folder && _selectedFolderId != null) {
-      filteredNodes = bookmarkData.nodes.values.where((n) => n.folderId == _selectedFolderId).toList();
-    } else if (_viewType == _BookmarkViewType.byDate || _viewType == _BookmarkViewType.byBook) {
+      filteredNodes =
+          bookmarkData.nodes.values.where((n) => n.folderId == null).toList();
+    } else if (_viewType == _BookmarkViewType.folder &&
+        _selectedFolderId != null) {
+      filteredNodes = bookmarkData.nodes.values
+          .where((n) => n.folderId == _selectedFolderId)
+          .toList();
+    } else if (_viewType == _BookmarkViewType.byDate ||
+        _viewType == _BookmarkViewType.byBook) {
       filteredNodes = bookmarkData.nodes.values.toList();
     }
-    
+
     // Sort descending by created date
     filteredNodes.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
     // For grouping
-    Map<String, List<BookmarkNode>> groups = {};
+    final Map<String, List<BookmarkNode>> groups = {};
     if (_viewType == _BookmarkViewType.byDate) {
       final now = DateTime.now();
       for (final n in filteredNodes) {
@@ -497,7 +521,7 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
         } else if (diff.inDays <= 30) {
           group = 'Last 30 Days';
         }
-        
+
         groups.putIfAbsent(group, () => []).add(n);
       }
     } else if (_viewType == _BookmarkViewType.byBook) {
@@ -509,7 +533,8 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
     }
 
     Widget content;
-    if (_viewType == _BookmarkViewType.byDate || _viewType == _BookmarkViewType.byBook) {
+    if (_viewType == _BookmarkViewType.byDate ||
+        _viewType == _BookmarkViewType.byBook) {
       final groupKeys = groups.keys.toList();
       content = ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -533,7 +558,9 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
               ...nodes.map((n) {
                 final data = _parseVerseRef(n.reference, flatChapters);
                 if (data == null) return const SizedBox.shrink();
-                return _buildRealVerseCard(context, ref, n.reference, data, widget.theme, isBookmarked: true);
+                return _buildRealVerseCard(
+                    context, ref, n.reference, data, widget.theme,
+                    isBookmarked: true);
               }),
             ],
           );
@@ -545,7 +572,8 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
               child: Text(
                 'No bookmarks here.',
                 style: widget.theme.textTheme.bodySmall?.copyWith(
-                  color: widget.theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                  color:
+                      widget.theme.colorScheme.onSurface.withValues(alpha: 0.5),
                 ),
               ),
             )
@@ -556,14 +584,18 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
                 final n = filteredNodes[index];
                 final data = _parseVerseRef(n.reference, flatChapters);
                 if (data == null) return const SizedBox.shrink();
-                return _buildRealVerseCard(context, ref, n.reference, data, widget.theme, isBookmarked: true);
+                return _buildRealVerseCard(
+                    context, ref, n.reference, data, widget.theme,
+                    isBookmarked: true);
               },
             );
     }
 
     BookmarkFolder? selectedFolder;
     if (_viewType == _BookmarkViewType.folder && _selectedFolderId != null) {
-      selectedFolder = bookmarkData.folders.where((f) => f.id == _selectedFolderId).firstOrNull;
+      selectedFolder = bookmarkData.folders
+          .where((f) => f.id == _selectedFolderId)
+          .firstOrNull;
     }
 
     return Column(
@@ -586,17 +618,23 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
                 label: const Text('Unfiled'),
                 selected: _viewType == _BookmarkViewType.unfiled,
                 onSelected: (val) {
-                  if (val) setState(() => _viewType = _BookmarkViewType.unfiled);
+                  if (val) {
+                    setState(() => _viewType = _BookmarkViewType.unfiled);
+                  }
                 },
               ),
               const SizedBox(width: 8),
-              Container(width: 1, height: 20, color: widget.theme.dividerColor.withValues(alpha: 0.2)),
+              Container(
+                  width: 1,
+                  height: 20,
+                  color: widget.theme.dividerColor.withValues(alpha: 0.2)),
               const SizedBox(width: 8),
               ...bookmarkData.folders.map((f) => Padding(
                     padding: const EdgeInsets.only(right: 8.0),
                     child: ChoiceChip(
                       label: Text(f.name),
-                      selected: _viewType == _BookmarkViewType.folder && _selectedFolderId == f.id,
+                      selected: _viewType == _BookmarkViewType.folder &&
+                          _selectedFolderId == f.id,
                       onSelected: (val) {
                         if (val) {
                           setState(() {
@@ -613,7 +651,10 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
                 onPressed: () => _showAddFolderDialog(context, ref),
               ),
               const SizedBox(width: 8),
-              Container(width: 1, height: 20, color: widget.theme.dividerColor.withValues(alpha: 0.2)),
+              Container(
+                  width: 1,
+                  height: 20,
+                  color: widget.theme.dividerColor.withValues(alpha: 0.2)),
               const SizedBox(width: 8),
               ChoiceChip(
                 label: const Text('By Date'),
@@ -633,7 +674,7 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
             ],
           ),
         ),
-        
+
         // Folder Header (Edit/Delete)
         if (selectedFolder != null)
           Padding(
@@ -643,19 +684,23 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
               children: [
                 Text(
                   selectedFolder.name,
-                  style: widget.theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                  style: widget.theme.textTheme.titleMedium
+                      ?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 Row(
                   children: [
                     IconButton(
                       icon: const Icon(Icons.edit, size: 20),
-                      onPressed: () => _showRenameFolderDialog(context, ref, selectedFolder!.id, selectedFolder.name),
+                      onPressed: () => _showRenameFolderDialog(context, ref,
+                          selectedFolder!.id, selectedFolder.name),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.delete, size: 20, color: Colors.red),
+                      icon:
+                          const Icon(Icons.delete, size: 20, color: Colors.red),
                       onPressed: () {
                         setState(() => _viewType = _BookmarkViewType.all);
-                        _showDeleteFolderDialog(context, ref, selectedFolder!.id, selectedFolder.name);
+                        _showDeleteFolderDialog(context, ref,
+                            selectedFolder!.id, selectedFolder.name);
                       },
                     ),
                   ],
@@ -663,7 +708,7 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
               ],
             ),
           ),
-          
+
         Expanded(child: content),
       ],
     );
@@ -742,8 +787,8 @@ class _NotesSegment extends ConsumerWidget {
                               editingId: note.id,
                             );
                           },
-                          onLongPress: () => _showNoteContext(
-                              context, ref, theme, note),
+                          onLongPress: () =>
+                              _showNoteContext(context, ref, theme, note),
                           child: Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Column(
@@ -861,7 +906,7 @@ _ParsedVerseData? _parseVerseRef(
   if (vIndex == -1) return null;
 
   return _ParsedVerseData(
-    bookAbbrev: fc.book.abbreviation, 
+    bookAbbrev: fc.book.abbreviation,
     bookName: fc.book.name,
     bookNumber: fc.bookNumber,
     chapter: chapter,
@@ -909,8 +954,8 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
           Navigator.of(context).pop(); // dismiss your space screen
           ref.read(navProvider.notifier).setIndex(1);
         },
-        onLongPress: () => _showVerseItemContext(context, ref, theme,
-            refStr, formattedRef, data, highlightColorIndex, isBookmarked),
+        onLongPress: () => _showVerseItemContext(context, ref, theme, refStr,
+            formattedRef, data, highlightColorIndex, isBookmarked),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -943,11 +988,17 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                     tooltip: 'More',
                     icon: Icon(Icons.more_vert_rounded,
                         size: 20,
-                        color: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.5)),
-                    onPressed: () => _showVerseItemContext(context, ref,
-                        theme, refStr, formattedRef, data,
-                        highlightColorIndex, isBookmarked),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.5)),
+                    onPressed: () => _showVerseItemContext(
+                        context,
+                        ref,
+                        theme,
+                        refStr,
+                        formattedRef,
+                        data,
+                        highlightColorIndex,
+                        isBookmarked),
                   ),
                 ],
               ),
@@ -957,14 +1008,16 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                   final settings = ref.watch(readSettingsProvider);
                   final activeTransId = ref.watch(activeTranslationProvider);
                   final showChips = settings.showChipsOnSavedItems;
-                  
-                  final installedTranslations = ref.watch(availableTranslationsProvider).value ?? [];
+
+                  final installedTranslations =
+                      ref.watch(availableTranslationsProvider).value ?? [];
                   final targetLanguages = <String, String>{};
                   for (final t in installedTranslations) {
                     if (!targetLanguages.containsKey(t.languageName)) {
-                      targetLanguages[t.languageName] = t.languageName.length > 3 
-                          ? t.languageName.substring(0, 3).toUpperCase() 
-                          : t.languageName.toUpperCase();
+                      targetLanguages[t.languageName] =
+                          t.languageName.length > 3
+                              ? t.languageName.substring(0, 3).toUpperCase()
+                              : t.languageName.toUpperCase();
                     }
                   }
 
@@ -984,18 +1037,23 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                       .where((e) => e.value != activeLanguageLabel)
                       .toList();
 
-                  final expandedChipsMap = ref.watch(yourSpaceExpandedChipsProvider);
+                  final expandedChipsMap =
+                      ref.watch(yourSpaceExpandedChipsProvider);
                   final activeChipId = expandedChipsMap[refStr];
 
                   Widget verseWidget;
-                  if (!settings.syncSavedItemsLanguage || activeTransId == 'kjv') {
+                  if (!settings.syncSavedItemsLanguage ||
+                      activeTransId == 'kjv') {
                     verseWidget = Text(
                       data.fallbackText,
                       style: theme.textTheme.bodySmall?.copyWith(
                         height: 1.4,
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
-                        decoration: isBookmarked ? TextDecoration.underline : null,
-                        decorationColor: isBookmarked ? theme.primaryColor : null,
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                        decoration:
+                            isBookmarked ? TextDecoration.underline : null,
+                        decorationColor:
+                            isBookmarked ? theme.primaryColor : null,
                       ),
                     );
                   } else {
@@ -1005,18 +1063,23 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                       chapter: data.chapter,
                       verse: data.verseNum
                     );
-                    final verseAsync = ref.watch(verseTranslationProvider(request));
+                    final verseAsync =
+                        ref.watch(verseTranslationProvider(request));
 
                     verseWidget = verseAsync.when(
                       data: (verseData) {
-                        final displayText = verseData?.text ?? data.fallbackText;
+                        final displayText =
+                            verseData?.text ?? data.fallbackText;
                         return Text(
                           displayText,
                           style: theme.textTheme.bodySmall?.copyWith(
                             height: 1.4,
-                            color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
-                            decoration: isBookmarked ? TextDecoration.underline : null,
-                            decorationColor: isBookmarked ? theme.primaryColor : null,
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.8),
+                            decoration:
+                                isBookmarked ? TextDecoration.underline : null,
+                            decorationColor:
+                                isBookmarked ? theme.primaryColor : null,
                           ),
                         );
                       },
@@ -1024,14 +1087,16 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                         data.fallbackText,
                         style: theme.textTheme.bodySmall?.copyWith(
                           height: 1.4,
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.4),
                         ),
                       ),
                       error: (_, __) => Text(
                         data.fallbackText,
                         style: theme.textTheme.bodySmall?.copyWith(
                           height: 1.4,
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.8),
                         ),
                       ),
                     );
@@ -1045,7 +1110,8 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                       chapter: data.chapter,
                       verse: data.verseNum
                     );
-                    final expandedAsync = ref.watch(verseTranslationProvider(request));
+                    final expandedAsync =
+                        ref.watch(verseTranslationProvider(request));
                     expandedTranslationWidget = expandedAsync.when(
                       data: (verseData) {
                         if (verseData == null) return const SizedBox.shrink();
@@ -1055,7 +1121,8 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                             verseData.text,
                             style: theme.textTheme.bodySmall?.copyWith(
                               height: 1.4,
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                              color: theme.colorScheme.onSurface
+                                  .withValues(alpha: 0.6),
                               fontStyle: FontStyle.italic,
                             ),
                           ),
@@ -1077,7 +1144,8 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       verseWidget,
-                      if (expandedTranslationWidget != null) expandedTranslationWidget,
+                      if (expandedTranslationWidget != null)
+                        expandedTranslationWidget,
                       if (showChips && chipsToRender.isNotEmpty) ...[
                         const SizedBox(height: 12),
                         Row(
@@ -1086,39 +1154,60 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                               Expanded(
                                 child: Padding(
                                   padding: EdgeInsets.only(
-                                      right: i == chipsToRender.length - 1 ? 0.0 : 6.0),
+                                      right: i == chipsToRender.length - 1
+                                          ? 0.0
+                                          : 6.0),
                                   child: Builder(builder: (context) {
                                     final langEntry = chipsToRender[i];
-                                    final isInstalled = availableChips.containsKey(langEntry.value);
-                                    final translationId = availableChips[langEntry.value];
-                                    final isSelected = activeChipId == translationId;
+                                    final isInstalled = availableChips
+                                        .containsKey(langEntry.value);
+                                    final translationId =
+                                        availableChips[langEntry.value];
+                                    final isSelected =
+                                        activeChipId == translationId;
 
                                     return Material(
                                       color: isSelected
-                                          ? theme.primaryColor.withValues(alpha: 0.15)
+                                          ? theme.primaryColor
+                                              .withValues(alpha: 0.15)
                                           : theme.colorScheme.surface,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(16),
                                         side: BorderSide(
                                           color: isSelected
-                                              ? theme.primaryColor.withValues(alpha: 0.5)
-                                              : theme.colorScheme.onSurface.withValues(
-                                                  alpha: isInstalled ? 0.15 : 0.05),
+                                              ? theme.primaryColor
+                                                  .withValues(alpha: 0.5)
+                                              : theme.colorScheme.onSurface
+                                                  .withValues(
+                                                      alpha: isInstalled
+                                                          ? 0.15
+                                                          : 0.05),
                                         ),
                                       ),
                                       clipBehavior: Clip.antiAlias,
                                       child: InkWell(
                                         onTap: () {
-                                          if (isInstalled && translationId != null) {
+                                          if (isInstalled &&
+                                              translationId != null) {
                                             if (isSelected) {
-                                              ref.read(yourSpaceExpandedChipsProvider.notifier).clear(refStr);
+                                              ref
+                                                  .read(
+                                                      yourSpaceExpandedChipsProvider
+                                                          .notifier)
+                                                  .clear(refStr);
                                             } else {
-                                              ref.read(yourSpaceExpandedChipsProvider.notifier).setLanguage(refStr, translationId);
+                                              ref
+                                                  .read(
+                                                      yourSpaceExpandedChipsProvider
+                                                          .notifier)
+                                                  .setLanguage(
+                                                      refStr, translationId);
                                             }
                                           }
                                         },
                                         child: Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 6.0),
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 6.0),
                                           child: Center(
                                             child: Text(
                                               langEntry.value,
@@ -1126,12 +1215,20 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                                               overflow: TextOverflow.ellipsis,
                                               style: TextStyle(
                                                 fontSize: 10,
-                                                fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                                                fontWeight: isSelected
+                                                    ? FontWeight.bold
+                                                    : FontWeight.w600,
                                                 color: isSelected
                                                     ? theme.primaryColor
                                                     : (isInstalled
-                                                        ? theme.colorScheme.onSurface.withValues(alpha: 0.7)
-                                                        : theme.colorScheme.onSurface.withValues(alpha: 0.3)),
+                                                        ? theme.colorScheme
+                                                            .onSurface
+                                                            .withValues(
+                                                                alpha: 0.7)
+                                                        : theme.colorScheme
+                                                            .onSurface
+                                                            .withValues(
+                                                                alpha: 0.3)),
                                               ),
                                             ),
                                           ),
@@ -1155,7 +1252,6 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
     ),
   );
 }
-
 
 /// Long-press context sheet for a note: Edit, Copy, Share, Delete.
 /// Tap already opens the editor, so this is purely additive.
@@ -1209,7 +1305,8 @@ void _showNoteContext(
           final ok = await confirmDestructive(
             context,
             title: 'Delete note?',
-            message: '"${note.title.isEmpty ? "Untitled" : note.title}" will be removed permanently.',
+            message:
+                '"${note.title.isEmpty ? "Untitled" : note.title}" will be removed permanently.',
           );
           if (ok) ref.read(notesProvider.notifier).remove(note.id);
         },
@@ -1242,11 +1339,6 @@ void _showVerseItemContext(
   }
 
   void shareVerse() {
-    final refParts = formattedRef.split(' ');
-    final bookName =
-        refParts.isNotEmpty ? refParts.sublist(0, refParts.length - 1).join(' ') : '';
-    final chapterVerse = refParts.isNotEmpty ? refParts.last : '1:1';
-    final cv = chapterVerse.split(':');
     showShareOptionsSheet(
       context: context,
       copyText: ShareService.formatVerse(
@@ -1342,7 +1434,7 @@ void _showHighlightColorSheet(
   int? currentIndex,
 ) {
   HapticFeedback.mediumImpact();
-  showModalBottomSheet(
+  showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
     builder: (ctx) => SafeArea(

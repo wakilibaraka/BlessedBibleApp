@@ -24,7 +24,8 @@ class NotesNotifier extends Notifier<List<PersonalNote>> {
 
       // Non-destructive migration: if any note lacked an 'id' in JSON, fromJson assigned one.
       // Save them back to persist the new IDs.
-      final needsMigration = list.any((e) => !(e as Map<String, dynamic>).containsKey('id'));
+      final needsMigration =
+          list.any((e) => !(e as Map<String, dynamic>).containsKey('id'));
       if (needsMigration) {
         if (notes.length == list.length) {
           Future.microtask(() {

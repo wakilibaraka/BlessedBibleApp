@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
@@ -19,9 +20,9 @@ import '../widgets/bouncy_entrance.dart';
 import '../widgets/commentary_view.dart';
 import '../../state/commentary_provider.dart';
 import '../../services/share_service.dart';
-import '../../services/devotional_service.dart';
 import '../../state/devotional_provider.dart';
 import '../widgets/share_card.dart';
+import '../../utils/log.dart';
 
 class StrictHorizontalDragGestureRecognizer
     extends HorizontalDragGestureRecognizer {
@@ -102,7 +103,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   /// Verse-of-the-day share: text flavors plus an image card whose
   /// artwork option reuses today's bundled Doré plate.
   Future<void> _shareVotd(VerseOfTheDay votd) async {
-    HapticFeedback.selectionClick();
+    unawaited(HapticFeedback.selectionClick());
     final plate =
         await ref.read(devotionalServiceProvider).plateForDay(DateTime.now());
     if (!mounted) return;
@@ -164,7 +165,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 }
                 if (dy > 0) {
                   _overscrollAccum = dy;
-                  if (_overscrollAccum >= _kOverscrollThreshold && !_hasFiredArmedHaptic) {
+                  if (_overscrollAccum >= _kOverscrollThreshold &&
+                      !_hasFiredArmedHaptic) {
                     _hasFiredArmedHaptic = true;
                     HapticFeedback.mediumImpact();
                   }
@@ -176,9 +178,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 if (_overscrollAccum >= _kOverscrollThreshold &&
                     ref.read(bibleNavSettingsProvider).homePullDownEnabled) {
                   HapticFeedback.mediumImpact();
-                  if (ref
-                          .read(bibleNavSettingsProvider)
-                          .homePullDownTarget ==
+                  if (ref.read(bibleNavSettingsProvider).homePullDownTarget ==
                       HomePullDownTarget.appearance) {
                     AppearanceSettingsSheet.show(context,
                         initialTab: AppearanceTab.typography);
@@ -202,7 +202,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   StrictHorizontalDragGestureRecognizer:
                       GestureRecognizerFactoryWithHandlers<
                           StrictHorizontalDragGestureRecognizer>(
-                    () => StrictHorizontalDragGestureRecognizer(),
+                    StrictHorizontalDragGestureRecognizer.new,
                     (StrictHorizontalDragGestureRecognizer instance) {
                       instance
                         ..onUpdate = (details) {}
@@ -225,7 +225,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   backgroundColor: Theme.of(context).colorScheme.surface,
                   onRefresh: () async {
                     // CMS: fetch remote content here in future
-                    await Future.delayed(const Duration(milliseconds: 500));
+                    await Future<void>.delayed(
+                        const Duration(milliseconds: 500));
                     ref.invalidate(homeProvider);
                   },
                   child: SingleChildScrollView(
@@ -250,16 +251,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final theme = Theme.of(context);
 
     // Get dynamic commentary snippet for VOTD
-    String? excerpt = data.verseOfTheDay.commentarySnippet;
+    final String? excerpt = data.verseOfTheDay.commentarySnippet;
 
     // Parse VOTD reference for availability check
     final votdRef = data.verseOfTheDay.reference;
     final votdLastSpace = votdRef.lastIndexOf(' ');
-    final votdBook = votdLastSpace != -1 ? votdRef.substring(0, votdLastSpace) : votdRef;
-    final votdChapterStr = votdLastSpace != -1 ? votdRef.substring(votdLastSpace + 1).split(':').first : '1';
+    final votdBook =
+        votdLastSpace != -1 ? votdRef.substring(0, votdLastSpace) : votdRef;
+    final votdChapterStr = votdLastSpace != -1
+        ? votdRef.substring(votdLastSpace + 1).split(':').first
+        : '1';
     final votdChapter = int.tryParse(votdChapterStr) ?? 1;
-    final hasVotdCommentary = ref.watch(
-        commentaryForChapterProvider((votdBook, votdChapter)));
+    final hasVotdCommentary =
+        ref.watch(commentaryForChapterProvider((votdBook, votdChapter)));
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -288,7 +292,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             behavior: HitTestBehavior.opaque,
             onTap: () {
               final refParts = votdRef.split(':');
-              final verseNum = refParts.length > 1 ? int.tryParse(refParts.last) : 1;
+              final verseNum =
+                  refParts.length > 1 ? int.tryParse(refParts.last) : 1;
               openReaderAtVerse(
                 ref,
                 bookName: votdBook,
@@ -417,8 +422,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                   ? refStr.substring(0, lastSpaceIdx)
                                   : refStr;
                               final refParts = lastSpaceIdx != -1
-                                  ? refStr.substring(lastSpaceIdx + 1).split(':')
-                                  : [];
+                                  ? refStr
+                                      .substring(lastSpaceIdx + 1)
+                                      .split(':')
+                                  : <String>[];
                               final chapterNum = refParts.isNotEmpty
                                   ? (int.tryParse(refParts[0]) ?? 1)
                                   : 1;
@@ -445,7 +452,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           onPressed: () => _shareVotd(data.verseOfTheDay),
                         ),
                       ),
-
                     ],
                   ),
                 ],
@@ -533,8 +539,6 @@ class _PillButton extends StatelessWidget {
   }
 }
 
-
-
 class WordOfTheDaySection extends ConsumerWidget {
   const WordOfTheDaySection({super.key});
 
@@ -542,7 +546,7 @@ class WordOfTheDaySection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final wotdAsync = ref.watch(wordOfTheDayProvider);
-    
+
     return wotdAsync.when(
       data: (wotd) {
         if (wotd == null) {
@@ -550,7 +554,7 @@ class WordOfTheDaySection extends ConsumerWidget {
             'No word picked for today yet — try again later.',
           );
         }
-        
+
         return BouncyEntrance(
           delay: const Duration(milliseconds: 500),
           child: Column(
@@ -578,7 +582,8 @@ class WordOfTheDaySection extends ConsumerWidget {
               GlassContainer(
                 isScrollable: false,
                 borderRadius: BorderRadius.circular(24),
-                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 20.0, vertical: 14.0),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -589,7 +594,8 @@ class WordOfTheDaySection extends ConsumerWidget {
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.bodySmall?.copyWith(
                         height: 1.60,
-                        color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.82),
+                        color: theme.textTheme.bodyMedium?.color
+                            ?.withValues(alpha: 0.82),
                       ),
                     ),
                     const SizedBox(height: 14),
@@ -600,7 +606,7 @@ class WordOfTheDaySection extends ConsumerWidget {
                             label: 'Read Full Definition',
                             filled: true,
                             onPressed: () {
-                              showModalBottomSheet(
+                              showModalBottomSheet<void>(
                                 context: context,
                                 isScrollControlled: true,
                                 backgroundColor: Colors.transparent,
@@ -630,8 +636,7 @@ class WordOfTheDaySection extends ConsumerWidget {
                                   sourceName: 'Word of the day',
                                 ),
                                 imageFilename: 'wotd',
-                                buildCard: (backdrop, style) =>
-                                    ShareCard.word(
+                                buildCard: (backdrop, style) => ShareCard.word(
                                   eyebrow: 'Word of the day',
                                   word: wotd.word,
                                   definition: wotd.snippet,
@@ -654,7 +659,7 @@ class WordOfTheDaySection extends ConsumerWidget {
       },
       loading: () => const SizedBox.shrink(),
       error: (e, st) {
-        debugPrint('wordOfTheDayProvider error: $e\n$st');
+        logDebug('wordOfTheDayProvider error: $e\n$st');
         return _WotdFallback('Word of the day unavailable ($e).');
       },
     );

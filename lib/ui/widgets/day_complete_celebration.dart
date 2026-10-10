@@ -25,7 +25,8 @@ class _DayCompleteCelebrationState extends State<DayCompleteCelebration>
     super.initState();
     HapticFeedback.heavyImpact();
 
-    _confettiController = ConfettiController(duration: const Duration(seconds: 1));
+    _confettiController =
+        ConfettiController(duration: const Duration(seconds: 1));
     _confettiController.play();
 
     _controller = AnimationController(
@@ -120,7 +121,8 @@ class _DayCompleteCelebrationState extends State<DayCompleteCelebration>
                                 .headlineSmall
                                 ?.copyWith(
                                   fontWeight: FontWeight.bold,
-                                  color: Theme.of(context).colorScheme.onSurface,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                 ),
                           ),
                         ],

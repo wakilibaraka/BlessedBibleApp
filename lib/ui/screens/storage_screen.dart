@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -120,7 +121,8 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
 
   Future<String> _packsDirPath() async {
     // Mirrors TranslationPackStore's layout.
-    final dir = Directory('${(await getApplicationSupportDirectory()).path}/translations');
+    final dir = Directory(
+        '${(await getApplicationSupportDirectory()).path}/translations');
     return dir.path;
   }
 
@@ -181,7 +183,7 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
     required String success,
   }) async {
     if (_busy) return;
-    HapticFeedback.mediumImpact();
+    unawaited(HapticFeedback.mediumImpact());
     setState(() => _busy = true);
     int freed = 0;
     String? error;
@@ -274,7 +276,9 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
                           label: 'Bible content (always kept)',
                           value: _mb(_contentBytes),
                         ),
-                        _StatRow(label: 'Downloaded packs', value: _mb(_downloadBytes)),
+                        _StatRow(
+                            label: 'Downloaded packs',
+                            value: _mb(_downloadBytes)),
                         _StatRow(label: 'Cache', value: _mb(_cacheBytes)),
                       ],
                     ),
@@ -329,15 +333,13 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: theme.textTheme.titleSmall
-                                        ?.copyWith(
-                                            fontWeight: FontWeight.w700),
+                                        ?.copyWith(fontWeight: FontWeight.w700),
                                   ),
                                   Text(
                                     '${pack.abbr} · '
                                     '${_mb(pack.sizeBytes)}'
                                     '${pack.bundled ? " · bundled" : ""}',
-                                    style: theme.textTheme.labelSmall
-                                        ?.copyWith(
+                                    style: theme.textTheme.labelSmall?.copyWith(
                                       color: theme.colorScheme.onSurface
                                           .withValues(alpha: 0.6),
                                     ),
@@ -408,8 +410,8 @@ class _StatRow extends StatelessWidget {
           Flexible(
             child: Text(label,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface
-                        .withValues(alpha: 0.75))),
+                    color:
+                        theme.colorScheme.onSurface.withValues(alpha: 0.75))),
           ),
           Text(value,
               style: theme.textTheme.bodyMedium

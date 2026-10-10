@@ -11,7 +11,11 @@ ReadingPlanState planStartedOn(DateTime start, int days) => ReadingPlanState(
       planId: 'test',
       planData: List.generate(
         days,
-        (i) => PlanDayData(day: i + 1, week: i ~/ 7 + 1, title: 'Day ${i + 1}', passages: const []),
+        (i) => PlanDayData(
+            day: i + 1,
+            week: i ~/ 7 + 1,
+            title: 'Day ${i + 1}',
+            passages: const []),
       ),
       planStartedOn: start,
     );
@@ -40,8 +44,7 @@ Future<void> settlePaging(WidgetTester tester) async {
 
 void main() {
   // 2026-10-04 is a Sunday -> its Monday-first week starts 2026-09-28.
-  testWidgets('centers on the current week and renders 7 days',
-      (tester) async {
+  testWidgets('centers on the current week and renders 7 days', (tester) async {
     await tester.pumpWidget(host());
     await tester.pump(const Duration(milliseconds: 100));
 
@@ -81,8 +84,8 @@ void main() {
     await tester.pumpWidget(host());
     await tester.pump(const Duration(milliseconds: 100));
 
-    final state = tester.state<LibraryCalendarRailState>(
-        find.byType(LibraryCalendarRail));
+    final state = tester
+        .state<LibraryCalendarRailState>(find.byType(LibraryCalendarRail));
     state.scrollToDate(DateTime(2026, 12, 20));
     await settlePaging(tester);
 

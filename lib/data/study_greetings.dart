@@ -9,68 +9,49 @@ class StudyGreeting {
 /// The everyday rotation: invitations, not imperatives (EID tone).
 /// Shared by all users on a given day — calm, never flickering.
 const List<StudyGreeting> _dailyGreetings = [
-  StudyGreeting(
-      'Peace be with you.', 'Let His word bring you rest.'),
-  StudyGreeting(
-      'Walk in the light.', 'His word is a lamp for your path.'),
-  StudyGreeting(
-      'Grace and peace to you.', 'Rest in the Vine today.'),
-  StudyGreeting(
-      'Come to the waters.', 'Jesus is the light of the world.'),
+  StudyGreeting('Peace be with you.', 'Let His word bring you rest.'),
+  StudyGreeting('Walk in the light.', 'His word is a lamp for your path.'),
+  StudyGreeting('Grace and peace to you.', 'Rest in the Vine today.'),
+  StudyGreeting('Come to the waters.', 'Jesus is the light of the world.'),
   StudyGreeting(
       'The Lord bless you.', 'Keep His promises close to your heart.'),
-  StudyGreeting(
-      'Be still and know.', 'Dwell in His quiet presence.'),
-  StudyGreeting(
-      'Morning mercies anew.', 'His compassions never fail.'),
-  StudyGreeting(
-      'Rooted in love.', 'Grow in grace and truth.'),
-  StudyGreeting(
-      'Let your light shine.', 'A city on a hill cannot be hidden.'),
-  StudyGreeting(
-      'Draw near to God.', 'He is already reaching for you.'),
-  StudyGreeting(
-      'The Word became flesh.', 'He understands your journey.'),
+  StudyGreeting('Be still and know.', 'Dwell in His quiet presence.'),
+  StudyGreeting('Morning mercies anew.', 'His compassions never fail.'),
+  StudyGreeting('Rooted in love.', 'Grow in grace and truth.'),
+  StudyGreeting('Let your light shine.', 'A city on a hill cannot be hidden.'),
+  StudyGreeting('Draw near to God.', 'He is already reaching for you.'),
+  StudyGreeting('The Word became flesh.', 'He understands your journey.'),
   StudyGreeting('Taste and see.', 'The Lord is incredibly good.'),
 ];
 
 /// Mornings (5:00–11:59): starting-the-day words.
 const List<StudyGreeting> _morningGreetings = [
   StudyGreeting('Awake, O sleeper.', 'Christ will shine on you.'),
-  StudyGreeting(
-      'Joy comes in the morning.', 'Step into His new day.'),
-  StudyGreeting('This is the day the Lord has made.',
-      'Let us rejoice in it.'),
+  StudyGreeting('Joy comes in the morning.', 'Step into His new day.'),
+  StudyGreeting('This is the day the Lord has made.', 'Let us rejoice in it.'),
 ];
 
 /// Evenings and nights (18:00–4:59): rest words.
 const List<StudyGreeting> _eveningGreetings = [
-  StudyGreeting(
-      'The day is done.', 'He gives sleep to those He loves.'),
+  StudyGreeting('The day is done.', 'He gives sleep to those He loves.'),
   StudyGreeting('Under His wings.', 'You will find refuge tonight.'),
-  StudyGreeting('Come to Me, you who are weary.',
-      'And I will give you rest.'),
+  StudyGreeting('Come to Me, you who are weary.', 'And I will give you rest.'),
 ];
 
 /// Grace days: the streak is broken but the reader has history, or
 /// today restarts it. Comfort, not guilt.
 const List<StudyGreeting> _graceGreetings = [
-  StudyGreeting(
-      'Cast all your anxiety on Him.', 'Because He cares for you.'),
-  StudyGreeting(
-      'My peace I give you.', 'Let not your heart be troubled.'),
-  StudyGreeting(
-      'He heals the brokenhearted.', 'And binds up their wounds.'),
-  StudyGreeting(
-      'Nothing can separate us.', 'From the love of God.'),
+  StudyGreeting('Cast all your anxiety on Him.', 'Because He cares for you.'),
+  StudyGreeting('My peace I give you.', 'Let not your heart be troubled.'),
+  StudyGreeting('He heals the brokenhearted.', 'And binds up their wounds.'),
+  StudyGreeting('Nothing can separate us.', 'From the love of God.'),
 ];
 
 /// On a roll (streak of 3+): encouragement for the road.
 const List<StudyGreeting> _encouragementGreetings = [
-  StudyGreeting('Be strong and courageous.',
-      'The Lord your God goes with you.'),
   StudyGreeting(
-      'Run with endurance.', 'Keep your eyes fixed on Jesus.'),
+      'Be strong and courageous.', 'The Lord your God goes with you.'),
+  StudyGreeting('Run with endurance.', 'Keep your eyes fixed on Jesus.'),
   StudyGreeting('Iron sharpens iron.', 'Grow together in the Word.'),
 ];
 
@@ -87,11 +68,9 @@ StudyGreeting greetingFor({
   required int distinctDaysThisYear,
 }) {
   final dayIndex =
-      DateTime(now.year, now.month, now.day).millisecondsSinceEpoch ~/
-          86400000;
+      DateTime(now.year, now.month, now.day).millisecondsSinceEpoch ~/ 86400000;
 
-  StudyGreeting pick(List<StudyGreeting> pool) =>
-      pool[dayIndex % pool.length];
+  StudyGreeting pick(List<StudyGreeting> pool) => pool[dayIndex % pool.length];
 
   final returning = (streakCount == 0 && distinctDaysThisYear > 0) ||
       (streakCount == 1 && distinctDaysThisYear > 1);

@@ -182,8 +182,8 @@ class NotificationService {
     }
 
     for (int i = 0; i < 4; i++) {
-      DateTime targetFriday = friday.add(Duration(days: 7 * i));
-      DateTime? targetSunset = SunsetCalculator.getSunset(
+      final DateTime targetFriday = friday.add(Duration(days: 7 * i));
+      final DateTime targetSunset = SunsetCalculator.getSunset(
               lat, lng, targetFriday) ??
           DateTime(
               targetFriday.year, targetFriday.month, targetFriday.day, 18, 0);
@@ -217,7 +217,6 @@ class NotificationService {
     await _flutterLocalNotificationsPlugin.cancel(id: 2);
   }
 
-
   Future<void> cancelWeeklyReminder() async {
     await _flutterLocalNotificationsPlugin.cancel(id: 1);
   }
@@ -241,8 +240,9 @@ class NotificationService {
   /// [restDay] uses the app convention (1=Sunday..7=Saturday) and is
   /// converted to the plugin's Dart-weekday convention before scheduling —
   /// comparing them directly skipped the wrong day.
-  Future<void> syncReadingPlanReminder(bool enabled, int hour, int minute,
-      int? restDay, {Set<int>? restDays, String? planId}) async {
+  Future<void> syncReadingPlanReminder(
+      bool enabled, int hour, int minute, int? restDay,
+      {Set<int>? restDays, String? planId}) async {
     // One-time cleanup of the legacy shared range.
     for (int i = 100; i <= 107; i++) {
       await _flutterLocalNotificationsPlugin.cancel(id: i);

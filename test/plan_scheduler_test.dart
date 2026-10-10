@@ -57,15 +57,16 @@ void main() {
   late Map<String, Map<int, List<int>>> canon;
 
   setUpAll(() async {
-    final wcJson =
-        File('assets/data/word_counts.json').readAsStringSync();
+    final wcJson = File('assets/data/word_counts.json').readAsStringSync();
     wordCountService = WordCountService();
     await wordCountService.initFromJson(wcJson);
 
-    final pList = jsonDecode(
-        File('assets/data/pericopes.json').readAsStringSync()) as List;
-    allPericopes =
-        pList.map((j) => PericopeEntry.fromJson(j)).toList();
+    final pList =
+        jsonDecode(File('assets/data/pericopes.json').readAsStringSync())
+            as List;
+    allPericopes = pList
+        .map((j) => PericopeEntry.fromJson(j as Map<String, dynamic>))
+        .toList();
 
     generator = PlanGenerator(
       wordCountService: wordCountService,
@@ -73,16 +74,15 @@ void main() {
     );
 
     canon = {};
-    final wcMap =
-        jsonDecode(wcJson) as Map<String, dynamic>;
+    final wcMap = jsonDecode(wcJson) as Map<String, dynamic>;
     wcMap.forEach((book, chapters) {
       final chMap = <int, List<int>>{};
       (chapters as Map<String, dynamic>).forEach((ch, info) {
-        chMap[int.parse(ch)] = ((info as Map<String, dynamic>)['verses']
-                as Map<String, dynamic>)
-            .keys
-            .map(int.parse)
-            .toList();
+        chMap[int.parse(ch)] =
+            ((info as Map<String, dynamic>)['verses'] as Map<String, dynamic>)
+                .keys
+                .map(int.parse)
+                .toList();
       });
       canon[book] = chMap;
     });
@@ -153,13 +153,15 @@ void main() {
           days: 30,
           cadence: 7,
         );
-    final a = jsonEncode(run('a').schedule
+    final a = jsonEncode(run('a')
+        .schedule
         .map((d) => d.portions
             .map((p) =>
                 '${p.book} ${p.startChapter}:${p.startVerse}-${p.endChapter}:${p.endVerse}')
             .toList())
         .toList());
-    final b = jsonEncode(run('b').schedule
+    final b = jsonEncode(run('b')
+        .schedule
         .map((d) => d.portions
             .map((p) =>
                 '${p.book} ${p.startChapter}:${p.startVerse}-${p.endChapter}:${p.endVerse}')

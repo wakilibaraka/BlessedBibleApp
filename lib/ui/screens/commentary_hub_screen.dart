@@ -103,27 +103,27 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
                 child: Center(child: CircularProgressIndicator())),
             error: (e, st) => SliverFillRemaining(
                 child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text('Could not load commentary.\n$e',
-                          textAlign: TextAlign.center),
-                      const SizedBox(height: 12),
-                      TextButton.icon(
-                        onPressed: () =>
-                            ref.invalidate(commentaryProvider),
-                        icon: const Icon(Icons.refresh_rounded),
-                        label: const Text('Retry'),
-                      ),
-                    ],
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Could not load commentary.\n$e',
+                      textAlign: TextAlign.center),
+                  const SizedBox(height: 12),
+                  TextButton.icon(
+                    onPressed: () => ref.invalidate(commentaryProvider),
+                    icon: const Icon(Icons.refresh_rounded),
+                    label: const Text('Retry'),
                   ),
-                )),
+                ],
+              ),
+            )),
             data: (entries) {
               // Filter data based on context and selected chips
               final filtered = entries.where((e) {
                 // Must match the book and chapter context
-                if (e.scope.book?.toLowerCase() != widget.book.toLowerCase())
+                if (e.scope.book?.toLowerCase() != widget.book.toLowerCase()) {
                   return false;
+                }
                 if (e.scope.chapter != widget.chapter) return false;
 
                 // Filter by Source / Category
@@ -140,9 +140,13 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
 
                 // Filter by Scope
                 if (_selectedScope == 'Chapter Level' &&
-                    e.scope.type != 'chapter') return false;
-                if (_selectedScope == 'Verse Level' && e.scope.type != 'verse')
+                    e.scope.type != 'chapter') {
                   return false;
+                }
+                if (_selectedScope == 'Verse Level' &&
+                    e.scope.type != 'verse') {
+                  return false;
+                }
 
                 return true;
               }).toList();
@@ -185,11 +189,8 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
         children: [
-          _buildDropdownChip(theme, tokens, _selectedSource, [
-            'All',
-            'Commentary',
-            'Devotionals'
-          ], (val) {
+          _buildDropdownChip(theme, tokens, _selectedSource,
+              ['All', 'Commentary', 'Devotionals'], (val) {
             setState(() => _selectedSource = val);
           }),
           const SizedBox(width: 8),

@@ -7,10 +7,13 @@ import 'read_settings_provider.dart';
 import '../data/models/bible_model.dart';
 import '../services/bible_database_service.dart';
 
-final dictionaryWordsProvider = FutureProvider<Map<String, String>>((ref) async {
+final dictionaryWordsProvider =
+    FutureProvider<Map<String, String>>((ref) async {
   try {
-    final jsonString = await rootBundle.loadString('assets/data/dictionary_words.json');
-    final Map<String, dynamic> jsonMap = json.decode(jsonString);
+    final jsonString =
+        await rootBundle.loadString('assets/data/dictionary_words.json');
+    final Map<String, dynamic> jsonMap =
+        json.decode(jsonString) as Map<String, dynamic>;
     return jsonMap.map((key, value) => MapEntry(key, value.toString()));
   } catch (e) {
     return {};
@@ -22,8 +25,9 @@ final dictionaryWordsProvider = FutureProvider<Map<String, String>>((ref) async 
 /// scope. Empty on load failure -> names branch simply never matches.
 final dictionaryNamesProvider = FutureProvider<Set<String>>((ref) async {
   try {
-    final jsonString = await rootBundle.loadString('assets/data/dictionary_names.json');
-    final List<dynamic> list = json.decode(jsonString);
+    final jsonString =
+        await rootBundle.loadString('assets/data/dictionary_names.json');
+    final List<dynamic> list = json.decode(jsonString) as List<dynamic>;
     return list.map((e) => e.toString()).toSet();
   } catch (e) {
     return {};
@@ -33,10 +37,13 @@ final dictionaryNamesProvider = FutureProvider<Set<String>>((ref) async {
 /// Token -> normalized_word for contested words defined under another
 /// headword (baptize -> baptism, kingdom -> kingdomofgod). Verified at
 /// generation time so every underline stays resolvable.
-final dictionaryAliasesProvider = FutureProvider<Map<String, String>>((ref) async {
+final dictionaryAliasesProvider =
+    FutureProvider<Map<String, String>>((ref) async {
   try {
-    final jsonString = await rootBundle.loadString('assets/data/dictionary_aliases.json');
-    final Map<String, dynamic> jsonMap = json.decode(jsonString);
+    final jsonString =
+        await rootBundle.loadString('assets/data/dictionary_aliases.json');
+    final Map<String, dynamic> jsonMap =
+        json.decode(jsonString) as Map<String, dynamic>;
     return jsonMap.map((key, value) => MapEntry(key, value.toString()));
   } catch (e) {
     return {};
@@ -51,8 +58,8 @@ class ChapterUnderlineArgs {
   final String translationId;
 
   ChapterUnderlineArgs({
-    required this.bookNumber, 
-    required this.chapterNumber, 
+    required this.bookNumber,
+    required this.chapterNumber,
     required this.verses,
     required this.isEnglish,
     required this.translationId,
@@ -69,7 +76,11 @@ class ChapterUnderlineArgs {
           translationId == other.translationId;
 
   @override
-  int get hashCode => bookNumber.hashCode ^ chapterNumber.hashCode ^ isEnglish.hashCode ^ translationId.hashCode;
+  int get hashCode =>
+      bookNumber.hashCode ^
+      chapterNumber.hashCode ^
+      isEnglish.hashCode ^
+      translationId.hashCode;
 }
 
 // Map of verseNumber -> Set of token indices.
@@ -81,14 +92,18 @@ class ChapterUnderlineArgs {
 // - `contested`: theologically disputed or misleading words
 //   (hell, baptism, easter, ghost, lord, ...). Matches classic scopes
 //   exactly as `term` did, so classic behavior is unchanged.
-final chapterUnderlineMapProvider = Provider.family<Map<int, Set<int>>, ChapterUnderlineArgs>((ref, args) {
+final chapterUnderlineMapProvider =
+    Provider.family<Map<int, Set<int>>, ChapterUnderlineArgs>((ref, args) {
   if (!args.isEnglish) return {};
 
   final dictWordsAsync = ref.watch(dictionaryWordsProvider);
   final namesAsync = ref.watch(dictionaryNamesProvider);
-  final scope = ref.watch(readSettingsProvider.select((s) => s.dictionaryScope));
-  final nonKjvMode = ref.watch(readSettingsProvider.select((s) => s.nonKjvDictionaryMode));
-  final isEnabled = ref.watch(readSettingsProvider.select((s) => s.dictionaryUnderlinesEnabled));
+  final scope =
+      ref.watch(readSettingsProvider.select((s) => s.dictionaryScope));
+  final nonKjvMode =
+      ref.watch(readSettingsProvider.select((s) => s.nonKjvDictionaryMode));
+  final isEnabled = ref
+      .watch(readSettingsProvider.select((s) => s.dictionaryUnderlinesEnabled));
 
   if (!isEnabled ||
       dictWordsAsync.value == null ||
@@ -195,7 +210,7 @@ class DictionaryDefinition {
   final String displayHeadword;
   final String source;
   final String definition;
-  
+
   DictionaryDefinition({
     required this.normalizedWord,
     required this.displayHeadword,
@@ -204,7 +219,9 @@ class DictionaryDefinition {
   });
 }
 
-final dictionaryDefinitionProvider = FutureProvider.family<List<DictionaryDefinition>, String>((ref, word) async {
+final dictionaryDefinitionProvider =
+    FutureProvider.family<List<DictionaryDefinition>, String>(
+        (ref, word) async {
   // Contested words defined under another headword resolve through the
   // alias table first (baptize -> baptism, kingdom -> kingdomofgod).
   final aliases = await ref.watch(dictionaryAliasesProvider.future);
@@ -215,15 +232,16 @@ final dictionaryDefinitionProvider = FutureProvider.family<List<DictionaryDefini
     where: 'normalized_word = ?',
     whereArgs: [lookup],
   );
-  
-  return results.map((r) => DictionaryDefinition(
-    normalizedWord: r['normalized_word'] as String,
-    displayHeadword: r['display_headword'] as String,
-    source: r['source'] as String,
-    definition: r['definition'] as String,
-  )).toList();
-});
 
+  return results
+      .map((r) => DictionaryDefinition(
+            normalizedWord: r['normalized_word'] as String,
+            displayHeadword: r['display_headword'] as String,
+            source: r['source'] as String,
+            definition: r['definition'] as String,
+          ))
+      .toList();
+});
 
 class BookmarkedWordsNotifier extends AsyncNotifier<Set<String>> {
   static const _key = 'bookmarked_dictionary_words';
@@ -238,17 +256,19 @@ class BookmarkedWordsNotifier extends AsyncNotifier<Set<String>> {
   Future<void> toggleBookmark(String word) async {
     final currentSet = state.asData?.value ?? {};
     final newSet = Set<String>.from(currentSet);
-    
+
     if (newSet.contains(word)) {
       newSet.remove(word);
     } else {
       newSet.add(word);
     }
-    
+
     state = AsyncData(newSet);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setStringList(_key, newSet.toList());
   }
 }
 
-final bookmarkedWordsProvider = AsyncNotifierProvider<BookmarkedWordsNotifier, Set<String>>(BookmarkedWordsNotifier.new);
+final bookmarkedWordsProvider =
+    AsyncNotifierProvider<BookmarkedWordsNotifier, Set<String>>(
+        BookmarkedWordsNotifier.new);

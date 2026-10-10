@@ -69,12 +69,10 @@ void main() {
 
     await container.read(devotionalStoriesProvider.future);
     container.read(devotionalFilterProvider.notifier).toggleFavoritesOnly();
-    expect(
-        container.read(filteredDevotionalStoriesProvider), isEmpty);
+    expect(container.read(filteredDevotionalStoriesProvider), isEmpty);
 
     container.read(devotionalFilterProvider.notifier).reset();
-    expect(
-        container.read(filteredDevotionalStoriesProvider).length, 500);
+    expect(container.read(filteredDevotionalStoriesProvider).length, 500);
   });
 
   test('favoriting a story surfaces it under favorites-only', () async {
@@ -82,9 +80,7 @@ void main() {
     addTearDown(container.dispose);
 
     final all = await container.read(devotionalStoriesProvider.future);
-    container
-        .read(devotionalFavoritesProvider.notifier)
-        .toggle(all.first.id);
+    container.read(devotionalFavoritesProvider.notifier).toggle(all.first.id);
     container.read(devotionalFilterProvider.notifier).toggleFavoritesOnly();
     final filtered = container.read(filteredDevotionalStoriesProvider);
     expect(filtered.length, 1);

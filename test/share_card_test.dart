@@ -22,8 +22,7 @@ Widget host(Widget card) => MaterialApp(
     );
 
 const short = 'Jesus wept.';
-const long =
-    'For God so loved the world, that he gave his only begotten Son, '
+const long = 'For God so loved the world, that he gave his only begotten Son, '
     'that whosoever believeth in him should not perish, but have '
     'everlasting life. For God sent not his Son into the world to '
     'condemn the world, but that the world through him might be saved.';
@@ -56,8 +55,7 @@ void main() {
     expect(find.text('JOHN 3:16-17 · KJV'), findsOneWidget);
   });
 
-  testWidgets('word card renders caps headword and source',
-      (tester) async {
+  testWidgets('word card renders caps headword and source', (tester) async {
     await tester.pumpWidget(host(ShareCard.word(
       eyebrow: 'Word of the day',
       word: 'grace',

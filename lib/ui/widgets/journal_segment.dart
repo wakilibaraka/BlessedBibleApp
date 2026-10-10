@@ -8,7 +8,7 @@ class JournalSegment extends ConsumerWidget {
 
   void _showAddJournalDialog(BuildContext context, WidgetRef ref) {
     final controller = TextEditingController();
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (c) => AlertDialog(
         title: const Text('New Journal Entry'),
@@ -21,7 +21,8 @@ class JournalSegment extends ConsumerWidget {
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(c), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(c), child: const Text('Cancel')),
           FilledButton(
             onPressed: () {
               if (controller.text.trim().isNotEmpty) {
@@ -69,8 +70,9 @@ class JournalSegment extends ConsumerWidget {
             return Card(
               margin: const EdgeInsets.only(bottom: 16),
               elevation: 0,
-              color: theme.primaryColor.withOpacity(0.05),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              color: theme.primaryColor.withValues(alpha: 0.05),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -78,7 +80,8 @@ class JournalSegment extends ConsumerWidget {
                   children: [
                     Text(
                       entry.date.split('T').first,
-                      style: theme.textTheme.labelSmall?.copyWith(color: theme.primaryColor),
+                      style: theme.textTheme.labelSmall
+                          ?.copyWith(color: theme.primaryColor),
                     ),
                     const SizedBox(height: 8),
                     Text(entry.content, style: theme.textTheme.bodyMedium),
@@ -86,26 +89,34 @@ class JournalSegment extends ConsumerWidget {
                     if (entry.detectedEmotions.isNotEmpty) ...[
                       Row(
                         children: [
-                          Icon(Icons.auto_awesome, size: 16, color: theme.primaryColor),
+                          Icon(Icons.auto_awesome,
+                              size: 16, color: theme.primaryColor),
                           const SizedBox(width: 8),
-                          Text('AI Reflection', style: theme.textTheme.labelMedium?.copyWith(color: theme.primaryColor, fontWeight: FontWeight.bold)),
+                          Text('AI Reflection',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                  color: theme.primaryColor,
+                                  fontWeight: FontWeight.bold)),
                         ],
                       ),
                       const SizedBox(height: 8),
-                      Text('Detected Emotion: ${entry.detectedEmotions.first}', style: theme.textTheme.bodySmall),
+                      Text('Detected Emotion: ${entry.detectedEmotions.first}',
+                          style: theme.textTheme.bodySmall),
                       const SizedBox(height: 8),
-                      Text('Verses: ${entry.recommendedVerses.join(', ')}', style: theme.textTheme.bodySmall),
+                      Text('Verses: ${entry.recommendedVerses.join(', ')}',
+                          style: theme.textTheme.bodySmall),
                       const SizedBox(height: 8),
                       ...entry.prayerPoints.map((p) => Padding(
-                        padding: const EdgeInsets.only(top: 4.0),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text('• '),
-                            Expanded(child: Text(p, style: theme.textTheme.bodySmall)),
-                          ],
-                        ),
-                      )),
+                            padding: const EdgeInsets.only(top: 4.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('• '),
+                                Expanded(
+                                    child: Text(p,
+                                        style: theme.textTheme.bodySmall)),
+                              ],
+                            ),
+                          )),
                     ],
                   ],
                 ),

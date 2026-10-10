@@ -25,10 +25,10 @@ class VersePreviewDialog extends ConsumerWidget {
     final theme = Theme.of(context);
     final typography = ref.watch(typographyProvider);
     final bibleState = ref.watch(bibleProvider);
-    
+
     int? bookNumber;
     String? fullBookName;
-    
+
     final searchName = bookAbbrev.toLowerCase().replaceAll('.', '').trim();
     for (final book in bibleState.books) {
       final bn = book.name.toLowerCase();
@@ -51,7 +51,7 @@ class VersePreviewDialog extends ConsumerWidget {
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 24,
               spreadRadius: 8,
             )
@@ -66,8 +66,8 @@ class VersePreviewDialog extends ConsumerWidget {
               children: [
                 Expanded(
                   child: Text(
-                    fullBookName != null 
-                        ? '$fullBookName $chapter:$verseNum' 
+                    fullBookName != null
+                        ? '$fullBookName $chapter:$verseNum'
                         : reference,
                     style: TextStyle(
                       fontSize: 18,
@@ -79,7 +79,9 @@ class VersePreviewDialog extends ConsumerWidget {
                 IconButton(
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
-                  icon: Icon(Icons.close_rounded, color: theme.colorScheme.onSurface.withOpacity(0.4)),
+                  icon: Icon(Icons.close_rounded,
+                      color:
+                          theme.colorScheme.onSurface.withValues(alpha: 0.4)),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
@@ -104,16 +106,16 @@ class VersePreviewDialog extends ConsumerWidget {
                       ),
                     );
                   }
-                  
+
                   if (snapshot.hasError) {
                     return Text('Error loading verse: ${snapshot.error}');
                   }
-                  
+
                   final verse = snapshot.data;
                   if (verse == null) {
                     return const Text('Verse not found.');
                   }
-                  
+
                   return SingleChildScrollView(
                     child: Text(
                       verse.text.replaceAll(RegExp(r'[<\[][^>\]]*[>\]]'), ''),
@@ -121,7 +123,8 @@ class VersePreviewDialog extends ConsumerWidget {
                         height: typography.lineHeight,
                         fontSize: typography.fontSize,
                         fontFamily: typography.fontFamily,
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.9),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.9),
                       ),
                     ),
                   );
