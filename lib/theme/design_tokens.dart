@@ -53,9 +53,7 @@ abstract final class Motion {
 
   /// [d], or zero when the platform asks to reduce motion.
   static Duration of(BuildContext context, Duration d) =>
-      MediaQuery.maybeDisableAnimationsOf(context) ?? false
-          ? Duration.zero
-          : d;
+      MediaQuery.maybeDisableAnimationsOf(context) ?? false ? Duration.zero : d;
 }
 
 /// Minimum touch target (Material 48 dp; also clears Apple's 44 pt).
