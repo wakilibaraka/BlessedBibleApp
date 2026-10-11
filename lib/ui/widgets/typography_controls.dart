@@ -64,6 +64,7 @@ class TypographyControls extends ConsumerWidget {
         Row(children: [
           _IconStepButton(
               icon: Icons.remove,
+              label: context.l10n.a11yTextSmaller,
               iconColor: iconColor,
               theme: theme,
               onTap: () {
@@ -105,6 +106,7 @@ class TypographyControls extends ConsumerWidget {
           const SizedBox(width: 12),
           _IconStepButton(
               icon: Icons.add,
+              label: context.l10n.a11yTextLarger,
               iconColor: iconColor,
               theme: theme,
               onTap: () {
@@ -146,32 +148,46 @@ class TypographyControls extends ConsumerWidget {
               child: Padding(
                 padding: EdgeInsets.only(
                     right: i < _weightValues.length - 1 ? 6 : 0),
-                child: GestureDetector(
-                  onTap: () {
-                    HapticFeedback.selectionClick();
-                    typographyNotifier.setFontWeight(_weightValues[i]);
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 180),
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? theme.primaryColor
-                          : theme.colorScheme.onSurface.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(Radii.md),
-                    ),
-                    child: Text(
-                      _weightLabels(context.l10n)[i],
-                      style: TextStyle(
-                        fontSize: TypeScale.caption,
-                        fontWeight: FontWeight.values.firstWhere(
-                            (w) => w.value == _weightValues[i],
-                            orElse: () => FontWeight.normal),
-                        color: isSelected
-                            ? theme.colorScheme.surface
-                            : theme.colorScheme.onSurface
-                                .withValues(alpha: 0.7),
+                child: Semantics(
+                  button: true,
+                  selected: isSelected,
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      HapticFeedback.selectionClick();
+                      typographyNotifier.setFontWeight(_weightValues[i]);
+                    },
+                    // 48 dp hit area around the slimmer chip.
+                    child: ConstrainedBox(
+                      constraints:
+                          const BoxConstraints(minHeight: kMinTouchTarget),
+                      child: Center(
+                        child: AnimatedContainer(
+                          duration: Motion.of(
+                              context, const Duration(milliseconds: 180)),
+                          alignment: Alignment.center,
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? theme.primaryColor
+                                : theme.colorScheme.onSurface
+                                    .withValues(alpha: 0.05),
+                            borderRadius: BorderRadius.circular(Radii.md),
+                          ),
+                          child: Text(
+                            _weightLabels(context.l10n)[i],
+                            style: TextStyle(
+                              fontSize: TypeScale.caption,
+                              fontWeight: FontWeight.values.firstWhere(
+                                  (w) => w.value == _weightValues[i],
+                                  orElse: () => FontWeight.normal),
+                              color: isSelected
+                                  ? theme.colorScheme.surface
+                                  : theme.colorScheme.onSurface
+                                      .withValues(alpha: 0.7),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -288,6 +304,7 @@ class TypographyControls extends ConsumerWidget {
           children: [
             _AlignmentButton(
                 icon: Icons.format_align_left_rounded,
+                label: context.l10n.settingsAlignLeft,
                 isSelected: typography.textAlignMode == TextAlignMode.left,
                 onTap: () {
                   HapticFeedback.selectionClick();
@@ -296,6 +313,7 @@ class TypographyControls extends ConsumerWidget {
             const SizedBox(width: 12),
             _AlignmentButton(
                 icon: Icons.format_align_center_rounded,
+                label: context.l10n.settingsAlignCenter,
                 isSelected: typography.textAlignMode == TextAlignMode.center,
                 onTap: () {
                   HapticFeedback.selectionClick();
@@ -304,6 +322,7 @@ class TypographyControls extends ConsumerWidget {
             const SizedBox(width: 12),
             _AlignmentButton(
                 icon: Icons.format_align_right_rounded,
+                label: context.l10n.settingsAlignRight,
                 isSelected: typography.textAlignMode == TextAlignMode.right,
                 onTap: () {
                   HapticFeedback.selectionClick();
@@ -312,6 +331,7 @@ class TypographyControls extends ConsumerWidget {
             const SizedBox(width: 12),
             _AlignmentButton(
                 icon: Icons.format_align_justify_rounded,
+                label: context.l10n.settingsAlignJustified,
                 isSelected: typography.textAlignMode == TextAlignMode.justified,
                 onTap: () {
                   HapticFeedback.selectionClick();
@@ -341,51 +361,58 @@ class TypographyControls extends ConsumerWidget {
                 return Expanded(
                   child: Padding(
                     padding: EdgeInsets.only(right: i < 2 ? 6 : 0),
-                    child: GestureDetector(
-                      onTap: () {
-                        HapticFeedback.selectionClick();
-                        typographyNotifier.setFontFamily(font);
-                      },
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 180),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 4),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? theme.primaryColor
-                              : theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.05),
-                          borderRadius: BorderRadius.circular(Radii.md),
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text('Aa',
+                    child: Semantics(
+                      button: true,
+                      selected: isSelected,
+                      label: font,
+                      excludeSemantics: true,
+                      child: GestureDetector(
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          typographyNotifier.setFontFamily(font);
+                        },
+                        child: AnimatedContainer(
+                          duration: Motion.of(
+                              context, const Duration(milliseconds: 180)),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 4),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? theme.primaryColor
+                                : theme.colorScheme.onSurface
+                                    .withValues(alpha: 0.05),
+                            borderRadius: BorderRadius.circular(Radii.md),
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text('Aa',
+                                  style: TextStyle(
+                                    fontFamily: font,
+                                    fontSize: TypeScale.title,
+                                    fontWeight: typography.fontWeight,
+                                    color: isSelected
+                                        ? theme.colorScheme.surface
+                                        : theme.colorScheme.onSurface
+                                            .withValues(alpha: 0.85),
+                                  )),
+                              const SizedBox(height: 2),
+                              Text(
+                                font,
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
-                                  fontFamily: font,
-                                  fontSize: TypeScale.title,
-                                  fontWeight: typography.fontWeight,
+                                  fontSize: TypeScale.micro,
                                   color: isSelected
                                       ? theme.colorScheme.surface
+                                          .withValues(alpha: 0.85)
                                       : theme.colorScheme.onSurface
-                                          .withValues(alpha: 0.85),
-                                )),
-                            const SizedBox(height: 2),
-                            Text(
-                              font,
-                              textAlign: TextAlign.center,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: TypeScale.micro,
-                                color: isSelected
-                                    ? theme.colorScheme.surface
-                                        .withValues(alpha: 0.85)
-                                    : theme.colorScheme.onSurface
-                                        .withValues(alpha: 0.55),
+                                          .withValues(alpha: 0.55),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -428,26 +455,40 @@ class TypographyControls extends ConsumerWidget {
 
 class _IconStepButton extends StatelessWidget {
   final IconData icon;
+  final String label;
   final Color iconColor;
   final ThemeData theme;
   final VoidCallback onTap;
   const _IconStepButton(
       {required this.icon,
+      required this.label,
       required this.iconColor,
       required this.theme,
       required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(Radii.md),
+    return Semantics(
+      button: true,
+      label: label,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        // 48 dp hit area; the visible square stays 36 dp.
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+              minWidth: kMinTouchTarget, minHeight: kMinTouchTarget),
+          child: Center(
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(Radii.md),
+              ),
+              child: Icon(icon, size: 20, color: iconColor),
+            ),
+          ),
         ),
-        child: Icon(icon, size: 20, color: iconColor),
       ),
     );
   }
@@ -455,30 +496,49 @@ class _IconStepButton extends StatelessWidget {
 
 class _AlignmentButton extends StatelessWidget {
   final IconData icon;
+  final String label;
   final bool isSelected;
   final VoidCallback onTap;
   const _AlignmentButton(
-      {required this.icon, required this.isSelected, required this.onTap});
+      {required this.icon,
+      required this.label,
+      required this.isSelected,
+      required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: Motion.normal,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? theme.primaryColor
-              : theme.colorScheme.onSurface.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(Radii.pill),
-          border: Border.all(
-              color: isSelected ? theme.primaryColor : Colors.transparent),
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: label,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        // 48 dp tall hit area around the 36 dp pill.
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: kMinTouchTarget),
+          child: Center(
+            child: AnimatedContainer(
+              duration: Motion.of(context, Motion.normal),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? theme.primaryColor
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(Radii.pill),
+                border: Border.all(
+                    color:
+                        isSelected ? theme.primaryColor : Colors.transparent),
+              ),
+              child: Icon(icon,
+                  size: 20,
+                  color: isSelected
+                      ? theme.colorScheme.surface
+                      : theme.primaryColor),
+            ),
+          ),
         ),
-        child: Icon(icon,
-            size: 20,
-            color: isSelected ? theme.colorScheme.surface : theme.primaryColor),
       ),
     );
   }

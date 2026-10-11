@@ -320,9 +320,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                             .read(readSettingsProvider.notifier)
                             .setStrongsIndicatorStyle(set.first);
                       },
-                      style: ButtonStyle(
-                        visualDensity: VisualDensity.compact,
-                      ),
                     ),
                   ),
               ],
@@ -362,9 +359,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                           .read(readSettingsProvider.notifier)
                           .setReadingWpm(set.first);
                     },
-                    style: ButtonStyle(
-                      visualDensity: VisualDensity.compact,
-                    ),
                   ),
                 ),
               ],
@@ -1521,34 +1515,39 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
   }) {
     final theme = Theme.of(context);
     final isSelected = value == groupValue;
-    return InkWell(
-      onTap: () => onTap(value),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        color: isSelected
-            ? theme.primaryColor.withValues(alpha: 0.05)
-            : Colors.transparent,
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title,
-                      style: theme.textTheme.titleSmall
-                          ?.copyWith(fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 4),
-                  Text(subtitle,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurface
-                              .withValues(alpha: 0.7))),
-                ],
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      inMutuallyExclusiveGroup: true,
+      child: InkWell(
+        onTap: () => onTap(value),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          color: isSelected
+              ? theme.primaryColor.withValues(alpha: 0.05)
+              : Colors.transparent,
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title,
+                        style: theme.textTheme.titleSmall
+                            ?.copyWith(fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 4),
+                    Text(subtitle,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.7))),
+                  ],
+                ),
               ),
-            ),
-            if (isSelected)
-              Icon(Icons.check_circle_rounded,
-                  color: theme.primaryColor, size: 20),
-          ],
+              if (isSelected)
+                Icon(Icons.check_circle_rounded,
+                    color: theme.primaryColor, size: 20),
+            ],
+          ),
         ),
       ),
     );
@@ -1564,41 +1563,46 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
   }) {
     final theme = Theme.of(context);
     final isSelected = value == groupValue;
-    return InkWell(
-      onTap: () => onTap(value),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        color: isSelected
-            ? theme.primaryColor.withValues(alpha: 0.05)
-            : Colors.transparent,
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title,
-                      style: TextStyle(
-                          fontSize: TypeScale.bodyLarge,
-                          fontWeight:
-                              isSelected ? FontWeight.w600 : FontWeight.w400,
-                          color: isSelected
-                              ? theme.primaryColor
-                              : theme.colorScheme.onSurface)),
-                  const SizedBox(height: 2),
-                  Text(subtitle,
-                      style: TextStyle(
-                          fontSize: TypeScale.body,
-                          color: theme.colorScheme.onSurface
-                              .withValues(alpha: 0.6))),
-                ],
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      inMutuallyExclusiveGroup: true,
+      child: InkWell(
+        onTap: () => onTap(value),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          color: isSelected
+              ? theme.primaryColor.withValues(alpha: 0.05)
+              : Colors.transparent,
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title,
+                        style: TextStyle(
+                            fontSize: TypeScale.bodyLarge,
+                            fontWeight:
+                                isSelected ? FontWeight.w600 : FontWeight.w400,
+                            color: isSelected
+                                ? theme.primaryColor
+                                : theme.colorScheme.onSurface)),
+                    const SizedBox(height: 2),
+                    Text(subtitle,
+                        style: TextStyle(
+                            fontSize: TypeScale.body,
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.6))),
+                  ],
+                ),
               ),
-            ),
-            if (isSelected)
-              Icon(Icons.check_circle_rounded, color: theme.primaryColor)
-            else
-              const SizedBox(width: 24),
-          ],
+              if (isSelected)
+                Icon(Icons.check_circle_rounded, color: theme.primaryColor)
+              else
+                const SizedBox(width: 24),
+            ],
+          ),
         ),
       ),
     );

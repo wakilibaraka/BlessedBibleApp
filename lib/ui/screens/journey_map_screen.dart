@@ -150,94 +150,107 @@ class _WeeklyJourneyPath extends StatelessWidget {
   Widget _buildNode(BuildContext context, PlanDayData dayData, bool isCompleted,
       bool isToday) {
     final bool isMilestone = dayData.day % 7 == 0;
+    final l10n = context.l10n;
+    var semanticLabel = dayData.title == 'Day ${dayData.day}'
+        ? l10n.plansDayN(dayData.day)
+        : dayData.title;
+    if (isCompleted) {
+      semanticLabel = l10n.plansCalendarDayComplete(semanticLabel);
+    }
+    if (isToday) semanticLabel = l10n.plansCalendarDayToday(semanticLabel);
 
-    return GestureDetector(
-      onTap: () {
-        // The per-day screen shipped with the retired plan browser; the
-        // V2 plan detail is the live equivalent for this plan.
-        Navigator.of(context).push(CupertinoPageRoute<void>(
-          builder: (_) => ReadingPlanDetailV2Screen(planId: planId),
-        ));
-      },
-      child: Stack(
-        clipBehavior: Clip.none,
-        alignment: Alignment.center,
-        children: [
-          Container(
-            width: 80,
-            height: 80, // fixed height helps path calculation
-            decoration: BoxDecoration(
-              color: isCompleted
-                  ? AppColors.goldAccent
-                  : (isToday
-                      ? AppColors.goldAccent.withValues(alpha: 0.15)
-                      : theme.colorScheme.surface),
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: isCompleted
-                      ? AppColors.goldAccent.withValues(alpha: 0.4)
-                      : (isToday
-                          ? AppColors.goldAccent.withValues(alpha: 0.4)
-                          : theme.shadowColor.withValues(alpha: 0.05)),
-                  blurRadius: isToday ? 20 : 12,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-              border: Border.all(
+    return Semantics(
+      button: true,
+      label: semanticLabel,
+      excludeSemantics: true,
+      child: GestureDetector(
+        onTap: () {
+          // The per-day screen shipped with the retired plan browser; the
+          // V2 plan detail is the live equivalent for this plan.
+          Navigator.of(context).push(CupertinoPageRoute<void>(
+            builder: (_) => ReadingPlanDetailV2Screen(planId: planId),
+          ));
+        },
+        child: Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.center,
+          children: [
+            Container(
+              width: 80,
+              height: 80, // fixed height helps path calculation
+              decoration: BoxDecoration(
                 color: isCompleted
                     ? AppColors.goldAccent
                     : (isToday
-                        ? AppColors.goldAccent
-                        : theme.dividerColor.withValues(alpha: 0.15)),
-                width: isCompleted ? 0 : 4,
+                        ? AppColors.goldAccent.withValues(alpha: 0.15)
+                        : theme.colorScheme.surface),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: isCompleted
+                        ? AppColors.goldAccent.withValues(alpha: 0.4)
+                        : (isToday
+                            ? AppColors.goldAccent.withValues(alpha: 0.4)
+                            : theme.shadowColor.withValues(alpha: 0.05)),
+                    blurRadius: isToday ? 20 : 12,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+                border: Border.all(
+                  color: isCompleted
+                      ? AppColors.goldAccent
+                      : (isToday
+                          ? AppColors.goldAccent
+                          : theme.dividerColor.withValues(alpha: 0.15)),
+                  width: isCompleted ? 0 : 4,
+                ),
               ),
-            ),
-            child: Center(
-              child: isCompleted
-                  ? Icon(
-                      isMilestone
-                          ? Icons.emoji_events_rounded
-                          : Icons.check_rounded,
-                      // Fixed: icon on the fixed gold completed-day badge.
-                      color: Colors.white,
-                      size: 40)
-                  : (isMilestone
-                      ? Icon(Icons.emoji_events_rounded,
-                          color: isToday
-                              ? AppColors.goldAccent
-                              : theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.3),
-                          size: 36)
-                      : Text(
-                          '${dayData.day}',
-                          style: theme.textTheme.titleLarge?.copyWith(
+              child: Center(
+                child: isCompleted
+                    ? Icon(
+                        isMilestone
+                            ? Icons.emoji_events_rounded
+                            : Icons.check_rounded,
+                        // Fixed: icon on the fixed gold completed-day badge.
+                        color: Colors.white,
+                        size: 40)
+                    : (isMilestone
+                        ? Icon(Icons.emoji_events_rounded,
                             color: isToday
                                 ? AppColors.goldAccent
                                 : theme.colorScheme.onSurface
-                                    .withValues(alpha: 0.4),
-                            fontWeight: FontWeight.bold,
-                          ),
-                        )),
-            ),
-          ),
-          Positioned(
-            bottom: -32,
-            child: Text(
-              // Custom plans store a generated English "Day N" title.
-              dayData.title == 'Day ${dayData.day}'
-                  ? context.l10n.plansDayN(dayData.day)
-                  : dayData.title,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.labelMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: (isToday || isCompleted)
-                    ? AppColors.goldAccent
-                    : theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                                    .withValues(alpha: 0.3),
+                            size: 36)
+                        : Text(
+                            '${dayData.day}',
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              color: isToday
+                                  ? AppColors.goldAccent
+                                  : theme.colorScheme.onSurface
+                                      .withValues(alpha: 0.4),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )),
               ),
             ),
-          ),
-        ],
+            Positioned(
+              bottom: -32,
+              child: Text(
+                // Custom plans store a generated English "Day N" title.
+                dayData.title == 'Day ${dayData.day}'
+                    ? context.l10n.plansDayN(dayData.day)
+                    : dayData.title,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: (isToday || isCompleted)
+                      ? AppColors.goldAccent
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

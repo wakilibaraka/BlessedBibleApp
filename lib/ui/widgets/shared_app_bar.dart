@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/l10n.dart';
+
 class SharedAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? title;
   final Widget? leading;
@@ -35,6 +37,7 @@ class SharedAppBar extends StatelessWidget implements PreferredSizeWidget {
       finalLeading = Padding(
         padding: const EdgeInsets.only(left: 16.0),
         child: IconButton(
+          tooltip: context.l10n.commonBack,
           icon: Icon(Icons.arrow_back_ios_new_rounded,
               color: Theme.of(context).primaryColor),
           onPressed: () => Navigator.of(context).maybePop(),

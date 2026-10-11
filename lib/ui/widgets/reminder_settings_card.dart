@@ -110,10 +110,13 @@ class ReminderSettingsCard extends ConsumerWidget {
         style:
             theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
       ),
-      subtitle: GestureDetector(
-        onTap: onTimeTap,
-        child: Padding(
-          padding: const EdgeInsets.only(top: 4.0),
+      // The whole row opens the time picker: the time text alone was far
+      // smaller than a 48 dp touch target.
+      onTap: onTimeTap,
+      subtitle: Padding(
+        padding: const EdgeInsets.only(top: 4.0),
+        child: Semantics(
+          label: context.l10n.onboardingReminderTime,
           child: Text(
             time.format(context),
             style: theme.textTheme.bodySmall?.copyWith(

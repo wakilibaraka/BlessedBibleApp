@@ -51,7 +51,7 @@ class _ReadingPlanDetailV2ScreenState
       if (ctx != null) {
         Scrollable.ensureVisible(
           ctx,
-          duration: const Duration(milliseconds: 350),
+          duration: Motion.of(context, const Duration(milliseconds: 350)),
           alignment: 0.05,
         );
       }
@@ -296,6 +296,7 @@ class _ReadingPlanDetailV2ScreenState
           title: Text(_title()),
           actions: [
             IconButton(
+              tooltip: context.l10n.plansSettings,
               icon: const Icon(Icons.more_horiz_rounded),
               onPressed: () => _showPlanSettings(plan),
             ),
@@ -394,33 +395,39 @@ class _ReadingPlanDetailV2ScreenState
                             children: ['scheduled', 'flexible'].map((m) {
                               final on = plan.paceMode == m;
                               return Expanded(
-                                child: GestureDetector(
-                                  onTap: () {
-                                    HapticFeedback.selectionClick();
-                                    notifier.setPaceMode(m);
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 10),
-                                    decoration: BoxDecoration(
-                                      color: on
-                                          ? theme.colorScheme.onSurface
-                                          : Colors.transparent,
-                                      borderRadius:
-                                          BorderRadius.circular(Radii.pill),
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      m == 'scheduled'
-                                          ? context.l10n.plansScheduled
-                                          : context.l10n.plansFlexible,
-                                      style:
-                                          theme.textTheme.labelLarge?.copyWith(
-                                        fontWeight: FontWeight.w800,
+                                child: Semantics(
+                                  button: true,
+                                  selected: on,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      HapticFeedback.selectionClick();
+                                      notifier.setPaceMode(m);
+                                    },
+                                    child: Container(
+                                      constraints: const BoxConstraints(
+                                          minHeight: kMinTouchTarget),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10),
+                                      decoration: BoxDecoration(
                                         color: on
-                                            ? theme.colorScheme.surface
-                                            : theme.colorScheme.onSurface
-                                                .withValues(alpha: 0.7),
+                                            ? theme.colorScheme.onSurface
+                                            : Colors.transparent,
+                                        borderRadius:
+                                            BorderRadius.circular(Radii.pill),
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        m == 'scheduled'
+                                            ? context.l10n.plansScheduled
+                                            : context.l10n.plansFlexible,
+                                        style: theme.textTheme.labelLarge
+                                            ?.copyWith(
+                                          fontWeight: FontWeight.w800,
+                                          color: on
+                                              ? theme.colorScheme.surface
+                                              : theme.colorScheme.onSurface
+                                                  .withValues(alpha: 0.7),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -545,7 +552,6 @@ class _ReadingPlanDetailV2ScreenState
                                 ),
                               ),
                               IconButton(
-                                visualDensity: VisualDensity.compact,
                                 icon: const Icon(Icons.map_rounded),
                                 tooltip: context.l10n.plansJourneyMap,
                                 onPressed: () {
@@ -558,7 +564,6 @@ class _ReadingPlanDetailV2ScreenState
                                 },
                               ),
                               IconButton(
-                                visualDensity: VisualDensity.compact,
                                 icon: const Icon(Icons.today_rounded),
                                 tooltip: context.l10n.plansJumpToToday,
                                 onPressed: () {
@@ -982,83 +987,88 @@ class _DayRow extends StatelessWidget {
             ? theme.primaryColor.withValues(alpha: 0.08)
             : Colors.transparent,
         borderRadius: BorderRadius.circular(Radii.lg),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(Radii.lg),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
-            child: Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: done ? theme.primaryColor : Colors.transparent,
-                    border: Border.all(
-                      color: statusColor,
-                      width: (isToday || done) ? 2 : 1.5,
+        child: Semantics(
+          selected: isSelected,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(Radii.lg),
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+              child: Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: done ? theme.primaryColor : Colors.transparent,
+                      border: Border.all(
+                        color: statusColor,
+                        width: (isToday || done) ? 2 : 1.5,
+                      ),
                     ),
+                    alignment: Alignment.center,
+                    child: done
+                        ? Icon(
+                            Icons.check_rounded,
+                            size: 20,
+                            color: theme.colorScheme.surface,
+                          )
+                        : FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              '$day',
+                              style: theme.textTheme.labelLarge?.copyWith(
+                                fontWeight: FontWeight.w800,
+                                color: (isToday || isMissed)
+                                    ? statusColor
+                                    : theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.65),
+                              ),
+                            ),
+                          ),
                   ),
-                  alignment: Alignment.center,
-                  child: done
-                      ? Icon(
-                          Icons.check_rounded,
-                          size: 20,
-                          color: theme.colorScheme.surface,
-                        )
-                      : Text(
-                          '$day',
-                          style: theme.textTheme.labelLarge?.copyWith(
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          dateLabel,
+                          style: theme.textTheme.labelSmall?.copyWith(
                             fontWeight: FontWeight.w800,
-                            color: (isToday || isMissed)
-                                ? statusColor
-                                : theme.colorScheme.onSurface
-                                    .withValues(alpha: 0.65),
+                            letterSpacing: 0.8,
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.6),
                           ),
                         ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        dateLabel,
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.8,
-                          color: theme.colorScheme.onSurface
-                              .withValues(alpha: 0.6),
+                        const SizedBox(height: 2),
+                        Text(
+                          summary,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        summary,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                IconButton(
-                  visualDensity: VisualDensity.compact,
-                  tooltip: done
-                      ? context.l10n.plansMarkUnread
-                      : context.l10n.plansMarkRead,
-                  icon: Icon(
-                    done ? Icons.check_circle_rounded : Icons.circle_outlined,
-                    color: done
-                        ? theme.primaryColor
-                        : theme.colorScheme.onSurface.withValues(alpha: 0.35),
+                  IconButton(
+                    tooltip: done
+                        ? context.l10n.plansMarkUnread
+                        : context.l10n.plansMarkRead,
+                    icon: Icon(
+                      done ? Icons.check_circle_rounded : Icons.circle_outlined,
+                      color: done
+                          ? theme.primaryColor
+                          : theme.colorScheme.onSurface.withValues(alpha: 0.35),
+                    ),
+                    onPressed: onToggle,
                   ),
-                  onPressed: onToggle,
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -1180,75 +1190,80 @@ class _DayDetailCardState extends ConsumerState<_DayDetailCard> {
           for (var i = 0; i < dayData.passages.length; i++)
             Padding(
               padding: const EdgeInsets.only(top: 8),
-              child: InkWell(
-                borderRadius: BorderRadius.circular(Radii.lg),
-                onTap: () async {
-                  // Open the passage in the shared study reader; the
-                  // checkbox below tracks it as read for this plan day.
-                  final markedComplete = await Navigator.of(context).push<bool>(
-                    MaterialPageRoute(
-                      builder: (_) => StudyReaderScreen(
-                        payload: StudySessionPayload.plan(
-                          planId: widget.planId,
-                          dayNum: widget.day,
-                          initialPassageIndex: i,
+              child: Semantics(
+                button: true,
+                checked: _checked.contains(i),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(Radii.lg),
+                  onTap: () async {
+                    // Open the passage in the shared study reader; the
+                    // checkbox below tracks it as read for this plan day.
+                    final markedComplete =
+                        await Navigator.of(context).push<bool>(
+                      MaterialPageRoute(
+                        builder: (_) => StudyReaderScreen(
+                          payload: StudySessionPayload.plan(
+                            planId: widget.planId,
+                            dayNum: widget.day,
+                            initialPassageIndex: i,
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                  if (!mounted) return;
-                  setState(() => _checked.add(i));
-                  if (markedComplete == true && !done) {
-                    notifier.markReadingComplete(widget.day);
-                  }
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: _checked.contains(i)
-                        ? theme.primaryColor.withValues(alpha: 0.1)
-                        : theme.colorScheme.onSurface.withValues(alpha: 0.03),
-                    borderRadius: BorderRadius.circular(Radii.lg),
-                    border: Border.all(
+                    );
+                    if (!mounted) return;
+                    setState(() => _checked.add(i));
+                    if (markedComplete == true && !done) {
+                      notifier.markReadingComplete(widget.day);
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
                       color: _checked.contains(i)
-                          ? theme.primaryColor.withValues(alpha: 0.35)
-                          : theme.dividerColor,
+                          ? theme.primaryColor.withValues(alpha: 0.1)
+                          : theme.colorScheme.onSurface.withValues(alpha: 0.03),
+                      borderRadius: BorderRadius.circular(Radii.lg),
+                      border: Border.all(
+                        color: _checked.contains(i)
+                            ? theme.primaryColor.withValues(alpha: 0.35)
+                            : theme.dividerColor,
+                      ),
                     ),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 24,
-                        height: 24,
-                        decoration: BoxDecoration(
-                          color: _checked.contains(i)
-                              ? theme.primaryColor
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(Radii.sm),
-                          border: Border.all(
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
                             color: _checked.contains(i)
                                 ? theme.primaryColor
-                                : theme.dividerColor,
-                            width: 2,
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(Radii.sm),
+                            border: Border.all(
+                              color: _checked.contains(i)
+                                  ? theme.primaryColor
+                                  : theme.dividerColor,
+                              width: 2,
+                            ),
+                          ),
+                          child: _checked.contains(i)
+                              ? Icon(Icons.check_rounded,
+                                  size: 16, color: theme.colorScheme.surface)
+                              : null,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            dayData.passages[i].label,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                        child: _checked.contains(i)
-                            ? Icon(Icons.check_rounded,
-                                size: 16, color: theme.colorScheme.surface)
-                            : null,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          dayData.passages[i].label,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      Icon(Icons.chevron_right_rounded,
-                          color: theme.primaryColor),
-                    ],
+                        Icon(Icons.chevron_right_rounded,
+                            color: theme.primaryColor),
+                      ],
+                    ),
                   ),
                 ),
               ),

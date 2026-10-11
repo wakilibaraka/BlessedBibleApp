@@ -203,7 +203,7 @@ class MainNavScreen extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             AnimatedOpacity(
-                              duration: Motion.normal,
+                              duration: Motion.of(context, Motion.normal),
                               opacity: effectiveNavHidden ? 0.0 : 1.0,
                               alwaysIncludeSemantics: true,
                               child: IgnorePointer(
@@ -243,9 +243,8 @@ class MainNavScreen extends ConsumerWidget {
                                                     .withValues(alpha: 0.2)),
                                           ),
                                           child: Text(
-                                            selectedVerses.length == 1
-                                                ? '1 verse selected'
-                                                : '${selectedVerses.length} verses selected',
+                                            context.l10n.a11yVersesSelected(
+                                                selectedVerses.length),
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .labelSmall
@@ -264,7 +263,7 @@ class MainNavScreen extends ConsumerWidget {
                               ),
                             ),
                             AnimatedContainer(
-                              duration: Motion.slow,
+                              duration: Motion.of(context, Motion.slow),
                               width: effectiveNavHidden
                                   ? 0.0
                                   : kBottomDockGap, // Collapse the gap too!
@@ -279,10 +278,11 @@ class MainNavScreen extends ConsumerWidget {
                                       ref.watch(chromeHiddenProvider))
                                   ? 0.0
                                   : 1.0,
-                              duration: const Duration(milliseconds: 300),
+                              duration: Motion.of(
+                                  context, const Duration(milliseconds: 300)),
                               curve: Curves.easeOutCubic,
                               child: TweenAnimationBuilder<double>(
-                                duration: Motion.slow,
+                                duration: Motion.of(context, Motion.slow),
                                 curve: Curves.easeOutCubic,
                                 tween: Tween<double>(
                                   begin: kBottomDockHeight,
@@ -454,6 +454,11 @@ class MainNavScreen extends ConsumerWidget {
                                                           return _buildColorDot(
                                                             context,
                                                             color,
+                                                            label:
+                                                                highlightPaletteName(
+                                                                    i,
+                                                                    context
+                                                                        .l10n),
                                                             isSelected:
                                                                 allHaveThisColor,
                                                             onTap: () {
@@ -512,8 +517,10 @@ class MainNavScreen extends ConsumerWidget {
                                                 alignment:
                                                     Alignment.bottomCenter,
                                                 child: AnimatedSwitcher(
-                                                  duration: const Duration(
-                                                      milliseconds: 300),
+                                                  duration: Motion.of(
+                                                      context,
+                                                      const Duration(
+                                                          milliseconds: 300)),
                                                   child: isClassicAction
                                                       ? _buildActionMenuIcons(
                                                           context,
@@ -526,12 +533,19 @@ class MainNavScreen extends ConsumerWidget {
                                                               kBottomDockHeight,
                                                           child: Center(
                                                             child: IconButton(
+                                                              tooltip: _fabTooltip(
+                                                                  context,
+                                                                  ref,
+                                                                  currentIndex,
+                                                                  selectedVerses
+                                                                      .isNotEmpty),
                                                               icon:
                                                                   AnimatedSwitcher(
-                                                                duration:
+                                                                duration: Motion.of(
+                                                                    context,
                                                                     const Duration(
                                                                         milliseconds:
-                                                                            300),
+                                                                            300)),
                                                                 transitionBuilder: (Widget
                                                                         child,
                                                                     Animation<
@@ -624,6 +638,21 @@ class MainNavScreen extends ConsumerWidget {
             ),
           ),
         ));
+  }
+
+  /// What the contextual FAB does right now, for its tooltip and screen
+  /// reader label (mirrors [_handleFabTap]).
+  String _fabTooltip(BuildContext context, WidgetRef ref, int currentIndex,
+      bool hasSelection) {
+    final l10n = context.l10n;
+    if (currentIndex == 1 && hasSelection) return l10n.commonClose;
+    return switch (currentIndex) {
+      0 => l10n.settingsTitle,
+      1 => ref.watch(navHiddenProvider) ? l10n.a11yShowNav : l10n.a11yHideNav,
+      2 => l10n.settingsSearchSettings,
+      3 => l10n.todayActionSurprise,
+      _ => l10n.navHome,
+    };
   }
 
   Widget _buildFabIcon(int currentIndex, WidgetRef ref) {
@@ -746,7 +775,7 @@ class MainNavScreen extends ConsumerWidget {
       if (!isAction) {
         if (navIndex == 3) {
           return TweenAnimationBuilder<double>(
-            duration: const Duration(milliseconds: 300),
+            duration: Motion.of(context, const Duration(milliseconds: 300)),
             curve: Curves.easeOutCubic,
             tween: Tween<double>(begin: 0.0, end: isActiveNav ? 0.2 : 0.0),
             builder: (context, rotation, child) =>
@@ -755,7 +784,7 @@ class MainNavScreen extends ConsumerWidget {
           );
         } else if (navIndex == 2) {
           return TweenAnimationBuilder<double>(
-            duration: const Duration(milliseconds: 300),
+            duration: Motion.of(context, const Duration(milliseconds: 300)),
             curve: Curves.easeOutBack,
             tween: Tween<double>(begin: 1.0, end: isActiveNav ? 1.2 : 1.0),
             builder: (context, scale, child) =>
@@ -767,63 +796,71 @@ class MainNavScreen extends ConsumerWidget {
       return Icon(currentIcon, color: currentColor, size: 24);
     }
 
+    void activate() {
+      if (isAction) {
+        onActionTap();
+      } else {
+        _changeTab(navIndex, ref, context);
+      }
+    }
+
     return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          if (isAction) {
-            onActionTap();
-          } else {
-            _changeTab(navIndex, ref, context);
-          }
-        },
-        onLongPress: isAction ? onActionLongPress : null,
-        behavior: HitTestBehavior.opaque,
-        child: MediaQuery(
-          data: MediaQuery.of(context).copyWith(
-            textScaler: MediaQuery.textScalerOf(context)
-                .clamp(minScaleFactor: 1.0, maxScaleFactor: 1.3),
-          ),
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  transitionBuilder: (child, anim) => FadeTransition(
-                      opacity: anim,
-                      alwaysIncludeSemantics: true,
-                      child: child),
-                  child: KeyedSubtree(
-                    key:
-                        ValueKey('${isAction ? 'action' : 'nav'}_$currentIcon'),
-                    child: buildIcon(),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  transitionBuilder: (child, anim) => FadeTransition(
-                      opacity: anim,
-                      alwaysIncludeSemantics: true,
-                      child: child),
-                  child: Text(
-                    currentLabel,
-                    key: ValueKey(currentLabel),
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      fontFamily: 'Inter',
-                      color: currentColor,
-                      fontWeight: isNavActiveStyle
-                          ? FontWeight.bold
-                          : FontWeight.normal,
+      child: Semantics(
+        button: true,
+        selected: isNavActiveStyle,
+        child: GestureDetector(
+          onTap: activate,
+          onLongPress: isAction ? onActionLongPress : null,
+          behavior: HitTestBehavior.opaque,
+          child: MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              textScaler: MediaQuery.textScalerOf(context)
+                  .clamp(minScaleFactor: 1.0, maxScaleFactor: 1.3),
+            ),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  AnimatedSwitcher(
+                    duration:
+                        Motion.of(context, const Duration(milliseconds: 300)),
+                    transitionBuilder: (child, anim) => FadeTransition(
+                        opacity: anim,
+                        alwaysIncludeSemantics: true,
+                        child: child),
+                    child: KeyedSubtree(
+                      key: ValueKey(
+                          '${isAction ? 'action' : 'nav'}_$currentIcon'),
+                      child: buildIcon(),
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 4),
+                  AnimatedSwitcher(
+                    duration:
+                        Motion.of(context, const Duration(milliseconds: 300)),
+                    transitionBuilder: (child, anim) => FadeTransition(
+                        opacity: anim,
+                        alwaysIncludeSemantics: true,
+                        child: child),
+                    child: Text(
+                      currentLabel,
+                      key: ValueKey(currentLabel),
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        fontFamily: 'Inter',
+                        color: currentColor,
+                        fontWeight: isNavActiveStyle
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -843,41 +880,48 @@ class MainNavScreen extends ConsumerWidget {
   }
 
   Widget _buildColorDot(BuildContext context, Color color,
-      {bool isSelected = false, VoidCallback? onTap}) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: Container(
-        width: 32,
-        height: 32,
-        alignment: Alignment.center,
+      {required String label, bool isSelected = false, VoidCallback? onTap}) {
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: label,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        // 44 dp hit area (5 swatches must fit a narrow phone); the dot
+        // itself stays 20 dp.
         child: Container(
-          width: 20,
-          height: 20,
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.8),
-            shape: BoxShape.circle,
-            // Highlight swatch ring: white reads against every swatch
-            // colour, so it stays fixed across themes.
-            border: Border.all(
-              color: isSelected
-                  ? Colors.white
-                  : Colors.white.withValues(alpha: 0.35),
-              width: isSelected ? 2 : 1,
+          width: kMinTouchTarget - 4,
+          height: kMinTouchTarget - 4,
+          alignment: Alignment.center,
+          child: Container(
+            width: 20,
+            height: 20,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.8),
+              shape: BoxShape.circle,
+              // Highlight swatch ring: white reads against every swatch
+              // colour, so it stays fixed across themes.
+              border: Border.all(
+                color: isSelected
+                    ? Colors.white
+                    : Colors.white.withValues(alpha: 0.35),
+                width: isSelected ? 2 : 1,
+              ),
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                          color: color.withValues(alpha: 0.4),
+                          blurRadius: 4,
+                          spreadRadius: 2)
+                    ]
+                  : [
+                      BoxShadow(
+                          color: context.palette.shadow,
+                          blurRadius: 4,
+                          spreadRadius: 1)
+                    ],
             ),
-            boxShadow: isSelected
-                ? [
-                    BoxShadow(
-                        color: color.withValues(alpha: 0.4),
-                        blurRadius: 4,
-                        spreadRadius: 2)
-                  ]
-                : [
-                    BoxShadow(
-                        color: context.palette.shadow,
-                        blurRadius: 4,
-                        spreadRadius: 1)
-                  ],
           ),
         ),
       ),
@@ -959,10 +1003,8 @@ class MainNavScreen extends ConsumerWidget {
           if (showCloseIcon) ...[
             const SizedBox(height: 2),
             IconButton(
+              tooltip: context.l10n.commonClose,
               icon: const Icon(Icons.close_rounded, size: 20),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-              visualDensity: VisualDensity.compact,
               color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
               onPressed: () => ref.read(readSelectionProvider.notifier).clear(),
             ),
@@ -1178,7 +1220,7 @@ class MainNavScreen extends ConsumerWidget {
       {required Key key, required double dockMaxWidth, required Widget child}) {
     return TweenAnimationBuilder<BorderRadius?>(
       key: key,
-      duration: Motion.slow,
+      duration: Motion.slow, // begin == end: never animates
       curve: Curves.easeOutCubic,
       tween: BorderRadiusTween(
         begin: BorderRadius.circular(kBottomDockHeight / 2),
@@ -1242,6 +1284,7 @@ class MainNavScreen extends ConsumerWidget {
                 highlightPaletteSwatches[paletteIndex],
                 theme.brightness,
                 theme.scaffoldBackgroundColor),
+            label: highlightPaletteName(paletteIndex, context.l10n),
             isSelected: allHaveThisColor,
             onTap: () {
               Future(() {
@@ -1359,6 +1402,11 @@ class _CastingLotsDialogState extends State<CastingLotsDialog>
               AnimatedBuilder(
                 animation: _controller,
                 builder: (context, child) {
+                  // Reduced motion: the dialog still shows for its time,
+                  // but the die does not spin.
+                  if (MediaQuery.maybeDisableAnimationsOf(context) ?? false) {
+                    return child!;
+                  }
                   return Transform.scale(
                     scale: _scale.value,
                     child: Transform.rotate(

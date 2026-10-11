@@ -300,51 +300,56 @@ class _BookChapterSelectorSheetState
       SelectionMode targetMode, SelectionMode currentMode, ThemeData theme) {
     final isSelected = currentMode == targetMode;
     return Expanded(
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () => ref.read(_sheetStateProvider.notifier).setMode(targetMode),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          decoration: BoxDecoration(
-            color: isSelected ? theme.primaryColor : Colors.transparent,
-            borderRadius: BorderRadius.circular(Radii.xxxl),
-            boxShadow: isSelected
-                ? [
-                    BoxShadow(
-                        color: theme.primaryColor.withValues(alpha: 0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2))
-                  ]
-                : [],
-          ),
-          child: Column(
-            children: [
-              Text(
-                label.toUpperCase(),
-                style: theme.textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1,
-                  fontFamily: theme.textTheme.bodyMedium?.fontFamily,
-                  color: isSelected
-                      ? context.palette.onAccent.withValues(alpha: 0.8)
-                      : theme.colorScheme.onSurface.withValues(alpha: 0.5),
+      child: Semantics(
+        button: true,
+        selected: isSelected,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () =>
+              ref.read(_sheetStateProvider.notifier).setMode(targetMode),
+          child: AnimatedContainer(
+            duration: Motion.of(context, const Duration(milliseconds: 200)),
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            decoration: BoxDecoration(
+              color: isSelected ? theme.primaryColor : Colors.transparent,
+              borderRadius: BorderRadius.circular(Radii.xxxl),
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                          color: theme.primaryColor.withValues(alpha: 0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2))
+                    ]
+                  : [],
+            ),
+            child: Column(
+              children: [
+                Text(
+                  label.toUpperCase(),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1,
+                    fontFamily: theme.textTheme.bodyMedium?.fontFamily,
+                    color: isSelected
+                        ? context.palette.onAccent.withValues(alpha: 0.8)
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: theme.textTheme.labelMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontFamily: theme.textTheme.bodyMedium?.fontFamily,
-                  color: isSelected
-                      ? context.palette.onAccent
-                      : theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontFamily: theme.textTheme.bodyMedium?.fontFamily,
+                    color: isSelected
+                        ? context.palette.onAccent
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -607,45 +612,48 @@ class _BookChapterSelectorSheetState
                   (context, index) {
                     final p = chapterPericopes[index];
                     final isSel = p.startVerse == selectedVerse;
-                    return InkWell(
-                      borderRadius: BorderRadius.circular(Radii.md),
-                      onTap: () => _onVerseSelected(p.startVerse, settings),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12),
-                        margin: const EdgeInsets.only(bottom: 8),
-                        decoration: BoxDecoration(
-                          color: isSel
-                              ? theme.primaryColor
-                              : theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.05),
-                          borderRadius: BorderRadius.circular(Radii.md),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                p.title,
-                                style: theme.textTheme.titleSmall?.copyWith(
-                                  color: isSel
-                                      ? theme.colorScheme.onPrimary
-                                      : theme.colorScheme.onSurface,
-                                  fontWeight: FontWeight.w600,
+                    return Semantics(
+                      selected: isSel,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(Radii.md),
+                        onTap: () => _onVerseSelected(p.startVerse, settings),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
+                          margin: const EdgeInsets.only(bottom: 8),
+                          decoration: BoxDecoration(
+                            color: isSel
+                                ? theme.primaryColor
+                                : theme.colorScheme.onSurface
+                                    .withValues(alpha: 0.05),
+                            borderRadius: BorderRadius.circular(Radii.md),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  p.title,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    color: isSel
+                                        ? theme.colorScheme.onPrimary
+                                        : theme.colorScheme.onSurface,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            Text(
-                              'v. ${p.startVerse}',
-                              style: theme.textTheme.labelMedium?.copyWith(
-                                color: isSel
-                                    ? theme.colorScheme.onPrimary
-                                        .withValues(alpha: 0.7)
-                                    : theme.colorScheme.primary,
-                                fontWeight: FontWeight.bold,
+                              const SizedBox(width: 12),
+                              Text(
+                                'v. ${p.startVerse}',
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  color: isSel
+                                      ? theme.colorScheme.onPrimary
+                                          .withValues(alpha: 0.7)
+                                      : theme.colorScheme.primary,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     );
@@ -758,44 +766,53 @@ class _BookChapterSelectorSheetState
             ),
     );
 
+    // Book rows are 44 dp tall (dense list); every other tile is larger.
     if (!isSelected) {
-      return GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: onTap,
-        child: Container(
-          decoration: BoxDecoration(
-            color: backgroundColor ??
-                theme.colorScheme.surface.withValues(alpha: 0.8),
-            borderRadius: BorderRadius.circular(Radii.lg),
-            border: Border.all(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-              width: 1,
+      return Semantics(
+        button: true,
+        selected: false,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onTap,
+          child: Container(
+            decoration: BoxDecoration(
+              color: backgroundColor ??
+                  theme.colorScheme.surface.withValues(alpha: 0.8),
+              borderRadius: BorderRadius.circular(Radii.lg),
+              border: Border.all(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                width: 1,
+              ),
             ),
-          ),
-          child: Center(
-            child: textWidget,
+            child: Center(
+              child: textWidget,
+            ),
           ),
         ),
       );
     }
 
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: theme.primaryColor,
-          borderRadius: BorderRadius.circular(Radii.lg),
-          boxShadow: [
-            BoxShadow(
-                color: theme.primaryColor.withValues(alpha: 0.4),
-                blurRadius: 8,
-                offset: const Offset(0, 3))
-          ],
+    return Semantics(
+      button: true,
+      selected: true,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: Motion.of(context, const Duration(milliseconds: 200)),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: theme.primaryColor,
+            borderRadius: BorderRadius.circular(Radii.lg),
+            boxShadow: [
+              BoxShadow(
+                  color: theme.primaryColor.withValues(alpha: 0.4),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3))
+            ],
+          ),
+          child: textWidget,
         ),
-        child: textWidget,
       ),
     );
   }

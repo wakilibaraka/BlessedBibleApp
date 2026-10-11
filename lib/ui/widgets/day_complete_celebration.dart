@@ -76,6 +76,7 @@ class _DayCompleteCelebrationState extends State<DayCompleteCelebration>
 
   @override
   Widget build(BuildContext context) {
+    final reduceMotion = Motion.of(context, Motion.normal) == Duration.zero;
     return Material(
       color: Colors.black45,
       child: GestureDetector(
@@ -92,7 +93,9 @@ class _DayCompleteCelebrationState extends State<DayCompleteCelebration>
                 return FadeTransition(
                   opacity: _fadeAnimation,
                   child: ScaleTransition(
-                    scale: _scaleAnimation,
+                    scale: reduceMotion
+                        ? const AlwaysStoppedAnimation<double>(1.0)
+                        : _scaleAnimation,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 40, vertical: 32),
@@ -135,25 +138,26 @@ class _DayCompleteCelebrationState extends State<DayCompleteCelebration>
                 );
               },
             ),
-            Align(
-              alignment: Alignment.topCenter,
-              child: ConfettiWidget(
-                confettiController: _confettiController,
-                blastDirection: 3.14159 / 2, // straight down
-                maxBlastForce: 5,
-                minBlastForce: 2,
-                emissionFrequency: 0.05,
-                numberOfParticles: 50,
-                gravity: 0.2,
-                colors: const [
-                  Colors.green,
-                  Colors.blue,
-                  Colors.pink,
-                  Colors.orange,
-                  Colors.purple
-                ],
+            if (!reduceMotion)
+              Align(
+                alignment: Alignment.topCenter,
+                child: ConfettiWidget(
+                  confettiController: _confettiController,
+                  blastDirection: 3.14159 / 2, // straight down
+                  maxBlastForce: 5,
+                  minBlastForce: 2,
+                  emissionFrequency: 0.05,
+                  numberOfParticles: 50,
+                  gravity: 0.2,
+                  colors: const [
+                    Colors.green,
+                    Colors.blue,
+                    Colors.pink,
+                    Colors.orange,
+                    Colors.purple
+                  ],
+                ),
               ),
-            ),
           ],
         ),
       ),

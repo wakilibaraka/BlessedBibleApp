@@ -16,6 +16,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -526,6 +527,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 IconButton(
+                                  tooltip: context.l10n.commonBack,
                                   icon: const Icon(Icons.arrow_back_rounded,
                                       size: 22),
                                   padding: const EdgeInsets.symmetric(
@@ -566,35 +568,55 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                                 ),
                                 const SizedBox(width: 90), // Clear center area
                                 // Full chapter toggle — compact pill
-                                GestureDetector(
-                                  onTap: () => setState(() =>
-                                      _showFullChapter = !_showFullChapter),
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 200),
-                                    margin: const EdgeInsets.only(right: 12),
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10, vertical: 5),
-                                    decoration: BoxDecoration(
-                                      color: _showFullChapter
-                                          ? gold.withValues(alpha: 0.15)
-                                          : Colors.transparent,
-                                      border: Border.all(
-                                          color: _showFullChapter
-                                              ? gold
-                                              : theme.dividerColor,
-                                          width: 1),
-                                      borderRadius:
-                                          BorderRadius.circular(Radii.lg),
-                                    ),
-                                    child: Text(
-                                      context.l10n.studyFullChapter,
-                                      style: TextStyle(
-                                        fontSize: TypeScale.caption,
-                                        fontWeight: FontWeight.w600,
-                                        color: _showFullChapter
-                                            ? gold
-                                            : theme.colorScheme.onSurface
-                                                .withValues(alpha: 0.5),
+                                Semantics(
+                                  button: true,
+                                  toggled: _showFullChapter,
+                                  child: GestureDetector(
+                                    behavior: HitTestBehavior.opaque,
+                                    onTap: () => setState(() =>
+                                        _showFullChapter = !_showFullChapter),
+                                    // Invisible hit padding: 48dp target.
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(right: 12),
+                                      child: ConstrainedBox(
+                                        constraints: const BoxConstraints(
+                                            minHeight: kMinTouchTarget),
+                                        child: Center(
+                                          widthFactor: 1,
+                                          child: AnimatedContainer(
+                                            duration: Motion.of(
+                                                context,
+                                                const Duration(
+                                                    milliseconds: 200)),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10, vertical: 5),
+                                            decoration: BoxDecoration(
+                                              color: _showFullChapter
+                                                  ? gold.withValues(alpha: 0.15)
+                                                  : Colors.transparent,
+                                              border: Border.all(
+                                                  color: _showFullChapter
+                                                      ? gold
+                                                      : theme.dividerColor,
+                                                  width: 1),
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      Radii.lg),
+                                            ),
+                                            child: Text(
+                                              context.l10n.studyFullChapter,
+                                              style: TextStyle(
+                                                fontSize: TypeScale.caption,
+                                                fontWeight: FontWeight.w600,
+                                                color: _showFullChapter
+                                                    ? gold
+                                                    : theme
+                                                        .colorScheme.onSurface
+                                                        .withValues(alpha: 0.5),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -652,6 +674,25 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                           final isSelected =
                               _selectedVerses.contains(verse.number);
                           final isBookmarked = bookmarks.contains(verseKey);
+                          void openVerseMenu() {
+                            showModalBottomSheet<void>(
+                              context: context,
+                              backgroundColor: Colors.transparent,
+                              useRootNavigator: true,
+                              builder: (ctx) => VerseContextMenuSheet(
+                                verseNumber: verse.number,
+                                bookName: passage.book.name,
+                                chapterNum: passage.chapterNum,
+                                bookNumber: ref
+                                        .read(bibleProvider)
+                                        .books
+                                        .indexOf(passage.book) +
+                                    1,
+                                onCustomSelection: () {},
+                              ),
+                            );
+                          }
+
                           final savedColorIdx = highlights[verseKey];
                           Color? highlightColor;
                           if (savedColorIdx != null &&
@@ -731,123 +772,121 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                                   ),
                                 ),
                               ],
-                              GestureDetector(
-                                onTap: () =>
-                                    _toggleVerseSelection(verse.number),
-                                onDoubleTap: () {
-                                  HapticFeedback.lightImpact();
-                                  VerseActionLogic.handleBookmark(
-                                      context,
-                                      theme,
-                                      ref,
-                                      passage.book.name,
-                                      passage.chapterNum,
-                                      [verse.number]);
+                              Semantics(
+                                selected: isSelected,
+                                // Screen readers reach the long-press menu
+                                // by name.
+                                customSemanticsActions: {
+                                  CustomSemanticsAction(
+                                          label: context.l10n.spaceMore):
+                                      openVerseMenu,
                                 },
-                                onLongPress: () {
-                                  HapticFeedback.mediumImpact();
-                                  showModalBottomSheet<void>(
-                                    context: context,
-                                    backgroundColor: Colors.transparent,
-                                    useRootNavigator: true,
-                                    builder: (ctx) => VerseContextMenuSheet(
-                                      verseNumber: verse.number,
-                                      bookName: passage.book.name,
-                                      chapterNum: passage.chapterNum,
-                                      bookNumber: ref
-                                              .read(bibleProvider)
-                                              .books
-                                              .indexOf(passage.book) +
-                                          1,
-                                      onCustomSelection: () {},
+                                child: GestureDetector(
+                                  onTap: () =>
+                                      _toggleVerseSelection(verse.number),
+                                  onDoubleTap: () {
+                                    HapticFeedback.lightImpact();
+                                    VerseActionLogic.handleBookmark(
+                                        context,
+                                        theme,
+                                        ref,
+                                        passage.book.name,
+                                        passage.chapterNum,
+                                        [verse.number]);
+                                  },
+                                  onLongPress: () {
+                                    HapticFeedback.mediumImpact();
+                                    openVerseMenu();
+                                  },
+                                  child: AnimatedContainer(
+                                    duration: Motion.of(context,
+                                        const Duration(milliseconds: 200)),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 7),
+                                    margin: const EdgeInsets.only(bottom: 2),
+                                    decoration: BoxDecoration(
+                                      color: isSelected
+                                          ? (highlightColor != null
+                                              ? highlightColor.withValues(
+                                                  alpha: 0.4)
+                                              : theme.primaryColor
+                                                  .withValues(alpha: 0.15))
+                                          : (highlightColor != null
+                                              ? highlightColor.withValues(
+                                                  alpha: 0.3)
+                                              : Colors.transparent),
+                                      borderRadius:
+                                          BorderRadius.circular(Radii.sm),
                                     ),
-                                  );
-                                },
-                                child: AnimatedContainer(
-                                  duration: const Duration(milliseconds: 200),
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 12, vertical: 7),
-                                  margin: const EdgeInsets.only(bottom: 2),
-                                  decoration: BoxDecoration(
-                                    color: isSelected
-                                        ? (highlightColor != null
-                                            ? highlightColor.withValues(
-                                                alpha: 0.4)
-                                            : theme.primaryColor
-                                                .withValues(alpha: 0.15))
-                                        : (highlightColor != null
-                                            ? highlightColor.withValues(
-                                                alpha: 0.3)
-                                            : Colors.transparent),
-                                    borderRadius:
-                                        BorderRadius.circular(Radii.sm),
-                                  ),
-                                  child: Builder(builder: (ctx) {
-                                    final fontStyle = TextStyle(
-                                      fontFamily: typography.fontFamily,
-                                      fontStyle: typography.fontStyle,
-                                      fontSize: typography.fontSize,
-                                      height: typography.lineHeight,
-                                      letterSpacing: 0.15,
-                                      color: theme.textTheme.bodyLarge?.color,
-                                      decoration: isBookmarked
-                                          ? TextDecoration.underline
-                                          : null,
-                                      decorationColor: isBookmarked
-                                          ? theme.primaryColor
-                                          : null,
-                                      decorationThickness: 2.0,
-                                    );
+                                    child: Builder(builder: (ctx) {
+                                      final fontStyle = TextStyle(
+                                        fontFamily: typography.fontFamily,
+                                        fontStyle: typography.fontStyle,
+                                        fontSize: typography.fontSize,
+                                        height: typography.lineHeight,
+                                        letterSpacing: 0.15,
+                                        color: theme.textTheme.bodyLarge?.color,
+                                        decoration: isBookmarked
+                                            ? TextDecoration.underline
+                                            : null,
+                                        decorationColor: isBookmarked
+                                            ? theme.primaryColor
+                                            : null,
+                                        decorationThickness: 2.0,
+                                      );
 
-                                    final List<TextSpan> spans = [];
-                                    final redStyle = fontStyle.copyWith(
-                                        color: redLetterColor);
-                                    final String text = verse.text;
-                                    int cur = 0;
-                                    while (cur < text.length) {
-                                      final s = text.indexOf('‹', cur);
-                                      if (s == -1) {
+                                      final List<TextSpan> spans = [];
+                                      final redStyle = fontStyle.copyWith(
+                                          color: redLetterColor);
+                                      final String text = verse.text;
+                                      int cur = 0;
+                                      while (cur < text.length) {
+                                        final s = text.indexOf('‹', cur);
+                                        if (s == -1) {
+                                          spans.add(TextSpan(
+                                              text: text.substring(cur),
+                                              style: fontStyle));
+                                          break;
+                                        }
+                                        if (s > cur) {
+                                          spans.add(TextSpan(
+                                              text: text.substring(cur, s),
+                                              style: fontStyle));
+                                        }
+                                        final e = text.indexOf('›', s + 1);
+                                        if (e == -1) {
+                                          spans.add(TextSpan(
+                                              text: text.substring(s + 1),
+                                              style: redStyle));
+                                          break;
+                                        }
                                         spans.add(TextSpan(
-                                            text: text.substring(cur),
-                                            style: fontStyle));
-                                        break;
-                                      }
-                                      if (s > cur) {
-                                        spans.add(TextSpan(
-                                            text: text.substring(cur, s),
-                                            style: fontStyle));
-                                      }
-                                      final e = text.indexOf('›', s + 1);
-                                      if (e == -1) {
-                                        spans.add(TextSpan(
-                                            text: text.substring(s + 1),
+                                            text: text.substring(s + 1, e),
                                             style: redStyle));
-                                        break;
+                                        cur = e + 1;
                                       }
-                                      spans.add(TextSpan(
-                                          text: text.substring(s + 1, e),
-                                          style: redStyle));
-                                      cur = e + 1;
-                                    }
 
-                                    return RichText(
-                                      text: TextSpan(
-                                        style: fontStyle,
-                                        children: [
-                                          TextSpan(
-                                            text: '${verse.number}  ',
-                                            style: fontStyle.copyWith(
-                                              color: theme.primaryColor,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize:
-                                                  typography.fontSize * 0.75,
+                                      return RichText(
+                                        textScaler:
+                                            MediaQuery.textScalerOf(context),
+                                        text: TextSpan(
+                                          style: fontStyle,
+                                          children: [
+                                            TextSpan(
+                                              text: '${verse.number}  ',
+                                              style: fontStyle.copyWith(
+                                                color: theme.primaryColor,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize:
+                                                    typography.fontSize * 0.75,
+                                              ),
                                             ),
-                                          ),
-                                          ...spans,
-                                        ],
-                                      ),
-                                    );
-                                  }),
+                                            ...spans,
+                                          ],
+                                        ),
+                                      );
+                                    }),
+                                  ),
                                 ),
                               ),
                             ],
@@ -863,7 +902,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
               Align(
                 alignment: Alignment.bottomCenter,
                 child: AnimatedSwitcher(
-                  duration: Motion.normal,
+                  duration: Motion.of(context, Motion.normal),
                   switchInCurve: Curves.easeOutCubic,
                   switchOutCurve: Curves.easeInCubic,
                   transitionBuilder: (child, animation) {

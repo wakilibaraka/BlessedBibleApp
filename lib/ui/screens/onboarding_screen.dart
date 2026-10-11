@@ -96,13 +96,21 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     }
   }
 
+  /// Animates to [page], or jumps when the system asks to reduce motion.
+  void _goToPage(int page, Duration duration) {
+    final d = Motion.of(context, duration);
+    if (d == Duration.zero) {
+      _pages.jumpToPage(page);
+    } else {
+      _pages.animateToPage(page, duration: d, curve: Curves.easeOutCubic);
+    }
+  }
+
   void _next() {
     HapticFeedback.lightImpact();
     if (_page == 1) unawaited(_applyBible());
     if (_page < _pageCount - 1) {
-      _pages.nextPage(
-          duration: const Duration(milliseconds: 380),
-          curve: Curves.easeOutCubic);
+      _goToPage(_page + 1, const Duration(milliseconds: 380));
     } else {
       _finish();
     }
@@ -123,7 +131,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         pageBuilder: (_, __, ___) => const MainNavScreen(),
         transitionsBuilder: (_, animation, __, child) =>
             FadeTransition(opacity: animation, child: child),
-        transitionDuration: Motion.slow,
+        transitionDuration: Motion.of(context, Motion.slow),
       ),
     ));
   }
@@ -147,8 +155,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           child: SafeArea(
             child: Column(
               children: [
-                SizedBox(
-                  height: 48,
+                ConstrainedBox(
+                  constraints: const BoxConstraints(minHeight: 48),
                   child: Row(
                     children: [
                       if (_page > 0)
@@ -156,9 +164,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           tooltip: l10n.commonBack,
                           color: _muted,
                           icon: const Icon(Icons.arrow_back_rounded),
-                          onPressed: () => _pages.previousPage(
-                              duration: const Duration(milliseconds: 320),
-                              curve: Curves.easeOutCubic),
+                          onPressed: () => _goToPage(
+                              _page - 1, const Duration(milliseconds: 320)),
                         ),
                       const Spacer(),
                       if (!last)
@@ -209,7 +216,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                             children: [
                               for (var i = 0; i < _pageCount; i++)
                                 AnimatedContainer(
-                                  duration: Motion.normal,
+                                  duration: Motion.of(context, Motion.normal),
                                   margin:
                                       const EdgeInsets.symmetric(horizontal: 4),
                                   width: i == _page ? 22 : 8,
@@ -355,7 +362,8 @@ class _ChoiceTile extends StatelessWidget {
                       ),
                     ),
                     AnimatedOpacity(
-                      duration: const Duration(milliseconds: 200),
+                      duration:
+                          Motion.of(context, const Duration(milliseconds: 200)),
                       opacity: selected ? 1 : 0,
                       child: const Icon(Icons.check_circle_rounded,
                           color: _terracotta),
@@ -549,8 +557,11 @@ class _ComfortPage extends ConsumerWidget {
                           ref.read(themeProvider.notifier).setTheme(o.$1);
                         },
                         child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          height: 72,
+                          duration: Motion.of(
+                              context, const Duration(milliseconds: 200)),
+                          // Min, not fixed: names wrap at large text sizes.
+                          constraints: const BoxConstraints(minHeight: 72),
+                          padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
                             color: o.$3,
                             borderRadius: BorderRadius.circular(Radii.lg),
@@ -564,6 +575,7 @@ class _ComfortPage extends ConsumerWidget {
                           alignment: Alignment.center,
                           child: ExcludeSemantics(
                             child: Text(o.$2,
+                                textAlign: TextAlign.center,
                                 style: TextStyle(
                                     color: o.$4, fontWeight: FontWeight.w600)),
                           ),
@@ -606,7 +618,7 @@ class _ComfortPage extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
           AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
+            duration: Motion.of(context, const Duration(milliseconds: 200)),
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
               color: current.$3,
@@ -672,7 +684,8 @@ class _ReminderPage extends ConsumerWidget {
                           fontSize: TypeScale.bodyLarge, color: _ink)),
                 ),
                 AnimatedSize(
-                  duration: const Duration(milliseconds: 200),
+                  duration:
+                      Motion.of(context, const Duration(milliseconds: 200)),
                   child: reminders.dailyEnabled
                       ? ListTile(
                           leading:

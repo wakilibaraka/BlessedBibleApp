@@ -94,7 +94,10 @@ class _AppearanceSettingsSheetState
                     const SizedBox(height: 14),
                     // Tab toggle
                     Container(
-                      height: 36,
+                      // Was a fixed 36: grows with text and gives each tab
+                      // a 42 dp target.
+                      constraints:
+                          const BoxConstraints(minHeight: kMinTouchTarget),
                       decoration: BoxDecoration(
                         color:
                             theme.colorScheme.onSurface.withValues(alpha: 0.06),
@@ -136,7 +139,7 @@ class _AppearanceSettingsSheetState
               // ── Body ────────────────────────────────────────────
               Expanded(
                 child: AnimatedSwitcher(
-                  duration: Motion.normal,
+                  duration: Motion.of(context, Motion.normal),
                   switchInCurve: Curves.easeOutCubic,
                   switchOutCurve: Curves.easeInCubic,
                   child: _activeTab == AppearanceTab.typography
@@ -206,38 +209,48 @@ class _TabButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: Motion.normal,
-          curve: Curves.easeOutCubic,
-          margin: const EdgeInsets.all(3),
-          decoration: BoxDecoration(
-            color: isSelected ? theme.primaryColor : Colors.transparent,
-            borderRadius: BorderRadius.circular(Radii.pill),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                icon,
-                size: 13,
-                color: isSelected
-                    ? AppColors.lightTextPrimary
-                    : theme.colorScheme.onSurface.withValues(alpha: 0.55),
-              ),
-              const SizedBox(width: 5),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: TypeScale.caption,
-                  fontWeight: FontWeight.w600,
+      child: Semantics(
+        button: true,
+        selected: isSelected,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onTap,
+          child: AnimatedContainer(
+            duration: Motion.of(context, Motion.normal),
+            curve: Curves.easeOutCubic,
+            margin: const EdgeInsets.all(3),
+            constraints: const BoxConstraints(minHeight: kMinTouchTarget - 6),
+            decoration: BoxDecoration(
+              color: isSelected ? theme.primaryColor : Colors.transparent,
+              borderRadius: BorderRadius.circular(Radii.pill),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  size: 13,
                   color: isSelected
                       ? AppColors.lightTextPrimary
                       : theme.colorScheme.onSurface.withValues(alpha: 0.55),
                 ),
-              ),
-            ],
+                const SizedBox(width: 5),
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: TypeScale.caption,
+                      fontWeight: FontWeight.w600,
+                      color: isSelected
+                          ? AppColors.lightTextPrimary
+                          : theme.colorScheme.onSurface.withValues(alpha: 0.55),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

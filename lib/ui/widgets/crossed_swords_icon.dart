@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../../theme/design_tokens.dart';
+
 /// Crossed swords for the Settings tab button, drawn with a painter so
 /// no image asset ships in the APK and the strokes follow the theme's
 /// primary color exactly.
@@ -32,6 +34,14 @@ class _CrossedSwordsIconState extends State<CrossedSwordsIcon>
     vsync: this,
     duration: kSwordsDuration,
   )..forward();
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (Motion.of(context, kSwordsDuration) == Duration.zero) {
+      _controller.value = 1.0;
+    }
+  }
 
   @override
   void dispose() {

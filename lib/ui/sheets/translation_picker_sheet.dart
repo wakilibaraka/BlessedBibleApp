@@ -94,6 +94,7 @@ class _TranslationPickerSheetState
                   ),
                 ),
                 IconButton(
+                  tooltip: context.l10n.commonClose,
                   onPressed: () => Navigator.of(context).pop(),
                   icon: const Icon(Icons.close_rounded),
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
@@ -192,28 +193,34 @@ class _TranslationPickerSheetState
 
   Widget _buildTabButton(
       String text, bool isSelected, VoidCallback onTap, ThemeData theme) {
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.selectionClick();
-        onTap();
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: isSelected
-              ? theme.primaryColor.withValues(alpha: 0.15)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(Radii.sm),
-        ),
-        child: Text(
-          text,
-          style: theme.textTheme.labelLarge?.copyWith(
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          HapticFeedback.selectionClick();
+          onTap();
+        },
+        child: AnimatedContainer(
+          duration: Motion.of(context, const Duration(milliseconds: 200)),
+          constraints: const BoxConstraints(minHeight: kMinTouchTarget),
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
             color: isSelected
-                ? theme.primaryColor
-                : theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                ? theme.primaryColor.withValues(alpha: 0.15)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(Radii.sm),
+          ),
+          child: Text(
+            text,
+            style: theme.textTheme.labelLarge?.copyWith(
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              color: isSelected
+                  ? theme.primaryColor
+                  : theme.colorScheme.onSurface.withValues(alpha: 0.7),
+            ),
           ),
         ),
       ),
@@ -335,109 +342,113 @@ class _TranslationPickerSheetState
             padding: const EdgeInsets.only(bottom: 8.0),
             child: Opacity(
               opacity: isOtherSelected ? 0.4 : 1.0,
-              child: Material(
-                color: isSelected
-                    ? theme.primaryColor.withValues(alpha: 0.1)
-                    : theme.colorScheme.surface,
-                borderRadius: BorderRadius.circular(Radii.lg),
-                child: InkWell(
+              child: Semantics(
+                selected: isSelected,
+                child: Material(
+                  color: isSelected
+                      ? theme.primaryColor.withValues(alpha: 0.1)
+                      : theme.colorScheme.surface,
                   borderRadius: BorderRadius.circular(Radii.lg),
-                  onTap: isOtherSelected
-                      ? null
-                      : () {
-                          if (_isSelectingSecondary) {
-                            ref
-                                .read(secondaryTranslationProvider.notifier)
-                                .setTranslation(item.translationId);
-                          } else {
-                            ref
-                                .read(activeTranslationProvider.notifier)
-                                .setTranslation(item.translationId);
-                          }
-                          Navigator.of(context).pop();
-                        },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 16),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: isSelected
-                            ? theme.primaryColor.withValues(alpha: 0.5)
-                            : theme.colorScheme.onSurface
-                                .withValues(alpha: 0.1),
-                      ),
-                      borderRadius: BorderRadius.circular(Radii.lg),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                item.translationName,
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: isSelected
-                                      ? theme.primaryColor
-                                      : theme.colorScheme.onSurface,
-                                ),
-                              ),
-                              Builder(builder: (_) {
-                                final subtitle = isKjv
-                                    ? context.l10n.readKjvAlwaysAvailable
-                                    : item.license;
-                                if (subtitle.isEmpty) {
-                                  return const SizedBox.shrink();
-                                }
-                                return Padding(
-                                  padding: const EdgeInsets.only(top: 4),
-                                  child: Text(
-                                    subtitle,
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: theme.colorScheme.onSurface
-                                          .withValues(alpha: 0.6),
-                                    ),
-                                  ),
-                                );
-                              }),
-                            ],
-                          ),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(Radii.lg),
+                    onTap: isOtherSelected
+                        ? null
+                        : () {
+                            if (_isSelectingSecondary) {
+                              ref
+                                  .read(secondaryTranslationProvider.notifier)
+                                  .setTranslation(item.translationId);
+                            } else {
+                              ref
+                                  .read(activeTranslationProvider.notifier)
+                                  .setTranslation(item.translationId);
+                            }
+                            Navigator.of(context).pop();
+                          },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 16),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: isSelected
+                              ? theme.primaryColor.withValues(alpha: 0.5)
+                              : theme.colorScheme.onSurface
+                                  .withValues(alpha: 0.1),
                         ),
-                        if (!isLocked)
-                          IconButton(
-                            tooltip: context.l10n
-                                .readDeleteTranslation(item.translationName),
-                            icon: const Icon(Icons.delete_outline_rounded,
-                                size: 20),
-                            color: theme.colorScheme.onSurface
-                                .withValues(alpha: 0.4),
-                            onPressed: () =>
-                                _deleteTranslation(context, ref, item),
+                        borderRadius: BorderRadius.circular(Radii.lg),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item.translationName,
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: isSelected
+                                        ? theme.primaryColor
+                                        : theme.colorScheme.onSurface,
+                                  ),
+                                ),
+                                Builder(builder: (_) {
+                                  final subtitle = isKjv
+                                      ? context.l10n.readKjvAlwaysAvailable
+                                      : item.license;
+                                  if (subtitle.isEmpty) {
+                                    return const SizedBox.shrink();
+                                  }
+                                  return Padding(
+                                    padding: const EdgeInsets.only(top: 4),
+                                    child: Text(
+                                      subtitle,
+                                      style:
+                                          theme.textTheme.bodySmall?.copyWith(
+                                        color: theme.colorScheme.onSurface
+                                            .withValues(alpha: 0.6),
+                                      ),
+                                    ),
+                                  );
+                                }),
+                              ],
+                            ),
                           ),
-                        if (isSelected)
-                          Icon(
-                            Icons.check_circle_rounded,
-                            color: theme.primaryColor,
-                          )
-                        else if (isLocked)
-                          Tooltip(
-                            message: context.l10n.readCannotDeleteBackbone,
-                            child: Icon(
-                              Icons.lock_outline_rounded,
+                          if (!isLocked)
+                            IconButton(
+                              tooltip: context.l10n
+                                  .readDeleteTranslation(item.translationName),
+                              icon: const Icon(Icons.delete_outline_rounded,
+                                  size: 20),
+                              color: theme.colorScheme.onSurface
+                                  .withValues(alpha: 0.4),
+                              onPressed: () =>
+                                  _deleteTranslation(context, ref, item),
+                            ),
+                          if (isSelected)
+                            Icon(
+                              Icons.check_circle_rounded,
+                              color: theme.primaryColor,
+                            )
+                          else if (isLocked)
+                            Tooltip(
+                              message: context.l10n.readCannotDeleteBackbone,
+                              child: Icon(
+                                Icons.lock_outline_rounded,
+                                size: 20,
+                                color: theme.colorScheme.onSurface
+                                    .withValues(alpha: 0.3),
+                              ),
+                            )
+                          else
+                            Icon(
+                              Icons.cloud_done_outlined,
                               size: 20,
                               color: theme.colorScheme.onSurface
                                   .withValues(alpha: 0.3),
                             ),
-                          )
-                        else
-                          Icon(
-                            Icons.cloud_done_outlined,
-                            size: 20,
-                            color: theme.colorScheme.onSurface
-                                .withValues(alpha: 0.3),
-                          ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

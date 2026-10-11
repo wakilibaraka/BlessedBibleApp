@@ -110,7 +110,7 @@ class RadialActionMenu extends StatefulWidget {
       barrierLabel: context.l10n.readVerseActions,
       // Light scrim so the verse under the menu stays readable.
       barrierColor: context.palette.scrim.withValues(alpha: 0.28),
-      transitionDuration: const Duration(milliseconds: 180),
+      transitionDuration: Motion.of(context, const Duration(milliseconds: 180)),
       pageBuilder: (_, __, ___) => RadialActionMenu(
         anchor: anchor,
         actions: actions,
@@ -128,9 +128,10 @@ class RadialActionMenu extends StatefulWidget {
 
 class _RadialActionMenuState extends State<RadialActionMenu>
     with SingleTickerProviderStateMixin {
+  // First read in build, so the context (and reduced-motion flag) is ready.
   late final AnimationController _controller = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 200),
+    duration: Motion.of(context, const Duration(milliseconds: 200)),
   )..forward();
 
   @override
@@ -201,6 +202,9 @@ class _RadialItem extends StatelessWidget {
     return Semantics(
       button: true,
       label: action.label,
+      // ExcludeSemantics below drops the detector's tap action, so expose it
+      // here for screen readers.
+      onTap: onTap,
       child: ExcludeSemantics(
         child: GestureDetector(
           onTap: onTap,

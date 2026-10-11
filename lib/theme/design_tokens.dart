@@ -56,6 +56,12 @@ abstract final class Motion {
       MediaQuery.maybeDisableAnimationsOf(context) ?? false ? Duration.zero : d;
 }
 
+/// True when the user asked the system for more contrast (iOS "Increase
+/// contrast" / "Reduce transparency", Android high-contrast text). Glass
+/// and blur surfaces should then draw an opaque fill instead.
+bool reduceTransparency(BuildContext context) =>
+    MediaQuery.maybeHighContrastOf(context) ?? false;
+
 /// Minimum touch target (Material 48 dp; also clears Apple's 44 pt).
 const double kMinTouchTarget = 48;
 

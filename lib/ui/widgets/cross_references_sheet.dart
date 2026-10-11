@@ -255,24 +255,28 @@ class _CrossRefTileState extends ConsumerState<_CrossRefTile> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Reference badge
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(
-                color: theme.primaryColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(Radii.sm),
-              ),
-              child: Text(
-                widget.refLabel,
-                style: TextStyle(
-                  fontSize: TypeScale.caption,
-                  fontWeight: FontWeight.w600,
-                  color: theme.primaryColor,
+            // Reference badge (Flexible so a long name at large text
+            // wraps instead of overflowing the row).
+            Flexible(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: theme.primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(Radii.sm),
+                ),
+                child: Text(
+                  widget.refLabel,
+                  style: TextStyle(
+                    fontSize: TypeScale.caption,
+                    fontWeight: FontWeight.w600,
+                    color: theme.primaryColor,
+                  ),
                 ),
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
+              flex: 2,
               child: _loading
                   ? Container(
                       height: 12,

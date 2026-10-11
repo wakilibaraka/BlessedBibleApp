@@ -43,7 +43,9 @@ class GlassContainer extends StatelessWidget {
       child: ClipRRect(
         borderRadius: radius,
         clipBehavior: Clip.antiAlias,
-        child: isScrollable
+        // Opaque fill (no blur) when scrolling or when the system asks for
+        // reduced transparency.
+        child: isScrollable || reduceTransparency(context)
             ? Container(
                 padding: padding,
                 decoration: BoxDecoration(

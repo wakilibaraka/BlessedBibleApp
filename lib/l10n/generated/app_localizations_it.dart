@@ -9,6 +9,44 @@ class AppLocalizationsIt extends AppLocalizations {
   AppLocalizationsIt([String locale = 'it']) : super(locale);
 
   @override
+  String get a11yTextSmaller => 'Testo più piccolo';
+
+  @override
+  String get a11yTextLarger => 'Testo più grande';
+
+  @override
+  String get a11yNotifications => 'Notifiche';
+
+  @override
+  String get a11yShowNav => 'Mostra navigazione';
+
+  @override
+  String get a11yHideNav => 'Nascondi navigazione';
+
+  @override
+  String a11yVersesSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count versetti selezionati',
+      one: '1 versetto selezionato',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get a11yMakePrimary => 'Imposta come traduzione principale';
+
+  @override
+  String get a11yPreviousWeek => 'Settimana precedente';
+
+  @override
+  String get a11yNextWeek => 'Settimana successiva';
+
+  @override
+  String get a11yRead => 'Letto';
+
+  @override
   String get appTitle => 'The Blessed Bible';
 
   @override
@@ -2506,6 +2544,18 @@ class AppLocalizationsIt extends AppLocalizations {
   String spaceDeletePackTooltip(String name) {
     return 'Elimina $name';
   }
+
+  @override
+  String get stateLoading => 'Caricamento';
+
+  @override
+  String get stateErrorTitle => 'Qualcosa è andato storto';
+
+  @override
+  String get stateErrorBody => 'Riprova tra un momento.';
+
+  @override
+  String get commonUndo => 'Annulla';
 
   @override
   String studyCouldNotOpenScreen(String error) {

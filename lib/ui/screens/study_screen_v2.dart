@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -302,16 +303,21 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                         ],
                       ),
                     ),
-                    GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () {
-                        HapticFeedback.selectionClick();
-                        showAccountMenu(context);
-                      },
-                      child: const Padding(
-                        padding: EdgeInsets.all(2),
-                        // 40 avatar + 2x2 padding = 44pt target.
-                        child: AccountAvatar(size: 40),
+                    Semantics(
+                      button: true,
+                      label: context.l10n.accountAccount,
+                      excludeSemantics: true,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          showAccountMenu(context);
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.all(4),
+                          // 40 avatar + 2x4 padding = 48dp target.
+                          child: AccountAvatar(size: 40),
+                        ),
                       ),
                     ),
                   ],
@@ -334,15 +340,23 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                       final framed = width == null
                           ? body
                           : SizedBox(width: width, child: body);
-                      return GestureDetector(
-                        behavior: HitTestBehavior.translucent,
-                        onLongPress: () {
-                          HapticFeedback.mediumImpact();
-                          _showCardSize(card, cards);
+                      return Semantics(
+                        // Screen readers reach the long-press sheet by name.
+                        customSemanticsActions: {
+                          CustomSemanticsAction(
+                                  label: context.l10n.studyCardSize):
+                              () => _showCardSize(card, cards),
                         },
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: framed,
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onLongPress: () {
+                            HapticFeedback.mediumImpact();
+                            _showCardSize(card, cards);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: framed,
+                          ),
                         ),
                       );
                     }
@@ -536,32 +550,35 @@ class _YourSpaceCard extends ConsumerWidget {
     final tiles = [
       for (final c in counts)
         Expanded(
-          child: GestureDetector(
-            onTap: () => go(c.$4),
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              decoration: BoxDecoration(
-                color: theme.primaryColor.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(Radii.lg),
-                border: Border.all(
-                  color: theme.primaryColor.withValues(alpha: 0.22),
+          child: Semantics(
+            button: true,
+            child: GestureDetector(
+              onTap: () => go(c.$4),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: theme.primaryColor.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(Radii.lg),
+                  border: Border.all(
+                    color: theme.primaryColor.withValues(alpha: 0.22),
+                  ),
                 ),
-              ),
-              child: Column(
-                children: [
-                  Icon(c.$1, size: 18, color: theme.primaryColor),
-                  const SizedBox(height: 4),
-                  Text('${c.$3}',
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w800,
-                      )),
-                  Text(c.$2,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        fontSize: TypeScale.micro,
-                        color:
-                            theme.colorScheme.onSurface.withValues(alpha: 0.65),
-                      )),
-                ],
+                child: Column(
+                  children: [
+                    Icon(c.$1, size: 18, color: theme.primaryColor),
+                    const SizedBox(height: 4),
+                    Text('${c.$3}',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        )),
+                    Text(c.$2,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          fontSize: TypeScale.micro,
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.65),
+                        )),
+                  ],
+                ),
               ),
             ),
           ),
@@ -782,7 +799,8 @@ class _PlansLiveCardState extends ConsumerState<_PlansLiveCard> {
         mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(
-            height: 132,
+            // Grows with the system text size so both pages fit.
+            height: MediaQuery.textScalerOf(context).scale(132),
             child: PageView(
               controller: _pages,
               onPageChanged: (i) => setState(() => _page = i),

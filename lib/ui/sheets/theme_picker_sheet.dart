@@ -675,6 +675,9 @@ class _ThemePillState extends ConsumerState<_ThemePill>
   }
 
   void _triggerSparkle() {
+    // Zero duration (reduced motion) finishes at once: no sparkle.
+    _sparkleController.duration =
+        Motion.of(context, const Duration(milliseconds: 1000));
     _sparkleController.forward(from: 0.0);
   }
 
@@ -722,92 +725,101 @@ class _ThemePillState extends ConsumerState<_ThemePill>
         ? widget.swatchColors[1]
         : theme.primaryColor;
 
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.mediumImpact();
-        _triggerSparkle();
-        ref.read(themeProvider.notifier).setTheme(widget.mode);
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        height: 46,
-        decoration: BoxDecoration(
-          color: isSelected
-              ? widget.fillColor
-              : theme.colorScheme.onSurface.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(Radii.pill),
-          border: Border.all(
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: widget.label.replaceAll('\n', ' '),
+      excludeSemantics: true,
+      child: GestureDetector(
+        onTap: () {
+          HapticFeedback.mediumImpact();
+          _triggerSparkle();
+          ref.read(themeProvider.notifier).setTheme(widget.mode);
+        },
+        child: AnimatedContainer(
+          duration: Motion.of(context, const Duration(milliseconds: 300)),
+          // Was a fixed 46: 48 dp target that grows with large text.
+          constraints: const BoxConstraints(minHeight: kMinTouchTarget),
+          decoration: BoxDecoration(
             color: isSelected
-                ? theme.primaryColor
-                : theme.colorScheme.onSurface.withValues(alpha: 0.1),
-            width: isSelected ? 2 : 1,
+                ? widget.fillColor
+                : theme.colorScheme.onSurface.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(Radii.pill),
+            border: Border.all(
+              color: isSelected
+                  ? theme.primaryColor
+                  : theme.colorScheme.onSurface.withValues(alpha: 0.1),
+              width: isSelected ? 2 : 1,
+            ),
+            boxShadow: neumorphicShadows,
           ),
-          boxShadow: neumorphicShadows,
-        ),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            AnimatedPadding(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeOutCubic,
-              padding: EdgeInsets.only(
-                left: isSelected ? 6 : 40,
-                right: isSelected ? 40 : 6,
-              ),
-              child: Align(
-                alignment: Alignment.center,
-                child: Text(
-                  widget.label,
-                  textAlign: widget.label.contains('\n')
-                      ? TextAlign.left
-                      : TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.visible,
-                  style: TextStyle(
-                    color: isSelected
-                        ? widget.textColor
-                        : theme.colorScheme.onSurface,
-                    fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
-                    fontSize: TypeScale.micro,
-                    height: 1.1,
+          child: Stack(
+            alignment: Alignment.center,
+            clipBehavior: Clip.none,
+            children: [
+              AnimatedPadding(
+                duration: Motion.of(context, const Duration(milliseconds: 300)),
+                curve: Curves.easeOutCubic,
+                padding: EdgeInsets.only(
+                  left: isSelected ? 6 : 40,
+                  right: isSelected ? 40 : 6,
+                ),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    widget.label,
+                    textAlign: widget.label.contains('\n')
+                        ? TextAlign.left
+                        : TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.visible,
+                    style: TextStyle(
+                      color: isSelected
+                          ? widget.textColor
+                          : theme.colorScheme.onSurface,
+                      fontWeight:
+                          isSelected ? FontWeight.w900 : FontWeight.w600,
+                      fontSize: TypeScale.micro,
+                      height: 1.1,
+                    ),
                   ),
                 ),
               ),
-            ),
-            AnimatedAlign(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeOutCubic,
-              alignment:
-                  isSelected ? Alignment.centerRight : Alignment.centerLeft,
-              child: Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: SweepGradient(colors: [
-                      ...widget.swatchColors,
-                      widget.swatchColors.first
-                    ]),
-                    boxShadow: [
-                      BoxShadow(
-                        color: context.palette.shadow.withValues(alpha: 0.2),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+              AnimatedAlign(
+                duration: Motion.of(context, const Duration(milliseconds: 300)),
+                curve: Curves.easeOutCubic,
+                alignment:
+                    isSelected ? Alignment.centerRight : Alignment.centerLeft,
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: SweepGradient(colors: [
+                        ...widget.swatchColors,
+                        widget.swatchColors.first
+                      ]),
+                      boxShadow: [
+                        BoxShadow(
+                          color: context.palette.shadow.withValues(alpha: 0.2),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            Positioned.fill(
-              child: _SparkleBurst(
-                controller: _sparkleController,
-                color: accentColor,
+              Positioned.fill(
+                child: _SparkleBurst(
+                  controller: _sparkleController,
+                  color: accentColor,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -845,6 +857,9 @@ class _DarkThemePillState extends ConsumerState<_DarkThemePill>
   }
 
   void _triggerSparkle() {
+    // Zero duration (reduced motion) finishes at once: no sparkle.
+    _sparkleController.duration =
+        Motion.of(context, const Duration(milliseconds: 1000));
     _sparkleController.forward(from: 0.0);
   }
 
@@ -908,96 +923,108 @@ class _DarkThemePillState extends ConsumerState<_DarkThemePill>
     final accentColor =
         activeVariant == AppThemeMode.oled ? Colors.amber : Colors.cyanAccent;
 
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.mediumImpact();
-        _triggerSparkle();
-        if (isDarkActive) {
-          _lastDarkVariant = AppThemeMode.oled;
-          ref.read(themeProvider.notifier).setTheme(AppThemeMode.oled);
-        } else if (isOledActive) {
-          _lastDarkVariant = AppThemeMode.dark;
-          ref.read(themeProvider.notifier).setTheme(AppThemeMode.dark);
-        } else {
-          ref.read(themeProvider.notifier).setTheme(_lastDarkVariant);
-        }
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        height: 46,
-        decoration: BoxDecoration(
-          color: isSelected
-              ? fillColor
-              : theme.colorScheme.onSurface.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(Radii.pill),
-          border: Border.all(
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: activeVariant == AppThemeMode.oled
+          ? context.l10n.settingsThemeOledDark
+          : context.l10n.settingsThemeDuskOled,
+      excludeSemantics: true,
+      child: GestureDetector(
+        onTap: () {
+          HapticFeedback.mediumImpact();
+          _triggerSparkle();
+          if (isDarkActive) {
+            _lastDarkVariant = AppThemeMode.oled;
+            ref.read(themeProvider.notifier).setTheme(AppThemeMode.oled);
+          } else if (isOledActive) {
+            _lastDarkVariant = AppThemeMode.dark;
+            ref.read(themeProvider.notifier).setTheme(AppThemeMode.dark);
+          } else {
+            ref.read(themeProvider.notifier).setTheme(_lastDarkVariant);
+          }
+        },
+        child: AnimatedContainer(
+          duration: Motion.of(context, const Duration(milliseconds: 300)),
+          // Was a fixed 46: 48 dp target that grows with large text.
+          constraints: const BoxConstraints(minHeight: kMinTouchTarget),
+          decoration: BoxDecoration(
             color: isSelected
-                ? theme.primaryColor
-                : theme.colorScheme.onSurface.withValues(alpha: 0.1),
-            width: isSelected ? 2 : 1,
+                ? fillColor
+                : theme.colorScheme.onSurface.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(Radii.pill),
+            border: Border.all(
+              color: isSelected
+                  ? theme.primaryColor
+                  : theme.colorScheme.onSurface.withValues(alpha: 0.1),
+              width: isSelected ? 2 : 1,
+            ),
+            boxShadow: neumorphicShadows,
           ),
-          boxShadow: neumorphicShadows,
-        ),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            AnimatedPadding(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeOutCubic,
-              padding: EdgeInsets.only(
-                left: isSelected ? 6 : 40,
-                right: isSelected ? 40 : 6,
-              ),
-              child: Align(
-                alignment: Alignment.center,
-                child: Text(
-                  activeVariant == AppThemeMode.oled
-                      ? context.l10n.settingsThemeOledDark
-                      : context.l10n.settingsThemeDuskOled,
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.visible,
-                  style: TextStyle(
-                    color: isSelected ? textColor : theme.colorScheme.onSurface,
-                    fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
-                    fontSize: TypeScale.micro,
-                    height: 1.1,
+          child: Stack(
+            alignment: Alignment.center,
+            clipBehavior: Clip.none,
+            children: [
+              AnimatedPadding(
+                duration: Motion.of(context, const Duration(milliseconds: 300)),
+                curve: Curves.easeOutCubic,
+                padding: EdgeInsets.only(
+                  left: isSelected ? 6 : 40,
+                  right: isSelected ? 40 : 6,
+                ),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    activeVariant == AppThemeMode.oled
+                        ? context.l10n.settingsThemeOledDark
+                        : context.l10n.settingsThemeDuskOled,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.visible,
+                    style: TextStyle(
+                      color:
+                          isSelected ? textColor : theme.colorScheme.onSurface,
+                      fontWeight:
+                          isSelected ? FontWeight.w900 : FontWeight.w600,
+                      fontSize: TypeScale.micro,
+                      height: 1.1,
+                    ),
                   ),
                 ),
               ),
-            ),
-            AnimatedAlign(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeOutCubic,
-              alignment:
-                  isSelected ? Alignment.centerRight : Alignment.centerLeft,
-              child: Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: SweepGradient(
-                        colors: [...swatchColors, swatchColors.first]),
-                    boxShadow: [
-                      BoxShadow(
-                        color: context.palette.shadow.withValues(alpha: 0.2),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+              AnimatedAlign(
+                duration: Motion.of(context, const Duration(milliseconds: 300)),
+                curve: Curves.easeOutCubic,
+                alignment:
+                    isSelected ? Alignment.centerRight : Alignment.centerLeft,
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: SweepGradient(
+                          colors: [...swatchColors, swatchColors.first]),
+                      boxShadow: [
+                        BoxShadow(
+                          color: context.palette.shadow.withValues(alpha: 0.2),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            Positioned.fill(
-              child: _SparkleBurst(
-                controller: _sparkleController,
-                color: accentColor,
+              Positioned.fill(
+                child: _SparkleBurst(
+                  controller: _sparkleController,
+                  color: accentColor,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -1223,66 +1250,71 @@ class _SurfaceStyleTile extends StatelessWidget {
     final primary = theme.primaryColor;
     final onSurface = theme.colorScheme.onSurface;
 
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: Motion.normal,
-        curve: Curves.easeOutCubic,
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? primary.withValues(alpha: 0.10)
-              : onSurface.withValues(alpha: 0.04),
-          borderRadius: BorderRadius.circular(Radii.lg),
-          border: Border.all(
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: Motion.of(context, Motion.normal),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
+          decoration: BoxDecoration(
             color: isSelected
-                ? primary.withValues(alpha: 0.75)
-                : onSurface.withValues(alpha: 0.10),
-            width: isSelected ? 1.5 : 0.8,
+                ? primary.withValues(alpha: 0.10)
+                : onSurface.withValues(alpha: 0.04),
+            borderRadius: BorderRadius.circular(Radii.lg),
+            border: Border.all(
+              color: isSelected
+                  ? primary.withValues(alpha: 0.75)
+                  : onSurface.withValues(alpha: 0.10),
+              width: isSelected ? 1.5 : 0.8,
+            ),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: primary.withValues(alpha: 0.18),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                : [],
           ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: primary.withValues(alpha: 0.18),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : [],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              meta.icon,
-              size: 20,
-              color: isSelected ? primary : onSurface.withValues(alpha: 0.55),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              meta.label(context.l10n),
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: TypeScale.micro,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                color: isSelected ? primary : onSurface.withValues(alpha: 0.80),
-                height: 1.1,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                meta.icon,
+                size: 20,
+                color: isSelected ? primary : onSurface.withValues(alpha: 0.55),
               ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              meta.subtitle(context.l10n),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: _kTileSubtitleSize,
-                fontWeight: FontWeight.w400,
-                color: onSurface.withValues(alpha: 0.45),
-                height: 1.1,
+              const SizedBox(height: 5),
+              Text(
+                meta.label(context.l10n),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: TypeScale.micro,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  color:
+                      isSelected ? primary : onSurface.withValues(alpha: 0.80),
+                  height: 1.1,
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 2),
+              Text(
+                meta.subtitle(context.l10n),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: _kTileSubtitleSize,
+                  fontWeight: FontWeight.w400,
+                  color: onSurface.withValues(alpha: 0.45),
+                  height: 1.1,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -60,7 +60,9 @@ class TexturedGlassContainer extends ConsumerWidget {
     final isFrutigerAero = surfaceStyle == SurfaceStyle.frutigerAero;
     final isSkeuomorphic = surfaceStyle == SurfaceStyle.skeuomorphic;
     final isFrosted = surfaceStyle == SurfaceStyle.frosted;
-    final useBlur = isFrosted && !isScrollable;
+    // Reduced transparency (system high contrast): no blur, opaque fill.
+    final opaque = reduceTransparency(context);
+    final useBlur = isFrosted && !isScrollable && !opaque;
 
     BorderRadius radius;
     if (isClaymorphic) {
@@ -133,6 +135,8 @@ class TexturedGlassContainer extends ConsumerWidget {
       fillColor = tokens.readingSurface;
       isDarkPanel = tokens.readingSurface.computeLuminance() < 0.4;
     }
+
+    if (opaque) fillColor = fillColor.withValues(alpha: 1);
 
     final bgLuminance = tokens.readingSurface.computeLuminance();
     final isDarkBg = bgLuminance < 0.4;
@@ -258,7 +262,7 @@ class TexturedGlassContainer extends ConsumerWidget {
     }
 
     Widget content = AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
+      duration: Motion.of(context, const Duration(milliseconds: 300)),
       padding: padding,
       decoration: BoxDecoration(
         color: fillColor,
@@ -306,7 +310,7 @@ class TexturedGlassContainer extends ConsumerWidget {
     }
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
+      duration: Motion.of(context, const Duration(milliseconds: 300)),
       curve: Curves.easeOut,
       margin: margin,
       clipBehavior: Clip.antiAlias,
@@ -318,7 +322,7 @@ class TexturedGlassContainer extends ConsumerWidget {
         borderRadius: radius,
         clipBehavior: Clip.antiAlias,
         child: RepaintBoundary(
-          child: (useBlur || isFrutigerAero)
+          child: (useBlur || (isFrutigerAero && !opaque))
               ? BackdropFilter(
                   filter: ImageFilter.blur(
                     sigmaX: isFrutigerAero

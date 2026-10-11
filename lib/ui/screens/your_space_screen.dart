@@ -67,11 +67,13 @@ class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
   }
 
   void _onTabTapped(int index) {
-    _pageController.animateToPage(
-      index,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
+    final d = Motion.of(context, const Duration(milliseconds: 300));
+    if (d == Duration.zero) {
+      _pageController.jumpToPage(index);
+    } else {
+      _pageController.animateToPage(index,
+          duration: d, curve: Curves.easeInOut);
+    }
   }
 
   @override
@@ -110,7 +112,9 @@ class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
                 children: [
                   // ── Segmented Control Header ──
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                    // Tabs carry 8dp of invisible hit padding above and
+                    // below (48dp targets), so the outer padding shrinks.
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
                     child: Row(
                       children: [
                         Expanded(
@@ -195,32 +199,40 @@ class _SegmentTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        margin: const EdgeInsets.symmetric(horizontal: 4),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: isSelected
-              ? theme.primaryColor.withValues(alpha: 0.15)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(Radii.xl),
-          border: Border.all(
-            color: isSelected
-                ? theme.primaryColor.withValues(alpha: 0.5)
-                : Colors.transparent,
-          ),
-        ),
-        child: Text(
-          label,
-          style: theme.textTheme.labelMedium?.copyWith(
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-            color: isSelected
-                ? theme.primaryColor
-                : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: AnimatedContainer(
+            duration: Motion.of(context, const Duration(milliseconds: 200)),
+            constraints: const BoxConstraints(minHeight: kMinTouchTarget - 16),
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? theme.primaryColor.withValues(alpha: 0.15)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(Radii.xl),
+              border: Border.all(
+                color: isSelected
+                    ? theme.primaryColor.withValues(alpha: 0.5)
+                    : Colors.transparent,
+              ),
+            ),
+            child: Text(
+              label,
+              style: theme.textTheme.labelMedium?.copyWith(
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                color: isSelected
+                    ? theme.primaryColor
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
+            ),
           ),
         ),
       ),
@@ -693,6 +705,7 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
                 Row(
                   children: [
                     IconButton(
+                      tooltip: context.l10n.spaceRenameFolder,
                       icon: const Icon(Icons.edit, size: 20),
                       onPressed: () => _showRenameFolderDialog(
                           context,
@@ -701,6 +714,7 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
                           bookmarkFolderLabel(selectedFolder, context.l10n)),
                     ),
                     IconButton(
+                      tooltip: context.l10n.spaceDeleteFolderTitle,
                       icon:
                           const Icon(Icons.delete, size: 20, color: Colors.red),
                       onPressed: () {
@@ -752,6 +766,7 @@ class _NotesSegment extends ConsumerWidget {
                 ),
               ),
               IconButton(
+                tooltip: context.l10n.spaceAddNote,
                 icon: Icon(Icons.add_circle_outline, color: theme.primaryColor),
                 onPressed: () => showAddNoteSheet(context, ref, theme),
               ),
@@ -823,6 +838,17 @@ class _NotesSegment extends ConsumerWidget {
                                             .withValues(alpha: 0.5),
                                         fontSize: TypeScale.micro,
                                       ),
+                                    ),
+                                    // Same sheet as long-press, reachable
+                                    // without the gesture.
+                                    IconButton(
+                                      tooltip: context.l10n.spaceMore,
+                                      icon: Icon(Icons.more_vert_rounded,
+                                          size: 20,
+                                          color: theme.colorScheme.onSurface
+                                              .withValues(alpha: 0.5)),
+                                      onPressed: () => _showNoteContext(
+                                          context, ref, theme, note),
                                     ),
                                   ],
                                 ),
@@ -1156,7 +1182,8 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                       if (expandedTranslationWidget != null)
                         expandedTranslationWidget,
                       if (showChips && chipsToRender.isNotEmpty) ...[
-                        const SizedBox(height: 12),
+                        // 12dp gap minus the chips' 11dp hit padding.
+                        const SizedBox(height: 1),
                         Row(
                           children: [
                             for (int i = 0; i < chipsToRender.length; i++)
@@ -1175,70 +1202,95 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                                     final isSelected =
                                         activeChipId == translationId;
 
-                                    return Material(
-                                      color: isSelected
-                                          ? theme.primaryColor
-                                              .withValues(alpha: 0.15)
-                                          : theme.colorScheme.surface,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(Radii.lg),
-                                        side: BorderSide(
-                                          color: isSelected
-                                              ? theme.primaryColor
-                                                  .withValues(alpha: 0.5)
-                                              : theme.colorScheme.onSurface
-                                                  .withValues(
-                                                      alpha: isInstalled
-                                                          ? 0.15
-                                                          : 0.05),
-                                        ),
-                                      ),
-                                      clipBehavior: Clip.antiAlias,
-                                      child: InkWell(
-                                        onTap: () {
-                                          if (isInstalled &&
-                                              translationId != null) {
-                                            if (isSelected) {
-                                              ref
-                                                  .read(
-                                                      yourSpaceExpandedChipsProvider
-                                                          .notifier)
-                                                  .clear(refStr);
-                                            } else {
-                                              ref
-                                                  .read(
-                                                      yourSpaceExpandedChipsProvider
-                                                          .notifier)
-                                                  .setLanguage(
-                                                      refStr, translationId);
-                                            }
-                                          }
-                                        },
+                                    void onChipTap() {
+                                      if (isInstalled &&
+                                          translationId != null) {
+                                        if (isSelected) {
+                                          ref
+                                              .read(
+                                                  yourSpaceExpandedChipsProvider
+                                                      .notifier)
+                                              .clear(refStr);
+                                        } else {
+                                          ref
+                                              .read(
+                                                  yourSpaceExpandedChipsProvider
+                                                      .notifier)
+                                              .setLanguage(
+                                                  refStr, translationId);
+                                        }
+                                      }
+                                    }
+
+                                    // Invisible vertical hit padding makes
+                                    // the slim chip a 48dp target.
+                                    return Semantics(
+                                      button: true,
+                                      selected: isSelected,
+                                      enabled: isInstalled,
+                                      child: GestureDetector(
+                                        behavior: HitTestBehavior.opaque,
+                                        onTap: onChipTap,
                                         child: Padding(
                                           padding: const EdgeInsets.symmetric(
-                                              vertical: 6.0),
-                                          child: Center(
-                                            child: Text(
-                                              langEntry.value,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: TextStyle(
-                                                fontSize: TypeScale.micro,
-                                                fontWeight: isSelected
-                                                    ? FontWeight.bold
-                                                    : FontWeight.w600,
+                                              vertical: 11),
+                                          child: Material(
+                                            color: isSelected
+                                                ? theme.primaryColor
+                                                    .withValues(alpha: 0.15)
+                                                : theme.colorScheme.surface,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      Radii.lg),
+                                              side: BorderSide(
                                                 color: isSelected
                                                     ? theme.primaryColor
-                                                    : (isInstalled
-                                                        ? theme.colorScheme
-                                                            .onSurface
-                                                            .withValues(
-                                                                alpha: 0.7)
-                                                        : theme.colorScheme
-                                                            .onSurface
-                                                            .withValues(
-                                                                alpha: 0.3)),
+                                                        .withValues(alpha: 0.5)
+                                                    : theme
+                                                        .colorScheme.onSurface
+                                                        .withValues(
+                                                            alpha: isInstalled
+                                                                ? 0.15
+                                                                : 0.05),
+                                              ),
+                                            ),
+                                            clipBehavior: Clip.antiAlias,
+                                            child: InkWell(
+                                              onTap: onChipTap,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 6.0),
+                                                child: Center(
+                                                  child: Text(
+                                                    langEntry.value,
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                      fontSize: TypeScale.micro,
+                                                      fontWeight: isSelected
+                                                          ? FontWeight.bold
+                                                          : FontWeight.w600,
+                                                      color: isSelected
+                                                          ? theme.primaryColor
+                                                          : (isInstalled
+                                                              ? theme
+                                                                  .colorScheme
+                                                                  .onSurface
+                                                                  .withValues(
+                                                                      alpha:
+                                                                          0.7)
+                                                              : theme
+                                                                  .colorScheme
+                                                                  .onSurface
+                                                                  .withValues(
+                                                                      alpha:
+                                                                          0.3)),
+                                                    ),
+                                                  ),
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -1470,8 +1522,9 @@ void _showHighlightColorSheet(
                     ?.copyWith(fontWeight: FontWeight.w800)),
             const SizedBox(height: 14),
             Wrap(
-              spacing: 12,
-              runSpacing: 12,
+              // 8 + 2dp hit padding per side keeps the 12dp visual gap.
+              spacing: 8,
+              runSpacing: 8,
               children: [
                 for (var i = 0; i < highlightPalette.length; i++)
                   Semantics(
@@ -1479,6 +1532,7 @@ void _showHighlightColorSheet(
                     selected: currentIndex == i,
                     label: context.l10n.spaceColourN(i + 1),
                     child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
                       onTap: () {
                         HapticFeedback.selectionClick();
                         Navigator.of(ctx).pop();
@@ -1486,20 +1540,23 @@ void _showHighlightColorSheet(
                             .read(highlightsProvider.notifier)
                             .toggleHighlight(refKey, i);
                       },
-                      child: Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.getRenderedHighlightColor(
-                              highlightPalette[i],
-                              theme.brightness,
-                              theme.scaffoldBackgroundColor),
-                          border: Border.all(
-                            color: currentIndex == i
-                                ? theme.primaryColor
-                                : theme.dividerColor,
-                            width: currentIndex == i ? 3 : 1,
+                      child: Padding(
+                        padding: const EdgeInsets.all(2),
+                        child: Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppColors.getRenderedHighlightColor(
+                                highlightPalette[i],
+                                theme.brightness,
+                                theme.scaffoldBackgroundColor),
+                            border: Border.all(
+                              color: currentIndex == i
+                                  ? theme.primaryColor
+                                  : theme.dividerColor,
+                              width: currentIndex == i ? 3 : 1,
+                            ),
                           ),
                         ),
                       ),

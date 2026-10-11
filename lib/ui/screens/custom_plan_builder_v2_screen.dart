@@ -609,8 +609,9 @@ class _CustomPlanBuilderV2ScreenState
                               ),
                               const Divider(height: 1),
                               Padding(
+                                // Chips add 6dp of hit padding each side.
                                 padding:
-                                    const EdgeInsets.symmetric(vertical: 10),
+                                    const EdgeInsets.symmetric(vertical: 4),
                                 child: Row(
                                   children: [
                                     Expanded(
@@ -890,26 +891,35 @@ class _RestChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: selected
-              ? theme.primaryColor
-              : theme.colorScheme.onSurface.withValues(alpha: 0.06),
-          borderRadius: BorderRadius.circular(Radii.md),
-          border: Border.all(
-            color: selected ? theme.primaryColor : theme.dividerColor,
-          ),
-        ),
-        child: Text(
-          label,
-          style: theme.textTheme.labelLarge?.copyWith(
-            fontWeight: FontWeight.w800,
-            color: selected
-                ? theme.colorScheme.surface
-                : theme.colorScheme.onSurface,
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        // Invisible vertical hit padding: 48dp target.
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: selected
+                  ? theme.primaryColor
+                  : theme.colorScheme.onSurface.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(Radii.md),
+              border: Border.all(
+                color: selected ? theme.primaryColor : theme.dividerColor,
+              ),
+            ),
+            child: Text(
+              label,
+              style: theme.textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: selected
+                    ? theme.colorScheme.surface
+                    : theme.colorScheme.onSurface,
+              ),
+            ),
           ),
         ),
       ),

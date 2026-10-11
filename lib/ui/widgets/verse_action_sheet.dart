@@ -263,19 +263,24 @@ class _SheetActionButton extends StatelessWidget {
     final theme = Theme.of(context);
     final color =
         action.active ? theme.primaryColor : theme.colorScheme.onSurface;
+    void activate() {
+      HapticFeedback.selectionClick();
+      Navigator.of(context).pop(true); // keep the sheet open (no clear)
+      action.onTap();
+    }
+
     return Semantics(
       button: true,
+      selected: action.active,
       label: action.label,
+      // ExcludeSemantics drops the button's own tap action; expose it here.
+      onTap: activate,
       child: ExcludeSemantics(
         child: CupertinoButton(
           // 56pt square target, zero chrome: a bare tap surface.
           padding: EdgeInsets.zero,
           minimumSize: const Size(56, 56),
-          onPressed: () {
-            HapticFeedback.selectionClick();
-            Navigator.of(context).pop(true); // keep the sheet open (no clear)
-            action.onTap();
-          },
+          onPressed: activate,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,

@@ -195,37 +195,41 @@ class _MenuButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: color != null
-                  ? color!.withValues(alpha: 0.15)
-                  : theme.colorScheme.onSurface.withValues(alpha: 0.08),
-              shape: BoxShape.circle,
-            ),
-            child: IconTheme(
-              data: IconThemeData(
-                color: color ?? theme.colorScheme.onSurface,
-                size: 24,
+    return Semantics(
+      button: true,
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: color != null
+                    ? color!.withValues(alpha: 0.15)
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.08),
+                shape: BoxShape.circle,
               ),
-              child: icon,
+              child: IconTheme(
+                data: IconThemeData(
+                  color: color ?? theme.colorScheme.onSurface,
+                  size: 24,
+                ),
+                child: icon,
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: theme.textTheme.labelSmall?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: color,
+            const SizedBox(height: 8),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.labelSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: color,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

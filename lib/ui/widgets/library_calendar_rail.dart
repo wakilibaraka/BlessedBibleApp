@@ -93,11 +93,13 @@ class LibraryCalendarRailState extends State<LibraryCalendarRail> {
     HapticFeedback.selectionClick();
     setState(() => _index = next);
     if (_controller.hasClients) {
-      _controller.animateToPage(
-        next,
-        duration: const Duration(milliseconds: 260),
-        curve: Curves.easeOutCubic,
-      );
+      final d = Motion.of(context, const Duration(milliseconds: 260));
+      if (d == Duration.zero) {
+        _controller.jumpToPage(next);
+      } else {
+        _controller.animateToPage(next,
+            duration: d, curve: Curves.easeOutCubic);
+      }
     }
   }
 
@@ -120,6 +122,7 @@ class LibraryCalendarRailState extends State<LibraryCalendarRail> {
       children: [
         _StepButton(
           icon: Icons.chevron_left_rounded,
+          label: context.l10n.a11yPreviousWeek,
           enabled: _index > 0,
           onTap: () =>
               _goTo(_visibleWeekStart.subtract(const Duration(days: 7))),
@@ -131,7 +134,8 @@ class LibraryCalendarRailState extends State<LibraryCalendarRail> {
           child: V2Card(
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
             child: SizedBox(
-              height: 64,
+              // Grows with the system text size so the day labels fit.
+              height: MediaQuery.textScalerOf(context).scale(64),
               child: PageView.builder(
                 controller: _controller,
                 onPageChanged: (i) {
@@ -165,6 +169,7 @@ class LibraryCalendarRailState extends State<LibraryCalendarRail> {
         ),
         _StepButton(
           icon: Icons.chevron_right_rounded,
+          label: context.l10n.a11yNextWeek,
           enabled: _index < _lastIndex,
           onTap: () => _goTo(_visibleWeekStart.add(const Duration(days: 7))),
         ),
@@ -256,11 +261,13 @@ class _DayCell extends StatelessWidget {
 
 class _StepButton extends StatelessWidget {
   final IconData icon;
+  final String label;
   final bool enabled;
   final VoidCallback onTap;
 
   const _StepButton({
     required this.icon,
+    required this.label,
     required this.enabled,
     required this.onTap,
   });
@@ -271,20 +278,20 @@ class _StepButton extends StatelessWidget {
     return Semantics(
       button: true,
       enabled: enabled,
-      label: context.l10n.plansChangeWeek,
-      child: ExcludeSemantics(
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: enabled
-              ? () {
-                  HapticFeedback.selectionClick();
-                  onTap();
-                }
-              : null,
-          // 44pt target with the icon centered.
-          child: SizedBox(
-            width: 44,
-            height: 44,
+      label: label,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: enabled
+            ? () {
+                HapticFeedback.selectionClick();
+                onTap();
+              }
+            : null,
+        // 48dp target with the icon centered.
+        child: SizedBox(
+          width: kMinTouchTarget,
+          height: kMinTouchTarget,
+          child: ExcludeSemantics(
             child: Icon(
               icon,
               size: 22,

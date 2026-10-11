@@ -128,52 +128,53 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                             // ── Shared top header ──────────────────────────────────
                             SharedTopHeader(
                               leading: IconButton(
+                                tooltip: l10n.commonBack,
                                 icon: const Icon(
                                     Icons.arrow_back_ios_new_rounded),
                                 color: theme.colorScheme.onSurface,
                                 padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(
-                                    minWidth: 44, minHeight: 44),
                                 onPressed: () => Navigator.of(context).pop(),
                               ),
-                              trailing: GestureDetector(
-                                behavior: HitTestBehavior.opaque,
-                                onTap: () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(showNudge
-                                          ? l10n.todayStreakNudge
-                                          : l10n.todayNotificationsSoon),
-                                      behavior: SnackBarBehavior.floating,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(Radii.md)),
+                              trailing: Semantics(
+                                button: true,
+                                label: l10n.a11yNotifications,
+                                excludeSemantics: true,
+                                child: GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: () {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(showNudge
+                                            ? l10n.todayStreakNudge
+                                            : l10n.todayNotificationsSoon),
+                                        behavior: SnackBarBehavior.floating,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                                Radii.md)),
+                                      ),
+                                    );
+                                  },
+                                  // Center fills the 48 dp slot, so the
+                                  // whole slot is tappable.
+                                  child: Center(
+                                    child: Stack(
+                                      alignment: Alignment.topRight,
+                                      children: [
+                                        Icon(Icons.notifications_none_rounded,
+                                            size: 26,
+                                            color: theme.colorScheme.onSurface),
+                                        if (showNudge)
+                                          Container(
+                                            margin: const EdgeInsets.only(
+                                                top: 2, right: 2),
+                                            width: 8,
+                                            height: 8,
+                                            decoration: const BoxDecoration(
+                                                color: Colors.red,
+                                                shape: BoxShape.circle),
+                                          ),
+                                      ],
                                     ),
-                                  );
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      right: 8.0,
-                                      top: 8.0,
-                                      bottom: 8.0,
-                                      left: 8.0),
-                                  child: Stack(
-                                    alignment: Alignment.topRight,
-                                    children: [
-                                      Icon(Icons.notifications_none_rounded,
-                                          size: 26,
-                                          color: theme.colorScheme.onSurface),
-                                      if (showNudge)
-                                        Container(
-                                          margin: const EdgeInsets.only(
-                                              top: 2, right: 2),
-                                          width: 8,
-                                          height: 8,
-                                          decoration: const BoxDecoration(
-                                              color: Colors.red,
-                                              shape: BoxShape.circle),
-                                        ),
-                                    ],
                                   ),
                                 ),
                               ),
@@ -647,12 +648,15 @@ class _QuickActionsRow extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: actions
             .map(
-              (a) => _QuickActionButton(
-                icon: a.icon,
-                label: a.label,
-                color: a.color,
-                theme: theme,
-                onTap: a.onTap,
+              // Expanded so long labels at large text wrap, not overflow.
+              (a) => Expanded(
+                child: _QuickActionButton(
+                  icon: a.icon,
+                  label: a.label,
+                  color: a.color,
+                  theme: theme,
+                  onTap: a.onTap,
+                ),
               ),
             )
             .toList(),
@@ -678,30 +682,35 @@ class _QuickActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: color.withValues(alpha: 0.13),
+    return Semantics(
+      button: true,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: color.withValues(alpha: 0.13),
+              ),
+              child: Icon(icon, color: color, size: 24),
             ),
-            child: Icon(icon, color: color, size: 24),
-          ),
-          const SizedBox(height: 7),
-          Text(
-            label,
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.colorScheme.onSurface,
-              fontWeight: FontWeight.w600,
-              fontSize: TypeScale.caption,
+            const SizedBox(height: 7),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSurface,
+                fontWeight: FontWeight.w600,
+                fontSize: TypeScale.caption,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -775,10 +784,12 @@ class _VotdArchiveBanner extends StatelessWidget {
                           color: theme.primaryColor.withValues(alpha: 0.7),
                           size: 16),
                       const SizedBox(width: 8),
-                      Text(context.l10n.todayVotdArchiveExplore,
-                          style: theme.textTheme.labelSmall?.copyWith(
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.7))),
+                      Flexible(
+                        child: Text(context.l10n.todayVotdArchiveExplore,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                                color: theme.colorScheme.onSurface
+                                    .withValues(alpha: 0.7))),
+                      ),
                     ],
                   ),
                 ),

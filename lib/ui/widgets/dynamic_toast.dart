@@ -74,8 +74,6 @@ class _ToastOverlayState extends State<_ToastOverlay>
           reverseCurve: Curves.easeOut),
     );
 
-    _controller.forward();
-
     Future.delayed(widget.duration, () {
       if (mounted) {
         _controller.reverse().then((_) {
@@ -83,6 +81,19 @@ class _ToastOverlayState extends State<_ToastOverlay>
         });
       }
     });
+  }
+
+  bool _started = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_started) return;
+    _started = true;
+    _controller
+      ..duration = Motion.of(context, const Duration(milliseconds: 600))
+      ..reverseDuration = Motion.of(context, Motion.slow)
+      ..forward();
   }
 
   @override
@@ -107,30 +118,34 @@ class _ToastOverlayState extends State<_ToastOverlay>
         );
       },
       child: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 400),
-            child: TexturedGlassContainer(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-              borderRadius: BorderRadius.circular(Radii.xxxl),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (widget.icon != null) ...[
-                    Icon(widget.icon,
-                        size: 20, color: Theme.of(context).primaryColor),
-                    const SizedBox(width: 12),
-                  ],
-                  Flexible(
-                    child: Text(
-                      widget.message,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                      textAlign: TextAlign.center,
+        child: Semantics(
+          liveRegion: true,
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 400),
+              child: TexturedGlassContainer(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                borderRadius: BorderRadius.circular(Radii.xxxl),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (widget.icon != null) ...[
+                      Icon(widget.icon,
+                          size: 20, color: Theme.of(context).primaryColor),
+                      const SizedBox(width: 12),
+                    ],
+                    Flexible(
+                      child: Text(
+                        widget.message,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

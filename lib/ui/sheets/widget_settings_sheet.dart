@@ -146,28 +146,30 @@ class WidgetSettingsSheet extends ConsumerWidget {
                         const Text('🔥',
                             style: TextStyle(fontSize: TypeScale.headline)),
                         const SizedBox(width: 8),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '${streak.count} Days',
-                              style: TextStyle(
-                                fontSize: TypeScale.bodyLarge,
-                                fontWeight: FontWeight.bold,
-                                color: primaryTextColor,
+                        Flexible(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                context.l10n.studyStreakDays(streak.count),
+                                style: TextStyle(
+                                  fontSize: TypeScale.bodyLarge,
+                                  fontWeight: FontWeight.bold,
+                                  color: primaryTextColor,
+                                ),
                               ),
-                            ),
-                            Text(
-                              context.l10n.settingsWidgetStreak,
-                              style: TextStyle(
-                                fontSize: TypeScale.caption,
-                                color: isDark
-                                    ? const Color(0xFF4ADE80)
-                                    : const Color(0xFF16A34A),
-                                fontWeight: FontWeight.w600,
+                              Text(
+                                context.l10n.settingsWidgetStreak,
+                                style: TextStyle(
+                                  fontSize: TypeScale.caption,
+                                  color: isDark
+                                      ? const Color(0xFF4ADE80)
+                                      : const Color(0xFF16A34A),
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),

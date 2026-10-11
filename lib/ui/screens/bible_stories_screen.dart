@@ -119,7 +119,8 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  // 12dp gap minus the pills' 6dp hit padding.
+                  const SizedBox(height: 6),
                   // Testament + books control: All | OT | NT | Books▾.
                   // Books opens a dropdown sheet instead of a chip row.
                   Row(
@@ -170,7 +171,6 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 4),
                   Row(
                     children: [
                       Text(
@@ -365,31 +365,40 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
     required VoidCallback onTap,
   }) {
     final theme = Theme.of(context);
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: active
-              ? theme.primaryColor.withValues(alpha: 0.15)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(Radii.lg),
-          border: Border.all(
-            color: active
-                ? theme.primaryColor
-                : theme.dividerColor.withValues(alpha: 0.4),
-          ),
-        ),
-        child: Row(
-          children: [
-            Icon(icon,
-                size: 14,
+    return Semantics(
+      button: true,
+      toggled: active,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        // Invisible vertical hit padding: 48dp target.
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: active
+                  ? theme.primaryColor.withValues(alpha: 0.15)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(Radii.lg),
+              border: Border.all(
                 color: active
                     ? theme.primaryColor
-                    : theme.colorScheme.onSurface.withValues(alpha: 0.6)),
-            const SizedBox(width: 4),
-            Text(label, style: theme.textTheme.labelSmall),
-          ],
+                    : theme.dividerColor.withValues(alpha: 0.4),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(icon,
+                    size: 14,
+                    color: active
+                        ? theme.primaryColor
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                const SizedBox(width: 4),
+                Text(label, style: theme.textTheme.labelSmall),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -412,42 +421,50 @@ class _FilterPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-        decoration: BoxDecoration(
-          color: selected
-              ? theme.primaryColor.withValues(alpha: 0.15)
-              : theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(Radii.pill),
-          border: Border.all(
-            color: selected
-                ? theme.primaryColor
-                : theme.dividerColor.withValues(alpha: 0.5),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Flexible(
-              child: Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: theme.textTheme.labelMedium?.copyWith(
-                  color: selected
-                      ? theme.primaryColor
-                      : theme.colorScheme.onSurface.withValues(alpha: 0.75),
-                  fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                ),
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        // Invisible vertical hit padding: 48dp target.
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+            decoration: BoxDecoration(
+              color: selected
+                  ? theme.primaryColor.withValues(alpha: 0.15)
+                  : theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(Radii.pill),
+              border: Border.all(
+                color: selected
+                    ? theme.primaryColor
+                    : theme.dividerColor.withValues(alpha: 0.5),
               ),
             ),
-            if (trailing != null) trailing!,
-          ],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: selected
+                          ? theme.primaryColor
+                          : theme.colorScheme.onSurface.withValues(alpha: 0.75),
+                      fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                    ),
+                  ),
+                ),
+                if (trailing != null) trailing!,
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -642,6 +659,9 @@ class _StoryCard extends ConsumerWidget {
                             isRead
                                 ? Icons.check_circle_rounded
                                 : Icons.circle_outlined,
+                            semanticLabel: isRead
+                                ? context.l10n.a11yRead
+                                : context.l10n.storiesUnread,
                             size: 16,
                             color: isRead
                                 ? AppColors.goldAccent

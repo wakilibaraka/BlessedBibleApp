@@ -11,6 +11,7 @@ import '../../state/translation_provider.dart';
 import '../../data/models/bible_model.dart';
 import '../../data/models/home_data.dart';
 import '../widgets/textured_glass_container.dart';
+import '../widgets/item_context_sheet.dart' show confirmDestructive;
 import '../widgets/shared_app_bar.dart';
 import '../sheets/book_chapter_selector_sheet.dart';
 import '../../theme/design_tokens.dart';
@@ -101,6 +102,29 @@ class NotesListScreen extends ConsumerWidget {
                                         .withValues(alpha: 0.5),
                                   ),
                                 ),
+                                // Visible alternative to swipe-to-delete.
+                                IconButton(
+                                  tooltip: context.l10n.notesDeleteNote,
+                                  icon: Icon(
+                                    Icons.delete_outline_rounded,
+                                    size: 20,
+                                    color: theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.5),
+                                  ),
+                                  onPressed: () async {
+                                    final ok = await confirmDestructive(
+                                      context,
+                                      title: context.l10n.spaceDeleteNoteTitle,
+                                      message: context.l10n
+                                          .spaceDeleteNoteBody(note.title),
+                                    );
+                                    if (ok) {
+                                      ref
+                                          .read(notesProvider.notifier)
+                                          .remove(note.id);
+                                    }
+                                  },
+                                ),
                               ],
                             ),
                             if (note.reference != null) ...[
@@ -132,6 +156,7 @@ class NotesListScreen extends ConsumerWidget {
               },
             ),
       floatingActionButton: FloatingActionButton(
+        tooltip: context.l10n.notesNewNote,
         onPressed: () => showAddNoteSheet(context, ref, theme),
         backgroundColor: theme.primaryColor,
         child: Icon(Icons.add, color: context.palette.onAccent),

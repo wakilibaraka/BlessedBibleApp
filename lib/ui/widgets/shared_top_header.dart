@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../l10n/l10n.dart';
 import '../../state/theme_provider.dart';
+import '../../theme/design_tokens.dart';
 import '../sheets/appearance_settings_sheet.dart';
 
 class SharedTopHeader extends ConsumerWidget {
@@ -69,104 +71,111 @@ class SharedTopHeader extends ConsumerWidget {
 
   Widget _buildDefaultTrailing(BuildContext context, WidgetRef ref,
       ThemeData theme, AppThemeMode appThemeMode) {
-    return Center(
+    // The whole 48x48 slot is the hit area, not just the 26 dp icon.
+    return Semantics(
+      button: true,
+      label: context.l10n.settingsTheme,
+      excludeSemantics: true,
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: () {
           AppearanceSettingsSheet.show(context,
               initialTab: AppearanceTab.theme);
         },
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 350),
-          transitionBuilder: (child, anim) => RotationTransition(
-            turns: Tween<double>(begin: 0.75, end: 1.0).animate(anim),
-            child: FadeTransition(
-                opacity: anim, alwaysIncludeSemantics: true, child: child),
+        child: Center(
+          child: AnimatedSwitcher(
+            duration: Motion.of(context, const Duration(milliseconds: 350)),
+            transitionBuilder: (child, anim) => RotationTransition(
+              turns: Tween<double>(begin: 0.75, end: 1.0).animate(anim),
+              child: FadeTransition(
+                  opacity: anim, alwaysIncludeSemantics: true, child: child),
+            ),
+            child: switch (appThemeMode) {
+              AppThemeMode.automatic => Icon(
+                  Icons.brightness_auto,
+                  key: const ValueKey('automatic'),
+                  size: 26,
+                  color: theme.primaryColor,
+                ),
+              AppThemeMode.light => Icon(
+                  Icons.wb_sunny_outlined,
+                  key: const ValueKey('light'),
+                  size: 26,
+                  color: theme.primaryColor,
+                ),
+              AppThemeMode.dark => Icon(
+                  Icons.dark_mode_rounded,
+                  color: theme.colorScheme.onSurface,
+                  size: 20,
+                ),
+              AppThemeMode.oled => Icon(
+                  Icons.nightlight_round,
+                  key: const ValueKey('dark'),
+                  size: 26,
+                  color: theme.primaryColor,
+                ),
+              AppThemeMode.sepia => Icon(
+                  Icons.cloud_outlined,
+                  key: const ValueKey('sepia'),
+                  size: 26,
+                  color: theme.primaryColor,
+                ),
+              AppThemeMode.dawn => Icon(
+                  Icons.wb_twilight_outlined,
+                  key: const ValueKey('dawn'),
+                  size: 26,
+                  color: theme.primaryColor,
+                ),
+              AppThemeMode.lilies => Icon(
+                  Icons.spa_outlined,
+                  key: const ValueKey('lilies'),
+                  size: 26,
+                  color: theme.primaryColor,
+                ),
+              AppThemeMode.roses => Icon(
+                  Icons.local_florist_outlined,
+                  key: const ValueKey('roses'),
+                  size: 26,
+                  color: theme.primaryColor,
+                ),
+              AppThemeMode.olives => Icon(
+                  Icons.eco_outlined,
+                  key: const ValueKey('olives'),
+                  size: 26,
+                  color: theme.primaryColor,
+                ),
+              AppThemeMode.dusk => Icon(
+                  Icons.nature_outlined,
+                  key: const ValueKey('dusk'),
+                  size: 26,
+                  color: theme.primaryColor,
+                ),
+              AppThemeMode.fresh => Icon(
+                  Icons.nights_stay_rounded,
+                  key: const ValueKey('fresh'),
+                  size: 26,
+                  color: theme.primaryColor,
+                ),
+              AppThemeMode.priestlyPurple => Icon(
+                  Icons.church_outlined,
+                  key: const ValueKey('priestlyPurple'),
+                  size: 26,
+                  color: theme.primaryColor,
+                ),
+              AppThemeMode.galileeBlue => Icon(
+                  Icons.water_drop_outlined,
+                  key: const ValueKey('galileeBlue'),
+                  size: 26,
+                  color: theme.primaryColor,
+                ),
+              AppThemeMode.scarletRed => Icon(
+                  Icons.local_fire_department_outlined,
+                  key: const ValueKey('scarletRed'),
+                  size: 26,
+                  color: theme.primaryColor,
+                ),
+            },
           ),
-          child: switch (appThemeMode) {
-            AppThemeMode.automatic => Icon(
-                Icons.brightness_auto,
-                key: const ValueKey('automatic'),
-                size: 26,
-                color: theme.primaryColor,
-              ),
-            AppThemeMode.light => Icon(
-                Icons.wb_sunny_outlined,
-                key: const ValueKey('light'),
-                size: 26,
-                color: theme.primaryColor,
-              ),
-            AppThemeMode.dark => Icon(
-                Icons.dark_mode_rounded,
-                color: theme.colorScheme.onSurface,
-                size: 20,
-              ),
-            AppThemeMode.oled => Icon(
-                Icons.nightlight_round,
-                key: const ValueKey('dark'),
-                size: 26,
-                color: theme.primaryColor,
-              ),
-            AppThemeMode.sepia => Icon(
-                Icons.cloud_outlined,
-                key: const ValueKey('sepia'),
-                size: 26,
-                color: theme.primaryColor,
-              ),
-            AppThemeMode.dawn => Icon(
-                Icons.wb_twilight_outlined,
-                key: const ValueKey('dawn'),
-                size: 26,
-                color: theme.primaryColor,
-              ),
-            AppThemeMode.lilies => Icon(
-                Icons.spa_outlined,
-                key: const ValueKey('lilies'),
-                size: 26,
-                color: theme.primaryColor,
-              ),
-            AppThemeMode.roses => Icon(
-                Icons.local_florist_outlined,
-                key: const ValueKey('roses'),
-                size: 26,
-                color: theme.primaryColor,
-              ),
-            AppThemeMode.olives => Icon(
-                Icons.eco_outlined,
-                key: const ValueKey('olives'),
-                size: 26,
-                color: theme.primaryColor,
-              ),
-            AppThemeMode.dusk => Icon(
-                Icons.nature_outlined,
-                key: const ValueKey('dusk'),
-                size: 26,
-                color: theme.primaryColor,
-              ),
-            AppThemeMode.fresh => Icon(
-                Icons.nights_stay_rounded,
-                key: const ValueKey('fresh'),
-                size: 26,
-                color: theme.primaryColor,
-              ),
-            AppThemeMode.priestlyPurple => Icon(
-                Icons.church_outlined,
-                key: const ValueKey('priestlyPurple'),
-                size: 26,
-                color: theme.primaryColor,
-              ),
-            AppThemeMode.galileeBlue => Icon(
-                Icons.water_drop_outlined,
-                key: const ValueKey('galileeBlue'),
-                size: 26,
-                color: theme.primaryColor,
-              ),
-            AppThemeMode.scarletRed => Icon(
-                Icons.local_fire_department_outlined,
-                key: const ValueKey('scarletRed'),
-                size: 26,
-                color: theme.primaryColor,
-              ),
-          },
         ),
       ),
     );

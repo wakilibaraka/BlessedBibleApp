@@ -79,8 +79,7 @@ class VersePreviewDialog extends ConsumerWidget {
                   ),
                 ),
                 IconButton(
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
+                  tooltip: context.l10n.commonClose,
                   icon: Icon(Icons.close_rounded,
                       color:
                           theme.colorScheme.onSurface.withValues(alpha: 0.4)),
@@ -92,46 +91,50 @@ class VersePreviewDialog extends ConsumerWidget {
             if (bookNumber == null)
               Text(context.l10n.readBookNotFound)
             else
-              FutureBuilder<BibleVerse?>(
-                future: bibleDbService.getVerse(
-                  ref.watch(activeTranslationProvider),
-                  bookNumber,
-                  chapter,
-                  verseNum,
-                ),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: CircularProgressIndicator(),
+              // Flexible so a long verse at large text scrolls instead of
+              // overflowing the dialog.
+              Flexible(
+                child: FutureBuilder<BibleVerse?>(
+                  future: bibleDbService.getVerse(
+                    ref.watch(activeTranslationProvider),
+                    bookNumber,
+                    chapter,
+                    verseNum,
+                  ),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+
+                    if (snapshot.hasError) {
+                      return Text(
+                          context.l10n.readVerseLoadError('${snapshot.error}'));
+                    }
+
+                    final verse = snapshot.data;
+                    if (verse == null) {
+                      return Text(context.l10n.readVerseNotFound);
+                    }
+
+                    return SingleChildScrollView(
+                      child: Text(
+                        verse.text.replaceAll(RegExp(r'[<\[][^>\]]*[>\]]'), ''),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          height: typography.lineHeight,
+                          fontSize: typography.fontSize,
+                          fontFamily: typography.fontFamily,
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.9),
+                        ),
                       ),
                     );
-                  }
-
-                  if (snapshot.hasError) {
-                    return Text(
-                        context.l10n.readVerseLoadError('${snapshot.error}'));
-                  }
-
-                  final verse = snapshot.data;
-                  if (verse == null) {
-                    return Text(context.l10n.readVerseNotFound);
-                  }
-
-                  return SingleChildScrollView(
-                    child: Text(
-                      verse.text.replaceAll(RegExp(r'[<\[][^>\]]*[>\]]'), ''),
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        height: typography.lineHeight,
-                        fontSize: typography.fontSize,
-                        fontFamily: typography.fontFamily,
-                        color:
-                            theme.colorScheme.onSurface.withValues(alpha: 0.9),
-                      ),
-                    ),
-                  );
-                },
+                  },
+                ),
               ),
           ],
         ),

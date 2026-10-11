@@ -1,0 +1,65 @@
+{
+  "a11yTextSmaller": {
+    "en": "Smaller text",
+    "fr": "Texte plus petit",
+    "it": "Testo più piccolo",
+    "ro": "Text mai mic",
+    "sw": "Maandishi madogo zaidi",
+    "tl": "Mas maliit na teksto"
+  },
+  "a11yTextLarger": {
+    "en": "Larger text",
+    "fr": "Texte plus grand",
+    "it": "Testo più grande",
+    "ro": "Text mai mare",
+    "sw": "Maandishi makubwa zaidi",
+    "tl": "Mas malaking teksto"
+  },
+  "a11yNotifications": {
+    "en": "Notifications",
+    "fr": "Notifications",
+    "it": "Notifiche",
+    "ro": "Notificări",
+    "sw": "Arifa",
+    "tl": "Mga abiso"
+  },
+  "a11yShowNav": {
+    "en": "Show navigation",
+    "fr": "Afficher la navigation",
+    "it": "Mostra navigazione",
+    "ro": "Afișează navigarea",
+    "sw": "Onyesha urambazaji",
+    "tl": "Ipakita ang nabigasyon"
+  },
+  "a11yHideNav": {
+    "en": "Hide navigation",
+    "fr": "Masquer la navigation",
+    "it": "Nascondi navigazione",
+    "ro": "Ascunde navigarea",
+    "sw": "Ficha urambazaji",
+    "tl": "Itago ang nabigasyon"
+  },
+  "a11yVersesSelected": {
+    "en": "{count, plural, =1{1 verse selected} other{{count} verses selected}}",
+    "fr": "{count, plural, =1{1 verset sélectionné} other{{count} versets sélectionnés}}",
+    "it": "{count, plural, =1{1 versetto selezionato} other{{count} versetti selezionati}}",
+    "ro": "{count, plural, =1{1 verset selectat} few{{count} versete selectate} other{{count} de versete selectate}}",
+    "sw": "{count, plural, =1{Aya 1 imechaguliwa} other{Aya {count} zimechaguliwa}}",
+    "tl": "{count, plural, =1{1 talata ang napili} other{{count} talata ang napili}}",
+    "@": {
+      "placeholders": {
+        "count": {
+          "type": "int"
+        }
+      }
+    }
+  },
+  "a11yMakePrimary": {
+    "en": "Make main translation",
+    "fr": "Définir comme traduction principale",
+    "it": "Imposta come traduzione principale",
+    "ro": "Setează ca traducere principală",
+    "sw": "Fanya iwe tafsiri kuu",
+    "tl": "Gawing pangunahing salin"
+  }
+}

@@ -111,6 +111,7 @@ class VersePreviewModal extends ConsumerWidget {
                     ),
                   ),
                   IconButton(
+                    tooltip: context.l10n.commonClose,
                     icon: Icon(Icons.close_rounded,
                         color:
                             theme.colorScheme.onSurface.withValues(alpha: 0.6)),

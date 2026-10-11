@@ -83,46 +83,52 @@ class _SegmentItemState<T> extends State<_SegmentItem<T>> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Expanded(
-      child: GestureDetector(
-        onTapDown: (_) => setState(() => _isPressed = true),
-        onTapUp: (_) {
-          setState(() => _isPressed = false);
-          widget.onChanged(widget.option.key);
-        },
-        onTapCancel: () => setState(() => _isPressed = false),
-        behavior: HitTestBehavior.opaque,
-        child: AnimatedScale(
-          scale: _isPressed ? 0.95 : 1.0,
-          duration: const Duration(milliseconds: 100),
-          child: AnimatedContainer(
-            duration: Motion.normal,
-            curve: Curves.easeOutCubic,
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            decoration: BoxDecoration(
-              color: widget.isSelected
-                  ? theme.colorScheme.surface
-                  : Colors.transparent,
-              borderRadius: BorderRadius.circular(Radii.sm),
-              boxShadow: widget.isSelected
-                  ? [
-                      BoxShadow(
-                        color: context.palette.shadow.withValues(alpha: 0.1),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      )
-                    ]
-                  : [],
-            ),
-            child: Text(
-              widget.option.value,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: TypeScale.body,
-                fontWeight:
-                    widget.isSelected ? FontWeight.w600 : FontWeight.w400,
+      child: Semantics(
+        button: true,
+        selected: widget.isSelected,
+        child: GestureDetector(
+          onTapDown: (_) => setState(() => _isPressed = true),
+          onTapUp: (_) {
+            setState(() => _isPressed = false);
+            widget.onChanged(widget.option.key);
+          },
+          onTapCancel: () => setState(() => _isPressed = false),
+          behavior: HitTestBehavior.opaque,
+          child: AnimatedScale(
+            scale: _isPressed ? 0.95 : 1.0,
+            duration: Motion.of(context, const Duration(milliseconds: 100)),
+            child: AnimatedContainer(
+              duration: Motion.of(context, Motion.normal),
+              curve: Curves.easeOutCubic,
+              constraints: const BoxConstraints(minHeight: kMinTouchTarget),
+              alignment: Alignment.center,
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              decoration: BoxDecoration(
                 color: widget.isSelected
-                    ? theme.colorScheme.onSurface
-                    : theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                    ? theme.colorScheme.surface
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(Radii.sm),
+                boxShadow: widget.isSelected
+                    ? [
+                        BoxShadow(
+                          color: context.palette.shadow.withValues(alpha: 0.1),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        )
+                      ]
+                    : [],
+              ),
+              child: Text(
+                widget.option.value,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: TypeScale.body,
+                  fontWeight:
+                      widget.isSelected ? FontWeight.w600 : FontWeight.w400,
+                  color: widget.isSelected
+                      ? theme.colorScheme.onSurface
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                ),
               ),
             ),
           ),

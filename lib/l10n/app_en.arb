@@ -1,5 +1,22 @@
 {
   "@@locale": "en",
+  "a11yTextSmaller": "Smaller text",
+  "a11yTextLarger": "Larger text",
+  "a11yNotifications": "Notifications",
+  "a11yShowNav": "Show navigation",
+  "a11yHideNav": "Hide navigation",
+  "a11yVersesSelected": "{count, plural, =1{1 verse selected} other{{count} verses selected}}",
+  "@a11yVersesSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "a11yMakePrimary": "Make main translation",
+  "a11yPreviousWeek": "Previous week",
+  "a11yNextWeek": "Next week",
+  "a11yRead": "Read",
   "appTitle": "The Blessed Bible",
   "commonCancel": "Cancel",
   "commonContinue": "Continue",
@@ -1359,6 +1376,10 @@
       }
     }
   },
+  "stateLoading": "Loading",
+  "stateErrorTitle": "Something went wrong",
+  "stateErrorBody": "Please try again in a moment.",
+  "commonUndo": "Undo",
   "studyCouldNotOpenScreen": "Could not open that screen. {error}",
   "@studyCouldNotOpenScreen": {
     "placeholders": {

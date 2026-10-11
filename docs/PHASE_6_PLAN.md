@@ -9,7 +9,7 @@ Each chunk ends with `flutter analyze` clean, `flutter test` green, one commit, 
 | 3 ✅ | Non-UI strings | Notifications, reminders, toasts from services, home widget labels, share text, error messages, plan/day labels | Reminders and the widget show in the chosen language |
 | 4 ✅ | Onboarding completion | Optional reminders step (permission asked after explaining why), optional sign-in step ("works fully offline"), resume after app kill | Widget tests for skip/back/resume |
 | 5 ✅ | Theme tokens | `ThemeExtension` for semantic colours, spacing, radii and text styles; replace `Color(0x…)`/`Colors.*`/`fontSize:` screen by screen (reader → settings → the rest) | Hard-coded counts down to a justified list; a lint script reports regressions |
-| 6 | Accessibility | Semantic labels on icon buttons and gestures, button alternatives for swipe-only actions, 48 dp touch targets, largest-text pass, reduced motion and reduced transparency (blur fallback) | Flutter `meetsGuideline` tests (tap target, labels, contrast) on key screens |
+| 6 ✅ | Accessibility | Semantic labels on icon buttons and gestures, button alternatives for swipe-only actions, 48 dp touch targets, largest-text pass, reduced motion and reduced transparency (blur fallback) | Flutter `meetsGuideline` tests (tap target, labels, contrast) on key screens |
 | 7 | Consistency | One empty/loading/error pattern, one confirm-and-undo pattern for deletes, one verse-reference format, sentence case, US English | Shared widgets used everywhere; checklist section 9 ticked |
 | 8 | Goldens + device checklist | Golden tests for key screens in light/sepia/dark/OLED and at large text; a device test script for you | Goldens in CI; script in `docs/` |
 

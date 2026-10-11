@@ -299,35 +299,42 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
                   children: [
-                    const SizedBox(height: 8),
                     // Date header doubles as a picker: choosing a date
-                    // scrolls the calendar rail to that week.
-                    GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: _pickDateAndScroll,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              libraryDateHeader(
-                                now,
-                                Localizations.localeOf(context).toString(),
+                    // scrolls the calendar rail to that week. The 48dp
+                    // min height replaces the old 8/12dp spacers.
+                    Semantics(
+                      button: true,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: _pickDateAndScroll,
+                        child: ConstrainedBox(
+                          constraints:
+                              const BoxConstraints(minHeight: kMinTouchTarget),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  libraryDateHeader(
+                                    now,
+                                    Localizations.localeOf(context).toString(),
+                                  ),
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
                               ),
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
+                              const SizedBox(width: 6),
+                              Icon(Icons.edit_calendar_outlined,
+                                  size: 16,
+                                  color: theme.colorScheme.onSurface
+                                      .withValues(alpha: 0.45)),
+                            ],
                           ),
-                          const SizedBox(width: 6),
-                          Icon(Icons.edit_calendar_outlined,
-                              size: 16,
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.45)),
-                        ],
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 4),
                     LibraryGreetingHeader(
                       name: name,
                       progressLabel: YearProgress.label(now, context.l10n),
@@ -474,11 +481,12 @@ class _LibraryCard extends StatelessWidget {
                 ],
               ),
             ),
-            // 44pt target, icon centred.
+            // 48dp target, icon centred.
             SizedBox(
-              width: 44,
-              height: 44,
+              width: kMinTouchTarget,
+              height: kMinTouchTarget,
               child: PopupMenuButton<String>(
+                tooltip: context.l10n.spaceMore,
                 padding: EdgeInsets.zero,
                 icon: Icon(
                   Icons.more_vert_rounded,

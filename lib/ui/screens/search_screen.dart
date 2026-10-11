@@ -14,6 +14,7 @@ import '../../state/bible_provider.dart';
 import '../../state/search_settings_provider.dart';
 import '../widgets/dictionary_entry_sheet.dart';
 import '../../state/most_read_provider.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import '../../state/typography_provider.dart';
 import '../widgets/textured_glass_container.dart';
@@ -64,7 +65,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
 
-      _animationController.forward();
+      _animationController
+        ..duration = Motion.of(context, const Duration(milliseconds: 500))
+        ..forward();
       _focusTimer = Timer(const Duration(milliseconds: 150), () {
         if (mounted) _focusNode.requestFocus();
       });
@@ -192,7 +195,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24.0),
                       child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
+                        duration: Motion.of(
+                            context, const Duration(milliseconds: 300)),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(Radii.xxxl),
                           boxShadow: [
@@ -274,15 +278,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                       ),
                                     ),
                                     if (_controller.text.isNotEmpty)
-                                      GestureDetector(
-                                        onTap: () {
+                                      IconButton(
+                                        tooltip:
+                                            context.l10n.storiesClearSearch,
+                                        onPressed: () {
                                           _controller.clear();
                                           ref
                                               .read(
                                                   searchStateProvider.notifier)
                                               .setQuery('');
                                         },
-                                        child: Icon(
+                                        icon: Icon(
                                           Icons.close_rounded,
                                           size: 20,
                                           color: theme.colorScheme.onSurface
@@ -300,10 +306,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                     .withValues(alpha: 0.08),
                               ),
 
-                              // Filter chips row
+                              // Filter chips row. Chips now have 48 dp hit
+                              // areas, so the vertical padding shrank to
+                              // keep the card the same height.
                               Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0, vertical: 10.0),
+                                    horizontal: 16.0, vertical: 2.0),
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
                                   child: Row(
@@ -411,13 +419,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                       }),
                                       const SizedBox(width: 8),
                                       IconButton(
+                                        tooltip:
+                                            context.l10n.settingsSearchSettings,
                                         icon: Icon(Icons.settings_rounded,
                                             color: theme.colorScheme.onSurface
                                                 .withValues(alpha: 0.6)),
                                         iconSize: 20,
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8, vertical: 4),
-                                        constraints: const BoxConstraints(),
                                         onPressed: () {
                                           showModalBottomSheet<void>(
                                             context: context,
@@ -472,41 +479,53 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     required VoidCallback onTap,
     required ThemeData theme,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-        decoration: BoxDecoration(
-          color: isActive ? theme.primaryColor : Colors.transparent,
-          borderRadius: BorderRadius.circular(Radii.xl),
-          border: Border.all(
-            color: isActive
-                ? Colors.transparent
-                : theme.colorScheme.onSurface.withValues(alpha: 0.2),
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 15,
-              color: isActive
-                  ? theme.colorScheme.surface
-                  : theme.colorScheme.onSurface,
-            ),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: theme.textTheme.labelMedium?.copyWith(
-                fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-                color: isActive
-                    ? theme.colorScheme.surface
-                    : theme.colorScheme.onSurface,
+    return Semantics(
+      button: true,
+      selected: isActive,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        // 48 dp tall hit area around the slimmer chip.
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: kMinTouchTarget),
+          child: Center(
+            child: AnimatedContainer(
+              duration: Motion.of(context, const Duration(milliseconds: 200)),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+              decoration: BoxDecoration(
+                color: isActive ? theme.primaryColor : Colors.transparent,
+                borderRadius: BorderRadius.circular(Radii.xl),
+                border: Border.all(
+                  color: isActive
+                      ? Colors.transparent
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    icon,
+                    size: 15,
+                    color: isActive
+                        ? theme.colorScheme.surface
+                        : theme.colorScheme.onSurface,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    label,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      fontWeight:
+                          isActive ? FontWeight.bold : FontWeight.normal,
+                      color: isActive
+                          ? theme.colorScheme.surface
+                          : theme.colorScheme.onSurface,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -560,61 +579,84 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                   letterSpacing: 1.2,
                 ),
               ),
-              GestureDetector(
-                onTap: () =>
-                    ref.read(searchStateProvider.notifier).clearRecentQueries(),
-                child: Text(
-                  context.l10n.searchClear,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.primaryColor,
-                    fontWeight: FontWeight.bold,
+              Semantics(
+                button: true,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => ref
+                      .read(searchStateProvider.notifier)
+                      .clearRecentQueries(),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                        minWidth: kMinTouchTarget, minHeight: kMinTouchTarget),
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      widthFactor: 1,
+                      child: Text(
+                        context.l10n.searchClear,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.primaryColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 4),
           Wrap(
             spacing: 8,
-            runSpacing: 8,
             children: state.recentQueries
-                .map((query) => GestureDetector(
+                .map((query) => Semantics(
+                    button: true,
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
                       onTap: () {
                         _controller.text = query;
                         ref.read(searchStateProvider.notifier).setQuery(query);
                       },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.surface,
-                          borderRadius: BorderRadius.circular(Radii.xl),
-                          border: Border.all(
-                            color: theme.colorScheme.onSurface
-                                .withValues(alpha: 0.1),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.history_rounded,
-                              size: 14,
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.5),
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              query,
-                              style: theme.textTheme.labelMedium?.copyWith(
+                      // 48 dp tall hit area; the chip stays 32 dp.
+                      child: ConstrainedBox(
+                        constraints:
+                            const BoxConstraints(minHeight: kMinTouchTarget),
+                        child: Center(
+                          widthFactor: 1,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 14, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surface,
+                              borderRadius: BorderRadius.circular(Radii.xl),
+                              border: Border.all(
                                 color: theme.colorScheme.onSurface
-                                    .withValues(alpha: 0.8),
+                                    .withValues(alpha: 0.1),
                               ),
                             ),
-                          ],
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.history_rounded,
+                                  size: 14,
+                                  color: theme.colorScheme.onSurface
+                                      .withValues(alpha: 0.5),
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  query,
+                                  style: theme.textTheme.labelMedium?.copyWith(
+                                    color: theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.8),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
-                    ))
+                    )))
                 .toList(),
           ),
           const SizedBox(height: 24),
@@ -799,52 +841,61 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
       icon = Icons.library_books_rounded;
     }
 
+    void copy() {
+      Clipboard.setData(ClipboardData(
+          text:
+              '${result.title}\n${searchResultSnippet(result, context.l10n).replaceAll('...', '')}'));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.searchCopied)),
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
-      child: GestureDetector(
-        onTap: () => _onResultTap(result),
-        onLongPress: () {
-          Clipboard.setData(ClipboardData(
-              text:
-                  '${result.title}\n${searchResultSnippet(result, context.l10n).replaceAll('...', '')}'));
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(context.l10n.searchCopied)),
-          );
+      // Long-press copies; screen readers get the same as a custom action.
+      child: Semantics(
+        button: true,
+        customSemanticsActions: {
+          CustomSemanticsAction(label: context.l10n.commonCopy): copy,
         },
-        child: TexturedGlassContainer(
-          isScrollable: true,
-          borderRadius: BorderRadius.circular(Radii.xl),
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(icon, size: 15, color: theme.primaryColor),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      searchResultSubtitle(result, context.l10n),
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.primaryColor,
-                        fontWeight: FontWeight.bold,
+        child: GestureDetector(
+          onTap: () => _onResultTap(result),
+          onLongPress: copy,
+          child: TexturedGlassContainer(
+            isScrollable: true,
+            borderRadius: BorderRadius.circular(Radii.xl),
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(icon, size: 15, color: theme.primaryColor),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        searchResultSubtitle(result, context.l10n),
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.primaryColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                result.title,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+                  ],
                 ),
-              ),
-              const SizedBox(height: 4),
-              _buildSnippet(
-                  searchResultSnippet(result, context.l10n), query, theme),
-            ],
+                const SizedBox(height: 8),
+                Text(
+                  result.title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                _buildSnippet(
+                    searchResultSnippet(result, context.l10n), query, theme),
+              ],
+            ),
           ),
         ),
       ),
@@ -905,13 +956,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
       spans.add(TextSpan(text: text.substring(start), style: baseStyle));
     }
 
-    return RichText(
-      maxLines: 2,
-      overflow: TextOverflow.ellipsis,
-      text: TextSpan(
+    // Text.rich (not RichText) so the snippet follows the system text size.
+    return Text.rich(
+      TextSpan(
         style: baseStyle,
         children: spans,
       ),
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
     );
   }
 }

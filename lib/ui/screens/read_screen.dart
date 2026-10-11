@@ -497,12 +497,19 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         final listener = _itemPositionsListeners[targetIndex];
 
         if (controller != null && controller.isAttached) {
-          controller.scrollTo(
-            index: verse - 1,
-            duration: const Duration(milliseconds: 600),
-            curve: Curves.easeInOutCubic,
-            alignment: 0.15, // Account for top header
-          );
+          final scrollDuration =
+              Motion.of(context, const Duration(milliseconds: 600));
+          if (scrollDuration == Duration.zero) {
+            // Reduced motion: jump straight to the verse.
+            controller.jumpTo(index: verse - 1, alignment: 0.15);
+          } else {
+            controller.scrollTo(
+              index: verse - 1,
+              duration: scrollDuration,
+              curve: Curves.easeInOutCubic,
+              alignment: 0.15, // Account for top header
+            );
+          }
 
           if (listener != null) {
             // Overscroll hack has been removed since we no longer have massive bottom padding.
@@ -532,6 +539,18 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       tryScroll(0);
     });
+  }
+
+  /// Animated page change, or a jump when the system asks for reduced
+  /// motion (page animations cannot run with a zero duration).
+  void _animateToPage(int index) {
+    final d = Motion.of(context, const Duration(milliseconds: 300));
+    if (d == Duration.zero) {
+      _pageController.jumpToPage(index);
+    } else {
+      _pageController.animateToPage(index,
+          duration: d, curve: Curves.easeInOut);
+    }
   }
 
   void _showTypographyBottomSheet() {
@@ -581,50 +600,71 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   Widget _buildThemedPill(
       {required Widget child,
       required ReadingTokens tokens,
-      required VoidCallback onTap}) {
+      required VoidCallback onTap,
+      String? semanticLabel,
+      bool replaceSemantics = false}) {
     final surfaceStyle = ref.watch(surfaceStyleProvider);
     final isEarth = surfaceStyle == SurfaceStyle.flat;
+    final opaque = reduceTransparency(context);
 
-    return GestureDetector(
-      onTap: onTap,
-      child: RepaintBoundary(
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(Radii.xxl),
-            boxShadow: isEarth
-                ? [
-                    BoxShadow(
-                      color: context.palette.shadow,
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ]
-                : null,
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(Radii.xxl),
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
-                    child: const SizedBox.shrink(),
+    return Semantics(
+      button: true,
+      label: semanticLabel,
+      excludeSemantics: replaceSemantics,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        // 48 dp tall hit area around the 36 dp pill.
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+              minWidth: kMinTouchTarget, minHeight: kMinTouchTarget),
+          child: Align(
+            widthFactor: 1,
+            heightFactor: 1,
+            child: RepaintBoundary(
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(Radii.xxl),
+                  boxShadow: isEarth
+                      ? [
+                          BoxShadow(
+                            color: context.palette.shadow,
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(Radii.xxl),
+                  child: Stack(
+                    children: [
+                      if (!opaque)
+                        Positioned.fill(
+                          child: BackdropFilter(
+                            filter:
+                                ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
+                            child: const SizedBox.shrink(),
+                          ),
+                        ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: tokens.readingPaper
+                              .withValues(alpha: opaque ? 1.0 : 0.85),
+                          borderRadius: BorderRadius.circular(Radii.xxl),
+                          border: Border.all(
+                            color: tokens.readingBorder.withValues(alpha: 0.3),
+                            width: 1,
+                          ),
+                        ),
+                        child: child,
+                      ),
+                    ],
                   ),
                 ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: tokens.readingPaper.withValues(alpha: 0.85),
-                    borderRadius: BorderRadius.circular(Radii.xxl),
-                    border: Border.all(
-                      color: tokens.readingBorder.withValues(alpha: 0.3),
-                      width: 1,
-                    ),
-                  ),
-                  child: child,
-                ),
-              ],
+              ),
             ),
           ),
         ),
@@ -633,11 +673,14 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   }
 
   Widget _buildSideButton(BuildContext context, ReadingTokens tokens,
-      Widget child, VoidCallback onTap) {
+      Widget child, VoidCallback onTap,
+      {String? semanticLabel, bool replaceSemantics = false}) {
     return _buildThemedPill(
       child: child,
       tokens: tokens,
       onTap: onTap,
+      semanticLabel: semanticLabel,
+      replaceSemantics: replaceSemantics,
     );
   }
 
@@ -722,7 +765,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                 backgroundColor: Colors.transparent,
                 builder: (ctx) => const TranslationPickerSheet(),
               );
-            });
+            }, semanticLabel: context.l10n.readTranslationTitle);
           });
 
     final trailingButton = _isPageSelectionMode
@@ -749,7 +792,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                 letterSpacing: -0.5,
               ),
             ),
-            _showTypographyBottomSheet);
+            _showTypographyBottomSheet,
+            semanticLabel: context.l10n.settingsAppearanceText,
+            replaceSemantics: true);
 
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(
@@ -865,9 +910,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
             final currentPage = _pageController.page?.round() ?? 0;
             if (currentPage != targetIndex) {
               if ((currentPage - targetIndex).abs() == 1) {
-                _pageController.animateToPage(targetIndex,
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut);
+                _animateToPage(targetIndex);
               } else {
                 _pageController.jumpToPage(targetIndex);
               }
@@ -1429,10 +1472,11 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                               ],
                                                               // Check for commentary
                                                               AnimatedOpacity(
-                                                                duration:
+                                                                duration: Motion.of(
+                                                                    context,
                                                                     const Duration(
                                                                         milliseconds:
-                                                                            250),
+                                                                            250)),
                                                                 opacity:
                                                                     (isSelectionMode &&
                                                                             !isSelected)
@@ -1578,73 +1622,82 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                             : _showDictionaryPopover,
                                                                   );
 
-                                                                  return GestureDetector(
-                                                                    behavior:
-                                                                        HitTestBehavior
-                                                                            .opaque,
-                                                                    onDoubleTap:
+                                                                  // Long-press menu as a screen reader action
+                                                                  // (VoiceOver has no long-press gesture).
+                                                                  return Semantics(
+                                                                    selected:
+                                                                        isSelected,
+                                                                    customSemanticsActions:
                                                                         _isPageSelectionMode
                                                                             ? null
-                                                                            : () {
-                                                                                HapticFeedback.lightImpact();
-                                                                                VerseActionLogic.handleBookmark(context, theme, ref, fc.book.name, fc.chapter.number, [
-                                                                                  verse.number
-                                                                                ]);
+                                                                            : {
+                                                                                CustomSemanticsAction(label: context.l10n.readVerseActions): () => _handleVerseLongPress(
+                                                                                      null,
+                                                                                      verse.number,
+                                                                                      fc.book.name,
+                                                                                      fc.chapter.number,
+                                                                                      allBooks.indexOf(fc.book) + 1,
+                                                                                    ),
                                                                               },
-                                                                    onTap: _isPageSelectionMode
-                                                                        ? null
-                                                                        : () {
-                                                                            if (ref.read(chromeHiddenProvider)) {
-                                                                              ref.read(chromeHiddenProvider.notifier).set(false);
-                                                                            } else {
-                                                                              _toggleVerseSelection(verse.number);
-                                                                            }
-                                                                          },
-                                                                    onLongPressStart: _isPageSelectionMode
-                                                                        ? null
-                                                                        : (d) =>
-                                                                            _pendingLongPressPosition =
-                                                                                d.globalPosition,
-                                                                    onLongPress:
-                                                                        _isPageSelectionMode
-                                                                            ? null
-                                                                            : () =>
-                                                                                _handleVerseLongPress(
-                                                                                  _pendingLongPressPosition,
-                                                                                  verse.number,
-                                                                                  fc.book.name,
-                                                                                  fc.chapter.number,
-                                                                                  allBooks.indexOf(fc.book) + 1,
-                                                                                ),
                                                                     child:
-                                                                        Stack(
-                                                                      children: [
-                                                                        AnimatedContainer(
-                                                                          duration:
-                                                                              Motion.normal,
-                                                                          clipBehavior:
-                                                                              Clip.antiAlias,
-                                                                          padding: const EdgeInsets
-                                                                              .only(
-                                                                              top: 6.0,
-                                                                              bottom: 6.0,
-                                                                              left: 12.0,
-                                                                              right: 12.0),
-                                                                          decoration:
-                                                                              BoxDecoration(
-                                                                            color: isSelected
-                                                                                ? (highlightColor != null ? highlightColor.withValues(alpha: 0.35) : theme.primaryColor.withValues(alpha: 0.15))
-                                                                                : (_navigatedVerseIndex == index ? theme.primaryColor.withValues(alpha: 0.15) : (highlightColor != null ? highlightColor.withValues(alpha: 0.35) : Colors.transparent)),
-                                                                            borderRadius:
-                                                                                BorderRadius.circular(Radii.md),
-                                                                            border: (isSelected && highlightColor != null)
-                                                                                ? Border.all(color: theme.primaryColor.withValues(alpha: 0.5), width: 1.5)
-                                                                                : Border.all(color: Colors.transparent, width: 1.5),
+                                                                        GestureDetector(
+                                                                      behavior:
+                                                                          HitTestBehavior
+                                                                              .opaque,
+                                                                      onDoubleTap: _isPageSelectionMode
+                                                                          ? null
+                                                                          : () {
+                                                                              HapticFeedback.lightImpact();
+                                                                              VerseActionLogic.handleBookmark(context, theme, ref, fc.book.name, fc.chapter.number, [
+                                                                                verse.number
+                                                                              ]);
+                                                                            },
+                                                                      onTap: _isPageSelectionMode
+                                                                          ? null
+                                                                          : () {
+                                                                              if (ref.read(chromeHiddenProvider)) {
+                                                                                ref.read(chromeHiddenProvider.notifier).set(false);
+                                                                              } else {
+                                                                                _toggleVerseSelection(verse.number);
+                                                                              }
+                                                                            },
+                                                                      onLongPressStart: _isPageSelectionMode
+                                                                          ? null
+                                                                          : (d) =>
+                                                                              _pendingLongPressPosition = d.globalPosition,
+                                                                      onLongPress: _isPageSelectionMode
+                                                                          ? null
+                                                                          : () => _handleVerseLongPress(
+                                                                                _pendingLongPressPosition,
+                                                                                verse.number,
+                                                                                fc.book.name,
+                                                                                fc.chapter.number,
+                                                                                allBooks.indexOf(fc.book) + 1,
+                                                                              ),
+                                                                      child:
+                                                                          Stack(
+                                                                        children: [
+                                                                          AnimatedContainer(
+                                                                            duration:
+                                                                                Motion.of(context, Motion.normal),
+                                                                            clipBehavior:
+                                                                                Clip.antiAlias,
+                                                                            padding: const EdgeInsets.only(
+                                                                                top: 6.0,
+                                                                                bottom: 6.0,
+                                                                                left: 12.0,
+                                                                                right: 12.0),
+                                                                            decoration:
+                                                                                BoxDecoration(
+                                                                              color: isSelected ? (highlightColor != null ? highlightColor.withValues(alpha: 0.35) : theme.primaryColor.withValues(alpha: 0.15)) : (_navigatedVerseIndex == index ? theme.primaryColor.withValues(alpha: 0.15) : (highlightColor != null ? highlightColor.withValues(alpha: 0.35) : Colors.transparent)),
+                                                                              borderRadius: BorderRadius.circular(Radii.md),
+                                                                              border: (isSelected && highlightColor != null) ? Border.all(color: theme.primaryColor.withValues(alpha: 0.5), width: 1.5) : Border.all(color: Colors.transparent, width: 1.5),
+                                                                            ),
+                                                                            child:
+                                                                                verseWidget,
                                                                           ),
-                                                                          child:
-                                                                              verseWidget,
-                                                                        ),
-                                                                      ],
+                                                                        ],
+                                                                      ),
                                                                     ),
                                                                   );
                                                                 }),
@@ -1768,11 +1821,13 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                         ref.watch(readSettingsProvider).readingViewMode;
                     final hideTopNav = isHidden && mode == ReadingViewMode.full;
                     return AnimatedSlide(
-                      duration: const Duration(milliseconds: 300),
+                      duration:
+                          Motion.of(context, const Duration(milliseconds: 300)),
                       curve: Curves.easeOutCubic,
                       offset: hideTopNav ? const Offset(0, -1.0) : Offset.zero,
                       child: AnimatedOpacity(
-                        duration: const Duration(milliseconds: 300),
+                        duration: Motion.of(
+                            context, const Duration(milliseconds: 300)),
                         opacity: hideTopNav ? 0.0 : 1.0,
                         child: Padding(
                           padding: EdgeInsets.only(
@@ -1802,7 +1857,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: AnimatedOpacity(
                           opacity: _currentHintMessage != null ? 1.0 : 0.0,
-                          duration: const Duration(milliseconds: 300),
+                          duration: Motion.of(
+                              context, const Duration(milliseconds: 300)),
                           alwaysIncludeSemantics: true,
                           child: Container(
                             padding: const EdgeInsets.symmetric(
@@ -1833,13 +1889,12 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                   ),
                                 ),
                                 IconButton(
+                                  tooltip: context.l10n.commonClose,
                                   icon: Icon(Icons.close_rounded,
                                       size: 16,
                                       color: theme.colorScheme.onSurface
                                           .withValues(alpha: 0.6)),
                                   onPressed: _dismissHint,
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
                                 ),
                               ],
                             ),
@@ -2133,96 +2188,131 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                       final translationId = availableChips[langEntry.value];
                       final isSelected = activeChipId == translationId;
 
-                      return Material(
-                        color: isSelected
-                            ? theme.primaryColor.withValues(alpha: 0.15)
-                            : theme.colorScheme.surface,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(Radii.lg),
-                          side: BorderSide(
-                            color: isSelected
-                                ? theme.primaryColor.withValues(alpha: 0.5)
-                                : theme.colorScheme.onSurface.withValues(
-                                    alpha: isInstalled ? 0.15 : 0.05),
-                          ),
-                        ),
-                        clipBehavior: Clip.antiAlias,
-                        child: InkWell(
-                          onTap: () {
-                            if (isInstalled) {
-                              if (isSelected) {
-                                ref
-                                    .read(expandedChipsProvider.notifier)
-                                    .clear(primaryVerse.number);
-                              } else {
-                                if (translationId != null) {
-                                  ref
-                                      .read(expandedChipsProvider.notifier)
-                                      .setLanguage(
-                                          primaryVerse.number, translationId);
-                                }
-                              }
-                            } else {
-                              // Uninstalled: Prompt download by opening picker
-                              showModalBottomSheet<void>(
-                                context: context,
-                                isScrollControlled: true,
-                                useRootNavigator: true,
-                                backgroundColor: Colors.transparent,
-                                builder: (context) =>
-                                    const TranslationPickerSheet(),
-                              );
-                            }
-                          },
-                          onLongPress: () {
-                            if (isInstalled && translationId != null) {
-                              final currentPrimary =
-                                  ref.read(activeTranslationProvider);
-                              ref
-                                  .read(activeTranslationProvider.notifier)
-                                  .setTranslation(translationId);
+                      void onChipTap() {
+                        if (isInstalled) {
+                          if (isSelected) {
+                            ref
+                                .read(expandedChipsProvider.notifier)
+                                .clear(primaryVerse.number);
+                          } else {
+                            if (translationId != null) {
                               ref
                                   .read(expandedChipsProvider.notifier)
                                   .setLanguage(
-                                      primaryVerse.number, currentPrimary);
+                                      primaryVerse.number, translationId);
                             }
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 4.0, vertical: 6.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    _getTranslationLabel(
-                                        isInstalled
-                                            ? (translationId ?? langEntry.value)
-                                            : langEntry.value,
-                                        installedTranslations,
-                                        defaultName: langEntry.key),
-                                    overflow: TextOverflow.ellipsis,
-                                    style:
-                                        theme.textTheme.labelMedium?.copyWith(
-                                      color: isSelected
-                                          ? theme.primaryColor
-                                          : theme.colorScheme.onSurface
-                                              .withValues(
-                                                  alpha:
-                                                      isInstalled ? 0.7 : 0.3),
-                                      fontWeight: FontWeight.w600,
+                          }
+                        } else {
+                          // Uninstalled: Prompt download by opening picker
+                          showModalBottomSheet<void>(
+                            context: context,
+                            isScrollControlled: true,
+                            useRootNavigator: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) =>
+                                const TranslationPickerSheet(),
+                          );
+                        }
+                      }
+
+                      // Long-press: make this the main translation.
+                      void onChipLongPress() {
+                        if (isInstalled && translationId != null) {
+                          final currentPrimary =
+                              ref.read(activeTranslationProvider);
+                          ref
+                              .read(activeTranslationProvider.notifier)
+                              .setTranslation(translationId);
+                          ref
+                              .read(expandedChipsProvider.notifier)
+                              .setLanguage(primaryVerse.number, currentPrimary);
+                        }
+                      }
+
+                      // The slim chip keeps its look; the area around it
+                      // takes taps too, for a 44 dp target (dense row).
+                      return Semantics(
+                        button: true,
+                        selected: isSelected,
+                        customSemanticsActions: isInstalled &&
+                                translationId != null
+                            ? {
+                                CustomSemanticsAction(
+                                        label: context.l10n.a11yMakePrimary):
+                                    onChipLongPress,
+                              }
+                            : null,
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: onChipTap,
+                          onLongPress: onChipLongPress,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(
+                                minHeight: kMinTouchTarget - 4),
+                            child: Center(
+                              child: Material(
+                                color: isSelected
+                                    ? theme.primaryColor.withValues(alpha: 0.15)
+                                    : theme.colorScheme.surface,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(Radii.lg),
+                                  side: BorderSide(
+                                    color: isSelected
+                                        ? theme.primaryColor
+                                            .withValues(alpha: 0.5)
+                                        : theme.colorScheme.onSurface
+                                            .withValues(
+                                                alpha:
+                                                    isInstalled ? 0.15 : 0.05),
+                                  ),
+                                ),
+                                clipBehavior: Clip.antiAlias,
+                                child: InkWell(
+                                  onTap: onChipTap,
+                                  onLongPress: onChipLongPress,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 4.0, vertical: 6.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            _getTranslationLabel(
+                                                isInstalled
+                                                    ? (translationId ??
+                                                        langEntry.value)
+                                                    : langEntry.value,
+                                                installedTranslations,
+                                                defaultName: langEntry.key),
+                                            overflow: TextOverflow.ellipsis,
+                                            style: theme.textTheme.labelMedium
+                                                ?.copyWith(
+                                              color: isSelected
+                                                  ? theme.primaryColor
+                                                  : theme.colorScheme.onSurface
+                                                      .withValues(
+                                                          alpha: isInstalled
+                                                              ? 0.7
+                                                              : 0.3),
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                        if (!isInstalled) ...[
+                                          const SizedBox(width: 2),
+                                          Icon(Icons.download_rounded,
+                                              size: 10,
+                                              color: theme.colorScheme.onSurface
+                                                  .withValues(alpha: 0.3)),
+                                        ]
+                                      ],
                                     ),
                                   ),
                                 ),
-                                if (!isInstalled) ...[
-                                  const SizedBox(width: 2),
-                                  Icon(Icons.download_rounded,
-                                      size: 10,
-                                      color: theme.colorScheme.onSurface
-                                          .withValues(alpha: 0.3)),
-                                ]
-                              ],
+                              ),
                             ),
                           ),
                         ),
@@ -2381,14 +2471,19 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           } else {
             strongsSpan = WidgetSpan(
               alignment: PlaceholderAlignment.middle,
-              child: GestureDetector(
-                onTap: () => showStrongsEntrySheet(context, strongsId),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 1.0),
-                  child: Icon(
-                    Icons.link,
-                    size: (style.fontSize ?? 16) * 0.85,
-                    color: theme.colorScheme.primary.withValues(alpha: 0.7),
+              child: Semantics(
+                button: true,
+                label: strongsId,
+                excludeSemantics: true,
+                child: GestureDetector(
+                  onTap: () => showStrongsEntrySheet(context, strongsId),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 1.0),
+                    child: Icon(
+                      Icons.link,
+                      size: (style.fontSize ?? 16) * 0.85,
+                      color: theme.colorScheme.primary.withValues(alpha: 0.7),
+                    ),
                   ),
                 ),
               ),
@@ -2501,16 +2596,21 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         if (hasDevotional && !isSelectionMode)
           WidgetSpan(
             alignment: PlaceholderAlignment.middle,
-            child: GestureDetector(
-              onTap: onDevotionalTap,
-              behavior: HitTestBehavior.opaque,
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
-                child: Icon(
-                  Icons.favorite_rounded,
-                  color: tokens?.readingAccent ?? theme.primaryColor,
-                  size: typography.fontSize * 0.85,
+            child: Semantics(
+              button: true,
+              label: context.l10n.studyCategoryDevotional,
+              excludeSemantics: true,
+              child: GestureDetector(
+                onTap: onDevotionalTap,
+                behavior: HitTestBehavior.opaque,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 6.0, vertical: 8.0),
+                  child: Icon(
+                    Icons.favorite_rounded,
+                    color: tokens?.readingAccent ?? theme.primaryColor,
+                    size: typography.fontSize * 0.85,
+                  ),
                 ),
               ),
             ),
@@ -2518,16 +2618,21 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         if (hasStudyNote && !isSelectionMode)
           WidgetSpan(
             alignment: PlaceholderAlignment.middle,
-            child: GestureDetector(
-              onTap: onStudyNoteTap,
-              behavior: HitTestBehavior.opaque,
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
-                child: Icon(
-                  Icons.edit_note_rounded,
-                  color: starColor,
-                  size: typography.fontSize * 0.85,
+            child: Semantics(
+              button: true,
+              label: context.l10n.studyCategoryStudyNote,
+              excludeSemantics: true,
+              child: GestureDetector(
+                onTap: onStudyNoteTap,
+                behavior: HitTestBehavior.opaque,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 6.0, vertical: 8.0),
+                  child: Icon(
+                    Icons.edit_note_rounded,
+                    color: starColor,
+                    size: typography.fontSize * 0.85,
+                  ),
                 ),
               ),
             ),
@@ -2535,16 +2640,21 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         if (hasCommentary && !isSelectionMode)
           WidgetSpan(
             alignment: PlaceholderAlignment.middle,
-            child: GestureDetector(
-              onTap: onCommentaryTap,
-              behavior: HitTestBehavior.opaque,
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
-                child: Icon(
-                  Icons.library_books_rounded,
-                  color: starColor,
-                  size: typography.fontSize * 0.85,
+            child: Semantics(
+              button: true,
+              label: context.l10n.readActionCommentary,
+              excludeSemantics: true,
+              child: GestureDetector(
+                onTap: onCommentaryTap,
+                behavior: HitTestBehavior.opaque,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 6.0, vertical: 8.0),
+                  child: Icon(
+                    Icons.library_books_rounded,
+                    color: starColor,
+                    size: typography.fontSize * 0.85,
+                  ),
                 ),
               ),
             ),
@@ -2659,39 +2769,40 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // Flexible: long labels at large text wrap, not overflow.
               if (hasPrevious)
-                TextButton(
+                Flexible(
+                    child: TextButton(
                   onPressed: () {
-                    _pageController.animateToPage(pageIndex - 1,
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut);
+                    _animateToPage(pageIndex - 1);
                   },
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 12),
                   ),
                   child: Text(context.l10n.readPreviousChapter,
+                      textAlign: TextAlign.center,
                       style: theme.textTheme.titleMedium?.copyWith(
                           color: tokens?.readingAccent ?? theme.primaryColor)),
-                )
+                ))
               else
                 const SizedBox(width: 100),
               const SizedBox(width: 24),
               if (hasNext)
-                TextButton(
+                Flexible(
+                    child: TextButton(
                   onPressed: () {
-                    _pageController.animateToPage(pageIndex + 1,
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut);
+                    _animateToPage(pageIndex + 1);
                   },
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 12),
                   ),
                   child: Text(context.l10n.readNextChapter,
+                      textAlign: TextAlign.center,
                       style: theme.textTheme.titleMedium?.copyWith(
                           color: tokens?.readingAccent ?? theme.primaryColor)),
-                )
+                ))
               else
                 const SizedBox(width: 100),
             ],
@@ -2944,52 +3055,61 @@ class VerseActionLogic {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  // Clear highlight button
-                  GestureDetector(
-                    onTap: () {
-                      HapticFeedback.lightImpact();
-                      for (var v in targetVerses) {
-                        final refStr =
-                            generateVerseKey(bookAbbrev, chapterNum, v);
-                        ref
-                            .read(highlightsProvider.notifier)
-                            .removeHighlight(refStr);
-                      }
-                      Navigator.of(ctx).pop();
-                      onClearSelection();
-                    },
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: theme.scaffoldBackgroundColor,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                                color: theme.colorScheme.onSurface
-                                    .withValues(alpha: 0.2),
-                                width: 1.5),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: ctx.palette.shadow,
-                                  blurRadius: 4,
-                                  spreadRadius: 1)
-                            ],
-                          ),
-                          child: Icon(Icons.block,
-                              size: 20,
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.6)),
+                  // Clear highlight button. Swatches: 44 dp wide hit areas
+                  // (six must fit a narrow phone).
+                  Semantics(
+                    button: true,
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        for (var v in targetVerses) {
+                          final refStr =
+                              generateVerseKey(bookAbbrev, chapterNum, v);
+                          ref
+                              .read(highlightsProvider.notifier)
+                              .removeHighlight(refStr);
+                        }
+                        Navigator.of(ctx).pop();
+                        onClearSelection();
+                      },
+                      child: ConstrainedBox(
+                        constraints:
+                            const BoxConstraints(minWidth: kMinTouchTarget - 4),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: theme.scaffoldBackgroundColor,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                    color: theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.2),
+                                    width: 1.5),
+                                boxShadow: [
+                                  BoxShadow(
+                                      color: ctx.palette.shadow,
+                                      blurRadius: 4,
+                                      spreadRadius: 1)
+                                ],
+                              ),
+                              child: Icon(Icons.block,
+                                  size: 20,
+                                  color: theme.colorScheme.onSurface
+                                      .withValues(alpha: 0.6)),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(context.l10n.readNone,
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: theme.colorScheme.onSurface
+                                      .withValues(alpha: 0.7),
+                                )),
+                          ],
                         ),
-                        const SizedBox(height: 6),
-                        Text(context.l10n.readNone,
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.7),
-                            )),
-                      ],
+                      ),
                     ),
                   ),
                   ...List.generate(highlightPalette.length, (i) {
@@ -2997,45 +3117,53 @@ class VerseActionLogic {
                         highlightPaletteSwatches[i],
                         theme.brightness,
                         theme.scaffoldBackgroundColor);
-                    return GestureDetector(
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        ref
-                            .read(readSettingsProvider.notifier)
-                            .setActiveHighlightColorIndex(i);
-                        VerseActionLogic.handleHighlight(ctx, theme, ref,
-                            bookAbbrev, chapterNum, targetVerses, i);
-                        Navigator.of(ctx).pop();
-                        onClearSelection();
-                      },
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: color,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                  color: theme.colorScheme.onSurface
-                                      .withValues(alpha: 0.2),
-                                  width: 1.5),
-                              boxShadow: [
-                                BoxShadow(
-                                    color: ctx.palette.shadow,
-                                    blurRadius: 4,
-                                    spreadRadius: 1)
-                              ],
-                            ),
+                    return Semantics(
+                      button: true,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          ref
+                              .read(readSettingsProvider.notifier)
+                              .setActiveHighlightColorIndex(i);
+                          VerseActionLogic.handleHighlight(ctx, theme, ref,
+                              bookAbbrev, chapterNum, targetVerses, i);
+                          Navigator.of(ctx).pop();
+                          onClearSelection();
+                        },
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(
+                              minWidth: kMinTouchTarget - 4),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: color,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                      color: theme.colorScheme.onSurface
+                                          .withValues(alpha: 0.2),
+                                      width: 1.5),
+                                  boxShadow: [
+                                    BoxShadow(
+                                        color: ctx.palette.shadow,
+                                        blurRadius: 4,
+                                        spreadRadius: 1)
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(highlightPaletteName(i, context.l10n),
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    color: theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.7),
+                                  )),
+                            ],
                           ),
-                          const SizedBox(height: 6),
-                          Text(highlightPaletteName(i, context.l10n),
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: theme.colorScheme.onSurface
-                                    .withValues(alpha: 0.7),
-                              )),
-                        ],
+                        ),
                       ),
                     );
                   }),

@@ -138,6 +138,7 @@ class JournalSegment extends ConsumerWidget {
           right: 24,
           child: FloatingActionButton(
             heroTag: 'journal_fab',
+            tooltip: context.l10n.notesWriteEntry,
             onPressed: () => _showAddJournalDialog(context, ref),
             child: const Icon(Icons.edit),
           ),

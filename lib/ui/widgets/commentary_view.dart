@@ -541,28 +541,32 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          InkWell(
-            onTap: onToggle,
-            borderRadius: BorderRadius.circular(Radii.md),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: tokens.readingInk,
+          Semantics(
+            button: true,
+            expanded: isExpanded,
+            child: InkWell(
+              onTap: onToggle,
+              borderRadius: BorderRadius.circular(Radii.md),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: tokens.readingInk,
+                        ),
                       ),
                     ),
-                  ),
-                  Icon(
-                      isExpanded
-                          ? Icons.keyboard_arrow_up
-                          : Icons.keyboard_arrow_down,
-                      color: tokens.readingAccent),
-                ],
+                    Icon(
+                        isExpanded
+                            ? Icons.keyboard_arrow_up
+                            : Icons.keyboard_arrow_down,
+                        color: tokens.readingAccent),
+                  ],
+                ),
               ),
             ),
           ),

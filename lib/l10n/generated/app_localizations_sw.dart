@@ -9,6 +9,44 @@ class AppLocalizationsSw extends AppLocalizations {
   AppLocalizationsSw([String locale = 'sw']) : super(locale);
 
   @override
+  String get a11yTextSmaller => 'Maandishi madogo zaidi';
+
+  @override
+  String get a11yTextLarger => 'Maandishi makubwa zaidi';
+
+  @override
+  String get a11yNotifications => 'Arifa';
+
+  @override
+  String get a11yShowNav => 'Onyesha urambazaji';
+
+  @override
+  String get a11yHideNav => 'Ficha urambazaji';
+
+  @override
+  String a11yVersesSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Aya $count zimechaguliwa',
+      one: 'Aya 1 imechaguliwa',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get a11yMakePrimary => 'Fanya iwe tafsiri kuu';
+
+  @override
+  String get a11yPreviousWeek => 'Wiki iliyopita';
+
+  @override
+  String get a11yNextWeek => 'Wiki ijayo';
+
+  @override
+  String get a11yRead => 'Imesomwa';
+
+  @override
   String get appTitle => 'The Blessed Bible';
 
   @override
@@ -2499,6 +2537,18 @@ class AppLocalizationsSw extends AppLocalizations {
   String spaceDeletePackTooltip(String name) {
     return 'Futa $name';
   }
+
+  @override
+  String get stateLoading => 'Inapakia';
+
+  @override
+  String get stateErrorTitle => 'Hitilafu imetokea';
+
+  @override
+  String get stateErrorBody => 'Tafadhali jaribu tena baada ya muda mfupi.';
+
+  @override
+  String get commonUndo => 'Tendua';
 
   @override
   String studyCouldNotOpenScreen(String error) {

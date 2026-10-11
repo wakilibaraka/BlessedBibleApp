@@ -101,7 +101,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       parent: _verseController,
       curve: Curves.easeOut,
     );
-    _verseController.forward();
+  }
+
+  bool _verseStarted = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Started here (not initState) so the reduced-motion flag is readable.
+    if (_verseStarted) return;
+    _verseStarted = true;
+    _verseController
+      ..duration = Motion.of(context, const Duration(milliseconds: 900))
+      ..forward();
   }
 
   @override
@@ -299,59 +311,62 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           const SizedBox(height: 56),
 
           // ── Verse of the Day ──────────────────────────────────────────
-          GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () {
-              final refParts = votdRef.split(':');
-              final verseNum =
-                  refParts.length > 1 ? int.tryParse(refParts.last) : 1;
-              openReaderAtVerse(
-                ref,
-                bookName: votdBook,
-                chapter: votdChapter,
-                verse: verseNum,
-              );
-            },
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                BouncyEntrance(
-                  delay: const Duration(milliseconds: 100),
-                  child: Text(
-                    context.l10n.homeVerseOfTheDay,
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.primaryColor,
-                      letterSpacing: 2.0,
-                      fontWeight: FontWeight.bold,
+          Semantics(
+            button: true,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                final refParts = votdRef.split(':');
+                final verseNum =
+                    refParts.length > 1 ? int.tryParse(refParts.last) : 1;
+                openReaderAtVerse(
+                  ref,
+                  bookName: votdBook,
+                  chapter: votdChapter,
+                  verse: verseNum,
+                );
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  BouncyEntrance(
+                    delay: const Duration(milliseconds: 100),
+                    child: Text(
+                      context.l10n.homeVerseOfTheDay,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.primaryColor,
+                        letterSpacing: 2.0,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                BouncyEntrance(
-                  delay: const Duration(milliseconds: 200),
-                  child: Text(
-                    '\u201c${data.verseOfTheDay.text}\u201d',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      height: 1.42,
+                  const SizedBox(height: 12),
+                  BouncyEntrance(
+                    delay: const Duration(milliseconds: 200),
+                    child: Text(
+                      '\u201c${data.verseOfTheDay.text}\u201d',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        height: 1.42,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 10),
-                BouncyEntrance(
-                  delay: const Duration(milliseconds: 300),
-                  child: Text(
-                    data.verseOfTheDay.reference,
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      color: theme.primaryColor,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.5,
+                  const SizedBox(height: 10),
+                  BouncyEntrance(
+                    delay: const Duration(milliseconds: 300),
+                    child: Text(
+                      data.verseOfTheDay.reference,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        color: theme.primaryColor,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
 
@@ -505,8 +520,9 @@ class _PillButton extends StatelessWidget {
     );
 
     if (filled) {
-      return SizedBox(
-        height: 48,
+      // Min (not fixed) 48 so the label is not clipped at large text.
+      return ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: kMinTouchTarget),
         child: ElevatedButton(
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
@@ -524,8 +540,8 @@ class _PillButton extends StatelessWidget {
         ),
       );
     } else {
-      return SizedBox(
-        height: 48,
+      return ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: kMinTouchTarget),
         child: OutlinedButton(
           onPressed: onPressed,
           style: OutlinedButton.styleFrom(

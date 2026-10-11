@@ -132,20 +132,25 @@ class ItemContextSheet extends StatelessWidget {
                                 Navigator.of(context).pop();
                                 a.onTap!();
                               },
-                        child: SizedBox(
-                          height: 50,
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(minHeight: 50),
                           child: Row(
                             children: [
                               const SizedBox(width: 18),
                               Icon(a.icon, size: 20, color: color),
                               const SizedBox(width: 14),
                               Expanded(
-                                child: Text(
-                                  a.label,
-                                  style: theme.textTheme.bodyLarge?.copyWith(
-                                    color: color,
-                                    fontWeight:
-                                        a.destructive ? FontWeight.w600 : null,
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12),
+                                  child: Text(
+                                    a.label,
+                                    style: theme.textTheme.bodyLarge?.copyWith(
+                                      color: color,
+                                      fontWeight: a.destructive
+                                          ? FontWeight.w600
+                                          : null,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -164,8 +169,8 @@ class ItemContextSheet extends StatelessWidget {
                 height: 1, color: theme.dividerColor.withValues(alpha: 0.5)),
             InkWell(
               onTap: () => Navigator.of(context).pop(),
-              child: SizedBox(
-                height: 50,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 50),
                 child: Center(
                   child: Text(
                     context.l10n.commonCancel,

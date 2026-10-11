@@ -9,6 +9,45 @@ class AppLocalizationsRo extends AppLocalizations {
   AppLocalizationsRo([String locale = 'ro']) : super(locale);
 
   @override
+  String get a11yTextSmaller => 'Text mai mic';
+
+  @override
+  String get a11yTextLarger => 'Text mai mare';
+
+  @override
+  String get a11yNotifications => 'Notificări';
+
+  @override
+  String get a11yShowNav => 'Afișează navigarea';
+
+  @override
+  String get a11yHideNav => 'Ascunde navigarea';
+
+  @override
+  String a11yVersesSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count de versete selectate',
+      few: '$count versete selectate',
+      one: '1 verset selectat',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get a11yMakePrimary => 'Setează ca traducere principală';
+
+  @override
+  String get a11yPreviousWeek => 'Săptămâna anterioară';
+
+  @override
+  String get a11yNextWeek => 'Săptămâna următoare';
+
+  @override
+  String get a11yRead => 'Citit';
+
+  @override
   String get appTitle => 'The Blessed Bible';
 
   @override
@@ -2509,6 +2548,18 @@ class AppLocalizationsRo extends AppLocalizations {
   String spaceDeletePackTooltip(String name) {
     return 'Șterge $name';
   }
+
+  @override
+  String get stateLoading => 'Se încarcă';
+
+  @override
+  String get stateErrorTitle => 'Ceva nu a mers bine';
+
+  @override
+  String get stateErrorBody => 'Încearcă din nou peste câteva clipe.';
+
+  @override
+  String get commonUndo => 'Anulează';
 
   @override
   String studyCouldNotOpenScreen(String error) {

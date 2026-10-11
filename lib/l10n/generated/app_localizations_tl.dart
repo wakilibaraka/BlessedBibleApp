@@ -9,6 +9,44 @@ class AppLocalizationsTl extends AppLocalizations {
   AppLocalizationsTl([String locale = 'tl']) : super(locale);
 
   @override
+  String get a11yTextSmaller => 'Mas maliit na teksto';
+
+  @override
+  String get a11yTextLarger => 'Mas malaking teksto';
+
+  @override
+  String get a11yNotifications => 'Mga abiso';
+
+  @override
+  String get a11yShowNav => 'Ipakita ang nabigasyon';
+
+  @override
+  String get a11yHideNav => 'Itago ang nabigasyon';
+
+  @override
+  String a11yVersesSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count talata ang napili',
+      one: '1 talata ang napili',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get a11yMakePrimary => 'Gawing pangunahing salin';
+
+  @override
+  String get a11yPreviousWeek => 'Nakaraang linggo';
+
+  @override
+  String get a11yNextWeek => 'Susunod na linggo';
+
+  @override
+  String get a11yRead => 'Nabasa na';
+
+  @override
   String get appTitle => 'The Blessed Bible';
 
   @override
@@ -2504,6 +2542,18 @@ class AppLocalizationsTl extends AppLocalizations {
   String spaceDeletePackTooltip(String name) {
     return 'Burahin ang $name';
   }
+
+  @override
+  String get stateLoading => 'Naglo-load';
+
+  @override
+  String get stateErrorTitle => 'May nangyaring mali';
+
+  @override
+  String get stateErrorBody => 'Pakisubukan muli mamaya.';
+
+  @override
+  String get commonUndo => 'I-undo';
 
   @override
   String studyCouldNotOpenScreen(String error) {

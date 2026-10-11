@@ -78,6 +78,7 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
             leading: IconButton(
               icon: Icon(Icons.arrow_back_ios_new_rounded,
                   color: theme.primaryColor, size: 20),
+              tooltip: context.l10n.commonBack,
               onPressed: () => Navigator.of(context).pop(),
             ),
             title: Text(
@@ -88,13 +89,16 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
                 color: theme.primaryColor,
               ),
             ),
-            flexibleSpace: ClipRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: Container(
-                    color: getThemeBackgroundColor().withValues(alpha: 0.8)),
-              ),
-            ),
+            flexibleSpace: reduceTransparency(context)
+                ? Container(color: getThemeBackgroundColor())
+                : ClipRect(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                          color:
+                              getThemeBackgroundColor().withValues(alpha: 0.8)),
+                    ),
+                  ),
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(60),
               child: _buildFilters(theme, tokens),
@@ -230,7 +234,7 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
       String current, List<String> options, ValueChanged<String> onChanged) {
     return Center(
       child: Container(
-        height: 36,
+        constraints: const BoxConstraints(minHeight: kMinTouchTarget),
         padding: const EdgeInsets.symmetric(horizontal: 4),
         decoration: BoxDecoration(
           color: theme.primaryColor.withValues(alpha: 0.05),
@@ -378,6 +382,7 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
           ...paragraphs.map((p) => Padding(
                 padding: const EdgeInsets.only(bottom: 16.0),
                 child: RichText(
+                  textScaler: MediaQuery.textScalerOf(context),
                   text: TextSpan(
                     style: baseStyle,
                     children: _parseMarkdown(p.trim(), baseStyle),

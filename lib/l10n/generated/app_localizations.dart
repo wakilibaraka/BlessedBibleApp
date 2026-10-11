@@ -106,6 +106,66 @@ abstract class AppLocalizations {
     Locale('tl')
   ];
 
+  /// No description provided for @a11yTextSmaller.
+  ///
+  /// In en, this message translates to:
+  /// **'Smaller text'**
+  String get a11yTextSmaller;
+
+  /// No description provided for @a11yTextLarger.
+  ///
+  /// In en, this message translates to:
+  /// **'Larger text'**
+  String get a11yTextLarger;
+
+  /// No description provided for @a11yNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get a11yNotifications;
+
+  /// No description provided for @a11yShowNav.
+  ///
+  /// In en, this message translates to:
+  /// **'Show navigation'**
+  String get a11yShowNav;
+
+  /// No description provided for @a11yHideNav.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide navigation'**
+  String get a11yHideNav;
+
+  /// No description provided for @a11yVersesSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 verse selected} other{{count} verses selected}}'**
+  String a11yVersesSelected(int count);
+
+  /// No description provided for @a11yMakePrimary.
+  ///
+  /// In en, this message translates to:
+  /// **'Make main translation'**
+  String get a11yMakePrimary;
+
+  /// No description provided for @a11yPreviousWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous week'**
+  String get a11yPreviousWeek;
+
+  /// No description provided for @a11yNextWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Next week'**
+  String get a11yNextWeek;
+
+  /// No description provided for @a11yRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Read'**
+  String get a11yRead;
+
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
@@ -4365,6 +4425,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete {name}'**
   String spaceDeletePackTooltip(String name);
+
+  /// No description provided for @stateLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading'**
+  String get stateLoading;
+
+  /// No description provided for @stateErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong'**
+  String get stateErrorTitle;
+
+  /// No description provided for @stateErrorBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Please try again in a moment.'**
+  String get stateErrorBody;
+
+  /// No description provided for @commonUndo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get commonUndo;
 
   /// No description provided for @studyCouldNotOpenScreen.
   ///

@@ -72,9 +72,9 @@ class LibraryGreetingHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        // 44pt min target, two lines of context, no magic offsets.
+        // 48dp min target, two lines of context, no magic offsets.
         ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 44),
+          constraints: const BoxConstraints(minHeight: kMinTouchTarget),
           child: Material(
             color: theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(Radii.lg),
@@ -269,14 +269,24 @@ class PlanCoverPlaceholder extends StatelessWidget {
               ),
             ),
           ),
-          Center(
-            child: Text(
-              initials,
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w800,
-                // Always on the mid/deep hue gradient, never the surface.
-                color: Colors.white,
-                letterSpacing: 1.0,
+          // Decorative initials: the title is read elsewhere. Scales
+          // down instead of wrapping at large text sizes.
+          ExcludeSemantics(
+            child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: Center(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    initials,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      // Always on the mid/deep hue gradient, never the surface.
+                      color: Colors.white,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
@@ -328,11 +338,13 @@ class LibraryPlateBand extends ConsumerWidget {
         return Semantics(
           button: true,
           label: context.l10n.plansOpenStory(p.caption),
+          excludeSemantics: true,
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: () => onOpen(p),
             child: SizedBox(
-              height: height,
+              // Grows with the system text size so the caption fits.
+              height: MediaQuery.textScalerOf(context).scale(height),
               width: double.infinity,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(Radii.xl),

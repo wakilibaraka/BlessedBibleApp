@@ -374,7 +374,8 @@ class _CommentaryHubV2ScreenState extends ConsumerState<CommentaryHubV2Screen> {
                               ),
                             ),
                           ),
-                        const SizedBox(height: 10),
+                        // 10dp gaps minus the chips' 4dp hit padding.
+                        const SizedBox(height: 6),
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
@@ -404,7 +405,7 @@ class _CommentaryHubV2ScreenState extends ConsumerState<CommentaryHubV2Screen> {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 6),
                         TextField(
                           decoration: InputDecoration(
                             hintText: context.l10n.studySearchWithin(
@@ -516,26 +517,36 @@ class _FilterChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color: selected
-              ? theme.colorScheme.onSurface
-              : theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(Radii.pill),
-          border: Border.all(
-            color: selected ? theme.colorScheme.onSurface : theme.dividerColor,
-          ),
-        ),
-        child: Text(
-          label,
-          style: theme.textTheme.labelLarge?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: selected
-                ? theme.colorScheme.surface
-                : theme.colorScheme.onSurface.withValues(alpha: 0.7),
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        // Invisible vertical hit padding: 48dp target.
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: selected
+                  ? theme.colorScheme.onSurface
+                  : theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(Radii.pill),
+              border: Border.all(
+                color:
+                    selected ? theme.colorScheme.onSurface : theme.dividerColor,
+              ),
+            ),
+            child: Text(
+              label,
+              style: theme.textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: selected
+                    ? theme.colorScheme.surface
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
+            ),
           ),
         ),
       ),
@@ -600,7 +611,9 @@ class _EntryCard extends ConsumerWidget {
                   ),
                 ),
                 IconButton(
-                  visualDensity: VisualDensity.compact,
+                  tooltip: bookmarked
+                      ? context.l10n.studyRemoveBookmark
+                      : context.l10n.studyBookmarkCommentary,
                   icon: Icon(
                     bookmarked
                         ? Icons.bookmark_rounded
