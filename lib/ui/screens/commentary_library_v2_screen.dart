@@ -10,6 +10,7 @@ import '../widgets/shared_app_bar.dart';
 import '../widgets/study_v2_widgets.dart';
 import '../../l10n/l10n.dart';
 import '../../theme/design_tokens.dart';
+import '../widgets/state_views.dart';
 
 /// Redesigned commentary library (V2).
 ///
@@ -125,40 +126,11 @@ class _CommentaryLibraryV2ScreenState
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 800),
               child: asyncEntries.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, _) => ListView(
-                  padding: const EdgeInsets.all(24),
-                  children: [
-                    const SizedBox(height: 60),
-                    Icon(Icons.cloud_off_rounded,
-                        size: 44,
-                        color:
-                            theme.colorScheme.onSurface.withValues(alpha: 0.4)),
-                    const SizedBox(height: 12),
-                    Text(
-                      context.l10n.studyCommentaryLoadError,
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '$e',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color:
-                            theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Center(
-                      child: FilledButton.tonal(
-                        onPressed: () => ref.invalidate(commentaryProvider),
-                        child: Text(context.l10n.commonRetry),
-                      ),
-                    ),
-                  ],
+                loading: () => const LoadingView(),
+                error: (e, _) => ErrorState(
+                  error: e,
+                  message: context.l10n.studyCommentaryLoadError,
+                  onRetry: () => ref.invalidate(commentaryProvider),
                 ),
                 data: (entries) {
                   // book -> chapter -> entry count
@@ -180,23 +152,11 @@ class _CommentaryLibraryV2ScreenState
                         .toList();
                   }
                   if (names.isEmpty) {
-                    return ListView(
-                      padding: const EdgeInsets.all(24),
-                      children: [
-                        const SizedBox(height: 60),
-                        Icon(Icons.search_off_rounded,
-                            size: 44,
-                            color: theme.colorScheme.onSurface
-                                .withValues(alpha: 0.4)),
-                        const SizedBox(height: 12),
-                        Text(
-                          entries.isEmpty
-                              ? context.l10n.studyNoCommentaryYet
-                              : context.l10n.studyNoBooksMatch(_query),
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.titleSmall,
-                        ),
-                      ],
+                    return EmptyState(
+                      icon: Icons.search_off_rounded,
+                      title: entries.isEmpty
+                          ? context.l10n.studyNoCommentaryYet
+                          : context.l10n.studyNoBooksMatch(_query),
                     );
                   }
                   return ListView.builder(
@@ -429,22 +389,11 @@ class _CommentaryHubV2ScreenState extends ConsumerState<CommentaryHubV2Screen> {
                   ),
                   Expanded(
                     child: asyncEntries.when(
-                      loading: () =>
-                          const Center(child: CircularProgressIndicator()),
-                      error: (e, _) => Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(context.l10n.studyEntriesLoadError('$e'),
-                                textAlign: TextAlign.center),
-                            const SizedBox(height: 12),
-                            FilledButton.tonal(
-                              onPressed: () =>
-                                  ref.invalidate(commentaryProvider),
-                              child: Text(context.l10n.commonRetry),
-                            ),
-                          ],
-                        ),
+                      loading: () => const LoadingView(),
+                      error: (e, _) => ErrorState(
+                        error: e,
+                        message: context.l10n.studyEntriesLoadFailed,
+                        onRetry: () => ref.invalidate(commentaryProvider),
                       ),
                       data: (entries) {
                         var list = entries

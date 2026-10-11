@@ -1,19 +1,4 @@
 {
- "studyCouldNotOpenScreen": {
-  "en": "Could not open that screen. {error}",
-  "fr": "Impossible d'ouvrir cet écran. {error}",
-  "it": "Impossibile aprire questa schermata. {error}",
-  "ro": "Ecranul nu a putut fi deschis. {error}",
-  "sw": "Imeshindwa kufungua skrini hiyo. {error}",
-  "tl": "Hindi mabuksan ang screen na iyon. {error}",
-  "@": {
-   "placeholders": {
-    "error": {
-     "type": "String"
-    }
-   }
-  }
- },
  "studyCardSize": {
   "en": "Card size",
   "fr": "Taille de la carte",
@@ -47,7 +32,7 @@
   "tl": "Buong lapad, kapareho ng lahat"
  },
  "studySizeExtraLarge": {
-  "en": "Extra Large",
+  "en": "Extra large",
   "fr": "Très grande",
   "it": "Extra grande",
   "ro": "Foarte mare",
@@ -135,7 +120,7 @@
   "tl": "Historisistang komentaryo na may filter sa kabanata at talata."
  },
  "studyCommentaryCta": {
-  "en": "Open Commentary",
+  "en": "Open commentary",
   "fr": "Ouvrir le commentaire",
   "it": "Apri il commento",
   "ro": "Deschide comentariul",
@@ -541,7 +526,7 @@
   "tl": "Markahang nabasa"
  },
  "studyNextPassage": {
-  "en": "Next Passage",
+  "en": "Next passage",
   "fr": "Passage suivant",
   "it": "Passo successivo",
   "ro": "Pasajul următor",
@@ -606,7 +591,7 @@
   "tl": "Bookmark"
  },
  "studyAddNote": {
-  "en": "Add Note",
+  "en": "Add note",
   "fr": "Ajouter une note",
   "it": "Aggiungi nota",
   "ro": "Adaugă notiță",
@@ -629,7 +614,7 @@
   }
  },
  "studyCommentaryLibrary": {
-  "en": "Commentary Library",
+  "en": "Commentary library",
   "fr": "Bibliothèque de commentaires",
   "it": "Biblioteca dei commenti",
   "ro": "Biblioteca de comentarii",
@@ -754,21 +739,6 @@
    }
   }
  },
- "studyEntriesLoadError": {
-  "en": "Could not load entries.\n{error}",
-  "fr": "Impossible de charger les entrées.\n{error}",
-  "it": "Impossibile caricare le voci.\n{error}",
-  "ro": "Intrările nu au putut fi încărcate.\n{error}",
-  "sw": "Imeshindwa kupakia maingizo.\n{error}",
-  "tl": "Hindi ma-load ang mga entry.\n{error}",
-  "@": {
-   "placeholders": {
-    "error": {
-     "type": "String"
-    }
-   }
-  }
- },
  "studyNoEntriesMatch": {
   "en": "No entries match these filters.\nTry All sources, or browse the library.",
   "fr": "Aucune entrée ne correspond à ces filtres.\nEssayez Toutes les sources ou parcourez la bibliothèque.",
@@ -817,27 +787,12 @@
   "tl": "Debosyonal"
  },
  "studyCategoryStudyNote": {
-  "en": "Study Note",
+  "en": "Study note",
   "fr": "Note d'étude",
   "it": "Nota di studio",
   "ro": "Notă de studiu",
   "sw": "Dokezo la funzo",
   "tl": "Tala sa pag-aaral"
- },
- "studyCommentaryLoadErrorDetail": {
-  "en": "Could not load commentary.\n{error}",
-  "fr": "Impossible de charger le commentaire.\n{error}",
-  "it": "Impossibile caricare il commento.\n{error}",
-  "ro": "Comentariul nu a putut fi încărcat.\n{error}",
-  "sw": "Imeshindwa kupakia ufafanuzi.\n{error}",
-  "tl": "Hindi ma-load ang komentaryo.\n{error}",
-  "@": {
-   "placeholders": {
-    "error": {
-     "type": "String"
-    }
-   }
-  }
  },
  "studyNoContentForFilters": {
   "en": "No content found for these filters.",
@@ -863,7 +818,7 @@
   }
  },
  "studyChapterView": {
-  "en": "Chapter View",
+  "en": "Chapter view",
   "fr": "Vue du chapitre",
   "it": "Vista capitolo",
   "ro": "Tot capitolul",
@@ -887,7 +842,7 @@
   "tl": "Mga debosyonal"
  },
  "studyFilterAllContexts": {
-  "en": "All Contexts",
+  "en": "All contexts",
   "fr": "Tous les contextes",
   "it": "Tutti i contesti",
   "ro": "Toate contextele",
@@ -895,7 +850,7 @@
   "tl": "Lahat ng konteksto"
  },
  "studyFilterChapterLevel": {
-  "en": "Chapter Level",
+  "en": "Chapter level",
   "fr": "Par chapitre",
   "it": "Per capitolo",
   "ro": "La nivel de capitol",
@@ -903,7 +858,7 @@
   "tl": "Bawat kabanata"
  },
  "studyFilterVerseLevel": {
-  "en": "Verse Level",
+  "en": "Verse level",
   "fr": "Par verset",
   "it": "Per versetto",
   "ro": "La nivel de verset",
@@ -911,7 +866,7 @@
   "tl": "Bawat talata"
  },
  "studyRemoveBookmark": {
-  "en": "Remove Bookmark",
+  "en": "Remove bookmark",
   "fr": "Retirer le signet",
   "it": "Rimuovi segnalibro",
   "ro": "Elimină semnul de carte",
@@ -919,7 +874,7 @@
   "tl": "Alisin ang bookmark"
  },
  "studyBookmarkCommentary": {
-  "en": "Bookmark Commentary",
+  "en": "Bookmark commentary",
   "fr": "Ajouter un signet",
   "it": "Aggiungi ai segnalibri",
   "ro": "Adaugă semn de carte",
@@ -975,7 +930,7 @@
   "tl": "Walang tiyak na komentaryo para sa talatang ito. Subukan ang komentaryo sa kabanata o aklat sa ibaba."
  },
  "storiesTitle": {
-  "en": "Bible Stories",
+  "en": "Bible stories",
   "fr": "Histoires bibliques",
   "it": "Storie bibliche",
   "ro": "Povestiri biblice",
@@ -1071,21 +1026,6 @@
   "ro": "Necitite",
   "sw": "Hazijasomwa",
   "tl": "Hindi pa nabasa"
- },
- "storiesLoadError": {
-  "en": "Could not load stories:\n{error}",
-  "fr": "Impossible de charger les histoires :\n{error}",
-  "it": "Impossibile caricare le storie:\n{error}",
-  "ro": "Povestirile nu au putut fi încărcate:\n{error}",
-  "sw": "Imeshindwa kupakia hadithi:\n{error}",
-  "tl": "Hindi ma-load ang mga kuwento:\n{error}",
-  "@": {
-   "placeholders": {
-    "error": {
-     "type": "String"
-    }
-   }
-  }
  },
  "storiesBooks": {
   "en": "Books",
@@ -1277,21 +1217,6 @@
   "sw": "★ Zilizohifadhiwa",
   "tl": "★ Naka-save"
  },
- "studyDictionaryUnavailable": {
-  "en": "Dictionary unavailable.\n{error}",
-  "fr": "Dictionnaire indisponible.\n{error}",
-  "it": "Dizionario non disponibile.\n{error}",
-  "ro": "Dicționar indisponibil.\n{error}",
-  "sw": "Kamusi haipatikani.\n{error}",
-  "tl": "Hindi available ang diksiyunaryo.\n{error}",
-  "@": {
-   "placeholders": {
-    "error": {
-     "type": "String"
-    }
-   }
-  }
- },
  "studyNoHeadwords": {
   "en": "No headwords found.",
   "fr": "Aucune entrée trouvée.",
@@ -1354,21 +1279,6 @@
   "ro": "Nicio definiție găsită.",
   "sw": "Hakuna maana iliyopatikana.",
   "tl": "Walang nahanap na kahulugan."
- },
- "studyFailedToLoad": {
-  "en": "Failed to load: {error}",
-  "fr": "Échec du chargement : {error}",
-  "it": "Caricamento non riuscito: {error}",
-  "ro": "Încărcarea a eșuat: {error}",
-  "sw": "Imeshindwa kupakia: {error}",
-  "tl": "Hindi na-load: {error}",
-  "@": {
-   "placeholders": {
-    "error": {
-     "type": "String"
-    }
-   }
-  }
  },
  "studyStrongsShareText": {
   "en": "{id} - {lemma}\n\nTransliteration: {transliteration}\nPronunciation: {pronunciation}\n\nDefinition:\n{definition}",
@@ -1540,7 +1450,7 @@
   }
  },
  "errorTitle": {
-  "en": "Something Went Wrong",
+  "en": "Something went wrong",
   "fr": "Un problème est survenu",
   "it": "Qualcosa è andato storto",
   "ro": "A apărut o problemă",
@@ -1579,7 +1489,7 @@
   }
  },
  "privacyTitle": {
-  "en": "Privacy Policy",
+  "en": "Privacy policy",
   "fr": "Politique de confidentialité",
   "it": "Informativa sulla privacy",
   "ro": "Politica de confidențialitate",

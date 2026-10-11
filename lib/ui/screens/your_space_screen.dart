@@ -10,7 +10,7 @@ import '../../state/notes_provider.dart';
 import '../../state/theme_provider.dart';
 import '../widgets/animated_background.dart';
 import '../widgets/shared_app_bar.dart';
-import 'notes_list_screen.dart'; // for showAddNoteSheet
+import 'notes_list_screen.dart'; // showAddNoteSheet, deleteNoteWithUndo
 import '../../services/share_service.dart';
 import '../../state/translation_provider.dart';
 import '../../state/read_settings_provider.dart';
@@ -262,7 +262,7 @@ class _HighlightsSegment extends ConsumerWidget {
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
           child: Text(
-            "Verses you've marked in colour.",
+            context.l10n.spaceHighlightsIntro,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
               height: 1.4,
@@ -423,7 +423,7 @@ void _showDeleteFolderDialog(
               Navigator.pop(context);
             },
             child: Text(context.l10n.commonDelete,
-                style: const TextStyle(color: Colors.red)),
+                style: TextStyle(color: context.palette.danger)),
           ),
         ],
       );
@@ -1363,15 +1363,7 @@ void _showNoteContext(
         icon: Icons.delete_outline_rounded,
         label: context.l10n.commonDelete,
         destructive: true,
-        onTap: () async {
-          final ok = await confirmDestructive(
-            context,
-            title: context.l10n.spaceDeleteNoteTitle,
-            message: context.l10n.spaceDeleteNoteBody(
-                note.title.isEmpty ? context.l10n.spaceUntitled : note.title),
-          );
-          if (ok) ref.read(notesProvider.notifier).remove(note.id);
-        },
+        onTap: () => deleteNoteWithUndo(context, ref, note),
       ),
     ],
   );
@@ -1479,12 +1471,43 @@ void _showVerseItemContext(
             ? context.l10n.spaceRemoveBookmark
             : context.l10n.spaceRemoveHighlight,
         destructive: true,
-        onTap: () async {
+        onTap: () {
+          final messenger = ScaffoldMessenger.of(context);
+          final l10n = context.l10n;
+          VoidCallback? undo;
+          String? message;
           if (isBookmarked) {
-            ref.read(bookmarksProvider.notifier).toggle(refKey);
+            final bookmarks = ref.read(bookmarkDataProvider.notifier);
+            final node = ref.read(bookmarkDataProvider).nodes[refKey];
+            bookmarks.toggle(refKey);
+            message = l10n.yourSpaceBookmarkRemoved;
+            // Put back the exact node so folder and date survive.
+            // The container outlives this screen, unlike ref.
+            final container = ProviderScope.containerOf(context, listen: false);
+            if (node != null) {
+              undo = () => bookmarks.applySyncedNodes({
+                    ...container.read(bookmarkDataProvider).nodes,
+                    refKey: node,
+                  });
+            }
           } else if (highlightColorIndex != null) {
-            ref.read(highlightsProvider.notifier).removeHighlight(refKey);
+            final highlights = ref.read(highlightsProvider.notifier);
+            highlights.removeHighlight(refKey);
+            message = l10n.yourSpaceHighlightRemoved;
+            undo =
+                () => highlights.toggleHighlight(refKey, highlightColorIndex);
           }
+          if (message == null) return;
+          messenger.hideCurrentSnackBar();
+          messenger.showSnackBar(
+            SnackBar(
+              content: Text(message),
+              behavior: SnackBarBehavior.floating,
+              action: undo == null
+                  ? null
+                  : SnackBarAction(label: l10n.commonUndo, onPressed: undo),
+            ),
+          );
         },
       ),
     ],

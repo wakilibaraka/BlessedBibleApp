@@ -9,18 +9,18 @@ import 'package:the_blessed_bible/l10n/l10n.dart';
 void main() {
   test('no hard-coded English UI strings in lib/ui', () {
     // Text widgets, tooltips and hints should read from context.l10n.
+    // Matches across line breaks and either quote style.
     final pattern = RegExp(
-        r"Text\(\s*'[A-Za-z]{3,}|tooltip: '[A-Z]|label: (const )?Text\('[A-Z]|hintText: '[A-Z]");
+        r"""Text\(\s*['"][A-Za-z][a-z]{2,}|tooltip: ['"][A-Z]|label: (const )?Text\(['"][A-Z]|hintText: ['"][A-Z]""");
     final offenders = <String>[];
     for (final file in Directory('lib/ui')
         .listSync(recursive: true)
         .whereType<File>()
         .where((f) => f.path.endsWith('.dart'))) {
-      final lines = file.readAsLinesSync();
-      for (var i = 0; i < lines.length; i++) {
-        if (pattern.hasMatch(lines[i])) {
-          offenders.add('${file.path}:${i + 1}: ${lines[i].trim()}');
-        }
+      final src = file.readAsStringSync();
+      for (final m in pattern.allMatches(src)) {
+        final line = '\n'.allMatches(src.substring(0, m.start)).length + 1;
+        offenders.add('${file.path}:$line: ${m.group(0)}');
       }
     }
     expect(offenders, isEmpty,

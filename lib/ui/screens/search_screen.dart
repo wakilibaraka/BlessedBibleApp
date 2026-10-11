@@ -18,6 +18,8 @@ import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import '../../state/typography_provider.dart';
 import '../widgets/textured_glass_container.dart';
+import '../widgets/item_context_sheet.dart' show confirmDestructive;
+import '../widgets/state_views.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -583,9 +585,16 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                 button: true,
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
-                  onTap: () => ref
-                      .read(searchStateProvider.notifier)
-                      .clearRecentQueries(),
+                  onTap: () async {
+                    final ok = await confirmDestructive(
+                      context,
+                      title: context.l10n.searchClearRecentTitle,
+                      message: context.l10n.searchClearRecentBody,
+                      confirmLabel: context.l10n.searchClearRecentConfirm,
+                    );
+                    if (!ok || !mounted) return;
+                    ref.read(searchStateProvider.notifier).clearRecentQueries();
+                  },
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(
                         minWidth: kMinTouchTarget, minHeight: kMinTouchTarget),
@@ -696,33 +705,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
   // ── Search results ─────────────────────────────────────────────────────
   Widget _buildSearchResults(SearchState state, ThemeData theme) {
     if (state.isSearching && state.results.isEmpty) {
-      return Center(
-        child: CircularProgressIndicator(
-          color: theme.primaryColor,
-          strokeWidth: 2,
-        ),
-      );
+      return const LoadingView();
     }
 
     if (state.results.isEmpty && !state.isSearching) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.search_off_rounded,
-              size: 48,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              context.l10n.searchNoResults,
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-              ),
-            ),
-          ],
-        ),
+      return EmptyState(
+        icon: Icons.search_off_rounded,
+        title: context.l10n.searchNoResults,
       );
     }
 

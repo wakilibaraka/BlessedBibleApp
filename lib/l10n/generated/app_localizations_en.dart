@@ -102,6 +102,120 @@ class AppLocalizationsEn extends AppLocalizations {
       'The language of menus and buttons. Your Bible translation is chosen separately.';
 
   @override
+  String get homeWotdUnavailableNow =>
+      'Word of the day is unavailable right now.';
+
+  @override
+  String get spaceCouldNotFinishPlain =>
+      'Couldn\'t finish that. Please try again.';
+
+  @override
+  String get readTranslationsLoadErrorPlain => 'Could not load translations.';
+
+  @override
+  String get readDeleteTranslationBody =>
+      'You can get it again from the translations list at any time.';
+
+  @override
+  String get readDeleteFailedPlain => 'Couldn\'t delete it. Please try again.';
+
+  @override
+  String get readCrossRefsLoadErrorPlain => 'Could not load cross-references.';
+
+  @override
+  String get readVerseLoadErrorPlain => 'Could not load this verse.';
+
+  @override
+  String get searchClearRecentTitle => 'Clear recent searches?';
+
+  @override
+  String get searchClearRecentBody =>
+      'Your recent searches will be removed from this device.';
+
+  @override
+  String get searchClearRecentConfirm => 'Clear';
+
+  @override
+  String readHighlightsRemoved(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count highlights removed',
+      one: 'Highlight removed',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String readVersesHighlighted(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count verses highlighted',
+      one: 'Verse highlighted',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String readBookmarksRemoved(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count bookmarks removed',
+      one: 'Bookmark removed',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String readVersesBookmarked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count verses bookmarked',
+      one: 'Verse bookmarked',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get storiesLoadFailed => 'Could not load stories.';
+
+  @override
+  String get studyEntriesLoadFailed => 'Could not load entries.';
+
+  @override
+  String get studyDictionaryLoadFailed => 'Could not load the dictionary.';
+
+  @override
+  String get studyEntryLoadFailed => 'Could not load this entry.';
+
+  @override
+  String get studyOpenScreenFailed => 'Could not open that screen.';
+
+  @override
+  String get studyWordUnsaved => 'Removed from saved words';
+
+  @override
+  String get plansBuilderSaveFailed => 'Could not save plan.';
+
+  @override
+  String get plansBuilderLoadFailed => 'Could not set up the plan builder.';
+
+  @override
+  String get plansDetailLoadFailed => 'Could not load this plan.';
+
+  @override
+  String get plansTrackRemoved => 'Track removed';
+
+  @override
+  String get yourSpaceBookmarkRemoved => 'Bookmark removed';
+
+  @override
+  String get yourSpaceHighlightRemoved => 'Highlight removed';
+
+  @override
   String get onboardingTagline => 'Scripture, without distraction.';
 
   @override
@@ -128,7 +242,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingLookBody =>
-      'Choose a page colour and text size. Everything can be fine-tuned later.';
+      'Choose a page color and text size. Everything can be fine-tuned later.';
 
   @override
   String get onboardingThemeLight => 'Light';
@@ -160,14 +274,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Read without distraction, with highlights, notes and bookmarks.';
 
   @override
-  String get onboardingFeaturePlansTitle => 'Reading Plans';
+  String get onboardingFeaturePlansTitle => 'Reading plans';
 
   @override
   String get onboardingFeaturePlansBody =>
       'Chronological, thematic or your own — with gentle reminders.';
 
   @override
-  String get onboardingFeatureStudyTitle => 'Deep Study';
+  String get onboardingFeatureStudyTitle => 'Deep study';
 
   @override
   String get onboardingFeatureStudyBody =>
@@ -221,7 +335,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingNotNow => 'Not now';
 
   @override
-  String get plansContinueReading => 'Continue Reading';
+  String get plansContinueReading => 'Continue reading';
 
   @override
   String get plansResume => 'Resume';
@@ -230,9 +344,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String plansDayCompleteCelebration(int day) {
     return 'Reading Plan\nDay $day Complete!';
   }
-
-  @override
-  String get plansChangeWeek => 'Change week';
 
   @override
   String plansCalendarDayComplete(String label) {
@@ -245,7 +356,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get plansDailyVerses => 'Daily Verses';
+  String get plansDailyVerses => 'Daily verses';
 
   @override
   String get plansToday => 'Today';
@@ -423,7 +534,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get plansCustomPlanDefaultTitle => 'Custom Plan';
+  String get plansCustomPlanDefaultTitle => 'Custom plan';
 
   @override
   String get plansCustom => 'Custom';
@@ -434,23 +545,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String plansCouldNotSave(String error) {
-    return 'Could not save plan: $error';
-  }
-
-  @override
-  String get plansBuilderTitle => 'Custom Plan Builder';
-
-  @override
-  String plansError(String error) {
-    return 'Error: $error';
-  }
+  String get plansBuilderTitle => 'Custom plan builder';
 
   @override
   String get plansPlanName => 'Plan name';
 
   @override
-  String get plansPlanNameHint => 'e.g. Genesis in 30 Days';
+  String get plansPlanNameHint => 'e.g. Genesis in 30 days';
 
   @override
   String get plansReadingTracks => 'Reading tracks';
@@ -603,7 +704,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get plansBeginPlan => 'Begin plan';
 
   @override
-  String get plansStartDayOne => 'Start Day 1 →';
+  String get plansStartDayOne => 'Start day 1 →';
 
   @override
   String get plansStartDateNote => 'Your plan begins on the date you choose.';
@@ -751,7 +852,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get plansRestDaysHelp => 'Tap to choose any weekdays';
 
   @override
-  String get plansRestartFromDayOne => 'Restart from Day 1…';
+  String get plansRestartFromDayOne => 'Restart from day 1…';
 
   @override
   String get plansRestartTitle => 'Restart plan?';
@@ -865,13 +966,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get todayActionSurprise => 'Surprise Me';
 
   @override
-  String get todayActionReadingPlan => 'Reading Plan';
+  String get todayActionReadingPlan => 'Reading plan';
 
   @override
   String get todayActionYourSpace => 'Your Space';
 
   @override
-  String get todayVotdArchive => 'Verse of the Day Archive';
+  String get todayVotdArchive => 'Verse of the day archive';
 
   @override
   String get todayVotdArchiveBody => 'Catch up on verses from days you missed.';
@@ -889,7 +990,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get readActionNotes => 'Notes';
 
   @override
-  String get readActionEditNote => 'Edit Note';
+  String get readActionEditNote => 'Edit note';
 
   @override
   String get readActionCommentary => 'Commentary';
@@ -907,7 +1008,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get readActionSaved => 'Saved';
 
   @override
-  String get readActionSelectText => 'Select Text';
+  String get readActionSelectText => 'Select text';
 
   @override
   String get readVerseActions => 'Verse actions';
@@ -961,7 +1062,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get readRelatedVerses => 'Related Verses';
+  String get readRelatedVerses => 'Related verses';
 
   @override
   String get readNoCrossRefs => 'No cross-references found for this verse.';
@@ -969,11 +1070,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get readCrossRefsComingSoon =>
       'Cross-references will be available\nafter the next app update.';
-
-  @override
-  String readCrossRefsLoadError(String error) {
-    return 'Could not load cross-references.\n$error';
-  }
 
   @override
   String get readVerseUnavailable => 'Verse not available';
@@ -994,11 +1090,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get readBookNotFound => 'Could not find the referenced book.';
 
   @override
-  String readVerseLoadError(String error) {
-    return 'Error loading verse: $error';
-  }
-
-  @override
   String get readTestament => 'Testament';
 
   @override
@@ -1011,7 +1102,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get readVerse => 'Verse';
 
   @override
-  String get readSelectBook => 'Select Book';
+  String get readSelectBook => 'Select book';
 
   @override
   String get readOtShort => 'OT';
@@ -1032,16 +1123,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get readNewTestamentTwoLine => 'New\nTestament';
 
   @override
-  String get readStoriesSections => 'Stories & Sections';
+  String get readStoriesSections => 'Stories & sections';
 
   @override
-  String get readAllVerses => 'All Verses';
+  String get readAllVerses => 'All verses';
 
   @override
-  String get readTranslationTitle => 'Bible Translation';
+  String get readTranslationTitle => 'Bible translation';
 
   @override
-  String get readLayoutTitle => 'Reading Layout';
+  String get readLayoutTitle => 'Reading layout';
 
   @override
   String get readLayoutSingle => 'Single';
@@ -1075,18 +1166,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get readSecondary => 'Secondary';
 
   @override
-  String readTranslationsLoadError(String error) {
-    return 'Error loading translations: $error';
-  }
-
-  @override
   String readTranslationDeleted(String name) {
     return '$name deleted.';
-  }
-
-  @override
-  String readDeleteFailed(String error) {
-    return 'Could not delete: $error';
   }
 
   @override
@@ -1114,16 +1195,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get readDownloadFailed => 'Download failed';
 
   @override
-  String readRestoreFailedDetail(String error) {
-    return 'Restore failed ($error).';
-  }
-
-  @override
-  String readDownloadFailedDetail(String error) {
-    return 'Download failed ($error).';
-  }
-
-  @override
   String get readRestoreOffline => 'restore offline';
 
   @override
@@ -1136,10 +1207,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeCommentary => 'COMMENTARY';
 
   @override
-  String get homeGoDeeper => 'Go Deeper';
+  String get homeGoDeeper => 'Go deeper';
 
   @override
-  String get homeReadFullDefinition => 'Read Full Definition';
+  String get homeReadFullDefinition => 'Read full definition';
 
   @override
   String get homeWordOfTheDayHeading => 'WORD OF THE DAY';
@@ -1149,11 +1220,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeWotdEmpty => 'No word picked for today yet — try again later.';
-
-  @override
-  String homeWotdUnavailable(String error) {
-    return 'Word of the day unavailable ($error).';
-  }
 
   @override
   String get navHome => 'Home';
@@ -1186,10 +1252,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchHint => 'Search verses, commentary…';
 
   @override
-  String get searchAllBooks => 'All Books';
+  String get searchAllBooks => 'All books';
 
   @override
-  String get searchFilterMyNotes => 'My Notes';
+  String get searchFilterMyNotes => 'My notes';
 
   @override
   String get searchEmptyPrompt =>
@@ -1273,7 +1339,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsTabInfo => 'Info';
 
   @override
-  String get settingsWidgetsTitle => 'Home Screen Widgets';
+  String get settingsWidgetsTitle => 'Home screen widgets';
 
   @override
   String get settingsWidgetsSubtitle =>
@@ -1299,17 +1365,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsPageSearch => 'Search';
 
   @override
-  String get settingsImmersiveReading => 'Immersive Reading';
+  String get settingsImmersiveReading => 'Immersive reading';
 
   @override
-  String get settingsImmersiveOffTitle => 'Anchored (Off)';
+  String get settingsImmersiveOffTitle => 'Anchored (off)';
 
   @override
   String get settingsImmersiveOffSubtitle =>
       'Navigation remains visible at all times';
 
   @override
-  String get settingsImmersivePartialTitle => 'Guided (Partial)';
+  String get settingsImmersivePartialTitle => 'Guided (partial)';
 
   @override
   String get settingsImmersivePartialSubtitle =>
@@ -1323,7 +1389,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Total immersion. All menus hide when scrolling';
 
   @override
-  String get settingsShowStrongs => 'Show Strong\'s Numbers';
+  String get settingsShowStrongs => 'Show Strong\'s numbers';
 
   @override
   String get settingsShowStrongsSubtitle =>
@@ -1358,14 +1424,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsSpeedBrisk => 'Brisk';
 
   @override
-  String get settingsDictUnderlines => 'Dictionary Underlines';
+  String get settingsDictUnderlines => 'Dictionary underlines';
 
   @override
   String get settingsDictUnderlinesSubtitle =>
       'Dotted underlines on biblical terms and archaic words';
 
   @override
-  String get settingsUnderlineScope => 'Underline Scope';
+  String get settingsUnderlineScope => 'Underline scope';
 
   @override
   String get settingsScopeNamesTitle => 'Names & terms only';
@@ -1375,7 +1441,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Proper nouns and specific biblical concepts';
 
   @override
-  String get settingsScopeTrickyTitle => 'Names + tricky words (Recommended)';
+  String get settingsScopeTrickyTitle => 'Names + tricky words (recommended)';
 
   @override
   String get settingsScopeTrickySubtitle =>
@@ -1427,7 +1493,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Other English versions show no dictionary marks';
 
   @override
-  String get settingsPopupStyle => 'Popup Style';
+  String get settingsPopupStyle => 'Popup style';
 
   @override
   String get settingsPopupStyleSubtitle =>
@@ -1455,7 +1521,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Adds a compact translation chip row to view saved verses in other translations';
 
   @override
-  String get settingsVerseActionStyle => 'Verse Action Style';
+  String get settingsVerseActionStyle => 'Verse action style';
 
   @override
   String get settingsVerseActionStyleSubtitle =>
@@ -1477,7 +1543,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsActionRadial => 'Radial';
 
   @override
-  String get settingsKeepAwake => 'Keep Screen Awake';
+  String get settingsKeepAwake => 'Keep screen awake';
 
   @override
   String get settingsKeepAwakeSubtitle =>
@@ -1507,7 +1573,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Theme, fonts, sizes and reading colors';
 
   @override
-  String get settingsSabbathTitle => 'Friday Sunset Reminder';
+  String get settingsSabbathTitle => 'Friday sunset reminder';
 
   @override
   String get settingsSabbathSubtitle =>
@@ -1517,10 +1583,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLocation => 'Location';
 
   @override
-  String get settingsLocationNotSet => 'Not set (Tap to set)';
+  String get settingsLocationNotSet => 'Not set (tap to set)';
 
   @override
-  String get settingsDailyReminderTitle => 'Daily Reading Reminder';
+  String get settingsDailyReminderTitle => 'Daily reading reminder';
 
   @override
   String get settingsDailyReminderSubtitle =>
@@ -1530,17 +1596,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsTime => 'Time';
 
   @override
-  String get settingsWeeklyReminderTitle => 'Custom Weekly Reminder';
+  String get settingsWeeklyReminderTitle => 'Custom weekly reminder';
 
   @override
   String get settingsWeeklyReminderSubtitle =>
       'Set a specific day and time each week for deeper study.';
 
   @override
-  String get settingsDayAndTime => 'Day & Time';
+  String get settingsDayAndTime => 'Day & time';
 
   @override
-  String get settingsChooseDay => 'Choose Day';
+  String get settingsChooseDay => 'Choose day';
 
   @override
   String get settingsShowReadingTips => 'Show reading tips';
@@ -1550,7 +1616,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Show guided hints for reading actions like highlighting and swiping';
 
   @override
-  String get settingsNavSteps => 'Navigation Steps';
+  String get settingsNavSteps => 'Navigation steps';
 
   @override
   String get settingsNavStepsSubtitle =>
@@ -1605,7 +1671,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Also show close matches for typos (e.g. Jhon finds John)';
 
   @override
-  String get settingsDefaultScopes => 'Default Search Scopes';
+  String get settingsDefaultScopes => 'Default search scopes';
 
   @override
   String get settingsOldTestament => 'Old Testament';
@@ -1651,7 +1717,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Long-press the bottom-right button to quickly open the Book/Chapter selector.';
 
   @override
-  String get settingsBbeNoteTitle => 'BBE Translation Note';
+  String get settingsBbeNoteTitle => 'BBE translation note';
 
   @override
   String get settingsBackup => 'Back up my data';
@@ -1667,7 +1733,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Import your data from a backup JSON';
 
   @override
-  String get settingsRestoreBackupDialogTitle => 'Restore from Backup';
+  String get settingsRestoreBackupDialogTitle => 'Restore from backup';
 
   @override
   String get settingsRestoreHint => 'Paste your backup JSON here...';
@@ -1719,7 +1785,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Cache, downloaded translations and what can be freed';
 
   @override
-  String get settingsSendFeedback => 'Send Feedback';
+  String get settingsSendFeedback => 'Send feedback';
 
   @override
   String get settingsCrashReports => 'Send crash reports';
@@ -1729,7 +1795,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Anonymous crash details help fix bugs. No Bible reading, notes or personal content is included.';
 
   @override
-  String get settingsPrivacyPolicy => 'Privacy Policy';
+  String get settingsPrivacyPolicy => 'Privacy policy';
 
   @override
   String get settingsCredits => 'Credits & sources';
@@ -1739,10 +1805,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Bible translations, commentary, study data, fonts and licenses';
 
   @override
-  String get settingsSetSunsetLocation => 'Set Location for Sunset';
+  String get settingsSetSunsetLocation => 'Set location for sunset';
 
   @override
-  String get settingsCurrentLocationGps => 'Current Location (GPS)';
+  String get settingsCurrentLocationGps => 'Current location (GPS)';
 
   @override
   String get settingsUseMyLocation => 'Use my current location';
@@ -1757,13 +1823,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsTheme => 'Theme';
 
   @override
-  String get settingsSearchSettings => 'Search Settings';
+  String get settingsSearchSettings => 'Search settings';
 
   @override
   String get settingsMatchTypeHeader => 'MATCH TYPE';
 
   @override
-  String get settingsExactMatch => 'Exact Match';
+  String get settingsExactMatch => 'Exact match';
 
   @override
   String get settingsExactMatchSubtitle => 'Only match the exact phrase';
@@ -1772,23 +1838,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsScopeHeader => 'SCOPE';
 
   @override
-  String get settingsDisabledBookFilter => 'Disabled (Book Filter Active)';
+  String get settingsDisabledBookFilter => 'Disabled (book filter active)';
 
   @override
-  String get settingsMyNotes => 'My Notes';
+  String get settingsMyNotes => 'My notes';
 
   @override
   String get settingsBehaviorHeader => 'BEHAVIOR';
 
   @override
-  String get settingsAutoOpenSingleShort => 'Auto-open Single Result';
+  String get settingsAutoOpenSingleShort => 'Auto-open single result';
 
   @override
   String get settingsAutoOpenSingleShortSubtitle =>
       'Jump directly if only one result is found';
 
   @override
-  String get settingsBackgroundGlow => 'Enable Background Glow';
+  String get settingsBackgroundGlow => 'Enable background glow';
 
   @override
   String get settingsBackgroundGlowSubtitle =>
@@ -1849,7 +1915,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsThemeDuskOled => 'Dusk\nOLED';
 
   @override
-  String get settingsSurfaceStyle => 'Surface Style';
+  String get settingsSurfaceStyle => 'Surface style';
 
   @override
   String get settingsSurfaceStyleSubtitle =>
@@ -1886,7 +1952,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsWidgetPreviewHeader => 'LIVE WIDGET PREVIEW';
 
   @override
-  String get settingsWidgetStreak => 'Streak Active! • Daily Goal';
+  String get settingsWidgetStreak => 'Streak active! • Daily goal';
 
   @override
   String get settingsWidgetWotd => 'WORD OF THE DAY';
@@ -1904,16 +1970,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsWidgetTextAuto => 'Auto ✨';
 
   @override
-  String get settingsWidgetTextDark => 'Dark Text ☀️';
+  String get settingsWidgetTextDark => 'Dark text ☀️';
 
   @override
-  String get settingsWidgetTextWhite => 'White Text 🌙';
+  String get settingsWidgetTextWhite => 'White text 🌙';
 
   @override
   String get settingsWidgetSynced => 'Widgets synced with new style! ✨';
 
   @override
-  String get settingsWidgetApply => 'Apply & Sync to Home Screen';
+  String get settingsWidgetApply => 'Apply & sync to home screen';
 
   @override
   String get settingsFontSizeHeader => 'FONT SIZE';
@@ -1967,10 +2033,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsItalicHeader => 'ITALIC READING TEXT';
 
   @override
-  String get settingsDailyReading => 'Daily Reading';
+  String get settingsDailyReading => 'Daily reading';
 
   @override
-  String get settingsCustomReminder => 'Custom Reminder';
+  String get settingsCustomReminder => 'Custom reminder';
 
   @override
   String get settingsMonday => 'Monday';
@@ -2027,7 +2093,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get spaceHighlighted => 'Highlighted';
 
   @override
-  String get spaceNewFolder => 'New Folder';
+  String get spaceNewFolder => 'New folder';
 
   @override
   String get spaceFolderNameHint => 'Folder name';
@@ -2036,7 +2102,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get spaceCreate => 'Create';
 
   @override
-  String get spaceRenameFolder => 'Rename Folder';
+  String get spaceRenameFolder => 'Rename folder';
 
   @override
   String get spaceRename => 'Rename';
@@ -2050,7 +2116,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get spaceMoveToFolder => 'Move to Folder';
+  String get spaceMoveToFolder => 'Move to folder';
 
   @override
   String get spaceUnfiled => 'Unfiled';
@@ -2059,13 +2125,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get spaceGroupEarlier => 'Earlier';
 
   @override
-  String get spaceGroupLast7Days => 'Last 7 Days';
+  String get spaceGroupLast7Days => 'Last 7 days';
 
   @override
-  String get spaceGroupLast30Days => 'Last 30 Days';
+  String get spaceGroupLast30Days => 'Last 30 days';
 
   @override
-  String get spaceUnknownBook => 'Unknown Book';
+  String get spaceUnknownBook => 'Unknown book';
 
   @override
   String get spaceNoBookmarks => 'No bookmarks here.';
@@ -2074,10 +2140,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get spaceFilterAll => 'All';
 
   @override
-  String get spaceByDate => 'By Date';
+  String get spaceByDate => 'By date';
 
   @override
-  String get spaceByBook => 'By Book';
+  String get spaceByBook => 'By book';
 
   @override
   String get spaceYourNotes => 'Your notes.';
@@ -2093,14 +2159,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get spaceCopyText => 'Copy text';
-
-  @override
-  String get spaceDeleteNoteTitle => 'Delete note?';
-
-  @override
-  String spaceDeleteNoteBody(String title) {
-    return '\"$title\" will be removed permanently.';
-  }
 
   @override
   String get spaceUntitled => 'Untitled';
@@ -2124,7 +2182,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get spaceShareVerse => 'Share verse';
 
   @override
-  String get spaceChangeColour => 'Change colour';
+  String get spaceChangeColour => 'Change color';
 
   @override
   String get spaceMoveToFolderAction => 'Move to folder';
@@ -2136,15 +2194,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get spaceRemoveHighlight => 'Remove highlight';
 
   @override
-  String get spaceHighlightColour => 'Highlight colour';
+  String get spaceHighlightColour => 'Highlight color';
 
   @override
   String spaceColourN(int index) {
-    return 'Colour $index';
+    return 'Color $index';
   }
 
   @override
-  String get notesMyNotes => 'My Notes';
+  String get notesMyNotes => 'My notes';
 
   @override
   String get notesEmptyTitle => 'No notes yet';
@@ -2156,13 +2214,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notesVerseInserted => 'Verse inserted';
 
   @override
-  String get notesAddCommentary => 'Add Commentary';
+  String get notesAddCommentary => 'Add commentary';
 
   @override
-  String get notesChapterTitlePlaceholder => 'Chapter Title';
+  String get notesChapterTitlePlaceholder => 'Chapter title';
 
   @override
-  String get notesEditNote => 'Edit Note';
+  String get notesEditNote => 'Edit note';
 
   @override
   String notesNewNoteOn(String reference) {
@@ -2170,10 +2228,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get notesNewNote => 'New Note';
+  String get notesNewNote => 'New note';
 
   @override
-  String get notesTitleHint => 'Note Title';
+  String get notesTitleHint => 'Note title';
 
   @override
   String get notesContentHint => 'Start typing... (type / for commands)';
@@ -2191,35 +2249,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notesSaved => 'Note saved!';
 
   @override
-  String get notesSaveChanges => 'Save Changes';
+  String get notesSaveChanges => 'Save changes';
 
   @override
-  String get notesSaveNote => 'Save Note';
+  String get notesSaveNote => 'Save note';
 
   @override
   String get notesDeleted => 'Note deleted';
 
   @override
-  String get notesDeleteNote => 'Delete Note';
+  String get notesDeleteNote => 'Delete note';
 
   @override
-  String get notesNewJournalEntry => 'New Journal Entry';
+  String get notesNewJournalEntry => 'New journal entry';
 
   @override
   String get notesJournalHint =>
       'How are you feeling today? Pour your heart out...';
 
   @override
-  String get notesSaveAndAnalyze => 'Save & Analyze';
+  String get notesSaveAndAnalyze => 'Save & analyze';
 
   @override
   String get notesNoJournalEntries => 'No journal entries yet.';
 
   @override
-  String get notesWriteEntry => 'Write Entry';
+  String get notesWriteEntry => 'Write entry';
 
   @override
-  String get notesAiReflection => 'AI Reflection';
+  String get notesAiReflection => 'AI reflection';
 
   @override
   String notesDetectedEmotion(String emotion) {
@@ -2262,7 +2320,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountSignInApple => 'Sign in with Apple';
 
   @override
-  String get accountSignOut => 'Sign Out';
+  String get accountSignOut => 'Sign out';
 
   @override
   String get accountResetApp => 'Reset app';
@@ -2271,13 +2329,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountResetAppSubtitle => 'Erase all on-device data';
 
   @override
-  String get accountSignIn => 'Sign In';
+  String get accountSignIn => 'Sign in';
 
   @override
-  String get accountSignedIn => 'Signed In';
+  String get accountSignedIn => 'Signed in';
 
   @override
-  String get accountDeleteAccount => 'Delete Account';
+  String get accountDeleteAccount => 'Delete account';
 
   @override
   String get accountDeleteAccountTitle => 'Delete Account?';
@@ -2365,7 +2423,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get accountRestoreTitle => 'Restore from Backup';
+  String get accountRestoreTitle => 'Restore from backup';
 
   @override
   String get accountRestoreHint => 'Paste your backup JSON here...';
@@ -2487,11 +2545,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String spaceCouldNotFinish(String error) {
-    return 'Could not finish: $error';
-  }
-
-  @override
   String spaceFreed(String message, String size) {
     return '$message · freed $size';
   }
@@ -2543,9 +2596,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonUndo => 'Undo';
 
   @override
-  String studyCouldNotOpenScreen(String error) {
-    return 'Could not open that screen. $error';
-  }
+  String get spaceHighlightsIntro => 'Verses you\'ve marked in color.';
 
   @override
   String get studyCardSize => 'Card size';
@@ -2560,7 +2611,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get studySizeLargeHint => 'Full width, same size as everything';
 
   @override
-  String get studySizeExtraLarge => 'Extra Large';
+  String get studySizeExtraLarge => 'Extra large';
 
   @override
   String get studySizeExtraLargeHint => 'Full width, roomier content';
@@ -2594,7 +2645,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Historicist commentary with chapter + verse filters.';
 
   @override
-  String get studyCommentaryCta => 'Open Commentary';
+  String get studyCommentaryCta => 'Open commentary';
 
   @override
   String get studyDictionaryEyebrow => 'Dictionary';
@@ -2749,7 +2800,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get studyMarkAsRead => 'Mark as Read';
 
   @override
-  String get studyNextPassage => 'Next Passage';
+  String get studyNextPassage => 'Next passage';
 
   @override
   String get studyFullChapter => 'Full chapter';
@@ -2771,7 +2822,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get studyBookmark => 'Bookmark';
 
   @override
-  String get studyAddNote => 'Add Note';
+  String get studyAddNote => 'Add note';
 
   @override
   String studyChaptersWithContent(int count) {
@@ -2785,7 +2836,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get studyCommentaryLibrary => 'Commentary Library';
+  String get studyCommentaryLibrary => 'Commentary library';
 
   @override
   String get studyCommentaryLoadError => 'Could not load commentary.';
@@ -2828,11 +2879,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String studyEntriesLoadError(String error) {
-    return 'Could not load entries.\n$error';
-  }
-
-  @override
   String get studyNoEntriesMatch =>
       'No entries match these filters.\nTry All sources, or browse the library.';
 
@@ -2851,12 +2897,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get studyCategoryDevotional => 'Devotional';
 
   @override
-  String get studyCategoryStudyNote => 'Study Note';
-
-  @override
-  String studyCommentaryLoadErrorDetail(String error) {
-    return 'Could not load commentary.\n$error';
-  }
+  String get studyCategoryStudyNote => 'Study note';
 
   @override
   String get studyNoContentForFilters => 'No content found for these filters.';
@@ -2867,7 +2908,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get studyChapterView => 'Chapter View';
+  String get studyChapterView => 'Chapter view';
 
   @override
   String get studyFilterAll => 'All';
@@ -2876,19 +2917,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get studyFilterDevotionals => 'Devotionals';
 
   @override
-  String get studyFilterAllContexts => 'All Contexts';
+  String get studyFilterAllContexts => 'All contexts';
 
   @override
-  String get studyFilterChapterLevel => 'Chapter Level';
+  String get studyFilterChapterLevel => 'Chapter level';
 
   @override
-  String get studyFilterVerseLevel => 'Verse Level';
+  String get studyFilterVerseLevel => 'Verse level';
 
   @override
-  String get studyRemoveBookmark => 'Remove Bookmark';
+  String get studyRemoveBookmark => 'Remove bookmark';
 
   @override
-  String get studyBookmarkCommentary => 'Bookmark Commentary';
+  String get studyBookmarkCommentary => 'Bookmark commentary';
 
   @override
   String get studyExpandFullScreen => 'Expand to full screen';
@@ -2910,7 +2951,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'We couldn\'t find specific commentary for this passage. Try exploring the chapter or book-level commentary below.';
 
   @override
-  String get storiesTitle => 'Bible Stories';
+  String get storiesTitle => 'Bible stories';
 
   @override
   String get storiesFilters => 'Filters';
@@ -2944,11 +2985,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get storiesUnread => 'Unread';
-
-  @override
-  String storiesLoadError(String error) {
-    return 'Could not load stories:\n$error';
-  }
 
   @override
   String get storiesBooks => 'Books';
@@ -3022,11 +3058,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get studyDictionarySavedFilter => '★ Saved';
 
   @override
-  String studyDictionaryUnavailable(String error) {
-    return 'Dictionary unavailable.\n$error';
-  }
-
-  @override
   String get studyNoHeadwords => 'No headwords found.';
 
   @override
@@ -3055,11 +3086,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get studyNoDefinition => 'No definition found.';
-
-  @override
-  String studyFailedToLoad(String error) {
-    return 'Failed to load: $error';
-  }
 
   @override
   String studyStrongsShareText(String id, String lemma, String transliteration,
@@ -3132,7 +3158,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get errorTitle => 'Something Went Wrong';
+  String get errorTitle => 'Something went wrong';
 
   @override
   String get errorBody =>
@@ -3147,7 +3173,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get privacyTitle => 'Privacy Policy';
+  String get privacyTitle => 'Privacy policy';
 
   @override
   String get privacyLoadError => 'Could not load the privacy policy.';
@@ -3170,44 +3196,44 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notifDailyBody => 'Take a moment to read and reflect today.';
 
   @override
-  String get notifDailyChannel => 'Daily Reminders';
+  String get notifDailyChannel => 'Daily reminders';
 
   @override
   String get notifDailyChannelDesc => 'Reminders for daily reading';
 
   @override
-  String get notifPrayerTitle => 'Time for Prayer';
+  String get notifPrayerTitle => 'Time for prayer';
 
   @override
   String get notifPrayerBody => 'Pause for a moment of reflection and prayer.';
 
   @override
-  String get notifPrayerChannel => 'Prayer Reminders';
+  String get notifPrayerChannel => 'Prayer reminders';
 
   @override
   String get notifPrayerChannelDesc => 'Daily prayer reminders';
 
   @override
-  String get notifWeeklyTitle => 'Weekly Study Time';
+  String get notifWeeklyTitle => 'Weekly study time';
 
   @override
   String get notifWeeklyBody =>
       'It\'s your scheduled time for study and reflection.';
 
   @override
-  String get notifWeeklyChannel => 'Weekly Reminders';
+  String get notifWeeklyChannel => 'Weekly reminders';
 
   @override
   String get notifWeeklyChannelDesc => 'Custom weekly study reminders';
 
   @override
-  String get notifSabbathTitle => 'The Sabbath is Approaching';
+  String get notifSabbathTitle => 'The Sabbath is approaching';
 
   @override
   String get notifSabbathBody => 'Welcome the day of rest.';
 
   @override
-  String get notifSabbathChannel => 'Sabbath Reminders';
+  String get notifSabbathChannel => 'Sabbath reminders';
 
   @override
   String get notifSabbathChannelDesc => 'Weekly sunset reminders for Sabbath';
@@ -3216,7 +3242,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notifPlanBody => 'Take a moment to read your daily passage.';
 
   @override
-  String get notifPlanChannel => 'Reading Plan';
+  String get notifPlanChannel => 'Reading plan';
 
   @override
   String get notifPlanChannelDesc => 'Reading plan reminders';
@@ -3278,7 +3304,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get backupConfirmTitle => 'Confirm Restore';
+  String get backupConfirmTitle => 'Confirm restore';
 
   @override
   String get backupConfirmBody =>
@@ -3499,7 +3525,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get creditsStudyTools => 'Study tools';
 
   @override
-  String get creditsBibleStories => 'Bible Stories';
+  String get creditsBibleStories => 'Bible stories';
 
   @override
   String get creditsFonts => 'Fonts';
@@ -3579,7 +3605,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get miscColorRed => 'Red';
 
   @override
-  String get miscSearchBibleVerse => 'Bible Verse';
+  String get miscSearchBibleVerse => 'Bible verse';
 
   @override
   String get miscSearchCommentary => 'Commentary';
@@ -3595,7 +3621,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get miscSearchJumpTo => 'Jump To';
+  String get miscSearchJumpTo => 'Jump to';
 
   @override
   String miscSearchGoToChapter(String book, int chapter) {

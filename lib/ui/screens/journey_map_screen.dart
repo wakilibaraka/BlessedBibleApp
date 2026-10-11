@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/reading_plan_provider.dart';
 import '../../theme/app_colors.dart';
+import '../widgets/state_views.dart';
 import 'reading_plan_detail_v2_screen.dart';
 import '../../l10n/l10n.dart';
 
@@ -37,9 +38,7 @@ class _JourneyMapScreenState extends ConsumerState<JourneyMapScreen> {
     final theme = Theme.of(context);
 
     if (planState.isLoading) {
-      return Scaffold(
-          body: Center(
-              child: CircularProgressIndicator(color: AppColors.goldAccent)));
+      return const Scaffold(body: LoadingView());
     }
 
     final totalDays = planState.planData.length;

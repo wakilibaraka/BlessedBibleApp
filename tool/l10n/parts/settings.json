@@ -40,7 +40,7 @@
   "tl": "Impormasyon"
  },
  "settingsWidgetsTitle": {
-  "en": "Home Screen Widgets",
+  "en": "Home screen widgets",
   "fr": "Widgets d'écran d'accueil",
   "it": "Widget della schermata Home",
   "ro": "Widgeturi pe ecranul principal",
@@ -104,7 +104,7 @@
   "tl": "Hanapin"
  },
  "settingsImmersiveReading": {
-  "en": "Immersive Reading",
+  "en": "Immersive reading",
   "fr": "Lecture immersive",
   "it": "Lettura immersiva",
   "ro": "Lectură imersivă",
@@ -112,7 +112,7 @@
   "tl": "Malalim na Pagbabasa"
  },
  "settingsImmersiveOffTitle": {
-  "en": "Anchored (Off)",
+  "en": "Anchored (off)",
   "fr": "Ancré (désactivé)",
   "it": "Ancorato (disattivo)",
   "ro": "Ancorat (oprit)",
@@ -128,7 +128,7 @@
   "tl": "Laging nakikita ang nabigasyon"
  },
  "settingsImmersivePartialTitle": {
-  "en": "Guided (Partial)",
+  "en": "Guided (partial)",
   "fr": "Guidé (partiel)",
   "it": "Guidato (parziale)",
   "ro": "Ghidat (parțial)",
@@ -160,7 +160,7 @@
   "tl": "Buong paglubog. Nagtatago ang lahat ng menu kapag nag-scroll"
  },
  "settingsShowStrongs": {
-  "en": "Show Strong's Numbers",
+  "en": "Show Strong's numbers",
   "fr": "Afficher les numéros Strong",
   "it": "Mostra numeri Strong",
   "ro": "Afișează numerele Strong",
@@ -248,7 +248,7 @@
   "tl": "Mabilis"
  },
  "settingsDictUnderlines": {
-  "en": "Dictionary Underlines",
+  "en": "Dictionary underlines",
   "fr": "Soulignements du dictionnaire",
   "it": "Sottolineature del dizionario",
   "ro": "Sublinieri din dicționar",
@@ -264,7 +264,7 @@
   "tl": "May tuldok na salungguhit sa mga terminong biblikal at lumang salita"
  },
  "settingsUnderlineScope": {
-  "en": "Underline Scope",
+  "en": "Underline scope",
   "fr": "Portée du soulignement",
   "it": "Ambito sottolineatura",
   "ro": "Ce se subliniază",
@@ -288,7 +288,7 @@
   "tl": "Mga pangngalang pantangi at tiyak na konseptong biblikal"
  },
  "settingsScopeTrickyTitle": {
-  "en": "Names + tricky words (Recommended)",
+  "en": "Names + tricky words (recommended)",
   "fr": "Noms + mots difficiles (recommandé)",
   "it": "Nomi + parole insidiose (consigliato)",
   "ro": "Nume + cuvinte dificile (recomandat)",
@@ -408,7 +408,7 @@
   "tl": "Walang marka ng diksiyonaryo sa ibang bersyong Ingles"
  },
  "settingsPopupStyle": {
-  "en": "Popup Style",
+  "en": "Popup style",
   "fr": "Style des fenêtres",
   "it": "Stile popup",
   "ro": "Stil fereastră",
@@ -472,7 +472,7 @@
   "tl": "Nagdaragdag ng hanay para makita ang naka-save na talata sa ibang salin"
  },
  "settingsVerseActionStyle": {
-  "en": "Verse Action Style",
+  "en": "Verse action style",
   "fr": "Style des actions de verset",
   "it": "Stile azioni versetto",
   "ro": "Stilul acțiunilor pe verset",
@@ -528,7 +528,7 @@
   "tl": "Radial"
  },
  "settingsKeepAwake": {
-  "en": "Keep Screen Awake",
+  "en": "Keep screen awake",
   "fr": "Garder l'écran allumé",
   "it": "Schermo sempre acceso",
   "ro": "Ecran mereu aprins",
@@ -600,7 +600,7 @@
   "tl": "Tema, font, laki at kulay"
  },
  "settingsSabbathTitle": {
-  "en": "Friday Sunset Reminder",
+  "en": "Friday sunset reminder",
   "fr": "Rappel du coucher du soleil le vendredi",
   "it": "Promemoria tramonto del venerdì",
   "ro": "Memento apus de vineri",
@@ -624,7 +624,7 @@
   "tl": "Lokasyon"
  },
  "settingsLocationNotSet": {
-  "en": "Not set (Tap to set)",
+  "en": "Not set (tap to set)",
   "fr": "Non défini (touchez pour définir)",
   "it": "Non impostata (tocca per impostare)",
   "ro": "Nesetată (atinge pentru a seta)",
@@ -632,7 +632,7 @@
   "tl": "Hindi nakatakda (I-tap para itakda)"
  },
  "settingsDailyReminderTitle": {
-  "en": "Daily Reading Reminder",
+  "en": "Daily reading reminder",
   "fr": "Rappel de lecture quotidienne",
   "it": "Promemoria lettura quotidiana",
   "ro": "Memento lectură zilnică",
@@ -656,7 +656,7 @@
   "tl": "Oras"
  },
  "settingsWeeklyReminderTitle": {
-  "en": "Custom Weekly Reminder",
+  "en": "Custom weekly reminder",
   "fr": "Rappel hebdomadaire",
   "it": "Promemoria settimanale",
   "ro": "Memento săptămânal",
@@ -672,7 +672,7 @@
   "tl": "Pumili ng araw at oras bawat linggo para sa mas malalim na pag-aaral."
  },
  "settingsDayAndTime": {
-  "en": "Day & Time",
+  "en": "Day & time",
   "fr": "Jour et heure",
   "it": "Giorno e ora",
   "ro": "Zi și oră",
@@ -680,7 +680,7 @@
   "tl": "Araw at Oras"
  },
  "settingsChooseDay": {
-  "en": "Choose Day",
+  "en": "Choose day",
   "fr": "Choisir le jour",
   "it": "Scegli il giorno",
   "ro": "Alege ziua",
@@ -704,7 +704,7 @@
   "tl": "Gabay para sa pag-highlight, pag-swipe at iba pa"
  },
  "settingsNavSteps": {
-  "en": "Navigation Steps",
+  "en": "Navigation steps",
   "fr": "Étapes de navigation",
   "it": "Passaggi di navigazione",
   "ro": "Pași de navigare",
@@ -832,7 +832,7 @@
   "tl": "Ipakita rin ang malapit na tugma sa mali (hal. Jhon → John)"
  },
  "settingsDefaultScopes": {
-  "en": "Default Search Scopes",
+  "en": "Default search scopes",
   "fr": "Portées de recherche par défaut",
   "it": "Ambiti di ricerca predefiniti",
   "ro": "Domenii de căutare implicite",
@@ -944,7 +944,7 @@
   "tl": "Pindutin nang matagal ang button sa kanang ibaba para sa Aklat/Kabanata."
  },
  "settingsBbeNoteTitle": {
-  "en": "BBE Translation Note",
+  "en": "BBE translation note",
   "fr": "Note sur la traduction BBE",
   "it": "Nota sulla traduzione BBE",
   "ro": "Notă despre traducerea BBE",
@@ -984,7 +984,7 @@
   "tl": "I-import ang data mula sa backup JSON"
  },
  "settingsRestoreBackupDialogTitle": {
-  "en": "Restore from Backup",
+  "en": "Restore from backup",
   "fr": "Restaurer une sauvegarde",
   "it": "Ripristina da backup",
   "ro": "Restaurează din copie",
@@ -1112,7 +1112,7 @@
   "tl": "Cache, na-download na salin at maaaring bakantehin"
  },
  "settingsSendFeedback": {
-  "en": "Send Feedback",
+  "en": "Send feedback",
   "fr": "Envoyer un avis",
   "it": "Invia feedback",
   "ro": "Trimite feedback",
@@ -1136,7 +1136,7 @@
   "tl": "Nakatutulong ang anonimong detalye sa pag-aayos ng bug. Walang pagbasa ng Biblia, tala o personal na nilalaman."
  },
  "settingsPrivacyPolicy": {
-  "en": "Privacy Policy",
+  "en": "Privacy policy",
   "fr": "Politique de confidentialité",
   "it": "Informativa sulla privacy",
   "ro": "Politica de confidențialitate",
@@ -1160,7 +1160,7 @@
   "tl": "Salin ng Biblia, komentaryo, datos sa pag-aaral, font at lisensya"
  },
  "settingsSetSunsetLocation": {
-  "en": "Set Location for Sunset",
+  "en": "Set location for sunset",
   "fr": "Lieu pour le coucher du soleil",
   "it": "Posizione per il tramonto",
   "ro": "Locația pentru apus",
@@ -1168,7 +1168,7 @@
   "tl": "Itakda ang Lokasyon ng Paglubog ng Araw"
  },
  "settingsCurrentLocationGps": {
-  "en": "Current Location (GPS)",
+  "en": "Current location (GPS)",
   "fr": "Position actuelle (GPS)",
   "it": "Posizione attuale (GPS)",
   "ro": "Locația actuală (GPS)",
@@ -1208,7 +1208,7 @@
   "tl": "Tema"
  },
  "settingsSearchSettings": {
-  "en": "Search Settings",
+  "en": "Search settings",
   "fr": "Paramètres de recherche",
   "it": "Impostazioni di ricerca",
   "ro": "Setări de căutare",
@@ -1224,7 +1224,7 @@
   "tl": "URI NG TUGMA"
  },
  "settingsExactMatch": {
-  "en": "Exact Match",
+  "en": "Exact match",
   "fr": "Correspondance exacte",
   "it": "Corrispondenza esatta",
   "ro": "Potrivire exactă",
@@ -1248,7 +1248,7 @@
   "tl": "SAKLAW"
  },
  "settingsDisabledBookFilter": {
-  "en": "Disabled (Book Filter Active)",
+  "en": "Disabled (book filter active)",
   "fr": "Désactivé (filtre de livre actif)",
   "it": "Disattivato (filtro libro attivo)",
   "ro": "Dezactivat (filtru de carte activ)",
@@ -1256,7 +1256,7 @@
   "tl": "Naka-off (May filter ng aklat)"
  },
  "settingsMyNotes": {
-  "en": "My Notes",
+  "en": "My notes",
   "fr": "Mes notes",
   "it": "Le mie note",
   "ro": "Notițele mele",
@@ -1272,7 +1272,7 @@
   "tl": "PAG-UUGALI"
  },
  "settingsAutoOpenSingleShort": {
-  "en": "Auto-open Single Result",
+  "en": "Auto-open single result",
   "fr": "Ouvrir un résultat unique",
   "it": "Apri risultato unico",
   "ro": "Deschide rezultatul unic",
@@ -1288,7 +1288,7 @@
   "tl": "Direktang pumunta kung iisa ang resulta"
  },
  "settingsBackgroundGlow": {
-  "en": "Enable Background Glow",
+  "en": "Enable background glow",
   "fr": "Activer la lueur de fond",
   "it": "Attiva bagliore di sfondo",
   "ro": "Activează strălucirea de fundal",
@@ -1448,7 +1448,7 @@
   "tl": "Takipsilim\nOLED"
  },
  "settingsSurfaceStyle": {
-  "en": "Surface Style",
+  "en": "Surface style",
   "fr": "Style de surface",
   "it": "Stile superficie",
   "ro": "Stil suprafață",
@@ -1544,7 +1544,7 @@
   "tl": "LIVE PREVIEW NG WIDGET"
  },
  "settingsWidgetStreak": {
-  "en": "Streak Active! • Daily Goal",
+  "en": "Streak active! • Daily goal",
   "fr": "Série en cours ! • Objectif du jour",
   "it": "Serie attiva! • Obiettivo del giorno",
   "ro": "Serie activă! • Obiectiv zilnic",
@@ -1592,7 +1592,7 @@
   "tl": "Auto ✨"
  },
  "settingsWidgetTextDark": {
-  "en": "Dark Text ☀️",
+  "en": "Dark text ☀️",
   "fr": "Texte sombre ☀️",
   "it": "Testo scuro ☀️",
   "ro": "Text închis ☀️",
@@ -1600,7 +1600,7 @@
   "tl": "Madilim na Teksto ☀️"
  },
  "settingsWidgetTextWhite": {
-  "en": "White Text 🌙",
+  "en": "White text 🌙",
   "fr": "Texte blanc 🌙",
   "it": "Testo bianco 🌙",
   "ro": "Text alb 🌙",
@@ -1616,7 +1616,7 @@
   "tl": "Na-sync ang mga widget sa bagong estilo! ✨"
  },
  "settingsWidgetApply": {
-  "en": "Apply & Sync to Home Screen",
+  "en": "Apply & sync to home screen",
   "fr": "Appliquer à l'écran d'accueil",
   "it": "Applica alla schermata Home",
   "ro": "Aplică pe ecranul principal",
@@ -1760,7 +1760,7 @@
   "tl": "ITALIC NA TEKSTO"
  },
  "settingsDailyReading": {
-  "en": "Daily Reading",
+  "en": "Daily reading",
   "fr": "Lecture quotidienne",
   "it": "Lettura quotidiana",
   "ro": "Lectură zilnică",
@@ -1768,7 +1768,7 @@
   "tl": "Araw-araw na Pagbasa"
  },
  "settingsCustomReminder": {
-  "en": "Custom Reminder",
+  "en": "Custom reminder",
   "fr": "Rappel personnalisé",
   "it": "Promemoria personalizzato",
   "ro": "Memento personalizat",

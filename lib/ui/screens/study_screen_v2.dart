@@ -4,6 +4,7 @@ import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../services/firebase_setup.dart';
 import '../../state/journal_provider.dart';
 import '../../state/notes_provider.dart';
 import '../../state/reading_plan_provider.dart';
@@ -112,10 +113,11 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
       Navigator.of(context)
           .push(CupertinoPageRoute<void>(builder: (_) => page));
     } catch (e) {
+      reportNonFatal('study open screen', code: e.runtimeType.toString());
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(context.l10n.studyCouldNotOpenScreen('$e')),
+          content: Text(context.l10n.studyOpenScreenFailed),
           behavior: SnackBarBehavior.floating,
         ),
       );

@@ -8,6 +8,7 @@ import 'share_card.dart';
 import '../dialogs/verse_preview_dialog.dart';
 import '../../l10n/l10n.dart';
 import '../../theme/design_tokens.dart';
+import 'state_views.dart';
 
 /// Decorative size for the headword at the top of the sheet.
 const double _kHeroWordSize = 40;
@@ -239,13 +240,16 @@ class DictionaryEntrySheet extends ConsumerWidget {
                     ],
                   );
                 },
-                loading: () => const Center(
-                    child: Padding(
+                loading: () => const Padding(
                   padding: EdgeInsets.all(40.0),
-                  child: CircularProgressIndicator(),
-                )),
-                error: (e, __) =>
-                    Center(child: Text(context.l10n.studyFailedToLoad('$e'))),
+                  child: LoadingView(),
+                ),
+                error: (e, __) => ErrorState(
+                  error: e,
+                  message: context.l10n.studyEntryLoadFailed,
+                  onRetry: () => ref
+                      .invalidate(dictionaryDefinitionProvider(normalizedWord)),
+                ),
               ),
             ),
           ],

@@ -688,7 +688,7 @@ class WordOfTheDaySection extends ConsumerWidget {
       loading: () => const SizedBox.shrink(),
       error: (e, st) {
         logDebug('wordOfTheDayProvider error: $e\n$st');
-        return _WotdFallback(context.l10n.homeWotdUnavailable('$e'));
+        return _WotdFallback(context.l10n.homeWotdUnavailableNow);
       },
     );
   }

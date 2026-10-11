@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../services/bible_database_service.dart';
+import '../../services/firebase_setup.dart';
 import '../../services/translation_downloader.dart';
 import '../../services/translation_pack_store.dart';
 import '../../state/theme_provider.dart';
@@ -132,6 +133,7 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
       title: context.l10n.spaceClearCacheTitle,
       body: context.l10n.spaceClearCacheBody,
       confirmLabel: context.l10n.spaceClearCache,
+      destructive: true,
     );
     if (!confirmed || !mounted) return;
     final success = context.l10n.spaceCacheCleared;
@@ -188,11 +190,12 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
     unawaited(HapticFeedback.mediumImpact());
     setState(() => _busy = true);
     int freed = 0;
-    String? error;
+    var failed = false;
     try {
       freed = await action();
     } catch (e) {
-      error = '$e';
+      failed = true;
+      reportNonFatal('storage action', code: e.runtimeType.toString());
     }
     await _refresh();
     if (!mounted) return;
@@ -202,8 +205,8 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
     messenger.showSnackBar(SnackBar(
       behavior: SnackBarBehavior.floating,
       content: Text(
-        error != null
-            ? context.l10n.spaceCouldNotFinish(error)
+        failed
+            ? context.l10n.spaceCouldNotFinishPlain
             : context.l10n.spaceFreed(success, _mb(freed)),
       ),
     ));

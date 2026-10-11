@@ -103,6 +103,127 @@ class AppLocalizationsRo extends AppLocalizations {
       'Limba meniurilor și a butoanelor. Traducerea Bibliei se alege separat.';
 
   @override
+  String get homeWotdUnavailableNow =>
+      'Cuvântul zilei nu este disponibil acum.';
+
+  @override
+  String get spaceCouldNotFinishPlain =>
+      'Nu s-a putut finaliza. Încearcă din nou.';
+
+  @override
+  String get readTranslationsLoadErrorPlain =>
+      'Nu s-au putut încărca traducerile.';
+
+  @override
+  String get readDeleteTranslationBody =>
+      'O poți obține din nou oricând din lista de traduceri.';
+
+  @override
+  String get readDeleteFailedPlain => 'Nu s-a putut șterge. Încearcă din nou.';
+
+  @override
+  String get readCrossRefsLoadErrorPlain =>
+      'Nu s-au putut încărca trimiterile.';
+
+  @override
+  String get readVerseLoadErrorPlain => 'Nu s-a putut încărca acest verset.';
+
+  @override
+  String get searchClearRecentTitle => 'Ștergi căutările recente?';
+
+  @override
+  String get searchClearRecentBody =>
+      'Căutările recente vor fi șterse de pe acest dispozitiv.';
+
+  @override
+  String get searchClearRecentConfirm => 'Șterge';
+
+  @override
+  String readHighlightsRemoved(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count de evidențieri eliminate',
+      few: '$count evidențieri eliminate',
+      one: 'Evidențiere eliminată',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String readVersesHighlighted(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count de versete evidențiate',
+      few: '$count versete evidențiate',
+      one: 'Verset evidențiat',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String readBookmarksRemoved(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count de semne de carte eliminate',
+      few: '$count semne de carte eliminate',
+      one: 'Semn de carte eliminat',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String readVersesBookmarked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count de versete adăugate la semne de carte',
+      few: '$count versete adăugate la semne de carte',
+      one: 'Verset adăugat la semne de carte',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get storiesLoadFailed => 'Poveștile nu au putut fi încărcate.';
+
+  @override
+  String get studyEntriesLoadFailed => 'Intrările nu au putut fi încărcate.';
+
+  @override
+  String get studyDictionaryLoadFailed => 'Dicționarul nu a putut fi încărcat.';
+
+  @override
+  String get studyEntryLoadFailed => 'Această intrare nu a putut fi încărcată.';
+
+  @override
+  String get studyOpenScreenFailed => 'Ecranul nu a putut fi deschis.';
+
+  @override
+  String get studyWordUnsaved => 'Eliminat din cuvintele salvate';
+
+  @override
+  String get plansBuilderSaveFailed => 'Planul nu a putut fi salvat.';
+
+  @override
+  String get plansBuilderLoadFailed =>
+      'Generatorul de planuri nu a putut fi pregătit.';
+
+  @override
+  String get plansDetailLoadFailed => 'Planul nu a putut fi încărcat.';
+
+  @override
+  String get plansTrackRemoved => 'Traseu eliminat';
+
+  @override
+  String get yourSpaceBookmarkRemoved => 'Semn de carte eliminat';
+
+  @override
+  String get yourSpaceHighlightRemoved => 'Evidențiere eliminată';
+
+  @override
   String get onboardingTagline => 'Scriptura, fără distrageri.';
 
   @override
@@ -230,9 +351,6 @@ class AppLocalizationsRo extends AppLocalizations {
   String plansDayCompleteCelebration(int day) {
     return 'Plan de citire\nZiua $day încheiată!';
   }
-
-  @override
-  String get plansChangeWeek => 'Schimbă săptămâna';
 
   @override
   String plansCalendarDayComplete(String label) {
@@ -442,17 +560,7 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
-  String plansCouldNotSave(String error) {
-    return 'Planul nu a putut fi salvat: $error';
-  }
-
-  @override
   String get plansBuilderTitle => 'Creează un plan';
-
-  @override
-  String plansError(String error) {
-    return 'Eroare: $error';
-  }
 
   @override
   String get plansPlanName => 'Numele planului';
@@ -990,11 +1098,6 @@ class AppLocalizationsRo extends AppLocalizations {
       'Trimiterile vor fi disponibile\ndupă următoarea actualizare.';
 
   @override
-  String readCrossRefsLoadError(String error) {
-    return 'Trimiterile nu au putut fi încărcate.\n$error';
-  }
-
-  @override
   String get readVerseUnavailable => 'Verset indisponibil';
 
   @override
@@ -1011,11 +1114,6 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get readBookNotFound => 'Cartea indicată nu a fost găsită.';
-
-  @override
-  String readVerseLoadError(String error) {
-    return 'Eroare la încărcarea versetului: $error';
-  }
 
   @override
   String get readTestament => 'Testament';
@@ -1094,18 +1192,8 @@ class AppLocalizationsRo extends AppLocalizations {
   String get readSecondary => 'Secundară';
 
   @override
-  String readTranslationsLoadError(String error) {
-    return 'Eroare la încărcarea traducerilor: $error';
-  }
-
-  @override
   String readTranslationDeleted(String name) {
     return '$name a fost ștearsă.';
-  }
-
-  @override
-  String readDeleteFailed(String error) {
-    return 'Nu s-a putut șterge: $error';
   }
 
   @override
@@ -1131,16 +1219,6 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get readDownloadFailed => 'Descărcare eșuată';
-
-  @override
-  String readRestoreFailedDetail(String error) {
-    return 'Restaurare eșuată ($error).';
-  }
-
-  @override
-  String readDownloadFailedDetail(String error) {
-    return 'Descărcare eșuată ($error).';
-  }
 
   @override
   String get readRestoreOffline => 'restaurare offline';
@@ -1169,11 +1247,6 @@ class AppLocalizationsRo extends AppLocalizations {
   @override
   String get homeWotdEmpty =>
       'Niciun cuvânt ales pentru azi — încearcă mai târziu.';
-
-  @override
-  String homeWotdUnavailable(String error) {
-    return 'Cuvântul zilei indisponibil ($error).';
-  }
 
   @override
   String get navHome => 'Acasă';
@@ -2116,14 +2189,6 @@ class AppLocalizationsRo extends AppLocalizations {
   String get spaceCopyText => 'Copiază textul';
 
   @override
-  String get spaceDeleteNoteTitle => 'Ștergi notița?';
-
-  @override
-  String spaceDeleteNoteBody(String title) {
-    return '„$title” va fi ștearsă definitiv.';
-  }
-
-  @override
   String get spaceUntitled => 'Fără titlu';
 
   @override
@@ -2506,11 +2571,6 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
-  String spaceCouldNotFinish(String error) {
-    return 'Nu s-a putut finaliza: $error';
-  }
-
-  @override
   String spaceFreed(String message, String size) {
     return '$message · eliberat $size';
   }
@@ -2562,9 +2622,7 @@ class AppLocalizationsRo extends AppLocalizations {
   String get commonUndo => 'Anulează';
 
   @override
-  String studyCouldNotOpenScreen(String error) {
-    return 'Ecranul nu a putut fi deschis. $error';
-  }
+  String get spaceHighlightsIntro => 'Versetele pe care le-ai evidențiat.';
 
   @override
   String get studyCardSize => 'Dimensiunea cardului';
@@ -2859,11 +2917,6 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
-  String studyEntriesLoadError(String error) {
-    return 'Intrările nu au putut fi încărcate.\n$error';
-  }
-
-  @override
   String get studyNoEntriesMatch =>
       'Nicio intrare nu corespunde filtrelor.\nÎncearcă Toate sursele sau răsfoiește biblioteca.';
 
@@ -2883,11 +2936,6 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get studyCategoryStudyNote => 'Notă de studiu';
-
-  @override
-  String studyCommentaryLoadErrorDetail(String error) {
-    return 'Comentariul nu a putut fi încărcat.\n$error';
-  }
 
   @override
   String get studyNoContentForFilters =>
@@ -2978,11 +3026,6 @@ class AppLocalizationsRo extends AppLocalizations {
   String get storiesUnread => 'Necitite';
 
   @override
-  String storiesLoadError(String error) {
-    return 'Povestirile nu au putut fi încărcate:\n$error';
-  }
-
-  @override
   String get storiesBooks => 'Cărți';
 
   @override
@@ -3055,11 +3098,6 @@ class AppLocalizationsRo extends AppLocalizations {
   String get studyDictionarySavedFilter => '★ Salvate';
 
   @override
-  String studyDictionaryUnavailable(String error) {
-    return 'Dicționar indisponibil.\n$error';
-  }
-
-  @override
   String get studyNoHeadwords => 'Niciun cuvânt-titlu găsit.';
 
   @override
@@ -3089,11 +3127,6 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get studyNoDefinition => 'Nicio definiție găsită.';
-
-  @override
-  String studyFailedToLoad(String error) {
-    return 'Încărcarea a eșuat: $error';
-  }
 
   @override
   String studyStrongsShareText(String id, String lemma, String transliteration,

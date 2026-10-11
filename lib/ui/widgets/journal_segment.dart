@@ -4,6 +4,7 @@ import '../../services/ai_journal_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/journal_provider.dart';
 import '../../theme/design_tokens.dart';
+import 'state_views.dart';
 
 class JournalSegment extends ConsumerWidget {
   final ThemeData theme;
@@ -46,22 +47,11 @@ class JournalSegment extends ConsumerWidget {
     final entries = ref.watch(journalProvider);
 
     if (entries.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.book, size: 64, color: Colors.grey),
-            const SizedBox(height: 16),
-            Text(context.l10n.notesNoJournalEntries,
-                style: theme.textTheme.titleMedium),
-            const SizedBox(height: 16),
-            FilledButton.icon(
-              onPressed: () => _showAddJournalDialog(context, ref),
-              icon: const Icon(Icons.add),
-              label: Text(context.l10n.notesWriteEntry),
-            ),
-          ],
-        ),
+      return EmptyState(
+        icon: Icons.book,
+        title: context.l10n.notesNoJournalEntries,
+        actionLabel: context.l10n.notesWriteEntry,
+        onAction: () => _showAddJournalDialog(context, ref),
       );
     }
 

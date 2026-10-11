@@ -30,6 +30,7 @@ import '../../state/user_data_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../state/surface_style_provider.dart';
 import '../widgets/commentary_view.dart';
+import '../widgets/state_views.dart';
 import '../../theme/app_colors.dart';
 import 'read_screen.dart' show VerseActionLogic;
 import '../sheets/verse_context_menu_sheet.dart';
@@ -376,7 +377,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
     if (!_loaded) {
       return Scaffold(
         appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
-        body: const Center(child: CircularProgressIndicator()),
+        body: const LoadingView(),
       );
     }
 
@@ -385,7 +386,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
         appBar: AppBar(
             title: Text(context.l10n.studyPassageNotFound),
             backgroundColor: Colors.transparent),
-        body: Center(child: Text(context.l10n.studyPassageLoadError)),
+        body: ErrorState(message: context.l10n.studyPassageLoadError),
       );
     }
 

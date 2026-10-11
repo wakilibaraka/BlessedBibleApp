@@ -373,7 +373,8 @@ void _showAccountSheet(BuildContext context) {
                               TextButton(
                                 onPressed: () => Navigator.pop(ctx, true),
                                 child: Text(context.l10n.commonDelete,
-                                    style: TextStyle(color: Colors.red)),
+                                    style:
+                                        TextStyle(color: ctx.palette.danger)),
                               ),
                             ],
                           ),
@@ -401,6 +402,8 @@ void _showAccountSheet(BuildContext context) {
                                 context.l10n.accountReauthFailed(
                                     SignInResult.failed(e.failure).message));
                           } catch (e) {
+                            reportNonFatal('delete account',
+                                code: e.runtimeType.toString());
                             if (!context.mounted) return;
                             _showError(
                                 context, context.l10n.accountDeleteFailed);
@@ -474,7 +477,8 @@ Future<void> _askAccountChoice(BuildContext context, WidgetRef ref) async {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(ctx, true),
-          child: Text(context.l10n.accountStartFresh),
+          child: Text(context.l10n.accountStartFresh,
+              style: TextStyle(color: ctx.palette.danger)),
         ),
         TextButton(
           onPressed: () => Navigator.pop(ctx, false),
@@ -504,7 +508,8 @@ Future<void> _signOut(BuildContext context, WidgetRef ref) async {
         ),
         TextButton(
           onPressed: () => Navigator.pop(ctx, true),
-          child: Text(context.l10n.accountRemoveFromDevice),
+          child: Text(context.l10n.accountRemoveFromDevice,
+              style: TextStyle(color: ctx.palette.danger)),
         ),
         TextButton(
           onPressed: () => Navigator.pop(ctx, false),

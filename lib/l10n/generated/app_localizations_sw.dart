@@ -102,6 +102,121 @@ class AppLocalizationsSw extends AppLocalizations {
       'Lugha ya menyu na vitufe. Tafsiri ya Biblia huchaguliwa kando.';
 
   @override
+  String get homeWotdUnavailableNow => 'Neno la siku halipatikani kwa sasa.';
+
+  @override
+  String get spaceCouldNotFinishPlain =>
+      'Imeshindwa kukamilisha. Tafadhali jaribu tena.';
+
+  @override
+  String get readTranslationsLoadErrorPlain => 'Imeshindwa kupakia tafsiri.';
+
+  @override
+  String get readDeleteTranslationBody =>
+      'Unaweza kuipata tena wakati wowote kutoka kwenye orodha ya tafsiri.';
+
+  @override
+  String get readDeleteFailedPlain =>
+      'Imeshindwa kufuta. Tafadhali jaribu tena.';
+
+  @override
+  String get readCrossRefsLoadErrorPlain =>
+      'Imeshindwa kupakia marejeo mtambuka.';
+
+  @override
+  String get readVerseLoadErrorPlain => 'Imeshindwa kupakia aya hii.';
+
+  @override
+  String get searchClearRecentTitle => 'Futa utafutaji wa hivi karibuni?';
+
+  @override
+  String get searchClearRecentBody =>
+      'Utafutaji wako wa hivi karibuni utaondolewa kwenye kifaa hiki.';
+
+  @override
+  String get searchClearRecentConfirm => 'Futa';
+
+  @override
+  String readHighlightsRemoved(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Uangaziaji $count umeondolewa',
+      one: 'Uangaziaji umeondolewa',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String readVersesHighlighted(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Aya $count zimeangaziwa',
+      one: 'Aya imeangaziwa',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String readBookmarksRemoved(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Alamisho $count zimeondolewa',
+      one: 'Alamisho limeondolewa',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String readVersesBookmarked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Aya $count zimewekewa alamisho',
+      one: 'Aya imewekewa alamisho',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get storiesLoadFailed => 'Imeshindwa kupakia hadithi.';
+
+  @override
+  String get studyEntriesLoadFailed => 'Imeshindwa kupakia maingizo.';
+
+  @override
+  String get studyDictionaryLoadFailed => 'Imeshindwa kupakia kamusi.';
+
+  @override
+  String get studyEntryLoadFailed => 'Imeshindwa kupakia ingizo hili.';
+
+  @override
+  String get studyOpenScreenFailed => 'Imeshindwa kufungua skrini hiyo.';
+
+  @override
+  String get studyWordUnsaved => 'Imeondolewa kwenye maneno yaliyohifadhiwa';
+
+  @override
+  String get plansBuilderSaveFailed => 'Imeshindwa kuhifadhi mpango.';
+
+  @override
+  String get plansBuilderLoadFailed => 'Imeshindwa kuandaa kiunda mpango.';
+
+  @override
+  String get plansDetailLoadFailed => 'Imeshindwa kupakia mpango huu.';
+
+  @override
+  String get plansTrackRemoved => 'Njia imeondolewa';
+
+  @override
+  String get yourSpaceBookmarkRemoved => 'Alamisho limeondolewa';
+
+  @override
+  String get yourSpaceHighlightRemoved => 'Alama ya rangi imeondolewa';
+
+  @override
   String get onboardingTagline => 'Maandiko, bila usumbufu.';
 
   @override
@@ -231,9 +346,6 @@ class AppLocalizationsSw extends AppLocalizations {
   String plansDayCompleteCelebration(int day) {
     return 'Mpango wa Kusoma\nSiku $day Imekamilika!';
   }
-
-  @override
-  String get plansChangeWeek => 'Badilisha wiki';
 
   @override
   String plansCalendarDayComplete(String label) {
@@ -437,17 +549,7 @@ class AppLocalizationsSw extends AppLocalizations {
   }
 
   @override
-  String plansCouldNotSave(String error) {
-    return 'Imeshindwa kuhifadhi mpango: $error';
-  }
-
-  @override
   String get plansBuilderTitle => 'Unda Mpango Wako';
-
-  @override
-  String plansError(String error) {
-    return 'Hitilafu: $error';
-  }
 
   @override
   String get plansPlanName => 'Jina la mpango';
@@ -977,11 +1079,6 @@ class AppLocalizationsSw extends AppLocalizations {
       'Marejeo mtambuka yatapatikana\nbaada ya sasisho lijalo.';
 
   @override
-  String readCrossRefsLoadError(String error) {
-    return 'Imeshindwa kupakia marejeo mtambuka.\n$error';
-  }
-
-  @override
   String get readVerseUnavailable => 'Mstari haupatikani';
 
   @override
@@ -998,11 +1095,6 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get readBookNotFound => 'Kitabu kilichotajwa hakikupatikana.';
-
-  @override
-  String readVerseLoadError(String error) {
-    return 'Hitilafu kupakia mstari: $error';
-  }
 
   @override
   String get readTestament => 'Agano';
@@ -1081,18 +1173,8 @@ class AppLocalizationsSw extends AppLocalizations {
   String get readSecondary => 'Ya pili';
 
   @override
-  String readTranslationsLoadError(String error) {
-    return 'Hitilafu kupakia tafsiri: $error';
-  }
-
-  @override
   String readTranslationDeleted(String name) {
     return '$name imefutwa.';
-  }
-
-  @override
-  String readDeleteFailed(String error) {
-    return 'Imeshindwa kufuta: $error';
   }
 
   @override
@@ -1117,16 +1199,6 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get readDownloadFailed => 'Upakuaji umeshindwa';
-
-  @override
-  String readRestoreFailedDetail(String error) {
-    return 'Kurejesha kumeshindwa ($error).';
-  }
-
-  @override
-  String readDownloadFailedDetail(String error) {
-    return 'Upakuaji umeshindwa ($error).';
-  }
 
   @override
   String get readRestoreOffline => 'rejesha bila mtandao';
@@ -1155,11 +1227,6 @@ class AppLocalizationsSw extends AppLocalizations {
   @override
   String get homeWotdEmpty =>
       'Hakuna neno lililochaguliwa leo — jaribu baadaye.';
-
-  @override
-  String homeWotdUnavailable(String error) {
-    return 'Neno la siku halipatikani ($error).';
-  }
 
   @override
   String get navHome => 'Nyumbani';
@@ -2103,14 +2170,6 @@ class AppLocalizationsSw extends AppLocalizations {
   String get spaceCopyText => 'Nakili maandishi';
 
   @override
-  String get spaceDeleteNoteTitle => 'Futa maelezo?';
-
-  @override
-  String spaceDeleteNoteBody(String title) {
-    return '\"$title\" itaondolewa kabisa.';
-  }
-
-  @override
   String get spaceUntitled => 'Bila kichwa';
 
   @override
@@ -2495,11 +2554,6 @@ class AppLocalizationsSw extends AppLocalizations {
   }
 
   @override
-  String spaceCouldNotFinish(String error) {
-    return 'Imeshindwa kukamilisha: $error';
-  }
-
-  @override
   String spaceFreed(String message, String size) {
     return '$message · $size zimeachiliwa';
   }
@@ -2551,9 +2605,7 @@ class AppLocalizationsSw extends AppLocalizations {
   String get commonUndo => 'Tendua';
 
   @override
-  String studyCouldNotOpenScreen(String error) {
-    return 'Imeshindwa kufungua skrini hiyo. $error';
-  }
+  String get spaceHighlightsIntro => 'Mistari uliyoiwekea rangi.';
 
   @override
   String get studyCardSize => 'Ukubwa wa kadi';
@@ -2837,11 +2889,6 @@ class AppLocalizationsSw extends AppLocalizations {
   }
 
   @override
-  String studyEntriesLoadError(String error) {
-    return 'Imeshindwa kupakia maingizo.\n$error';
-  }
-
-  @override
   String get studyNoEntriesMatch =>
       'Hakuna maingizo yanayolingana na vichujio hivi.\nJaribu Vyanzo vyote, au vinjari maktaba.';
 
@@ -2861,11 +2908,6 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get studyCategoryStudyNote => 'Dokezo la funzo';
-
-  @override
-  String studyCommentaryLoadErrorDetail(String error) {
-    return 'Imeshindwa kupakia ufafanuzi.\n$error';
-  }
 
   @override
   String get studyNoContentForFilters => 'Hakuna maudhui kwa vichujio hivi.';
@@ -2955,11 +2997,6 @@ class AppLocalizationsSw extends AppLocalizations {
   String get storiesUnread => 'Hazijasomwa';
 
   @override
-  String storiesLoadError(String error) {
-    return 'Imeshindwa kupakia hadithi:\n$error';
-  }
-
-  @override
   String get storiesBooks => 'Vitabu';
 
   @override
@@ -3032,11 +3069,6 @@ class AppLocalizationsSw extends AppLocalizations {
   String get studyDictionarySavedFilter => '★ Zilizohifadhiwa';
 
   @override
-  String studyDictionaryUnavailable(String error) {
-    return 'Kamusi haipatikani.\n$error';
-  }
-
-  @override
   String get studyNoHeadwords => 'Hakuna vichwa vya maneno vilivyopatikana.';
 
   @override
@@ -3065,11 +3097,6 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get studyNoDefinition => 'Hakuna maana iliyopatikana.';
-
-  @override
-  String studyFailedToLoad(String error) {
-    return 'Imeshindwa kupakia: $error';
-  }
 
   @override
   String studyStrongsShareText(String id, String lemma, String transliteration,

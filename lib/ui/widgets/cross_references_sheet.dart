@@ -7,6 +7,7 @@ import '../../state/cross_references_provider.dart';
 import '../../state/bible_provider.dart';
 import '../../state/translation_provider.dart';
 import '../../services/bible_database_service.dart';
+import 'state_views.dart';
 
 /// A bottom sheet showing all cross-references for a given verse.
 class CrossReferencesSheet extends ConsumerWidget {
@@ -85,38 +86,10 @@ class CrossReferencesSheet extends ConsumerWidget {
             child: crossRefsAsync.when(
               data: (refs) {
                 if (refs.isEmpty) {
-                  return Padding(
-                    padding: const EdgeInsets.all(32),
-                    child: Center(
-                      child: Column(
-                        children: [
-                          Icon(
-                            Icons.link_off_rounded,
-                            size: 40,
-                            color: theme.colorScheme.onSurface
-                                .withValues(alpha: 0.2),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            context.l10n.readNoCrossRefs,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.4),
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            context.l10n.readCrossRefsComingSoon,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.3),
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
+                  return EmptyState(
+                    icon: Icons.link_off_rounded,
+                    title: context.l10n.readNoCrossRefs,
+                    message: context.l10n.readCrossRefsComingSoon,
                   );
                 }
                 return ListView.separated(
@@ -146,26 +119,12 @@ class CrossReferencesSheet extends ConsumerWidget {
               },
               loading: () => const Padding(
                 padding: EdgeInsets.all(32),
-                child: Center(child: CircularProgressIndicator()),
+                child: LoadingView(),
               ),
-              error: (e, _) => Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      context.l10n.readCrossRefsLoadError('$e'),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 12),
-                    TextButton.icon(
-                      onPressed: () =>
-                          ref.invalidate(crossReferencesProvider(key)),
-                      icon: const Icon(Icons.refresh_rounded),
-                      label: Text(context.l10n.commonRetry),
-                    ),
-                  ],
-                ),
+              error: (e, _) => ErrorState(
+                error: e,
+                message: context.l10n.readCrossRefsLoadErrorPlain,
+                onRetry: () => ref.invalidate(crossReferencesProvider(key)),
               ),
             ),
           ),

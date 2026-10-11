@@ -8,18 +8,27 @@ class DynamicToast {
     BuildContext context,
     String message, {
     IconData? icon,
-    Duration duration = const Duration(milliseconds: 2500),
+    Duration? duration,
+    String? actionLabel,
+    VoidCallback? onAction,
   }) {
     HapticFeedback.lightImpact();
 
     final overlay = Overlay.of(context);
     late OverlayEntry overlayEntry;
+    final hasAction = actionLabel != null && onAction != null;
 
     overlayEntry = OverlayEntry(
       builder: (context) => _ToastOverlay(
         message: message,
         icon: icon,
-        duration: duration,
+        // An action (Undo) needs a little longer to be reachable.
+        duration: duration ??
+            (hasAction
+                ? const Duration(seconds: 5)
+                : const Duration(milliseconds: 2500)),
+        actionLabel: hasAction ? actionLabel : null,
+        onAction: hasAction ? onAction : null,
         onDismissed: () => overlayEntry.remove(),
       ),
     );
@@ -32,12 +41,16 @@ class _ToastOverlay extends StatefulWidget {
   final String message;
   final IconData? icon;
   final Duration duration;
+  final String? actionLabel;
+  final VoidCallback? onAction;
   final VoidCallback onDismissed;
 
   const _ToastOverlay({
     required this.message,
     this.icon,
     required this.duration,
+    this.actionLabel,
+    this.onAction,
     required this.onDismissed,
   });
 
@@ -74,13 +87,24 @@ class _ToastOverlayState extends State<_ToastOverlay>
           reverseCurve: Curves.easeOut),
     );
 
-    Future.delayed(widget.duration, () {
-      if (mounted) {
-        _controller.reverse().then((_) {
-          widget.onDismissed();
-        });
-      }
+    Future.delayed(widget.duration, _dismiss);
+  }
+
+  bool _dismissing = false;
+
+  void _dismiss() {
+    if (!mounted || _dismissing) return;
+    _dismissing = true;
+    _controller.reverse().then((_) {
+      widget.onDismissed();
     });
+  }
+
+  void _runAction() {
+    if (_dismissing) return;
+    HapticFeedback.selectionClick();
+    widget.onAction?.call();
+    _dismiss();
   }
 
   bool _started = false;
@@ -144,6 +168,13 @@ class _ToastOverlayState extends State<_ToastOverlay>
                         textAlign: TextAlign.center,
                       ),
                     ),
+                    if (widget.actionLabel != null) ...[
+                      const SizedBox(width: 8),
+                      TextButton(
+                        onPressed: _runAction,
+                        child: Text(widget.actionLabel!),
+                      ),
+                    ],
                   ],
                 ),
               ),

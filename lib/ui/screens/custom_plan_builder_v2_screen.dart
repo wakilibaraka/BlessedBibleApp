@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../models/reading_plan.dart';
+import '../../services/firebase_setup.dart';
 import '../../services/plan_cloud_backup.dart';
 import '../../services/plan_generator.dart';
 import '../../services/word_count_service.dart';
@@ -21,6 +22,7 @@ import '../../state/reading_plan_provider.dart'
     show readingPlanProvider, activePlanIdsProvider;
 import '../../data/local_storage/preferences_service.dart';
 import '../widgets/shared_app_bar.dart';
+import '../widgets/state_views.dart';
 import '../widgets/study_v2_widgets.dart';
 import '../sheets/book_chapter_selector_sheet.dart';
 import '../../l10n/l10n.dart';
@@ -124,7 +126,7 @@ class _CustomPlanBuilderV2ScreenState
   ReadingPlan? _preview;
   bool _isLoading = true;
   bool _isSaving = false;
-  String? _error;
+  Object? _error;
   int _previewToken = 0;
 
   @override
@@ -206,7 +208,7 @@ class _CustomPlanBuilderV2ScreenState
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = e.toString();
+        _error = e;
         _isLoading = false;
       });
     }
@@ -417,16 +419,45 @@ class _CustomPlanBuilderV2ScreenState
       }
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
+      reportNonFatal('custom plan save', code: e.runtimeType.toString());
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(context.l10n.plansCouldNotSave('$e')),
+          content: Text(context.l10n.plansBuilderSaveFailed),
           behavior: SnackBarBehavior.floating,
         ),
       );
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
+  }
+
+  /// Removes a track and offers Undo, since the range picks are fiddly
+  /// to redo.
+  void _removeTrack(int index) {
+    final removed = _drafts[index];
+    setState(() {
+      _drafts.removeAt(index);
+      _schedulePreview();
+    });
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(context.l10n.plansTrackRemoved),
+        behavior: SnackBarBehavior.floating,
+        action: SnackBarAction(
+          label: context.l10n.commonUndo,
+          onPressed: () {
+            if (!mounted) return;
+            setState(() {
+              _drafts.insert(index.clamp(0, _drafts.length), removed);
+              _schedulePreview();
+            });
+          },
+        ),
+      ),
+    );
   }
 
   @override
@@ -441,9 +472,19 @@ class _CustomPlanBuilderV2ScreenState
         body: SafeArea(
           bottom: false,
           child: _isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? const LoadingView()
               : _error != null
-                  ? Center(child: Text(context.l10n.plansError('$_error')))
+                  ? ErrorState(
+                      error: _error,
+                      message: context.l10n.plansBuilderLoadFailed,
+                      onRetry: () {
+                        setState(() {
+                          _error = null;
+                          _isLoading = true;
+                        });
+                        _initGenerator();
+                      },
+                    )
                   : ListView(
                       padding: const EdgeInsets.fromLTRB(20, 12, 20, 140),
                       children: [
@@ -475,10 +516,7 @@ class _CustomPlanBuilderV2ScreenState
                             onStart: () => _pickStart(i),
                             onEnd: () => _pickEnd(i),
                             onRemove: _drafts.length > 1
-                                ? () => setState(() {
-                                      _drafts.removeAt(i);
-                                      _schedulePreview();
-                                    })
+                                ? () => _removeTrack(i)
                                 : null,
                           ),
                         const SizedBox(height: 8),

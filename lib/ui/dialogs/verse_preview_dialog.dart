@@ -7,6 +7,7 @@ import '../../state/translation_provider.dart';
 import '../../services/bible_database_service.dart';
 import '../../data/models/bible_model.dart';
 import '../../state/typography_provider.dart';
+import '../widgets/state_views.dart';
 
 class VersePreviewDialog extends ConsumerWidget {
   final String reference;
@@ -103,17 +104,14 @@ class VersePreviewDialog extends ConsumerWidget {
                   ),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(16.0),
-                          child: CircularProgressIndicator(),
-                        ),
+                      return const Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: LoadingView(),
                       );
                     }
 
                     if (snapshot.hasError) {
-                      return Text(
-                          context.l10n.readVerseLoadError('${snapshot.error}'));
+                      return Text(context.l10n.readVerseLoadErrorPlain);
                     }
 
                     final verse = snapshot.data;

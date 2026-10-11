@@ -97,7 +97,7 @@ void main() {
     expect(find.text('Ruth'), findsOneWidget);
     expect(find.text('ruth@example.com'), findsOneWidget);
     expect(find.text('Sign in with Google'), findsNothing);
-    expect(find.text('Sign Out'), findsOneWidget);
+    expect(find.text('Sign out'), findsOneWidget);
   });
 
   testWidgets('sign-out asks whether to keep data, then signs out',
@@ -113,9 +113,9 @@ void main() {
         isTrue,
         reason: 'signed-in menu shows the sync row');
 
-    await tester.ensureVisible(find.text('Sign Out'));
+    await tester.ensureVisible(find.text('Sign out'));
     await tester.pump(const Duration(milliseconds: 300));
-    await tester.tap(find.text('Sign Out'));
+    await tester.tap(find.text('Sign out'));
     await tester.pump(const Duration(milliseconds: 500));
     expect(find.text('Sign out?'), findsOneWidget);
     await tester.tap(find.text('Keep on device'));

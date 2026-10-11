@@ -50,6 +50,7 @@ import '../sheets/translation_picker_sheet.dart';
 
 import '../widgets/day_complete_celebration.dart';
 import '../widgets/dynamic_toast.dart';
+import '../widgets/state_views.dart';
 import '../../state/theme_provider.dart';
 import '../../state/bbe_substitutions_provider.dart';
 import '../../state/typography_provider.dart';
@@ -980,11 +981,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                 // Scripture View
                 Positioned.fill(
                   child: isLoading
-                      ? Center(
-                          child: CircularProgressIndicator(
-                            color: theme.primaryColor,
-                          ),
-                        )
+                      ? const LoadingView()
                       : flatChapters.isEmpty
                           ? Center(
                               child: Text(context.l10n.readPassageNotFound,
@@ -3025,8 +3022,59 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 class VerseActionLogic {
   static void _showFeedback(
       BuildContext context, ThemeData theme, String message,
-      {IconData? icon}) {
-    DynamicToast.show(context, message, icon: icon);
+      {IconData? icon, VoidCallback? onUndo}) {
+    DynamicToast.show(
+      context,
+      message,
+      icon: icon,
+      actionLabel: onUndo == null ? null : context.l10n.commonUndo,
+      onAction: onUndo,
+    );
+  }
+
+  /// Puts back the highlights captured in [previous] (reference -> color,
+  /// null when the verse had none). Reads through the container so Undo
+  /// still works after the sheet that started it has closed.
+  static void _restoreHighlights(
+      ProviderContainer container, Map<String, int?> previous) {
+    final notifier = container.read(highlightsProvider.notifier);
+    previous.forEach((refStr, color) {
+      final current = container.read(highlightsProvider)[refStr];
+      if (color == null) {
+        notifier.removeHighlight(refStr);
+      } else if (current != color) {
+        notifier.toggleHighlight(refStr, color);
+      }
+    });
+  }
+
+  /// Clears the highlight on [targetVerses], offering Undo.
+  static void clearHighlights(
+      BuildContext context,
+      ThemeData theme,
+      WidgetRef ref,
+      String bookAbbrev,
+      int chapterNum,
+      List<int> targetVerses) {
+    final container = ProviderScope.containerOf(context, listen: false);
+    final current = ref.read(highlightsProvider);
+    final previous = <String, int?>{
+      for (final v in targetVerses)
+        if (current[generateVerseKey(bookAbbrev, chapterNum, v)] != null)
+          generateVerseKey(bookAbbrev, chapterNum, v):
+              current[generateVerseKey(bookAbbrev, chapterNum, v)],
+    };
+    for (final refStr in previous.keys) {
+      ref.read(highlightsProvider.notifier).removeHighlight(refStr);
+    }
+    if (previous.isEmpty) return;
+    _showFeedback(
+      context,
+      theme,
+      context.l10n.readHighlightsRemoved(previous.length),
+      icon: Icons.format_paint_outlined,
+      onUndo: () => _restoreHighlights(container, previous),
+    );
   }
 
   static void showHighlightPaletteModal(
@@ -3063,13 +3111,8 @@ class VerseActionLogic {
                       behavior: HitTestBehavior.opaque,
                       onTap: () {
                         HapticFeedback.lightImpact();
-                        for (var v in targetVerses) {
-                          final refStr =
-                              generateVerseKey(bookAbbrev, chapterNum, v);
-                          ref
-                              .read(highlightsProvider.notifier)
-                              .removeHighlight(refStr);
-                        }
+                        VerseActionLogic.clearHighlights(ctx, theme, ref,
+                            bookAbbrev, chapterNum, targetVerses);
                         Navigator.of(ctx).pop();
                         onClearSelection();
                       },
@@ -3202,6 +3245,13 @@ class VerseActionLogic {
       final refStr = generateVerseKey(bookAbbrev, chapterNum, v);
       return ref.read(highlightsProvider)[refStr] == activeIndex;
     });
+    final container = ProviderScope.containerOf(context, listen: false);
+    final before = ref.read(highlightsProvider);
+    final previous = <String, int?>{
+      for (final v in targetVerses)
+        generateVerseKey(bookAbbrev, chapterNum, v):
+            before[generateVerseKey(bookAbbrev, chapterNum, v)],
+    };
 
     for (var v in targetVerses) {
       final refStr = generateVerseKey(bookAbbrev, chapterNum, v);
@@ -3216,11 +3266,13 @@ class VerseActionLogic {
         context,
         theme,
         isRemoving
-            ? '$count Highlight(s) removed'
-            : '$count verse(s) highlighted',
+            ? context.l10n.readHighlightsRemoved(count)
+            : context.l10n.readVersesHighlighted(count),
         icon: isRemoving
             ? Icons.format_paint_outlined
-            : Icons.format_paint_rounded);
+            : Icons.format_paint_rounded,
+        onUndo:
+            isRemoving ? () => _restoreHighlights(container, previous) : null);
   }
 
   static void handleBookmark(
@@ -3233,6 +3285,17 @@ class VerseActionLogic {
     final isAllBookmarked = targetVerses.every((v) => ref
         .read(bookmarksProvider)
         .contains(generateVerseKey(canonicalBookName, chapterNum, v)));
+    final container = ProviderScope.containerOf(context, listen: false);
+    // Folder of each bookmark about to be removed, so Undo can put it back
+    // where it was.
+    final nodes = ref.read(bookmarkDataProvider).nodes;
+    final removedFolders = <String, String?>{
+      if (isAllBookmarked)
+        for (final v in targetVerses)
+          generateVerseKey(canonicalBookName, chapterNum, v):
+              nodes[generateVerseKey(canonicalBookName, chapterNum, v)]
+                  ?.folderId,
+    };
     for (var v in targetVerses) {
       final refStr = generateVerseKey(canonicalBookName, chapterNum, v);
       if (isAllBookmarked) {
@@ -3245,11 +3308,23 @@ class VerseActionLogic {
         context,
         theme,
         isAllBookmarked
-            ? '${targetVerses.length} verse(s) removed from bookmarks'
-            : '${targetVerses.length} verse(s) bookmarked!',
+            ? context.l10n.readBookmarksRemoved(targetVerses.length)
+            : context.l10n.readVersesBookmarked(targetVerses.length),
         icon: isAllBookmarked
             ? Icons.bookmark_outline_rounded
-            : Icons.bookmark_rounded);
+            : Icons.bookmark_rounded,
+        onUndo: isAllBookmarked
+            ? () {
+                final data = container.read(bookmarkDataProvider.notifier);
+                removedFolders.forEach((refStr, folderId) {
+                  if (container.read(bookmarksProvider).contains(refStr)) {
+                    return;
+                  }
+                  data.toggle(refStr);
+                  if (folderId != null) data.moveBookmark(refStr, folderId);
+                });
+              }
+            : null);
   }
 
   static Future<void> handleNote(

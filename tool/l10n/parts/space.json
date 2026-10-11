@@ -48,7 +48,7 @@
   "tl": "Naka-highlight"
  },
  "spaceNewFolder": {
-  "en": "New Folder",
+  "en": "New folder",
   "fr": "Nouveau dossier",
   "it": "Nuova cartella",
   "ro": "Dosar nou",
@@ -72,7 +72,7 @@
   "tl": "Gumawa"
  },
  "spaceRenameFolder": {
-  "en": "Rename Folder",
+  "en": "Rename folder",
   "fr": "Renommer le dossier",
   "it": "Rinomina cartella",
   "ro": "Redenumește dosarul",
@@ -111,7 +111,7 @@
   }
  },
  "spaceMoveToFolder": {
-  "en": "Move to Folder",
+  "en": "Move to folder",
   "fr": "Déplacer vers un dossier",
   "it": "Sposta in cartella",
   "ro": "Mută în dosar",
@@ -135,7 +135,7 @@
   "tl": "Mas maaga"
  },
  "spaceGroupLast7Days": {
-  "en": "Last 7 Days",
+  "en": "Last 7 days",
   "fr": "7 derniers jours",
   "it": "Ultimi 7 giorni",
   "ro": "Ultimele 7 zile",
@@ -143,7 +143,7 @@
   "tl": "Huling 7 Araw"
  },
  "spaceGroupLast30Days": {
-  "en": "Last 30 Days",
+  "en": "Last 30 days",
   "fr": "30 derniers jours",
   "it": "Ultimi 30 giorni",
   "ro": "Ultimele 30 de zile",
@@ -151,7 +151,7 @@
   "tl": "Huling 30 Araw"
  },
  "spaceUnknownBook": {
-  "en": "Unknown Book",
+  "en": "Unknown book",
   "fr": "Livre inconnu",
   "it": "Libro sconosciuto",
   "ro": "Carte necunoscută",
@@ -175,7 +175,7 @@
   "tl": "Lahat"
  },
  "spaceByDate": {
-  "en": "By Date",
+  "en": "By date",
   "fr": "Par date",
   "it": "Per data",
   "ro": "După dată",
@@ -183,7 +183,7 @@
   "tl": "Ayon sa Petsa"
  },
  "spaceByBook": {
-  "en": "By Book",
+  "en": "By book",
   "fr": "Par livre",
   "it": "Per libro",
   "ro": "După carte",
@@ -229,29 +229,6 @@
   "ro": "Copiază textul",
   "sw": "Nakili maandishi",
   "tl": "Kopyahin ang teksto"
- },
- "spaceDeleteNoteTitle": {
-  "en": "Delete note?",
-  "fr": "Supprimer la note ?",
-  "it": "Eliminare la nota?",
-  "ro": "Ștergi notița?",
-  "sw": "Futa maelezo?",
-  "tl": "Burahin ang tala?"
- },
- "spaceDeleteNoteBody": {
-  "en": "\"{title}\" will be removed permanently.",
-  "fr": "« {title} » sera supprimée définitivement.",
-  "it": "\"{title}\" verrà eliminata definitivamente.",
-  "ro": "„{title}” va fi ștearsă definitiv.",
-  "sw": "\"{title}\" itaondolewa kabisa.",
-  "tl": "Permanenteng aalisin ang \"{title}\".",
-  "@": {
-   "placeholders": {
-    "title": {
-     "type": "String"
-    }
-   }
-  }
  },
  "spaceUntitled": {
   "en": "Untitled",
@@ -310,7 +287,7 @@
   "tl": "Ibahagi ang talata"
  },
  "spaceChangeColour": {
-  "en": "Change colour",
+  "en": "Change color",
   "fr": "Changer la couleur",
   "it": "Cambia colore",
   "ro": "Schimbă culoarea",
@@ -342,7 +319,7 @@
   "tl": "Alisin ang highlight"
  },
  "spaceHighlightColour": {
-  "en": "Highlight colour",
+  "en": "Highlight color",
   "fr": "Couleur de surlignage",
   "it": "Colore evidenziazione",
   "ro": "Culoarea evidențierii",
@@ -350,7 +327,7 @@
   "tl": "Kulay ng highlight"
  },
  "spaceColourN": {
-  "en": "Colour {index}",
+  "en": "Color {index}",
   "fr": "Couleur {index}",
   "it": "Colore {index}",
   "ro": "Culoarea {index}",
@@ -365,7 +342,7 @@
   }
  },
  "notesMyNotes": {
-  "en": "My Notes",
+  "en": "My notes",
   "fr": "Mes notes",
   "it": "Le mie note",
   "ro": "Notițele mele",
@@ -397,7 +374,7 @@
   "tl": "Naisingit ang talata"
  },
  "notesAddCommentary": {
-  "en": "Add Commentary",
+  "en": "Add commentary",
   "fr": "Ajouter un commentaire",
   "it": "Aggiungi commento",
   "ro": "Adaugă comentariu",
@@ -405,7 +382,7 @@
   "tl": "Magdagdag ng Komentaryo"
  },
  "notesChapterTitlePlaceholder": {
-  "en": "Chapter Title",
+  "en": "Chapter title",
   "fr": "Titre du chapitre",
   "it": "Titolo del capitolo",
   "ro": "Titlul capitolului",
@@ -413,7 +390,7 @@
   "tl": "Pamagat ng Kabanata"
  },
  "notesEditNote": {
-  "en": "Edit Note",
+  "en": "Edit note",
   "fr": "Modifier la note",
   "it": "Modifica nota",
   "ro": "Editează notița",
@@ -436,7 +413,7 @@
   }
  },
  "notesNewNote": {
-  "en": "New Note",
+  "en": "New note",
   "fr": "Nouvelle note",
   "it": "Nuova nota",
   "ro": "Notiță nouă",
@@ -444,7 +421,7 @@
   "tl": "Bagong Tala"
  },
  "notesTitleHint": {
-  "en": "Note Title",
+  "en": "Note title",
   "fr": "Titre de la note",
   "it": "Titolo della nota",
   "ro": "Titlul notiței",
@@ -492,7 +469,7 @@
   "tl": "Na-save ang tala!"
  },
  "notesSaveChanges": {
-  "en": "Save Changes",
+  "en": "Save changes",
   "fr": "Enregistrer",
   "it": "Salva modifiche",
   "ro": "Salvează modificările",
@@ -500,7 +477,7 @@
   "tl": "I-save ang mga Pagbabago"
  },
  "notesSaveNote": {
-  "en": "Save Note",
+  "en": "Save note",
   "fr": "Enregistrer la note",
   "it": "Salva nota",
   "ro": "Salvează notița",
@@ -516,7 +493,7 @@
   "tl": "Nabura ang tala"
  },
  "notesDeleteNote": {
-  "en": "Delete Note",
+  "en": "Delete note",
   "fr": "Supprimer la note",
   "it": "Elimina nota",
   "ro": "Șterge notița",
@@ -524,7 +501,7 @@
   "tl": "Burahin ang Tala"
  },
  "notesNewJournalEntry": {
-  "en": "New Journal Entry",
+  "en": "New journal entry",
   "fr": "Nouvelle entrée de journal",
   "it": "Nuova voce di diario",
   "ro": "Intrare nouă în jurnal",
@@ -540,7 +517,7 @@
   "tl": "Kumusta ang pakiramdam mo ngayon? Ibuhos ang iyong puso..."
  },
  "notesSaveAndAnalyze": {
-  "en": "Save & Analyze",
+  "en": "Save & analyze",
   "fr": "Enregistrer et analyser",
   "it": "Salva e analizza",
   "ro": "Salvează și analizează",
@@ -556,7 +533,7 @@
   "tl": "Wala pang tala sa talaarawan."
  },
  "notesWriteEntry": {
-  "en": "Write Entry",
+  "en": "Write entry",
   "fr": "Écrire",
   "it": "Scrivi",
   "ro": "Scrie",
@@ -564,7 +541,7 @@
   "tl": "Sumulat"
  },
  "notesAiReflection": {
-  "en": "AI Reflection",
+  "en": "AI reflection",
   "fr": "Réflexion IA",
   "it": "Riflessione IA",
   "ro": "Reflecție AI",
@@ -682,7 +659,7 @@
   "tl": "Mag-sign in gamit ang Apple"
  },
  "accountSignOut": {
-  "en": "Sign Out",
+  "en": "Sign out",
   "fr": "Se déconnecter",
   "it": "Esci",
   "ro": "Deconectează-te",
@@ -706,7 +683,7 @@
   "tl": "Burahin ang lahat ng data sa device"
  },
  "accountSignIn": {
-  "en": "Sign In",
+  "en": "Sign in",
   "fr": "Se connecter",
   "it": "Accedi",
   "ro": "Conectare",
@@ -714,7 +691,7 @@
   "tl": "Mag-sign in"
  },
  "accountSignedIn": {
-  "en": "Signed In",
+  "en": "Signed in",
   "fr": "Connecté",
   "it": "Accesso effettuato",
   "ro": "Conectat",
@@ -722,7 +699,7 @@
   "tl": "Naka-sign in"
  },
  "accountDeleteAccount": {
-  "en": "Delete Account",
+  "en": "Delete account",
   "fr": "Supprimer le compte",
   "it": "Elimina account",
   "ro": "Șterge contul",
@@ -956,7 +933,7 @@
   }
  },
  "accountRestoreTitle": {
-  "en": "Restore from Backup",
+  "en": "Restore from backup",
   "fr": "Restaurer une sauvegarde",
   "it": "Ripristina dal backup",
   "ro": "Restaurează din copie",
@@ -1280,21 +1257,6 @@
   "@": {
    "placeholders": {
     "abbr": {
-     "type": "String"
-    }
-   }
-  }
- },
- "spaceCouldNotFinish": {
-  "en": "Could not finish: {error}",
-  "fr": "Échec : {error}",
-  "it": "Impossibile completare: {error}",
-  "ro": "Nu s-a putut finaliza: {error}",
-  "sw": "Imeshindwa kukamilisha: {error}",
-  "tl": "Hindi natapos: {error}",
-  "@": {
-   "placeholders": {
-    "error": {
      "type": "String"
     }
    }

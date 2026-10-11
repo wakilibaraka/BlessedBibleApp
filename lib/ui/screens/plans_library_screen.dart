@@ -184,12 +184,21 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
 
   void _pausePlan(String id) {
     HapticFeedback.selectionClick();
-    ref.read(activePlanIdsProvider.notifier).removePlan(id);
+    final active = ref.read(activePlanIdsProvider.notifier);
+    final ids = ref.read(activePlanIdsProvider);
+    final wasPrimary = ids.isNotEmpty && ids.first == id;
+    active.removePlan(id);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(context.l10n.plansPausedSnack),
         behavior: SnackBarBehavior.floating,
+        action: SnackBarAction(
+          label: context.l10n.commonUndo,
+          onPressed: () {
+            if (active.addPlan(id) && wasPrimary) active.makePrimary(id);
+          },
+        ),
       ),
     );
   }

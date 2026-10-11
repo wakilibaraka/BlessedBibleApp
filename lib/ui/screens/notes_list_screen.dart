@@ -11,10 +11,28 @@ import '../../state/translation_provider.dart';
 import '../../data/models/bible_model.dart';
 import '../../data/models/home_data.dart';
 import '../widgets/textured_glass_container.dart';
-import '../widgets/item_context_sheet.dart' show confirmDestructive;
 import '../widgets/shared_app_bar.dart';
 import '../sheets/book_chapter_selector_sheet.dart';
 import '../../theme/design_tokens.dart';
+
+/// Deletes [note] straight away and offers Undo, which puts it back.
+void deleteNoteWithUndo(
+    BuildContext context, WidgetRef ref, PersonalNote note) {
+  final notes = ref.read(notesProvider.notifier);
+  notes.remove(note.id);
+  final messenger = ScaffoldMessenger.of(context);
+  messenger.hideCurrentSnackBar();
+  messenger.showSnackBar(
+    SnackBar(
+      content: Text(context.l10n.notesDeleted),
+      behavior: SnackBarBehavior.floating,
+      action: SnackBarAction(
+        label: context.l10n.commonUndo,
+        onPressed: () => notes.add(note),
+      ),
+    ),
+  );
+}
 
 class NotesListScreen extends ConsumerWidget {
   const NotesListScreen({super.key});
@@ -74,9 +92,7 @@ class NotesListScreen extends ConsumerWidget {
                     // White on the fixed red swipe background in every theme.
                     child: const Icon(Icons.delete, color: Colors.white),
                   ),
-                  onDismissed: (_) {
-                    ref.read(notesProvider.notifier).remove(note.id);
-                  },
+                  onDismissed: (_) => deleteNoteWithUndo(context, ref, note),
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: 12.0),
                     child: TexturedGlassContainer(
@@ -111,19 +127,8 @@ class NotesListScreen extends ConsumerWidget {
                                     color: theme.colorScheme.onSurface
                                         .withValues(alpha: 0.5),
                                   ),
-                                  onPressed: () async {
-                                    final ok = await confirmDestructive(
-                                      context,
-                                      title: context.l10n.spaceDeleteNoteTitle,
-                                      message: context.l10n
-                                          .spaceDeleteNoteBody(note.title),
-                                    );
-                                    if (ok) {
-                                      ref
-                                          .read(notesProvider.notifier)
-                                          .remove(note.id);
-                                    }
-                                  },
+                                  onPressed: () =>
+                                      deleteNoteWithUndo(context, ref, note),
                                 ),
                               ],
                             ),
@@ -638,10 +643,28 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 onPressed: () {
-                  ref.read(notesProvider.notifier).remove(widget.editingId!);
+                  final messenger = ScaffoldMessenger.of(context);
+                  final undoLabel = context.l10n.commonUndo;
+                  final deletedLabel = context.l10n.notesDeleted;
+                  final notes = ref.read(notesProvider.notifier);
+                  final id = widget.editingId!;
+                  final removed = ref
+                      .read(notesProvider)
+                      .where((n) => n.id == id)
+                      .firstOrNull;
+                  notes.remove(id);
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(context.l10n.notesDeleted)),
+                  messenger.hideCurrentSnackBar();
+                  messenger.showSnackBar(
+                    SnackBar(
+                      content: Text(deletedLabel),
+                      action: removed == null
+                          ? null
+                          : SnackBarAction(
+                              label: undoLabel,
+                              onPressed: () => notes.add(removed),
+                            ),
+                    ),
                   );
                 },
                 child: Text(context.l10n.notesDeleteNote,

@@ -6,6 +6,7 @@ import '../../state/dictionary_search_provider.dart';
 import '../../state/theme_provider.dart';
 import '../widgets/dictionary_entry_sheet.dart';
 import '../widgets/shared_app_bar.dart';
+import '../widgets/state_views.dart';
 import '../widgets/study_v2_widgets.dart';
 import '../../l10n/l10n.dart';
 import '../../theme/design_tokens.dart';
@@ -99,10 +100,11 @@ class _DictionaryV2ScreenState extends ConsumerState<DictionaryV2Screen> {
                       padding: EdgeInsets.all(32),
                       child: Center(child: CircularProgressIndicator()),
                     ),
-                    error: (e, _) => Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Text(context.l10n.studyDictionaryUnavailable('$e'),
-                          textAlign: TextAlign.center),
+                    error: (e, _) => ErrorState(
+                      error: e,
+                      message: context.l10n.studyDictionaryLoadFailed,
+                      onRetry: () =>
+                          ref.invalidate(dictionarySearchProvider(_query)),
                     ),
                     data: (words) {
                       var list = words;
@@ -227,9 +229,24 @@ class _WordCard extends ConsumerWidget {
                     : theme.colorScheme.onSurface.withValues(alpha: 0.4),
               ),
               onPressed: () {
-                ref
-                    .read(bookmarkedWordsProvider.notifier)
-                    .toggleBookmark(word.normalizedWord);
+                final notifier = ref.read(bookmarkedWordsProvider.notifier);
+                notifier.toggleBookmark(word.normalizedWord);
+                if (!saved) return;
+                // Unsaving can drop the card from the Saved filter, so
+                // offer a way back.
+                final messenger = ScaffoldMessenger.of(context);
+                messenger.hideCurrentSnackBar();
+                messenger.showSnackBar(
+                  SnackBar(
+                    content: Text(context.l10n.studyWordUnsaved),
+                    behavior: SnackBarBehavior.floating,
+                    action: SnackBarAction(
+                      label: context.l10n.commonUndo,
+                      onPressed: () =>
+                          notifier.toggleBookmark(word.normalizedWord),
+                    ),
+                  ),
+                );
               },
             ),
           ],

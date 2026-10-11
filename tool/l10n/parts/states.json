@@ -2,5 +2,6 @@
   "stateLoading": {"en": "Loading", "fr": "Chargement", "it": "Caricamento", "ro": "Se încarcă", "sw": "Inapakia", "tl": "Naglo-load"},
   "stateErrorTitle": {"en": "Something went wrong", "fr": "Un problème est survenu", "it": "Qualcosa è andato storto", "ro": "Ceva nu a mers bine", "sw": "Hitilafu imetokea", "tl": "May nangyaring mali"},
   "stateErrorBody": {"en": "Please try again in a moment.", "fr": "Veuillez réessayer dans un instant.", "it": "Riprova tra un momento.", "ro": "Încearcă din nou peste câteva clipe.", "sw": "Tafadhali jaribu tena baada ya muda mfupi.", "tl": "Pakisubukan muli mamaya."},
-  "commonUndo": {"en": "Undo", "fr": "Annuler", "it": "Annulla", "ro": "Anulează", "sw": "Tendua", "tl": "I-undo"}
+  "commonUndo": {"en": "Undo", "fr": "Annuler", "it": "Annulla", "ro": "Anulează", "sw": "Tendua", "tl": "I-undo"},
+  "spaceHighlightsIntro": {"en": "Verses you've marked in color.", "fr": "Les versets que vous avez surlignés.", "it": "I versetti che hai evidenziato.", "ro": "Versetele pe care le-ai evidențiat.", "sw": "Mistari uliyoiwekea rangi.", "tl": "Mga talatang minarkahan mo ng kulay."}
 }

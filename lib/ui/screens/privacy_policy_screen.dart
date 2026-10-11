@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:url_launcher/url_launcher.dart';
 import '../../l10n/l10n.dart';
+import '../widgets/state_views.dart';
 
 /// Privacy policy parsed from assets/legal/privacy_policy.json, the same
 /// source that generates the hosted docs/privacy_policy.html.
@@ -64,11 +65,12 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
         builder: (context, snapshot) {
           final policy = snapshot.data;
           if (policy == null) {
-            return Center(
-              child: snapshot.hasError
-                  ? Text(context.l10n.privacyLoadError)
-                  : const CircularProgressIndicator(),
-            );
+            return snapshot.hasError
+                ? ErrorState(
+                    error: snapshot.error,
+                    message: context.l10n.privacyLoadError,
+                  )
+                : const LoadingView();
           }
           return ListView(
             padding: const EdgeInsets.all(24.0),

@@ -33,6 +33,7 @@ import '../../state/read_settings_provider.dart';
 import '../../state/study_provider.dart';
 import '../../state/commentary_provider.dart';
 import '../widgets/commentary_view.dart';
+import '../../services/firebase_setup.dart';
 import '../../utils/log.dart';
 
 const double kBottomDockHeight = 64.0;
@@ -1073,6 +1074,7 @@ class MainNavScreen extends ConsumerWidget {
         });
       } catch (e, st) {
         logDebug('Casting lots error: $e\n$st');
+        reportNonFatal('cast lots', code: e.runtimeType.toString());
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

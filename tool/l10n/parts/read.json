@@ -24,7 +24,7 @@
   "tl": "Mga tala"
  },
  "readActionEditNote": {
-  "en": "Edit Note",
+  "en": "Edit note",
   "fr": "Modifier la note",
   "it": "Modifica nota",
   "ro": "Editează notița",
@@ -72,7 +72,7 @@
   "tl": "Na-save"
  },
  "readActionSelectText": {
-  "en": "Select Text",
+  "en": "Select text",
   "fr": "Sélectionner",
   "it": "Seleziona testo",
   "ro": "Selectează text",
@@ -210,7 +210,7 @@
   }
  },
  "readRelatedVerses": {
-  "en": "Related Verses",
+  "en": "Related verses",
   "fr": "Versets liés",
   "it": "Versetti correlati",
   "ro": "Versete corelate",
@@ -232,21 +232,6 @@
   "ro": "Trimiterile vor fi disponibile\ndupă următoarea actualizare.",
   "sw": "Marejeo mtambuka yatapatikana\nbaada ya sasisho lijalo.",
   "tl": "Magiging available ang cross-reference\npagkatapos ng susunod na update."
- },
- "readCrossRefsLoadError": {
-  "en": "Could not load cross-references.\n{error}",
-  "fr": "Impossible de charger les références croisées.\n{error}",
-  "it": "Impossibile caricare i riferimenti incrociati.\n{error}",
-  "ro": "Trimiterile nu au putut fi încărcate.\n{error}",
-  "sw": "Imeshindwa kupakia marejeo mtambuka.\n{error}",
-  "tl": "Hindi ma-load ang cross-reference.\n{error}",
-  "@": {
-   "placeholders": {
-    "error": {
-     "type": "String"
-    }
-   }
-  }
  },
  "readVerseUnavailable": {
   "en": "Verse not available",
@@ -296,21 +281,6 @@
   "sw": "Kitabu kilichotajwa hakikupatikana.",
   "tl": "Hindi nakita ang tinukoy na aklat."
  },
- "readVerseLoadError": {
-  "en": "Error loading verse: {error}",
-  "fr": "Erreur de chargement du verset : {error}",
-  "it": "Errore nel caricamento del versetto: {error}",
-  "ro": "Eroare la încărcarea versetului: {error}",
-  "sw": "Hitilafu kupakia mstari: {error}",
-  "tl": "Error sa pag-load ng talata: {error}",
-  "@": {
-   "placeholders": {
-    "error": {
-     "type": "String"
-    }
-   }
-  }
- },
  "readTestament": {
   "en": "Testament",
   "fr": "Testament",
@@ -344,7 +314,7 @@
   "tl": "Talata"
  },
  "readSelectBook": {
-  "en": "Select Book",
+  "en": "Select book",
   "fr": "Choisir un livre",
   "it": "Scegli libro",
   "ro": "Alege cartea",
@@ -400,7 +370,7 @@
   "tl": "Bagong\nTipan"
  },
  "readStoriesSections": {
-  "en": "Stories & Sections",
+  "en": "Stories & sections",
   "fr": "Récits et sections",
   "it": "Racconti e sezioni",
   "ro": "Relatări și secțiuni",
@@ -408,7 +378,7 @@
   "tl": "Mga Kuwento at Seksyon"
  },
  "readAllVerses": {
-  "en": "All Verses",
+  "en": "All verses",
   "fr": "Tous les versets",
   "it": "Tutti i versetti",
   "ro": "Toate versetele",
@@ -416,7 +386,7 @@
   "tl": "Lahat ng talata"
  },
  "readTranslationTitle": {
-  "en": "Bible Translation",
+  "en": "Bible translation",
   "fr": "Traduction de la Bible",
   "it": "Traduzione della Bibbia",
   "ro": "Traducerea Bibliei",
@@ -424,7 +394,7 @@
   "tl": "Salin ng Bibliya"
  },
  "readLayoutTitle": {
-  "en": "Reading Layout",
+  "en": "Reading layout",
   "fr": "Mise en page",
   "it": "Layout di lettura",
   "ro": "Aspect lectură",
@@ -511,21 +481,6 @@
   "sw": "Ya pili",
   "tl": "Pangalawa"
  },
- "readTranslationsLoadError": {
-  "en": "Error loading translations: {error}",
-  "fr": "Erreur de chargement des traductions : {error}",
-  "it": "Errore nel caricamento delle traduzioni: {error}",
-  "ro": "Eroare la încărcarea traducerilor: {error}",
-  "sw": "Hitilafu kupakia tafsiri: {error}",
-  "tl": "Error sa pag-load ng mga salin: {error}",
-  "@": {
-   "placeholders": {
-    "error": {
-     "type": "String"
-    }
-   }
-  }
- },
  "readTranslationDeleted": {
   "en": "{name} deleted.",
   "fr": "{name} supprimée.",
@@ -536,21 +491,6 @@
   "@": {
    "placeholders": {
     "name": {
-     "type": "String"
-    }
-   }
-  }
- },
- "readDeleteFailed": {
-  "en": "Could not delete: {error}",
-  "fr": "Suppression impossible : {error}",
-  "it": "Impossibile eliminare: {error}",
-  "ro": "Nu s-a putut șterge: {error}",
-  "sw": "Imeshindwa kufuta: {error}",
-  "tl": "Hindi mabura: {error}",
-  "@": {
-   "placeholders": {
-    "error": {
      "type": "String"
     }
    }
@@ -619,36 +559,6 @@
   "sw": "Upakuaji umeshindwa",
   "tl": "Nabigo ang pag-download"
  },
- "readRestoreFailedDetail": {
-  "en": "Restore failed ({error}).",
-  "fr": "Échec de la restauration ({error}).",
-  "it": "Ripristino non riuscito ({error}).",
-  "ro": "Restaurare eșuată ({error}).",
-  "sw": "Kurejesha kumeshindwa ({error}).",
-  "tl": "Nabigo ang pag-restore ({error}).",
-  "@": {
-   "placeholders": {
-    "error": {
-     "type": "String"
-    }
-   }
-  }
- },
- "readDownloadFailedDetail": {
-  "en": "Download failed ({error}).",
-  "fr": "Échec du téléchargement ({error}).",
-  "it": "Download non riuscito ({error}).",
-  "ro": "Descărcare eșuată ({error}).",
-  "sw": "Upakuaji umeshindwa ({error}).",
-  "tl": "Nabigo ang pag-download ({error}).",
-  "@": {
-   "placeholders": {
-    "error": {
-     "type": "String"
-    }
-   }
-  }
- },
  "readRestoreOffline": {
   "en": "restore offline",
   "fr": "restauration hors ligne",
@@ -682,7 +592,7 @@
   "tl": "KOMENTARYO"
  },
  "homeGoDeeper": {
-  "en": "Go Deeper",
+  "en": "Go deeper",
   "fr": "Approfondir",
   "it": "Approfondisci",
   "ro": "Aprofundează",
@@ -690,7 +600,7 @@
   "tl": "Lumalim pa"
  },
  "homeReadFullDefinition": {
-  "en": "Read Full Definition",
+  "en": "Read full definition",
   "fr": "Lire la définition",
   "it": "Leggi la definizione",
   "ro": "Citește definiția",
@@ -720,21 +630,6 @@
   "ro": "Niciun cuvânt ales pentru azi — încearcă mai târziu.",
   "sw": "Hakuna neno lililochaguliwa leo — jaribu baadaye.",
   "tl": "Wala pang salitang napili ngayon — subukan mamaya."
- },
- "homeWotdUnavailable": {
-  "en": "Word of the day unavailable ({error}).",
-  "fr": "Mot du jour indisponible ({error}).",
-  "it": "Parola del giorno non disponibile ({error}).",
-  "ro": "Cuvântul zilei indisponibil ({error}).",
-  "sw": "Neno la siku halipatikani ({error}).",
-  "tl": "Hindi available ang salita ng araw ({error}).",
-  "@": {
-   "placeholders": {
-    "error": {
-     "type": "String"
-    }
-   }
-  }
  },
  "navHome": {
   "en": "Home",
@@ -817,7 +712,7 @@
   "tl": "Hanapin ang talata, komentaryo…"
  },
  "searchAllBooks": {
-  "en": "All Books",
+  "en": "All books",
   "fr": "Tous les livres",
   "it": "Tutti i libri",
   "ro": "Toate cărțile",
@@ -825,7 +720,7 @@
   "tl": "Lahat ng aklat"
  },
  "searchFilterMyNotes": {
-  "en": "My Notes",
+  "en": "My notes",
   "fr": "Mes notes",
   "it": "Le mie note",
   "ro": "Notițele mele",

@@ -274,6 +274,162 @@ abstract class AppLocalizations {
   /// **'The language of menus and buttons. Your Bible translation is chosen separately.'**
   String get languageSubtitle;
 
+  /// No description provided for @homeWotdUnavailableNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Word of the day is unavailable right now.'**
+  String get homeWotdUnavailableNow;
+
+  /// No description provided for @spaceCouldNotFinishPlain.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t finish that. Please try again.'**
+  String get spaceCouldNotFinishPlain;
+
+  /// No description provided for @readTranslationsLoadErrorPlain.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load translations.'**
+  String get readTranslationsLoadErrorPlain;
+
+  /// No description provided for @readDeleteTranslationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You can get it again from the translations list at any time.'**
+  String get readDeleteTranslationBody;
+
+  /// No description provided for @readDeleteFailedPlain.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t delete it. Please try again.'**
+  String get readDeleteFailedPlain;
+
+  /// No description provided for @readCrossRefsLoadErrorPlain.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load cross-references.'**
+  String get readCrossRefsLoadErrorPlain;
+
+  /// No description provided for @readVerseLoadErrorPlain.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load this verse.'**
+  String get readVerseLoadErrorPlain;
+
+  /// No description provided for @searchClearRecentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear recent searches?'**
+  String get searchClearRecentTitle;
+
+  /// No description provided for @searchClearRecentBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your recent searches will be removed from this device.'**
+  String get searchClearRecentBody;
+
+  /// No description provided for @searchClearRecentConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get searchClearRecentConfirm;
+
+  /// No description provided for @readHighlightsRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Highlight removed} other{{count} highlights removed}}'**
+  String readHighlightsRemoved(int count);
+
+  /// No description provided for @readVersesHighlighted.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Verse highlighted} other{{count} verses highlighted}}'**
+  String readVersesHighlighted(int count);
+
+  /// No description provided for @readBookmarksRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Bookmark removed} other{{count} bookmarks removed}}'**
+  String readBookmarksRemoved(int count);
+
+  /// No description provided for @readVersesBookmarked.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Verse bookmarked} other{{count} verses bookmarked}}'**
+  String readVersesBookmarked(int count);
+
+  /// No description provided for @storiesLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load stories.'**
+  String get storiesLoadFailed;
+
+  /// No description provided for @studyEntriesLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load entries.'**
+  String get studyEntriesLoadFailed;
+
+  /// No description provided for @studyDictionaryLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load the dictionary.'**
+  String get studyDictionaryLoadFailed;
+
+  /// No description provided for @studyEntryLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load this entry.'**
+  String get studyEntryLoadFailed;
+
+  /// No description provided for @studyOpenScreenFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open that screen.'**
+  String get studyOpenScreenFailed;
+
+  /// No description provided for @studyWordUnsaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed from saved words'**
+  String get studyWordUnsaved;
+
+  /// No description provided for @plansBuilderSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save plan.'**
+  String get plansBuilderSaveFailed;
+
+  /// No description provided for @plansBuilderLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not set up the plan builder.'**
+  String get plansBuilderLoadFailed;
+
+  /// No description provided for @plansDetailLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load this plan.'**
+  String get plansDetailLoadFailed;
+
+  /// No description provided for @plansTrackRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Track removed'**
+  String get plansTrackRemoved;
+
+  /// No description provided for @yourSpaceBookmarkRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmark removed'**
+  String get yourSpaceBookmarkRemoved;
+
+  /// No description provided for @yourSpaceHighlightRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Highlight removed'**
+  String get yourSpaceHighlightRemoved;
+
   /// No description provided for @onboardingTagline.
   ///
   /// In en, this message translates to:
@@ -319,7 +475,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingLookBody.
   ///
   /// In en, this message translates to:
-  /// **'Choose a page colour and text size. Everything can be fine-tuned later.'**
+  /// **'Choose a page color and text size. Everything can be fine-tuned later.'**
   String get onboardingLookBody;
 
   /// No description provided for @onboardingThemeLight.
@@ -379,7 +535,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingFeaturePlansTitle.
   ///
   /// In en, this message translates to:
-  /// **'Reading Plans'**
+  /// **'Reading plans'**
   String get onboardingFeaturePlansTitle;
 
   /// No description provided for @onboardingFeaturePlansBody.
@@ -391,7 +547,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingFeatureStudyTitle.
   ///
   /// In en, this message translates to:
-  /// **'Deep Study'**
+  /// **'Deep study'**
   String get onboardingFeatureStudyTitle;
 
   /// No description provided for @onboardingFeatureStudyBody.
@@ -481,7 +637,7 @@ abstract class AppLocalizations {
   /// No description provided for @plansContinueReading.
   ///
   /// In en, this message translates to:
-  /// **'Continue Reading'**
+  /// **'Continue reading'**
   String get plansContinueReading;
 
   /// No description provided for @plansResume.
@@ -495,12 +651,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reading Plan\nDay {day} Complete!'**
   String plansDayCompleteCelebration(int day);
-
-  /// No description provided for @plansChangeWeek.
-  ///
-  /// In en, this message translates to:
-  /// **'Change week'**
-  String get plansChangeWeek;
 
   /// No description provided for @plansCalendarDayComplete.
   ///
@@ -517,7 +667,7 @@ abstract class AppLocalizations {
   /// No description provided for @plansDailyVerses.
   ///
   /// In en, this message translates to:
-  /// **'Daily Verses'**
+  /// **'Daily verses'**
   String get plansDailyVerses;
 
   /// No description provided for @plansToday.
@@ -751,7 +901,7 @@ abstract class AppLocalizations {
   /// No description provided for @plansCustomPlanDefaultTitle.
   ///
   /// In en, this message translates to:
-  /// **'Custom Plan'**
+  /// **'Custom plan'**
   String get plansCustomPlanDefaultTitle;
 
   /// No description provided for @plansCustom.
@@ -766,23 +916,11 @@ abstract class AppLocalizations {
   /// **'{start} to {end}'**
   String plansBookRange(String start, String end);
 
-  /// No description provided for @plansCouldNotSave.
-  ///
-  /// In en, this message translates to:
-  /// **'Could not save plan: {error}'**
-  String plansCouldNotSave(String error);
-
   /// No description provided for @plansBuilderTitle.
   ///
   /// In en, this message translates to:
-  /// **'Custom Plan Builder'**
+  /// **'Custom plan builder'**
   String get plansBuilderTitle;
-
-  /// No description provided for @plansError.
-  ///
-  /// In en, this message translates to:
-  /// **'Error: {error}'**
-  String plansError(String error);
 
   /// No description provided for @plansPlanName.
   ///
@@ -793,7 +931,7 @@ abstract class AppLocalizations {
   /// No description provided for @plansPlanNameHint.
   ///
   /// In en, this message translates to:
-  /// **'e.g. Genesis in 30 Days'**
+  /// **'e.g. Genesis in 30 days'**
   String get plansPlanNameHint;
 
   /// No description provided for @plansReadingTracks.
@@ -1003,7 +1141,7 @@ abstract class AppLocalizations {
   /// No description provided for @plansStartDayOne.
   ///
   /// In en, this message translates to:
-  /// **'Start Day 1 →'**
+  /// **'Start day 1 →'**
   String get plansStartDayOne;
 
   /// No description provided for @plansStartDateNote.
@@ -1231,7 +1369,7 @@ abstract class AppLocalizations {
   /// No description provided for @plansRestartFromDayOne.
   ///
   /// In en, this message translates to:
-  /// **'Restart from Day 1…'**
+  /// **'Restart from day 1…'**
   String get plansRestartFromDayOne;
 
   /// No description provided for @plansRestartTitle.
@@ -1417,7 +1555,7 @@ abstract class AppLocalizations {
   /// No description provided for @todayActionReadingPlan.
   ///
   /// In en, this message translates to:
-  /// **'Reading Plan'**
+  /// **'Reading plan'**
   String get todayActionReadingPlan;
 
   /// No description provided for @todayActionYourSpace.
@@ -1429,7 +1567,7 @@ abstract class AppLocalizations {
   /// No description provided for @todayVotdArchive.
   ///
   /// In en, this message translates to:
-  /// **'Verse of the Day Archive'**
+  /// **'Verse of the day archive'**
   String get todayVotdArchive;
 
   /// No description provided for @todayVotdArchiveBody.
@@ -1465,7 +1603,7 @@ abstract class AppLocalizations {
   /// No description provided for @readActionEditNote.
   ///
   /// In en, this message translates to:
-  /// **'Edit Note'**
+  /// **'Edit note'**
   String get readActionEditNote;
 
   /// No description provided for @readActionCommentary.
@@ -1501,7 +1639,7 @@ abstract class AppLocalizations {
   /// No description provided for @readActionSelectText.
   ///
   /// In en, this message translates to:
-  /// **'Select Text'**
+  /// **'Select text'**
   String get readActionSelectText;
 
   /// No description provided for @readVerseActions.
@@ -1579,7 +1717,7 @@ abstract class AppLocalizations {
   /// No description provided for @readRelatedVerses.
   ///
   /// In en, this message translates to:
-  /// **'Related Verses'**
+  /// **'Related verses'**
   String get readRelatedVerses;
 
   /// No description provided for @readNoCrossRefs.
@@ -1593,12 +1731,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cross-references will be available\nafter the next app update.'**
   String get readCrossRefsComingSoon;
-
-  /// No description provided for @readCrossRefsLoadError.
-  ///
-  /// In en, this message translates to:
-  /// **'Could not load cross-references.\n{error}'**
-  String readCrossRefsLoadError(String error);
 
   /// No description provided for @readVerseUnavailable.
   ///
@@ -1636,12 +1768,6 @@ abstract class AppLocalizations {
   /// **'Could not find the referenced book.'**
   String get readBookNotFound;
 
-  /// No description provided for @readVerseLoadError.
-  ///
-  /// In en, this message translates to:
-  /// **'Error loading verse: {error}'**
-  String readVerseLoadError(String error);
-
   /// No description provided for @readTestament.
   ///
   /// In en, this message translates to:
@@ -1669,7 +1795,7 @@ abstract class AppLocalizations {
   /// No description provided for @readSelectBook.
   ///
   /// In en, this message translates to:
-  /// **'Select Book'**
+  /// **'Select book'**
   String get readSelectBook;
 
   /// No description provided for @readOtShort.
@@ -1711,25 +1837,25 @@ abstract class AppLocalizations {
   /// No description provided for @readStoriesSections.
   ///
   /// In en, this message translates to:
-  /// **'Stories & Sections'**
+  /// **'Stories & sections'**
   String get readStoriesSections;
 
   /// No description provided for @readAllVerses.
   ///
   /// In en, this message translates to:
-  /// **'All Verses'**
+  /// **'All verses'**
   String get readAllVerses;
 
   /// No description provided for @readTranslationTitle.
   ///
   /// In en, this message translates to:
-  /// **'Bible Translation'**
+  /// **'Bible translation'**
   String get readTranslationTitle;
 
   /// No description provided for @readLayoutTitle.
   ///
   /// In en, this message translates to:
-  /// **'Reading Layout'**
+  /// **'Reading layout'**
   String get readLayoutTitle;
 
   /// No description provided for @readLayoutSingle.
@@ -1792,23 +1918,11 @@ abstract class AppLocalizations {
   /// **'Secondary'**
   String get readSecondary;
 
-  /// No description provided for @readTranslationsLoadError.
-  ///
-  /// In en, this message translates to:
-  /// **'Error loading translations: {error}'**
-  String readTranslationsLoadError(String error);
-
   /// No description provided for @readTranslationDeleted.
   ///
   /// In en, this message translates to:
   /// **'{name} deleted.'**
   String readTranslationDeleted(String name);
-
-  /// No description provided for @readDeleteFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Could not delete: {error}'**
-  String readDeleteFailed(String error);
 
   /// No description provided for @readDeleteTranslation.
   ///
@@ -1852,18 +1966,6 @@ abstract class AppLocalizations {
   /// **'Download failed'**
   String get readDownloadFailed;
 
-  /// No description provided for @readRestoreFailedDetail.
-  ///
-  /// In en, this message translates to:
-  /// **'Restore failed ({error}).'**
-  String readRestoreFailedDetail(String error);
-
-  /// No description provided for @readDownloadFailedDetail.
-  ///
-  /// In en, this message translates to:
-  /// **'Download failed ({error}).'**
-  String readDownloadFailedDetail(String error);
-
   /// No description provided for @readRestoreOffline.
   ///
   /// In en, this message translates to:
@@ -1891,13 +1993,13 @@ abstract class AppLocalizations {
   /// No description provided for @homeGoDeeper.
   ///
   /// In en, this message translates to:
-  /// **'Go Deeper'**
+  /// **'Go deeper'**
   String get homeGoDeeper;
 
   /// No description provided for @homeReadFullDefinition.
   ///
   /// In en, this message translates to:
-  /// **'Read Full Definition'**
+  /// **'Read full definition'**
   String get homeReadFullDefinition;
 
   /// No description provided for @homeWordOfTheDayHeading.
@@ -1917,12 +2019,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No word picked for today yet — try again later.'**
   String get homeWotdEmpty;
-
-  /// No description provided for @homeWotdUnavailable.
-  ///
-  /// In en, this message translates to:
-  /// **'Word of the day unavailable ({error}).'**
-  String homeWotdUnavailable(String error);
 
   /// No description provided for @navHome.
   ///
@@ -1987,13 +2083,13 @@ abstract class AppLocalizations {
   /// No description provided for @searchAllBooks.
   ///
   /// In en, this message translates to:
-  /// **'All Books'**
+  /// **'All books'**
   String get searchAllBooks;
 
   /// No description provided for @searchFilterMyNotes.
   ///
   /// In en, this message translates to:
-  /// **'My Notes'**
+  /// **'My notes'**
   String get searchFilterMyNotes;
 
   /// No description provided for @searchEmptyPrompt.
@@ -2119,7 +2215,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsWidgetsTitle.
   ///
   /// In en, this message translates to:
-  /// **'Home Screen Widgets'**
+  /// **'Home screen widgets'**
   String get settingsWidgetsTitle;
 
   /// No description provided for @settingsWidgetsSubtitle.
@@ -2167,13 +2263,13 @@ abstract class AppLocalizations {
   /// No description provided for @settingsImmersiveReading.
   ///
   /// In en, this message translates to:
-  /// **'Immersive Reading'**
+  /// **'Immersive reading'**
   String get settingsImmersiveReading;
 
   /// No description provided for @settingsImmersiveOffTitle.
   ///
   /// In en, this message translates to:
-  /// **'Anchored (Off)'**
+  /// **'Anchored (off)'**
   String get settingsImmersiveOffTitle;
 
   /// No description provided for @settingsImmersiveOffSubtitle.
@@ -2185,7 +2281,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsImmersivePartialTitle.
   ///
   /// In en, this message translates to:
-  /// **'Guided (Partial)'**
+  /// **'Guided (partial)'**
   String get settingsImmersivePartialTitle;
 
   /// No description provided for @settingsImmersivePartialSubtitle.
@@ -2209,7 +2305,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsShowStrongs.
   ///
   /// In en, this message translates to:
-  /// **'Show Strong\'s Numbers'**
+  /// **'Show Strong\'s numbers'**
   String get settingsShowStrongs;
 
   /// No description provided for @settingsShowStrongsSubtitle.
@@ -2275,7 +2371,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsDictUnderlines.
   ///
   /// In en, this message translates to:
-  /// **'Dictionary Underlines'**
+  /// **'Dictionary underlines'**
   String get settingsDictUnderlines;
 
   /// No description provided for @settingsDictUnderlinesSubtitle.
@@ -2287,7 +2383,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsUnderlineScope.
   ///
   /// In en, this message translates to:
-  /// **'Underline Scope'**
+  /// **'Underline scope'**
   String get settingsUnderlineScope;
 
   /// No description provided for @settingsScopeNamesTitle.
@@ -2305,7 +2401,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsScopeTrickyTitle.
   ///
   /// In en, this message translates to:
-  /// **'Names + tricky words (Recommended)'**
+  /// **'Names + tricky words (recommended)'**
   String get settingsScopeTrickyTitle;
 
   /// No description provided for @settingsScopeTrickySubtitle.
@@ -2395,7 +2491,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsPopupStyle.
   ///
   /// In en, this message translates to:
-  /// **'Popup Style'**
+  /// **'Popup style'**
   String get settingsPopupStyle;
 
   /// No description provided for @settingsPopupStyleSubtitle.
@@ -2443,7 +2539,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsVerseActionStyle.
   ///
   /// In en, this message translates to:
-  /// **'Verse Action Style'**
+  /// **'Verse action style'**
   String get settingsVerseActionStyle;
 
   /// No description provided for @settingsVerseActionStyleSubtitle.
@@ -2485,7 +2581,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsKeepAwake.
   ///
   /// In en, this message translates to:
-  /// **'Keep Screen Awake'**
+  /// **'Keep screen awake'**
   String get settingsKeepAwake;
 
   /// No description provided for @settingsKeepAwakeSubtitle.
@@ -2539,7 +2635,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsSabbathTitle.
   ///
   /// In en, this message translates to:
-  /// **'Friday Sunset Reminder'**
+  /// **'Friday sunset reminder'**
   String get settingsSabbathTitle;
 
   /// No description provided for @settingsSabbathSubtitle.
@@ -2557,13 +2653,13 @@ abstract class AppLocalizations {
   /// No description provided for @settingsLocationNotSet.
   ///
   /// In en, this message translates to:
-  /// **'Not set (Tap to set)'**
+  /// **'Not set (tap to set)'**
   String get settingsLocationNotSet;
 
   /// No description provided for @settingsDailyReminderTitle.
   ///
   /// In en, this message translates to:
-  /// **'Daily Reading Reminder'**
+  /// **'Daily reading reminder'**
   String get settingsDailyReminderTitle;
 
   /// No description provided for @settingsDailyReminderSubtitle.
@@ -2581,7 +2677,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsWeeklyReminderTitle.
   ///
   /// In en, this message translates to:
-  /// **'Custom Weekly Reminder'**
+  /// **'Custom weekly reminder'**
   String get settingsWeeklyReminderTitle;
 
   /// No description provided for @settingsWeeklyReminderSubtitle.
@@ -2593,13 +2689,13 @@ abstract class AppLocalizations {
   /// No description provided for @settingsDayAndTime.
   ///
   /// In en, this message translates to:
-  /// **'Day & Time'**
+  /// **'Day & time'**
   String get settingsDayAndTime;
 
   /// No description provided for @settingsChooseDay.
   ///
   /// In en, this message translates to:
-  /// **'Choose Day'**
+  /// **'Choose day'**
   String get settingsChooseDay;
 
   /// No description provided for @settingsShowReadingTips.
@@ -2617,7 +2713,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsNavSteps.
   ///
   /// In en, this message translates to:
-  /// **'Navigation Steps'**
+  /// **'Navigation steps'**
   String get settingsNavSteps;
 
   /// No description provided for @settingsNavStepsSubtitle.
@@ -2713,7 +2809,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsDefaultScopes.
   ///
   /// In en, this message translates to:
-  /// **'Default Search Scopes'**
+  /// **'Default search scopes'**
   String get settingsDefaultScopes;
 
   /// No description provided for @settingsOldTestament.
@@ -2797,7 +2893,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsBbeNoteTitle.
   ///
   /// In en, this message translates to:
-  /// **'BBE Translation Note'**
+  /// **'BBE translation note'**
   String get settingsBbeNoteTitle;
 
   /// No description provided for @settingsBackup.
@@ -2827,7 +2923,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsRestoreBackupDialogTitle.
   ///
   /// In en, this message translates to:
-  /// **'Restore from Backup'**
+  /// **'Restore from backup'**
   String get settingsRestoreBackupDialogTitle;
 
   /// No description provided for @settingsRestoreHint.
@@ -2923,7 +3019,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsSendFeedback.
   ///
   /// In en, this message translates to:
-  /// **'Send Feedback'**
+  /// **'Send feedback'**
   String get settingsSendFeedback;
 
   /// No description provided for @settingsCrashReports.
@@ -2941,7 +3037,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsPrivacyPolicy.
   ///
   /// In en, this message translates to:
-  /// **'Privacy Policy'**
+  /// **'Privacy policy'**
   String get settingsPrivacyPolicy;
 
   /// No description provided for @settingsCredits.
@@ -2959,13 +3055,13 @@ abstract class AppLocalizations {
   /// No description provided for @settingsSetSunsetLocation.
   ///
   /// In en, this message translates to:
-  /// **'Set Location for Sunset'**
+  /// **'Set location for sunset'**
   String get settingsSetSunsetLocation;
 
   /// No description provided for @settingsCurrentLocationGps.
   ///
   /// In en, this message translates to:
-  /// **'Current Location (GPS)'**
+  /// **'Current location (GPS)'**
   String get settingsCurrentLocationGps;
 
   /// No description provided for @settingsUseMyLocation.
@@ -2995,7 +3091,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsSearchSettings.
   ///
   /// In en, this message translates to:
-  /// **'Search Settings'**
+  /// **'Search settings'**
   String get settingsSearchSettings;
 
   /// No description provided for @settingsMatchTypeHeader.
@@ -3007,7 +3103,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsExactMatch.
   ///
   /// In en, this message translates to:
-  /// **'Exact Match'**
+  /// **'Exact match'**
   String get settingsExactMatch;
 
   /// No description provided for @settingsExactMatchSubtitle.
@@ -3025,13 +3121,13 @@ abstract class AppLocalizations {
   /// No description provided for @settingsDisabledBookFilter.
   ///
   /// In en, this message translates to:
-  /// **'Disabled (Book Filter Active)'**
+  /// **'Disabled (book filter active)'**
   String get settingsDisabledBookFilter;
 
   /// No description provided for @settingsMyNotes.
   ///
   /// In en, this message translates to:
-  /// **'My Notes'**
+  /// **'My notes'**
   String get settingsMyNotes;
 
   /// No description provided for @settingsBehaviorHeader.
@@ -3043,7 +3139,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsAutoOpenSingleShort.
   ///
   /// In en, this message translates to:
-  /// **'Auto-open Single Result'**
+  /// **'Auto-open single result'**
   String get settingsAutoOpenSingleShort;
 
   /// No description provided for @settingsAutoOpenSingleShortSubtitle.
@@ -3055,7 +3151,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsBackgroundGlow.
   ///
   /// In en, this message translates to:
-  /// **'Enable Background Glow'**
+  /// **'Enable background glow'**
   String get settingsBackgroundGlow;
 
   /// No description provided for @settingsBackgroundGlowSubtitle.
@@ -3175,7 +3271,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsSurfaceStyle.
   ///
   /// In en, this message translates to:
-  /// **'Surface Style'**
+  /// **'Surface style'**
   String get settingsSurfaceStyle;
 
   /// No description provided for @settingsSurfaceStyleSubtitle.
@@ -3247,7 +3343,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsWidgetStreak.
   ///
   /// In en, this message translates to:
-  /// **'Streak Active! • Daily Goal'**
+  /// **'Streak active! • Daily goal'**
   String get settingsWidgetStreak;
 
   /// No description provided for @settingsWidgetWotd.
@@ -3283,13 +3379,13 @@ abstract class AppLocalizations {
   /// No description provided for @settingsWidgetTextDark.
   ///
   /// In en, this message translates to:
-  /// **'Dark Text ☀️'**
+  /// **'Dark text ☀️'**
   String get settingsWidgetTextDark;
 
   /// No description provided for @settingsWidgetTextWhite.
   ///
   /// In en, this message translates to:
-  /// **'White Text 🌙'**
+  /// **'White text 🌙'**
   String get settingsWidgetTextWhite;
 
   /// No description provided for @settingsWidgetSynced.
@@ -3301,7 +3397,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsWidgetApply.
   ///
   /// In en, this message translates to:
-  /// **'Apply & Sync to Home Screen'**
+  /// **'Apply & sync to home screen'**
   String get settingsWidgetApply;
 
   /// No description provided for @settingsFontSizeHeader.
@@ -3409,13 +3505,13 @@ abstract class AppLocalizations {
   /// No description provided for @settingsDailyReading.
   ///
   /// In en, this message translates to:
-  /// **'Daily Reading'**
+  /// **'Daily reading'**
   String get settingsDailyReading;
 
   /// No description provided for @settingsCustomReminder.
   ///
   /// In en, this message translates to:
-  /// **'Custom Reminder'**
+  /// **'Custom reminder'**
   String get settingsCustomReminder;
 
   /// No description provided for @settingsMonday.
@@ -3517,7 +3613,7 @@ abstract class AppLocalizations {
   /// No description provided for @spaceNewFolder.
   ///
   /// In en, this message translates to:
-  /// **'New Folder'**
+  /// **'New folder'**
   String get spaceNewFolder;
 
   /// No description provided for @spaceFolderNameHint.
@@ -3535,7 +3631,7 @@ abstract class AppLocalizations {
   /// No description provided for @spaceRenameFolder.
   ///
   /// In en, this message translates to:
-  /// **'Rename Folder'**
+  /// **'Rename folder'**
   String get spaceRenameFolder;
 
   /// No description provided for @spaceRename.
@@ -3559,7 +3655,7 @@ abstract class AppLocalizations {
   /// No description provided for @spaceMoveToFolder.
   ///
   /// In en, this message translates to:
-  /// **'Move to Folder'**
+  /// **'Move to folder'**
   String get spaceMoveToFolder;
 
   /// No description provided for @spaceUnfiled.
@@ -3577,19 +3673,19 @@ abstract class AppLocalizations {
   /// No description provided for @spaceGroupLast7Days.
   ///
   /// In en, this message translates to:
-  /// **'Last 7 Days'**
+  /// **'Last 7 days'**
   String get spaceGroupLast7Days;
 
   /// No description provided for @spaceGroupLast30Days.
   ///
   /// In en, this message translates to:
-  /// **'Last 30 Days'**
+  /// **'Last 30 days'**
   String get spaceGroupLast30Days;
 
   /// No description provided for @spaceUnknownBook.
   ///
   /// In en, this message translates to:
-  /// **'Unknown Book'**
+  /// **'Unknown book'**
   String get spaceUnknownBook;
 
   /// No description provided for @spaceNoBookmarks.
@@ -3607,13 +3703,13 @@ abstract class AppLocalizations {
   /// No description provided for @spaceByDate.
   ///
   /// In en, this message translates to:
-  /// **'By Date'**
+  /// **'By date'**
   String get spaceByDate;
 
   /// No description provided for @spaceByBook.
   ///
   /// In en, this message translates to:
-  /// **'By Book'**
+  /// **'By book'**
   String get spaceByBook;
 
   /// No description provided for @spaceYourNotes.
@@ -3645,18 +3741,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Copy text'**
   String get spaceCopyText;
-
-  /// No description provided for @spaceDeleteNoteTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete note?'**
-  String get spaceDeleteNoteTitle;
-
-  /// No description provided for @spaceDeleteNoteBody.
-  ///
-  /// In en, this message translates to:
-  /// **'\"{title}\" will be removed permanently.'**
-  String spaceDeleteNoteBody(String title);
 
   /// No description provided for @spaceUntitled.
   ///
@@ -3703,7 +3787,7 @@ abstract class AppLocalizations {
   /// No description provided for @spaceChangeColour.
   ///
   /// In en, this message translates to:
-  /// **'Change colour'**
+  /// **'Change color'**
   String get spaceChangeColour;
 
   /// No description provided for @spaceMoveToFolderAction.
@@ -3727,19 +3811,19 @@ abstract class AppLocalizations {
   /// No description provided for @spaceHighlightColour.
   ///
   /// In en, this message translates to:
-  /// **'Highlight colour'**
+  /// **'Highlight color'**
   String get spaceHighlightColour;
 
   /// No description provided for @spaceColourN.
   ///
   /// In en, this message translates to:
-  /// **'Colour {index}'**
+  /// **'Color {index}'**
   String spaceColourN(int index);
 
   /// No description provided for @notesMyNotes.
   ///
   /// In en, this message translates to:
-  /// **'My Notes'**
+  /// **'My notes'**
   String get notesMyNotes;
 
   /// No description provided for @notesEmptyTitle.
@@ -3763,19 +3847,19 @@ abstract class AppLocalizations {
   /// No description provided for @notesAddCommentary.
   ///
   /// In en, this message translates to:
-  /// **'Add Commentary'**
+  /// **'Add commentary'**
   String get notesAddCommentary;
 
   /// No description provided for @notesChapterTitlePlaceholder.
   ///
   /// In en, this message translates to:
-  /// **'Chapter Title'**
+  /// **'Chapter title'**
   String get notesChapterTitlePlaceholder;
 
   /// No description provided for @notesEditNote.
   ///
   /// In en, this message translates to:
-  /// **'Edit Note'**
+  /// **'Edit note'**
   String get notesEditNote;
 
   /// No description provided for @notesNewNoteOn.
@@ -3787,13 +3871,13 @@ abstract class AppLocalizations {
   /// No description provided for @notesNewNote.
   ///
   /// In en, this message translates to:
-  /// **'New Note'**
+  /// **'New note'**
   String get notesNewNote;
 
   /// No description provided for @notesTitleHint.
   ///
   /// In en, this message translates to:
-  /// **'Note Title'**
+  /// **'Note title'**
   String get notesTitleHint;
 
   /// No description provided for @notesContentHint.
@@ -3829,13 +3913,13 @@ abstract class AppLocalizations {
   /// No description provided for @notesSaveChanges.
   ///
   /// In en, this message translates to:
-  /// **'Save Changes'**
+  /// **'Save changes'**
   String get notesSaveChanges;
 
   /// No description provided for @notesSaveNote.
   ///
   /// In en, this message translates to:
-  /// **'Save Note'**
+  /// **'Save note'**
   String get notesSaveNote;
 
   /// No description provided for @notesDeleted.
@@ -3847,13 +3931,13 @@ abstract class AppLocalizations {
   /// No description provided for @notesDeleteNote.
   ///
   /// In en, this message translates to:
-  /// **'Delete Note'**
+  /// **'Delete note'**
   String get notesDeleteNote;
 
   /// No description provided for @notesNewJournalEntry.
   ///
   /// In en, this message translates to:
-  /// **'New Journal Entry'**
+  /// **'New journal entry'**
   String get notesNewJournalEntry;
 
   /// No description provided for @notesJournalHint.
@@ -3865,7 +3949,7 @@ abstract class AppLocalizations {
   /// No description provided for @notesSaveAndAnalyze.
   ///
   /// In en, this message translates to:
-  /// **'Save & Analyze'**
+  /// **'Save & analyze'**
   String get notesSaveAndAnalyze;
 
   /// No description provided for @notesNoJournalEntries.
@@ -3877,13 +3961,13 @@ abstract class AppLocalizations {
   /// No description provided for @notesWriteEntry.
   ///
   /// In en, this message translates to:
-  /// **'Write Entry'**
+  /// **'Write entry'**
   String get notesWriteEntry;
 
   /// No description provided for @notesAiReflection.
   ///
   /// In en, this message translates to:
-  /// **'AI Reflection'**
+  /// **'AI reflection'**
   String get notesAiReflection;
 
   /// No description provided for @notesDetectedEmotion.
@@ -3961,7 +4045,7 @@ abstract class AppLocalizations {
   /// No description provided for @accountSignOut.
   ///
   /// In en, this message translates to:
-  /// **'Sign Out'**
+  /// **'Sign out'**
   String get accountSignOut;
 
   /// No description provided for @accountResetApp.
@@ -3979,19 +4063,19 @@ abstract class AppLocalizations {
   /// No description provided for @accountSignIn.
   ///
   /// In en, this message translates to:
-  /// **'Sign In'**
+  /// **'Sign in'**
   String get accountSignIn;
 
   /// No description provided for @accountSignedIn.
   ///
   /// In en, this message translates to:
-  /// **'Signed In'**
+  /// **'Signed in'**
   String get accountSignedIn;
 
   /// No description provided for @accountDeleteAccount.
   ///
   /// In en, this message translates to:
-  /// **'Delete Account'**
+  /// **'Delete account'**
   String get accountDeleteAccount;
 
   /// No description provided for @accountDeleteAccountTitle.
@@ -4141,7 +4225,7 @@ abstract class AppLocalizations {
   /// No description provided for @accountRestoreTitle.
   ///
   /// In en, this message translates to:
-  /// **'Restore from Backup'**
+  /// **'Restore from backup'**
   String get accountRestoreTitle;
 
   /// No description provided for @accountRestoreHint.
@@ -4354,12 +4438,6 @@ abstract class AppLocalizations {
   /// **'{abbr} downloaded'**
   String spacePackDownloaded(String abbr);
 
-  /// No description provided for @spaceCouldNotFinish.
-  ///
-  /// In en, this message translates to:
-  /// **'Could not finish: {error}'**
-  String spaceCouldNotFinish(String error);
-
   /// No description provided for @spaceFreed.
   ///
   /// In en, this message translates to:
@@ -4450,11 +4528,11 @@ abstract class AppLocalizations {
   /// **'Undo'**
   String get commonUndo;
 
-  /// No description provided for @studyCouldNotOpenScreen.
+  /// No description provided for @spaceHighlightsIntro.
   ///
   /// In en, this message translates to:
-  /// **'Could not open that screen. {error}'**
-  String studyCouldNotOpenScreen(String error);
+  /// **'Verses you\'ve marked in color.'**
+  String get spaceHighlightsIntro;
 
   /// No description provided for @studyCardSize.
   ///
@@ -4483,7 +4561,7 @@ abstract class AppLocalizations {
   /// No description provided for @studySizeExtraLarge.
   ///
   /// In en, this message translates to:
-  /// **'Extra Large'**
+  /// **'Extra large'**
   String get studySizeExtraLarge;
 
   /// No description provided for @studySizeExtraLargeHint.
@@ -4549,7 +4627,7 @@ abstract class AppLocalizations {
   /// No description provided for @studyCommentaryCta.
   ///
   /// In en, this message translates to:
-  /// **'Open Commentary'**
+  /// **'Open commentary'**
   String get studyCommentaryCta;
 
   /// No description provided for @studyDictionaryEyebrow.
@@ -4825,7 +4903,7 @@ abstract class AppLocalizations {
   /// No description provided for @studyNextPassage.
   ///
   /// In en, this message translates to:
-  /// **'Next Passage'**
+  /// **'Next passage'**
   String get studyNextPassage;
 
   /// No description provided for @studyFullChapter.
@@ -4861,7 +4939,7 @@ abstract class AppLocalizations {
   /// No description provided for @studyAddNote.
   ///
   /// In en, this message translates to:
-  /// **'Add Note'**
+  /// **'Add note'**
   String get studyAddNote;
 
   /// No description provided for @studyChaptersWithContent.
@@ -4873,7 +4951,7 @@ abstract class AppLocalizations {
   /// No description provided for @studyCommentaryLibrary.
   ///
   /// In en, this message translates to:
-  /// **'Commentary Library'**
+  /// **'Commentary library'**
   String get studyCommentaryLibrary;
 
   /// No description provided for @studyCommentaryLoadError.
@@ -4936,12 +5014,6 @@ abstract class AppLocalizations {
   /// **'Search within {reference}…'**
   String studySearchWithin(String reference);
 
-  /// No description provided for @studyEntriesLoadError.
-  ///
-  /// In en, this message translates to:
-  /// **'Could not load entries.\n{error}'**
-  String studyEntriesLoadError(String error);
-
   /// No description provided for @studyNoEntriesMatch.
   ///
   /// In en, this message translates to:
@@ -4975,14 +5047,8 @@ abstract class AppLocalizations {
   /// No description provided for @studyCategoryStudyNote.
   ///
   /// In en, this message translates to:
-  /// **'Study Note'**
+  /// **'Study note'**
   String get studyCategoryStudyNote;
-
-  /// No description provided for @studyCommentaryLoadErrorDetail.
-  ///
-  /// In en, this message translates to:
-  /// **'Could not load commentary.\n{error}'**
-  String studyCommentaryLoadErrorDetail(String error);
 
   /// No description provided for @studyNoContentForFilters.
   ///
@@ -4999,7 +5065,7 @@ abstract class AppLocalizations {
   /// No description provided for @studyChapterView.
   ///
   /// In en, this message translates to:
-  /// **'Chapter View'**
+  /// **'Chapter view'**
   String get studyChapterView;
 
   /// No description provided for @studyFilterAll.
@@ -5017,31 +5083,31 @@ abstract class AppLocalizations {
   /// No description provided for @studyFilterAllContexts.
   ///
   /// In en, this message translates to:
-  /// **'All Contexts'**
+  /// **'All contexts'**
   String get studyFilterAllContexts;
 
   /// No description provided for @studyFilterChapterLevel.
   ///
   /// In en, this message translates to:
-  /// **'Chapter Level'**
+  /// **'Chapter level'**
   String get studyFilterChapterLevel;
 
   /// No description provided for @studyFilterVerseLevel.
   ///
   /// In en, this message translates to:
-  /// **'Verse Level'**
+  /// **'Verse level'**
   String get studyFilterVerseLevel;
 
   /// No description provided for @studyRemoveBookmark.
   ///
   /// In en, this message translates to:
-  /// **'Remove Bookmark'**
+  /// **'Remove bookmark'**
   String get studyRemoveBookmark;
 
   /// No description provided for @studyBookmarkCommentary.
   ///
   /// In en, this message translates to:
-  /// **'Bookmark Commentary'**
+  /// **'Bookmark commentary'**
   String get studyBookmarkCommentary;
 
   /// No description provided for @studyExpandFullScreen.
@@ -5083,7 +5149,7 @@ abstract class AppLocalizations {
   /// No description provided for @storiesTitle.
   ///
   /// In en, this message translates to:
-  /// **'Bible Stories'**
+  /// **'Bible stories'**
   String get storiesTitle;
 
   /// No description provided for @storiesFilters.
@@ -5145,12 +5211,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unread'**
   String get storiesUnread;
-
-  /// No description provided for @storiesLoadError.
-  ///
-  /// In en, this message translates to:
-  /// **'Could not load stories:\n{error}'**
-  String storiesLoadError(String error);
 
   /// No description provided for @storiesBooks.
   ///
@@ -5284,12 +5344,6 @@ abstract class AppLocalizations {
   /// **'★ Saved'**
   String get studyDictionarySavedFilter;
 
-  /// No description provided for @studyDictionaryUnavailable.
-  ///
-  /// In en, this message translates to:
-  /// **'Dictionary unavailable.\n{error}'**
-  String studyDictionaryUnavailable(String error);
-
   /// No description provided for @studyNoHeadwords.
   ///
   /// In en, this message translates to:
@@ -5331,12 +5385,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No definition found.'**
   String get studyNoDefinition;
-
-  /// No description provided for @studyFailedToLoad.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to load: {error}'**
-  String studyFailedToLoad(String error);
 
   /// No description provided for @studyStrongsShareText.
   ///
@@ -5426,7 +5474,7 @@ abstract class AppLocalizations {
   /// No description provided for @errorTitle.
   ///
   /// In en, this message translates to:
-  /// **'Something Went Wrong'**
+  /// **'Something went wrong'**
   String get errorTitle;
 
   /// No description provided for @errorBody.
@@ -5450,7 +5498,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacyTitle.
   ///
   /// In en, this message translates to:
-  /// **'Privacy Policy'**
+  /// **'Privacy policy'**
   String get privacyTitle;
 
   /// No description provided for @privacyLoadError.
@@ -5492,7 +5540,7 @@ abstract class AppLocalizations {
   /// No description provided for @notifDailyChannel.
   ///
   /// In en, this message translates to:
-  /// **'Daily Reminders'**
+  /// **'Daily reminders'**
   String get notifDailyChannel;
 
   /// No description provided for @notifDailyChannelDesc.
@@ -5504,7 +5552,7 @@ abstract class AppLocalizations {
   /// No description provided for @notifPrayerTitle.
   ///
   /// In en, this message translates to:
-  /// **'Time for Prayer'**
+  /// **'Time for prayer'**
   String get notifPrayerTitle;
 
   /// No description provided for @notifPrayerBody.
@@ -5516,7 +5564,7 @@ abstract class AppLocalizations {
   /// No description provided for @notifPrayerChannel.
   ///
   /// In en, this message translates to:
-  /// **'Prayer Reminders'**
+  /// **'Prayer reminders'**
   String get notifPrayerChannel;
 
   /// No description provided for @notifPrayerChannelDesc.
@@ -5528,7 +5576,7 @@ abstract class AppLocalizations {
   /// No description provided for @notifWeeklyTitle.
   ///
   /// In en, this message translates to:
-  /// **'Weekly Study Time'**
+  /// **'Weekly study time'**
   String get notifWeeklyTitle;
 
   /// No description provided for @notifWeeklyBody.
@@ -5540,7 +5588,7 @@ abstract class AppLocalizations {
   /// No description provided for @notifWeeklyChannel.
   ///
   /// In en, this message translates to:
-  /// **'Weekly Reminders'**
+  /// **'Weekly reminders'**
   String get notifWeeklyChannel;
 
   /// No description provided for @notifWeeklyChannelDesc.
@@ -5552,7 +5600,7 @@ abstract class AppLocalizations {
   /// No description provided for @notifSabbathTitle.
   ///
   /// In en, this message translates to:
-  /// **'The Sabbath is Approaching'**
+  /// **'The Sabbath is approaching'**
   String get notifSabbathTitle;
 
   /// No description provided for @notifSabbathBody.
@@ -5564,7 +5612,7 @@ abstract class AppLocalizations {
   /// No description provided for @notifSabbathChannel.
   ///
   /// In en, this message translates to:
-  /// **'Sabbath Reminders'**
+  /// **'Sabbath reminders'**
   String get notifSabbathChannel;
 
   /// No description provided for @notifSabbathChannelDesc.
@@ -5582,7 +5630,7 @@ abstract class AppLocalizations {
   /// No description provided for @notifPlanChannel.
   ///
   /// In en, this message translates to:
-  /// **'Reading Plan'**
+  /// **'Reading plan'**
   String get notifPlanChannel;
 
   /// No description provided for @notifPlanChannelDesc.
@@ -5696,7 +5744,7 @@ abstract class AppLocalizations {
   /// No description provided for @backupConfirmTitle.
   ///
   /// In en, this message translates to:
-  /// **'Confirm Restore'**
+  /// **'Confirm restore'**
   String get backupConfirmTitle;
 
   /// No description provided for @backupConfirmBody.
@@ -6080,7 +6128,7 @@ abstract class AppLocalizations {
   /// No description provided for @creditsBibleStories.
   ///
   /// In en, this message translates to:
-  /// **'Bible Stories'**
+  /// **'Bible stories'**
   String get creditsBibleStories;
 
   /// No description provided for @creditsFonts.
@@ -6218,7 +6266,7 @@ abstract class AppLocalizations {
   /// No description provided for @miscSearchBibleVerse.
   ///
   /// In en, this message translates to:
-  /// **'Bible Verse'**
+  /// **'Bible verse'**
   String get miscSearchBibleVerse;
 
   /// No description provided for @miscSearchCommentary.
@@ -6242,7 +6290,7 @@ abstract class AppLocalizations {
   /// No description provided for @miscSearchJumpTo.
   ///
   /// In en, this message translates to:
-  /// **'Jump To'**
+  /// **'Jump to'**
   String get miscSearchJumpTo;
 
   /// No description provided for @miscSearchGoToChapter.

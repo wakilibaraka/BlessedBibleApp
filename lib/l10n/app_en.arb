@@ -35,6 +35,60 @@
   "languageTitle": "Language",
   "languageSystem": "Same as device",
   "languageSubtitle": "The language of menus and buttons. Your Bible translation is chosen separately.",
+  "homeWotdUnavailableNow": "Word of the day is unavailable right now.",
+  "spaceCouldNotFinishPlain": "Couldn't finish that. Please try again.",
+  "readTranslationsLoadErrorPlain": "Could not load translations.",
+  "readDeleteTranslationBody": "You can get it again from the translations list at any time.",
+  "readDeleteFailedPlain": "Couldn't delete it. Please try again.",
+  "readCrossRefsLoadErrorPlain": "Could not load cross-references.",
+  "readVerseLoadErrorPlain": "Could not load this verse.",
+  "searchClearRecentTitle": "Clear recent searches?",
+  "searchClearRecentBody": "Your recent searches will be removed from this device.",
+  "searchClearRecentConfirm": "Clear",
+  "readHighlightsRemoved": "{count, plural, =1{Highlight removed} other{{count} highlights removed}}",
+  "@readHighlightsRemoved": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "readVersesHighlighted": "{count, plural, =1{Verse highlighted} other{{count} verses highlighted}}",
+  "@readVersesHighlighted": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "readBookmarksRemoved": "{count, plural, =1{Bookmark removed} other{{count} bookmarks removed}}",
+  "@readBookmarksRemoved": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "readVersesBookmarked": "{count, plural, =1{Verse bookmarked} other{{count} verses bookmarked}}",
+  "@readVersesBookmarked": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "storiesLoadFailed": "Could not load stories.",
+  "studyEntriesLoadFailed": "Could not load entries.",
+  "studyDictionaryLoadFailed": "Could not load the dictionary.",
+  "studyEntryLoadFailed": "Could not load this entry.",
+  "studyOpenScreenFailed": "Could not open that screen.",
+  "studyWordUnsaved": "Removed from saved words",
+  "plansBuilderSaveFailed": "Could not save plan.",
+  "plansBuilderLoadFailed": "Could not set up the plan builder.",
+  "plansDetailLoadFailed": "Could not load this plan.",
+  "plansTrackRemoved": "Track removed",
+  "yourSpaceBookmarkRemoved": "Bookmark removed",
+  "yourSpaceHighlightRemoved": "Highlight removed",
   "onboardingTagline": "Scripture, without distraction.",
   "onboardingPickLanguage": "Choose your language",
   "onboardingLanguageHint": "You can change this any time in Settings.",
@@ -49,7 +103,7 @@
     }
   },
   "onboardingLookTitle": "Make it comfortable",
-  "onboardingLookBody": "Choose a page colour and text size. Everything can be fine-tuned later.",
+  "onboardingLookBody": "Choose a page color and text size. Everything can be fine-tuned later.",
   "onboardingThemeLight": "Light",
   "onboardingThemeSepia": "Sepia",
   "onboardingThemeDark": "Dark",
@@ -59,9 +113,9 @@
   "onboardingFeaturesTitle": "Everything for your daily walk",
   "onboardingFeatureWordTitle": "The Pure Word",
   "onboardingFeatureWordBody": "Read without distraction, with highlights, notes and bookmarks.",
-  "onboardingFeaturePlansTitle": "Reading Plans",
+  "onboardingFeaturePlansTitle": "Reading plans",
   "onboardingFeaturePlansBody": "Chronological, thematic or your own — with gentle reminders.",
-  "onboardingFeatureStudyTitle": "Deep Study",
+  "onboardingFeatureStudyTitle": "Deep study",
   "onboardingFeatureStudyBody": "Commentary, dictionary, Strong's and maps, right beside the text.",
   "onboardingFeatureSyncTitle": "Kept safe",
   "onboardingFeatureSyncBody": "Sign in any time to sync across your devices. No account needed to read.",
@@ -93,7 +147,7 @@
     }
   },
   "onboardingNotNow": "Not now",
-  "plansContinueReading": "Continue Reading",
+  "plansContinueReading": "Continue reading",
   "plansResume": "Resume",
   "plansDayCompleteCelebration": "Reading Plan\nDay {day} Complete!",
   "@plansDayCompleteCelebration": {
@@ -103,7 +157,6 @@
       }
     }
   },
-  "plansChangeWeek": "Change week",
   "plansCalendarDayComplete": "{label}, reading complete",
   "@plansCalendarDayComplete": {
     "placeholders": {
@@ -120,7 +173,7 @@
       }
     }
   },
-  "plansDailyVerses": "Daily Verses",
+  "plansDailyVerses": "Daily verses",
   "plansToday": "Today",
   "plansYesterday": "Yesterday",
   "plansDaysAgo": "{count, plural, =1{1 day ago} other{{count} days ago}}",
@@ -255,7 +308,7 @@
       }
     }
   },
-  "plansCustomPlanDefaultTitle": "Custom Plan",
+  "plansCustomPlanDefaultTitle": "Custom plan",
   "plansCustom": "Custom",
   "plansBookRange": "{start} to {end}",
   "@plansBookRange": {
@@ -268,25 +321,9 @@
       }
     }
   },
-  "plansCouldNotSave": "Could not save plan: {error}",
-  "@plansCouldNotSave": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "plansBuilderTitle": "Custom Plan Builder",
-  "plansError": "Error: {error}",
-  "@plansError": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
+  "plansBuilderTitle": "Custom plan builder",
   "plansPlanName": "Plan name",
-  "plansPlanNameHint": "e.g. Genesis in 30 Days",
+  "plansPlanNameHint": "e.g. Genesis in 30 days",
   "plansReadingTracks": "Reading tracks",
   "plansAddTrack": "Add track",
   "plansTracksOverlap": "Tracks overlap — shared verses are counted once in the preview below.",
@@ -393,7 +430,7 @@
     }
   },
   "plansBeginPlan": "Begin plan",
-  "plansStartDayOne": "Start Day 1 →",
+  "plansStartDayOne": "Start day 1 →",
   "plansStartDateNote": "Your plan begins on the date you choose.",
   "plansScheduleLabel": "SCHEDULE",
   "plansNoReadings": "No readings",
@@ -497,7 +534,7 @@
     }
   },
   "plansRestDaysHelp": "Tap to choose any weekdays",
-  "plansRestartFromDayOne": "Restart from Day 1…",
+  "plansRestartFromDayOne": "Restart from day 1…",
   "plansRestartTitle": "Restart plan?",
   "plansRestartBody": "Completed days will be cleared.",
   "plansRestart": "Restart",
@@ -562,21 +599,21 @@
   },
   "todayActionRead": "Read",
   "todayActionSurprise": "Surprise Me",
-  "todayActionReadingPlan": "Reading Plan",
+  "todayActionReadingPlan": "Reading plan",
   "todayActionYourSpace": "Your Space",
-  "todayVotdArchive": "Verse of the Day Archive",
+  "todayVotdArchive": "Verse of the day archive",
   "todayVotdArchiveBody": "Catch up on verses from days you missed.",
   "todayVotdArchiveExplore": "Explore your past daily verses",
   "readActionBookmark": "Bookmark",
   "readActionNote": "Note",
   "readActionNotes": "Notes",
-  "readActionEditNote": "Edit Note",
+  "readActionEditNote": "Edit note",
   "readActionCommentary": "Commentary",
   "readActionRelated": "Related",
   "readActionHighlight": "Highlight",
   "readActionStudy": "Study",
   "readActionSaved": "Saved",
-  "readActionSelectText": "Select Text",
+  "readActionSelectText": "Select text",
   "readVerseActions": "Verse actions",
   "readVersesSelected": "{count, plural, =1{1 verse selected} other{{count} verses selected}} · {where}",
   "@readVersesSelected": {
@@ -623,46 +660,30 @@
       }
     }
   },
-  "readRelatedVerses": "Related Verses",
+  "readRelatedVerses": "Related verses",
   "readNoCrossRefs": "No cross-references found for this verse.",
   "readCrossRefsComingSoon": "Cross-references will be available\nafter the next app update.",
-  "readCrossRefsLoadError": "Could not load cross-references.\n{error}",
-  "@readCrossRefsLoadError": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "readVerseUnavailable": "Verse not available",
   "readLoading": "Loading...",
   "readVerseNotFound": "Verse not found.",
   "readBookOrChapterNotFound": "Book or chapter not found.",
   "readOpenInRead": "Open in Read",
   "readBookNotFound": "Could not find the referenced book.",
-  "readVerseLoadError": "Error loading verse: {error}",
-  "@readVerseLoadError": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "readTestament": "Testament",
   "readBook": "Book",
   "readChapter": "Chapter",
   "readVerse": "Verse",
-  "readSelectBook": "Select Book",
+  "readSelectBook": "Select book",
   "readOtShort": "OT",
   "readNtShort": "NT",
   "readOldTestament": "Old Testament",
   "readNewTestament": "New Testament",
   "readOldTestamentTwoLine": "Old\nTestament",
   "readNewTestamentTwoLine": "New\nTestament",
-  "readStoriesSections": "Stories & Sections",
-  "readAllVerses": "All Verses",
-  "readTranslationTitle": "Bible Translation",
-  "readLayoutTitle": "Reading Layout",
+  "readStoriesSections": "Stories & sections",
+  "readAllVerses": "All verses",
+  "readTranslationTitle": "Bible translation",
+  "readLayoutTitle": "Reading layout",
   "readLayoutSingle": "Single",
   "readLayoutBilingual": "Bilingual",
   "readLayoutParallel": "Parallel",
@@ -673,26 +694,10 @@
   "readLayoutChipsDesc": "Tap a verse to switch its translation",
   "readPrimary": "Primary",
   "readSecondary": "Secondary",
-  "readTranslationsLoadError": "Error loading translations: {error}",
-  "@readTranslationsLoadError": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "readTranslationDeleted": "{name} deleted.",
   "@readTranslationDeleted": {
     "placeholders": {
       "name": {
-        "type": "String"
-      }
-    }
-  },
-  "readDeleteFailed": "Could not delete: {error}",
-  "@readDeleteFailed": {
-    "placeholders": {
-      "error": {
         "type": "String"
       }
     }
@@ -711,39 +716,15 @@
   "readNoInternet": "No internet connection — try again when online.",
   "readRestoreFailed": "Restore failed",
   "readDownloadFailed": "Download failed",
-  "readRestoreFailedDetail": "Restore failed ({error}).",
-  "@readRestoreFailedDetail": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "readDownloadFailedDetail": "Download failed ({error}).",
-  "@readDownloadFailedDetail": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "readRestoreOffline": "restore offline",
   "homeVerseOfTheDay": "VERSE OF THE DAY",
   "homeDevotional": "DEVOTIONAL",
   "homeCommentary": "COMMENTARY",
-  "homeGoDeeper": "Go Deeper",
-  "homeReadFullDefinition": "Read Full Definition",
+  "homeGoDeeper": "Go deeper",
+  "homeReadFullDefinition": "Read full definition",
   "homeWordOfTheDayHeading": "WORD OF THE DAY",
   "homeWordOfTheDay": "Word of the day",
   "homeWotdEmpty": "No word picked for today yet — try again later.",
-  "homeWotdUnavailable": "Word of the day unavailable ({error}).",
-  "@homeWotdUnavailable": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "navHome": "Home",
   "navRead": "Read",
   "navStudy": "Study",
@@ -754,8 +735,8 @@
   "navCastLotsError": "Could not cast lots — please try again.",
   "navCastingLots": "Casting lots...",
   "searchHint": "Search verses, commentary…",
-  "searchAllBooks": "All Books",
-  "searchFilterMyNotes": "My Notes",
+  "searchAllBooks": "All books",
+  "searchFilterMyNotes": "My notes",
   "searchEmptyPrompt": "Search the Bible, commentary\nand your notes",
   "searchRecentSearches": "RECENT SEARCHES",
   "searchClear": "CLEAR",
@@ -825,7 +806,7 @@
   "settingsTabNavigation": "Navigation",
   "settingsTabReminders": "Reminders",
   "settingsTabInfo": "Info",
-  "settingsWidgetsTitle": "Home Screen Widgets",
+  "settingsWidgetsTitle": "Home screen widgets",
   "settingsWidgetsSubtitle": "Customize gradients, transparency, and live preview",
   "settingsStartPageTitle": "Default start page",
   "settingsStartPageSubtitle": "Choose which page the app opens to on launch",
@@ -833,14 +814,14 @@
   "settingsPageRead": "Read",
   "settingsPageStudy": "Study",
   "settingsPageSearch": "Search",
-  "settingsImmersiveReading": "Immersive Reading",
-  "settingsImmersiveOffTitle": "Anchored (Off)",
+  "settingsImmersiveReading": "Immersive reading",
+  "settingsImmersiveOffTitle": "Anchored (off)",
   "settingsImmersiveOffSubtitle": "Navigation remains visible at all times",
-  "settingsImmersivePartialTitle": "Guided (Partial)",
+  "settingsImmersivePartialTitle": "Guided (partial)",
   "settingsImmersivePartialSubtitle": "Auto-hides main navigation, but leaves the book & chapter pill",
   "settingsImmersiveFullTitle": "Deep Waters (Full)",
   "settingsImmersiveFullSubtitle": "Total immersion. All menus hide when scrolling",
-  "settingsShowStrongs": "Show Strong's Numbers",
+  "settingsShowStrongs": "Show Strong's numbers",
   "settingsShowStrongsSubtitle": "Displays original Hebrew/Greek identifiers alongside KJV text for deep word study",
   "settingsStrongsGetIt": "Get it",
   "settingsStrongsMarkerAsterisk": "Asterisk (*)",
@@ -851,12 +832,12 @@
   "settingsSpeedRelaxed": "Relaxed",
   "settingsSpeedStandard": "Standard",
   "settingsSpeedBrisk": "Brisk",
-  "settingsDictUnderlines": "Dictionary Underlines",
+  "settingsDictUnderlines": "Dictionary underlines",
   "settingsDictUnderlinesSubtitle": "Dotted underlines on biblical terms and archaic words",
-  "settingsUnderlineScope": "Underline Scope",
+  "settingsUnderlineScope": "Underline scope",
   "settingsScopeNamesTitle": "Names & terms only",
   "settingsScopeNamesSubtitle": "Proper nouns and specific biblical concepts",
-  "settingsScopeTrickyTitle": "Names + tricky words (Recommended)",
+  "settingsScopeTrickyTitle": "Names + tricky words (recommended)",
   "settingsScopeTrickySubtitle": "Includes archaic words with changed meanings (e.g., let, prevent)",
   "settingsScopeEverythingTitle": "Everything",
   "settingsScopeEverythingSubtitle": "Highlights all archaic grammar (e.g., thee, thou, hath, unto)",
@@ -871,7 +852,7 @@
   "settingsFollowScopeSubtitle": "Same marking as KJV in every English version",
   "settingsNoUnderlinesTitle": "No underlines",
   "settingsNoUnderlinesSubtitle": "Other English versions show no dictionary marks",
-  "settingsPopupStyle": "Popup Style",
+  "settingsPopupStyle": "Popup style",
   "settingsPopupStyleSubtitle": "How dictionary definitions and Strong's numbers are displayed",
   "settingsPopupFloating": "Floating",
   "settingsPopupBottomSheet": "Bottom sheet",
@@ -879,14 +860,14 @@
   "settingsSavedInMyLanguageSubtitle": "Display Bookmarks, Highlights, and Commentary verses in your active primary translation",
   "settingsTranslationChips": "Show translation options on saved items",
   "settingsTranslationChipsSubtitle": "Adds a compact translation chip row to view saved verses in other translations",
-  "settingsVerseActionStyle": "Verse Action Style",
+  "settingsVerseActionStyle": "Verse action style",
   "settingsVerseActionStyleSubtitle": "Sheet (compact) or Classic (tall dock) when verses are selected; Radial moves the long-press menu to a circular ring",
   "settingsActionSheet": "Sheet",
   "settingsActionClassic": "Classic",
   "settingsActionMinimal": "Minimal",
   "settingsActionRaindrop": "Raindrop",
   "settingsActionRadial": "Radial",
-  "settingsKeepAwake": "Keep Screen Awake",
+  "settingsKeepAwake": "Keep screen awake",
   "settingsKeepAwakeSubtitle": "Prevent device from sleeping while reading",
   "settingsRestartOnboarding": "Restart onboarding",
   "settingsRestartOnboardingSubtitle": "Replay the first-time setup",
@@ -895,20 +876,20 @@
   "settingsRestart": "Restart",
   "settingsAppearanceText": "Appearance & text",
   "settingsAppearanceTextSubtitle": "Theme, fonts, sizes and reading colors",
-  "settingsSabbathTitle": "Friday Sunset Reminder",
+  "settingsSabbathTitle": "Friday sunset reminder",
   "settingsSabbathSubtitle": "Welcome the Sabbath at your local sunset time.",
   "settingsLocation": "Location",
-  "settingsLocationNotSet": "Not set (Tap to set)",
-  "settingsDailyReminderTitle": "Daily Reading Reminder",
+  "settingsLocationNotSet": "Not set (tap to set)",
+  "settingsDailyReminderTitle": "Daily reading reminder",
   "settingsDailyReminderSubtitle": "A daily nudge to spend time in the Word.",
   "settingsTime": "Time",
-  "settingsWeeklyReminderTitle": "Custom Weekly Reminder",
+  "settingsWeeklyReminderTitle": "Custom weekly reminder",
   "settingsWeeklyReminderSubtitle": "Set a specific day and time each week for deeper study.",
-  "settingsDayAndTime": "Day & Time",
-  "settingsChooseDay": "Choose Day",
+  "settingsDayAndTime": "Day & time",
+  "settingsChooseDay": "Choose day",
   "settingsShowReadingTips": "Show reading tips",
   "settingsShowReadingTipsSubtitle": "Show guided hints for reading actions like highlighting and swiping",
-  "settingsNavSteps": "Navigation Steps",
+  "settingsNavSteps": "Navigation steps",
   "settingsNavStepsSubtitle": "How many steps to reach a verse. 2-step: Book → Chapter. 3-step: Book → Chapter → Verse. 4-step: Testament → Book → Chapter → Verse.",
   "settingsAutoClose": "Auto-close sheet on final selection",
   "settingsAutoCloseSubtitle": "Automatically dismiss the picker after the last step",
@@ -924,7 +905,7 @@
   "settingsWholeWordsSubtitle": "Only find exact word matches (disables partial/prefix matching)",
   "settingsFuzzySearch": "Forgiving search",
   "settingsFuzzySearchSubtitle": "Also show close matches for typos (e.g. Jhon finds John)",
-  "settingsDefaultScopes": "Default Search Scopes",
+  "settingsDefaultScopes": "Default search scopes",
   "settingsOldTestament": "Old Testament",
   "settingsNewTestament": "New Testament",
   "settingsCommentary": "Commentary",
@@ -938,12 +919,12 @@
   "settingsSwipeLeftHomeSubtitle": "Swipe left to jump to the Read tab",
   "settingsLongPressNav": "Long-press button to open navigation",
   "settingsLongPressNavSubtitle": "Long-press the bottom-right button to quickly open the Book/Chapter selector.",
-  "settingsBbeNoteTitle": "BBE Translation Note",
+  "settingsBbeNoteTitle": "BBE translation note",
   "settingsBackup": "Back up my data",
   "settingsBackupSubtitle": "Export notes, highlights, and settings",
   "settingsRestoreBackup": "Restore from backup",
   "settingsRestoreBackupSubtitle": "Import your data from a backup JSON",
-  "settingsRestoreBackupDialogTitle": "Restore from Backup",
+  "settingsRestoreBackupDialogTitle": "Restore from backup",
   "settingsRestoreHint": "Paste your backup JSON here...",
   "settingsRestore": "Restore",
   "settingsClearCache": "Clear cache/downloaded data",
@@ -959,29 +940,29 @@
   "settingsUnknown": "Unknown",
   "settingsStorage": "Storage & downloads",
   "settingsStorageSubtitle": "Cache, downloaded translations and what can be freed",
-  "settingsSendFeedback": "Send Feedback",
+  "settingsSendFeedback": "Send feedback",
   "settingsCrashReports": "Send crash reports",
   "settingsCrashReportsSubtitle": "Anonymous crash details help fix bugs. No Bible reading, notes or personal content is included.",
-  "settingsPrivacyPolicy": "Privacy Policy",
+  "settingsPrivacyPolicy": "Privacy policy",
   "settingsCredits": "Credits & sources",
   "settingsCreditsSubtitle": "Bible translations, commentary, study data, fonts and licenses",
-  "settingsSetSunsetLocation": "Set Location for Sunset",
-  "settingsCurrentLocationGps": "Current Location (GPS)",
+  "settingsSetSunsetLocation": "Set location for sunset",
+  "settingsCurrentLocationGps": "Current location (GPS)",
   "settingsUseMyLocation": "Use my current location",
   "settingsOrSelectCity": "OR select a major city",
   "settingsTypography": "Typography",
   "settingsTheme": "Theme",
-  "settingsSearchSettings": "Search Settings",
+  "settingsSearchSettings": "Search settings",
   "settingsMatchTypeHeader": "MATCH TYPE",
-  "settingsExactMatch": "Exact Match",
+  "settingsExactMatch": "Exact match",
   "settingsExactMatchSubtitle": "Only match the exact phrase",
   "settingsScopeHeader": "SCOPE",
-  "settingsDisabledBookFilter": "Disabled (Book Filter Active)",
-  "settingsMyNotes": "My Notes",
+  "settingsDisabledBookFilter": "Disabled (book filter active)",
+  "settingsMyNotes": "My notes",
   "settingsBehaviorHeader": "BEHAVIOR",
-  "settingsAutoOpenSingleShort": "Auto-open Single Result",
+  "settingsAutoOpenSingleShort": "Auto-open single result",
   "settingsAutoOpenSingleShortSubtitle": "Jump directly if only one result is found",
-  "settingsBackgroundGlow": "Enable Background Glow",
+  "settingsBackgroundGlow": "Enable background glow",
   "settingsBackgroundGlowSubtitle": "Renders a subtle animated light behind the reader",
   "settingsThemeGroupFoundations": "FOUNDATIONS",
   "settingsThemeDawn": "Dawn",
@@ -1001,7 +982,7 @@
   "settingsSurpriseMe": "Surprise me",
   "settingsThemeOledDark": "OLED\nDark",
   "settingsThemeDuskOled": "Dusk\nOLED",
-  "settingsSurfaceStyle": "Surface Style",
+  "settingsSurfaceStyle": "Surface style",
   "settingsSurfaceStyleSubtitle": "Visual depth and material rendering",
   "settingsSurfaceEarth": "Earth",
   "settingsSurfaceEarthSubtitle": "Flat surface",
@@ -1013,16 +994,16 @@
   "settingsSurfaceClaySubtitle": "Pillowy 3-D",
   "settingsWidgetsLivePreview": "Live preview & style customization",
   "settingsWidgetPreviewHeader": "LIVE WIDGET PREVIEW",
-  "settingsWidgetStreak": "Streak Active! • Daily Goal",
+  "settingsWidgetStreak": "Streak active! • Daily goal",
   "settingsWidgetWotd": "WORD OF THE DAY",
   "settingsWidgetVotd": "VERSE OF THE DAY",
   "settingsWidgetBackgroundHeader": "BACKGROUND THEME & GRADIENTS",
   "settingsWidgetContrastHeader": "TEXT CONTRAST",
   "settingsWidgetTextAuto": "Auto ✨",
-  "settingsWidgetTextDark": "Dark Text ☀️",
-  "settingsWidgetTextWhite": "White Text 🌙",
+  "settingsWidgetTextDark": "Dark text ☀️",
+  "settingsWidgetTextWhite": "White text 🌙",
   "settingsWidgetSynced": "Widgets synced with new style! ✨",
-  "settingsWidgetApply": "Apply & Sync to Home Screen",
+  "settingsWidgetApply": "Apply & sync to home screen",
   "settingsFontSizeHeader": "FONT SIZE",
   "settingsFontWeightHeader": "FONT WEIGHT",
   "settingsWeightLight": "Light",
@@ -1040,8 +1021,8 @@
   "settingsAlignJustified": "Justified",
   "settingsFontFamilyHeader": "FONT FAMILY",
   "settingsItalicHeader": "ITALIC READING TEXT",
-  "settingsDailyReading": "Daily Reading",
-  "settingsCustomReminder": "Custom Reminder",
+  "settingsDailyReading": "Daily reading",
+  "settingsCustomReminder": "Custom reminder",
   "settingsMonday": "Monday",
   "settingsTuesday": "Tuesday",
   "settingsWednesday": "Wednesday",
@@ -1082,10 +1063,10 @@
   "spaceTabNotes": "Notes",
   "spaceTabJournal": "Journal",
   "spaceHighlighted": "Highlighted",
-  "spaceNewFolder": "New Folder",
+  "spaceNewFolder": "New folder",
   "spaceFolderNameHint": "Folder name",
   "spaceCreate": "Create",
-  "spaceRenameFolder": "Rename Folder",
+  "spaceRenameFolder": "Rename folder",
   "spaceRename": "Rename",
   "spaceDeleteFolderTitle": "Delete Folder?",
   "spaceDeleteFolderBody": "Are you sure you want to delete \"{folderName}\"?\n\nYour bookmarks inside this folder will NOT be deleted; they will be moved to Unfiled.",
@@ -1096,30 +1077,21 @@
       }
     }
   },
-  "spaceMoveToFolder": "Move to Folder",
+  "spaceMoveToFolder": "Move to folder",
   "spaceUnfiled": "Unfiled",
   "spaceGroupEarlier": "Earlier",
-  "spaceGroupLast7Days": "Last 7 Days",
-  "spaceGroupLast30Days": "Last 30 Days",
-  "spaceUnknownBook": "Unknown Book",
+  "spaceGroupLast7Days": "Last 7 days",
+  "spaceGroupLast30Days": "Last 30 days",
+  "spaceUnknownBook": "Unknown book",
   "spaceNoBookmarks": "No bookmarks here.",
   "spaceFilterAll": "All",
-  "spaceByDate": "By Date",
-  "spaceByBook": "By Book",
+  "spaceByDate": "By date",
+  "spaceByBook": "By book",
   "spaceYourNotes": "Your notes.",
   "spaceNoNotesTapPlus": "No notes yet.\nTap + to create one.",
   "spaceMore": "More",
   "spaceNote": "Note",
   "spaceCopyText": "Copy text",
-  "spaceDeleteNoteTitle": "Delete note?",
-  "spaceDeleteNoteBody": "\"{title}\" will be removed permanently.",
-  "@spaceDeleteNoteBody": {
-    "placeholders": {
-      "title": {
-        "type": "String"
-      }
-    }
-  },
   "spaceUntitled": "Untitled",
   "spaceBookmarkedVerse": "Bookmarked verse",
   "spaceHighlightedVerse": "Highlighted verse",
@@ -1127,12 +1099,12 @@
   "spaceAddNote": "Add note",
   "spaceCopyVerse": "Copy verse",
   "spaceShareVerse": "Share verse",
-  "spaceChangeColour": "Change colour",
+  "spaceChangeColour": "Change color",
   "spaceMoveToFolderAction": "Move to folder",
   "spaceRemoveBookmark": "Remove bookmark",
   "spaceRemoveHighlight": "Remove highlight",
-  "spaceHighlightColour": "Highlight colour",
-  "spaceColourN": "Colour {index}",
+  "spaceHighlightColour": "Highlight color",
+  "spaceColourN": "Color {index}",
   "@spaceColourN": {
     "placeholders": {
       "index": {
@@ -1140,13 +1112,13 @@
       }
     }
   },
-  "notesMyNotes": "My Notes",
+  "notesMyNotes": "My notes",
   "notesEmptyTitle": "No notes yet",
   "notesEmptyBody": "Tap the + button to add your first note.",
   "notesVerseInserted": "Verse inserted",
-  "notesAddCommentary": "Add Commentary",
-  "notesChapterTitlePlaceholder": "Chapter Title",
-  "notesEditNote": "Edit Note",
+  "notesAddCommentary": "Add commentary",
+  "notesChapterTitlePlaceholder": "Chapter title",
+  "notesEditNote": "Edit note",
   "notesNewNoteOn": "New Note on {reference}",
   "@notesNewNoteOn": {
     "placeholders": {
@@ -1155,23 +1127,23 @@
       }
     }
   },
-  "notesNewNote": "New Note",
-  "notesTitleHint": "Note Title",
+  "notesNewNote": "New note",
+  "notesTitleHint": "Note title",
   "notesContentHint": "Start typing... (type / for commands)",
   "notesInsertVerse": "Insert verse",
   "notesInsertDate": "Insert date",
   "notesInsertChapterTitle": "Insert chapter title",
   "notesSaved": "Note saved!",
-  "notesSaveChanges": "Save Changes",
-  "notesSaveNote": "Save Note",
+  "notesSaveChanges": "Save changes",
+  "notesSaveNote": "Save note",
   "notesDeleted": "Note deleted",
-  "notesDeleteNote": "Delete Note",
-  "notesNewJournalEntry": "New Journal Entry",
+  "notesDeleteNote": "Delete note",
+  "notesNewJournalEntry": "New journal entry",
   "notesJournalHint": "How are you feeling today? Pour your heart out...",
-  "notesSaveAndAnalyze": "Save & Analyze",
+  "notesSaveAndAnalyze": "Save & analyze",
   "notesNoJournalEntries": "No journal entries yet.",
-  "notesWriteEntry": "Write Entry",
-  "notesAiReflection": "AI Reflection",
+  "notesWriteEntry": "Write entry",
+  "notesAiReflection": "AI reflection",
   "notesDetectedEmotion": "Detected Emotion: {emotion}",
   "@notesDetectedEmotion": {
     "placeholders": {
@@ -1198,12 +1170,12 @@
   "accountRestoreSubtitle": "Import from a backup file",
   "accountSignInGoogle": "Sign in with Google",
   "accountSignInApple": "Sign in with Apple",
-  "accountSignOut": "Sign Out",
+  "accountSignOut": "Sign out",
   "accountResetApp": "Reset app",
   "accountResetAppSubtitle": "Erase all on-device data",
-  "accountSignIn": "Sign In",
-  "accountSignedIn": "Signed In",
-  "accountDeleteAccount": "Delete Account",
+  "accountSignIn": "Sign in",
+  "accountSignedIn": "Signed in",
+  "accountDeleteAccount": "Delete account",
   "accountDeleteAccountTitle": "Delete Account?",
   "accountDeleteAccountBody": "This is permanent and irreversible.\n\nThe following will be completely removed:\n• Your sign-in account\n• Its cloud data in The Blessed Bible and Blessed Arcade (they share the account)\n• All on-device study data (bookmarks, highlights, history)",
   "accountDeleted": "Account deleted successfully.",
@@ -1262,7 +1234,7 @@
       }
     }
   },
-  "accountRestoreTitle": "Restore from Backup",
+  "accountRestoreTitle": "Restore from backup",
   "accountRestoreHint": "Paste your backup JSON here...",
   "accountRestoreAction": "Restore",
   "accountResetTitle": "Reset app?",
@@ -1340,14 +1312,6 @@
       }
     }
   },
-  "spaceCouldNotFinish": "Could not finish: {error}",
-  "@spaceCouldNotFinish": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "spaceFreed": "{message} · freed {size}",
   "@spaceFreed": {
     "placeholders": {
@@ -1380,19 +1344,12 @@
   "stateErrorTitle": "Something went wrong",
   "stateErrorBody": "Please try again in a moment.",
   "commonUndo": "Undo",
-  "studyCouldNotOpenScreen": "Could not open that screen. {error}",
-  "@studyCouldNotOpenScreen": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
+  "spaceHighlightsIntro": "Verses you've marked in color.",
   "studyCardSize": "Card size",
   "studyPosition": "Position",
   "studySizeLarge": "Large",
   "studySizeLargeHint": "Full width, same size as everything",
-  "studySizeExtraLarge": "Extra Large",
+  "studySizeExtraLarge": "Extra large",
   "studySizeExtraLargeHint": "Full width, roomier content",
   "studySizeHalf": "Half",
   "studySizeHalfHint": "Compact, two per row",
@@ -1403,7 +1360,7 @@
   "studyCommentaryEyebrow": "Commentary",
   "studyCommentaryTitle": "Verse-by-verse insight",
   "studyCommentarySnippet": "Historicist commentary with chapter + verse filters.",
-  "studyCommentaryCta": "Open Commentary",
+  "studyCommentaryCta": "Open commentary",
   "studyDictionaryEyebrow": "Dictionary",
   "studyDictionaryTitle": "Words defined",
   "studyDictionarySnippet": "Easton & Smith, offline, with saved words.",
@@ -1487,7 +1444,7 @@
   "studyPassageLoadError": "Could not load passage data.",
   "studyCompletedCheck": "✓ Completed",
   "studyMarkAsRead": "Mark as Read",
-  "studyNextPassage": "Next Passage",
+  "studyNextPassage": "Next passage",
   "studyFullChapter": "Full chapter",
   "studyPassageOfTotal": "Passage {current} of {total}",
   "@studyPassageOfTotal": {
@@ -1510,7 +1467,7 @@
   },
   "studyHighlight": "Highlight",
   "studyBookmark": "Bookmark",
-  "studyAddNote": "Add Note",
+  "studyAddNote": "Add note",
   "studyChaptersWithContent": "{count, plural, =1{1 chapter with content} other{{count} chapters with content}}",
   "@studyChaptersWithContent": {
     "placeholders": {
@@ -1519,7 +1476,7 @@
       }
     }
   },
-  "studyCommentaryLibrary": "Commentary Library",
+  "studyCommentaryLibrary": "Commentary library",
   "studyCommentaryLoadError": "Could not load commentary.",
   "studyNoCommentaryYet": "No commentary available yet.",
   "studyNoBooksMatch": "No books match \"{query}\".",
@@ -1568,14 +1525,6 @@
       }
     }
   },
-  "studyEntriesLoadError": "Could not load entries.\n{error}",
-  "@studyEntriesLoadError": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "studyNoEntriesMatch": "No entries match these filters.\nTry All sources, or browse the library.",
   "studyVerseN": "Verse {verse}",
   "@studyVerseN": {
@@ -1588,15 +1537,7 @@
   "studyChapter": "Chapter",
   "studyCategoryCommentary": "Commentary",
   "studyCategoryDevotional": "Devotional",
-  "studyCategoryStudyNote": "Study Note",
-  "studyCommentaryLoadErrorDetail": "Could not load commentary.\n{error}",
-  "@studyCommentaryLoadErrorDetail": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
+  "studyCategoryStudyNote": "Study note",
   "studyNoContentForFilters": "No content found for these filters.",
   "studyVerseLabel": "Verse {verse}",
   "@studyVerseLabel": {
@@ -1606,21 +1547,21 @@
       }
     }
   },
-  "studyChapterView": "Chapter View",
+  "studyChapterView": "Chapter view",
   "studyFilterAll": "All",
   "studyFilterDevotionals": "Devotionals",
-  "studyFilterAllContexts": "All Contexts",
-  "studyFilterChapterLevel": "Chapter Level",
-  "studyFilterVerseLevel": "Verse Level",
-  "studyRemoveBookmark": "Remove Bookmark",
-  "studyBookmarkCommentary": "Bookmark Commentary",
+  "studyFilterAllContexts": "All contexts",
+  "studyFilterChapterLevel": "Chapter level",
+  "studyFilterVerseLevel": "Verse level",
+  "studyRemoveBookmark": "Remove bookmark",
+  "studyBookmarkCommentary": "Bookmark commentary",
   "studyExpandFullScreen": "Expand to full screen",
   "studyTapToReadInContext": "Tap to read in context",
   "studyOnThisChapter": "On this chapter",
   "studyOnThisBook": "On this book",
   "studyNoCommentaryTitle": "No commentary yet",
   "studyNoCommentaryBody": "We couldn't find specific commentary for this passage. Try exploring the chapter or book-level commentary below.",
-  "storiesTitle": "Bible Stories",
+  "storiesTitle": "Bible stories",
   "storiesFilters": "Filters",
   "storiesSubtitle": "500 illustrated moments from Genesis to Revelation",
   "storiesSearchHint": "Search title, book, or reference…",
@@ -1641,14 +1582,6 @@
   },
   "storiesFavorites": "Favorites",
   "storiesUnread": "Unread",
-  "storiesLoadError": "Could not load stories:\n{error}",
-  "@storiesLoadError": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "storiesBooks": "Books",
   "storiesSearchBooks": "Search books…",
   "storiesAllBooks": "All books",
@@ -1685,14 +1618,6 @@
   "storiesNext": "Next story",
   "studyDictionarySearchHint": "Search 3,400+ words…",
   "studyDictionarySavedFilter": "★ Saved",
-  "studyDictionaryUnavailable": "Dictionary unavailable.\n{error}",
-  "@studyDictionaryUnavailable": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "studyNoHeadwords": "No headwords found.",
   "studyDictionaryNoMatches": "No matches. Try “grace”, “atonement” or “wilderness”.",
   "studyResultCount": "{count, plural, =1{1 result} other{{count} results}}",
@@ -1707,14 +1632,6 @@
   "studyRemoveSavedWord": "Remove saved word",
   "studySaveWord": "Save word",
   "studyNoDefinition": "No definition found.",
-  "studyFailedToLoad": "Failed to load: {error}",
-  "@studyFailedToLoad": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "studyStrongsShareText": "{id} - {lemma}\n\nTransliteration: {transliteration}\nPronunciation: {pronunciation}\n\nDefinition:\n{definition}",
   "@studyStrongsShareText": {
     "placeholders": {
@@ -1786,7 +1703,7 @@
       }
     }
   },
-  "errorTitle": "Something Went Wrong",
+  "errorTitle": "Something went wrong",
   "errorBody": "An unexpected issue occurred. Tap below to return to the home screen.",
   "errorBackHome": "Back to Home",
   "studyWeekN": "Week {week}",
@@ -1797,7 +1714,7 @@
       }
     }
   },
-  "privacyTitle": "Privacy Policy",
+  "privacyTitle": "Privacy policy",
   "privacyLoadError": "Could not load the privacy policy.",
   "privacyEffectiveDate": "Effective Date: {date}",
   "@privacyEffectiveDate": {
@@ -1811,22 +1728,22 @@
   "privacyViewOnline": "View online",
   "notifDailyTitle": "Time to Read",
   "notifDailyBody": "Take a moment to read and reflect today.",
-  "notifDailyChannel": "Daily Reminders",
+  "notifDailyChannel": "Daily reminders",
   "notifDailyChannelDesc": "Reminders for daily reading",
-  "notifPrayerTitle": "Time for Prayer",
+  "notifPrayerTitle": "Time for prayer",
   "notifPrayerBody": "Pause for a moment of reflection and prayer.",
-  "notifPrayerChannel": "Prayer Reminders",
+  "notifPrayerChannel": "Prayer reminders",
   "notifPrayerChannelDesc": "Daily prayer reminders",
-  "notifWeeklyTitle": "Weekly Study Time",
+  "notifWeeklyTitle": "Weekly study time",
   "notifWeeklyBody": "It's your scheduled time for study and reflection.",
-  "notifWeeklyChannel": "Weekly Reminders",
+  "notifWeeklyChannel": "Weekly reminders",
   "notifWeeklyChannelDesc": "Custom weekly study reminders",
-  "notifSabbathTitle": "The Sabbath is Approaching",
+  "notifSabbathTitle": "The Sabbath is approaching",
   "notifSabbathBody": "Welcome the day of rest.",
-  "notifSabbathChannel": "Sabbath Reminders",
+  "notifSabbathChannel": "Sabbath reminders",
   "notifSabbathChannelDesc": "Weekly sunset reminders for Sabbath",
   "notifPlanBody": "Take a moment to read your daily passage.",
-  "notifPlanChannel": "Reading Plan",
+  "notifPlanChannel": "Reading plan",
   "notifPlanChannelDesc": "Reading plan reminders",
   "widgetStreakActive": "Streak active!",
   "widgetStreakInactive": "Read today to keep your streak",
@@ -1859,7 +1776,7 @@
       }
     }
   },
-  "backupConfirmTitle": "Confirm Restore",
+  "backupConfirmTitle": "Confirm restore",
   "backupConfirmBody": "This will overwrite all existing notes, highlights, bookmarks, and settings. Are you sure?",
   "backupSkippedValues": "{count, plural, =1{1 value skipped} other{{count} values skipped}}",
   "@backupSkippedValues": {
@@ -1982,7 +1899,7 @@
   "creditsScripture": "Scripture",
   "creditsCommentary": "Commentary",
   "creditsStudyTools": "Study tools",
-  "creditsBibleStories": "Bible Stories",
+  "creditsBibleStories": "Bible stories",
   "creditsFonts": "Fonts",
   "creditsCommentaryPerspective": "The commentary comes from 19th- and 20th-century writers in the Seventh-day Adventist tradition and reads Bible prophecy from the historicist perspective. It is offered as a study aid alongside Scripture, not as part of it.",
   "creditsPublicDomain": "Public domain.",
@@ -2026,7 +1943,7 @@
   "miscColorBlue": "Blue",
   "miscColorPink": "Pink",
   "miscColorRed": "Red",
-  "miscSearchBibleVerse": "Bible Verse",
+  "miscSearchBibleVerse": "Bible verse",
   "miscSearchCommentary": "Commentary",
   "miscSearchCommentaryBy": "{author} Commentary",
   "@miscSearchCommentaryBy": {
@@ -2044,7 +1961,7 @@
       }
     }
   },
-  "miscSearchJumpTo": "Jump To",
+  "miscSearchJumpTo": "Jump to",
   "miscSearchGoToChapter": "Go to {book} chapter {chapter}",
   "@miscSearchGoToChapter": {
     "placeholders": {

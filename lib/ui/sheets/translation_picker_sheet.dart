@@ -8,9 +8,12 @@ import '../../state/translation_provider.dart';
 import '../../state/read_settings_provider.dart';
 import '../../data/models/translation_model.dart';
 import '../../services/bible_database_service.dart';
+import '../../services/firebase_setup.dart';
 import '../../services/translation_downloader.dart';
 import '../../services/translation_pack_store.dart';
 import '../widgets/animated_segmented_tile.dart';
+import '../widgets/item_context_sheet.dart' show confirmDestructive;
+import '../widgets/state_views.dart';
 import '../widgets/textured_glass_container.dart';
 
 class TranslationPickerSheet extends ConsumerStatefulWidget {
@@ -175,13 +178,13 @@ class _TranslationPickerSheetState
                       activeTranslationId,
                       otherTranslationId,
                       installed),
-                  loading: () => const Center(
-                      child: Padding(
-                          padding: EdgeInsets.all(32),
-                          child: CircularProgressIndicator())),
-                  error: (e, st) => Center(
-                      child:
-                          Text(context.l10n.readTranslationsLoadError('$e'))),
+                  loading: () => const Padding(
+                      padding: EdgeInsets.all(32), child: LoadingView()),
+                  error: (e, st) => ErrorState(
+                      error: e,
+                      message: context.l10n.readTranslationsLoadErrorPlain,
+                      onRetry: () =>
+                          ref.invalidate(availableTranslationsProvider)),
                 ),
               ),
             ),
@@ -237,6 +240,12 @@ class _TranslationPickerSheetState
   ) async {
     final id = item.translationId;
     if (TranslationPackStore.isCoreId(id)) return;
+    final ok = await confirmDestructive(
+      context,
+      title: context.l10n.spaceDeletePackTitle(item.translationName),
+      message: context.l10n.readDeleteTranslationBody,
+    );
+    if (!ok || !context.mounted) return;
     if (ref.read(activeTranslationProvider) == id) {
       await ref.read(activeTranslationProvider.notifier).setTranslation('kjv');
     }
@@ -258,10 +267,11 @@ class _TranslationPickerSheetState
         );
       }
     } catch (e) {
+      reportNonFatal('delete translation', code: e.runtimeType.toString());
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(context.l10n.readDeleteFailed('$e')),
+            content: Text(context.l10n.readDeleteFailedPlain),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -556,8 +566,13 @@ class _DownloadableTileState extends ConsumerState<_DownloadableTile> {
         final message = offline
             ? context.l10n.readNoInternet
             : (_isRestore
-                ? context.l10n.readRestoreFailedDetail('$e')
-                : context.l10n.readDownloadFailedDetail('$e'));
+                ? context.l10n.readRestoreFailed
+                : context.l10n.readDownloadFailed);
+        if (!offline) {
+          reportNonFatal(
+              _isRestore ? 'restore translation' : 'download translation',
+              code: e.runtimeType.toString());
+        }
         setState(() {
           _isDownloading = false;
           _error = _isRestore

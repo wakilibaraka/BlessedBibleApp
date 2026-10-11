@@ -9,6 +9,7 @@ import '../../theme/app_colors.dart';
 import 'bible_story_reader_screen.dart';
 import '../../l10n/l10n.dart';
 import '../../theme/design_tokens.dart';
+import '../widgets/state_views.dart';
 
 /// Entry point: "Bible Stories" — an illustrated journey through Scripture.
 class BibleStoriesScreen extends ConsumerStatefulWidget {
@@ -208,24 +209,22 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
             ),
           ),
           totalAsync.when(
-            loading: () => const SliverFillRemaining(
-              child: Center(child: CupertinoActivityIndicator()),
-            ),
+            loading: () => const SliverFillRemaining(child: LoadingView()),
             error: (e, _) => SliverFillRemaining(
-              child: Center(
-                  child: Text(context.l10n.storiesLoadError('$e'),
-                      textAlign: TextAlign.center)),
+              child: ErrorState(
+                error: e,
+                message: context.l10n.storiesLoadFailed,
+                onRetry: () => ref.invalidate(devotionalStoriesProvider),
+              ),
             ),
             data: (_) => stories.isEmpty
                 ? SliverFillRemaining(
-                    child: Center(
-                      child: _EmptyStories(
-                        onClearFilters: () =>
-                            ref.read(devotionalFilterProvider.notifier).reset(),
-                        onShowRead: () => ref
-                            .read(devotionalFilterProvider.notifier)
-                            .toggleUnreadOnly(),
-                      ),
+                    child: _EmptyStories(
+                      onClearFilters: () =>
+                          ref.read(devotionalFilterProvider.notifier).reset(),
+                      onShowRead: () => ref
+                          .read(devotionalFilterProvider.notifier)
+                          .toggleUnreadOnly(),
                     ),
                   )
                 : _StoryGrid(stories: stories),
@@ -484,7 +483,6 @@ class _EmptyStories extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     final filter = ref.watch(devotionalFilterProvider);
     final favorites = ref.watch(devotionalFavoritesProvider);
 
@@ -508,48 +506,20 @@ class _EmptyStories extends ConsumerWidget {
       action = onClearFilters;
     }
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            filter.favoritesOnly && favorites.isEmpty
-                ? Icons.favorite_outline_rounded
-                : Icons.search_off_rounded,
-            size: 40,
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          if (filter.favoritesOnly && favorites.isEmpty) ...[
-            const SizedBox(height: 4),
-            Text(
-              l10n.storiesFavoritesHint,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-              ),
-            ),
-          ],
-          if (actionLabel != null) ...[
-            const SizedBox(height: 16),
-            FilledButton.tonal(
-              onPressed: () {
-                HapticFeedback.selectionClick();
-                action!();
-              },
-              child: Text(actionLabel),
-            ),
-          ],
-        ],
-      ),
+    final noFavorites = filter.favoritesOnly && favorites.isEmpty;
+    return EmptyState(
+      icon: noFavorites
+          ? Icons.favorite_outline_rounded
+          : Icons.search_off_rounded,
+      title: title,
+      message: noFavorites ? l10n.storiesFavoritesHint : null,
+      actionLabel: actionLabel,
+      onAction: action == null
+          ? null
+          : () {
+              HapticFeedback.selectionClick();
+              action!();
+            },
     );
   }
 }

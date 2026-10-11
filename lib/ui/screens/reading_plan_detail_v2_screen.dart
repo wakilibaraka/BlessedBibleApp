@@ -11,6 +11,7 @@ import '../../state/reading_plan_provider.dart'
 import '../../state/theme_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../widgets/shared_app_bar.dart';
+import '../widgets/state_views.dart';
 import '../widgets/study_v2_widgets.dart';
 import 'journey_map_screen.dart';
 import '../../data/curated_plans.dart';
@@ -152,7 +153,7 @@ class _ReadingPlanDetailV2ScreenState
         page: Scaffold(
           backgroundColor: Colors.transparent,
           appBar: SharedAppBar(title: Text(context.l10n.plansPlan)),
-          body: const Center(child: CircularProgressIndicator()),
+          body: const LoadingView(),
         ),
       );
     }
@@ -164,25 +165,11 @@ class _ReadingPlanDetailV2ScreenState
         page: Scaffold(
           backgroundColor: Colors.transparent,
           appBar: SharedAppBar(title: Text(context.l10n.plansPlan)),
-          body: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(32),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    loadError,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  FilledButton.tonal(
-                    onPressed: () =>
-                        ref.invalidate(readingPlanProvider(widget.planId)),
-                    child: Text(context.l10n.commonRetry),
-                  ),
-                ],
-              ),
-            ),
+          // The provider's message carries exception text, so show a
+          // plain line instead.
+          body: ErrorState(
+            message: context.l10n.plansDetailLoadFailed,
+            onRetry: () => ref.invalidate(readingPlanProvider(widget.planId)),
           ),
         ),
       );
@@ -928,7 +915,10 @@ class _ReadingPlanDetailV2ScreenState
                         ),
                         TextButton(
                           onPressed: () => Navigator.of(d).pop(true),
-                          child: Text(context.l10n.plansRestart),
+                          child: Text(
+                            context.l10n.plansRestart,
+                            style: TextStyle(color: d.palette.danger),
+                          ),
                         ),
                       ],
                     ),

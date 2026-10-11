@@ -102,6 +102,122 @@ class AppLocalizationsTl extends AppLocalizations {
       'Ang wika ng mga menu at button. Hiwalay na pinipili ang salin ng Bibliya.';
 
   @override
+  String get homeWotdUnavailableNow =>
+      'Hindi available ang salita ng araw sa ngayon.';
+
+  @override
+  String get spaceCouldNotFinishPlain =>
+      'Hindi ito natapos. Pakisubukang muli.';
+
+  @override
+  String get readTranslationsLoadErrorPlain => 'Hindi ma-load ang mga salin.';
+
+  @override
+  String get readDeleteTranslationBody =>
+      'Makukuha mo itong muli anumang oras mula sa listahan ng mga salin.';
+
+  @override
+  String get readDeleteFailedPlain => 'Hindi ito mabura. Pakisubukang muli.';
+
+  @override
+  String get readCrossRefsLoadErrorPlain =>
+      'Hindi ma-load ang mga kaugnay na talata.';
+
+  @override
+  String get readVerseLoadErrorPlain => 'Hindi ma-load ang talatang ito.';
+
+  @override
+  String get searchClearRecentTitle =>
+      'Burahin ang mga kamakailang paghahanap?';
+
+  @override
+  String get searchClearRecentBody =>
+      'Aalisin sa device na ito ang iyong mga kamakailang paghahanap.';
+
+  @override
+  String get searchClearRecentConfirm => 'Burahin';
+
+  @override
+  String readHighlightsRemoved(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Inalis ang $count highlight',
+      one: 'Inalis ang highlight',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String readVersesHighlighted(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Na-highlight ang $count talata',
+      one: 'Na-highlight ang talata',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String readBookmarksRemoved(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Inalis ang $count bookmark',
+      one: 'Inalis ang bookmark',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String readVersesBookmarked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Na-bookmark ang $count talata',
+      one: 'Na-bookmark ang talata',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get storiesLoadFailed => 'Hindi ma-load ang mga kuwento.';
+
+  @override
+  String get studyEntriesLoadFailed => 'Hindi ma-load ang mga entry.';
+
+  @override
+  String get studyDictionaryLoadFailed => 'Hindi ma-load ang diksiyonaryo.';
+
+  @override
+  String get studyEntryLoadFailed => 'Hindi ma-load ang entry na ito.';
+
+  @override
+  String get studyOpenScreenFailed => 'Hindi mabuksan ang screen na iyon.';
+
+  @override
+  String get studyWordUnsaved => 'Inalis sa mga naka-save na salita';
+
+  @override
+  String get plansBuilderSaveFailed => 'Hindi ma-save ang plano.';
+
+  @override
+  String get plansBuilderLoadFailed => 'Hindi maihanda ang tagagawa ng plano.';
+
+  @override
+  String get plansDetailLoadFailed => 'Hindi ma-load ang planong ito.';
+
+  @override
+  String get plansTrackRemoved => 'Inalis ang ruta';
+
+  @override
+  String get yourSpaceBookmarkRemoved => 'Inalis ang bookmark';
+
+  @override
+  String get yourSpaceHighlightRemoved => 'Inalis ang highlight';
+
+  @override
   String get onboardingTagline => 'Ang Kasulatan, walang abala.';
 
   @override
@@ -231,9 +347,6 @@ class AppLocalizationsTl extends AppLocalizations {
   String plansDayCompleteCelebration(int day) {
     return 'Plano sa Pagbasa\nTapos na ang Araw $day!';
   }
-
-  @override
-  String get plansChangeWeek => 'Palitan ang linggo';
 
   @override
   String plansCalendarDayComplete(String label) {
@@ -437,17 +550,7 @@ class AppLocalizationsTl extends AppLocalizations {
   }
 
   @override
-  String plansCouldNotSave(String error) {
-    return 'Hindi ma-save ang plano: $error';
-  }
-
-  @override
   String get plansBuilderTitle => 'Bumuo ng Plano';
-
-  @override
-  String plansError(String error) {
-    return 'Error: $error';
-  }
 
   @override
   String get plansPlanName => 'Pangalan ng plano';
@@ -981,11 +1084,6 @@ class AppLocalizationsTl extends AppLocalizations {
       'Magiging available ang cross-reference\npagkatapos ng susunod na update.';
 
   @override
-  String readCrossRefsLoadError(String error) {
-    return 'Hindi ma-load ang cross-reference.\n$error';
-  }
-
-  @override
   String get readVerseUnavailable => 'Hindi available ang talata';
 
   @override
@@ -1002,11 +1100,6 @@ class AppLocalizationsTl extends AppLocalizations {
 
   @override
   String get readBookNotFound => 'Hindi nakita ang tinukoy na aklat.';
-
-  @override
-  String readVerseLoadError(String error) {
-    return 'Error sa pag-load ng talata: $error';
-  }
 
   @override
   String get readTestament => 'Tipan';
@@ -1084,18 +1177,8 @@ class AppLocalizationsTl extends AppLocalizations {
   String get readSecondary => 'Pangalawa';
 
   @override
-  String readTranslationsLoadError(String error) {
-    return 'Error sa pag-load ng mga salin: $error';
-  }
-
-  @override
   String readTranslationDeleted(String name) {
     return 'Nabura ang $name.';
-  }
-
-  @override
-  String readDeleteFailed(String error) {
-    return 'Hindi mabura: $error';
   }
 
   @override
@@ -1120,16 +1203,6 @@ class AppLocalizationsTl extends AppLocalizations {
 
   @override
   String get readDownloadFailed => 'Nabigo ang pag-download';
-
-  @override
-  String readRestoreFailedDetail(String error) {
-    return 'Nabigo ang pag-restore ($error).';
-  }
-
-  @override
-  String readDownloadFailedDetail(String error) {
-    return 'Nabigo ang pag-download ($error).';
-  }
 
   @override
   String get readRestoreOffline => 'i-restore offline';
@@ -1158,11 +1231,6 @@ class AppLocalizationsTl extends AppLocalizations {
   @override
   String get homeWotdEmpty =>
       'Wala pang salitang napili ngayon — subukan mamaya.';
-
-  @override
-  String homeWotdUnavailable(String error) {
-    return 'Hindi available ang salita ng araw ($error).';
-  }
 
   @override
   String get navHome => 'Home';
@@ -2107,14 +2175,6 @@ class AppLocalizationsTl extends AppLocalizations {
   String get spaceCopyText => 'Kopyahin ang teksto';
 
   @override
-  String get spaceDeleteNoteTitle => 'Burahin ang tala?';
-
-  @override
-  String spaceDeleteNoteBody(String title) {
-    return 'Permanenteng aalisin ang \"$title\".';
-  }
-
-  @override
   String get spaceUntitled => 'Walang pamagat';
 
   @override
@@ -2500,11 +2560,6 @@ class AppLocalizationsTl extends AppLocalizations {
   }
 
   @override
-  String spaceCouldNotFinish(String error) {
-    return 'Hindi natapos: $error';
-  }
-
-  @override
   String spaceFreed(String message, String size) {
     return '$message · napalaya ang $size';
   }
@@ -2556,9 +2611,7 @@ class AppLocalizationsTl extends AppLocalizations {
   String get commonUndo => 'I-undo';
 
   @override
-  String studyCouldNotOpenScreen(String error) {
-    return 'Hindi mabuksan ang screen na iyon. $error';
-  }
+  String get spaceHighlightsIntro => 'Mga talatang minarkahan mo ng kulay.';
 
   @override
   String get studyCardSize => 'Laki ng card';
@@ -2842,11 +2895,6 @@ class AppLocalizationsTl extends AppLocalizations {
   }
 
   @override
-  String studyEntriesLoadError(String error) {
-    return 'Hindi ma-load ang mga entry.\n$error';
-  }
-
-  @override
   String get studyNoEntriesMatch =>
       'Walang entry na tugma sa mga filter.\nSubukan ang Lahat ng sanggunian, o tingnan ang aklatan.';
 
@@ -2866,11 +2914,6 @@ class AppLocalizationsTl extends AppLocalizations {
 
   @override
   String get studyCategoryStudyNote => 'Tala sa pag-aaral';
-
-  @override
-  String studyCommentaryLoadErrorDetail(String error) {
-    return 'Hindi ma-load ang komentaryo.\n$error';
-  }
 
   @override
   String get studyNoContentForFilters =>
@@ -2961,11 +3004,6 @@ class AppLocalizationsTl extends AppLocalizations {
   String get storiesUnread => 'Hindi pa nabasa';
 
   @override
-  String storiesLoadError(String error) {
-    return 'Hindi ma-load ang mga kuwento:\n$error';
-  }
-
-  @override
   String get storiesBooks => 'Mga aklat';
 
   @override
@@ -3038,11 +3076,6 @@ class AppLocalizationsTl extends AppLocalizations {
   String get studyDictionarySavedFilter => '★ Naka-save';
 
   @override
-  String studyDictionaryUnavailable(String error) {
-    return 'Hindi available ang diksiyunaryo.\n$error';
-  }
-
-  @override
   String get studyNoHeadwords => 'Walang nahanap na salita.';
 
   @override
@@ -3071,11 +3104,6 @@ class AppLocalizationsTl extends AppLocalizations {
 
   @override
   String get studyNoDefinition => 'Walang nahanap na kahulugan.';
-
-  @override
-  String studyFailedToLoad(String error) {
-    return 'Hindi na-load: $error';
-  }
 
   @override
   String studyStrongsShareText(String id, String lemma, String transliteration,

@@ -19,6 +19,7 @@ import '../../state/read_location_provider.dart';
 import 'verse_link_text.dart';
 import '../../l10n/l10n.dart';
 import '../../theme/design_tokens.dart';
+import 'state_views.dart';
 
 class CommentaryView extends ConsumerStatefulWidget {
   final String book;
@@ -414,7 +415,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
             const SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.all(32.0),
-                child: Center(child: CircularProgressIndicator()),
+                child: LoadingView(),
               ),
             )
           else if (!hasContent)

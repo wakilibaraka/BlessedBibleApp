@@ -11,6 +11,7 @@ import '../../state/typography_provider.dart';
 import 'dart:ui';
 import '../../l10n/l10n.dart';
 import '../../theme/design_tokens.dart';
+import '../widgets/state_views.dart';
 
 class CommentaryHubScreen extends ConsumerStatefulWidget {
   final String book;
@@ -105,24 +106,14 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
             ),
           ),
           asyncEntries.when(
-            loading: () => const SliverFillRemaining(
-                child: Center(child: CircularProgressIndicator())),
+            loading: () => const SliverFillRemaining(child: LoadingView()),
             error: (e, st) => SliverFillRemaining(
-                child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(context.l10n.studyCommentaryLoadErrorDetail('$e'),
-                      textAlign: TextAlign.center),
-                  const SizedBox(height: 12),
-                  TextButton.icon(
-                    onPressed: () => ref.invalidate(commentaryProvider),
-                    icon: const Icon(Icons.refresh_rounded),
-                    label: Text(context.l10n.commonRetry),
-                  ),
-                ],
+              child: ErrorState(
+                error: e,
+                message: context.l10n.studyCommentaryLoadError,
+                onRetry: () => ref.invalidate(commentaryProvider),
               ),
-            )),
+            ),
             data: (entries) {
               // Filter data based on context and selected chips
               final filtered = entries.where((e) {

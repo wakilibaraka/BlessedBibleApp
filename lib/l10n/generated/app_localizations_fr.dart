@@ -102,6 +102,125 @@ class AppLocalizationsFr extends AppLocalizations {
       'La langue des menus et des boutons. Votre traduction de la Bible se choisit à part.';
 
   @override
+  String get homeWotdUnavailableNow =>
+      'Le mot du jour n\'est pas disponible pour le moment.';
+
+  @override
+  String get spaceCouldNotFinishPlain =>
+      'Impossible de terminer. Veuillez réessayer.';
+
+  @override
+  String get readTranslationsLoadErrorPlain =>
+      'Impossible de charger les traductions.';
+
+  @override
+  String get readDeleteTranslationBody =>
+      'Vous pourrez la récupérer à tout moment depuis la liste des traductions.';
+
+  @override
+  String get readDeleteFailedPlain =>
+      'Suppression impossible. Veuillez réessayer.';
+
+  @override
+  String get readCrossRefsLoadErrorPlain =>
+      'Impossible de charger les références croisées.';
+
+  @override
+  String get readVerseLoadErrorPlain => 'Impossible de charger ce verset.';
+
+  @override
+  String get searchClearRecentTitle => 'Effacer les recherches récentes ?';
+
+  @override
+  String get searchClearRecentBody =>
+      'Vos recherches récentes seront supprimées de cet appareil.';
+
+  @override
+  String get searchClearRecentConfirm => 'Effacer';
+
+  @override
+  String readHighlightsRemoved(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count surlignages supprimés',
+      one: 'Surlignage supprimé',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String readVersesHighlighted(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count versets surlignés',
+      one: 'Verset surligné',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String readBookmarksRemoved(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count signets supprimés',
+      one: 'Signet supprimé',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String readVersesBookmarked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count versets ajoutés aux signets',
+      one: 'Verset ajouté aux signets',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get storiesLoadFailed => 'Impossible de charger les histoires.';
+
+  @override
+  String get studyEntriesLoadFailed => 'Impossible de charger les entrées.';
+
+  @override
+  String get studyDictionaryLoadFailed =>
+      'Impossible de charger le dictionnaire.';
+
+  @override
+  String get studyEntryLoadFailed => 'Impossible de charger cette entrée.';
+
+  @override
+  String get studyOpenScreenFailed => 'Impossible d\'ouvrir cet écran.';
+
+  @override
+  String get studyWordUnsaved => 'Retiré des mots enregistrés';
+
+  @override
+  String get plansBuilderSaveFailed => 'Impossible d\'enregistrer le plan.';
+
+  @override
+  String get plansBuilderLoadFailed =>
+      'Impossible de préparer le créateur de plan.';
+
+  @override
+  String get plansDetailLoadFailed => 'Impossible de charger ce plan.';
+
+  @override
+  String get plansTrackRemoved => 'Parcours retiré';
+
+  @override
+  String get yourSpaceBookmarkRemoved => 'Signet supprimé';
+
+  @override
+  String get yourSpaceHighlightRemoved => 'Surlignage supprimé';
+
+  @override
   String get onboardingTagline => 'Les Écritures, sans distraction.';
 
   @override
@@ -230,9 +349,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String plansDayCompleteCelebration(int day) {
     return 'Plan de lecture\nJour $day terminé !';
   }
-
-  @override
-  String get plansChangeWeek => 'Changer de semaine';
 
   @override
   String plansCalendarDayComplete(String label) {
@@ -436,17 +552,7 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String plansCouldNotSave(String error) {
-    return 'Impossible d\'enregistrer le plan : $error';
-  }
-
-  @override
   String get plansBuilderTitle => 'Créateur de plan';
-
-  @override
-  String plansError(String error) {
-    return 'Erreur : $error';
-  }
 
   @override
   String get plansPlanName => 'Nom du plan';
@@ -977,11 +1083,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'Les références croisées seront disponibles\naprès la prochaine mise à jour.';
 
   @override
-  String readCrossRefsLoadError(String error) {
-    return 'Impossible de charger les références croisées.\n$error';
-  }
-
-  @override
   String get readVerseUnavailable => 'Verset indisponible';
 
   @override
@@ -998,11 +1099,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get readBookNotFound => 'Livre de la référence introuvable.';
-
-  @override
-  String readVerseLoadError(String error) {
-    return 'Erreur de chargement du verset : $error';
-  }
 
   @override
   String get readTestament => 'Testament';
@@ -1083,18 +1179,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get readSecondary => 'Secondaire';
 
   @override
-  String readTranslationsLoadError(String error) {
-    return 'Erreur de chargement des traductions : $error';
-  }
-
-  @override
   String readTranslationDeleted(String name) {
     return '$name supprimée.';
-  }
-
-  @override
-  String readDeleteFailed(String error) {
-    return 'Suppression impossible : $error';
   }
 
   @override
@@ -1123,16 +1209,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get readDownloadFailed => 'Échec du téléchargement';
 
   @override
-  String readRestoreFailedDetail(String error) {
-    return 'Échec de la restauration ($error).';
-  }
-
-  @override
-  String readDownloadFailedDetail(String error) {
-    return 'Échec du téléchargement ($error).';
-  }
-
-  @override
   String get readRestoreOffline => 'restauration hors ligne';
 
   @override
@@ -1159,11 +1235,6 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get homeWotdEmpty =>
       'Aucun mot choisi pour aujourd’hui — réessayez plus tard.';
-
-  @override
-  String homeWotdUnavailable(String error) {
-    return 'Mot du jour indisponible ($error).';
-  }
 
   @override
   String get navHome => 'Accueil';
@@ -2112,14 +2183,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get spaceCopyText => 'Copier le texte';
 
   @override
-  String get spaceDeleteNoteTitle => 'Supprimer la note ?';
-
-  @override
-  String spaceDeleteNoteBody(String title) {
-    return '« $title » sera supprimée définitivement.';
-  }
-
-  @override
   String get spaceUntitled => 'Sans titre';
 
   @override
@@ -2509,11 +2572,6 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String spaceCouldNotFinish(String error) {
-    return 'Échec : $error';
-  }
-
-  @override
   String spaceFreed(String message, String size) {
     return '$message · $size libérés';
   }
@@ -2565,9 +2623,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get commonUndo => 'Annuler';
 
   @override
-  String studyCouldNotOpenScreen(String error) {
-    return 'Impossible d\'ouvrir cet écran. $error';
-  }
+  String get spaceHighlightsIntro => 'Les versets que vous avez surlignés.';
 
   @override
   String get studyCardSize => 'Taille de la carte';
@@ -2860,11 +2916,6 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String studyEntriesLoadError(String error) {
-    return 'Impossible de charger les entrées.\n$error';
-  }
-
-  @override
   String get studyNoEntriesMatch =>
       'Aucune entrée ne correspond à ces filtres.\nEssayez Toutes les sources ou parcourez la bibliothèque.';
 
@@ -2884,11 +2935,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get studyCategoryStudyNote => 'Note d\'étude';
-
-  @override
-  String studyCommentaryLoadErrorDetail(String error) {
-    return 'Impossible de charger le commentaire.\n$error';
-  }
 
   @override
   String get studyNoContentForFilters => 'Aucun contenu pour ces filtres.';
@@ -2978,11 +3024,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get storiesUnread => 'Non lues';
 
   @override
-  String storiesLoadError(String error) {
-    return 'Impossible de charger les histoires :\n$error';
-  }
-
-  @override
   String get storiesBooks => 'Livres';
 
   @override
@@ -3055,11 +3096,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get studyDictionarySavedFilter => '★ Enregistrés';
 
   @override
-  String studyDictionaryUnavailable(String error) {
-    return 'Dictionnaire indisponible.\n$error';
-  }
-
-  @override
   String get studyNoHeadwords => 'Aucune entrée trouvée.';
 
   @override
@@ -3088,11 +3124,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get studyNoDefinition => 'Aucune définition trouvée.';
-
-  @override
-  String studyFailedToLoad(String error) {
-    return 'Échec du chargement : $error';
-  }
 
   @override
   String studyStrongsShareText(String id, String lemma, String transliteration,
