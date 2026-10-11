@@ -85,8 +85,15 @@ class EmptyState extends StatelessWidget {
             ],
             if (actionLabel != null && onAction != null) ...[
               const SizedBox(height: Space.xl),
-              FilledButton.tonal(
-                  onPressed: onAction, child: Text(actionLabel!)),
+              FilledButton(
+                // Accent + onAccent: not every theme sets the tonal colours.
+                style: FilledButton.styleFrom(
+                  backgroundColor: theme.colorScheme.primary,
+                  foregroundColor: context.palette.onAccent,
+                ),
+                onPressed: onAction,
+                child: Text(actionLabel!),
+              ),
             ],
           ],
         ),
