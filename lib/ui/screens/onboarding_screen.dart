@@ -6,11 +6,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/local_storage/preferences_service.dart';
 import '../../l10n/l10n.dart';
+import '../../state/auth_provider.dart';
 import '../../state/locale_provider.dart';
+import '../../state/reminders_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../state/translation_provider.dart';
 import '../../state/typography_provider.dart';
 import '../../theme/app_colors.dart';
+import '../widgets/account_menu.dart';
 import 'main_nav_screen.dart';
 
 // Onboarding keeps its own warm sepia look whatever theme is picked, so the
@@ -26,29 +29,39 @@ const Color _olive = Color(0xFF7D8C61);
 const Color _slate = Color(0xFF5E7A8C);
 const Color _cream = Color(0xFFF9F4E8);
 
-/// First-run flow: language, Bible, reading comfort, then a short tour.
+/// First-run flow: language, Bible, reading comfort, a daily reminder, a
+/// short tour, then optional sign-in.
 ///
 /// Every step is optional — "Skip" keeps sensible defaults (the device
 /// language and its matching Bible) so nobody is forced through setup.
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
+  /// Where an interrupted onboarding resumes.
+  static const String pageKey = 'onboarding_page';
+
   @override
   ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
-  static const int _pageCount = 4;
-  final PageController _pages = PageController();
-  int _page = 0;
+  static const int _pageCount = 6;
+
+  late final PageController _pages;
+  late int _page;
   late AppLanguage _language;
   bool _showParallel = true;
 
   @override
   void initState() {
     super.initState();
-    final saved = ref.read(appLocaleProvider);
-    _language = (saved == null ? null : appLanguageFor(saved.languageCode)) ??
+    final saved =
+        ref.read(preferencesProvider).prefs.getInt(OnboardingScreen.pageKey) ??
+            0;
+    _page = saved.clamp(0, _pageCount - 1);
+    _pages = PageController(initialPage: _page);
+    final locale = ref.read(appLocaleProvider);
+    _language = (locale == null ? null : appLanguageFor(locale.languageCode)) ??
         deviceLanguage();
   }
 
@@ -97,7 +110,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     // so the app opens the way the flow suggested. The interface language
     // keeps following the device unless one was tapped.
     if (_page < 2) await _applyBible();
-    ref.read(preferencesProvider).setOnboardingComplete(true);
+    final prefs = ref.read(preferencesProvider);
+    prefs.setOnboardingComplete(true);
+    await prefs.prefs.remove(OnboardingScreen.pageKey);
     if (!mounted) return;
     unawaited(Navigator.of(context).pushReplacement(
       PageRouteBuilder<void>(
@@ -158,6 +173,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     onPageChanged: (i) {
                       if (_page == 1 && i > 1) unawaited(_applyBible());
                       setState(() => _page = i);
+                      unawaited(ref
+                          .read(preferencesProvider)
+                          .prefs
+                          .setInt(OnboardingScreen.pageKey, i));
                     },
                     children: [
                       _LanguagePage(
@@ -168,7 +187,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         onParallel: (v) => setState(() => _showParallel = v),
                       ),
                       const _ComfortPage(),
+                      const _ReminderPage(),
                       const _FeaturesPage(),
+                      const _AccountPage(),
                     ],
                   ),
                 ),
@@ -596,6 +617,124 @@ class _ComfortPage extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ReminderPage extends ConsumerWidget {
+  const _ReminderPage();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final reminders = ref.watch(remindersProvider);
+    final notifier = ref.read(remindersProvider.notifier);
+    final time =
+        TimeOfDay(hour: reminders.dailyHour, minute: reminders.dailyMinute);
+    return _PageFrame(
+      title: l10n.onboardingReminderTitle,
+      body: l10n.onboardingReminderBody,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Material(
+            color: _cream.withValues(alpha: 0.6),
+            borderRadius: BorderRadius.circular(14),
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              children: [
+                SwitchListTile.adaptive(
+                  activeTrackColor: _terracotta,
+                  value: reminders.dailyEnabled,
+                  // Turning it on is what asks for notification permission,
+                  // so the request comes right after this explanation.
+                  onChanged: notifier.toggleDaily,
+                  secondary: const Icon(Icons.notifications_active_outlined,
+                      color: _terracotta),
+                  title: Text(l10n.onboardingReminderToggle,
+                      style: const TextStyle(fontSize: 16, color: _ink)),
+                ),
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 200),
+                  child: reminders.dailyEnabled
+                      ? ListTile(
+                          leading:
+                              const Icon(Icons.schedule_rounded, color: _muted),
+                          title: Text(l10n.onboardingReminderTime,
+                              style: const TextStyle(color: _ink)),
+                          trailing: Text(time.format(context),
+                              style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: _terracotta)),
+                          onTap: () async {
+                            final picked = await showTimePicker(
+                                context: context, initialTime: time);
+                            if (picked != null) {
+                              notifier.setDailyTime(picked.hour, picked.minute);
+                            }
+                          },
+                        )
+                      : const SizedBox(width: double.infinity),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(l10n.onboardingReminderPermission,
+              style: TextStyle(
+                  fontSize: 14, color: _muted.withValues(alpha: 0.65))),
+        ],
+      ),
+    );
+  }
+}
+
+class _AccountPage extends ConsumerWidget {
+  const _AccountPage();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final user = ref.watch(accountUserProvider).value;
+    final apple = ref.watch(appleSignInAvailableProvider);
+    final buttonStyle = OutlinedButton.styleFrom(
+      foregroundColor: _ink,
+      backgroundColor: _cream,
+      minimumSize: const Size.fromHeight(52),
+      side: BorderSide(color: _muted.withValues(alpha: 0.25)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+    );
+    return _PageFrame(
+      title: l10n.onboardingAccountTitle,
+      body: l10n.onboardingAccountBody,
+      child: user != null
+          ? _ChoiceTile(
+              title: l10n
+                  .onboardingSignedInAs(user.displayName ?? user.email ?? ''),
+              selected: true,
+              onTap: () {},
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                OutlinedButton.icon(
+                  style: buttonStyle,
+                  icon: const Icon(Icons.account_circle_outlined),
+                  label: Text(l10n.accountSignInGoogle),
+                  onPressed: () => runSignIn(context, ref, google: true),
+                ),
+                if (apple) ...[
+                  const SizedBox(height: 10),
+                  OutlinedButton.icon(
+                    style: buttonStyle,
+                    icon: const Icon(Icons.apple),
+                    label: Text(l10n.accountSignInApple),
+                    onPressed: () => runSignIn(context, ref, google: false),
+                  ),
+                ],
+              ],
+            ),
     );
   }
 }

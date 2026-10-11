@@ -425,25 +425,39 @@ Future<void> _signIn(
   WidgetRef ref, {
   required bool google,
 }) async {
+  if (await runSignIn(sheetContext, ref, google: google) &&
+      sheetContext.mounted) {
+    Navigator.of(sheetContext).pop();
+  }
+}
+
+/// Signs in, settles which data wins if this device held another account's
+/// data, and explains failures. Returns true when signed in.
+Future<bool> runSignIn(
+  BuildContext context,
+  WidgetRef ref, {
+  required bool google,
+}) async {
   final actions = ref.read(authActionsProvider);
   final result = google
       ? await actions.signInWithGoogle()
       : await actions.signInWithApple();
-  if (!sheetContext.mounted) return;
+  if (!context.mounted) return false;
   switch (result.status) {
     case SignInStatus.success:
       final sync = ref.read(syncControllerProvider.notifier);
       if (await sync.afterSignIn() == SyncPhase.needsAccountChoice &&
-          sheetContext.mounted) {
-        await _askAccountChoice(sheetContext, ref);
+          context.mounted) {
+        await _askAccountChoice(context, ref);
       }
-      if (sheetContext.mounted) Navigator.of(sheetContext).pop();
+      return true;
     case SignInStatus.failed:
       reportNonFatal('Sign-in failed: ${result.failure?.name}',
           code: result.code);
-      _showError(sheetContext, result.message);
+      _showError(context, result.message);
+      return false;
     case SignInStatus.cancelled:
-      break;
+      return false;
   }
 }
 
