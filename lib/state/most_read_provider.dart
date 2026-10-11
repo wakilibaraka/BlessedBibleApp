@@ -53,6 +53,7 @@ class MostReadItem {
         'bookName': bookName,
         'chapter': chapter,
         'verse': verse,
+        'visits': visits,
       },
     );
   }

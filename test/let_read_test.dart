@@ -1,8 +1,12 @@
 // Year progress + shared verse-of-the-day helpers for the Plans header.
 
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:the_blessed_bible/data/let_read.dart';
 import 'package:the_blessed_bible/data/models/home_data.dart';
+import 'package:the_blessed_bible/l10n/l10n.dart';
+
+final _en = lookupAppLocalizations(const Locale('en'));
 
 void main() {
   group('YearProgress', () {
@@ -31,13 +35,13 @@ void main() {
     });
 
     test('labels read "Day N of M" and the remaining phrase', () {
-      expect(YearProgress.label(DateTime(2026, 10, 4)), 'Day 277 of 365');
-      expect(YearProgress.label(DateTime(2024, 12, 31)), 'Day 366 of 366');
-      expect(YearProgress.remainingLabel(DateTime(2026, 12, 31)),
+      expect(YearProgress.label(DateTime(2026, 10, 4), _en), 'Day 277 of 365');
+      expect(YearProgress.label(DateTime(2024, 12, 31), _en), 'Day 366 of 366');
+      expect(YearProgress.remainingLabel(DateTime(2026, 12, 31), _en),
           'Last day of the year');
-      expect(YearProgress.remainingLabel(DateTime(2026, 12, 30)),
+      expect(YearProgress.remainingLabel(DateTime(2026, 12, 30), _en),
           '1 day left in the year');
-      expect(YearProgress.remainingLabel(DateTime(2026, 10, 4)),
+      expect(YearProgress.remainingLabel(DateTime(2026, 10, 4), _en),
           '88 days left in the year');
     });
 

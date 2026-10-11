@@ -223,7 +223,10 @@ class _WeeklyJourneyPath extends StatelessWidget {
           Positioned(
             bottom: -32,
             child: Text(
-              dayData.title,
+              // Custom plans store a generated English "Day N" title.
+              dayData.title == 'Day ${dayData.day}'
+                  ? context.l10n.plansDayN(dayData.day)
+                  : dayData.title,
               textAlign: TextAlign.center,
               style: theme.textTheme.labelMedium?.copyWith(
                 fontWeight: FontWeight.bold,

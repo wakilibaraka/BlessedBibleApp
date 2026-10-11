@@ -152,6 +152,38 @@ class AppLocalizationsTl extends AppLocalizations {
   }
 
   @override
+  String get onboardingReminderTitle => 'Isang banayad na paalala araw-araw';
+
+  @override
+  String get onboardingReminderBody =>
+      'Ang maikling paalala sa oras na pipiliin mo ay tumutulong bumuo ng araw-araw na gawi. Para lang sa pagbasa — hindi kailanman ad.';
+
+  @override
+  String get onboardingReminderToggle => 'Paalalahanan akong magbasa araw-araw';
+
+  @override
+  String get onboardingReminderTime => 'Oras ng paalala';
+
+  @override
+  String get onboardingReminderPermission =>
+      'Hihingi ng pahintulot ang iyong telepono na magpakita ng notification. Mababago ito mamaya sa Settings.';
+
+  @override
+  String get onboardingAccountTitle => 'Panatilihing ligtas ang iyong mga tala';
+
+  @override
+  String get onboardingAccountBody =>
+      'Opsyonal ang pag-sign in. Gumagana nang buo ang app offline kahit walang account. Kapag may account, naka-back up at naka-sync sa iyong mga device ang iyong mga highlight, tala, bookmark at plano.';
+
+  @override
+  String onboardingSignedInAs(String name) {
+    return 'Naka-sign in bilang $name';
+  }
+
+  @override
+  String get onboardingNotNow => 'Hindi muna';
+
+  @override
   String get plansContinueReading => 'Ituloy ang Pagbasa';
 
   @override
@@ -3095,4 +3127,541 @@ class AppLocalizationsTl extends AppLocalizations {
 
   @override
   String get privacyViewOnline => 'Tingnan online';
+
+  @override
+  String get notifDailyTitle => 'Oras na para Magbasa';
+
+  @override
+  String get notifDailyBody =>
+      'Maglaan ng sandali ngayon para magbasa at magnilay.';
+
+  @override
+  String get notifDailyChannel => 'Mga Araw-araw na Paalala';
+
+  @override
+  String get notifDailyChannelDesc =>
+      'Mga paalala para sa araw-araw na pagbasa';
+
+  @override
+  String get notifPrayerTitle => 'Oras na para Manalangin';
+
+  @override
+  String get notifPrayerBody => 'Huminto sandali para magnilay at manalangin.';
+
+  @override
+  String get notifPrayerChannel => 'Mga Paalala sa Panalangin';
+
+  @override
+  String get notifPrayerChannelDesc => 'Mga araw-araw na paalala sa panalangin';
+
+  @override
+  String get notifWeeklyTitle => 'Lingguhang Oras ng Pag-aaral';
+
+  @override
+  String get notifWeeklyBody =>
+      'Ito ang nakatakda mong oras para mag-aral at magnilay.';
+
+  @override
+  String get notifWeeklyChannel => 'Mga Lingguhang Paalala';
+
+  @override
+  String get notifWeeklyChannelDesc =>
+      'Mga pasadyang lingguhang paalala sa pag-aaral';
+
+  @override
+  String get notifSabbathTitle => 'Malapit na ang Sabbath';
+
+  @override
+  String get notifSabbathBody => 'Salubungin ang araw ng kapahingahan.';
+
+  @override
+  String get notifSabbathChannel => 'Mga Paalala sa Sabbath';
+
+  @override
+  String get notifSabbathChannelDesc =>
+      'Lingguhang paalala sa paglubog ng araw para sa Sabbath';
+
+  @override
+  String get notifPlanBody =>
+      'Maglaan ng sandali para basahin ang iyong talata ngayong araw.';
+
+  @override
+  String get notifPlanChannel => 'Plano sa Pagbasa';
+
+  @override
+  String get notifPlanChannelDesc => 'Mga paalala sa plano sa pagbasa';
+
+  @override
+  String get widgetStreakActive => 'Tuloy ang streak!';
+
+  @override
+  String get widgetStreakInactive =>
+      'Magbasa ngayon para mapanatili ang streak';
+
+  @override
+  String get widgetFallbackWord => 'Biyaya (Charis)';
+
+  @override
+  String get widgetFallbackDefinition =>
+      'Ang di-karapat-dapat na kagandahang-loob at banal na pag-ibig ng Diyos na ipinagkaloob sa sangkatauhan.';
+
+  @override
+  String get widgetStyleDusk => 'Makalangit na Takipsilim';
+
+  @override
+  String get widgetStyleDawn => 'Bukang-liwayway';
+
+  @override
+  String get widgetStyleEmerald => 'Esmeralda ng Santuwaryo';
+
+  @override
+  String get widgetStyleGolden => 'Banal na Amber';
+
+  @override
+  String get widgetStyleRoyal => 'Maharlikang Zafiro';
+
+  @override
+  String get widgetStyleGlassLight => 'Frosted na Salamin';
+
+  @override
+  String get widgetStyleGlassDark => 'Obsidian na Salamin';
+
+  @override
+  String get widgetStyleSolidLight => 'Malinis na Papel';
+
+  @override
+  String get widgetStyleSolidDark => 'Malalim na Uling';
+
+  @override
+  String get widgetStyleTransparent => 'Malinaw na Wallpaper';
+
+  @override
+  String get backupShareSubject => 'Backup ng The Blessed Bible';
+
+  @override
+  String backupExportFailed(String error) {
+    return 'Nabigo ang pag-export: $error';
+  }
+
+  @override
+  String backupNewerVersion(int version) {
+    return 'Galing ang backup na ito sa mas bagong bersyon ng app (v$version). I-update muna ang app.';
+  }
+
+  @override
+  String get backupConfirmTitle => 'Kumpirmahin ang Pag-restore';
+
+  @override
+  String get backupConfirmBody =>
+      'Papalitan nito ang lahat ng kasalukuyang tala, highlight, bookmark at setting. Sigurado ka ba?';
+
+  @override
+  String backupSkippedValues(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count value ang nilaktawan',
+      one: '1 value ang nilaktawan',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String backupRedownload(int count, String list) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'i-download muli ang $count salin: $list',
+      one: 'i-download muli ang 1 salin: $list',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get backupRestored => 'Matagumpay na na-restore ang backup';
+
+  @override
+  String backupRestoredWithDetails(String details) {
+    return 'Na-restore ang backup ($details)';
+  }
+
+  @override
+  String backupRestoreFailed(String error) {
+    return 'Nabigo ang pag-restore: di-wasto o sirang backup ($error)';
+  }
+
+  @override
+  String get greetingDaily1Title => 'Sumaiyo ang kapayapaan.';
+
+  @override
+  String get greetingDaily1Subtitle =>
+      'Bigyan ka nawa ng kapahingahan ng Kanyang salita.';
+
+  @override
+  String get greetingDaily2Title => 'Lumakad sa liwanag.';
+
+  @override
+  String get greetingDaily2Subtitle =>
+      'Ang Kanyang salita ay ilawan sa iyong landas.';
+
+  @override
+  String get greetingDaily3Title => 'Biyaya at kapayapaan sa iyo.';
+
+  @override
+  String get greetingDaily3Subtitle => 'Manahan sa Puno ng Ubas ngayon.';
+
+  @override
+  String get greetingDaily4Title => 'Halika sa tubigan.';
+
+  @override
+  String get greetingDaily4Subtitle => 'Si Jesus ang ilaw ng sanlibutan.';
+
+  @override
+  String get greetingDaily5Title => 'Pagpalain ka nawa ng Panginoon.';
+
+  @override
+  String get greetingDaily5Subtitle =>
+      'Ingatan ang Kanyang mga pangako sa iyong puso.';
+
+  @override
+  String get greetingDaily6Title => 'Tumahimik ka at kilalanin.';
+
+  @override
+  String get greetingDaily6Subtitle =>
+      'Manahan sa Kanyang tahimik na presensya.';
+
+  @override
+  String get greetingDaily7Title => 'Bagong kahabagan tuwing umaga.';
+
+  @override
+  String get greetingDaily7Subtitle =>
+      'Hindi nagkukulang ang Kanyang mga habag.';
+
+  @override
+  String get greetingDaily8Title => 'Nakaugat sa pag-ibig.';
+
+  @override
+  String get greetingDaily8Subtitle => 'Lumago sa biyaya at katotohanan.';
+
+  @override
+  String get greetingDaily9Title => 'Paliwanagin ang iyong ilaw.';
+
+  @override
+  String get greetingDaily9Subtitle =>
+      'Hindi maitatago ang bayang nakatayo sa ibabaw ng bundok.';
+
+  @override
+  String get greetingDaily10Title => 'Lumapit sa Diyos.';
+
+  @override
+  String get greetingDaily10Subtitle => 'Inaabot ka na Niya.';
+
+  @override
+  String get greetingDaily11Title => 'Ang Salita ay nagkatawang-tao.';
+
+  @override
+  String get greetingDaily11Subtitle =>
+      'Nauunawaan Niya ang iyong paglalakbay.';
+
+  @override
+  String get greetingDaily12Title => 'Tikman at tingnan.';
+
+  @override
+  String get greetingDaily12Subtitle => 'Ang Panginoon ay napakabuti.';
+
+  @override
+  String get greetingMorning1Title => 'Gumising ka, ikaw na natutulog.';
+
+  @override
+  String get greetingMorning1Subtitle => 'Liliwanagan ka ni Cristo.';
+
+  @override
+  String get greetingMorning2Title => 'Darating ang kagalakan sa umaga.';
+
+  @override
+  String get greetingMorning2Subtitle => 'Pumasok sa Kanyang bagong araw.';
+
+  @override
+  String get greetingMorning3Title => 'Ito ang araw na ginawa ng Panginoon.';
+
+  @override
+  String get greetingMorning3Subtitle => 'Tayo\'y magalak at magsaya rito.';
+
+  @override
+  String get greetingEvening1Title => 'Tapos na ang araw.';
+
+  @override
+  String get greetingEvening1Subtitle =>
+      'Binibigyan Niya ng tulog ang Kanyang minamahal.';
+
+  @override
+  String get greetingEvening2Title => 'Sa ilalim ng Kanyang mga pakpak.';
+
+  @override
+  String get greetingEvening2Subtitle =>
+      'Makasusumpong ka ng kanlungan ngayong gabi.';
+
+  @override
+  String get greetingEvening3Title =>
+      'Lumapit kayo sa Akin, kayong nahihirapan.';
+
+  @override
+  String get greetingEvening3Subtitle =>
+      'At kayo\'y Aking bibigyan ng kapahingahan.';
+
+  @override
+  String get greetingGrace1Title =>
+      'Ilagak mo sa Kanya ang lahat ng iyong alalahanin.';
+
+  @override
+  String get greetingGrace1Subtitle =>
+      'Sapagkat Siya\'y nagmamalasakit sa iyo.';
+
+  @override
+  String get greetingGrace2Title =>
+      'Ang Aking kapayapaan ay ibinibigay Ko sa inyo.';
+
+  @override
+  String get greetingGrace2Subtitle => 'Huwag mabagabag ang inyong puso.';
+
+  @override
+  String get greetingGrace3Title =>
+      'Pinagagaling Niya ang mga bagbag ang puso.';
+
+  @override
+  String get greetingGrace3Subtitle => 'At tinatalian ang kanilang mga sugat.';
+
+  @override
+  String get greetingGrace4Title => 'Walang makapaghihiwalay sa atin.';
+
+  @override
+  String get greetingGrace4Subtitle => 'Sa pag-ibig ng Diyos.';
+
+  @override
+  String get greetingCheer1Title => 'Magpakalakas ka at magpakatapang.';
+
+  @override
+  String get greetingCheer1Subtitle => 'Ang Panginoon mong Diyos ay sumasaiyo.';
+
+  @override
+  String get greetingCheer2Title => 'Tumakbo nang may pagtitiis.';
+
+  @override
+  String get greetingCheer2Subtitle => 'Ituon ang iyong paningin kay Jesus.';
+
+  @override
+  String get greetingCheer3Title => 'Ang bakal ay nagpapatalas sa bakal.';
+
+  @override
+  String get greetingCheer3Subtitle => 'Lumago nang sama-sama sa Salita.';
+
+  @override
+  String greetingEyebrowMorning(String day) {
+    return '$day ng umaga';
+  }
+
+  @override
+  String greetingEyebrowAfternoon(String day) {
+    return '$day ng hapon';
+  }
+
+  @override
+  String greetingEyebrowEvening(String day) {
+    return '$day ng gabi';
+  }
+
+  @override
+  String greetingEyebrowNight(String day) {
+    return '$day ng madaling-araw';
+  }
+
+  @override
+  String get creditsScripture => 'Kasulatan';
+
+  @override
+  String get creditsCommentary => 'Komentaryo';
+
+  @override
+  String get creditsStudyTools => 'Mga kagamitan sa pag-aaral';
+
+  @override
+  String get creditsBibleStories => 'Mga Kuwento sa Bibliya';
+
+  @override
+  String get creditsFonts => 'Mga font';
+
+  @override
+  String get creditsCommentaryPerspective =>
+      'Ang komentaryo ay mula sa mga manunulat ng ika-19 at ika-20 siglo sa tradisyong Seventh-day Adventist at binabasa ang propesiya ng Bibliya mula sa pananaw na historisista. Iniaalok ito bilang tulong sa pag-aaral kasama ng Kasulatan, hindi bilang bahagi nito.';
+
+  @override
+  String get creditsPublicDomain => 'Pampublikong domain.';
+
+  @override
+  String get creditsPublicDomainUs => 'Pampublikong domain sa US.';
+
+  @override
+  String get creditsKjvDetail =>
+      'Pampublikong domain. Pampublikong domain din ang edisyong may numerong Strong\'s.';
+
+  @override
+  String get creditsSelectedWriting => 'Mga piling akda.';
+
+  @override
+  String get creditsAdditionalTranslationsDetail =>
+      'Na-download mula sa Free Use Bible API (bible.helloao.org) at open-bibles (github.com/seven1m/open-bibles).';
+
+  @override
+  String get creditsNarrativeDetail =>
+      'Hinango mula sa The Graham Bible (grahambible.com), sa tulong ng AI at sinuri ng tao.';
+
+  @override
+  String creditsFontsDetail(String licenses) {
+    return 'SIL Open Font License 1.1. Kumpletong abiso sa ilalim ng $licenses.';
+  }
+
+  @override
+  String get miscPlanNotFound => 'Hindi nahanap ang plano.';
+
+  @override
+  String get miscPaceUnsupported =>
+      'Ginawa ang planong ito bago pa suportado ang pag-aayos ng bilis. Gawin itong muli para magamit ang feature na ito.';
+
+  @override
+  String miscPaceFailed(String error) {
+    return 'Nabigo ang pag-aayos ng bilis: $error';
+  }
+
+  @override
+  String miscPlanLoadFailed(String error) {
+    return 'Hindi ma-load ang planong ito ($error).';
+  }
+
+  @override
+  String get miscFolderSermon => 'Paghahanda ng sermon';
+
+  @override
+  String get miscFolderMemorize => 'Isaulo';
+
+  @override
+  String get miscFolderComfort => 'Kaaliwan';
+
+  @override
+  String get miscFolderStudy => 'Pag-aaral';
+
+  @override
+  String get miscColorPurple => 'Lila';
+
+  @override
+  String get miscColorGreen => 'Berde';
+
+  @override
+  String get miscColorBlue => 'Asul';
+
+  @override
+  String get miscColorPink => 'Rosas';
+
+  @override
+  String get miscColorRed => 'Pula';
+
+  @override
+  String get miscSearchBibleVerse => 'Talata sa Bibliya';
+
+  @override
+  String get miscSearchCommentary => 'Komentaryo';
+
+  @override
+  String miscSearchCommentaryBy(String author) {
+    return 'Komentaryo ni $author';
+  }
+
+  @override
+  String miscSearchNote(String date) {
+    return 'Tala • $date';
+  }
+
+  @override
+  String get miscSearchJumpTo => 'Pumunta sa';
+
+  @override
+  String miscSearchGoToChapter(String book, int chapter) {
+    return 'Pumunta sa $book kabanata $chapter';
+  }
+
+  @override
+  String miscSearchGoToVerse(String book, int chapter, int verse) {
+    return 'Pumunta sa $book kabanata $chapter, talata $verse';
+  }
+
+  @override
+  String miscSearchDictionary(String sources) {
+    return 'Diksiyonaryo ($sources)';
+  }
+
+  @override
+  String miscMostReadSnippet(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Madalas basahing talata ($count pagbisita)',
+      one: 'Madalas basahing talata (1 pagbisita)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get miscEmotionAnxiety => 'pagkabalisa';
+
+  @override
+  String get miscEmotionFear => 'takot';
+
+  @override
+  String get miscEmotionSadness => 'kalungkutan';
+
+  @override
+  String get miscEmotionLoneliness => 'pag-iisa';
+
+  @override
+  String get miscEmotionAnger => 'galit';
+
+  @override
+  String get miscEmotionTemptation => 'tukso';
+
+  @override
+  String get miscEmotionGuilt => 'pagkakasala';
+
+  @override
+  String get miscEmotionHopelessness => 'kawalan ng pag-asa';
+
+  @override
+  String get miscEmotionConfusion => 'kalituhan';
+
+  @override
+  String get miscEmotionDoubt => 'pag-aalinlangan';
+
+  @override
+  String get miscEmotionExhaustion => 'pagod';
+
+  @override
+  String get miscEmotionGratitude => 'pasasalamat';
+
+  @override
+  String get miscEmotionJoy => 'kagalakan';
+
+  @override
+  String get miscEmotionPeace => 'kapayapaan';
+
+  @override
+  String miscPrayerComfort(String emotion) {
+    return 'Panginoon, bigyan Mo ako ng aliw at lakas habang dinaranas ko ang $emotion ngayon.';
+  }
+
+  @override
+  String miscPrayerScripture(String verse) {
+    return 'Ipagkaloob Mo sa akin ang biyayang pagnilayan ang Kasulatan, lalo na ang $verse.';
+  }
+
+  @override
+  String get miscPrayerGuide =>
+      'Gabayan Mo ang aking mga hakbang sa pag-asa at kapayapaan, nagtitiwala sa Iyong tapat na mga pangako.';
 }

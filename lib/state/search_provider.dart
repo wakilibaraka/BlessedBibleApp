@@ -272,6 +272,7 @@ class SearchNotifier extends Notifier<SearchState> {
           type: SearchResultType.dictionary,
           metadata: {
             'normalized_word': normWord,
+            'sources': sourceList,
           },
         );
       }).toList();

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/local_storage/preferences_service.dart';
 import '../data/models/journal_entry.dart';
 import '../services/ai_journal_service.dart';
+import 'locale_provider.dart';
 
 class JournalNotifier extends Notifier<List<JournalEntry>> {
   static const _key = 'user_journal_entries';
@@ -32,7 +33,9 @@ class JournalNotifier extends Notifier<List<JournalEntry>> {
 
   Future<void> add(String content) async {
     final aiService = ref.read(aiJournalServiceProvider);
-    final reflection = await aiService.analyzeEntry(content);
+    final prefs = ref.read(preferencesProvider).prefs;
+    final reflection = await aiService.analyzeEntry(content,
+        l10n: l10nFor(prefs.getString(AppLocaleNotifier.key)));
 
     final entry = JournalEntry(
       date: DateTime.now().toIso8601String(),

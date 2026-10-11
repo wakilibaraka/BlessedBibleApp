@@ -60,6 +60,22 @@
       }
     }
   },
+  "onboardingReminderTitle": "A gentle daily reminder",
+  "onboardingReminderBody": "A short nudge at the time you choose helps build a daily habit. We only notify you for reading — never ads.",
+  "onboardingReminderToggle": "Remind me to read each day",
+  "onboardingReminderTime": "Reminder time",
+  "onboardingReminderPermission": "Your phone will ask permission to show notifications. You can change this later in Settings.",
+  "onboardingAccountTitle": "Keep your notes safe",
+  "onboardingAccountBody": "Signing in is optional. The app works fully offline without an account. With one, your highlights, notes, bookmarks and plans are backed up and kept in step across your devices.",
+  "onboardingSignedInAs": "Signed in as {name}",
+  "@onboardingSignedInAs": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "onboardingNotNow": "Not now",
   "plansContinueReading": "Continue Reading",
   "plansResume": "Resume",
   "plansDayCompleteCelebration": "Reading Plan\nDay {day} Complete!",
@@ -1771,5 +1787,313 @@
     }
   },
   "privacyEnglishOnly": "This policy is provided in English.",
-  "privacyViewOnline": "View online"
+  "privacyViewOnline": "View online",
+  "notifDailyTitle": "Time to Read",
+  "notifDailyBody": "Take a moment to read and reflect today.",
+  "notifDailyChannel": "Daily Reminders",
+  "notifDailyChannelDesc": "Reminders for daily reading",
+  "notifPrayerTitle": "Time for Prayer",
+  "notifPrayerBody": "Pause for a moment of reflection and prayer.",
+  "notifPrayerChannel": "Prayer Reminders",
+  "notifPrayerChannelDesc": "Daily prayer reminders",
+  "notifWeeklyTitle": "Weekly Study Time",
+  "notifWeeklyBody": "It's your scheduled time for study and reflection.",
+  "notifWeeklyChannel": "Weekly Reminders",
+  "notifWeeklyChannelDesc": "Custom weekly study reminders",
+  "notifSabbathTitle": "The Sabbath is Approaching",
+  "notifSabbathBody": "Welcome the day of rest.",
+  "notifSabbathChannel": "Sabbath Reminders",
+  "notifSabbathChannelDesc": "Weekly sunset reminders for Sabbath",
+  "notifPlanBody": "Take a moment to read your daily passage.",
+  "notifPlanChannel": "Reading Plan",
+  "notifPlanChannelDesc": "Reading plan reminders",
+  "widgetStreakActive": "Streak active!",
+  "widgetStreakInactive": "Read today to keep your streak",
+  "widgetFallbackWord": "Grace (Charis)",
+  "widgetFallbackDefinition": "The unmerited favor and divine love of God bestowed upon humanity.",
+  "widgetStyleDusk": "Celestial Dusk",
+  "widgetStyleDawn": "Morning Dawn",
+  "widgetStyleEmerald": "Sanctuary Emerald",
+  "widgetStyleGolden": "Sacred Amber",
+  "widgetStyleRoyal": "Royal Sapphire",
+  "widgetStyleGlassLight": "Frosted Glass",
+  "widgetStyleGlassDark": "Obsidian Glass",
+  "widgetStyleSolidLight": "Clean Paper",
+  "widgetStyleSolidDark": "Deep Charcoal",
+  "widgetStyleTransparent": "Clear Wallpaper",
+  "backupShareSubject": "The Blessed Bible Backup",
+  "backupExportFailed": "Export failed: {error}",
+  "@backupExportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "backupNewerVersion": "This backup is from a newer app version (v{version}). Update the app first.",
+  "@backupNewerVersion": {
+    "placeholders": {
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "backupConfirmTitle": "Confirm Restore",
+  "backupConfirmBody": "This will overwrite all existing notes, highlights, bookmarks, and settings. Are you sure?",
+  "backupSkippedValues": "{count, plural, =1{1 value skipped} other{{count} values skipped}}",
+  "@backupSkippedValues": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "backupRedownload": "{count, plural, =1{re-download 1 translation: {list}} other{re-download {count} translations: {list}}}",
+  "@backupRedownload": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "list": {
+        "type": "String"
+      }
+    }
+  },
+  "backupRestored": "Backup restored successfully",
+  "backupRestoredWithDetails": "Backup restored ({details})",
+  "@backupRestoredWithDetails": {
+    "placeholders": {
+      "details": {
+        "type": "String"
+      }
+    }
+  },
+  "backupRestoreFailed": "Restore failed: invalid or corrupted backup ({error})",
+  "@backupRestoreFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "greetingDaily1Title": "Peace be with you.",
+  "greetingDaily1Subtitle": "Let His word bring you rest.",
+  "greetingDaily2Title": "Walk in the light.",
+  "greetingDaily2Subtitle": "His word is a lamp for your path.",
+  "greetingDaily3Title": "Grace and peace to you.",
+  "greetingDaily3Subtitle": "Rest in the Vine today.",
+  "greetingDaily4Title": "Come to the waters.",
+  "greetingDaily4Subtitle": "Jesus is the light of the world.",
+  "greetingDaily5Title": "The Lord bless you.",
+  "greetingDaily5Subtitle": "Keep His promises close to your heart.",
+  "greetingDaily6Title": "Be still and know.",
+  "greetingDaily6Subtitle": "Dwell in His quiet presence.",
+  "greetingDaily7Title": "Morning mercies anew.",
+  "greetingDaily7Subtitle": "His compassions never fail.",
+  "greetingDaily8Title": "Rooted in love.",
+  "greetingDaily8Subtitle": "Grow in grace and truth.",
+  "greetingDaily9Title": "Let your light shine.",
+  "greetingDaily9Subtitle": "A city on a hill cannot be hidden.",
+  "greetingDaily10Title": "Draw near to God.",
+  "greetingDaily10Subtitle": "He is already reaching for you.",
+  "greetingDaily11Title": "The Word became flesh.",
+  "greetingDaily11Subtitle": "He understands your journey.",
+  "greetingDaily12Title": "Taste and see.",
+  "greetingDaily12Subtitle": "The Lord is incredibly good.",
+  "greetingMorning1Title": "Awake, O sleeper.",
+  "greetingMorning1Subtitle": "Christ will shine on you.",
+  "greetingMorning2Title": "Joy comes in the morning.",
+  "greetingMorning2Subtitle": "Step into His new day.",
+  "greetingMorning3Title": "This is the day the Lord has made.",
+  "greetingMorning3Subtitle": "Let us rejoice in it.",
+  "greetingEvening1Title": "The day is done.",
+  "greetingEvening1Subtitle": "He gives sleep to those He loves.",
+  "greetingEvening2Title": "Under His wings.",
+  "greetingEvening2Subtitle": "You will find refuge tonight.",
+  "greetingEvening3Title": "Come to Me, you who are weary.",
+  "greetingEvening3Subtitle": "And I will give you rest.",
+  "greetingGrace1Title": "Cast all your anxiety on Him.",
+  "greetingGrace1Subtitle": "Because He cares for you.",
+  "greetingGrace2Title": "My peace I give you.",
+  "greetingGrace2Subtitle": "Let not your heart be troubled.",
+  "greetingGrace3Title": "He heals the brokenhearted.",
+  "greetingGrace3Subtitle": "And binds up their wounds.",
+  "greetingGrace4Title": "Nothing can separate us.",
+  "greetingGrace4Subtitle": "From the love of God.",
+  "greetingCheer1Title": "Be strong and courageous.",
+  "greetingCheer1Subtitle": "The Lord your God goes with you.",
+  "greetingCheer2Title": "Run with endurance.",
+  "greetingCheer2Subtitle": "Keep your eyes fixed on Jesus.",
+  "greetingCheer3Title": "Iron sharpens iron.",
+  "greetingCheer3Subtitle": "Grow together in the Word.",
+  "greetingEyebrowMorning": "{day} morning",
+  "@greetingEyebrowMorning": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "greetingEyebrowAfternoon": "{day} afternoon",
+  "@greetingEyebrowAfternoon": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "greetingEyebrowEvening": "{day} evening",
+  "@greetingEyebrowEvening": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "greetingEyebrowNight": "{day} night",
+  "@greetingEyebrowNight": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "creditsScripture": "Scripture",
+  "creditsCommentary": "Commentary",
+  "creditsStudyTools": "Study tools",
+  "creditsBibleStories": "Bible Stories",
+  "creditsFonts": "Fonts",
+  "creditsCommentaryPerspective": "The commentary comes from 19th- and 20th-century writers in the Seventh-day Adventist tradition and reads Bible prophecy from the historicist perspective. It is offered as a study aid alongside Scripture, not as part of it.",
+  "creditsPublicDomain": "Public domain.",
+  "creditsPublicDomainUs": "Public domain in the US.",
+  "creditsKjvDetail": "Public domain. Strong's-tagged edition also public domain.",
+  "creditsSelectedWriting": "Selected writing.",
+  "creditsAdditionalTranslationsDetail": "Downloaded from the Free Use Bible API (bible.helloao.org) and open-bibles (github.com/seven1m/open-bibles).",
+  "creditsNarrativeDetail": "Adapted from The Graham Bible (grahambible.com), AI-assisted and human reviewed.",
+  "creditsFontsDetail": "SIL Open Font License 1.1. Full notices under {licenses}.",
+  "@creditsFontsDetail": {
+    "placeholders": {
+      "licenses": {
+        "type": "String"
+      }
+    }
+  },
+  "miscPlanNotFound": "Plan not found.",
+  "miscPaceUnsupported": "This plan was created before pace adjustment was supported. Recreate it to enable this feature.",
+  "miscPaceFailed": "Pace adjustment failed: {error}",
+  "@miscPaceFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "miscPlanLoadFailed": "Could not load this plan ({error}).",
+  "@miscPlanLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "miscFolderSermon": "Sermon prep",
+  "miscFolderMemorize": "Memorize",
+  "miscFolderComfort": "Comfort",
+  "miscFolderStudy": "Study",
+  "miscColorPurple": "Purple",
+  "miscColorGreen": "Green",
+  "miscColorBlue": "Blue",
+  "miscColorPink": "Pink",
+  "miscColorRed": "Red",
+  "miscSearchBibleVerse": "Bible Verse",
+  "miscSearchCommentary": "Commentary",
+  "miscSearchCommentaryBy": "{author} Commentary",
+  "@miscSearchCommentaryBy": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "miscSearchNote": "Note • {date}",
+  "@miscSearchNote": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "miscSearchJumpTo": "Jump To",
+  "miscSearchGoToChapter": "Go to {book} chapter {chapter}",
+  "@miscSearchGoToChapter": {
+    "placeholders": {
+      "book": {
+        "type": "String"
+      },
+      "chapter": {
+        "type": "int"
+      }
+    }
+  },
+  "miscSearchGoToVerse": "Go to {book} chapter {chapter}, verse {verse}",
+  "@miscSearchGoToVerse": {
+    "placeholders": {
+      "book": {
+        "type": "String"
+      },
+      "chapter": {
+        "type": "int"
+      },
+      "verse": {
+        "type": "int"
+      }
+    }
+  },
+  "miscSearchDictionary": "Dictionary ({sources})",
+  "@miscSearchDictionary": {
+    "placeholders": {
+      "sources": {
+        "type": "String"
+      }
+    }
+  },
+  "miscMostReadSnippet": "{count, plural, =1{Frequently read passage (1 visit)} other{Frequently read passage ({count} visits)}}",
+  "@miscMostReadSnippet": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "miscEmotionAnxiety": "anxiety",
+  "miscEmotionFear": "fear",
+  "miscEmotionSadness": "sadness",
+  "miscEmotionLoneliness": "loneliness",
+  "miscEmotionAnger": "anger",
+  "miscEmotionTemptation": "temptation",
+  "miscEmotionGuilt": "guilt",
+  "miscEmotionHopelessness": "hopelessness",
+  "miscEmotionConfusion": "confusion",
+  "miscEmotionDoubt": "doubt",
+  "miscEmotionExhaustion": "exhaustion",
+  "miscEmotionGratitude": "gratitude",
+  "miscEmotionJoy": "joy",
+  "miscEmotionPeace": "peace",
+  "miscPrayerComfort": "Lord, bring comfort and strength as I navigate feelings of {emotion} today.",
+  "@miscPrayerComfort": {
+    "placeholders": {
+      "emotion": {
+        "type": "String"
+      }
+    }
+  },
+  "miscPrayerScripture": "Grant me the grace to reflect on scripture, especially {verse}.",
+  "@miscPrayerScripture": {
+    "placeholders": {
+      "verse": {
+        "type": "String"
+      }
+    }
+  },
+  "miscPrayerGuide": "Guide my steps in hope and peace, trusting in Your faithful promises."
 }

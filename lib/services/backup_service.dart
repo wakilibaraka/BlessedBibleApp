@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../data/local_storage/preferences_service.dart';
+import '../l10n/l10n.dart';
 import '../services/bible_database_service.dart';
 import '../services/translation_pack_store.dart';
 import '../state/user_data_provider.dart';
@@ -63,7 +64,7 @@ class BackupService {
         final box = context.findRenderObject() as RenderBox?;
         await SharePlus.instance.share(ShareParams(
           files: [XFile(file.path)],
-          subject: 'The Blessed Bible Backup',
+          subject: context.l10n.backupShareSubject,
           sharePositionOrigin:
               box != null ? box.localToGlobal(Offset.zero) & box.size : null,
         ));
@@ -71,7 +72,7 @@ class BackupService {
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Export failed: $e')),
+          SnackBar(content: Text(context.l10n.backupExportFailed('$e'))),
         );
       }
     }
@@ -88,8 +89,11 @@ class BackupService {
       }
       final backupVersion = decoded['version'] as int? ?? 0;
       if (backupVersion > currentVersion) {
-        throw FormatException(
-            'Backup is from a newer app version (v$backupVersion). Update the app first.');
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(context.l10n.backupNewerVersion(backupVersion))));
+        }
+        return;
       }
 
       final data = decoded['data'];
@@ -100,20 +104,19 @@ class BackupService {
       final confirm = await showDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: const Text('Confirm Restore'),
-          content: const Text(
-              'This will overwrite all existing notes, highlights, bookmarks, and settings. Are you sure?'),
+          title: Text(ctx.l10n.backupConfirmTitle),
+          content: Text(ctx.l10n.backupConfirmBody),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(false),
-              child: const Text('Cancel'),
+              child: Text(ctx.l10n.commonCancel),
             ),
             ElevatedButton(
               onPressed: () => Navigator.of(ctx).pop(true),
               style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.error),
-              child:
-                  const Text('Restore', style: TextStyle(color: Colors.white)),
+              child: Text(ctx.l10n.settingsRestore,
+                  style: const TextStyle(color: Colors.white)),
             ),
           ],
         ),
@@ -186,24 +189,23 @@ class BackupService {
       ].where((id) => !installedIds.contains(id)).toList();
 
       if (context.mounted) {
+        final l10n = context.l10n;
         final details = [
-          if (skippedKeys > 0) '$skippedKeys value(s) skipped',
+          if (skippedKeys > 0) l10n.backupSkippedValues(skippedKeys),
           if (backedPacks.isNotEmpty)
-            're-download ${backedPacks.length} translation(s): ${backedPacks.join(', ')}',
+            l10n.backupRedownload(backedPacks.length, backedPacks.join(', ')),
         ].join('. ');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text(details.isEmpty
-                  ? 'Backup restored successfully'
-                  : 'Backup restored ($details)')),
+                  ? l10n.backupRestored
+                  : l10n.backupRestoredWithDetails(details))),
         );
       }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content:
-                  Text('Restore failed: Invalid or corrupted backup ($e)')),
+          SnackBar(content: Text(context.l10n.backupRestoreFailed('$e'))),
         );
       }
     }

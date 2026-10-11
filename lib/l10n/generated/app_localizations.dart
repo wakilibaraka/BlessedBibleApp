@@ -364,6 +364,60 @@ abstract class AppLocalizations {
   /// **'Step {current} of {total}'**
   String onboardingStep(int current, int total);
 
+  /// No description provided for @onboardingReminderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A gentle daily reminder'**
+  String get onboardingReminderTitle;
+
+  /// No description provided for @onboardingReminderBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A short nudge at the time you choose helps build a daily habit. We only notify you for reading — never ads.'**
+  String get onboardingReminderBody;
+
+  /// No description provided for @onboardingReminderToggle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind me to read each day'**
+  String get onboardingReminderToggle;
+
+  /// No description provided for @onboardingReminderTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder time'**
+  String get onboardingReminderTime;
+
+  /// No description provided for @onboardingReminderPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Your phone will ask permission to show notifications. You can change this later in Settings.'**
+  String get onboardingReminderPermission;
+
+  /// No description provided for @onboardingAccountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep your notes safe'**
+  String get onboardingAccountTitle;
+
+  /// No description provided for @onboardingAccountBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Signing in is optional. The app works fully offline without an account. With one, your highlights, notes, bookmarks and plans are backed up and kept in step across your devices.'**
+  String get onboardingAccountBody;
+
+  /// No description provided for @onboardingSignedInAs.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed in as {name}'**
+  String onboardingSignedInAs(String name);
+
+  /// No description provided for @onboardingNotNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get onboardingNotNow;
+
   /// No description provided for @plansContinueReading.
   ///
   /// In en, this message translates to:
@@ -5338,6 +5392,900 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'View online'**
   String get privacyViewOnline;
+
+  /// No description provided for @notifDailyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Time to Read'**
+  String get notifDailyTitle;
+
+  /// No description provided for @notifDailyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a moment to read and reflect today.'**
+  String get notifDailyBody;
+
+  /// No description provided for @notifDailyChannel.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Reminders'**
+  String get notifDailyChannel;
+
+  /// No description provided for @notifDailyChannelDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders for daily reading'**
+  String get notifDailyChannelDesc;
+
+  /// No description provided for @notifPrayerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Time for Prayer'**
+  String get notifPrayerTitle;
+
+  /// No description provided for @notifPrayerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause for a moment of reflection and prayer.'**
+  String get notifPrayerBody;
+
+  /// No description provided for @notifPrayerChannel.
+  ///
+  /// In en, this message translates to:
+  /// **'Prayer Reminders'**
+  String get notifPrayerChannel;
+
+  /// No description provided for @notifPrayerChannelDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily prayer reminders'**
+  String get notifPrayerChannelDesc;
+
+  /// No description provided for @notifWeeklyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Study Time'**
+  String get notifWeeklyTitle;
+
+  /// No description provided for @notifWeeklyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'It\'s your scheduled time for study and reflection.'**
+  String get notifWeeklyBody;
+
+  /// No description provided for @notifWeeklyChannel.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Reminders'**
+  String get notifWeeklyChannel;
+
+  /// No description provided for @notifWeeklyChannelDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom weekly study reminders'**
+  String get notifWeeklyChannelDesc;
+
+  /// No description provided for @notifSabbathTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The Sabbath is Approaching'**
+  String get notifSabbathTitle;
+
+  /// No description provided for @notifSabbathBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome the day of rest.'**
+  String get notifSabbathBody;
+
+  /// No description provided for @notifSabbathChannel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sabbath Reminders'**
+  String get notifSabbathChannel;
+
+  /// No description provided for @notifSabbathChannelDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly sunset reminders for Sabbath'**
+  String get notifSabbathChannelDesc;
+
+  /// No description provided for @notifPlanBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a moment to read your daily passage.'**
+  String get notifPlanBody;
+
+  /// No description provided for @notifPlanChannel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading Plan'**
+  String get notifPlanChannel;
+
+  /// No description provided for @notifPlanChannelDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading plan reminders'**
+  String get notifPlanChannelDesc;
+
+  /// No description provided for @widgetStreakActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Streak active!'**
+  String get widgetStreakActive;
+
+  /// No description provided for @widgetStreakInactive.
+  ///
+  /// In en, this message translates to:
+  /// **'Read today to keep your streak'**
+  String get widgetStreakInactive;
+
+  /// No description provided for @widgetFallbackWord.
+  ///
+  /// In en, this message translates to:
+  /// **'Grace (Charis)'**
+  String get widgetFallbackWord;
+
+  /// No description provided for @widgetFallbackDefinition.
+  ///
+  /// In en, this message translates to:
+  /// **'The unmerited favor and divine love of God bestowed upon humanity.'**
+  String get widgetFallbackDefinition;
+
+  /// No description provided for @widgetStyleDusk.
+  ///
+  /// In en, this message translates to:
+  /// **'Celestial Dusk'**
+  String get widgetStyleDusk;
+
+  /// No description provided for @widgetStyleDawn.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning Dawn'**
+  String get widgetStyleDawn;
+
+  /// No description provided for @widgetStyleEmerald.
+  ///
+  /// In en, this message translates to:
+  /// **'Sanctuary Emerald'**
+  String get widgetStyleEmerald;
+
+  /// No description provided for @widgetStyleGolden.
+  ///
+  /// In en, this message translates to:
+  /// **'Sacred Amber'**
+  String get widgetStyleGolden;
+
+  /// No description provided for @widgetStyleRoyal.
+  ///
+  /// In en, this message translates to:
+  /// **'Royal Sapphire'**
+  String get widgetStyleRoyal;
+
+  /// No description provided for @widgetStyleGlassLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Frosted Glass'**
+  String get widgetStyleGlassLight;
+
+  /// No description provided for @widgetStyleGlassDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Obsidian Glass'**
+  String get widgetStyleGlassDark;
+
+  /// No description provided for @widgetStyleSolidLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Clean Paper'**
+  String get widgetStyleSolidLight;
+
+  /// No description provided for @widgetStyleSolidDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Deep Charcoal'**
+  String get widgetStyleSolidDark;
+
+  /// No description provided for @widgetStyleTransparent.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Wallpaper'**
+  String get widgetStyleTransparent;
+
+  /// No description provided for @backupShareSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'The Blessed Bible Backup'**
+  String get backupShareSubject;
+
+  /// No description provided for @backupExportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed: {error}'**
+  String backupExportFailed(String error);
+
+  /// No description provided for @backupNewerVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'This backup is from a newer app version (v{version}). Update the app first.'**
+  String backupNewerVersion(int version);
+
+  /// No description provided for @backupConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Restore'**
+  String get backupConfirmTitle;
+
+  /// No description provided for @backupConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This will overwrite all existing notes, highlights, bookmarks, and settings. Are you sure?'**
+  String get backupConfirmBody;
+
+  /// No description provided for @backupSkippedValues.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 value skipped} other{{count} values skipped}}'**
+  String backupSkippedValues(int count);
+
+  /// No description provided for @backupRedownload.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{re-download 1 translation: {list}} other{re-download {count} translations: {list}}}'**
+  String backupRedownload(int count, String list);
+
+  /// No description provided for @backupRestored.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup restored successfully'**
+  String get backupRestored;
+
+  /// No description provided for @backupRestoredWithDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup restored ({details})'**
+  String backupRestoredWithDetails(String details);
+
+  /// No description provided for @backupRestoreFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore failed: invalid or corrupted backup ({error})'**
+  String backupRestoreFailed(String error);
+
+  /// No description provided for @greetingDaily1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Peace be with you.'**
+  String get greetingDaily1Title;
+
+  /// No description provided for @greetingDaily1Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Let His word bring you rest.'**
+  String get greetingDaily1Subtitle;
+
+  /// No description provided for @greetingDaily2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Walk in the light.'**
+  String get greetingDaily2Title;
+
+  /// No description provided for @greetingDaily2Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'His word is a lamp for your path.'**
+  String get greetingDaily2Subtitle;
+
+  /// No description provided for @greetingDaily3Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Grace and peace to you.'**
+  String get greetingDaily3Title;
+
+  /// No description provided for @greetingDaily3Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rest in the Vine today.'**
+  String get greetingDaily3Subtitle;
+
+  /// No description provided for @greetingDaily4Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Come to the waters.'**
+  String get greetingDaily4Title;
+
+  /// No description provided for @greetingDaily4Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Jesus is the light of the world.'**
+  String get greetingDaily4Subtitle;
+
+  /// No description provided for @greetingDaily5Title.
+  ///
+  /// In en, this message translates to:
+  /// **'The Lord bless you.'**
+  String get greetingDaily5Title;
+
+  /// No description provided for @greetingDaily5Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep His promises close to your heart.'**
+  String get greetingDaily5Subtitle;
+
+  /// No description provided for @greetingDaily6Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Be still and know.'**
+  String get greetingDaily6Title;
+
+  /// No description provided for @greetingDaily6Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Dwell in His quiet presence.'**
+  String get greetingDaily6Subtitle;
+
+  /// No description provided for @greetingDaily7Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning mercies anew.'**
+  String get greetingDaily7Title;
+
+  /// No description provided for @greetingDaily7Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'His compassions never fail.'**
+  String get greetingDaily7Subtitle;
+
+  /// No description provided for @greetingDaily8Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Rooted in love.'**
+  String get greetingDaily8Title;
+
+  /// No description provided for @greetingDaily8Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Grow in grace and truth.'**
+  String get greetingDaily8Subtitle;
+
+  /// No description provided for @greetingDaily9Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Let your light shine.'**
+  String get greetingDaily9Title;
+
+  /// No description provided for @greetingDaily9Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A city on a hill cannot be hidden.'**
+  String get greetingDaily9Subtitle;
+
+  /// No description provided for @greetingDaily10Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Draw near to God.'**
+  String get greetingDaily10Title;
+
+  /// No description provided for @greetingDaily10Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'He is already reaching for you.'**
+  String get greetingDaily10Subtitle;
+
+  /// No description provided for @greetingDaily11Title.
+  ///
+  /// In en, this message translates to:
+  /// **'The Word became flesh.'**
+  String get greetingDaily11Title;
+
+  /// No description provided for @greetingDaily11Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'He understands your journey.'**
+  String get greetingDaily11Subtitle;
+
+  /// No description provided for @greetingDaily12Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Taste and see.'**
+  String get greetingDaily12Title;
+
+  /// No description provided for @greetingDaily12Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The Lord is incredibly good.'**
+  String get greetingDaily12Subtitle;
+
+  /// No description provided for @greetingMorning1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Awake, O sleeper.'**
+  String get greetingMorning1Title;
+
+  /// No description provided for @greetingMorning1Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Christ will shine on you.'**
+  String get greetingMorning1Subtitle;
+
+  /// No description provided for @greetingMorning2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Joy comes in the morning.'**
+  String get greetingMorning2Title;
+
+  /// No description provided for @greetingMorning2Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Step into His new day.'**
+  String get greetingMorning2Subtitle;
+
+  /// No description provided for @greetingMorning3Title.
+  ///
+  /// In en, this message translates to:
+  /// **'This is the day the Lord has made.'**
+  String get greetingMorning3Title;
+
+  /// No description provided for @greetingMorning3Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Let us rejoice in it.'**
+  String get greetingMorning3Subtitle;
+
+  /// No description provided for @greetingEvening1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'The day is done.'**
+  String get greetingEvening1Title;
+
+  /// No description provided for @greetingEvening1Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'He gives sleep to those He loves.'**
+  String get greetingEvening1Subtitle;
+
+  /// No description provided for @greetingEvening2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Under His wings.'**
+  String get greetingEvening2Title;
+
+  /// No description provided for @greetingEvening2Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You will find refuge tonight.'**
+  String get greetingEvening2Subtitle;
+
+  /// No description provided for @greetingEvening3Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Come to Me, you who are weary.'**
+  String get greetingEvening3Title;
+
+  /// No description provided for @greetingEvening3Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'And I will give you rest.'**
+  String get greetingEvening3Subtitle;
+
+  /// No description provided for @greetingGrace1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Cast all your anxiety on Him.'**
+  String get greetingGrace1Title;
+
+  /// No description provided for @greetingGrace1Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Because He cares for you.'**
+  String get greetingGrace1Subtitle;
+
+  /// No description provided for @greetingGrace2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'My peace I give you.'**
+  String get greetingGrace2Title;
+
+  /// No description provided for @greetingGrace2Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Let not your heart be troubled.'**
+  String get greetingGrace2Subtitle;
+
+  /// No description provided for @greetingGrace3Title.
+  ///
+  /// In en, this message translates to:
+  /// **'He heals the brokenhearted.'**
+  String get greetingGrace3Title;
+
+  /// No description provided for @greetingGrace3Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'And binds up their wounds.'**
+  String get greetingGrace3Subtitle;
+
+  /// No description provided for @greetingGrace4Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing can separate us.'**
+  String get greetingGrace4Title;
+
+  /// No description provided for @greetingGrace4Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'From the love of God.'**
+  String get greetingGrace4Subtitle;
+
+  /// No description provided for @greetingCheer1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Be strong and courageous.'**
+  String get greetingCheer1Title;
+
+  /// No description provided for @greetingCheer1Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The Lord your God goes with you.'**
+  String get greetingCheer1Subtitle;
+
+  /// No description provided for @greetingCheer2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Run with endurance.'**
+  String get greetingCheer2Title;
+
+  /// No description provided for @greetingCheer2Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep your eyes fixed on Jesus.'**
+  String get greetingCheer2Subtitle;
+
+  /// No description provided for @greetingCheer3Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Iron sharpens iron.'**
+  String get greetingCheer3Title;
+
+  /// No description provided for @greetingCheer3Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Grow together in the Word.'**
+  String get greetingCheer3Subtitle;
+
+  /// No description provided for @greetingEyebrowMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'{day} morning'**
+  String greetingEyebrowMorning(String day);
+
+  /// No description provided for @greetingEyebrowAfternoon.
+  ///
+  /// In en, this message translates to:
+  /// **'{day} afternoon'**
+  String greetingEyebrowAfternoon(String day);
+
+  /// No description provided for @greetingEyebrowEvening.
+  ///
+  /// In en, this message translates to:
+  /// **'{day} evening'**
+  String greetingEyebrowEvening(String day);
+
+  /// No description provided for @greetingEyebrowNight.
+  ///
+  /// In en, this message translates to:
+  /// **'{day} night'**
+  String greetingEyebrowNight(String day);
+
+  /// No description provided for @creditsScripture.
+  ///
+  /// In en, this message translates to:
+  /// **'Scripture'**
+  String get creditsScripture;
+
+  /// No description provided for @creditsCommentary.
+  ///
+  /// In en, this message translates to:
+  /// **'Commentary'**
+  String get creditsCommentary;
+
+  /// No description provided for @creditsStudyTools.
+  ///
+  /// In en, this message translates to:
+  /// **'Study tools'**
+  String get creditsStudyTools;
+
+  /// No description provided for @creditsBibleStories.
+  ///
+  /// In en, this message translates to:
+  /// **'Bible Stories'**
+  String get creditsBibleStories;
+
+  /// No description provided for @creditsFonts.
+  ///
+  /// In en, this message translates to:
+  /// **'Fonts'**
+  String get creditsFonts;
+
+  /// No description provided for @creditsCommentaryPerspective.
+  ///
+  /// In en, this message translates to:
+  /// **'The commentary comes from 19th- and 20th-century writers in the Seventh-day Adventist tradition and reads Bible prophecy from the historicist perspective. It is offered as a study aid alongside Scripture, not as part of it.'**
+  String get creditsCommentaryPerspective;
+
+  /// No description provided for @creditsPublicDomain.
+  ///
+  /// In en, this message translates to:
+  /// **'Public domain.'**
+  String get creditsPublicDomain;
+
+  /// No description provided for @creditsPublicDomainUs.
+  ///
+  /// In en, this message translates to:
+  /// **'Public domain in the US.'**
+  String get creditsPublicDomainUs;
+
+  /// No description provided for @creditsKjvDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Public domain. Strong\'s-tagged edition also public domain.'**
+  String get creditsKjvDetail;
+
+  /// No description provided for @creditsSelectedWriting.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected writing.'**
+  String get creditsSelectedWriting;
+
+  /// No description provided for @creditsAdditionalTranslationsDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloaded from the Free Use Bible API (bible.helloao.org) and open-bibles (github.com/seven1m/open-bibles).'**
+  String get creditsAdditionalTranslationsDetail;
+
+  /// No description provided for @creditsNarrativeDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Adapted from The Graham Bible (grahambible.com), AI-assisted and human reviewed.'**
+  String get creditsNarrativeDetail;
+
+  /// No description provided for @creditsFontsDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'SIL Open Font License 1.1. Full notices under {licenses}.'**
+  String creditsFontsDetail(String licenses);
+
+  /// No description provided for @miscPlanNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan not found.'**
+  String get miscPlanNotFound;
+
+  /// No description provided for @miscPaceUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'This plan was created before pace adjustment was supported. Recreate it to enable this feature.'**
+  String get miscPaceUnsupported;
+
+  /// No description provided for @miscPaceFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Pace adjustment failed: {error}'**
+  String miscPaceFailed(String error);
+
+  /// No description provided for @miscPlanLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load this plan ({error}).'**
+  String miscPlanLoadFailed(String error);
+
+  /// No description provided for @miscFolderSermon.
+  ///
+  /// In en, this message translates to:
+  /// **'Sermon prep'**
+  String get miscFolderSermon;
+
+  /// No description provided for @miscFolderMemorize.
+  ///
+  /// In en, this message translates to:
+  /// **'Memorize'**
+  String get miscFolderMemorize;
+
+  /// No description provided for @miscFolderComfort.
+  ///
+  /// In en, this message translates to:
+  /// **'Comfort'**
+  String get miscFolderComfort;
+
+  /// No description provided for @miscFolderStudy.
+  ///
+  /// In en, this message translates to:
+  /// **'Study'**
+  String get miscFolderStudy;
+
+  /// No description provided for @miscColorPurple.
+  ///
+  /// In en, this message translates to:
+  /// **'Purple'**
+  String get miscColorPurple;
+
+  /// No description provided for @miscColorGreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Green'**
+  String get miscColorGreen;
+
+  /// No description provided for @miscColorBlue.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue'**
+  String get miscColorBlue;
+
+  /// No description provided for @miscColorPink.
+  ///
+  /// In en, this message translates to:
+  /// **'Pink'**
+  String get miscColorPink;
+
+  /// No description provided for @miscColorRed.
+  ///
+  /// In en, this message translates to:
+  /// **'Red'**
+  String get miscColorRed;
+
+  /// No description provided for @miscSearchBibleVerse.
+  ///
+  /// In en, this message translates to:
+  /// **'Bible Verse'**
+  String get miscSearchBibleVerse;
+
+  /// No description provided for @miscSearchCommentary.
+  ///
+  /// In en, this message translates to:
+  /// **'Commentary'**
+  String get miscSearchCommentary;
+
+  /// No description provided for @miscSearchCommentaryBy.
+  ///
+  /// In en, this message translates to:
+  /// **'{author} Commentary'**
+  String miscSearchCommentaryBy(String author);
+
+  /// No description provided for @miscSearchNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note • {date}'**
+  String miscSearchNote(String date);
+
+  /// No description provided for @miscSearchJumpTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Jump To'**
+  String get miscSearchJumpTo;
+
+  /// No description provided for @miscSearchGoToChapter.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to {book} chapter {chapter}'**
+  String miscSearchGoToChapter(String book, int chapter);
+
+  /// No description provided for @miscSearchGoToVerse.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to {book} chapter {chapter}, verse {verse}'**
+  String miscSearchGoToVerse(String book, int chapter, int verse);
+
+  /// No description provided for @miscSearchDictionary.
+  ///
+  /// In en, this message translates to:
+  /// **'Dictionary ({sources})'**
+  String miscSearchDictionary(String sources);
+
+  /// No description provided for @miscMostReadSnippet.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Frequently read passage (1 visit)} other{Frequently read passage ({count} visits)}}'**
+  String miscMostReadSnippet(int count);
+
+  /// No description provided for @miscEmotionAnxiety.
+  ///
+  /// In en, this message translates to:
+  /// **'anxiety'**
+  String get miscEmotionAnxiety;
+
+  /// No description provided for @miscEmotionFear.
+  ///
+  /// In en, this message translates to:
+  /// **'fear'**
+  String get miscEmotionFear;
+
+  /// No description provided for @miscEmotionSadness.
+  ///
+  /// In en, this message translates to:
+  /// **'sadness'**
+  String get miscEmotionSadness;
+
+  /// No description provided for @miscEmotionLoneliness.
+  ///
+  /// In en, this message translates to:
+  /// **'loneliness'**
+  String get miscEmotionLoneliness;
+
+  /// No description provided for @miscEmotionAnger.
+  ///
+  /// In en, this message translates to:
+  /// **'anger'**
+  String get miscEmotionAnger;
+
+  /// No description provided for @miscEmotionTemptation.
+  ///
+  /// In en, this message translates to:
+  /// **'temptation'**
+  String get miscEmotionTemptation;
+
+  /// No description provided for @miscEmotionGuilt.
+  ///
+  /// In en, this message translates to:
+  /// **'guilt'**
+  String get miscEmotionGuilt;
+
+  /// No description provided for @miscEmotionHopelessness.
+  ///
+  /// In en, this message translates to:
+  /// **'hopelessness'**
+  String get miscEmotionHopelessness;
+
+  /// No description provided for @miscEmotionConfusion.
+  ///
+  /// In en, this message translates to:
+  /// **'confusion'**
+  String get miscEmotionConfusion;
+
+  /// No description provided for @miscEmotionDoubt.
+  ///
+  /// In en, this message translates to:
+  /// **'doubt'**
+  String get miscEmotionDoubt;
+
+  /// No description provided for @miscEmotionExhaustion.
+  ///
+  /// In en, this message translates to:
+  /// **'exhaustion'**
+  String get miscEmotionExhaustion;
+
+  /// No description provided for @miscEmotionGratitude.
+  ///
+  /// In en, this message translates to:
+  /// **'gratitude'**
+  String get miscEmotionGratitude;
+
+  /// No description provided for @miscEmotionJoy.
+  ///
+  /// In en, this message translates to:
+  /// **'joy'**
+  String get miscEmotionJoy;
+
+  /// No description provided for @miscEmotionPeace.
+  ///
+  /// In en, this message translates to:
+  /// **'peace'**
+  String get miscEmotionPeace;
+
+  /// No description provided for @miscPrayerComfort.
+  ///
+  /// In en, this message translates to:
+  /// **'Lord, bring comfort and strength as I navigate feelings of {emotion} today.'**
+  String miscPrayerComfort(String emotion);
+
+  /// No description provided for @miscPrayerScripture.
+  ///
+  /// In en, this message translates to:
+  /// **'Grant me the grace to reflect on scripture, especially {verse}.'**
+  String miscPrayerScripture(String verse);
+
+  /// No description provided for @miscPrayerGuide.
+  ///
+  /// In en, this message translates to:
+  /// **'Guide my steps in hope and peace, trusting in Your faithful promises.'**
+  String get miscPrayerGuide;
 }
 
 class _AppLocalizationsDelegate

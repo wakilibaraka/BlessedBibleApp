@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:the_blessed_bible/data/credits.dart';
+import 'package:the_blessed_bible/l10n/l10n.dart';
 import 'package:the_blessed_bible/ui/screens/credits_screen.dart';
 
 void main() {
@@ -18,7 +19,10 @@ void main() {
     await tester.pump();
 
     expect(find.text('Scripture'), findsOneWidget);
-    await tester.scrollUntilVisible(find.text(kCommentaryPerspective), 200);
+    await tester.scrollUntilVisible(
+        find.text(lookupAppLocalizations(const Locale('en'))
+            .creditsCommentaryPerspective),
+        200);
     await tester.scrollUntilVisible(find.textContaining('OpenBible.info'), 200);
     await tester.scrollUntilVisible(find.text('Open-source licenses'), 200);
     expect(find.text('Open-source licenses'), findsOneWidget);

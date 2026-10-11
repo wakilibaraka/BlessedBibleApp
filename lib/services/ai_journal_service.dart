@@ -1,3 +1,5 @@
+import 'package:flutter/widgets.dart' show Locale;
+import '../l10n/l10n.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class JournalReflectionResult {
@@ -73,7 +75,9 @@ class AiJournalService {
     'peace': ['John 14:27', 'Isaiah 26:3', 'Numbers 6:24-26'],
   };
 
-  Future<JournalReflectionResult> analyzeEntry(String text) async {
+  Future<JournalReflectionResult> analyzeEntry(String text,
+      {AppLocalizations? l10n}) async {
+    final l = l10n ?? lookupAppLocalizations(const Locale('en'));
     final lower = text.toLowerCase();
     final found = <String>[];
 
@@ -90,9 +94,9 @@ class AiJournalService {
         _emotionVerses[primaryEmotion] ?? _emotionVerses['peace']!;
 
     final prayerPoints = [
-      'Lord, bring comfort and strength as I navigate feelings of $primaryEmotion today.',
-      'Grant me the grace to reflect on scripture, especially ${recommendedVerses.first}.',
-      'Guide my steps in hope and peace, trusting in Your faithful promises.',
+      l.miscPrayerComfort(emotionLabel(primaryEmotion, l)),
+      l.miscPrayerScripture(recommendedVerses.first),
+      l.miscPrayerGuide,
     ];
 
     return JournalReflectionResult(
@@ -102,6 +106,25 @@ class AiJournalService {
     );
   }
 }
+
+/// Display name of a detected emotion key (stored in English).
+String emotionLabel(String emotion, AppLocalizations l10n) => switch (emotion) {
+      'anxiety' => l10n.miscEmotionAnxiety,
+      'fear' => l10n.miscEmotionFear,
+      'sadness' => l10n.miscEmotionSadness,
+      'loneliness' => l10n.miscEmotionLoneliness,
+      'anger' => l10n.miscEmotionAnger,
+      'temptation' => l10n.miscEmotionTemptation,
+      'guilt' => l10n.miscEmotionGuilt,
+      'hopelessness' => l10n.miscEmotionHopelessness,
+      'confusion' => l10n.miscEmotionConfusion,
+      'doubt' => l10n.miscEmotionDoubt,
+      'exhaustion' => l10n.miscEmotionExhaustion,
+      'gratitude' => l10n.miscEmotionGratitude,
+      'joy' => l10n.miscEmotionJoy,
+      'peace' => l10n.miscEmotionPeace,
+      _ => emotion,
+    };
 
 final aiJournalServiceProvider =
     Provider<AiJournalService>((ref) => AiJournalService());

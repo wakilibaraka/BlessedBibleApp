@@ -150,6 +150,38 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
+  String get onboardingReminderTitle => 'Un memento zilnic discret';
+
+  @override
+  String get onboardingReminderBody =>
+      'Un mic memento la ora aleasă te ajută să-ți formezi un obicei zilnic. Doar pentru citire — niciodată reclame.';
+
+  @override
+  String get onboardingReminderToggle => 'Amintește-mi să citesc zilnic';
+
+  @override
+  String get onboardingReminderTime => 'Ora mementoului';
+
+  @override
+  String get onboardingReminderPermission =>
+      'Telefonul va cere permisiunea de a afișa notificări. O poți schimba ulterior din Setări.';
+
+  @override
+  String get onboardingAccountTitle => 'Păstrează-ți notițele în siguranță';
+
+  @override
+  String get onboardingAccountBody =>
+      'Conectarea este opțională. Aplicația funcționează complet offline, fără cont. Cu un cont, evidențierile, notițele, semnele de carte și planurile sunt salvate și sincronizate pe dispozitivele tale.';
+
+  @override
+  String onboardingSignedInAs(String name) {
+    return 'Conectat ca $name';
+  }
+
+  @override
+  String get onboardingNotNow => 'Nu acum';
+
+  @override
   String get plansContinueReading => 'Continuă lectura';
 
   @override
@@ -3117,4 +3149,534 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get privacyViewOnline => 'Vezi online';
+
+  @override
+  String get notifDailyTitle => 'E timpul să citești';
+
+  @override
+  String get notifDailyBody =>
+      'Ia-ți un moment azi să citești și să reflectezi.';
+
+  @override
+  String get notifDailyChannel => 'Mementouri zilnice';
+
+  @override
+  String get notifDailyChannelDesc => 'Mementouri pentru citirea zilnică';
+
+  @override
+  String get notifPrayerTitle => 'E timpul pentru rugăciune';
+
+  @override
+  String get notifPrayerBody =>
+      'Oprește-te pentru un moment de reflecție și rugăciune.';
+
+  @override
+  String get notifPrayerChannel => 'Mementouri de rugăciune';
+
+  @override
+  String get notifPrayerChannelDesc => 'Mementouri zilnice de rugăciune';
+
+  @override
+  String get notifWeeklyTitle => 'Timpul de studiu săptămânal';
+
+  @override
+  String get notifWeeklyBody =>
+      'Este momentul tău programat pentru studiu și reflecție.';
+
+  @override
+  String get notifWeeklyChannel => 'Mementouri săptămânale';
+
+  @override
+  String get notifWeeklyChannelDesc =>
+      'Mementouri personalizate de studiu săptămânal';
+
+  @override
+  String get notifSabbathTitle => 'Se apropie Sabatul';
+
+  @override
+  String get notifSabbathBody => 'Primește ziua de odihnă.';
+
+  @override
+  String get notifSabbathChannel => 'Mementouri de Sabat';
+
+  @override
+  String get notifSabbathChannelDesc =>
+      'Mementouri săptămânale la apus pentru Sabat';
+
+  @override
+  String get notifPlanBody => 'Ia-ți un moment să citești pasajul zilei.';
+
+  @override
+  String get notifPlanChannel => 'Plan de citire';
+
+  @override
+  String get notifPlanChannelDesc => 'Mementouri pentru planul de citire';
+
+  @override
+  String get widgetStreakActive => 'Serie activă!';
+
+  @override
+  String get widgetStreakInactive => 'Citește astăzi ca să-ți păstrezi seria';
+
+  @override
+  String get widgetFallbackWord => 'Har (Charis)';
+
+  @override
+  String get widgetFallbackDefinition =>
+      'Favoarea nemeritată și dragostea divină a lui Dumnezeu revărsate asupra omenirii.';
+
+  @override
+  String get widgetStyleDusk => 'Amurg celest';
+
+  @override
+  String get widgetStyleDawn => 'Zori de dimineață';
+
+  @override
+  String get widgetStyleEmerald => 'Smarald de sanctuar';
+
+  @override
+  String get widgetStyleGolden => 'Chihlimbar sacru';
+
+  @override
+  String get widgetStyleRoyal => 'Safir regal';
+
+  @override
+  String get widgetStyleGlassLight => 'Sticlă mată';
+
+  @override
+  String get widgetStyleGlassDark => 'Sticlă de obsidian';
+
+  @override
+  String get widgetStyleSolidLight => 'Hârtie curată';
+
+  @override
+  String get widgetStyleSolidDark => 'Cărbune adânc';
+
+  @override
+  String get widgetStyleTransparent => 'Fundal transparent';
+
+  @override
+  String get backupShareSubject => 'Copie de rezervă The Blessed Bible';
+
+  @override
+  String backupExportFailed(String error) {
+    return 'Exportul a eșuat: $error';
+  }
+
+  @override
+  String backupNewerVersion(int version) {
+    return 'Această copie provine dintr-o versiune mai nouă a aplicației (v$version). Actualizează mai întâi aplicația.';
+  }
+
+  @override
+  String get backupConfirmTitle => 'Confirmă restaurarea';
+
+  @override
+  String get backupConfirmBody =>
+      'Toate notițele, evidențierile, marcajele și setările existente vor fi suprascrise. Ești sigur?';
+
+  @override
+  String backupSkippedValues(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count de valori omise',
+      few: '$count valori omise',
+      one: '1 valoare omisă',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String backupRedownload(int count, String list) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'descarcă din nou $count de traduceri: $list',
+      few: 'descarcă din nou $count traduceri: $list',
+      one: 'descarcă din nou 1 traducere: $list',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get backupRestored => 'Copia de rezervă a fost restaurată cu succes';
+
+  @override
+  String backupRestoredWithDetails(String details) {
+    return 'Copia de rezervă a fost restaurată ($details)';
+  }
+
+  @override
+  String backupRestoreFailed(String error) {
+    return 'Restaurarea a eșuat: copie de rezervă invalidă sau coruptă ($error)';
+  }
+
+  @override
+  String get greetingDaily1Title => 'Pace ție.';
+
+  @override
+  String get greetingDaily1Subtitle => 'Cuvântul Lui să-ți aducă odihnă.';
+
+  @override
+  String get greetingDaily2Title => 'Umblă în lumină.';
+
+  @override
+  String get greetingDaily2Subtitle =>
+      'Cuvântul Lui este o candelă pentru cărarea ta.';
+
+  @override
+  String get greetingDaily3Title => 'Har și pace ție.';
+
+  @override
+  String get greetingDaily3Subtitle => 'Odihnește-te azi în Viță.';
+
+  @override
+  String get greetingDaily4Title => 'Vino la ape.';
+
+  @override
+  String get greetingDaily4Subtitle => 'Isus este lumina lumii.';
+
+  @override
+  String get greetingDaily5Title => 'Domnul să te binecuvânteze.';
+
+  @override
+  String get greetingDaily5Subtitle =>
+      'Păstrează-I promisiunile aproape de inimă.';
+
+  @override
+  String get greetingDaily6Title => 'Oprește-te și să știi.';
+
+  @override
+  String get greetingDaily6Subtitle => 'Rămâi în prezența Lui liniștită.';
+
+  @override
+  String get greetingDaily7Title => 'Îndurări noi în fiecare dimineață.';
+
+  @override
+  String get greetingDaily7Subtitle => 'Îndurările Lui nu se sfârșesc.';
+
+  @override
+  String get greetingDaily8Title => 'Înrădăcinat în dragoste.';
+
+  @override
+  String get greetingDaily8Subtitle => 'Crește în har și adevăr.';
+
+  @override
+  String get greetingDaily9Title => 'Să lumineze lumina ta.';
+
+  @override
+  String get greetingDaily9Subtitle =>
+      'O cetate așezată pe un munte nu poate să rămână ascunsă.';
+
+  @override
+  String get greetingDaily10Title => 'Apropie-te de Dumnezeu.';
+
+  @override
+  String get greetingDaily10Subtitle => 'El Își întinde deja mâna spre tine.';
+
+  @override
+  String get greetingDaily11Title => 'Cuvântul S-a făcut trup.';
+
+  @override
+  String get greetingDaily11Subtitle => 'El îți înțelege drumul.';
+
+  @override
+  String get greetingDaily12Title => 'Gustă și vezi.';
+
+  @override
+  String get greetingDaily12Subtitle => 'Cât de bun este Domnul.';
+
+  @override
+  String get greetingMorning1Title => 'Deșteaptă-te, tu care dormi.';
+
+  @override
+  String get greetingMorning1Subtitle => 'Hristos te va lumina.';
+
+  @override
+  String get greetingMorning2Title => 'Dimineața vine bucuria.';
+
+  @override
+  String get greetingMorning2Subtitle => 'Pășește în ziua Lui cea nouă.';
+
+  @override
+  String get greetingMorning3Title =>
+      'Aceasta este ziua pe care a făcut-o Domnul.';
+
+  @override
+  String get greetingMorning3Subtitle =>
+      'Să ne bucurăm și să ne veselim în ea.';
+
+  @override
+  String get greetingEvening1Title => 'Ziua s-a sfârșit.';
+
+  @override
+  String get greetingEvening1Subtitle => 'El dă somn preaiubiților Lui.';
+
+  @override
+  String get greetingEvening2Title => 'Sub aripile Lui.';
+
+  @override
+  String get greetingEvening2Subtitle => 'Vei găsi adăpost în noaptea aceasta.';
+
+  @override
+  String get greetingEvening3Title => 'Veniți la Mine, toți cei trudiți.';
+
+  @override
+  String get greetingEvening3Subtitle => 'Și Eu vă voi da odihnă.';
+
+  @override
+  String get greetingGrace1Title =>
+      'Aruncă asupra Lui toate îngrijorările tale.';
+
+  @override
+  String get greetingGrace1Subtitle => 'Căci El Însuși îngrijește de tine.';
+
+  @override
+  String get greetingGrace2Title => 'Vă dau pacea Mea.';
+
+  @override
+  String get greetingGrace2Subtitle => 'Să nu vi se tulbure inima.';
+
+  @override
+  String get greetingGrace3Title => 'El vindecă pe cei cu inima zdrobită.';
+
+  @override
+  String get greetingGrace3Subtitle => 'Și le leagă rănile.';
+
+  @override
+  String get greetingGrace4Title => 'Nimic nu ne va putea despărți.';
+
+  @override
+  String get greetingGrace4Subtitle => 'De dragostea lui Dumnezeu.';
+
+  @override
+  String get greetingCheer1Title => 'Întărește-te și îmbărbătează-te.';
+
+  @override
+  String get greetingCheer1Subtitle => 'Domnul, Dumnezeul tău, merge cu tine.';
+
+  @override
+  String get greetingCheer2Title => 'Aleargă cu stăruință.';
+
+  @override
+  String get greetingCheer2Subtitle =>
+      'Ține-ți ochii pironiți asupra lui Isus.';
+
+  @override
+  String get greetingCheer3Title => 'Fierul ascute fierul.';
+
+  @override
+  String get greetingCheer3Subtitle => 'Creșteți împreună în Cuvânt.';
+
+  @override
+  String greetingEyebrowMorning(String day) {
+    return '$day dimineața';
+  }
+
+  @override
+  String greetingEyebrowAfternoon(String day) {
+    return '$day după-amiaza';
+  }
+
+  @override
+  String greetingEyebrowEvening(String day) {
+    return '$day seara';
+  }
+
+  @override
+  String greetingEyebrowNight(String day) {
+    return '$day noaptea';
+  }
+
+  @override
+  String get creditsScripture => 'Scriptura';
+
+  @override
+  String get creditsCommentary => 'Comentariu';
+
+  @override
+  String get creditsStudyTools => 'Instrumente de studiu';
+
+  @override
+  String get creditsBibleStories => 'Povestiri biblice';
+
+  @override
+  String get creditsFonts => 'Fonturi';
+
+  @override
+  String get creditsCommentaryPerspective =>
+      'Comentariile provin de la autori din secolele al XIX-lea și al XX-lea din tradiția adventistă de ziua a șaptea și interpretează profeția biblică din perspectivă istoricistă. Sunt oferite ca ajutor de studiu alături de Scriptură, nu ca parte a ei.';
+
+  @override
+  String get creditsPublicDomain => 'Domeniu public.';
+
+  @override
+  String get creditsPublicDomainUs => 'Domeniu public în SUA.';
+
+  @override
+  String get creditsKjvDetail =>
+      'Domeniu public. Ediția cu numerele Strong este, de asemenea, în domeniul public.';
+
+  @override
+  String get creditsSelectedWriting => 'Scrieri alese.';
+
+  @override
+  String get creditsAdditionalTranslationsDetail =>
+      'Descărcate din Free Use Bible API (bible.helloao.org) și open-bibles (github.com/seven1m/open-bibles).';
+
+  @override
+  String get creditsNarrativeDetail =>
+      'Adaptate după The Graham Bible (grahambible.com), cu ajutorul IA și verificate de oameni.';
+
+  @override
+  String creditsFontsDetail(String licenses) {
+    return 'SIL Open Font License 1.1. Notificările complete se află la $licenses.';
+  }
+
+  @override
+  String get miscPlanNotFound => 'Planul nu a fost găsit.';
+
+  @override
+  String get miscPaceUnsupported =>
+      'Acest plan a fost creat înainte ca ajustarea ritmului să fie disponibilă. Creează-l din nou pentru a activa această funcție.';
+
+  @override
+  String miscPaceFailed(String error) {
+    return 'Ajustarea ritmului a eșuat: $error';
+  }
+
+  @override
+  String miscPlanLoadFailed(String error) {
+    return 'Planul nu a putut fi încărcat ($error).';
+  }
+
+  @override
+  String get miscFolderSermon => 'Pregătire de predici';
+
+  @override
+  String get miscFolderMemorize => 'De memorat';
+
+  @override
+  String get miscFolderComfort => 'Mângâiere';
+
+  @override
+  String get miscFolderStudy => 'Studiu';
+
+  @override
+  String get miscColorPurple => 'Mov';
+
+  @override
+  String get miscColorGreen => 'Verde';
+
+  @override
+  String get miscColorBlue => 'Albastru';
+
+  @override
+  String get miscColorPink => 'Roz';
+
+  @override
+  String get miscColorRed => 'Roșu';
+
+  @override
+  String get miscSearchBibleVerse => 'Verset biblic';
+
+  @override
+  String get miscSearchCommentary => 'Comentariu';
+
+  @override
+  String miscSearchCommentaryBy(String author) {
+    return 'Comentariul lui $author';
+  }
+
+  @override
+  String miscSearchNote(String date) {
+    return 'Notiță • $date';
+  }
+
+  @override
+  String get miscSearchJumpTo => 'Salt la';
+
+  @override
+  String miscSearchGoToChapter(String book, int chapter) {
+    return 'Mergi la $book, capitolul $chapter';
+  }
+
+  @override
+  String miscSearchGoToVerse(String book, int chapter, int verse) {
+    return 'Mergi la $book, capitolul $chapter, versetul $verse';
+  }
+
+  @override
+  String miscSearchDictionary(String sources) {
+    return 'Dicționar ($sources)';
+  }
+
+  @override
+  String miscMostReadSnippet(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Pasaj citit des ($count de vizite)',
+      few: 'Pasaj citit des ($count vizite)',
+      one: 'Pasaj citit des (1 vizită)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get miscEmotionAnxiety => 'anxietate';
+
+  @override
+  String get miscEmotionFear => 'frică';
+
+  @override
+  String get miscEmotionSadness => 'tristețe';
+
+  @override
+  String get miscEmotionLoneliness => 'singurătate';
+
+  @override
+  String get miscEmotionAnger => 'mânie';
+
+  @override
+  String get miscEmotionTemptation => 'ispită';
+
+  @override
+  String get miscEmotionGuilt => 'vinovăție';
+
+  @override
+  String get miscEmotionHopelessness => 'deznădejde';
+
+  @override
+  String get miscEmotionConfusion => 'confuzie';
+
+  @override
+  String get miscEmotionDoubt => 'îndoială';
+
+  @override
+  String get miscEmotionExhaustion => 'epuizare';
+
+  @override
+  String get miscEmotionGratitude => 'recunoștință';
+
+  @override
+  String get miscEmotionJoy => 'bucurie';
+
+  @override
+  String get miscEmotionPeace => 'pace';
+
+  @override
+  String miscPrayerComfort(String emotion) {
+    return 'Doamne, dă-mi mângâiere și putere în fața sentimentelor de $emotion de astăzi.';
+  }
+
+  @override
+  String miscPrayerScripture(String verse) {
+    return 'Dă-mi harul să cuget la Scriptură, mai ales la $verse.';
+  }
+
+  @override
+  String get miscPrayerGuide =>
+      'Călăuzește-mi pașii în nădejde și pace, încrezându-mă în promisiunile Tale credincioase.';
 }

@@ -118,11 +118,6 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
     Navigator.of(context).push(CupertinoPageRoute<void>(builder: (_) => page));
   }
 
-  String _remainingLabel(AppLocalizations l10n, DateTime now) {
-    final left = YearProgress.daysRemaining(now);
-    return left == 0 ? l10n.plansLastDayOfYear : l10n.plansDaysLeftInYear(left);
-  }
-
   String _planTitle(String id) {
     for (final p in availablePlans) {
       if (p.id == id) return p.title;
@@ -233,7 +228,7 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
       builder: (ctx) => _LetReadSheet(
         day: YearProgress.dayOfYear(now),
         total: YearProgress.daysInYear(now.year),
-        remainingLabel: _remainingLabel(context.l10n, now),
+        remainingLabel: YearProgress.remainingLabel(now, context.l10n),
         verse: verse,
         onRead: () {
           Navigator.of(ctx).pop();
@@ -334,11 +329,9 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
                     const SizedBox(height: 12),
                     LibraryGreetingHeader(
                       name: name,
-                      progressLabel: context.l10n.plansDayOfTotal(
-                        YearProgress.dayOfYear(now),
-                        YearProgress.daysInYear(now.year),
-                      ),
-                      remainingLabel: _remainingLabel(context.l10n, now),
+                      progressLabel: YearProgress.label(now, context.l10n),
+                      remainingLabel:
+                          YearProgress.remainingLabel(now, context.l10n),
                       onReadPressed: _openLetRead,
                     ),
                     const SizedBox(height: 12),

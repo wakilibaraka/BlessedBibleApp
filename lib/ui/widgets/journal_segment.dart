@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../l10n/l10n.dart';
+import '../../services/ai_journal_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/journal_provider.dart';
 
@@ -103,8 +104,8 @@ class JournalSegment extends ConsumerWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                          context.l10n.notesDetectedEmotion(
-                              entry.detectedEmotions.first),
+                          context.l10n.notesDetectedEmotion(emotionLabel(
+                              entry.detectedEmotions.first, context.l10n)),
                           style: theme.textTheme.bodySmall),
                       const SizedBox(height: 8),
                       Text(

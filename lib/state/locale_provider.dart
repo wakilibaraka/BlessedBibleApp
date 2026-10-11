@@ -1,9 +1,14 @@
+import 'dart:async';
 import 'dart:ui' show PlatformDispatcher;
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/local_storage/preferences_service.dart';
+import '../l10n/l10n.dart';
+import '../utils/log.dart';
+import 'reading_plan_provider.dart';
+import 'reminders_provider.dart';
 
 /// A language the app's interface is translated into.
 class AppLanguage {
@@ -67,6 +72,19 @@ class AppLocaleNotifier extends Notifier<Locale?> {
       await prefs.setString(key, code);
       state = Locale(code);
     }
+    // Scheduled notifications carry their text from when they were
+    // scheduled; re-schedule them in the new language. Best effort and
+    // never blocking: no permission or no platform just leaves them as is.
+    unawaited(_rescheduleNotifications());
+  }
+
+  Future<void> _rescheduleNotifications() async {
+    try {
+      await ref.read(remindersProvider.notifier).rescheduleAll();
+      await resyncPlanReminders(ref);
+    } catch (e) {
+      logDebug('notification reschedule after language change failed: $e');
+    }
   }
 }
 
@@ -81,4 +99,13 @@ Locale resolveAppLocale(List<Locale>? deviceLocales, Iterable<Locale> _) {
     if (match != null) return Locale(match.code);
   }
   return const Locale('en');
+}
+
+/// Interface strings for code that has no [BuildContext] (notifications,
+/// home-screen widget, background work). Uses the saved language, else the
+/// device language.
+AppLocalizations l10nFor(String? savedCode) {
+  final lang = (savedCode == null ? null : appLanguageFor(savedCode)) ??
+      deviceLanguage();
+  return lookupAppLocalizations(Locale(lang.code));
 }

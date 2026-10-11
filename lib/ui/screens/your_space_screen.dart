@@ -453,7 +453,7 @@ void _showMoveToFolderSheet(
                 },
               ),
               ...bookmarkData.folders.map((f) => ListTile(
-                    title: Text(f.name),
+                    title: Text(bookmarkFolderLabel(f, context.l10n)),
                     trailing: currentFolderId == f.id
                         ? Icon(Icons.check, color: theme.primaryColor)
                         : null,
@@ -635,7 +635,7 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
               ...bookmarkData.folders.map((f) => Padding(
                     padding: const EdgeInsets.only(right: 8.0),
                     child: ChoiceChip(
-                      label: Text(f.name),
+                      label: Text(bookmarkFolderLabel(f, context.l10n)),
                       selected: _viewType == _BookmarkViewType.folder &&
                           _selectedFolderId == f.id,
                       onSelected: (val) {
@@ -686,7 +686,7 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  selectedFolder.name,
+                  bookmarkFolderLabel(selectedFolder, context.l10n),
                   style: widget.theme.textTheme.titleMedium
                       ?.copyWith(fontWeight: FontWeight.bold),
                 ),
@@ -694,16 +694,22 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.edit, size: 20),
-                      onPressed: () => _showRenameFolderDialog(context, ref,
-                          selectedFolder!.id, selectedFolder.name),
+                      onPressed: () => _showRenameFolderDialog(
+                          context,
+                          ref,
+                          selectedFolder!.id,
+                          bookmarkFolderLabel(selectedFolder, context.l10n)),
                     ),
                     IconButton(
                       icon:
                           const Icon(Icons.delete, size: 20, color: Colors.red),
                       onPressed: () {
                         setState(() => _viewType = _BookmarkViewType.all);
-                        _showDeleteFolderDialog(context, ref,
-                            selectedFolder!.id, selectedFolder.name);
+                        _showDeleteFolderDialog(
+                            context,
+                            ref,
+                            selectedFolder!.id,
+                            bookmarkFolderLabel(selectedFolder, context.l10n));
                       },
                     ),
                   ],

@@ -251,6 +251,7 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
     final streak = ref.watch(streakProvider);
     final now = DateTime.now();
     final greeting = greetingFor(
+      l10n: context.l10n,
       now: now,
       streakCount: streak.count,
       distinctDaysThisYear: streak.distinctDaysThisYear,
@@ -278,7 +279,7 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          V2Eyebrow(greetingEyebrow(now)),
+                          V2Eyebrow(greetingEyebrow(now, context.l10n)),
                           const SizedBox(height: 2),
                           Text(
                             greeting.title,

@@ -151,6 +151,38 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get onboardingReminderTitle => 'Un doux rappel quotidien';
+
+  @override
+  String get onboardingReminderBody =>
+      'Un petit rappel à l\'heure choisie aide à prendre une habitude quotidienne. Uniquement pour la lecture — jamais de publicité.';
+
+  @override
+  String get onboardingReminderToggle => 'Me rappeler de lire chaque jour';
+
+  @override
+  String get onboardingReminderTime => 'Heure du rappel';
+
+  @override
+  String get onboardingReminderPermission =>
+      'Votre téléphone demandera l\'autorisation d\'afficher des notifications. Modifiable plus tard dans les Réglages.';
+
+  @override
+  String get onboardingAccountTitle => 'Gardez vos notes en sécurité';
+
+  @override
+  String get onboardingAccountBody =>
+      'La connexion est facultative. L\'application fonctionne entièrement hors ligne sans compte. Avec un compte, vos surlignages, notes, signets et plans sont sauvegardés et synchronisés entre vos appareils.';
+
+  @override
+  String onboardingSignedInAs(String name) {
+    return 'Connecté en tant que $name';
+  }
+
+  @override
+  String get onboardingNotNow => 'Pas maintenant';
+
+  @override
   String get plansContinueReading => 'Reprendre la lecture';
 
   @override
@@ -3113,4 +3145,537 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get privacyViewOnline => 'Voir en ligne';
+
+  @override
+  String get notifDailyTitle => 'C\'est l\'heure de lire';
+
+  @override
+  String get notifDailyBody =>
+      'Prenez un moment pour lire et méditer aujourd\'hui.';
+
+  @override
+  String get notifDailyChannel => 'Rappels quotidiens';
+
+  @override
+  String get notifDailyChannelDesc => 'Rappels pour la lecture quotidienne';
+
+  @override
+  String get notifPrayerTitle => 'C\'est l\'heure de prier';
+
+  @override
+  String get notifPrayerBody =>
+      'Faites une pause pour un moment de méditation et de prière.';
+
+  @override
+  String get notifPrayerChannel => 'Rappels de prière';
+
+  @override
+  String get notifPrayerChannelDesc => 'Rappels de prière quotidiens';
+
+  @override
+  String get notifWeeklyTitle => 'Temps d\'étude hebdomadaire';
+
+  @override
+  String get notifWeeklyBody =>
+      'C\'est votre moment prévu pour l\'étude et la méditation.';
+
+  @override
+  String get notifWeeklyChannel => 'Rappels hebdomadaires';
+
+  @override
+  String get notifWeeklyChannelDesc =>
+      'Rappels d\'étude hebdomadaires personnalisés';
+
+  @override
+  String get notifSabbathTitle => 'Le sabbat approche';
+
+  @override
+  String get notifSabbathBody => 'Accueillez le jour du repos.';
+
+  @override
+  String get notifSabbathChannel => 'Rappels du sabbat';
+
+  @override
+  String get notifSabbathChannelDesc =>
+      'Rappels hebdomadaires au coucher du soleil pour le sabbat';
+
+  @override
+  String get notifPlanBody =>
+      'Prenez un moment pour lire votre passage du jour.';
+
+  @override
+  String get notifPlanChannel => 'Plan de lecture';
+
+  @override
+  String get notifPlanChannelDesc => 'Rappels du plan de lecture';
+
+  @override
+  String get widgetStreakActive => 'Série en cours !';
+
+  @override
+  String get widgetStreakInactive =>
+      'Lisez aujourd\'hui pour garder votre série';
+
+  @override
+  String get widgetFallbackWord => 'Grâce (Charis)';
+
+  @override
+  String get widgetFallbackDefinition =>
+      'La faveur imméritée et l\'amour divin de Dieu accordés à l\'humanité.';
+
+  @override
+  String get widgetStyleDusk => 'Crépuscule céleste';
+
+  @override
+  String get widgetStyleDawn => 'Aube matinale';
+
+  @override
+  String get widgetStyleEmerald => 'Émeraude du sanctuaire';
+
+  @override
+  String get widgetStyleGolden => 'Ambre sacré';
+
+  @override
+  String get widgetStyleRoyal => 'Saphir royal';
+
+  @override
+  String get widgetStyleGlassLight => 'Verre givré';
+
+  @override
+  String get widgetStyleGlassDark => 'Verre d\'obsidienne';
+
+  @override
+  String get widgetStyleSolidLight => 'Papier blanc';
+
+  @override
+  String get widgetStyleSolidDark => 'Charbon profond';
+
+  @override
+  String get widgetStyleTransparent => 'Fond d\'écran visible';
+
+  @override
+  String get backupShareSubject => 'Sauvegarde The Blessed Bible';
+
+  @override
+  String backupExportFailed(String error) {
+    return 'Échec de l\'exportation : $error';
+  }
+
+  @override
+  String backupNewerVersion(int version) {
+    return 'Cette sauvegarde provient d\'une version plus récente de l\'application (v$version). Mettez d\'abord l\'application à jour.';
+  }
+
+  @override
+  String get backupConfirmTitle => 'Confirmer la restauration';
+
+  @override
+  String get backupConfirmBody =>
+      'Cela remplacera toutes vos notes, surlignages, signets et réglages existants. Voulez-vous continuer ?';
+
+  @override
+  String backupSkippedValues(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count valeurs ignorées',
+      one: '1 valeur ignorée',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String backupRedownload(int count, String list) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'retéléchargez $count traductions : $list',
+      one: 'retéléchargez 1 traduction : $list',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get backupRestored => 'Sauvegarde restaurée avec succès';
+
+  @override
+  String backupRestoredWithDetails(String details) {
+    return 'Sauvegarde restaurée ($details)';
+  }
+
+  @override
+  String backupRestoreFailed(String error) {
+    return 'Échec de la restauration : sauvegarde invalide ou corrompue ($error)';
+  }
+
+  @override
+  String get greetingDaily1Title => 'La paix soit avec vous.';
+
+  @override
+  String get greetingDaily1Subtitle => 'Que sa parole vous apporte le repos.';
+
+  @override
+  String get greetingDaily2Title => 'Marchez dans la lumière.';
+
+  @override
+  String get greetingDaily2Subtitle =>
+      'Sa parole est une lampe sur votre sentier.';
+
+  @override
+  String get greetingDaily3Title =>
+      'Que la grâce et la paix vous soient données.';
+
+  @override
+  String get greetingDaily3Subtitle => 'Demeurez dans le Cep aujourd\'hui.';
+
+  @override
+  String get greetingDaily4Title => 'Venez aux eaux.';
+
+  @override
+  String get greetingDaily4Subtitle => 'Jésus est la lumière du monde.';
+
+  @override
+  String get greetingDaily5Title => 'Que l\'Éternel vous bénisse.';
+
+  @override
+  String get greetingDaily5Subtitle =>
+      'Gardez ses promesses près de votre cœur.';
+
+  @override
+  String get greetingDaily6Title => 'Arrêtez, et sachez.';
+
+  @override
+  String get greetingDaily6Subtitle => 'Demeurez dans sa paisible présence.';
+
+  @override
+  String get greetingDaily7Title => 'Ses bontés se renouvellent chaque matin.';
+
+  @override
+  String get greetingDaily7Subtitle =>
+      'Ses compassions ne sont pas à leur terme.';
+
+  @override
+  String get greetingDaily8Title => 'Enracinés dans l\'amour.';
+
+  @override
+  String get greetingDaily8Subtitle => 'Grandissez dans la grâce et la vérité.';
+
+  @override
+  String get greetingDaily9Title => 'Que votre lumière brille.';
+
+  @override
+  String get greetingDaily9Subtitle =>
+      'Une ville située sur une montagne ne peut être cachée.';
+
+  @override
+  String get greetingDaily10Title => 'Approchez-vous de Dieu.';
+
+  @override
+  String get greetingDaily10Subtitle => 'Il vous tend déjà la main.';
+
+  @override
+  String get greetingDaily11Title => 'La Parole a été faite chair.';
+
+  @override
+  String get greetingDaily11Subtitle => 'Il comprend votre chemin.';
+
+  @override
+  String get greetingDaily12Title => 'Goûtez et voyez.';
+
+  @override
+  String get greetingDaily12Subtitle => 'Combien l\'Éternel est bon.';
+
+  @override
+  String get greetingMorning1Title => 'Réveille-toi, toi qui dors.';
+
+  @override
+  String get greetingMorning1Subtitle => 'Christ t\'éclairera.';
+
+  @override
+  String get greetingMorning2Title => 'Le matin vient l\'allégresse.';
+
+  @override
+  String get greetingMorning2Subtitle => 'Entrez dans son jour nouveau.';
+
+  @override
+  String get greetingMorning3Title =>
+      'Voici la journée que l\'Éternel a faite.';
+
+  @override
+  String get greetingMorning3Subtitle =>
+      'Qu\'elle soit pour nous un sujet d\'allégresse.';
+
+  @override
+  String get greetingEvening1Title => 'La journée s\'achève.';
+
+  @override
+  String get greetingEvening1Subtitle =>
+      'Il donne le sommeil à ses bien-aimés.';
+
+  @override
+  String get greetingEvening2Title => 'Sous ses ailes.';
+
+  @override
+  String get greetingEvening2Subtitle => 'Vous trouverez refuge cette nuit.';
+
+  @override
+  String get greetingEvening3Title =>
+      'Venez à moi, vous tous qui êtes fatigués.';
+
+  @override
+  String get greetingEvening3Subtitle => 'Et je vous donnerai du repos.';
+
+  @override
+  String get greetingGrace1Title =>
+      'Déchargez-vous sur lui de tous vos soucis.';
+
+  @override
+  String get greetingGrace1Subtitle => 'Car lui-même prend soin de vous.';
+
+  @override
+  String get greetingGrace2Title => 'Je vous donne ma paix.';
+
+  @override
+  String get greetingGrace2Subtitle => 'Que votre cœur ne se trouble point.';
+
+  @override
+  String get greetingGrace3Title => 'Il guérit ceux qui ont le cœur brisé.';
+
+  @override
+  String get greetingGrace3Subtitle => 'Et il panse leurs blessures.';
+
+  @override
+  String get greetingGrace4Title => 'Rien ne pourra nous séparer.';
+
+  @override
+  String get greetingGrace4Subtitle => 'De l\'amour de Dieu.';
+
+  @override
+  String get greetingCheer1Title => 'Fortifiez-vous et ayez du courage.';
+
+  @override
+  String get greetingCheer1Subtitle =>
+      'L\'Éternel, votre Dieu, marche avec vous.';
+
+  @override
+  String get greetingCheer2Title => 'Courez avec persévérance.';
+
+  @override
+  String get greetingCheer2Subtitle => 'Gardez les yeux fixés sur Jésus.';
+
+  @override
+  String get greetingCheer3Title => 'Le fer aiguise le fer.';
+
+  @override
+  String get greetingCheer3Subtitle => 'Grandissez ensemble dans la Parole.';
+
+  @override
+  String greetingEyebrowMorning(String day) {
+    return '$day matin';
+  }
+
+  @override
+  String greetingEyebrowAfternoon(String day) {
+    return '$day après-midi';
+  }
+
+  @override
+  String greetingEyebrowEvening(String day) {
+    return '$day soir';
+  }
+
+  @override
+  String greetingEyebrowNight(String day) {
+    return '$day nuit';
+  }
+
+  @override
+  String get creditsScripture => 'Écritures';
+
+  @override
+  String get creditsCommentary => 'Commentaires';
+
+  @override
+  String get creditsStudyTools => 'Outils d\'étude';
+
+  @override
+  String get creditsBibleStories => 'Histoires bibliques';
+
+  @override
+  String get creditsFonts => 'Polices';
+
+  @override
+  String get creditsCommentaryPerspective =>
+      'Les commentaires proviennent d\'auteurs des XIXe et XXe siècles de la tradition adventiste du septième jour et lisent la prophétie biblique selon la perspective historiciste. Ils sont proposés comme aide à l\'étude, à côté des Écritures, et n\'en font pas partie.';
+
+  @override
+  String get creditsPublicDomain => 'Domaine public.';
+
+  @override
+  String get creditsPublicDomainUs => 'Domaine public aux États-Unis.';
+
+  @override
+  String get creditsKjvDetail =>
+      'Domaine public. L\'édition annotée avec les numéros Strong l\'est aussi.';
+
+  @override
+  String get creditsSelectedWriting => 'Écrits choisis.';
+
+  @override
+  String get creditsAdditionalTranslationsDetail =>
+      'Téléchargées depuis la Free Use Bible API (bible.helloao.org) et open-bibles (github.com/seven1m/open-bibles).';
+
+  @override
+  String get creditsNarrativeDetail =>
+      'Adaptés de The Graham Bible (grahambible.com), avec l\'aide de l\'IA et relus par des humains.';
+
+  @override
+  String creditsFontsDetail(String licenses) {
+    return 'SIL Open Font License 1.1. Avis complets dans $licenses.';
+  }
+
+  @override
+  String get miscPlanNotFound => 'Plan introuvable.';
+
+  @override
+  String get miscPaceUnsupported =>
+      'Ce plan a été créé avant que l\'ajustement du rythme soit possible. Recréez-le pour activer cette fonction.';
+
+  @override
+  String miscPaceFailed(String error) {
+    return 'Échec de l\'ajustement du rythme : $error';
+  }
+
+  @override
+  String miscPlanLoadFailed(String error) {
+    return 'Impossible de charger ce plan ($error).';
+  }
+
+  @override
+  String get miscFolderSermon => 'Préparation de sermon';
+
+  @override
+  String get miscFolderMemorize => 'À mémoriser';
+
+  @override
+  String get miscFolderComfort => 'Réconfort';
+
+  @override
+  String get miscFolderStudy => 'Étude';
+
+  @override
+  String get miscColorPurple => 'Violet';
+
+  @override
+  String get miscColorGreen => 'Vert';
+
+  @override
+  String get miscColorBlue => 'Bleu';
+
+  @override
+  String get miscColorPink => 'Rose';
+
+  @override
+  String get miscColorRed => 'Rouge';
+
+  @override
+  String get miscSearchBibleVerse => 'Verset biblique';
+
+  @override
+  String get miscSearchCommentary => 'Commentaire';
+
+  @override
+  String miscSearchCommentaryBy(String author) {
+    return 'Commentaire de $author';
+  }
+
+  @override
+  String miscSearchNote(String date) {
+    return 'Note • $date';
+  }
+
+  @override
+  String get miscSearchJumpTo => 'Aller à';
+
+  @override
+  String miscSearchGoToChapter(String book, int chapter) {
+    return 'Aller à $book, chapitre $chapter';
+  }
+
+  @override
+  String miscSearchGoToVerse(String book, int chapter, int verse) {
+    return 'Aller à $book, chapitre $chapter, verset $verse';
+  }
+
+  @override
+  String miscSearchDictionary(String sources) {
+    return 'Dictionnaire ($sources)';
+  }
+
+  @override
+  String miscMostReadSnippet(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Passage souvent lu ($count visites)',
+      one: 'Passage souvent lu (1 visite)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get miscEmotionAnxiety => 'anxiété';
+
+  @override
+  String get miscEmotionFear => 'peur';
+
+  @override
+  String get miscEmotionSadness => 'tristesse';
+
+  @override
+  String get miscEmotionLoneliness => 'solitude';
+
+  @override
+  String get miscEmotionAnger => 'colère';
+
+  @override
+  String get miscEmotionTemptation => 'tentation';
+
+  @override
+  String get miscEmotionGuilt => 'culpabilité';
+
+  @override
+  String get miscEmotionHopelessness => 'désespoir';
+
+  @override
+  String get miscEmotionConfusion => 'confusion';
+
+  @override
+  String get miscEmotionDoubt => 'doute';
+
+  @override
+  String get miscEmotionExhaustion => 'épuisement';
+
+  @override
+  String get miscEmotionGratitude => 'gratitude';
+
+  @override
+  String get miscEmotionJoy => 'joie';
+
+  @override
+  String get miscEmotionPeace => 'paix';
+
+  @override
+  String miscPrayerComfort(String emotion) {
+    return 'Seigneur, apporte-moi réconfort et force face à ce sentiment de $emotion aujourd\'hui.';
+  }
+
+  @override
+  String miscPrayerScripture(String verse) {
+    return 'Accorde-moi la grâce de méditer les Écritures, en particulier $verse.';
+  }
+
+  @override
+  String get miscPrayerGuide =>
+      'Guide mes pas dans l\'espérance et la paix, confiant en tes promesses fidèles.';
 }

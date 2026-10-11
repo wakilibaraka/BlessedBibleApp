@@ -4,12 +4,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/notification_service.dart';
 import '../data/local_storage/preferences_service.dart';
+import 'locale_provider.dart';
 import 'read_settings_provider.dart';
 import '../models/plan_spec.dart';
 import '../models/reading_plan.dart';
 import '../services/pace_remap_service.dart';
 import '../services/word_count_service.dart';
 import '../utils/isolate_parsers.dart';
+import '../l10n/l10n.dart';
 import '../utils/log.dart';
 
 /// App weekday: 1=Sunday, 2=Monday, ..., 7=Saturday
@@ -587,7 +589,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
       // Never a silent empty plan: surface the failure for retry UI.
       state = state.copyWith(
         isLoading: false,
-        error: 'Could not load this plan ($e).',
+        error: _l10n().miscPlanLoadFailed('$e'),
       );
     }
   }
@@ -758,6 +760,10 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
   /// plan state writes (or unit tests without platform channels). Async
   /// with an awaited call so failures land in this try/catch instead of
   /// escaping through an async gap.
+  /// Interface strings for messages this notifier returns to the UI.
+  AppLocalizations _l10n() => l10nFor(
+      ref.read(preferencesProvider).prefs.getString(AppLocaleNotifier.key));
+
   Future<void> _syncReminder(ReadingPlanState next) async {
     try {
       await ref.read(notificationServiceProvider).syncReadingPlanReminder(
@@ -848,12 +854,11 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
     try {
       final prefs = ref.read(preferencesProvider);
       final planJson = prefs.getCustomPlan(_planId);
-      if (planJson == null) return 'Plan not found.';
+      if (planJson == null) return _l10n().miscPlanNotFound;
 
       final oldPlan = ReadingPlan.fromJson(planJson);
       if (oldPlan.tracks == null || oldPlan.tracks!.isEmpty) {
-        return 'This plan was created before pace-adjustment was supported. '
-            'Recreate it to enable this feature.';
+        return _l10n().miscPaceUnsupported;
       }
 
       final wcs = ref.read(wordCountServiceProvider);
@@ -891,7 +896,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
       ref.invalidateSelf();
       return null;
     } catch (e) {
-      return 'Pace adjustment failed: $e';
+      return _l10n().miscPaceFailed('$e');
     }
   }
 }
@@ -929,6 +934,34 @@ class ActivePlanIdsNotifier extends Notifier<List<String>> {
     next.insert(0, id);
     state = next;
     ref.read(preferencesProvider).saveActivePlanIds(next);
+  }
+}
+
+/// Re-schedules the reminders of every active plan from saved plan state,
+/// e.g. after the interface language changes. Plans without a reminder are
+/// left alone; failures (no permission, no platform) are non-fatal.
+Future<void> resyncPlanReminders(Ref ref) async {
+  final prefs = ref.read(preferencesProvider);
+  final ns = ref.read(notificationServiceProvider);
+  for (final id in prefs.getActivePlanIds()) {
+    try {
+      final saved = prefs.getReadingPlanState(id);
+      if (saved == null || saved['reminderEnabled'] != true) continue;
+      await ns.initialize();
+      await ns.syncReadingPlanReminder(
+        true,
+        saved['reminderTimeHour'] as int? ?? 8,
+        saved['reminderTimeMinute'] as int? ?? 0,
+        saved['restDay'] as int?,
+        restDays: {
+          for (final d in (saved['restDays'] as List? ?? const [])) d as int
+        },
+        planId: saved['planId'] as String? ?? id,
+        askPermission: false,
+      );
+    } catch (e) {
+      logDebug('plan reminder resync failed (non-fatal): $e');
+    }
   }
 }
 

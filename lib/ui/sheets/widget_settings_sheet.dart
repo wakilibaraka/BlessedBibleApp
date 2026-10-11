@@ -289,7 +289,7 @@ class WidgetSettingsSheet extends ConsumerWidget {
                         ),
                       ),
                     ),
-                    label: Text(style.label),
+                    label: Text(style.label(context.l10n)),
                     selected: isSelected,
                     onSelected: (selected) {
                       if (selected) {

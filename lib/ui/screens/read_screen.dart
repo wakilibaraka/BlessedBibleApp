@@ -3021,7 +3021,7 @@ class VerseActionLogic {
                             ),
                           ),
                           const SizedBox(height: 6),
-                          Text(highlightPaletteNames[i],
+                          Text(highlightPaletteName(i, context.l10n),
                               style: theme.textTheme.labelSmall?.copyWith(
                                 color: theme.colorScheme.onSurface
                                     .withValues(alpha: 0.7),

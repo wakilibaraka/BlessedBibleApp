@@ -10,6 +10,7 @@ import 'commentary_provider.dart';
 import 'translation_provider.dart';
 import 'pericopes_provider.dart';
 import '../services/bible_database_service.dart';
+import '../l10n/l10n.dart';
 
 enum SearchResultType {
   reference,
@@ -54,6 +55,55 @@ class SearchResult {
         ),
         metadata: (json['metadata'] as Map<String, dynamic>?) ?? {},
       );
+}
+
+/// The result's subtitle in the interface language. Results are built
+/// (often in an isolate) and saved with English labels; this translates
+/// them for display from the result's type and metadata, falling back to
+/// the stored text when the metadata isn't there (older saved results).
+String searchResultSubtitle(SearchResult r, AppLocalizations l10n) {
+  final m = r.metadata;
+  switch (r.type) {
+    case SearchResultType.bible:
+      return r.subtitle == 'Bible Verse'
+          ? l10n.miscSearchBibleVerse
+          : r.subtitle;
+    case SearchResultType.commentary:
+      final author = m['author'];
+      if (author is! String) return r.subtitle;
+      return author.isEmpty
+          ? l10n.miscSearchCommentary
+          : l10n.miscSearchCommentaryBy(author);
+    case SearchResultType.note:
+      final date = m['date'];
+      return date is String ? l10n.miscSearchNote(date) : r.subtitle;
+    case SearchResultType.reference:
+      return m['jumpTo'] == true ? l10n.miscSearchJumpTo : r.subtitle;
+    case SearchResultType.dictionary:
+      final sources = m['sources'];
+      return sources is String
+          ? l10n.miscSearchDictionary(sources)
+          : r.subtitle;
+    default:
+      return r.subtitle;
+  }
+}
+
+/// The result's snippet in the interface language (only the generated
+/// "Go to …" and most-read snippets are UI text; the rest is content).
+String searchResultSnippet(SearchResult r, AppLocalizations l10n) {
+  final m = r.metadata;
+  final visits = m['visits'];
+  if (visits is int) return l10n.miscMostReadSnippet(visits);
+  if (r.type == SearchResultType.reference && m['jumpTo'] == true) {
+    final book = m['bookName'] as String? ?? r.title;
+    final chapter = m['chapter'] as int? ?? 1;
+    final verse = m['verse'];
+    return verse is int
+        ? l10n.miscSearchGoToVerse(book, chapter, verse)
+        : l10n.miscSearchGoToChapter(book, chapter);
+  }
+  return r.snippet;
 }
 
 class SearchItem {
@@ -255,6 +305,7 @@ IndexData buildIndexIsolate(IndexBuildArgs args) {
             (entry.author.isNotEmpty ? '«${entry.author}» ' : '') + entry.text,
         metadata: {
           'bookName': bookName,
+          'author': entry.author,
           if (chapterNum != null) 'chapter': chapterNum,
           if (verseNum != null) 'verse': verseNum,
         },
@@ -322,6 +373,7 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
         text: note.content,
         metadata: {
           'title': note.title,
+          'date': note.date,
           if (note.reference != null) 'reference': note.reference,
         },
       );
@@ -399,6 +451,7 @@ List<SearchResult> _searchIsolate(SearchQueryArgs args) {
             metadata: {
               'bookAbbrev': book.abbreviation,
               'bookName': book.name,
+              'jumpTo': true,
               'chapter': chapter ?? 1,
               if (verse != null) 'verse': verse,
             },

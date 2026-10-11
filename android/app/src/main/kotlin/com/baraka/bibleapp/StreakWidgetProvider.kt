@@ -21,13 +21,26 @@ class StreakWidgetProvider : HomeWidgetProvider() {
                 // Read synced data from Flutter
                 val streakCount = widgetData.getInt("streak_count", 0)
                 val isLit = widgetData.getBoolean("streak_is_lit", false)
-                val wotdWord = widgetData.getString("wotd_word", "Grace (Charis)") ?: "Grace (Charis)"
-                val wotdSnippet = widgetData.getString("wotd_snippet", "The unmerited favor and divine love of God bestowed upon humanity.") ?: ""
+                val wotdWord = widgetData.getString("wotd_word", null)
+                    ?: context.getString(R.string.widget_wotd_fallback_word)
+                val wotdSnippet = widgetData.getString("wotd_snippet", null)
+                    ?: context.getString(R.string.widget_wotd_fallback_snippet)
+                // Labels pushed by the app in its own interface language;
+                // the device-language resources are the fallback.
+                val streakText = widgetData.getString("label_streak_days", null)
+                    ?: context.resources.getQuantityString(R.plurals.widget_streak_days, streakCount, streakCount)
+                val wotdLabel = widgetData.getString("label_wotd", null)
+                    ?: context.getString(R.string.widget_wotd_title)
+                val activeText = widgetData.getString("label_streak_active", null)
+                    ?: context.getString(R.string.widget_streak_active)
+                val inactiveText = widgetData.getString("label_streak_inactive", null)
+                    ?: context.getString(R.string.widget_streak_inactive)
                 val bgStyle = widgetData.getString("widget_bg_style", "gradient_dusk") ?: "gradient_dusk"
                 val textMode = widgetData.getString("widget_text_mode", "auto") ?: "auto"
 
                 // Bind text
-                setTextViewText(R.id.streak_count, "$streakCount Days")
+                setTextViewText(R.id.streak_count, streakText)
+                setTextViewText(R.id.wotd_label, wotdLabel)
                 setTextViewText(R.id.wotd_word, wotdWord)
                 setTextViewText(R.id.wotd_snippet, wotdSnippet)
 
@@ -35,10 +48,10 @@ class StreakWidgetProvider : HomeWidgetProvider() {
                 val isDark = applyWidgetTheme(context, this, bgStyle, textMode)
 
                 if (isLit) {
-                    setTextViewText(R.id.streak_subtitle, "Streak Active! 🔥")
+                    setTextViewText(R.id.streak_subtitle, activeText)
                     setTextColor(R.id.streak_subtitle, if (isDark) Color.parseColor("#4ADE80") else Color.parseColor("#16A34A"))
                 } else {
-                    setTextViewText(R.id.streak_subtitle, "Read today to keep streak")
+                    setTextViewText(R.id.streak_subtitle, inactiveText)
                     setTextColor(R.id.streak_subtitle, if (isDark) Color.parseColor("#D4D4D8") else Color.parseColor("#71717A"))
                 }
 

@@ -152,6 +152,38 @@ class AppLocalizationsSw extends AppLocalizations {
   }
 
   @override
+  String get onboardingReminderTitle => 'Kikumbusho cha upole kila siku';
+
+  @override
+  String get onboardingReminderBody =>
+      'Ukumbusho mfupi kwa wakati unaouchagua husaidia kujenga desturi ya kila siku. Ni kwa kusoma tu — kamwe si matangazo.';
+
+  @override
+  String get onboardingReminderToggle => 'Nikumbushe kusoma kila siku';
+
+  @override
+  String get onboardingReminderTime => 'Wakati wa kikumbusho';
+
+  @override
+  String get onboardingReminderPermission =>
+      'Simu yako itaomba ruhusa ya kuonyesha arifa. Unaweza kubadilisha hili baadaye kwenye Mipangilio.';
+
+  @override
+  String get onboardingAccountTitle => 'Linda maelezo yako';
+
+  @override
+  String get onboardingAccountBody =>
+      'Kuingia ni hiari. Programu hufanya kazi kikamilifu bila mtandao na bila akaunti. Ukiwa na akaunti, alama, maelezo, vialamisho na mipango yako huhifadhiwa na kusawazishwa kwenye vifaa vyako.';
+
+  @override
+  String onboardingSignedInAs(String name) {
+    return 'Umeingia kama $name';
+  }
+
+  @override
+  String get onboardingNotNow => 'Si sasa';
+
+  @override
   String get plansContinueReading => 'Endelea Kusoma';
 
   @override
@@ -3090,4 +3122,524 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get privacyViewOnline => 'Tazama mtandaoni';
+
+  @override
+  String get notifDailyTitle => 'Wakati wa Kusoma';
+
+  @override
+  String get notifDailyBody => 'Chukua muda leo kusoma na kutafakari.';
+
+  @override
+  String get notifDailyChannel => 'Vikumbusho vya Kila Siku';
+
+  @override
+  String get notifDailyChannelDesc => 'Vikumbusho vya kusoma kila siku';
+
+  @override
+  String get notifPrayerTitle => 'Wakati wa Maombi';
+
+  @override
+  String get notifPrayerBody => 'Tulia kwa muda wa kutafakari na kuomba.';
+
+  @override
+  String get notifPrayerChannel => 'Vikumbusho vya Maombi';
+
+  @override
+  String get notifPrayerChannelDesc => 'Vikumbusho vya maombi kila siku';
+
+  @override
+  String get notifWeeklyTitle => 'Wakati wa Kujifunza wa Wiki';
+
+  @override
+  String get notifWeeklyBody =>
+      'Ni wakati wako uliopangwa wa kujifunza na kutafakari.';
+
+  @override
+  String get notifWeeklyChannel => 'Vikumbusho vya Kila Wiki';
+
+  @override
+  String get notifWeeklyChannelDesc =>
+      'Vikumbusho maalum vya kujifunza kila wiki';
+
+  @override
+  String get notifSabbathTitle => 'Sabato Inakaribia';
+
+  @override
+  String get notifSabbathBody => 'Karibisha siku ya mapumziko.';
+
+  @override
+  String get notifSabbathChannel => 'Vikumbusho vya Sabato';
+
+  @override
+  String get notifSabbathChannelDesc =>
+      'Vikumbusho vya kila wiki vya machweo kwa Sabato';
+
+  @override
+  String get notifPlanBody => 'Chukua muda kusoma kifungu chako cha leo.';
+
+  @override
+  String get notifPlanChannel => 'Mpango wa Kusoma';
+
+  @override
+  String get notifPlanChannelDesc => 'Vikumbusho vya mpango wa kusoma';
+
+  @override
+  String get widgetStreakActive => 'Mfululizo unaendelea!';
+
+  @override
+  String get widgetStreakInactive => 'Soma leo kudumisha mfululizo wako';
+
+  @override
+  String get widgetFallbackWord => 'Neema (Charis)';
+
+  @override
+  String get widgetFallbackDefinition =>
+      'Upendeleo usiostahiliwa na upendo wa Mungu uliotolewa kwa wanadamu.';
+
+  @override
+  String get widgetStyleDusk => 'Machweo ya Mbinguni';
+
+  @override
+  String get widgetStyleDawn => 'Mapambazuko';
+
+  @override
+  String get widgetStyleEmerald => 'Zumaridi ya Patakatifu';
+
+  @override
+  String get widgetStyleGolden => 'Kaharabu Takatifu';
+
+  @override
+  String get widgetStyleRoyal => 'Yakuti ya Kifalme';
+
+  @override
+  String get widgetStyleGlassLight => 'Kioo cha Barafu';
+
+  @override
+  String get widgetStyleGlassDark => 'Kioo cha Obsidiani';
+
+  @override
+  String get widgetStyleSolidLight => 'Karatasi Safi';
+
+  @override
+  String get widgetStyleSolidDark => 'Mkaa Mzito';
+
+  @override
+  String get widgetStyleTransparent => 'Mandhari Wazi';
+
+  @override
+  String get backupShareSubject => 'Nakala Rudufu ya The Blessed Bible';
+
+  @override
+  String backupExportFailed(String error) {
+    return 'Imeshindwa kuhamisha: $error';
+  }
+
+  @override
+  String backupNewerVersion(int version) {
+    return 'Nakala hii ni ya toleo jipya zaidi la programu (v$version). Sasisha programu kwanza.';
+  }
+
+  @override
+  String get backupConfirmTitle => 'Thibitisha Kurejesha';
+
+  @override
+  String get backupConfirmBody =>
+      'Hii itabadilisha madokezo, alama za kuangazia, alamisho na mipangilio yote iliyopo. Una uhakika?';
+
+  @override
+  String backupSkippedValues(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Thamani $count zimerukwa',
+      one: 'Thamani 1 imerukwa',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String backupRedownload(int count, String list) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'pakua tena tafsiri $count: $list',
+      one: 'pakua tena tafsiri 1: $list',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get backupRestored => 'Nakala rudufu imerejeshwa kikamilifu';
+
+  @override
+  String backupRestoredWithDetails(String details) {
+    return 'Nakala rudufu imerejeshwa ($details)';
+  }
+
+  @override
+  String backupRestoreFailed(String error) {
+    return 'Imeshindwa kurejesha: nakala rudufu si sahihi au imeharibika ($error)';
+  }
+
+  @override
+  String get greetingDaily1Title => 'Amani iwe nawe.';
+
+  @override
+  String get greetingDaily1Subtitle => 'Neno lake likupe pumziko.';
+
+  @override
+  String get greetingDaily2Title => 'Enenda nuruni.';
+
+  @override
+  String get greetingDaily2Subtitle => 'Neno lake ni taa ya njia yako.';
+
+  @override
+  String get greetingDaily3Title => 'Neema na amani kwako.';
+
+  @override
+  String get greetingDaily3Subtitle => 'Pumzika ndani ya Mzabibu leo.';
+
+  @override
+  String get greetingDaily4Title => 'Njoo majini.';
+
+  @override
+  String get greetingDaily4Subtitle => 'Yesu ni nuru ya ulimwengu.';
+
+  @override
+  String get greetingDaily5Title => 'Bwana akubariki.';
+
+  @override
+  String get greetingDaily5Subtitle => 'Shika ahadi zake karibu na moyo wako.';
+
+  @override
+  String get greetingDaily6Title => 'Tulia ujue.';
+
+  @override
+  String get greetingDaily6Subtitle => 'Kaa katika uwepo wake wa utulivu.';
+
+  @override
+  String get greetingDaily7Title => 'Rehema mpya kila asubuhi.';
+
+  @override
+  String get greetingDaily7Subtitle => 'Rehema zake hazikomi.';
+
+  @override
+  String get greetingDaily8Title => 'Ukiwa na mizizi katika upendo.';
+
+  @override
+  String get greetingDaily8Subtitle => 'Kua katika neema na kweli.';
+
+  @override
+  String get greetingDaily9Title => 'Nuru yako iangaze.';
+
+  @override
+  String get greetingDaily9Subtitle =>
+      'Mji ulio juu ya mlima hauwezi kusitirika.';
+
+  @override
+  String get greetingDaily10Title => 'Mkaribie Mungu.';
+
+  @override
+  String get greetingDaily10Subtitle => 'Tayari anakufikia.';
+
+  @override
+  String get greetingDaily11Title => 'Neno alifanyika mwili.';
+
+  @override
+  String get greetingDaily11Subtitle => 'Anaelewa safari yako.';
+
+  @override
+  String get greetingDaily12Title => 'Onjeni mwone.';
+
+  @override
+  String get greetingDaily12Subtitle => 'Ya kuwa Bwana yu mwema.';
+
+  @override
+  String get greetingMorning1Title => 'Amka, wewe usinziaye.';
+
+  @override
+  String get greetingMorning1Subtitle => 'Kristo atakuangaza.';
+
+  @override
+  String get greetingMorning2Title => 'Furaha huja asubuhi.';
+
+  @override
+  String get greetingMorning2Subtitle => 'Ingia katika siku yake mpya.';
+
+  @override
+  String get greetingMorning3Title => 'Siku hii ndiyo aliyoifanya Bwana.';
+
+  @override
+  String get greetingMorning3Subtitle => 'Tushangilie na kuifurahia.';
+
+  @override
+  String get greetingEvening1Title => 'Siku imekwisha.';
+
+  @override
+  String get greetingEvening1Subtitle => 'Huwapa wapenzi wake usingizi.';
+
+  @override
+  String get greetingEvening2Title => 'Chini ya mabawa yake.';
+
+  @override
+  String get greetingEvening2Subtitle => 'Utapata kimbilio usiku huu.';
+
+  @override
+  String get greetingEvening3Title => 'Njooni kwangu, ninyi nyote msumbukao.';
+
+  @override
+  String get greetingEvening3Subtitle => 'Nami nitawapumzisha.';
+
+  @override
+  String get greetingGrace1Title => 'Mtwike yeye fadhaika zako zote.';
+
+  @override
+  String get greetingGrace1Subtitle =>
+      'Kwa maana yeye hujishughulisha sana kwa mambo yako.';
+
+  @override
+  String get greetingGrace2Title => 'Amani yangu nawapa.';
+
+  @override
+  String get greetingGrace2Subtitle => 'Msifadhaike mioyoni mwenu.';
+
+  @override
+  String get greetingGrace3Title => 'Huwaponya waliovunjika moyo.';
+
+  @override
+  String get greetingGrace3Subtitle => 'Na kuziganga jeraha zao.';
+
+  @override
+  String get greetingGrace4Title => 'Hakuna kitakachoweza kututenga.';
+
+  @override
+  String get greetingGrace4Subtitle => 'Na upendo wa Mungu.';
+
+  @override
+  String get greetingCheer1Title => 'Uwe hodari na moyo wa ushujaa.';
+
+  @override
+  String get greetingCheer1Subtitle => 'Bwana, Mungu wako, yu pamoja nawe.';
+
+  @override
+  String get greetingCheer2Title => 'Piga mbio kwa saburi.';
+
+  @override
+  String get greetingCheer2Subtitle => 'Ukimtazama Yesu.';
+
+  @override
+  String get greetingCheer3Title => 'Chuma hunoa chuma.';
+
+  @override
+  String get greetingCheer3Subtitle => 'Kueni pamoja katika Neno.';
+
+  @override
+  String greetingEyebrowMorning(String day) {
+    return '$day asubuhi';
+  }
+
+  @override
+  String greetingEyebrowAfternoon(String day) {
+    return '$day mchana';
+  }
+
+  @override
+  String greetingEyebrowEvening(String day) {
+    return '$day jioni';
+  }
+
+  @override
+  String greetingEyebrowNight(String day) {
+    return '$day usiku';
+  }
+
+  @override
+  String get creditsScripture => 'Maandiko';
+
+  @override
+  String get creditsCommentary => 'Maelezo';
+
+  @override
+  String get creditsStudyTools => 'Zana za kujifunza';
+
+  @override
+  String get creditsBibleStories => 'Hadithi za Biblia';
+
+  @override
+  String get creditsFonts => 'Fonti';
+
+  @override
+  String get creditsCommentaryPerspective =>
+      'Maelezo yanatoka kwa waandishi wa karne ya 19 na 20 wa mapokeo ya Waadventista Wasabato, na yanasoma unabii wa Biblia kwa mtazamo wa kihistoria (historicist). Yanatolewa kama msaada wa kujifunza pamoja na Maandiko, si sehemu yake.';
+
+  @override
+  String get creditsPublicDomain => 'Haki za umma (public domain).';
+
+  @override
+  String get creditsPublicDomainUs => 'Haki za umma nchini Marekani.';
+
+  @override
+  String get creditsKjvDetail =>
+      'Haki za umma. Toleo lenye namba za Strong pia ni la umma.';
+
+  @override
+  String get creditsSelectedWriting => 'Maandishi teule.';
+
+  @override
+  String get creditsAdditionalTranslationsDetail =>
+      'Zimepakuliwa kutoka Free Use Bible API (bible.helloao.org) na open-bibles (github.com/seven1m/open-bibles).';
+
+  @override
+  String get creditsNarrativeDetail =>
+      'Zimetoholewa kutoka The Graham Bible (grahambible.com), kwa msaada wa AI na kukaguliwa na watu.';
+
+  @override
+  String creditsFontsDetail(String licenses) {
+    return 'SIL Open Font License 1.1. Taarifa kamili ziko chini ya $licenses.';
+  }
+
+  @override
+  String get miscPlanNotFound => 'Mpango haukupatikana.';
+
+  @override
+  String get miscPaceUnsupported =>
+      'Mpango huu uliundwa kabla ya kuwezesha kurekebisha kasi. Uunde upya ili kuwasha kipengele hiki.';
+
+  @override
+  String miscPaceFailed(String error) {
+    return 'Imeshindwa kurekebisha kasi: $error';
+  }
+
+  @override
+  String miscPlanLoadFailed(String error) {
+    return 'Imeshindwa kupakia mpango huu ($error).';
+  }
+
+  @override
+  String get miscFolderSermon => 'Maandalizi ya mahubiri';
+
+  @override
+  String get miscFolderMemorize => 'Kukariri';
+
+  @override
+  String get miscFolderComfort => 'Faraja';
+
+  @override
+  String get miscFolderStudy => 'Kujifunza';
+
+  @override
+  String get miscColorPurple => 'Zambarau';
+
+  @override
+  String get miscColorGreen => 'Kijani';
+
+  @override
+  String get miscColorBlue => 'Bluu';
+
+  @override
+  String get miscColorPink => 'Waridi';
+
+  @override
+  String get miscColorRed => 'Nyekundu';
+
+  @override
+  String get miscSearchBibleVerse => 'Mstari wa Biblia';
+
+  @override
+  String get miscSearchCommentary => 'Maelezo';
+
+  @override
+  String miscSearchCommentaryBy(String author) {
+    return 'Maelezo ya $author';
+  }
+
+  @override
+  String miscSearchNote(String date) {
+    return 'Dokezo • $date';
+  }
+
+  @override
+  String get miscSearchJumpTo => 'Nenda kwa';
+
+  @override
+  String miscSearchGoToChapter(String book, int chapter) {
+    return 'Nenda kwa $book sura ya $chapter';
+  }
+
+  @override
+  String miscSearchGoToVerse(String book, int chapter, int verse) {
+    return 'Nenda kwa $book sura ya $chapter, mstari wa $verse';
+  }
+
+  @override
+  String miscSearchDictionary(String sources) {
+    return 'Kamusi ($sources)';
+  }
+
+  @override
+  String miscMostReadSnippet(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Kifungu kinachosomwa mara nyingi (ziara $count)',
+      one: 'Kifungu kinachosomwa mara nyingi (ziara 1)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get miscEmotionAnxiety => 'wasiwasi';
+
+  @override
+  String get miscEmotionFear => 'hofu';
+
+  @override
+  String get miscEmotionSadness => 'huzuni';
+
+  @override
+  String get miscEmotionLoneliness => 'upweke';
+
+  @override
+  String get miscEmotionAnger => 'hasira';
+
+  @override
+  String get miscEmotionTemptation => 'jaribu';
+
+  @override
+  String get miscEmotionGuilt => 'hatia';
+
+  @override
+  String get miscEmotionHopelessness => 'kukata tamaa';
+
+  @override
+  String get miscEmotionConfusion => 'kuchanganyikiwa';
+
+  @override
+  String get miscEmotionDoubt => 'shaka';
+
+  @override
+  String get miscEmotionExhaustion => 'uchovu';
+
+  @override
+  String get miscEmotionGratitude => 'shukrani';
+
+  @override
+  String get miscEmotionJoy => 'furaha';
+
+  @override
+  String get miscEmotionPeace => 'amani';
+
+  @override
+  String miscPrayerComfort(String emotion) {
+    return 'Bwana, nipe faraja na nguvu ninapopitia hisia za $emotion leo.';
+  }
+
+  @override
+  String miscPrayerScripture(String verse) {
+    return 'Nijalie neema ya kutafakari Maandiko, hasa $verse.';
+  }
+
+  @override
+  String get miscPrayerGuide =>
+      'Uongoze hatua zangu katika tumaini na amani, nikitumaini ahadi zako za uaminifu.';
 }

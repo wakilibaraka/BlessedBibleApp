@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home-screen widget text. Generated alongside tool/l10n/parts/system.json;
+     the app also pushes these strings in its own interface language. -->
+<resources>
+    <string name="widget_votd_title">MSTARI WA SIKU</string>
+    <string name="widget_votd_loading">Inapakia mstari…</string>
+    <string name="widget_wotd_title">NENO LA SIKU</string>
+    <string name="widget_streak_zero">Siku 0</string>
+    <string name="widget_streak_read_today">Soma leo!</string>
+    <string name="widget_streak_active">Mfululizo unaendelea! 🔥</string>
+    <string name="widget_streak_inactive">Soma leo kudumisha mfululizo wako</string>
+    <string name="widget_wotd_fallback_word">Neema (Charis)</string>
+    <string name="widget_wotd_fallback_snippet">Upendeleo usiostahiliwa na upendo wa Mungu uliotolewa kwa wanadamu.</string>
+    <plurals name="widget_streak_days">
+        <item quantity="one">Siku %d</item>
+        <item quantity="other">Siku %d</item>
+    </plurals>
+</resources>

@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../data/bible_books.dart';
+import '../l10n/l10n.dart';
 import '../state/translation_provider.dart';
 import 'bible_database_service.dart';
 import '../utils/log.dart';
@@ -205,9 +206,9 @@ class ShareService {
     await Clipboard.setData(ClipboardData(text: text));
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Copied to clipboard'),
-            duration: Duration(seconds: 2)),
+        SnackBar(
+            content: Text(context.l10n.searchCopied),
+            duration: const Duration(seconds: 2)),
       );
     }
   }

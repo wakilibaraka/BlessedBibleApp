@@ -23,7 +23,7 @@ class CreditsScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 8),
         children: [
-          for (final section in kCreditSections) ...[
+          for (final section in creditSections(context.l10n)) ...[
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
               child: Text(

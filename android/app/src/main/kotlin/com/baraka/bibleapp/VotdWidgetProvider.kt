@@ -25,6 +25,11 @@ class VotdWidgetProvider : HomeWidgetProvider() {
 
                 setTextViewText(R.id.votd_text, votdText)
                 setTextViewText(R.id.votd_reference, votdRef)
+                setTextViewText(
+                    R.id.votd_title,
+                    widgetData.getString("label_votd", null)
+                        ?: context.getString(R.string.widget_votd_title)
+                )
 
                 applyWidgetTheme(context, this, bgStyle, textMode)
 

@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+import '../l10n/l10n.dart';
+
 /// Content credits shown on the Credits & sources screen. Keep in sync with
 /// docs/LICENSES_REGISTER.md.
 class CreditItem {
@@ -16,87 +18,78 @@ class CreditSection {
   const CreditSection(this.heading, this.items, {this.note});
 }
 
-const String kCommentaryPerspective =
-    'The commentary comes from 19th- and 20th-century writers in the '
-    'Seventh-day Adventist tradition and reads Bible prophecy from the '
-    'historicist perspective. It is offered as a study aid alongside '
-    'Scripture, not as part of it.';
-
-const List<CreditSection> kCreditSections = [
-  CreditSection('Scripture', [
-    CreditItem('King James Version',
-        'Public domain. Strong\'s-tagged edition also public domain.'),
-    CreditItem('Bible in Basic English (1965)', 'Public domain in the US.'),
-    CreditItem('World English Bible', 'Public domain.'),
-    CreditItem(
-        'Reina-Valera 1909, Louis Segond 1910, Luther 1912, Diodati 1885, '
+/// The credits in the interface language. Section headings and generic
+/// descriptions are translated; work titles, names and licence lines are
+/// kept as published.
+List<CreditSection> creditSections(AppLocalizations l10n) => [
+      CreditSection(l10n.creditsScripture, [
+        CreditItem('King James Version', l10n.creditsKjvDetail),
+        CreditItem('Bible in Basic English (1965)', l10n.creditsPublicDomainUs),
+        CreditItem('World English Bible', l10n.creditsPublicDomain),
+        CreditItem(
+            'Reina-Valera 1909, Louis Segond 1910, Luther 1912, Diodati 1885, '
             'Dutch 1917, Russian Synodal, Chinese Union Version, '
             'Arabic Van Dyck, Korean 1910, Ukrainian Kulish, '
             'Kralice Bible 1613 (Czech), Károli Bible (Hungarian)',
-        'Public domain.'),
-    CreditItem('Swahili and Tagalog Unlocked Literal Bible',
-        'Licensed under CC BY-SA 4.0 (creativecommons.org/licenses/by-sa/4.0).'),
-    CreditItem('Romanian BTF Bible (2015)',
-        '© 2015 Dr. Brian J. Nibbe, Sr. All rights reserved.'),
-    CreditItem('Hindi Indian Revised Version',
-        'Licensed under CC BY-SA 4.0 (creativecommons.org/licenses/by-sa/4.0).'),
-    CreditItem(
-        'Updated Gdańsk Bible (Polish)',
-        '© 2018 Fundacja Wrota Nadziei. Licensed under CC BY-ND 4.0 '
-            '(creativecommons.org/licenses/by-nd/4.0).'),
-    CreditItem(
-        'Bíblia Livre', 'Licensed under Creative Commons Attribution (CC BY).'),
-    CreditItem(
-        'Additional translations',
-        'Downloaded from the Free Use Bible API (bible.helloao.org) and '
-            'open-bibles (github.com/seven1m/open-bibles).'),
-  ]),
-  CreditSection(
-    'Commentary',
-    [
-      CreditItem(
-          'Ellen G. White',
-          'The Desire of Ages (1898), Patriarchs and Prophets (1890), '
-              'The Acts of the Apostles (1911), Prophets and Kings (1917).'),
-      CreditItem('Uriah Smith', 'Daniel and the Revelation.'),
-      CreditItem('E. J. Waggoner', 'Waggoner on Romans; The Glad Tidings.'),
-      CreditItem('M. L. Andreasen', 'The Book of Hebrews (1948).'),
-      CreditItem('Samuel T. Spear', 'Selected writing.'),
-    ],
-    note: kCommentaryPerspective,
-  ),
-  CreditSection('Study tools', [
-    CreditItem(
-        'Cross-references',
-        'OpenBible.info (openbible.info/labs/cross-references), licensed '
-            'under CC BY. Based on the Treasury of Scripture Knowledge.'),
-    CreditItem(
-        'Dictionary',
-        'Easton\'s Bible Dictionary (1897) and Smith\'s Bible Dictionary '
-            '(1863), public domain.'),
-    CreditItem('Strong\'s lexicon',
-        'James Strong\'s Hebrew and Greek dictionaries (1890), public domain.'),
-    CreditItem(
-        'Topical reading plans',
-        'Nave\'s Topical Bible (1896) and Torrey\'s New Topical Textbook '
-            '(1897), public domain; normalized via topical-bible-search (MIT).'),
-  ]),
-  CreditSection('Bible Stories', [
-    CreditItem(
-        'Narrative summaries',
-        'Adapted from The Graham Bible (grahambible.com), AI-assisted and '
-            'human reviewed.'),
-    CreditItem('Artwork',
-        'Gustave Doré (1832–1883), public domain, via Wikimedia Commons.'),
-  ]),
-  CreditSection('Fonts', [
-    CreditItem(
-        'Alegreya, Bitter, Cardo, Cormorant Garamond, EB Garamond, '
+            l10n.creditsPublicDomain),
+        CreditItem('Swahili and Tagalog Unlocked Literal Bible',
+            'Licensed under CC BY-SA 4.0 (creativecommons.org/licenses/by-sa/4.0).'),
+        CreditItem('Romanian BTF Bible (2015)',
+            '© 2015 Dr. Brian J. Nibbe, Sr. All rights reserved.'),
+        CreditItem('Hindi Indian Revised Version',
+            'Licensed under CC BY-SA 4.0 (creativecommons.org/licenses/by-sa/4.0).'),
+        CreditItem(
+            'Updated Gdańsk Bible (Polish)',
+            '© 2018 Fundacja Wrota Nadziei. Licensed under CC BY-ND 4.0 '
+                '(creativecommons.org/licenses/by-nd/4.0).'),
+        CreditItem('Bíblia Livre',
+            'Licensed under Creative Commons Attribution (CC BY).'),
+        CreditItem('Additional translations',
+            l10n.creditsAdditionalTranslationsDetail),
+      ]),
+      CreditSection(
+        l10n.creditsCommentary,
+        [
+          CreditItem(
+              'Ellen G. White',
+              'The Desire of Ages (1898), Patriarchs and Prophets (1890), '
+                  'The Acts of the Apostles (1911), Prophets and Kings (1917).'),
+          CreditItem('Uriah Smith', 'Daniel and the Revelation.'),
+          CreditItem('E. J. Waggoner', 'Waggoner on Romans; The Glad Tidings.'),
+          CreditItem('M. L. Andreasen', 'The Book of Hebrews (1948).'),
+          CreditItem('Samuel T. Spear', l10n.creditsSelectedWriting),
+        ],
+        note: l10n.creditsCommentaryPerspective,
+      ),
+      CreditSection(l10n.creditsStudyTools, [
+        CreditItem(
+            'Cross-references',
+            'OpenBible.info (openbible.info/labs/cross-references), licensed '
+                'under CC BY. Based on the Treasury of Scripture Knowledge.'),
+        CreditItem(
+            'Dictionary',
+            'Easton\'s Bible Dictionary (1897) and Smith\'s Bible Dictionary '
+                '(1863), public domain.'),
+        CreditItem('Strong\'s lexicon',
+            'James Strong\'s Hebrew and Greek dictionaries (1890), public domain.'),
+        CreditItem(
+            'Topical reading plans',
+            'Nave\'s Topical Bible (1896) and Torrey\'s New Topical Textbook '
+                '(1897), public domain; normalized via topical-bible-search (MIT).'),
+      ]),
+      CreditSection(l10n.creditsBibleStories, [
+        CreditItem('Narrative summaries', l10n.creditsNarrativeDetail),
+        CreditItem('Artwork',
+            'Gustave Doré (1832–1883), public domain, via Wikimedia Commons.'),
+      ]),
+      CreditSection(l10n.creditsFonts, [
+        CreditItem(
+            'Alegreya, Bitter, Cardo, Cormorant Garamond, EB Garamond, '
             'Gentium Book Plus, IM FELL English, Inter, Lexend, Literata, '
             'Lora, Noto Serif, OpenDyslexic, Playfair Display, Source Sans 3',
-        'SIL Open Font License 1.1. Full notices under Open-source licenses.'),
-  ]),
-];
+            l10n.creditsFontsDetail(l10n.creditsLicenses)),
+      ]),
+    ];
 
 /// Copyright lines from each bundled font's own metadata.
 const Map<String, String> _fontCopyrights = {

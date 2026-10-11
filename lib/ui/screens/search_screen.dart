@@ -805,7 +805,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
         onLongPress: () {
           Clipboard.setData(ClipboardData(
               text:
-                  '${result.title}\n${result.snippet.replaceAll('...', '')}'));
+                  '${result.title}\n${searchResultSnippet(result, context.l10n).replaceAll('...', '')}'));
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(context.l10n.searchCopied)),
           );
@@ -823,7 +823,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      result.subtitle,
+                      searchResultSubtitle(result, context.l10n),
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.primaryColor,
                         fontWeight: FontWeight.bold,
@@ -841,7 +841,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                 ),
               ),
               const SizedBox(height: 4),
-              _buildSnippet(result.snippet, query, theme),
+              _buildSnippet(
+                  searchResultSnippet(result, context.l10n), query, theme),
             ],
           ),
         ),
