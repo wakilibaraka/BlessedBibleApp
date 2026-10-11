@@ -1,3 +1,4 @@
+import '../../l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
@@ -5,11 +6,20 @@ import 'package:flutter/services.dart';
 import '../../state/theme_provider.dart';
 import '../../state/surface_style_provider.dart';
 import '../../theme/app_colors.dart';
+import '../../theme/design_tokens.dart';
 
 import '../widgets/textured_glass_container.dart';
 import '../../state/read_settings_provider.dart';
 
 const double kAppearanceSheetHeightFactor = 0.70;
+
+// Highlight/shade for the neumorphic theme pills (simulated light, fixed).
+const Color _kHighlight = Colors.white;
+const Color _kShade = Colors.black;
+
+// Subtitle in the four-across surface-style tiles; smaller than
+// TypeScale.micro so it fits.
+const double _kTileSubtitleSize = 8.5;
 
 class ThemePickerSheet extends ConsumerStatefulWidget {
   const ThemePickerSheet({super.key});
@@ -53,7 +63,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
         child: TexturedGlassContainer(
           sigmaX: 45.0,
           sigmaY: 45.0,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: Radii.sheet,
           padding: EdgeInsets.zero,
           child: SingleChildScrollView(
             physics: const ClampingScrollPhysics(),
@@ -73,13 +83,13 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                     height: 4,
                     decoration: BoxDecoration(
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(2),
+                      borderRadius: BorderRadius.circular(Radii.xs),
                     ),
                   ),
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Appearance',
+                  context.l10n.settingsAppearance,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -110,13 +120,14 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                             SwitchListTile(
                               contentPadding: const EdgeInsets.only(
                                   left: 16, right: 16, bottom: 8),
-                              title: const Text('Enable Background Glow',
+                              title: Text(context.l10n.settingsBackgroundGlow,
                                   style: TextStyle(
-                                      fontSize: 14,
+                                      fontSize: TypeScale.body,
                                       fontWeight: FontWeight.bold)),
-                              subtitle: const Text(
-                                  'Renders a subtle animated light behind the reader',
-                                  style: TextStyle(fontSize: 12)),
+                              subtitle: Text(
+                                  context.l10n.settingsBackgroundGlowSubtitle,
+                                  style:
+                                      TextStyle(fontSize: TypeScale.caption)),
                               value: readSettings.isGlowEnabled,
                               onChanged: (value) {
                                 HapticFeedback.selectionClick();
@@ -130,12 +141,12 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                       }),
                       const SizedBox(height: 24),
                       Text(
-                        'FOUNDATIONS',
+                        context.l10n.settingsThemeGroupFoundations,
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: theme.primaryColor,
                           letterSpacing: 1.2,
                           fontWeight: FontWeight.bold,
-                          fontSize: 10,
+                          fontSize: TypeScale.micro,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -143,7 +154,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                         children: [
                           Expanded(
                             child: _ThemePill(
-                              label: 'Dawn',
+                              label: context.l10n.settingsThemeDawn,
                               mode: AppThemeMode.light,
                               currentMode: currentMode,
                               fillColor: AppColors.lightBackground,
@@ -158,7 +169,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: _ThemePill(
-                              label: 'Fresh',
+                              label: context.l10n.settingsThemeFresh,
                               mode: AppThemeMode.sepia,
                               currentMode: currentMode,
                               fillColor: AppColors.sepiaBackground,
@@ -178,12 +189,12 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'FIRMAMENT',
+                        context.l10n.settingsThemeGroupFirmament,
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: theme.primaryColor,
                           letterSpacing: 1.2,
                           fontWeight: FontWeight.bold,
-                          fontSize: 10,
+                          fontSize: TypeScale.micro,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -191,7 +202,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                         children: [
                           Expanded(
                             child: _ThemePill(
-                              label: 'Sun',
+                              label: context.l10n.settingsThemeSun,
                               mode: AppThemeMode.dawn,
                               currentMode: currentMode,
                               fillColor: AppColors.dawnBackground,
@@ -206,7 +217,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: _ThemePill(
-                              label: 'Moon',
+                              label: context.l10n.settingsThemeMoon,
                               mode: AppThemeMode.fresh,
                               currentMode: currentMode,
                               fillColor: AppColors.freshBackground,
@@ -221,7 +232,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: _ThemePill(
-                              label: 'Stars',
+                              label: context.l10n.settingsThemeStars,
                               mode: AppThemeMode.dusk,
                               currentMode: currentMode,
                               fillColor: AppColors.duskBackground,
@@ -237,12 +248,12 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'EDEN',
+                        context.l10n.settingsThemeGroupEden,
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: theme.primaryColor,
                           letterSpacing: 1.2,
                           fontWeight: FontWeight.bold,
-                          fontSize: 10,
+                          fontSize: TypeScale.micro,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -250,7 +261,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                         children: [
                           Expanded(
                             child: _ThemePill(
-                              label: 'Lilies',
+                              label: context.l10n.settingsThemeLilies,
                               mode: AppThemeMode.lilies,
                               currentMode: currentMode,
                               fillColor: AppColors.liliesBackground,
@@ -265,7 +276,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: _ThemePill(
-                              label: 'Roses',
+                              label: context.l10n.settingsThemeRoses,
                               mode: AppThemeMode.roses,
                               currentMode: currentMode,
                               fillColor: AppColors.rosesBackground,
@@ -280,7 +291,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: _ThemePill(
-                              label: 'Olives',
+                              label: context.l10n.settingsThemeOlives,
                               mode: AppThemeMode.olives,
                               currentMode: currentMode,
                               fillColor: AppColors.olivesBackground,
@@ -296,12 +307,12 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'SANCTUARY',
+                        context.l10n.settingsThemeGroupSanctuary,
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: theme.primaryColor,
                           letterSpacing: 1.2,
                           fontWeight: FontWeight.bold,
-                          fontSize: 10,
+                          fontSize: TypeScale.micro,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -309,10 +320,11 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                         children: [
                           Expanded(
                             child: _ThemePill(
-                              label: 'Priestly\nPurple',
+                              label: context.l10n.settingsThemePurple,
                               mode: AppThemeMode.priestlyPurple,
                               currentMode: currentMode,
                               fillColor: AppColors.lightBackground,
+                              // Swatch colours preview each theme, so they stay literal.
                               textColor: const Color(0xFF673AB7),
                               swatchColors: const [
                                 Color(0xFF673AB7),
@@ -324,7 +336,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: _ThemePill(
-                              label: 'Galilee\nBlue',
+                              label: context.l10n.settingsThemeBlue,
                               mode: AppThemeMode.galileeBlue,
                               currentMode: currentMode,
                               fillColor: AppColors.lightBackground,
@@ -339,7 +351,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: _ThemePill(
-                              label: 'Scarlet\nRed',
+                              label: context.l10n.settingsThemeRed,
                               mode: AppThemeMode.scarletRed,
                               currentMode: currentMode,
                               fillColor: AppColors.lightBackground,
@@ -394,11 +406,11 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
               ref.read(earthHeavenStyleProvider.notifier).shuffleStyle();
             },
             icon: const Icon(Icons.shuffle_rounded, size: 18),
-            label: const Text('Surprise me'),
+            label: Text(context.l10n.settingsSurpriseMe),
             style: OutlinedButton.styleFrom(
               minimumSize: const Size.fromHeight(48),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(Radii.lg),
               ),
             ),
           ),
@@ -421,12 +433,11 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
               SwitchListTile(
                 contentPadding:
                     const EdgeInsets.only(left: 16, right: 16, bottom: 8),
-                title: const Text('Enable Background Glow',
-                    style:
-                        TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                subtitle: const Text(
-                    'Renders a subtle animated light behind the reader',
-                    style: TextStyle(fontSize: 12)),
+                title: Text(context.l10n.settingsBackgroundGlow,
+                    style: TextStyle(
+                        fontSize: TypeScale.body, fontWeight: FontWeight.bold)),
+                subtitle: Text(context.l10n.settingsBackgroundGlowSubtitle,
+                    style: TextStyle(fontSize: TypeScale.caption)),
                 value: readSettings.isGlowEnabled,
                 onChanged: (value) {
                   HapticFeedback.selectionClick();
@@ -437,17 +448,17 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
           );
         }),
         const SizedBox(height: 24),
-        Text('FOUNDATIONS',
+        Text(context.l10n.settingsThemeGroupFoundations,
             style: theme.textTheme.labelSmall?.copyWith(
                 color: theme.primaryColor,
                 letterSpacing: 1.2,
                 fontWeight: FontWeight.bold,
-                fontSize: 10)),
+                fontSize: TypeScale.micro)),
         const SizedBox(height: 8),
         Row(children: [
           Expanded(
               child: _ThemePill(
-                  label: 'Dawn',
+                  label: context.l10n.settingsThemeDawn,
                   mode: AppThemeMode.light,
                   currentMode: currentMode,
                   fillColor: AppColors.lightBackground,
@@ -460,7 +471,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
           const SizedBox(width: 8),
           Expanded(
               child: _ThemePill(
-                  label: 'Fresh',
+                  label: context.l10n.settingsThemeFresh,
                   mode: AppThemeMode.sepia,
                   currentMode: currentMode,
                   fillColor: AppColors.sepiaBackground,
@@ -474,17 +485,17 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
           Expanded(child: _DarkThemePill(currentMode: currentMode)),
         ]),
         const SizedBox(height: 16),
-        Text('FIRMAMENT',
+        Text(context.l10n.settingsThemeGroupFirmament,
             style: theme.textTheme.labelSmall?.copyWith(
                 color: theme.primaryColor,
                 letterSpacing: 1.2,
                 fontWeight: FontWeight.bold,
-                fontSize: 10)),
+                fontSize: TypeScale.micro)),
         const SizedBox(height: 8),
         Row(children: [
           Expanded(
               child: _ThemePill(
-                  label: 'Sun',
+                  label: context.l10n.settingsThemeSun,
                   mode: AppThemeMode.dawn,
                   currentMode: currentMode,
                   fillColor: AppColors.dawnBackground,
@@ -497,7 +508,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
           const SizedBox(width: 8),
           Expanded(
               child: _ThemePill(
-                  label: 'Moon',
+                  label: context.l10n.settingsThemeMoon,
                   mode: AppThemeMode.fresh,
                   currentMode: currentMode,
                   fillColor: AppColors.freshBackground,
@@ -510,7 +521,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
           const SizedBox(width: 8),
           Expanded(
               child: _ThemePill(
-                  label: 'Stars',
+                  label: context.l10n.settingsThemeStars,
                   mode: AppThemeMode.dusk,
                   currentMode: currentMode,
                   fillColor: AppColors.duskBackground,
@@ -522,17 +533,17 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
               ])),
         ]),
         const SizedBox(height: 16),
-        Text('EDEN',
+        Text(context.l10n.settingsThemeGroupEden,
             style: theme.textTheme.labelSmall?.copyWith(
                 color: theme.primaryColor,
                 letterSpacing: 1.2,
                 fontWeight: FontWeight.bold,
-                fontSize: 10)),
+                fontSize: TypeScale.micro)),
         const SizedBox(height: 8),
         Row(children: [
           Expanded(
               child: _ThemePill(
-                  label: 'Lilies',
+                  label: context.l10n.settingsThemeLilies,
                   mode: AppThemeMode.lilies,
                   currentMode: currentMode,
                   fillColor: AppColors.liliesBackground,
@@ -545,7 +556,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
           const SizedBox(width: 8),
           Expanded(
               child: _ThemePill(
-                  label: 'Roses',
+                  label: context.l10n.settingsThemeRoses,
                   mode: AppThemeMode.roses,
                   currentMode: currentMode,
                   fillColor: AppColors.rosesBackground,
@@ -558,7 +569,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
           const SizedBox(width: 8),
           Expanded(
               child: _ThemePill(
-                  label: 'Olives',
+                  label: context.l10n.settingsThemeOlives,
                   mode: AppThemeMode.olives,
                   currentMode: currentMode,
                   fillColor: AppColors.olivesBackground,
@@ -570,20 +581,21 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
               ])),
         ]),
         const SizedBox(height: 16),
-        Text('SANCTUARY',
+        Text(context.l10n.settingsThemeGroupSanctuary,
             style: theme.textTheme.labelSmall?.copyWith(
                 color: theme.primaryColor,
                 letterSpacing: 1.2,
                 fontWeight: FontWeight.bold,
-                fontSize: 10)),
+                fontSize: TypeScale.micro)),
         const SizedBox(height: 8),
         Row(children: [
           Expanded(
               child: _ThemePill(
-                  label: 'Priestly\nPurple',
+                  label: context.l10n.settingsThemePurple,
                   mode: AppThemeMode.priestlyPurple,
                   currentMode: currentMode,
                   fillColor: AppColors.lightBackground,
+                  // Swatch colours preview each theme, so they stay literal.
                   textColor: const Color(0xFF673AB7),
                   swatchColors: const [
                 Color(0xFF673AB7),
@@ -593,7 +605,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
           const SizedBox(width: 8),
           Expanded(
               child: _ThemePill(
-                  label: 'Galilee\nBlue',
+                  label: context.l10n.settingsThemeBlue,
                   mode: AppThemeMode.galileeBlue,
                   currentMode: currentMode,
                   fillColor: AppColors.lightBackground,
@@ -606,7 +618,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
           const SizedBox(width: 8),
           Expanded(
               child: _ThemePill(
-                  label: 'Scarlet\nRed',
+                  label: context.l10n.settingsThemeRed,
                   mode: AppThemeMode.scarletRed,
                   currentMode: currentMode,
                   fillColor: AppColors.lightBackground,
@@ -663,6 +675,9 @@ class _ThemePillState extends ConsumerState<_ThemePill>
   }
 
   void _triggerSparkle() {
+    // Zero duration (reduced motion) finishes at once: no sparkle.
+    _sparkleController.duration =
+        Motion.of(context, const Duration(milliseconds: 1000));
     _sparkleController.forward(from: 0.0);
   }
 
@@ -679,27 +694,28 @@ class _ThemePillState extends ConsumerState<_ThemePill>
             .computeLuminance();
     final isDarkBg = bgLuminance < 0.4;
 
+    // Neumorphic light/shade pair: models light, not theme colours.
     final neumorphicShadows = isDarkBg
         ? [
             BoxShadow(
-              color: Colors.white.withValues(alpha: 0.15),
+              color: _kHighlight.withValues(alpha: 0.15),
               offset: const Offset(-2, -2),
               blurRadius: 4,
             ),
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.45),
+              color: _kShade.withValues(alpha: 0.45),
               offset: const Offset(3, 3),
               blurRadius: 6,
             ),
           ]
         : [
             BoxShadow(
-              color: Colors.white.withValues(alpha: 0.85),
+              color: _kHighlight.withValues(alpha: 0.85),
               offset: const Offset(-2, -2),
               blurRadius: 4,
             ),
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.12),
+              color: _kShade.withValues(alpha: 0.12),
               offset: const Offset(3, 3),
               blurRadius: 6,
             ),
@@ -709,92 +725,101 @@ class _ThemePillState extends ConsumerState<_ThemePill>
         ? widget.swatchColors[1]
         : theme.primaryColor;
 
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.mediumImpact();
-        _triggerSparkle();
-        ref.read(themeProvider.notifier).setTheme(widget.mode);
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        height: 46,
-        decoration: BoxDecoration(
-          color: isSelected
-              ? widget.fillColor
-              : theme.colorScheme.onSurface.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(26),
-          border: Border.all(
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: widget.label.replaceAll('\n', ' '),
+      excludeSemantics: true,
+      child: GestureDetector(
+        onTap: () {
+          HapticFeedback.mediumImpact();
+          _triggerSparkle();
+          ref.read(themeProvider.notifier).setTheme(widget.mode);
+        },
+        child: AnimatedContainer(
+          duration: Motion.of(context, const Duration(milliseconds: 300)),
+          // Was a fixed 46: 48 dp target that grows with large text.
+          constraints: const BoxConstraints(minHeight: kMinTouchTarget),
+          decoration: BoxDecoration(
             color: isSelected
-                ? theme.primaryColor
-                : theme.colorScheme.onSurface.withValues(alpha: 0.1),
-            width: isSelected ? 2 : 1,
+                ? widget.fillColor
+                : theme.colorScheme.onSurface.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(Radii.pill),
+            border: Border.all(
+              color: isSelected
+                  ? theme.primaryColor
+                  : theme.colorScheme.onSurface.withValues(alpha: 0.1),
+              width: isSelected ? 2 : 1,
+            ),
+            boxShadow: neumorphicShadows,
           ),
-          boxShadow: neumorphicShadows,
-        ),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            AnimatedPadding(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeOutCubic,
-              padding: EdgeInsets.only(
-                left: isSelected ? 6 : 40,
-                right: isSelected ? 40 : 6,
-              ),
-              child: Align(
-                alignment: Alignment.center,
-                child: Text(
-                  widget.label,
-                  textAlign: widget.label.contains('\n')
-                      ? TextAlign.left
-                      : TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.visible,
-                  style: TextStyle(
-                    color: isSelected
-                        ? widget.textColor
-                        : theme.colorScheme.onSurface,
-                    fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
-                    fontSize: 10,
-                    height: 1.1,
+          child: Stack(
+            alignment: Alignment.center,
+            clipBehavior: Clip.none,
+            children: [
+              AnimatedPadding(
+                duration: Motion.of(context, const Duration(milliseconds: 300)),
+                curve: Curves.easeOutCubic,
+                padding: EdgeInsets.only(
+                  left: isSelected ? 6 : 40,
+                  right: isSelected ? 40 : 6,
+                ),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    widget.label,
+                    textAlign: widget.label.contains('\n')
+                        ? TextAlign.left
+                        : TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.visible,
+                    style: TextStyle(
+                      color: isSelected
+                          ? widget.textColor
+                          : theme.colorScheme.onSurface,
+                      fontWeight:
+                          isSelected ? FontWeight.w900 : FontWeight.w600,
+                      fontSize: TypeScale.micro,
+                      height: 1.1,
+                    ),
                   ),
                 ),
               ),
-            ),
-            AnimatedAlign(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeOutCubic,
-              alignment:
-                  isSelected ? Alignment.centerRight : Alignment.centerLeft,
-              child: Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: SweepGradient(colors: [
-                      ...widget.swatchColors,
-                      widget.swatchColors.first
-                    ]),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+              AnimatedAlign(
+                duration: Motion.of(context, const Duration(milliseconds: 300)),
+                curve: Curves.easeOutCubic,
+                alignment:
+                    isSelected ? Alignment.centerRight : Alignment.centerLeft,
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: SweepGradient(colors: [
+                        ...widget.swatchColors,
+                        widget.swatchColors.first
+                      ]),
+                      boxShadow: [
+                        BoxShadow(
+                          color: context.palette.shadow.withValues(alpha: 0.2),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            Positioned.fill(
-              child: _SparkleBurst(
-                controller: _sparkleController,
-                color: accentColor,
+              Positioned.fill(
+                child: _SparkleBurst(
+                  controller: _sparkleController,
+                  color: accentColor,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -832,6 +857,9 @@ class _DarkThemePillState extends ConsumerState<_DarkThemePill>
   }
 
   void _triggerSparkle() {
+    // Zero duration (reduced motion) finishes at once: no sparkle.
+    _sparkleController.duration =
+        Motion.of(context, const Duration(milliseconds: 1000));
     _sparkleController.forward(from: 0.0);
   }
 
@@ -852,6 +880,7 @@ class _DarkThemePillState extends ConsumerState<_DarkThemePill>
         ? (isOledActive ? AppThemeMode.oled : AppThemeMode.dark)
         : _lastDarkVariant;
 
+    // Preview of the dark/OLED themes' own colours, so these stay literal.
     final fillColor = activeVariant == AppThemeMode.oled
         ? Colors.black
         : const Color(0xFF333333);
@@ -864,27 +893,28 @@ class _DarkThemePillState extends ConsumerState<_DarkThemePill>
         (isSelected ? fillColor : theme.colorScheme.surface).computeLuminance();
     final isDarkBg = bgLuminance < 0.4;
 
+    // Neumorphic light/shade pair: models light, not theme colours.
     final neumorphicShadows = isDarkBg
         ? [
             BoxShadow(
-              color: Colors.white.withValues(alpha: 0.15),
+              color: _kHighlight.withValues(alpha: 0.15),
               offset: const Offset(-2, -2),
               blurRadius: 4,
             ),
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.45),
+              color: _kShade.withValues(alpha: 0.45),
               offset: const Offset(3, 3),
               blurRadius: 6,
             ),
           ]
         : [
             BoxShadow(
-              color: Colors.white.withValues(alpha: 0.85),
+              color: _kHighlight.withValues(alpha: 0.85),
               offset: const Offset(-2, -2),
               blurRadius: 4,
             ),
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.12),
+              color: _kShade.withValues(alpha: 0.12),
               offset: const Offset(3, 3),
               blurRadius: 6,
             ),
@@ -893,96 +923,108 @@ class _DarkThemePillState extends ConsumerState<_DarkThemePill>
     final accentColor =
         activeVariant == AppThemeMode.oled ? Colors.amber : Colors.cyanAccent;
 
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.mediumImpact();
-        _triggerSparkle();
-        if (isDarkActive) {
-          _lastDarkVariant = AppThemeMode.oled;
-          ref.read(themeProvider.notifier).setTheme(AppThemeMode.oled);
-        } else if (isOledActive) {
-          _lastDarkVariant = AppThemeMode.dark;
-          ref.read(themeProvider.notifier).setTheme(AppThemeMode.dark);
-        } else {
-          ref.read(themeProvider.notifier).setTheme(_lastDarkVariant);
-        }
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        height: 46,
-        decoration: BoxDecoration(
-          color: isSelected
-              ? fillColor
-              : theme.colorScheme.onSurface.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(26),
-          border: Border.all(
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: activeVariant == AppThemeMode.oled
+          ? context.l10n.settingsThemeOledDark
+          : context.l10n.settingsThemeDuskOled,
+      excludeSemantics: true,
+      child: GestureDetector(
+        onTap: () {
+          HapticFeedback.mediumImpact();
+          _triggerSparkle();
+          if (isDarkActive) {
+            _lastDarkVariant = AppThemeMode.oled;
+            ref.read(themeProvider.notifier).setTheme(AppThemeMode.oled);
+          } else if (isOledActive) {
+            _lastDarkVariant = AppThemeMode.dark;
+            ref.read(themeProvider.notifier).setTheme(AppThemeMode.dark);
+          } else {
+            ref.read(themeProvider.notifier).setTheme(_lastDarkVariant);
+          }
+        },
+        child: AnimatedContainer(
+          duration: Motion.of(context, const Duration(milliseconds: 300)),
+          // Was a fixed 46: 48 dp target that grows with large text.
+          constraints: const BoxConstraints(minHeight: kMinTouchTarget),
+          decoration: BoxDecoration(
             color: isSelected
-                ? theme.primaryColor
-                : theme.colorScheme.onSurface.withValues(alpha: 0.1),
-            width: isSelected ? 2 : 1,
+                ? fillColor
+                : theme.colorScheme.onSurface.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(Radii.pill),
+            border: Border.all(
+              color: isSelected
+                  ? theme.primaryColor
+                  : theme.colorScheme.onSurface.withValues(alpha: 0.1),
+              width: isSelected ? 2 : 1,
+            ),
+            boxShadow: neumorphicShadows,
           ),
-          boxShadow: neumorphicShadows,
-        ),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            AnimatedPadding(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeOutCubic,
-              padding: EdgeInsets.only(
-                left: isSelected ? 6 : 40,
-                right: isSelected ? 40 : 6,
-              ),
-              child: Align(
-                alignment: Alignment.center,
-                child: Text(
-                  activeVariant == AppThemeMode.oled
-                      ? 'OLED\nDark'
-                      : 'Dusk\nOLED',
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.visible,
-                  style: TextStyle(
-                    color: isSelected ? textColor : theme.colorScheme.onSurface,
-                    fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
-                    fontSize: 10,
-                    height: 1.1,
+          child: Stack(
+            alignment: Alignment.center,
+            clipBehavior: Clip.none,
+            children: [
+              AnimatedPadding(
+                duration: Motion.of(context, const Duration(milliseconds: 300)),
+                curve: Curves.easeOutCubic,
+                padding: EdgeInsets.only(
+                  left: isSelected ? 6 : 40,
+                  right: isSelected ? 40 : 6,
+                ),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    activeVariant == AppThemeMode.oled
+                        ? context.l10n.settingsThemeOledDark
+                        : context.l10n.settingsThemeDuskOled,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.visible,
+                    style: TextStyle(
+                      color:
+                          isSelected ? textColor : theme.colorScheme.onSurface,
+                      fontWeight:
+                          isSelected ? FontWeight.w900 : FontWeight.w600,
+                      fontSize: TypeScale.micro,
+                      height: 1.1,
+                    ),
                   ),
                 ),
               ),
-            ),
-            AnimatedAlign(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeOutCubic,
-              alignment:
-                  isSelected ? Alignment.centerRight : Alignment.centerLeft,
-              child: Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: SweepGradient(
-                        colors: [...swatchColors, swatchColors.first]),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+              AnimatedAlign(
+                duration: Motion.of(context, const Duration(milliseconds: 300)),
+                curve: Curves.easeOutCubic,
+                alignment:
+                    isSelected ? Alignment.centerRight : Alignment.centerLeft,
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: SweepGradient(
+                          colors: [...swatchColors, swatchColors.first]),
+                      boxShadow: [
+                        BoxShadow(
+                          color: context.palette.shadow.withValues(alpha: 0.2),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            Positioned.fill(
-              child: _SparkleBurst(
-                controller: _sparkleController,
-                color: accentColor,
+              Positioned.fill(
+                child: _SparkleBurst(
+                  controller: _sparkleController,
+                  color: accentColor,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -1097,26 +1139,26 @@ class _SurfaceStyleGrid extends StatelessWidget {
   static const _kTiles = [
     _StyleMeta(
       style: EarthHeavenStyle.earth,
-      label: 'Earth',
-      subtitle: 'Flat surface',
+      label: _lEarth,
+      subtitle: _sEarth,
       icon: Icons.layers_outlined,
     ),
     _StyleMeta(
       style: EarthHeavenStyle.heaven,
-      label: 'Heaven',
-      subtitle: 'Frosted depth',
+      label: _lHeaven,
+      subtitle: _sHeaven,
       icon: Icons.blur_on_rounded,
     ),
     _StyleMeta(
       style: EarthHeavenStyle.paperlike,
-      label: 'Paper',
-      subtitle: 'Warm e-reader',
+      label: _lPaper,
+      subtitle: _sPaper,
       icon: Icons.menu_book_rounded,
     ),
     _StyleMeta(
       style: EarthHeavenStyle.claymorphic,
-      label: 'Clay',
-      subtitle: 'Pillowy 3-D',
+      label: _lClay,
+      subtitle: _sClay,
       icon: Icons.interests_rounded,
     ),
   ];
@@ -1130,20 +1172,20 @@ class _SurfaceStyleGrid extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Surface Style',
+            context.l10n.settingsSurfaceStyle,
             style: theme.textTheme.labelSmall?.copyWith(
               color: theme.primaryColor,
               letterSpacing: 1.2,
               fontWeight: FontWeight.bold,
-              fontSize: 10,
+              fontSize: TypeScale.micro,
             ),
           ),
           const SizedBox(height: 4),
           Text(
-            'Visual depth and material rendering',
+            context.l10n.settingsSurfaceStyleSubtitle,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
-              fontSize: 11,
+              fontSize: TypeScale.caption,
             ),
           ),
           const SizedBox(height: 12),
@@ -1167,11 +1209,20 @@ class _SurfaceStyleGrid extends StatelessWidget {
   }
 }
 
+String _lEarth(AppLocalizations l) => l.settingsSurfaceEarth;
+String _sEarth(AppLocalizations l) => l.settingsSurfaceEarthSubtitle;
+String _lHeaven(AppLocalizations l) => l.settingsSurfaceHeaven;
+String _sHeaven(AppLocalizations l) => l.settingsSurfaceHeavenSubtitle;
+String _lPaper(AppLocalizations l) => l.settingsSurfacePaper;
+String _sPaper(AppLocalizations l) => l.settingsSurfacePaperSubtitle;
+String _lClay(AppLocalizations l) => l.settingsSurfaceClay;
+String _sClay(AppLocalizations l) => l.settingsSurfaceClaySubtitle;
+
 @immutable
 class _StyleMeta {
   final EarthHeavenStyle style;
-  final String label;
-  final String subtitle;
+  final String Function(AppLocalizations) label;
+  final String Function(AppLocalizations) subtitle;
   final IconData icon;
 
   const _StyleMeta({
@@ -1199,66 +1250,71 @@ class _SurfaceStyleTile extends StatelessWidget {
     final primary = theme.primaryColor;
     final onSurface = theme.colorScheme.onSurface;
 
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.easeOutCubic,
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? primary.withValues(alpha: 0.10)
-              : onSurface.withValues(alpha: 0.04),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: Motion.of(context, Motion.normal),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
+          decoration: BoxDecoration(
             color: isSelected
-                ? primary.withValues(alpha: 0.75)
-                : onSurface.withValues(alpha: 0.10),
-            width: isSelected ? 1.5 : 0.8,
+                ? primary.withValues(alpha: 0.10)
+                : onSurface.withValues(alpha: 0.04),
+            borderRadius: BorderRadius.circular(Radii.lg),
+            border: Border.all(
+              color: isSelected
+                  ? primary.withValues(alpha: 0.75)
+                  : onSurface.withValues(alpha: 0.10),
+              width: isSelected ? 1.5 : 0.8,
+            ),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: primary.withValues(alpha: 0.18),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                : [],
           ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: primary.withValues(alpha: 0.18),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : [],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              meta.icon,
-              size: 20,
-              color: isSelected ? primary : onSurface.withValues(alpha: 0.55),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              meta.label,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 10.5,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                color: isSelected ? primary : onSurface.withValues(alpha: 0.80),
-                height: 1.1,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                meta.icon,
+                size: 20,
+                color: isSelected ? primary : onSurface.withValues(alpha: 0.55),
               ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              meta.subtitle,
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 8.5,
-                fontWeight: FontWeight.w400,
-                color: onSurface.withValues(alpha: 0.45),
-                height: 1.1,
+              const SizedBox(height: 5),
+              Text(
+                meta.label(context.l10n),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: TypeScale.micro,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  color:
+                      isSelected ? primary : onSurface.withValues(alpha: 0.80),
+                  height: 1.1,
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 2),
+              Text(
+                meta.subtitle(context.l10n),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: _kTileSubtitleSize,
+                  fontWeight: FontWeight.w400,
+                  color: onSurface.withValues(alpha: 0.45),
+                  height: 1.1,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

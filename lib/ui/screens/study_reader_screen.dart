@@ -16,6 +16,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -29,12 +30,15 @@ import '../../state/user_data_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../state/surface_style_provider.dart';
 import '../widgets/commentary_view.dart';
+import '../widgets/state_views.dart';
 import '../../theme/app_colors.dart';
 import 'read_screen.dart' show VerseActionLogic;
 import '../sheets/verse_context_menu_sheet.dart';
 import '../../state/pericopes_provider.dart';
 
 import '../../models/pericope_entry.dart';
+import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
 
 enum StudyMode { plan, deepDive }
 
@@ -373,16 +377,16 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
     if (!_loaded) {
       return Scaffold(
         appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
-        body: const Center(child: CircularProgressIndicator()),
+        body: const LoadingView(),
       );
     }
 
     if (_passages.isEmpty) {
       return Scaffold(
         appBar: AppBar(
-            title: const Text('Passage not found'),
+            title: Text(context.l10n.studyPassageNotFound),
             backgroundColor: Colors.transparent),
-        body: const Center(child: Text('Could not load passage data.')),
+        body: ErrorState(message: context.l10n.studyPassageLoadError),
       );
     }
 
@@ -409,7 +413,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                      borderRadius: BorderRadius.circular(Radii.md)),
                 ),
                 child: const Icon(Icons.arrow_back_rounded, size: 20),
               ),
@@ -420,10 +424,11 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor:
                           isDone ? gold.withValues(alpha: 0.6) : gold,
+                      // Fixed: sits on the fixed gold accent, not a theme colour.
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                          borderRadius: BorderRadius.circular(Radii.md)),
                     ),
                     onPressed: () {
                       if (widget.payload.mode == StudyMode.plan && isDone) {
@@ -434,33 +439,36 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                     },
                     child: Text(
                       widget.payload.mode == StudyMode.plan
-                          ? (isDone ? '✓ Completed' : 'Mark as Read')
-                          : 'Done',
+                          ? (isDone
+                              ? context.l10n.studyCompletedCheck
+                              : context.l10n.studyMarkAsRead)
+                          : context.l10n.commonDone,
                       style: const TextStyle(
                           fontFamily: 'EB Garamond',
-                          fontSize: 18,
+                          fontSize: TypeScale.title,
                           fontWeight: FontWeight.bold),
                     ),
                   )
                 : ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: gold,
+                      // Fixed: sits on the fixed gold accent, not a theme colour.
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                          borderRadius: BorderRadius.circular(Radii.md)),
                     ),
                     onPressed: () => _goToPassage(_passageIndex + 1),
-                    child: const Row(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('Next Passage',
-                            style: TextStyle(
+                        Text(context.l10n.studyNextPassage,
+                            style: const TextStyle(
                                 fontFamily: 'EB Garamond',
-                                fontSize: 18,
+                                fontSize: TypeScale.title,
                                 fontWeight: FontWeight.bold)),
-                        SizedBox(width: 8),
-                        Icon(Icons.arrow_forward_rounded, size: 20),
+                        const SizedBox(width: 8),
+                        const Icon(Icons.arrow_forward_rounded, size: 20),
                       ],
                     ),
                   ),
@@ -483,9 +491,9 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
         case AppThemeMode.olives:
           return AppColors.olivesBackground;
         case AppThemeMode.dusk:
-          return const Color(0xFF312C51);
+          return AppColors.duskBackground;
         case AppThemeMode.fresh:
-          return const Color(0xFF132C33);
+          return AppColors.freshBackground;
         default:
           return theme.scaffoldBackgroundColor;
       }
@@ -520,6 +528,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 IconButton(
+                                  tooltip: context.l10n.commonBack,
                                   icon: const Icon(Icons.arrow_back_rounded,
                                       size: 22),
                                   padding: const EdgeInsets.symmetric(
@@ -536,7 +545,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                                         passage.label,
                                         style: TextStyle(
                                           fontFamily: 'EB Garamond',
-                                          fontSize: 18,
+                                          fontSize: TypeScale.title,
                                           fontWeight: FontWeight.bold,
                                           color:
                                               theme.textTheme.bodyLarge?.color,
@@ -552,7 +561,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                                           color: theme.colorScheme.onSurface
                                               .withValues(alpha: 0.4),
                                           letterSpacing: 1.0,
-                                          fontSize: 10,
+                                          fontSize: TypeScale.micro,
                                         ),
                                       ),
                                     ],
@@ -560,34 +569,55 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                                 ),
                                 const SizedBox(width: 90), // Clear center area
                                 // Full chapter toggle — compact pill
-                                GestureDetector(
-                                  onTap: () => setState(() =>
-                                      _showFullChapter = !_showFullChapter),
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 200),
-                                    margin: const EdgeInsets.only(right: 12),
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10, vertical: 5),
-                                    decoration: BoxDecoration(
-                                      color: _showFullChapter
-                                          ? gold.withValues(alpha: 0.15)
-                                          : Colors.transparent,
-                                      border: Border.all(
-                                          color: _showFullChapter
-                                              ? gold
-                                              : theme.dividerColor,
-                                          width: 1),
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    child: Text(
-                                      'Full chapter',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w600,
-                                        color: _showFullChapter
-                                            ? gold
-                                            : theme.colorScheme.onSurface
-                                                .withValues(alpha: 0.5),
+                                Semantics(
+                                  button: true,
+                                  toggled: _showFullChapter,
+                                  child: GestureDetector(
+                                    behavior: HitTestBehavior.opaque,
+                                    onTap: () => setState(() =>
+                                        _showFullChapter = !_showFullChapter),
+                                    // Invisible hit padding: 48dp target.
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(right: 12),
+                                      child: ConstrainedBox(
+                                        constraints: const BoxConstraints(
+                                            minHeight: kMinTouchTarget),
+                                        child: Center(
+                                          widthFactor: 1,
+                                          child: AnimatedContainer(
+                                            duration: Motion.of(
+                                                context,
+                                                const Duration(
+                                                    milliseconds: 200)),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10, vertical: 5),
+                                            decoration: BoxDecoration(
+                                              color: _showFullChapter
+                                                  ? gold.withValues(alpha: 0.15)
+                                                  : Colors.transparent,
+                                              border: Border.all(
+                                                  color: _showFullChapter
+                                                      ? gold
+                                                      : theme.dividerColor,
+                                                  width: 1),
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      Radii.lg),
+                                            ),
+                                            child: Text(
+                                              context.l10n.studyFullChapter,
+                                              style: TextStyle(
+                                                fontSize: TypeScale.caption,
+                                                fontWeight: FontWeight.w600,
+                                                color: _showFullChapter
+                                                    ? gold
+                                                    : theme
+                                                        .colorScheme.onSurface
+                                                        .withValues(alpha: 0.5),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -597,7 +627,8 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                             if (_passages.length > 1)
                               IgnorePointer(
                                 child: Text(
-                                  'Passage ${_passageIndex + 1} of ${_passages.length}',
+                                  context.l10n.studyPassageOfTotal(
+                                      _passageIndex + 1, _passages.length),
                                   style: theme.textTheme.labelSmall?.copyWith(
                                     color: gold.withValues(alpha: 0.75),
                                     letterSpacing: 1.0,
@@ -644,6 +675,25 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                           final isSelected =
                               _selectedVerses.contains(verse.number);
                           final isBookmarked = bookmarks.contains(verseKey);
+                          void openVerseMenu() {
+                            showModalBottomSheet<void>(
+                              context: context,
+                              backgroundColor: Colors.transparent,
+                              useRootNavigator: true,
+                              builder: (ctx) => VerseContextMenuSheet(
+                                verseNumber: verse.number,
+                                bookName: passage.book.name,
+                                chapterNum: passage.chapterNum,
+                                bookNumber: ref
+                                        .read(bibleProvider)
+                                        .books
+                                        .indexOf(passage.book) +
+                                    1,
+                                onCustomSelection: () {},
+                              ),
+                            );
+                          }
+
                           final savedColorIdx = highlights[verseKey];
                           Color? highlightColor;
                           if (savedColorIdx != null &&
@@ -681,7 +731,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                               padding: const EdgeInsets.all(16.0),
                               decoration: BoxDecoration(
                                 color: gold.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(Radii.lg),
                                 border: Border.all(
                                     color: gold.withValues(alpha: 0.3)),
                               ),
@@ -723,122 +773,121 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                                   ),
                                 ),
                               ],
-                              GestureDetector(
-                                onTap: () =>
-                                    _toggleVerseSelection(verse.number),
-                                onDoubleTap: () {
-                                  HapticFeedback.lightImpact();
-                                  VerseActionLogic.handleBookmark(
-                                      context,
-                                      theme,
-                                      ref,
-                                      passage.book.name,
-                                      passage.chapterNum,
-                                      [verse.number]);
+                              Semantics(
+                                selected: isSelected,
+                                // Screen readers reach the long-press menu
+                                // by name.
+                                customSemanticsActions: {
+                                  CustomSemanticsAction(
+                                          label: context.l10n.spaceMore):
+                                      openVerseMenu,
                                 },
-                                onLongPress: () {
-                                  HapticFeedback.mediumImpact();
-                                  showModalBottomSheet<void>(
-                                    context: context,
-                                    backgroundColor: Colors.transparent,
-                                    useRootNavigator: true,
-                                    builder: (ctx) => VerseContextMenuSheet(
-                                      verseNumber: verse.number,
-                                      bookName: passage.book.name,
-                                      chapterNum: passage.chapterNum,
-                                      bookNumber: ref
-                                              .read(bibleProvider)
-                                              .books
-                                              .indexOf(passage.book) +
-                                          1,
-                                      onCustomSelection: () {},
+                                child: GestureDetector(
+                                  onTap: () =>
+                                      _toggleVerseSelection(verse.number),
+                                  onDoubleTap: () {
+                                    HapticFeedback.lightImpact();
+                                    VerseActionLogic.handleBookmark(
+                                        context,
+                                        theme,
+                                        ref,
+                                        passage.book.name,
+                                        passage.chapterNum,
+                                        [verse.number]);
+                                  },
+                                  onLongPress: () {
+                                    HapticFeedback.mediumImpact();
+                                    openVerseMenu();
+                                  },
+                                  child: AnimatedContainer(
+                                    duration: Motion.of(context,
+                                        const Duration(milliseconds: 200)),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 7),
+                                    margin: const EdgeInsets.only(bottom: 2),
+                                    decoration: BoxDecoration(
+                                      color: isSelected
+                                          ? (highlightColor != null
+                                              ? highlightColor.withValues(
+                                                  alpha: 0.4)
+                                              : theme.primaryColor
+                                                  .withValues(alpha: 0.15))
+                                          : (highlightColor != null
+                                              ? highlightColor.withValues(
+                                                  alpha: 0.3)
+                                              : Colors.transparent),
+                                      borderRadius:
+                                          BorderRadius.circular(Radii.sm),
                                     ),
-                                  );
-                                },
-                                child: AnimatedContainer(
-                                  duration: const Duration(milliseconds: 200),
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 12, vertical: 7),
-                                  margin: const EdgeInsets.only(bottom: 2),
-                                  decoration: BoxDecoration(
-                                    color: isSelected
-                                        ? (highlightColor != null
-                                            ? highlightColor.withValues(
-                                                alpha: 0.4)
-                                            : theme.primaryColor
-                                                .withValues(alpha: 0.15))
-                                        : (highlightColor != null
-                                            ? highlightColor.withValues(
-                                                alpha: 0.3)
-                                            : Colors.transparent),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Builder(builder: (ctx) {
-                                    final fontStyle = TextStyle(
-                                      fontFamily: typography.fontFamily,
-                                      fontStyle: typography.fontStyle,
-                                      fontSize: typography.fontSize,
-                                      height: typography.lineHeight,
-                                      letterSpacing: 0.15,
-                                      color: theme.textTheme.bodyLarge?.color,
-                                      decoration: isBookmarked
-                                          ? TextDecoration.underline
-                                          : null,
-                                      decorationColor: isBookmarked
-                                          ? theme.primaryColor
-                                          : null,
-                                      decorationThickness: 2.0,
-                                    );
+                                    child: Builder(builder: (ctx) {
+                                      final fontStyle = TextStyle(
+                                        fontFamily: typography.fontFamily,
+                                        fontStyle: typography.fontStyle,
+                                        fontSize: typography.fontSize,
+                                        height: typography.lineHeight,
+                                        letterSpacing: 0.15,
+                                        color: theme.textTheme.bodyLarge?.color,
+                                        decoration: isBookmarked
+                                            ? TextDecoration.underline
+                                            : null,
+                                        decorationColor: isBookmarked
+                                            ? theme.primaryColor
+                                            : null,
+                                        decorationThickness: 2.0,
+                                      );
 
-                                    final List<TextSpan> spans = [];
-                                    final redStyle = fontStyle.copyWith(
-                                        color: redLetterColor);
-                                    final String text = verse.text;
-                                    int cur = 0;
-                                    while (cur < text.length) {
-                                      final s = text.indexOf('‹', cur);
-                                      if (s == -1) {
+                                      final List<TextSpan> spans = [];
+                                      final redStyle = fontStyle.copyWith(
+                                          color: redLetterColor);
+                                      final String text = verse.text;
+                                      int cur = 0;
+                                      while (cur < text.length) {
+                                        final s = text.indexOf('‹', cur);
+                                        if (s == -1) {
+                                          spans.add(TextSpan(
+                                              text: text.substring(cur),
+                                              style: fontStyle));
+                                          break;
+                                        }
+                                        if (s > cur) {
+                                          spans.add(TextSpan(
+                                              text: text.substring(cur, s),
+                                              style: fontStyle));
+                                        }
+                                        final e = text.indexOf('›', s + 1);
+                                        if (e == -1) {
+                                          spans.add(TextSpan(
+                                              text: text.substring(s + 1),
+                                              style: redStyle));
+                                          break;
+                                        }
                                         spans.add(TextSpan(
-                                            text: text.substring(cur),
-                                            style: fontStyle));
-                                        break;
-                                      }
-                                      if (s > cur) {
-                                        spans.add(TextSpan(
-                                            text: text.substring(cur, s),
-                                            style: fontStyle));
-                                      }
-                                      final e = text.indexOf('›', s + 1);
-                                      if (e == -1) {
-                                        spans.add(TextSpan(
-                                            text: text.substring(s + 1),
+                                            text: text.substring(s + 1, e),
                                             style: redStyle));
-                                        break;
+                                        cur = e + 1;
                                       }
-                                      spans.add(TextSpan(
-                                          text: text.substring(s + 1, e),
-                                          style: redStyle));
-                                      cur = e + 1;
-                                    }
 
-                                    return RichText(
-                                      text: TextSpan(
-                                        style: fontStyle,
-                                        children: [
-                                          TextSpan(
-                                            text: '${verse.number}  ',
-                                            style: fontStyle.copyWith(
-                                              color: theme.primaryColor,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize:
-                                                  typography.fontSize * 0.75,
+                                      return RichText(
+                                        textScaler:
+                                            MediaQuery.textScalerOf(context),
+                                        text: TextSpan(
+                                          style: fontStyle,
+                                          children: [
+                                            TextSpan(
+                                              text: '${verse.number}  ',
+                                              style: fontStyle.copyWith(
+                                                color: theme.primaryColor,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize:
+                                                    typography.fontSize * 0.75,
+                                              ),
                                             ),
-                                          ),
-                                          ...spans,
-                                        ],
-                                      ),
-                                    );
-                                  }),
+                                            ...spans,
+                                          ],
+                                        ),
+                                      );
+                                    }),
+                                  ),
                                 ),
                               ),
                             ],
@@ -854,7 +903,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
               Align(
                 alignment: Alignment.bottomCenter,
                 child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 250),
+                  duration: Motion.of(context, Motion.normal),
                   switchInCurve: Curves.easeOutCubic,
                   switchOutCurve: Curves.easeInCubic,
                   transitionBuilder: (child, animation) {
@@ -955,7 +1004,7 @@ class _VerseActionBar extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 24.0, left: 16, right: 16),
       child: TexturedGlassContainer(
-        borderRadius: BorderRadius.circular(32),
+        borderRadius: BorderRadius.circular(Radii.xxxl),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         child: FittedBox(
           fit: BoxFit.scaleDown,
@@ -964,21 +1013,22 @@ class _VerseActionBar extends ConsumerWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.only(left: 8.0),
-                child: Text('${selectedVerses.length} selected',
+                child: Text(
+                    context.l10n.studySelectedCount(selectedVerses.length),
                     style: theme.textTheme.labelMedium),
               ),
               // Highlight — opens color palette sheet
               GestureDetector(
                 onLongPress: onHighlightLongPress,
                 child: IconButton(
-                  tooltip: 'Highlight',
+                  tooltip: context.l10n.studyHighlight,
                   icon: Icon(Icons.highlight_rounded, color: gold),
                   onPressed: onHighlight,
                 ),
               ),
               // Bookmark
               IconButton(
-                tooltip: 'Bookmark',
+                tooltip: context.l10n.studyBookmark,
                 icon: Icon(Icons.bookmark_rounded, color: gold),
                 onPressed: () {
                   VerseActionLogic.handleBookmark(context, theme, ref, bookName,
@@ -988,7 +1038,7 @@ class _VerseActionBar extends ConsumerWidget {
               ),
               // Note
               IconButton(
-                tooltip: 'Add Note',
+                tooltip: context.l10n.studyAddNote,
                 icon: Icon(Icons.note_add_rounded, color: gold),
                 onPressed: () async {
                   await VerseActionLogic.handleNote(context, ref, theme,
@@ -998,13 +1048,13 @@ class _VerseActionBar extends ConsumerWidget {
               ),
               // Commentary (first selected verse)
               IconButton(
-                tooltip: 'Commentary',
+                tooltip: context.l10n.studyCommentaryEyebrow,
                 icon: Icon(Icons.star_rounded, color: gold),
                 onPressed: () => onCommentary(selectedVerses.first),
               ),
               // Share
               IconButton(
-                tooltip: 'Share',
+                tooltip: context.l10n.commonShare,
                 icon: Icon(Icons.share_rounded, color: gold),
                 onPressed: () async {
                   await VerseActionLogic.handleShare(
@@ -1013,6 +1063,7 @@ class _VerseActionBar extends ConsumerWidget {
                 },
               ),
               IconButton(
+                tooltip: context.l10n.commonClose,
                 icon: const Icon(Icons.close_rounded, size: 20),
                 onPressed: onDismiss,
               ),

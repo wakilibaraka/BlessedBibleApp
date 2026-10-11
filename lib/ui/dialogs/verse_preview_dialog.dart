@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import '../../theme/design_tokens.dart';
+import '../../l10n/l10n.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/bible_provider.dart';
 import '../../state/translation_provider.dart';
 import '../../services/bible_database_service.dart';
 import '../../data/models/bible_model.dart';
 import '../../state/typography_provider.dart';
+import '../widgets/state_views.dart';
 
 class VersePreviewDialog extends ConsumerWidget {
   final String reference;
@@ -48,10 +51,10 @@ class VersePreviewDialog extends ConsumerWidget {
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           color: theme.scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(Radii.xxl),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
+              color: context.palette.shadow,
               blurRadius: 24,
               spreadRadius: 8,
             )
@@ -70,15 +73,14 @@ class VersePreviewDialog extends ConsumerWidget {
                         ? '$fullBookName $chapter:$verseNum'
                         : reference,
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: TypeScale.title,
                       fontWeight: FontWeight.bold,
                       color: theme.primaryColor,
                     ),
                   ),
                 ),
                 IconButton(
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
+                  tooltip: context.l10n.commonClose,
                   icon: Icon(Icons.close_rounded,
                       color:
                           theme.colorScheme.onSurface.withValues(alpha: 0.4)),
@@ -88,47 +90,49 @@ class VersePreviewDialog extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             if (bookNumber == null)
-              const Text('Could not find the referenced book.')
+              Text(context.l10n.readBookNotFound)
             else
-              FutureBuilder<BibleVerse?>(
-                future: bibleDbService.getVerse(
-                  ref.watch(activeTranslationProvider),
-                  bookNumber,
-                  chapter,
-                  verseNum,
-                ),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: Padding(
+              // Flexible so a long verse at large text scrolls instead of
+              // overflowing the dialog.
+              Flexible(
+                child: FutureBuilder<BibleVerse?>(
+                  future: bibleDbService.getVerse(
+                    ref.watch(activeTranslationProvider),
+                    bookNumber,
+                    chapter,
+                    verseNum,
+                  ),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Padding(
                         padding: EdgeInsets.all(16.0),
-                        child: CircularProgressIndicator(),
+                        child: LoadingView(),
+                      );
+                    }
+
+                    if (snapshot.hasError) {
+                      return Text(context.l10n.readVerseLoadErrorPlain);
+                    }
+
+                    final verse = snapshot.data;
+                    if (verse == null) {
+                      return Text(context.l10n.readVerseNotFound);
+                    }
+
+                    return SingleChildScrollView(
+                      child: Text(
+                        verse.text.replaceAll(RegExp(r'[<\[][^>\]]*[>\]]'), ''),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          height: typography.lineHeight,
+                          fontSize: typography.fontSize,
+                          fontFamily: typography.fontFamily,
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.9),
+                        ),
                       ),
                     );
-                  }
-
-                  if (snapshot.hasError) {
-                    return Text('Error loading verse: ${snapshot.error}');
-                  }
-
-                  final verse = snapshot.data;
-                  if (verse == null) {
-                    return const Text('Verse not found.');
-                  }
-
-                  return SingleChildScrollView(
-                    child: Text(
-                      verse.text.replaceAll(RegExp(r'[<\[][^>\]]*[>\]]'), ''),
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        height: typography.lineHeight,
-                        fontSize: typography.fontSize,
-                        fontFamily: typography.fontFamily,
-                        color:
-                            theme.colorScheme.onSurface.withValues(alpha: 0.9),
-                      ),
-                    ),
-                  );
-                },
+                  },
+                ),
               ),
           ],
         ),

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import '../../theme/design_tokens.dart';
+import '../../l10n/l10n.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/cross_references_provider.dart';
 import '../../state/bible_provider.dart';
 import '../../state/translation_provider.dart';
 import '../../services/bible_database_service.dart';
+import 'state_views.dart';
 
 /// A bottom sheet showing all cross-references for a given verse.
 class CrossReferencesSheet extends ConsumerWidget {
@@ -21,10 +24,10 @@ class CrossReferencesSheet extends ConsumerWidget {
     required this.bookName,
   });
 
-  String _bookName(WidgetRef ref, int num) {
+  String _bookName(BuildContext context, WidgetRef ref, int num) {
     final books = ref.watch(bibleProvider).books;
     if (num >= 1 && num <= books.length) return books[num - 1].name;
-    return 'Book $num';
+    return context.l10n.readBookFallback(num);
   }
 
   @override
@@ -37,7 +40,8 @@ class CrossReferencesSheet extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius:
+            const BorderRadius.vertical(top: Radius.circular(Radii.xl)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -51,7 +55,7 @@ class CrossReferencesSheet extends ConsumerWidget {
               height: 4,
               decoration: BoxDecoration(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: BorderRadius.circular(Radii.xs),
               ),
             ),
           ),
@@ -61,7 +65,7 @@ class CrossReferencesSheet extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Related Verses',
+                  context.l10n.readRelatedVerses,
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -82,38 +86,10 @@ class CrossReferencesSheet extends ConsumerWidget {
             child: crossRefsAsync.when(
               data: (refs) {
                 if (refs.isEmpty) {
-                  return Padding(
-                    padding: const EdgeInsets.all(32),
-                    child: Center(
-                      child: Column(
-                        children: [
-                          Icon(
-                            Icons.link_off_rounded,
-                            size: 40,
-                            color: theme.colorScheme.onSurface
-                                .withValues(alpha: 0.2),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            'No cross-references found for this verse.',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.4),
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Cross-references will be available\nafter the next app update.',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.3),
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
+                  return EmptyState(
+                    icon: Icons.link_off_rounded,
+                    title: context.l10n.readNoCrossRefs,
+                    message: context.l10n.readCrossRefsComingSoon,
                   );
                 }
                 return ListView.separated(
@@ -125,7 +101,8 @@ class CrossReferencesSheet extends ConsumerWidget {
                       const Divider(height: 1, indent: 16),
                   itemBuilder: (context, index) {
                     final cr = refs[index];
-                    final targetBookName = _bookName(ref, cr.toBookNumber);
+                    final targetBookName =
+                        _bookName(context, ref, cr.toBookNumber);
                     final refLabel =
                         '$targetBookName ${cr.toChapter}:${cr.toVerse}';
 
@@ -142,26 +119,12 @@ class CrossReferencesSheet extends ConsumerWidget {
               },
               loading: () => const Padding(
                 padding: EdgeInsets.all(32),
-                child: Center(child: CircularProgressIndicator()),
+                child: LoadingView(),
               ),
-              error: (e, _) => Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Could not load cross-references.\n$e',
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 12),
-                    TextButton.icon(
-                      onPressed: () =>
-                          ref.invalidate(crossReferencesProvider(key)),
-                      icon: const Icon(Icons.refresh_rounded),
-                      label: const Text('Retry'),
-                    ),
-                  ],
-                ),
+              error: (e, _) => ErrorState(
+                error: e,
+                message: context.l10n.readCrossRefsLoadErrorPlain,
+                onRetry: () => ref.invalidate(crossReferencesProvider(key)),
               ),
             ),
           ),
@@ -238,48 +201,52 @@ class _CrossRefTileState extends ConsumerState<_CrossRefTile> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Close'),
+                  child: Text(context.l10n.commonClose),
                 ),
               ],
             ),
           );
         }
       },
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(Radii.sm),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Reference badge
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(
-                color: theme.primaryColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Text(
-                widget.refLabel,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: theme.primaryColor,
+            // Reference badge (Flexible so a long name at large text
+            // wraps instead of overflowing the row).
+            Flexible(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: theme.primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(Radii.sm),
+                ),
+                child: Text(
+                  widget.refLabel,
+                  style: TextStyle(
+                    fontSize: TypeScale.caption,
+                    fontWeight: FontWeight.w600,
+                    color: theme.primaryColor,
+                  ),
                 ),
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
+              flex: 2,
               child: _loading
                   ? Container(
                       height: 12,
                       decoration: BoxDecoration(
                         color:
                             theme.colorScheme.onSurface.withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(Radii.xs),
                       ),
                     )
                   : Text(
-                      _verseText ?? 'Verse not available',
+                      _verseText ?? context.l10n.readVerseUnavailable,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         height: 1.4,
                         color: _verseText == null

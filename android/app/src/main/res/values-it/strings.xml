@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home-screen widget text. Generated alongside tool/l10n/parts/system.json;
+     the app also pushes these strings in its own interface language. -->
+<resources>
+    <string name="widget_votd_title">VERSETTO DEL GIORNO</string>
+    <string name="widget_votd_loading">Caricamento del versetto…</string>
+    <string name="widget_wotd_title">PAROLA DEL GIORNO</string>
+    <string name="widget_streak_zero">0 giorni</string>
+    <string name="widget_streak_read_today">Leggi oggi!</string>
+    <string name="widget_streak_active">Serie attiva! 🔥</string>
+    <string name="widget_streak_inactive">Leggi oggi per mantenere la serie</string>
+    <string name="widget_wotd_fallback_word">Grazia (Charis)</string>
+    <string name="widget_wotd_fallback_snippet">Il favore immeritato e l\'amore divino di Dio donati all\'umanità.</string>
+    <plurals name="widget_streak_days">
+        <item quantity="one">%d giorno</item>
+        <item quantity="other">%d giorni</item>
+    </plurals>
+</resources>

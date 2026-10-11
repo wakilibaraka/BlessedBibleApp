@@ -6,7 +6,10 @@ import '../../state/dictionary_search_provider.dart';
 import '../../state/theme_provider.dart';
 import '../widgets/dictionary_entry_sheet.dart';
 import '../widgets/shared_app_bar.dart';
+import '../widgets/state_views.dart';
 import '../widgets/study_v2_widgets.dart';
+import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
 
 /// Standalone dictionary (V2): just words — bookmarks, highlights and
 /// notes moved to the Your Space banner.
@@ -42,7 +45,7 @@ class _DictionaryV2ScreenState extends ConsumerState<DictionaryV2Screen> {
       appThemeMode: appThemeMode,
       page: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: const SharedAppBar(title: Text('Dictionary')),
+        appBar: SharedAppBar(title: Text(context.l10n.studyDictionaryEyebrow)),
         body: SafeArea(
           bottom: false,
           child: Center(
@@ -53,16 +56,16 @@ class _DictionaryV2ScreenState extends ConsumerState<DictionaryV2Screen> {
                 children: [
                   TextField(
                     decoration: InputDecoration(
-                      hintText: 'Search 3,400+ words…',
+                      hintText: context.l10n.studyDictionarySearchHint,
                       prefixIcon: const Icon(Icons.search_rounded),
                       filled: true,
                       fillColor: theme.colorScheme.surface,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(Radii.lg),
                         borderSide: BorderSide(color: theme.dividerColor),
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(Radii.lg),
                         borderSide: BorderSide(color: theme.dividerColor),
                       ),
                     ),
@@ -77,13 +80,14 @@ class _DictionaryV2ScreenState extends ConsumerState<DictionaryV2Screen> {
                           Padding(
                             padding: const EdgeInsets.only(right: 8),
                             child: ChoiceChip(
-                              label: Text(s),
+                              label: Text(
+                                  s == 'All' ? context.l10n.studyFilterAll : s),
                               selected: _source == s,
                               onSelected: (_) => setState(() => _source = s),
                             ),
                           ),
                         FilterChip(
-                          label: const Text('★ Saved'),
+                          label: Text(context.l10n.studyDictionarySavedFilter),
                           selected: _savedOnly,
                           onSelected: (v) => setState(() => _savedOnly = v),
                         ),
@@ -96,10 +100,11 @@ class _DictionaryV2ScreenState extends ConsumerState<DictionaryV2Screen> {
                       padding: EdgeInsets.all(32),
                       child: Center(child: CircularProgressIndicator()),
                     ),
-                    error: (e, _) => Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Text('Dictionary unavailable.\n$e',
-                          textAlign: TextAlign.center),
+                    error: (e, _) => ErrorState(
+                      error: e,
+                      message: context.l10n.studyDictionaryLoadFailed,
+                      onRetry: () =>
+                          ref.invalidate(dictionarySearchProvider(_query)),
                     ),
                     data: (words) {
                       var list = words;
@@ -120,8 +125,8 @@ class _DictionaryV2ScreenState extends ConsumerState<DictionaryV2Screen> {
                           padding: const EdgeInsets.all(32),
                           child: Text(
                             _query.isEmpty && !_savedOnly
-                                ? 'No headwords found.'
-                                : 'No matches. Try “grace”, “atonement” or “wilderness”.',
+                                ? context.l10n.studyNoHeadwords
+                                : context.l10n.studyDictionaryNoMatches,
                             textAlign: TextAlign.center,
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onSurface
@@ -136,7 +141,7 @@ class _DictionaryV2ScreenState extends ConsumerState<DictionaryV2Screen> {
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 6),
                             child: Text(
-                              '${list.length} result${list.length == 1 ? '' : 's'}',
+                              context.l10n.studyResultCount(list.length),
                               style: theme.textTheme.labelSmall?.copyWith(
                                 fontWeight: FontWeight.w800,
                                 color: theme.colorScheme.onSurface
@@ -187,7 +192,7 @@ class _WordCard extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    head.isEmpty ? '(untitled entry)' : head,
+                    head.isEmpty ? context.l10n.studyUntitledEntry : head,
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -214,7 +219,9 @@ class _WordCard extends ConsumerWidget {
               ),
             ),
             IconButton(
-              visualDensity: VisualDensity.compact,
+              tooltip: saved
+                  ? context.l10n.studyRemoveSavedWord
+                  : context.l10n.studySaveWord,
               icon: Icon(
                 saved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
                 color: saved
@@ -222,9 +229,24 @@ class _WordCard extends ConsumerWidget {
                     : theme.colorScheme.onSurface.withValues(alpha: 0.4),
               ),
               onPressed: () {
-                ref
-                    .read(bookmarkedWordsProvider.notifier)
-                    .toggleBookmark(word.normalizedWord);
+                final notifier = ref.read(bookmarkedWordsProvider.notifier);
+                notifier.toggleBookmark(word.normalizedWord);
+                if (!saved) return;
+                // Unsaving can drop the card from the Saved filter, so
+                // offer a way back.
+                final messenger = ScaffoldMessenger.of(context);
+                messenger.hideCurrentSnackBar();
+                messenger.showSnackBar(
+                  SnackBar(
+                    content: Text(context.l10n.studyWordUnsaved),
+                    behavior: SnackBarBehavior.floating,
+                    action: SnackBarAction(
+                      label: context.l10n.commonUndo,
+                      onPressed: () =>
+                          notifier.toggleBookmark(word.normalizedWord),
+                    ),
+                  ),
+                );
               },
             ),
           ],

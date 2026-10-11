@@ -1,5 +1,7 @@
 import 'dart:async';
+import '../../theme/design_tokens.dart';
 import 'package:flutter/material.dart';
+import '../../l10n/l10n.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,6 +25,7 @@ import '../../services/share_service.dart';
 import '../../state/devotional_provider.dart';
 import '../widgets/share_card.dart';
 import '../../utils/log.dart';
+import 'package:intl/intl.dart';
 
 class StrictHorizontalDragGestureRecognizer
     extends HorizontalDragGestureRecognizer {
@@ -98,7 +101,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       parent: _verseController,
       curve: Curves.easeOut,
     );
-    _verseController.forward();
+  }
+
+  bool _verseStarted = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Started here (not initState) so the reduced-motion flag is readable.
+    if (_verseStarted) return;
+    _verseStarted = true;
+    _verseController
+      ..duration = Motion.of(context, const Duration(milliseconds: 900))
+      ..forward();
   }
 
   @override
@@ -283,7 +298,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           // ── Header Row ────────────────────────────────────────────────
           SharedTopHeader(
             centerContent: Text(
-              'Wednesday · July 22',
+              _todayLabel(context),
               textAlign: TextAlign.center,
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w500,
@@ -296,59 +311,62 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           const SizedBox(height: 56),
 
           // ── Verse of the Day ──────────────────────────────────────────
-          GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () {
-              final refParts = votdRef.split(':');
-              final verseNum =
-                  refParts.length > 1 ? int.tryParse(refParts.last) : 1;
-              openReaderAtVerse(
-                ref,
-                bookName: votdBook,
-                chapter: votdChapter,
-                verse: verseNum,
-              );
-            },
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                BouncyEntrance(
-                  delay: const Duration(milliseconds: 100),
-                  child: Text(
-                    'VERSE OF THE DAY',
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.primaryColor,
-                      letterSpacing: 2.0,
-                      fontWeight: FontWeight.bold,
+          Semantics(
+            button: true,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                final refParts = votdRef.split(':');
+                final verseNum =
+                    refParts.length > 1 ? int.tryParse(refParts.last) : 1;
+                openReaderAtVerse(
+                  ref,
+                  bookName: votdBook,
+                  chapter: votdChapter,
+                  verse: verseNum,
+                );
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  BouncyEntrance(
+                    delay: const Duration(milliseconds: 100),
+                    child: Text(
+                      context.l10n.homeVerseOfTheDay,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.primaryColor,
+                        letterSpacing: 2.0,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                BouncyEntrance(
-                  delay: const Duration(milliseconds: 200),
-                  child: Text(
-                    '\u201c${data.verseOfTheDay.text}\u201d',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      height: 1.42,
+                  const SizedBox(height: 12),
+                  BouncyEntrance(
+                    delay: const Duration(milliseconds: 200),
+                    child: Text(
+                      '\u201c${data.verseOfTheDay.text}\u201d',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        height: 1.42,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 10),
-                BouncyEntrance(
-                  delay: const Duration(milliseconds: 300),
-                  child: Text(
-                    data.verseOfTheDay.reference,
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      color: theme.primaryColor,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.5,
+                  const SizedBox(height: 10),
+                  BouncyEntrance(
+                    delay: const Duration(milliseconds: 300),
+                    child: Text(
+                      data.verseOfTheDay.reference,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        color: theme.primaryColor,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
 
@@ -359,7 +377,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             delay: const Duration(milliseconds: 400),
             child: GlassContainer(
               isScrollable: true,
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(Radii.xxl),
               // Tighter vertical padding so the card fits without nav overlap
               padding:
                   const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
@@ -382,8 +400,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         Expanded(
                           child: Text(
                             (data.verseOfTheDay.isDevotional
-                                    ? 'DEVOTIONAL'
-                                    : 'COMMENTARY') +
+                                    ? context.l10n.homeDevotional
+                                    : context.l10n.homeCommentary) +
                                 (data.verseOfTheDay.author != null
                                     ? ' · ${data.verseOfTheDay.author}'
                                     : (data.verseOfTheDay.sourceTitle != null
@@ -393,7 +411,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                               fontWeight: FontWeight.w700,
                               letterSpacing: 0.8,
                               color: theme.primaryColor,
-                              fontSize: 11,
+                              fontSize: TypeScale.caption,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -421,7 +439,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         Expanded(
                           flex: 3,
                           child: _PillButton(
-                            label: 'Go Deeper',
+                            label: context.l10n.homeGoDeeper,
                             filled: true,
                             onPressed: () {
                               final refStr = data.verseOfTheDay.reference;
@@ -455,7 +473,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       Expanded(
                         flex: 2,
                         child: _PillButton(
-                          label: 'Share',
+                          label: context.l10n.commonShare,
                           filled: false,
                           onPressed: () => _shareVotd(data.verseOfTheDay),
                         ),
@@ -498,31 +516,32 @@ class _PillButton extends StatelessWidget {
     final gold = theme.primaryColor;
 
     final shape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(50),
+      borderRadius: BorderRadius.circular(Radii.pill),
     );
 
     if (filled) {
-      return SizedBox(
-        height: 48,
+      // Min (not fixed) 48 so the label is not clipped at large text.
+      return ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: kMinTouchTarget),
         child: ElevatedButton(
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
             backgroundColor: gold,
-            foregroundColor: Colors.white,
+            foregroundColor: context.palette.onAccent,
             elevation: 0,
             shape: shape,
             padding: EdgeInsets.zero,
           ),
           child: Text(
             label,
-            style: theme.textTheme.labelMedium
-                ?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+            style: theme.textTheme.labelMedium?.copyWith(
+                color: context.palette.onAccent, fontWeight: FontWeight.bold),
           ),
         ),
       );
     } else {
-      return SizedBox(
-        height: 48,
+      return ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: kMinTouchTarget),
         child: OutlinedButton(
           onPressed: onPressed,
           style: OutlinedButton.styleFrom(
@@ -530,8 +549,9 @@ class _PillButton extends StatelessWidget {
             side: BorderSide(
               color: Theme.of(context).brightness == Brightness.dark
                   ? gold.withValues(alpha: 0.55)
-                  : const Color(0xFF8C6300).withValues(
-                      alpha: 0.8), // Deeper bronze for sharper contrast
+                  // Hand-tuned deeper bronze for outline contrast on light
+                  // paper; kept literal on purpose.
+                  : const Color(0xFF8C6300).withValues(alpha: 0.8),
             ),
             shape: shape,
             padding: EdgeInsets.zero,
@@ -558,8 +578,8 @@ class WordOfTheDaySection extends ConsumerWidget {
     return wotdAsync.when(
       data: (wotd) {
         if (wotd == null) {
-          return const _WotdFallback(
-            'No word picked for today yet — try again later.',
+          return _WotdFallback(
+            context.l10n.homeWotdEmpty,
           );
         }
 
@@ -570,7 +590,7 @@ class WordOfTheDaySection extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'WORD OF THE DAY',
+                context.l10n.homeWordOfTheDayHeading,
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.primaryColor,
                   letterSpacing: 2.0,
@@ -589,7 +609,7 @@ class WordOfTheDaySection extends ConsumerWidget {
               const SizedBox(height: 16),
               GlassContainer(
                 isScrollable: false,
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(Radii.xxl),
                 padding: const EdgeInsets.symmetric(
                     horizontal: 20.0, vertical: 14.0),
                 child: Column(
@@ -611,7 +631,7 @@ class WordOfTheDaySection extends ConsumerWidget {
                       children: [
                         Expanded(
                           child: _PillButton(
-                            label: 'Read Full Definition',
+                            label: context.l10n.homeReadFullDefinition,
                             filled: true,
                             onPressed: () {
                               showModalBottomSheet<void>(
@@ -627,7 +647,7 @@ class WordOfTheDaySection extends ConsumerWidget {
                         const SizedBox(width: 10),
                         Expanded(
                           child: _PillButton(
-                            label: 'Share',
+                            label: context.l10n.commonShare,
                             filled: false,
                             onPressed: () {
                               HapticFeedback.selectionClick();
@@ -636,19 +656,19 @@ class WordOfTheDaySection extends ConsumerWidget {
                                 copyText: ShareService.formatWord(
                                   word: wotd.word,
                                   definition: wotd.snippet,
-                                  sourceName: 'Word of the day',
+                                  sourceName: context.l10n.homeWordOfTheDay,
                                 ),
                                 shareText: ShareService.formatWord(
                                   word: wotd.word,
                                   definition: wotd.snippet,
-                                  sourceName: 'Word of the day',
+                                  sourceName: context.l10n.homeWordOfTheDay,
                                 ),
                                 imageFilename: 'wotd',
                                 buildCard: (backdrop, style) => ShareCard.word(
-                                  eyebrow: 'Word of the day',
+                                  eyebrow: context.l10n.homeWordOfTheDay,
                                   word: wotd.word,
                                   definition: wotd.snippet,
-                                  source: 'Word of the day',
+                                  source: context.l10n.homeWordOfTheDay,
                                   backdrop: backdrop,
                                   style: style,
                                 ),
@@ -668,7 +688,7 @@ class WordOfTheDaySection extends ConsumerWidget {
       loading: () => const SizedBox.shrink(),
       error: (e, st) {
         logDebug('wordOfTheDayProvider error: $e\n$st');
-        return _WotdFallback('Word of the day unavailable ($e).');
+        return _WotdFallback(context.l10n.homeWotdUnavailableNow);
       },
     );
   }
@@ -687,7 +707,7 @@ class _WotdFallback extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          'WORD OF THE DAY',
+          context.l10n.homeWordOfTheDayHeading,
           style: theme.textTheme.labelSmall?.copyWith(
             color: theme.primaryColor,
             letterSpacing: 2.0,
@@ -697,7 +717,7 @@ class _WotdFallback extends StatelessWidget {
         const SizedBox(height: 12),
         GlassContainer(
           isScrollable: false,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(Radii.xxl),
           padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
           child: Text(
             message,
@@ -710,5 +730,18 @@ class _WotdFallback extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+/// Today's date in the interface language, e.g. "Wednesday · July 22".
+String _todayLabel(BuildContext context) {
+  final now = DateTime.now();
+  final locale = Localizations.localeOf(context).toString();
+  try {
+    return '${DateFormat.EEEE(locale).format(now)} · '
+        '${DateFormat.MMMMd(locale).format(now)}';
+  } catch (_) {
+    return '${DateFormat.EEEE('en').format(now)} · '
+        '${DateFormat.MMMMd('en').format(now)}';
   }
 }

@@ -7,6 +7,9 @@ import '../../data/models/devotional_story.dart';
 import '../../state/devotional_provider.dart';
 import '../../theme/app_colors.dart';
 import 'bible_story_reader_screen.dart';
+import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
+import '../widgets/state_views.dart';
 
 /// Entry point: "Bible Stories" — an illustrated journey through Scripture.
 class BibleStoriesScreen extends ConsumerStatefulWidget {
@@ -48,7 +51,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsets.only(left: 20, bottom: 14),
               title: Text(
-                'Bible Stories',
+                context.l10n.storiesTitle,
                 style: theme.textTheme.titleLarge?.copyWith(
                   fontFamily: 'Playfair Display',
                   fontWeight: FontWeight.w700,
@@ -70,7 +73,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
             actions: [
               IconButton(
                 icon: const Icon(Icons.tune_rounded),
-                tooltip: 'Filters',
+                tooltip: context.l10n.storiesFilters,
                 onPressed: () => _openFilters(context),
               ),
               const SizedBox(width: 8),
@@ -83,7 +86,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '500 illustrated moments from Genesis to Revelation',
+                    context.l10n.storiesSubtitle,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
@@ -94,11 +97,12 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                     onChanged: (v) =>
                         ref.read(devotionalFilterProvider.notifier).setQuery(v),
                     decoration: InputDecoration(
-                      hintText: 'Search title, book, or reference…',
+                      hintText: context.l10n.storiesSearchHint,
                       prefixIcon: const Icon(Icons.search_rounded),
                       suffixIcon: filter.query.isEmpty
                           ? null
                           : IconButton(
+                              tooltip: context.l10n.storiesClearSearch,
                               icon: const Icon(Icons.close_rounded, size: 18),
                               onPressed: () {
                                 _searchController.clear();
@@ -111,19 +115,20 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                       filled: true,
                       fillColor: theme.colorScheme.surface,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(Radii.lg),
                         borderSide: BorderSide.none,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  // 12dp gap minus the pills' 6dp hit padding.
+                  const SizedBox(height: 6),
                   // Testament + books control: All | OT | NT | Books▾.
                   // Books opens a dropdown sheet instead of a chip row.
                   Row(
                     children: [
                       Expanded(
                         child: _FilterPill(
-                          label: 'All',
+                          label: context.l10n.storiesFilterAll,
                           selected: filter.testament == TestamentFilter.all &&
                               filter.bookPrefix == null,
                           onTap: () => ref
@@ -134,7 +139,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: _FilterPill(
-                          label: 'OT',
+                          label: context.l10n.storiesFilterOt,
                           selected: filter.testament == TestamentFilter.ot &&
                               filter.bookPrefix == null,
                           onTap: () => ref
@@ -145,7 +150,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: _FilterPill(
-                          label: 'NT',
+                          label: context.l10n.storiesFilterNt,
                           selected: filter.testament == TestamentFilter.nt &&
                               filter.bookPrefix == null,
                           onTap: () => ref
@@ -167,11 +172,11 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 4),
                   Row(
                     children: [
                       Text(
-                        '${stories.length} of ${totalAsync.value?.length ?? 0} stories',
+                        context.l10n.storiesCountOfTotal(
+                            stories.length, totalAsync.value?.length ?? 0),
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: theme.colorScheme.onSurface
                               .withValues(alpha: 0.55),
@@ -181,7 +186,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                       _filterToggleButton(
                         context,
                         icon: Icons.favorite_rounded,
-                        label: 'Favorites',
+                        label: context.l10n.storiesFavorites,
                         active: filter.favoritesOnly,
                         onTap: () => ref
                             .read(devotionalFilterProvider.notifier)
@@ -191,7 +196,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                       _filterToggleButton(
                         context,
                         icon: Icons.check_circle_outline_rounded,
-                        label: 'Unread',
+                        label: context.l10n.storiesUnread,
                         active: filter.unreadOnly,
                         onTap: () => ref
                             .read(devotionalFilterProvider.notifier)
@@ -204,24 +209,22 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
             ),
           ),
           totalAsync.when(
-            loading: () => const SliverFillRemaining(
-              child: Center(child: CupertinoActivityIndicator()),
-            ),
+            loading: () => const SliverFillRemaining(child: LoadingView()),
             error: (e, _) => SliverFillRemaining(
-              child: Center(
-                  child: Text('Could not load stories:\n$e',
-                      textAlign: TextAlign.center)),
+              child: ErrorState(
+                error: e,
+                message: context.l10n.storiesLoadFailed,
+                onRetry: () => ref.invalidate(devotionalStoriesProvider),
+              ),
             ),
             data: (_) => stories.isEmpty
                 ? SliverFillRemaining(
-                    child: Center(
-                      child: _EmptyStories(
-                        onClearFilters: () =>
-                            ref.read(devotionalFilterProvider.notifier).reset(),
-                        onShowRead: () => ref
-                            .read(devotionalFilterProvider.notifier)
-                            .toggleUnreadOnly(),
-                      ),
+                    child: _EmptyStories(
+                      onClearFilters: () =>
+                          ref.read(devotionalFilterProvider.notifier).reset(),
+                      onShowRead: () => ref
+                          .read(devotionalFilterProvider.notifier)
+                          .toggleUnreadOnly(),
                     ),
                   )
                 : _StoryGrid(stories: stories),
@@ -244,11 +247,11 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
 
   /// Display label for the Books pill: the chosen book, else "Books".
   String _bookLabel(List<DevotionalBookInfo> books, String? prefix) {
-    if (prefix == null) return 'Books';
+    if (prefix == null) return context.l10n.storiesBooks;
     for (final b in books) {
       if (b.prefix == prefix) return b.book;
     }
-    return 'Books';
+    return context.l10n.storiesBooks;
   }
 
   /// Book dropdown: search + scoped book list + All-books reset.
@@ -266,7 +269,8 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
           ),
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(Radii.xxl)),
           ),
           padding: const EdgeInsets.fromLTRB(8, 8, 8, 32),
           child: StatefulBuilder(
@@ -288,7 +292,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                       decoration: BoxDecoration(
                         color:
                             theme.colorScheme.onSurface.withValues(alpha: 0.25),
-                        borderRadius: BorderRadius.circular(3),
+                        borderRadius: BorderRadius.circular(Radii.pill),
                       ),
                     ),
                   ),
@@ -296,13 +300,13 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: TextField(
                       decoration: InputDecoration(
-                        hintText: 'Search books…',
+                        hintText: context.l10n.storiesSearchBooks,
                         prefixIcon: const Icon(Icons.search_rounded),
                         isDense: true,
                         filled: true,
                         fillColor: theme.colorScheme.surface,
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(Radii.lg),
                           borderSide: BorderSide.none,
                         ),
                       ),
@@ -315,7 +319,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                       children: [
                         ListTile(
                           leading: const Icon(Icons.menu_book_outlined),
-                          title: const Text('All books'),
+                          title: Text(context.l10n.storiesAllBooks),
                           onTap: () {
                             ref
                                 .read(devotionalFilterProvider.notifier)
@@ -360,31 +364,40 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
     required VoidCallback onTap,
   }) {
     final theme = Theme.of(context);
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: active
-              ? theme.primaryColor.withValues(alpha: 0.15)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: active
-                ? theme.primaryColor
-                : theme.dividerColor.withValues(alpha: 0.4),
-          ),
-        ),
-        child: Row(
-          children: [
-            Icon(icon,
-                size: 14,
+    return Semantics(
+      button: true,
+      toggled: active,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        // Invisible vertical hit padding: 48dp target.
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: active
+                  ? theme.primaryColor.withValues(alpha: 0.15)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(Radii.lg),
+              border: Border.all(
                 color: active
                     ? theme.primaryColor
-                    : theme.colorScheme.onSurface.withValues(alpha: 0.6)),
-            const SizedBox(width: 4),
-            Text(label, style: theme.textTheme.labelSmall),
-          ],
+                    : theme.dividerColor.withValues(alpha: 0.4),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(icon,
+                    size: 14,
+                    color: active
+                        ? theme.primaryColor
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                const SizedBox(width: 4),
+                Text(label, style: theme.textTheme.labelSmall),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -407,42 +420,50 @@ class _FilterPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-        decoration: BoxDecoration(
-          color: selected
-              ? theme.primaryColor.withValues(alpha: 0.15)
-              : theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(999),
-          border: Border.all(
-            color: selected
-                ? theme.primaryColor
-                : theme.dividerColor.withValues(alpha: 0.5),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Flexible(
-              child: Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: theme.textTheme.labelMedium?.copyWith(
-                  color: selected
-                      ? theme.primaryColor
-                      : theme.colorScheme.onSurface.withValues(alpha: 0.75),
-                  fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                ),
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        // Invisible vertical hit padding: 48dp target.
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+            decoration: BoxDecoration(
+              color: selected
+                  ? theme.primaryColor.withValues(alpha: 0.15)
+                  : theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(Radii.pill),
+              border: Border.all(
+                color: selected
+                    ? theme.primaryColor
+                    : theme.dividerColor.withValues(alpha: 0.5),
               ),
             ),
-            if (trailing != null) trailing!,
-          ],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: selected
+                          ? theme.primaryColor
+                          : theme.colorScheme.onSurface.withValues(alpha: 0.75),
+                      fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                    ),
+                  ),
+                ),
+                if (trailing != null) trailing!,
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -462,71 +483,43 @@ class _EmptyStories extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     final filter = ref.watch(devotionalFilterProvider);
     final favorites = ref.watch(devotionalFavoritesProvider);
 
-    String title = 'No stories match these filters.';
+    final l10n = context.l10n;
+    String title = l10n.storiesNoMatch;
     String? actionLabel;
     VoidCallback? action;
 
     if (filter.favoritesOnly && favorites.isEmpty) {
-      title = 'No favorites yet.';
-      actionLabel = 'Browse all stories';
+      title = l10n.storiesNoFavorites;
+      actionLabel = l10n.storiesBrowseAll;
       action = onClearFilters;
     } else if (filter.unreadOnly) {
-      title = "You're all caught up.";
-      actionLabel = 'Show read stories';
+      title = l10n.storiesAllCaughtUp;
+      actionLabel = l10n.storiesShowRead;
       action = onShowRead;
     } else if (filter.query.isNotEmpty ||
         filter.bookPrefix != null ||
         filter.testament != TestamentFilter.all) {
-      actionLabel = 'Clear filters';
+      actionLabel = l10n.storiesClearFilters;
       action = onClearFilters;
     }
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            filter.favoritesOnly && favorites.isEmpty
-                ? Icons.favorite_outline_rounded
-                : Icons.search_off_rounded,
-            size: 40,
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          if (filter.favoritesOnly && favorites.isEmpty) ...[
-            const SizedBox(height: 4),
-            Text(
-              'Tap ♥ on any story to save it here.',
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-              ),
-            ),
-          ],
-          if (actionLabel != null) ...[
-            const SizedBox(height: 16),
-            FilledButton.tonal(
-              onPressed: () {
-                HapticFeedback.selectionClick();
-                action!();
-              },
-              child: Text(actionLabel),
-            ),
-          ],
-        ],
-      ),
+    final noFavorites = filter.favoritesOnly && favorites.isEmpty;
+    return EmptyState(
+      icon: noFavorites
+          ? Icons.favorite_outline_rounded
+          : Icons.search_off_rounded,
+      title: title,
+      message: noFavorites ? l10n.storiesFavoritesHint : null,
+      actionLabel: actionLabel,
+      onAction: action == null
+          ? null
+          : () {
+              HapticFeedback.selectionClick();
+              action!();
+            },
     );
   }
 }
@@ -576,9 +569,9 @@ class _StoryCard extends ConsumerWidget {
 
     return Material(
       color: theme.colorScheme.surface,
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(Radii.xl),
       child: InkWell(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(Radii.xl),
         onTap: () {
           Navigator.of(context).push(CupertinoPageRoute<void>(
             builder: (_) => BibleStoryReaderScreen(initialStory: story),
@@ -586,7 +579,7 @@ class _StoryCard extends ConsumerWidget {
         },
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(Radii.xl),
             border: Border.all(
               color: isFavorite
                   ? AppColors.goldAccent.withValues(alpha: 0.8)
@@ -604,7 +597,8 @@ class _StoryCard extends ConsumerWidget {
                 : null,
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(17),
+            // Inset by the 1px border so the clip sits inside it.
+            borderRadius: BorderRadius.circular(Radii.xl - 1),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -627,13 +621,17 @@ class _StoryCard extends ConsumerWidget {
                         child: Container(
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
+                            // Fixed: read badge sits over the story artwork.
                             color: Colors.black.withValues(alpha: 0.35),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(Radii.md),
                           ),
                           child: Icon(
                             isRead
                                 ? Icons.check_circle_rounded
                                 : Icons.circle_outlined,
+                            semanticLabel: isRead
+                                ? context.l10n.a11yRead
+                                : context.l10n.storiesUnread,
                             size: 16,
                             color: isRead
                                 ? AppColors.goldAccent
@@ -705,9 +703,7 @@ class DevotionalAttribution extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Text(
-      'Scripture from the King James Version (public domain). Narrative summaries '
-      'adapted from The Graham Bible (grahambible.com), AI-assisted and human reviewed. '
-      'Artwork: Gustave Doré (1832–1883), public domain, via Wikimedia Commons.',
+      context.l10n.storiesAttribution,
       style: theme.textTheme.labelSmall?.copyWith(
         color: theme.colorScheme.onSurface.withValues(alpha: 0.45),
         height: 1.5,

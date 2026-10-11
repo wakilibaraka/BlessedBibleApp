@@ -1,3 +1,5 @@
+import '../l10n/l10n.dart';
+
 /// A Study hub greeting: benediction title + companion subtitle.
 class StudyGreeting {
   final String title;
@@ -8,52 +10,50 @@ class StudyGreeting {
 
 /// The everyday rotation: invitations, not imperatives (EID tone).
 /// Shared by all users on a given day — calm, never flickering.
-const List<StudyGreeting> _dailyGreetings = [
-  StudyGreeting('Peace be with you.', 'Let His word bring you rest.'),
-  StudyGreeting('Walk in the light.', 'His word is a lamp for your path.'),
-  StudyGreeting('Grace and peace to you.', 'Rest in the Vine today.'),
-  StudyGreeting('Come to the waters.', 'Jesus is the light of the world.'),
-  StudyGreeting(
-      'The Lord bless you.', 'Keep His promises close to your heart.'),
-  StudyGreeting('Be still and know.', 'Dwell in His quiet presence.'),
-  StudyGreeting('Morning mercies anew.', 'His compassions never fail.'),
-  StudyGreeting('Rooted in love.', 'Grow in grace and truth.'),
-  StudyGreeting('Let your light shine.', 'A city on a hill cannot be hidden.'),
-  StudyGreeting('Draw near to God.', 'He is already reaching for you.'),
-  StudyGreeting('The Word became flesh.', 'He understands your journey.'),
-  StudyGreeting('Taste and see.', 'The Lord is incredibly good.'),
-];
+List<StudyGreeting> _dailyGreetings(AppLocalizations l) => [
+      StudyGreeting(l.greetingDaily1Title, l.greetingDaily1Subtitle),
+      StudyGreeting(l.greetingDaily2Title, l.greetingDaily2Subtitle),
+      StudyGreeting(l.greetingDaily3Title, l.greetingDaily3Subtitle),
+      StudyGreeting(l.greetingDaily4Title, l.greetingDaily4Subtitle),
+      StudyGreeting(l.greetingDaily5Title, l.greetingDaily5Subtitle),
+      StudyGreeting(l.greetingDaily6Title, l.greetingDaily6Subtitle),
+      StudyGreeting(l.greetingDaily7Title, l.greetingDaily7Subtitle),
+      StudyGreeting(l.greetingDaily8Title, l.greetingDaily8Subtitle),
+      StudyGreeting(l.greetingDaily9Title, l.greetingDaily9Subtitle),
+      StudyGreeting(l.greetingDaily10Title, l.greetingDaily10Subtitle),
+      StudyGreeting(l.greetingDaily11Title, l.greetingDaily11Subtitle),
+      StudyGreeting(l.greetingDaily12Title, l.greetingDaily12Subtitle),
+    ];
 
 /// Mornings (5:00–11:59): starting-the-day words.
-const List<StudyGreeting> _morningGreetings = [
-  StudyGreeting('Awake, O sleeper.', 'Christ will shine on you.'),
-  StudyGreeting('Joy comes in the morning.', 'Step into His new day.'),
-  StudyGreeting('This is the day the Lord has made.', 'Let us rejoice in it.'),
-];
+List<StudyGreeting> _morningGreetings(AppLocalizations l) => [
+      StudyGreeting(l.greetingMorning1Title, l.greetingMorning1Subtitle),
+      StudyGreeting(l.greetingMorning2Title, l.greetingMorning2Subtitle),
+      StudyGreeting(l.greetingMorning3Title, l.greetingMorning3Subtitle),
+    ];
 
 /// Evenings and nights (18:00–4:59): rest words.
-const List<StudyGreeting> _eveningGreetings = [
-  StudyGreeting('The day is done.', 'He gives sleep to those He loves.'),
-  StudyGreeting('Under His wings.', 'You will find refuge tonight.'),
-  StudyGreeting('Come to Me, you who are weary.', 'And I will give you rest.'),
-];
+List<StudyGreeting> _eveningGreetings(AppLocalizations l) => [
+      StudyGreeting(l.greetingEvening1Title, l.greetingEvening1Subtitle),
+      StudyGreeting(l.greetingEvening2Title, l.greetingEvening2Subtitle),
+      StudyGreeting(l.greetingEvening3Title, l.greetingEvening3Subtitle),
+    ];
 
 /// Grace days: the streak is broken but the reader has history, or
 /// today restarts it. Comfort, not guilt.
-const List<StudyGreeting> _graceGreetings = [
-  StudyGreeting('Cast all your anxiety on Him.', 'Because He cares for you.'),
-  StudyGreeting('My peace I give you.', 'Let not your heart be troubled.'),
-  StudyGreeting('He heals the brokenhearted.', 'And binds up their wounds.'),
-  StudyGreeting('Nothing can separate us.', 'From the love of God.'),
-];
+List<StudyGreeting> _graceGreetings(AppLocalizations l) => [
+      StudyGreeting(l.greetingGrace1Title, l.greetingGrace1Subtitle),
+      StudyGreeting(l.greetingGrace2Title, l.greetingGrace2Subtitle),
+      StudyGreeting(l.greetingGrace3Title, l.greetingGrace3Subtitle),
+      StudyGreeting(l.greetingGrace4Title, l.greetingGrace4Subtitle),
+    ];
 
 /// On a roll (streak of 3+): encouragement for the road.
-const List<StudyGreeting> _encouragementGreetings = [
-  StudyGreeting(
-      'Be strong and courageous.', 'The Lord your God goes with you.'),
-  StudyGreeting('Run with endurance.', 'Keep your eyes fixed on Jesus.'),
-  StudyGreeting('Iron sharpens iron.', 'Grow together in the Word.'),
-];
+List<StudyGreeting> _encouragementGreetings(AppLocalizations l) => [
+      StudyGreeting(l.greetingCheer1Title, l.greetingCheer1Subtitle),
+      StudyGreeting(l.greetingCheer2Title, l.greetingCheer2Subtitle),
+      StudyGreeting(l.greetingCheer3Title, l.greetingCheer3Subtitle),
+    ];
 
 /// Picks the Study greeting for this moment.
 ///
@@ -63,6 +63,7 @@ const List<StudyGreeting> _encouragementGreetings = [
 /// header is stable all day and fresh tomorrow — deterministic and
 /// testable, with no per-launch randomness.
 StudyGreeting greetingFor({
+  required AppLocalizations l10n,
   required DateTime now,
   required int streakCount,
   required int distinctDaysThisYear,
@@ -74,36 +75,31 @@ StudyGreeting greetingFor({
 
   final returning = (streakCount == 0 && distinctDaysThisYear > 0) ||
       (streakCount == 1 && distinctDaysThisYear > 1);
-  if (returning) return pick(_graceGreetings);
+  if (returning) return pick(_graceGreetings(l10n));
 
-  if (streakCount >= 3) return pick(_encouragementGreetings);
+  if (streakCount >= 3) return pick(_encouragementGreetings(l10n));
 
   final hour = now.hour;
-  if (hour >= 5 && hour < 12) return pick(_morningGreetings);
-  if (hour >= 18 || hour < 5) return pick(_eveningGreetings);
-  return pick(_dailyGreetings);
+  if (hour >= 5 && hour < 12) return pick(_morningGreetings(l10n));
+  if (hour >= 18 || hour < 5) return pick(_eveningGreetings(l10n));
+  return pick(_dailyGreetings(l10n));
 }
 
 /// Header eyebrow: weekday + daypart, echoing whichever pool is
 /// active ("Sunday morning", "Sunday night", ...).
-String greetingEyebrow(DateTime now) {
-  const weekdays = [
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-    'Sunday'
-  ];
-  final day = weekdays[now.weekday - 1];
+String greetingEyebrow(DateTime now, AppLocalizations l10n) {
+  final day = switch (now.weekday) {
+    DateTime.monday => l10n.settingsMonday,
+    DateTime.tuesday => l10n.settingsTuesday,
+    DateTime.wednesday => l10n.settingsWednesday,
+    DateTime.thursday => l10n.settingsThursday,
+    DateTime.friday => l10n.settingsFriday,
+    DateTime.saturday => l10n.settingsSaturday,
+    _ => l10n.settingsSunday,
+  };
   final hour = now.hour;
-  final part = hour >= 5 && hour < 12
-      ? 'morning'
-      : hour >= 12 && hour < 18
-          ? 'afternoon'
-          : hour >= 18
-              ? 'evening'
-              : 'night';
-  return '$day $part';
+  if (hour >= 5 && hour < 12) return l10n.greetingEyebrowMorning(day);
+  if (hour >= 12 && hour < 18) return l10n.greetingEyebrowAfternoon(day);
+  if (hour >= 18) return l10n.greetingEyebrowEvening(day);
+  return l10n.greetingEyebrowNight(day);
 }

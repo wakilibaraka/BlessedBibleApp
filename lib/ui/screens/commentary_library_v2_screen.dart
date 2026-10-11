@@ -8,6 +8,9 @@ import '../../state/commentary_provider.dart';
 import '../../state/theme_provider.dart';
 import '../widgets/shared_app_bar.dart';
 import '../widgets/study_v2_widgets.dart';
+import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
+import '../widgets/state_views.dart';
 
 /// Redesigned commentary library (V2).
 ///
@@ -39,7 +42,8 @@ class _CommentaryLibraryV2ScreenState
         return Container(
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(Radii.xxl)),
           ),
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
           child: Column(
@@ -51,7 +55,7 @@ class _CommentaryLibraryV2ScreenState
                     fontWeight: FontWeight.bold,
                   )),
               const SizedBox(height: 4),
-              Text('${chapters.length} chapters with content',
+              Text(context.l10n.studyChaptersWithContent(chapters.length),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   )),
@@ -69,7 +73,7 @@ class _CommentaryLibraryV2ScreenState
                   itemBuilder: (context, i) {
                     final ch = chapters[i];
                     return InkWell(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(Radii.md),
                       onTap: () {
                         Navigator.of(ctx).pop();
                         Navigator.of(context).push(CupertinoPageRoute<void>(
@@ -81,7 +85,7 @@ class _CommentaryLibraryV2ScreenState
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
                           color: theme.primaryColor.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(Radii.md),
                           border: Border.all(
                             color: theme.primaryColor.withValues(alpha: 0.3),
                           ),
@@ -115,47 +119,18 @@ class _CommentaryLibraryV2ScreenState
       appThemeMode: appThemeMode,
       page: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: const SharedAppBar(title: Text('Commentary Library')),
+        appBar: SharedAppBar(title: Text(context.l10n.studyCommentaryLibrary)),
         body: SafeArea(
           bottom: false,
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 800),
               child: asyncEntries.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, _) => ListView(
-                  padding: const EdgeInsets.all(24),
-                  children: [
-                    const SizedBox(height: 60),
-                    Icon(Icons.cloud_off_rounded,
-                        size: 44,
-                        color:
-                            theme.colorScheme.onSurface.withValues(alpha: 0.4)),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Could not load commentary.',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '$e',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color:
-                            theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Center(
-                      child: FilledButton.tonal(
-                        onPressed: () => ref.invalidate(commentaryProvider),
-                        child: const Text('Retry'),
-                      ),
-                    ),
-                  ],
+                loading: () => const LoadingView(),
+                error: (e, _) => ErrorState(
+                  error: e,
+                  message: context.l10n.studyCommentaryLoadError,
+                  onRetry: () => ref.invalidate(commentaryProvider),
                 ),
                 data: (entries) {
                   // book -> chapter -> entry count
@@ -177,23 +152,11 @@ class _CommentaryLibraryV2ScreenState
                         .toList();
                   }
                   if (names.isEmpty) {
-                    return ListView(
-                      padding: const EdgeInsets.all(24),
-                      children: [
-                        const SizedBox(height: 60),
-                        Icon(Icons.search_off_rounded,
-                            size: 44,
-                            color: theme.colorScheme.onSurface
-                                .withValues(alpha: 0.4)),
-                        const SizedBox(height: 12),
-                        Text(
-                          entries.isEmpty
-                              ? 'No commentary available yet.'
-                              : 'No books match "$_query".',
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.titleSmall,
-                        ),
-                      ],
+                    return EmptyState(
+                      icon: Icons.search_off_rounded,
+                      title: entries.isEmpty
+                          ? context.l10n.studyNoCommentaryYet
+                          : context.l10n.studyNoBooksMatch(_query),
                     );
                   }
                   return ListView.builder(
@@ -205,17 +168,18 @@ class _CommentaryLibraryV2ScreenState
                           padding: const EdgeInsets.only(bottom: 10),
                           child: TextField(
                             decoration: InputDecoration(
-                              hintText: 'Search ${books.length} books…',
+                              hintText: context.l10n
+                                  .studySearchBooksCount(books.length),
                               prefixIcon: const Icon(Icons.search_rounded),
                               filled: true,
                               fillColor: theme.colorScheme.surface,
                               border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(14),
+                                borderRadius: BorderRadius.circular(Radii.lg),
                                 borderSide:
                                     BorderSide(color: theme.dividerColor),
                               ),
                               enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(14),
+                                borderRadius: BorderRadius.circular(Radii.lg),
                                 borderSide:
                                     BorderSide(color: theme.dividerColor),
                               ),
@@ -239,7 +203,7 @@ class _CommentaryLibraryV2ScreenState
                                 decoration: BoxDecoration(
                                   color: theme.primaryColor
                                       .withValues(alpha: 0.12),
-                                  borderRadius: BorderRadius.circular(13),
+                                  borderRadius: BorderRadius.circular(Radii.md),
                                   border: Border.all(
                                     color: theme.primaryColor
                                         .withValues(alpha: 0.3),
@@ -265,7 +229,10 @@ class _CommentaryLibraryV2ScreenState
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
-                                      '${authors[book] ?? 'Classic sources'} · ${chapters.length} ch',
+                                      context.l10n.studyBookAuthorChapters(
+                                          authors[book] ??
+                                              context.l10n.studyClassicSources,
+                                          chapters.length),
                                       style:
                                           theme.textTheme.bodySmall?.copyWith(
                                         color: theme.colorScheme.onSurface
@@ -352,27 +319,29 @@ class _CommentaryHubV2ScreenState extends ConsumerState<CommentaryHubV2Screen> {
                             padding: const EdgeInsets.all(13),
                             decoration: BoxDecoration(
                               color: theme.primaryColor.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius: BorderRadius.circular(Radii.lg),
                               border: Border.all(
                                 color:
                                     theme.primaryColor.withValues(alpha: 0.3),
                               ),
                             ),
                             child: Text(
-                              'Reading · ${widget.book} ${widget.chapter}:${widget.verse}',
+                              context.l10n.studyReadingRef(
+                                  '${widget.book} ${widget.chapter}:${widget.verse}'),
                               style: theme.textTheme.titleSmall?.copyWith(
                                 fontWeight: FontWeight.w700,
                                 color: theme.primaryColor,
                               ),
                             ),
                           ),
-                        const SizedBox(height: 10),
+                        // 10dp gaps minus the chips' 4dp hit padding.
+                        const SizedBox(height: 6),
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
                             children: [
                               _FilterChip(
-                                label: 'All sources',
+                                label: context.l10n.studyAllSources,
                                 selected: _filter == null,
                                 onTap: () => setState(() => _filter = null),
                               ),
@@ -381,14 +350,14 @@ class _CommentaryHubV2ScreenState extends ConsumerState<CommentaryHubV2Screen> {
                                 Padding(
                                   padding: const EdgeInsets.only(right: 8),
                                   child: _FilterChip(
-                                    label: c.displayName,
+                                    label: studyCategoryLabel(context.l10n, c),
                                     selected: _filter == c,
                                     onTap: () => setState(() =>
                                         _filter = _filter == c ? null : c),
                                   ),
                                 ),
                               _FilterChip(
-                                label: 'Verse-level',
+                                label: context.l10n.studyVerseLevel,
                                 selected: _verseOnly,
                                 onTap: () =>
                                     setState(() => _verseOnly = !_verseOnly),
@@ -396,20 +365,20 @@ class _CommentaryHubV2ScreenState extends ConsumerState<CommentaryHubV2Screen> {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 6),
                         TextField(
                           decoration: InputDecoration(
-                            hintText:
-                                'Search within ${widget.book} ${widget.chapter}…',
+                            hintText: context.l10n.studySearchWithin(
+                                '${widget.book} ${widget.chapter}'),
                             prefixIcon: const Icon(Icons.search_rounded),
                             filled: true,
                             fillColor: theme.colorScheme.surface,
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(14),
+                              borderRadius: BorderRadius.circular(Radii.lg),
                               borderSide: BorderSide(color: theme.dividerColor),
                             ),
                             enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(14),
+                              borderRadius: BorderRadius.circular(Radii.lg),
                               borderSide: BorderSide(color: theme.dividerColor),
                             ),
                           ),
@@ -420,22 +389,11 @@ class _CommentaryHubV2ScreenState extends ConsumerState<CommentaryHubV2Screen> {
                   ),
                   Expanded(
                     child: asyncEntries.when(
-                      loading: () =>
-                          const Center(child: CircularProgressIndicator()),
-                      error: (e, _) => Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text('Could not load entries.\n$e',
-                                textAlign: TextAlign.center),
-                            const SizedBox(height: 12),
-                            FilledButton.tonal(
-                              onPressed: () =>
-                                  ref.invalidate(commentaryProvider),
-                              child: const Text('Retry'),
-                            ),
-                          ],
-                        ),
+                      loading: () => const LoadingView(),
+                      error: (e, _) => ErrorState(
+                        error: e,
+                        message: context.l10n.studyEntriesLoadFailed,
+                        onRetry: () => ref.invalidate(commentaryProvider),
                       ),
                       data: (entries) {
                         var list = entries
@@ -469,7 +427,7 @@ class _CommentaryHubV2ScreenState extends ConsumerState<CommentaryHubV2Screen> {
                             child: Padding(
                               padding: const EdgeInsets.all(32),
                               child: Text(
-                                'No entries match these filters.\nTry All sources, or browse the library.',
+                                context.l10n.studyNoEntriesMatch,
                                 textAlign: TextAlign.center,
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   color: theme.colorScheme.onSurface
@@ -508,26 +466,36 @@ class _FilterChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color: selected
-              ? theme.colorScheme.onSurface
-              : theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(999),
-          border: Border.all(
-            color: selected ? theme.colorScheme.onSurface : theme.dividerColor,
-          ),
-        ),
-        child: Text(
-          label,
-          style: theme.textTheme.labelLarge?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: selected
-                ? theme.colorScheme.surface
-                : theme.colorScheme.onSurface.withValues(alpha: 0.7),
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        // Invisible vertical hit padding: 48dp target.
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: selected
+                  ? theme.colorScheme.onSurface
+                  : theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(Radii.pill),
+              border: Border.all(
+                color:
+                    selected ? theme.colorScheme.onSurface : theme.dividerColor,
+              ),
+            ),
+            child: Text(
+              label,
+              style: theme.textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: selected
+                    ? theme.colorScheme.surface
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
+            ),
           ),
         ),
       ),
@@ -569,8 +537,9 @@ class _EntryCard extends ConsumerWidget {
                     ),
                   ),
                 ),
-                V2Badge(
-                    isVerseLevel && verse != null ? 'Verse $verse' : 'Chapter'),
+                V2Badge(isVerseLevel && verse != null
+                    ? context.l10n.studyVerseN(verse)
+                    : context.l10n.studyChapter),
               ],
             ),
             const SizedBox(height: 10),
@@ -591,7 +560,9 @@ class _EntryCard extends ConsumerWidget {
                   ),
                 ),
                 IconButton(
-                  visualDensity: VisualDensity.compact,
+                  tooltip: bookmarked
+                      ? context.l10n.studyRemoveBookmark
+                      : context.l10n.studyBookmarkCommentary,
                   icon: Icon(
                     bookmarked
                         ? Icons.bookmark_rounded
@@ -613,5 +584,17 @@ class _EntryCard extends ConsumerWidget {
         ),
       ),
     );
+  }
+}
+
+/// Localized label for a commentary [StudyContentCategory].
+String studyCategoryLabel(AppLocalizations l10n, StudyContentCategory c) {
+  switch (c) {
+    case StudyContentCategory.commentary:
+      return l10n.studyCategoryCommentary;
+    case StudyContentCategory.devotional:
+      return l10n.studyCategoryDevotional;
+    case StudyContentCategory.studyNote:
+      return l10n.studyCategoryStudyNote;
   }
 }

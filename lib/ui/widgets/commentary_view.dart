@@ -17,6 +17,9 @@ import '../../models/study_content_category.dart';
 import '../screens/commentary_hub_screen.dart';
 import '../../state/read_location_provider.dart';
 import 'verse_link_text.dart';
+import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
+import 'state_views.dart';
 
 class CommentaryView extends ConsumerStatefulWidget {
   final String book;
@@ -201,7 +204,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                   icon: Icon(Icons.arrow_back_ios_new_rounded,
                       color: theme.primaryColor),
                   onPressed: () => Navigator.pop(context),
-                  tooltip: 'Back',
+                  tooltip: context.l10n.commonBack,
                 ),
               ),
               Container(
@@ -209,7 +212,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                 decoration: BoxDecoration(
                   color: Colors.transparent,
-                  borderRadius: BorderRadius.circular(30),
+                  borderRadius: BorderRadius.circular(Radii.xxxl),
                   border: Border.all(
                       color: tokens.readingAccent.withValues(alpha: 0.5)),
                 ),
@@ -237,8 +240,8 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                             : tokens.readingInkMuted,
                       ),
                       tooltip: isBookmarked
-                          ? 'Remove Bookmark'
-                          : 'Bookmark Commentary',
+                          ? context.l10n.studyRemoveBookmark
+                          : context.l10n.studyBookmarkCommentary,
                       onPressed: () {
                         VerseActionLogic.handleBookmark(context, theme, ref,
                             bookName, chapterNum, [displayVerse ?? 1]);
@@ -248,7 +251,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                       IconButton(
                         icon: Icon(Icons.open_in_full_rounded,
                             color: tokens.readingAccent, size: 20),
-                        tooltip: 'Expand to full screen',
+                        tooltip: context.l10n.studyExpandFullScreen,
                         onPressed: widget.onExpand,
                       ),
                   ],
@@ -354,13 +357,13 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                     padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
                     decoration: BoxDecoration(
                       color: tokens.readingSurface,
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(Radii.xxl),
                       border: Border.all(
                           color:
                               tokens.readingInkMuted.withValues(alpha: 0.15)),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.08),
+                          color: context.palette.shadow,
                           blurRadius: 20,
                           offset: const Offset(0, 8),
                         )
@@ -386,7 +389,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Tap to read in context',
+                              context.l10n.studyTapToReadInContext,
                               style: theme.textTheme.bodyMedium?.copyWith(
                                 color: tokens.readingInkMuted
                                     .withValues(alpha: 0.6),
@@ -412,7 +415,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
             const SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.all(32.0),
-                child: Center(child: CircularProgressIndicator()),
+                child: LoadingView(),
               ),
             )
           else if (!hasContent)
@@ -443,7 +446,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                 child: _buildCollapsibleSection(
                   theme: theme,
                   tokens: tokens,
-                  title: 'On this chapter',
+                  title: context.l10n.studyOnThisChapter,
                   isExpanded: _userToggledChapter
                       ? _showChapter
                       : (verseEntries.isEmpty || _showChapter),
@@ -463,7 +466,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                 child: _buildCollapsibleSection(
                   theme: theme,
                   tokens: tokens,
-                  title: 'On this book',
+                  title: context.l10n.studyOnThisBook,
                   isExpanded: _userToggledBook
                       ? _showBook
                       : (verseEntries.isEmpty && chapterEntries.isEmpty ||
@@ -491,10 +494,10 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
     return Container(
       decoration: BoxDecoration(
         color: is3DTheme ? theme.colorScheme.surface : tokens.readingSurface,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(Radii.xl),
         border: Border.all(
             color: is3DTheme
-                ? Colors.white.withValues(alpha: 0.15)
+                ? theme.colorScheme.onSurface.withValues(alpha: 0.15)
                 : tokens.readingBorder),
       ),
       padding: const EdgeInsets.symmetric(vertical: 40.0, horizontal: 24.0),
@@ -505,7 +508,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
               size: 56, color: tokens.readingAccent.withValues(alpha: 0.4)),
           const SizedBox(height: 20),
           Text(
-            'No commentary yet',
+            context.l10n.studyNoCommentaryTitle,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: tokens.readingInk,
@@ -513,7 +516,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
           ),
           const SizedBox(height: 12),
           Text(
-            'We couldn\'t find specific commentary for this passage. Try exploring the chapter or book-level commentary below.',
+            context.l10n.studyNoCommentaryBody,
             textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall?.copyWith(
               color: tokens.readingInkMuted,
@@ -539,28 +542,32 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          InkWell(
-            onTap: onToggle,
-            borderRadius: BorderRadius.circular(12),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: tokens.readingInk,
+          Semantics(
+            button: true,
+            expanded: isExpanded,
+            child: InkWell(
+              onTap: onToggle,
+              borderRadius: BorderRadius.circular(Radii.md),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: tokens.readingInk,
+                        ),
                       ),
                     ),
-                  ),
-                  Icon(
-                      isExpanded
-                          ? Icons.keyboard_arrow_up
-                          : Icons.keyboard_arrow_down,
-                      color: tokens.readingAccent),
-                ],
+                    Icon(
+                        isExpanded
+                            ? Icons.keyboard_arrow_up
+                            : Icons.keyboard_arrow_down,
+                        color: tokens.readingAccent),
+                  ],
+                ),
               ),
             ),
           ),
@@ -603,7 +610,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
       decoration: BoxDecoration(
         color: bgColor,
         border: border,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(Radii.lg),
       ),
       child: _buildEntryContent(theme, tokens, entry, typography),
     );
@@ -637,7 +644,9 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  entry.source.isNotEmpty ? entry.source : 'Commentary',
+                  entry.source.isNotEmpty
+                      ? entry.source
+                      : context.l10n.studyCommentaryEyebrow,
                   style: theme.textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.1,
@@ -694,7 +703,7 @@ void showCommentaryBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    barrierColor: Colors.black.withValues(alpha: 0.5),
+    barrierColor: context.palette.scrim,
     builder: (context) {
       return Consumer(
         builder: (context, ref, _) {
@@ -720,8 +729,8 @@ void showCommentaryBottomSheet(
                       (is3DTheme
                           ? theme.colorScheme.surface
                           : tokens.readingSurface),
-                  borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(28)),
+                  borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(Radii.xxxl)),
                 ),
                 child: SafeArea(
                   top: false,
@@ -736,7 +745,7 @@ void showCommentaryBottomSheet(
                           height: 4,
                           decoration: BoxDecoration(
                             color: tokens.readingBorder,
-                            borderRadius: BorderRadius.circular(2),
+                            borderRadius: BorderRadius.circular(Radii.xs),
                           ),
                         ),
                       ),

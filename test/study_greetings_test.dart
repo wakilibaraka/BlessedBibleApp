@@ -2,7 +2,11 @@
 // daily rotation; deterministic per calendar day, stable all day.
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/widgets.dart';
 import 'package:the_blessed_bible/data/study_greetings.dart';
+import 'package:the_blessed_bible/l10n/l10n.dart';
+
+final _en = lookupAppLocalizations(const Locale('en'));
 
 const _morning = {
   'Awake, O sleeper.',
@@ -29,6 +33,7 @@ const _cheer = {
 StudyGreeting at(int y, int m, int d, int h,
         {int streak = 0, int distinct = 0}) =>
     greetingFor(
+      l10n: _en,
       now: DateTime(y, m, d, h),
       streakCount: streak,
       distinctDaysThisYear: distinct,
@@ -92,11 +97,22 @@ void main() {
     expect(seen, hasLength(12 + 3 + 3 + 4 + 3));
   });
 
+  test('greetings follow the interface language', () {
+    final fr = lookupAppLocalizations(const Locale('fr'));
+    final g = greetingFor(
+        l10n: fr,
+        now: DateTime(2026, 10, 4, 21),
+        streakCount: 0,
+        distinctDaysThisYear: 0);
+    expect(_evening, isNot(contains(g.title)));
+    expect(greetingEyebrow(DateTime(2026, 10, 4, 9), fr), 'Dimanche matin');
+  });
+
   test('eyebrow names weekday + daypart', () {
     // 2026-10-04 is a Sunday.
-    expect(greetingEyebrow(DateTime(2026, 10, 4, 9)), 'Sunday morning');
-    expect(greetingEyebrow(DateTime(2026, 10, 4, 14)), 'Sunday afternoon');
-    expect(greetingEyebrow(DateTime(2026, 10, 4, 20)), 'Sunday evening');
-    expect(greetingEyebrow(DateTime(2026, 10, 5, 2)), 'Monday night');
+    expect(greetingEyebrow(DateTime(2026, 10, 4, 9), _en), 'Sunday morning');
+    expect(greetingEyebrow(DateTime(2026, 10, 4, 14), _en), 'Sunday afternoon');
+    expect(greetingEyebrow(DateTime(2026, 10, 4, 20), _en), 'Sunday evening');
+    expect(greetingEyebrow(DateTime(2026, 10, 5, 2), _en), 'Monday night');
   });
 }

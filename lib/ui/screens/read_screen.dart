@@ -1,4 +1,5 @@
 import 'dart:async';
+import '../../theme/design_tokens.dart';
 import 'dart:ui';
 import '../widgets/strongs_entry_sheet.dart';
 
@@ -8,6 +9,7 @@ import '../sheets/appearance_settings_sheet.dart';
 
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import '../../l10n/l10n.dart';
 import '../../theme/app_colors.dart';
 
 import 'package:flutter/rendering.dart';
@@ -48,6 +50,7 @@ import '../sheets/translation_picker_sheet.dart';
 
 import '../widgets/day_complete_celebration.dart';
 import '../widgets/dynamic_toast.dart';
+import '../widgets/state_views.dart';
 import '../../state/theme_provider.dart';
 import '../../state/bbe_substitutions_provider.dart';
 import '../../state/typography_provider.dart';
@@ -233,31 +236,31 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         actions: [
           RadialAction(
             icon: Icons.copy_rounded,
-            label: 'Copy',
+            label: context.l10n.commonCopy,
             onTap: () => VerseActionLogic.handleCopy(
                 context, ref, bookName, chapterNumber, [verseNumber]),
           ),
           RadialAction(
             icon: Icons.bookmark_border_rounded,
-            label: 'Bookmark',
+            label: context.l10n.readActionBookmark,
             onTap: () => VerseActionLogic.handleBookmark(
                 context, theme, ref, bookName, chapterNumber, [verseNumber]),
           ),
           RadialAction(
             icon: Icons.note_add_outlined,
-            label: 'Note',
+            label: context.l10n.readActionNote,
             onTap: () => VerseActionLogic.handleNote(
                 context, ref, theme, bookName, chapterNumber, [verseNumber]),
           ),
           RadialAction(
             icon: Icons.menu_book_rounded,
-            label: 'Commentary',
+            label: context.l10n.readActionCommentary,
             onTap: () => VerseActionLogic.handleCommentary(context, ref,
                 bookName, chapterNumber, verseNumber, [verseNumber]),
           ),
           RadialAction(
             icon: Icons.link_rounded,
-            label: 'Related',
+            label: context.l10n.readActionRelated,
             onTap: () => showCrossReferencesSheet(
               context,
               bookNumber: bookNumber,
@@ -268,7 +271,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           ),
           RadialAction(
             icon: Icons.ios_share_rounded,
-            label: 'Share',
+            label: context.l10n.commonShare,
             onTap: () => VerseActionLogic.handleShareOptions(
                 context, ref, bookName, chapterNumber, [verseNumber]),
           ),
@@ -424,8 +427,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
           final hints = ref.read(hintsProvider);
           if (!hints.contains('seen_commentary_hint')) {
-            _tryShowHint('seen_commentary_hint',
-                'Tap the bulb icon next to a verse for commentary');
+            _tryShowHint(
+                'seen_commentary_hint', context.l10n.readCommentaryHint);
           }
         });
       }
@@ -495,12 +498,19 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         final listener = _itemPositionsListeners[targetIndex];
 
         if (controller != null && controller.isAttached) {
-          controller.scrollTo(
-            index: verse - 1,
-            duration: const Duration(milliseconds: 600),
-            curve: Curves.easeInOutCubic,
-            alignment: 0.15, // Account for top header
-          );
+          final scrollDuration =
+              Motion.of(context, const Duration(milliseconds: 600));
+          if (scrollDuration == Duration.zero) {
+            // Reduced motion: jump straight to the verse.
+            controller.jumpTo(index: verse - 1, alignment: 0.15);
+          } else {
+            controller.scrollTo(
+              index: verse - 1,
+              duration: scrollDuration,
+              curve: Curves.easeInOutCubic,
+              alignment: 0.15, // Account for top header
+            );
+          }
 
           if (listener != null) {
             // Overscroll hack has been removed since we no longer have massive bottom padding.
@@ -530,6 +540,18 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       tryScroll(0);
     });
+  }
+
+  /// Animated page change, or a jump when the system asks for reduced
+  /// motion (page animations cannot run with a zero duration).
+  void _animateToPage(int index) {
+    final d = Motion.of(context, const Duration(milliseconds: 300));
+    if (d == Duration.zero) {
+      _pageController.jumpToPage(index);
+    } else {
+      _pageController.animateToPage(index,
+          duration: d, curve: Curves.easeInOut);
+    }
   }
 
   void _showTypographyBottomSheet() {
@@ -579,50 +601,71 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   Widget _buildThemedPill(
       {required Widget child,
       required ReadingTokens tokens,
-      required VoidCallback onTap}) {
+      required VoidCallback onTap,
+      String? semanticLabel,
+      bool replaceSemantics = false}) {
     final surfaceStyle = ref.watch(surfaceStyleProvider);
     final isEarth = surfaceStyle == SurfaceStyle.flat;
+    final opaque = reduceTransparency(context);
 
-    return GestureDetector(
-      onTap: onTap,
-      child: RepaintBoundary(
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: isEarth
-                ? [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.12),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ]
-                : null,
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
-                    child: const SizedBox.shrink(),
+    return Semantics(
+      button: true,
+      label: semanticLabel,
+      excludeSemantics: replaceSemantics,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        // 48 dp tall hit area around the 36 dp pill.
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+              minWidth: kMinTouchTarget, minHeight: kMinTouchTarget),
+          child: Align(
+            widthFactor: 1,
+            heightFactor: 1,
+            child: RepaintBoundary(
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(Radii.xxl),
+                  boxShadow: isEarth
+                      ? [
+                          BoxShadow(
+                            color: context.palette.shadow,
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(Radii.xxl),
+                  child: Stack(
+                    children: [
+                      if (!opaque)
+                        Positioned.fill(
+                          child: BackdropFilter(
+                            filter:
+                                ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
+                            child: const SizedBox.shrink(),
+                          ),
+                        ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: tokens.readingPaper
+                              .withValues(alpha: opaque ? 1.0 : 0.85),
+                          borderRadius: BorderRadius.circular(Radii.xxl),
+                          border: Border.all(
+                            color: tokens.readingBorder.withValues(alpha: 0.3),
+                            width: 1,
+                          ),
+                        ),
+                        child: child,
+                      ),
+                    ],
                   ),
                 ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: tokens.readingPaper.withValues(alpha: 0.85),
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                      color: tokens.readingBorder.withValues(alpha: 0.3),
-                      width: 1,
-                    ),
-                  ),
-                  child: child,
-                ),
-              ],
+              ),
             ),
           ),
         ),
@@ -631,11 +674,14 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   }
 
   Widget _buildSideButton(BuildContext context, ReadingTokens tokens,
-      Widget child, VoidCallback onTap) {
+      Widget child, VoidCallback onTap,
+      {String? semanticLabel, bool replaceSemantics = false}) {
     return _buildThemedPill(
       child: child,
       tokens: tokens,
       onTap: onTap,
+      semanticLabel: semanticLabel,
+      replaceSemantics: replaceSemantics,
     );
   }
 
@@ -720,7 +766,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                 backgroundColor: Colors.transparent,
                 builder: (ctx) => const TranslationPickerSheet(),
               );
-            });
+            }, semanticLabel: context.l10n.readTranslationTitle);
           });
 
     final trailingButton = _isPageSelectionMode
@@ -728,7 +774,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
             context,
             tokens,
             Text(
-              'Done',
+              context.l10n.commonDone,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: tokens.readingInk,
@@ -747,7 +793,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                 letterSpacing: -0.5,
               ),
             ),
-            _showTypographyBottomSheet);
+            _showTypographyBottomSheet,
+            semanticLabel: context.l10n.settingsAppearanceText,
+            replaceSemantics: true);
 
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(
@@ -863,9 +911,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
             final currentPage = _pageController.page?.round() ?? 0;
             if (currentPage != targetIndex) {
               if ((currentPage - targetIndex).abs() == 1) {
-                _pageController.animateToPage(targetIndex,
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut);
+                _animateToPage(targetIndex);
               } else {
                 _pageController.jumpToPage(targetIndex);
               }
@@ -935,14 +981,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                 // Scripture View
                 Positioned.fill(
                   child: isLoading
-                      ? Center(
-                          child: CircularProgressIndicator(
-                            color: theme.primaryColor,
-                          ),
-                        )
+                      ? const LoadingView()
                       : flatChapters.isEmpty
                           ? Center(
-                              child: Text('Passage not found.',
+                              child: Text(context.l10n.readPassageNotFound,
                                   style: theme.textTheme.bodyLarge),
                             )
                           : MediaQuery(
@@ -1427,10 +1469,11 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                               ],
                                                               // Check for commentary
                                                               AnimatedOpacity(
-                                                                duration:
+                                                                duration: Motion.of(
+                                                                    context,
                                                                     const Duration(
                                                                         milliseconds:
-                                                                            250),
+                                                                            250)),
                                                                 opacity:
                                                                     (isSelectionMode &&
                                                                             !isSelected)
@@ -1576,73 +1619,82 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                             : _showDictionaryPopover,
                                                                   );
 
-                                                                  return GestureDetector(
-                                                                    behavior:
-                                                                        HitTestBehavior
-                                                                            .opaque,
-                                                                    onDoubleTap:
+                                                                  // Long-press menu as a screen reader action
+                                                                  // (VoiceOver has no long-press gesture).
+                                                                  return Semantics(
+                                                                    selected:
+                                                                        isSelected,
+                                                                    customSemanticsActions:
                                                                         _isPageSelectionMode
                                                                             ? null
-                                                                            : () {
-                                                                                HapticFeedback.lightImpact();
-                                                                                VerseActionLogic.handleBookmark(context, theme, ref, fc.book.name, fc.chapter.number, [
-                                                                                  verse.number
-                                                                                ]);
+                                                                            : {
+                                                                                CustomSemanticsAction(label: context.l10n.readVerseActions): () => _handleVerseLongPress(
+                                                                                      null,
+                                                                                      verse.number,
+                                                                                      fc.book.name,
+                                                                                      fc.chapter.number,
+                                                                                      allBooks.indexOf(fc.book) + 1,
+                                                                                    ),
                                                                               },
-                                                                    onTap: _isPageSelectionMode
-                                                                        ? null
-                                                                        : () {
-                                                                            if (ref.read(chromeHiddenProvider)) {
-                                                                              ref.read(chromeHiddenProvider.notifier).set(false);
-                                                                            } else {
-                                                                              _toggleVerseSelection(verse.number);
-                                                                            }
-                                                                          },
-                                                                    onLongPressStart: _isPageSelectionMode
-                                                                        ? null
-                                                                        : (d) =>
-                                                                            _pendingLongPressPosition =
-                                                                                d.globalPosition,
-                                                                    onLongPress:
-                                                                        _isPageSelectionMode
-                                                                            ? null
-                                                                            : () =>
-                                                                                _handleVerseLongPress(
-                                                                                  _pendingLongPressPosition,
-                                                                                  verse.number,
-                                                                                  fc.book.name,
-                                                                                  fc.chapter.number,
-                                                                                  allBooks.indexOf(fc.book) + 1,
-                                                                                ),
                                                                     child:
-                                                                        Stack(
-                                                                      children: [
-                                                                        AnimatedContainer(
-                                                                          duration:
-                                                                              const Duration(milliseconds: 250),
-                                                                          clipBehavior:
-                                                                              Clip.antiAlias,
-                                                                          padding: const EdgeInsets
-                                                                              .only(
-                                                                              top: 6.0,
-                                                                              bottom: 6.0,
-                                                                              left: 12.0,
-                                                                              right: 12.0),
-                                                                          decoration:
-                                                                              BoxDecoration(
-                                                                            color: isSelected
-                                                                                ? (highlightColor != null ? highlightColor.withValues(alpha: 0.35) : theme.primaryColor.withValues(alpha: 0.15))
-                                                                                : (_navigatedVerseIndex == index ? theme.primaryColor.withValues(alpha: 0.15) : (highlightColor != null ? highlightColor.withValues(alpha: 0.35) : Colors.transparent)),
-                                                                            borderRadius:
-                                                                                BorderRadius.circular(12),
-                                                                            border: (isSelected && highlightColor != null)
-                                                                                ? Border.all(color: theme.primaryColor.withValues(alpha: 0.5), width: 1.5)
-                                                                                : Border.all(color: Colors.transparent, width: 1.5),
+                                                                        GestureDetector(
+                                                                      behavior:
+                                                                          HitTestBehavior
+                                                                              .opaque,
+                                                                      onDoubleTap: _isPageSelectionMode
+                                                                          ? null
+                                                                          : () {
+                                                                              HapticFeedback.lightImpact();
+                                                                              VerseActionLogic.handleBookmark(context, theme, ref, fc.book.name, fc.chapter.number, [
+                                                                                verse.number
+                                                                              ]);
+                                                                            },
+                                                                      onTap: _isPageSelectionMode
+                                                                          ? null
+                                                                          : () {
+                                                                              if (ref.read(chromeHiddenProvider)) {
+                                                                                ref.read(chromeHiddenProvider.notifier).set(false);
+                                                                              } else {
+                                                                                _toggleVerseSelection(verse.number);
+                                                                              }
+                                                                            },
+                                                                      onLongPressStart: _isPageSelectionMode
+                                                                          ? null
+                                                                          : (d) =>
+                                                                              _pendingLongPressPosition = d.globalPosition,
+                                                                      onLongPress: _isPageSelectionMode
+                                                                          ? null
+                                                                          : () => _handleVerseLongPress(
+                                                                                _pendingLongPressPosition,
+                                                                                verse.number,
+                                                                                fc.book.name,
+                                                                                fc.chapter.number,
+                                                                                allBooks.indexOf(fc.book) + 1,
+                                                                              ),
+                                                                      child:
+                                                                          Stack(
+                                                                        children: [
+                                                                          AnimatedContainer(
+                                                                            duration:
+                                                                                Motion.of(context, Motion.normal),
+                                                                            clipBehavior:
+                                                                                Clip.antiAlias,
+                                                                            padding: const EdgeInsets.only(
+                                                                                top: 6.0,
+                                                                                bottom: 6.0,
+                                                                                left: 12.0,
+                                                                                right: 12.0),
+                                                                            decoration:
+                                                                                BoxDecoration(
+                                                                              color: isSelected ? (highlightColor != null ? highlightColor.withValues(alpha: 0.35) : theme.primaryColor.withValues(alpha: 0.15)) : (_navigatedVerseIndex == index ? theme.primaryColor.withValues(alpha: 0.15) : (highlightColor != null ? highlightColor.withValues(alpha: 0.35) : Colors.transparent)),
+                                                                              borderRadius: BorderRadius.circular(Radii.md),
+                                                                              border: (isSelected && highlightColor != null) ? Border.all(color: theme.primaryColor.withValues(alpha: 0.5), width: 1.5) : Border.all(color: Colors.transparent, width: 1.5),
+                                                                            ),
+                                                                            child:
+                                                                                verseWidget,
                                                                           ),
-                                                                          child:
-                                                                              verseWidget,
-                                                                        ),
-                                                                      ],
+                                                                        ],
+                                                                      ),
                                                                     ),
                                                                   );
                                                                 }),
@@ -1766,11 +1818,13 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                         ref.watch(readSettingsProvider).readingViewMode;
                     final hideTopNav = isHidden && mode == ReadingViewMode.full;
                     return AnimatedSlide(
-                      duration: const Duration(milliseconds: 300),
+                      duration:
+                          Motion.of(context, const Duration(milliseconds: 300)),
                       curve: Curves.easeOutCubic,
                       offset: hideTopNav ? const Offset(0, -1.0) : Offset.zero,
                       child: AnimatedOpacity(
-                        duration: const Duration(milliseconds: 300),
+                        duration: Motion.of(
+                            context, const Duration(milliseconds: 300)),
                         opacity: hideTopNav ? 0.0 : 1.0,
                         child: Padding(
                           padding: EdgeInsets.only(
@@ -1800,17 +1854,18 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: AnimatedOpacity(
                           opacity: _currentHintMessage != null ? 1.0 : 0.0,
-                          duration: const Duration(milliseconds: 300),
+                          duration: Motion.of(
+                              context, const Duration(milliseconds: 300)),
                           alwaysIncludeSemantics: true,
                           child: Container(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 8),
                             decoration: BoxDecoration(
                               color: theme.colorScheme.surface,
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(Radii.md),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.1),
+                                  color: context.palette.shadow,
                                   blurRadius: 10,
                                   offset: const Offset(0, 4),
                                 )
@@ -1831,13 +1886,12 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                   ),
                                 ),
                                 IconButton(
+                                  tooltip: context.l10n.commonClose,
                                   icon: Icon(Icons.close_rounded,
                                       size: 16,
                                       color: theme.colorScheme.onSurface
                                           .withValues(alpha: 0.6)),
                                   onPressed: _dismissHint,
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
                                 ),
                               ],
                             ),
@@ -1852,14 +1906,14 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                       child: FilledButton.icon(
                         onPressed: _exitPageSelection,
                         icon: const Icon(Icons.check, size: 20),
-                        label: const Text('Done'),
+                        label: Text(context.l10n.commonDone),
                         style: FilledButton.styleFrom(
                           backgroundColor: theme.primaryColor,
                           foregroundColor: theme.colorScheme.onPrimary,
                           padding: const EdgeInsets.symmetric(
                               horizontal: 24, vertical: 12),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
+                            borderRadius: BorderRadius.circular(Radii.xxxl),
                           ),
                           elevation: 8,
                         ),
@@ -1944,7 +1998,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     if (layout == ReadingLayout.interleaved) {
       final tokens = theme.extension<ReadingTokens>();
       final secondaryColor = tokens?.readingInk.withValues(alpha: 0.65) ??
-          Colors.black.withValues(alpha: 0.65);
+          theme.colorScheme.onSurface.withValues(alpha: 0.65);
 
       final secondaryTypography = typography.copyWith(
         fontSize: typography.fontSize * 0.95,
@@ -1989,7 +2043,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     if (layout == ReadingLayout.sideBySide) {
       final tokens = theme.extension<ReadingTokens>();
       final secondaryColor = tokens?.readingInk.withValues(alpha: 0.75) ??
-          Colors.black.withValues(alpha: 0.75);
+          theme.colorScheme.onSurface.withValues(alpha: 0.75);
 
       final secondaryTypography = typography.copyWith(
         fontSize: typography.fontSize * 0.95,
@@ -2036,7 +2090,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
       final tokens = theme.extension<ReadingTokens>();
       final secondaryColor = tokens?.readingInk.withValues(alpha: 0.75) ??
-          Colors.black.withValues(alpha: 0.75);
+          theme.colorScheme.onSurface.withValues(alpha: 0.75);
 
       final secondaryTypography = typography.copyWith(
         fontSize: typography.fontSize * 0.95,
@@ -2131,96 +2185,131 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                       final translationId = availableChips[langEntry.value];
                       final isSelected = activeChipId == translationId;
 
-                      return Material(
-                        color: isSelected
-                            ? theme.primaryColor.withValues(alpha: 0.15)
-                            : theme.colorScheme.surface,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          side: BorderSide(
-                            color: isSelected
-                                ? theme.primaryColor.withValues(alpha: 0.5)
-                                : theme.colorScheme.onSurface.withValues(
-                                    alpha: isInstalled ? 0.15 : 0.05),
-                          ),
-                        ),
-                        clipBehavior: Clip.antiAlias,
-                        child: InkWell(
-                          onTap: () {
-                            if (isInstalled) {
-                              if (isSelected) {
-                                ref
-                                    .read(expandedChipsProvider.notifier)
-                                    .clear(primaryVerse.number);
-                              } else {
-                                if (translationId != null) {
-                                  ref
-                                      .read(expandedChipsProvider.notifier)
-                                      .setLanguage(
-                                          primaryVerse.number, translationId);
-                                }
-                              }
-                            } else {
-                              // Uninstalled: Prompt download by opening picker
-                              showModalBottomSheet<void>(
-                                context: context,
-                                isScrollControlled: true,
-                                useRootNavigator: true,
-                                backgroundColor: Colors.transparent,
-                                builder: (context) =>
-                                    const TranslationPickerSheet(),
-                              );
-                            }
-                          },
-                          onLongPress: () {
-                            if (isInstalled && translationId != null) {
-                              final currentPrimary =
-                                  ref.read(activeTranslationProvider);
-                              ref
-                                  .read(activeTranslationProvider.notifier)
-                                  .setTranslation(translationId);
+                      void onChipTap() {
+                        if (isInstalled) {
+                          if (isSelected) {
+                            ref
+                                .read(expandedChipsProvider.notifier)
+                                .clear(primaryVerse.number);
+                          } else {
+                            if (translationId != null) {
                               ref
                                   .read(expandedChipsProvider.notifier)
                                   .setLanguage(
-                                      primaryVerse.number, currentPrimary);
+                                      primaryVerse.number, translationId);
                             }
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 4.0, vertical: 6.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    _getTranslationLabel(
-                                        isInstalled
-                                            ? (translationId ?? langEntry.value)
-                                            : langEntry.value,
-                                        installedTranslations,
-                                        defaultName: langEntry.key),
-                                    overflow: TextOverflow.ellipsis,
-                                    style:
-                                        theme.textTheme.labelMedium?.copyWith(
-                                      color: isSelected
-                                          ? theme.primaryColor
-                                          : theme.colorScheme.onSurface
-                                              .withValues(
-                                                  alpha:
-                                                      isInstalled ? 0.7 : 0.3),
-                                      fontWeight: FontWeight.w600,
+                          }
+                        } else {
+                          // Uninstalled: Prompt download by opening picker
+                          showModalBottomSheet<void>(
+                            context: context,
+                            isScrollControlled: true,
+                            useRootNavigator: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) =>
+                                const TranslationPickerSheet(),
+                          );
+                        }
+                      }
+
+                      // Long-press: make this the main translation.
+                      void onChipLongPress() {
+                        if (isInstalled && translationId != null) {
+                          final currentPrimary =
+                              ref.read(activeTranslationProvider);
+                          ref
+                              .read(activeTranslationProvider.notifier)
+                              .setTranslation(translationId);
+                          ref
+                              .read(expandedChipsProvider.notifier)
+                              .setLanguage(primaryVerse.number, currentPrimary);
+                        }
+                      }
+
+                      // The slim chip keeps its look; the area around it
+                      // takes taps too, for a 44 dp target (dense row).
+                      return Semantics(
+                        button: true,
+                        selected: isSelected,
+                        customSemanticsActions: isInstalled &&
+                                translationId != null
+                            ? {
+                                CustomSemanticsAction(
+                                        label: context.l10n.a11yMakePrimary):
+                                    onChipLongPress,
+                              }
+                            : null,
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: onChipTap,
+                          onLongPress: onChipLongPress,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(
+                                minHeight: kMinTouchTarget - 4),
+                            child: Center(
+                              child: Material(
+                                color: isSelected
+                                    ? theme.primaryColor.withValues(alpha: 0.15)
+                                    : theme.colorScheme.surface,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(Radii.lg),
+                                  side: BorderSide(
+                                    color: isSelected
+                                        ? theme.primaryColor
+                                            .withValues(alpha: 0.5)
+                                        : theme.colorScheme.onSurface
+                                            .withValues(
+                                                alpha:
+                                                    isInstalled ? 0.15 : 0.05),
+                                  ),
+                                ),
+                                clipBehavior: Clip.antiAlias,
+                                child: InkWell(
+                                  onTap: onChipTap,
+                                  onLongPress: onChipLongPress,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 4.0, vertical: 6.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            _getTranslationLabel(
+                                                isInstalled
+                                                    ? (translationId ??
+                                                        langEntry.value)
+                                                    : langEntry.value,
+                                                installedTranslations,
+                                                defaultName: langEntry.key),
+                                            overflow: TextOverflow.ellipsis,
+                                            style: theme.textTheme.labelMedium
+                                                ?.copyWith(
+                                              color: isSelected
+                                                  ? theme.primaryColor
+                                                  : theme.colorScheme.onSurface
+                                                      .withValues(
+                                                          alpha: isInstalled
+                                                              ? 0.7
+                                                              : 0.3),
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                        if (!isInstalled) ...[
+                                          const SizedBox(width: 2),
+                                          Icon(Icons.download_rounded,
+                                              size: 10,
+                                              color: theme.colorScheme.onSurface
+                                                  .withValues(alpha: 0.3)),
+                                        ]
+                                      ],
                                     ),
                                   ),
                                 ),
-                                if (!isInstalled) ...[
-                                  const SizedBox(width: 2),
-                                  Icon(Icons.download_rounded,
-                                      size: 10,
-                                      color: theme.colorScheme.onSurface
-                                          .withValues(alpha: 0.3)),
-                                ]
-                              ],
+                              ),
                             ),
                           ),
                         ),
@@ -2270,7 +2359,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           fontSize: typography.fontSize,
           height: typography.lineHeight,
           letterSpacing: 0.15,
-          color: overrideColor ?? tokens?.readingInk ?? Colors.black,
+          color: overrideColor ??
+              tokens?.readingInk ??
+              theme.colorScheme.onSurface,
           decoration: isBookmarked ? TextDecoration.underline : null,
           decorationColor: isBookmarked ? theme.primaryColor : null,
           decorationStyle: isBookmarked ? TextDecorationStyle.solid : null,
@@ -2279,6 +2370,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         const TextStyle();
 
     Color starColor;
+    // Red-letter ink is a fixed, hand-tuned scripture palette per theme
+    // family (like highlight colours), so these stay literal.
     Color redLetterColor;
     switch (appThemeMode.resolve(context)) {
       case AppThemeMode.light:
@@ -2375,14 +2468,19 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           } else {
             strongsSpan = WidgetSpan(
               alignment: PlaceholderAlignment.middle,
-              child: GestureDetector(
-                onTap: () => showStrongsEntrySheet(context, strongsId),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 1.0),
-                  child: Icon(
-                    Icons.link,
-                    size: (style.fontSize ?? 16) * 0.85,
-                    color: theme.colorScheme.primary.withValues(alpha: 0.7),
+              child: Semantics(
+                button: true,
+                label: strongsId,
+                excludeSemantics: true,
+                child: GestureDetector(
+                  onTap: () => showStrongsEntrySheet(context, strongsId),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 1.0),
+                    child: Icon(
+                      Icons.link,
+                      size: (style.fontSize ?? 16) * 0.85,
+                      color: theme.colorScheme.primary.withValues(alpha: 0.7),
+                    ),
                   ),
                 ),
               ),
@@ -2495,16 +2593,21 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         if (hasDevotional && !isSelectionMode)
           WidgetSpan(
             alignment: PlaceholderAlignment.middle,
-            child: GestureDetector(
-              onTap: onDevotionalTap,
-              behavior: HitTestBehavior.opaque,
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
-                child: Icon(
-                  Icons.favorite_rounded,
-                  color: tokens?.readingAccent ?? theme.primaryColor,
-                  size: typography.fontSize * 0.85,
+            child: Semantics(
+              button: true,
+              label: context.l10n.studyCategoryDevotional,
+              excludeSemantics: true,
+              child: GestureDetector(
+                onTap: onDevotionalTap,
+                behavior: HitTestBehavior.opaque,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 6.0, vertical: 8.0),
+                  child: Icon(
+                    Icons.favorite_rounded,
+                    color: tokens?.readingAccent ?? theme.primaryColor,
+                    size: typography.fontSize * 0.85,
+                  ),
                 ),
               ),
             ),
@@ -2512,16 +2615,21 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         if (hasStudyNote && !isSelectionMode)
           WidgetSpan(
             alignment: PlaceholderAlignment.middle,
-            child: GestureDetector(
-              onTap: onStudyNoteTap,
-              behavior: HitTestBehavior.opaque,
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
-                child: Icon(
-                  Icons.edit_note_rounded,
-                  color: starColor,
-                  size: typography.fontSize * 0.85,
+            child: Semantics(
+              button: true,
+              label: context.l10n.studyCategoryStudyNote,
+              excludeSemantics: true,
+              child: GestureDetector(
+                onTap: onStudyNoteTap,
+                behavior: HitTestBehavior.opaque,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 6.0, vertical: 8.0),
+                  child: Icon(
+                    Icons.edit_note_rounded,
+                    color: starColor,
+                    size: typography.fontSize * 0.85,
+                  ),
                 ),
               ),
             ),
@@ -2529,16 +2637,21 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         if (hasCommentary && !isSelectionMode)
           WidgetSpan(
             alignment: PlaceholderAlignment.middle,
-            child: GestureDetector(
-              onTap: onCommentaryTap,
-              behavior: HitTestBehavior.opaque,
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
-                child: Icon(
-                  Icons.library_books_rounded,
-                  color: starColor,
-                  size: typography.fontSize * 0.85,
+            child: Semantics(
+              button: true,
+              label: context.l10n.readActionCommentary,
+              excludeSemantics: true,
+              child: GestureDetector(
+                onTap: onCommentaryTap,
+                behavior: HitTestBehavior.opaque,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 6.0, vertical: 8.0),
+                  child: Icon(
+                    Icons.library_books_rounded,
+                    color: starColor,
+                    size: typography.fontSize * 0.85,
+                  ),
                 ),
               ),
             ),
@@ -2551,7 +2664,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
               decoration: BoxDecoration(
                 color: theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(Radii.xs),
               ),
               child: Text(
                 'WEB',
@@ -2630,10 +2743,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                     ? (tokens?.readingAccent ?? theme.primaryColor)
                     : theme.disabledColor),
             label: Text(
-              'Read commentary on this chapter',
+              context.l10n.readChapterCommentary,
               style: theme.textTheme.titleSmall?.copyWith(
                 color: hasChapterCommentary
-                    ? (tokens?.readingInk ?? Colors.black)
+                    ? (tokens?.readingInk ?? theme.colorScheme.onSurface)
                     : theme.disabledColor,
                 fontWeight: FontWeight.w600,
               ),
@@ -2641,9 +2754,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
             style: TextButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               backgroundColor:
-                  (tokens?.readingInk ?? Colors.black).withValues(alpha: 0.05),
+                  (tokens?.readingInk ?? theme.colorScheme.onSurface)
+                      .withValues(alpha: 0.05),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
+                  borderRadius: BorderRadius.circular(Radii.lg)),
             ),
           ),
           const SizedBox(height: 32),
@@ -2652,39 +2766,40 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // Flexible: long labels at large text wrap, not overflow.
               if (hasPrevious)
-                TextButton(
+                Flexible(
+                    child: TextButton(
                   onPressed: () {
-                    _pageController.animateToPage(pageIndex - 1,
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut);
+                    _animateToPage(pageIndex - 1);
                   },
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 12),
                   ),
-                  child: Text('‹ Previous',
+                  child: Text(context.l10n.readPreviousChapter,
+                      textAlign: TextAlign.center,
                       style: theme.textTheme.titleMedium?.copyWith(
                           color: tokens?.readingAccent ?? theme.primaryColor)),
-                )
+                ))
               else
                 const SizedBox(width: 100),
               const SizedBox(width: 24),
               if (hasNext)
-                TextButton(
+                Flexible(
+                    child: TextButton(
                   onPressed: () {
-                    _pageController.animateToPage(pageIndex + 1,
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut);
+                    _animateToPage(pageIndex + 1);
                   },
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 12),
                   ),
-                  child: Text('Next ›',
+                  child: Text(context.l10n.readNextChapter,
+                      textAlign: TextAlign.center,
                       style: theme.textTheme.titleMedium?.copyWith(
                           color: tokens?.readingAccent ?? theme.primaryColor)),
-                )
+                ))
               else
                 const SizedBox(width: 100),
             ],
@@ -2726,13 +2841,13 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
               return Padding(
                 padding: const EdgeInsets.only(top: 32.0, bottom: 16.0),
                 child: TexturedGlassContainer(
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(Radii.xxl),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                   child: Column(
                     children: [
                       Text(
-                        'Reading Plan · Day $activePlanDay',
+                        context.l10n.readPlanDay(activePlanDay),
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: theme.colorScheme.onSurface
                               .withValues(alpha: 0.6),
@@ -2770,6 +2885,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                 Navigator.of(dialogContext);
                                             final messenger =
                                                 ScaffoldMessenger.of(context);
+                                            final planCompletedMsg =
+                                                context.l10n.readPlanCompleted;
 
                                             nav.pop();
                                             if (!mounted) return;
@@ -2781,9 +2898,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                 readingPlanProvider(
                                                     primaryPlanId));
                                             if (finalState.isPlanComplete) {
-                                              messenger.showSnackBar(const SnackBar(
-                                                  content: Text(
-                                                      'Plan completed! Congratulations! 🎉')));
+                                              messenger.showSnackBar(SnackBar(
+                                                  content:
+                                                      Text(planCompletedMsg)));
                                             } else {
                                               final nextDay =
                                                   finalState.currentDay;
@@ -2880,12 +2997,14 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                             elevation: 0,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16)),
+                                borderRadius: BorderRadius.circular(Radii.lg)),
                           ),
                           label: Text(
-                              'Mark ${fc.book.name} ${fc.chapter.number} done & continue',
+                              context.l10n.readMarkDoneContinue(
+                                  fc.book.name, fc.chapter.number),
                               style: const TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w600)),
+                                  fontSize: TypeScale.bodyLarge,
+                                  fontWeight: FontWeight.w600)),
                         ),
                       ),
                     ],
@@ -2903,8 +3022,59 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 class VerseActionLogic {
   static void _showFeedback(
       BuildContext context, ThemeData theme, String message,
-      {IconData? icon}) {
-    DynamicToast.show(context, message, icon: icon);
+      {IconData? icon, VoidCallback? onUndo}) {
+    DynamicToast.show(
+      context,
+      message,
+      icon: icon,
+      actionLabel: onUndo == null ? null : context.l10n.commonUndo,
+      onAction: onUndo,
+    );
+  }
+
+  /// Puts back the highlights captured in [previous] (reference -> color,
+  /// null when the verse had none). Reads through the container so Undo
+  /// still works after the sheet that started it has closed.
+  static void _restoreHighlights(
+      ProviderContainer container, Map<String, int?> previous) {
+    final notifier = container.read(highlightsProvider.notifier);
+    previous.forEach((refStr, color) {
+      final current = container.read(highlightsProvider)[refStr];
+      if (color == null) {
+        notifier.removeHighlight(refStr);
+      } else if (current != color) {
+        notifier.toggleHighlight(refStr, color);
+      }
+    });
+  }
+
+  /// Clears the highlight on [targetVerses], offering Undo.
+  static void clearHighlights(
+      BuildContext context,
+      ThemeData theme,
+      WidgetRef ref,
+      String bookAbbrev,
+      int chapterNum,
+      List<int> targetVerses) {
+    final container = ProviderScope.containerOf(context, listen: false);
+    final current = ref.read(highlightsProvider);
+    final previous = <String, int?>{
+      for (final v in targetVerses)
+        if (current[generateVerseKey(bookAbbrev, chapterNum, v)] != null)
+          generateVerseKey(bookAbbrev, chapterNum, v):
+              current[generateVerseKey(bookAbbrev, chapterNum, v)],
+    };
+    for (final refStr in previous.keys) {
+      ref.read(highlightsProvider.notifier).removeHighlight(refStr);
+    }
+    if (previous.isEmpty) return;
+    _showFeedback(
+      context,
+      theme,
+      context.l10n.readHighlightsRemoved(previous.length),
+      icon: Icons.format_paint_outlined,
+      onUndo: () => _restoreHighlights(container, previous),
+    );
   }
 
   static void showHighlightPaletteModal(
@@ -2925,7 +3095,7 @@ class VerseActionLogic {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
           decoration: BoxDecoration(
             color: theme.cardColor,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(Radii.xl),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -2933,51 +3103,56 @@ class VerseActionLogic {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  // Clear highlight button
-                  GestureDetector(
-                    onTap: () {
-                      HapticFeedback.lightImpact();
-                      for (var v in targetVerses) {
-                        final refStr =
-                            generateVerseKey(bookAbbrev, chapterNum, v);
-                        ref
-                            .read(highlightsProvider.notifier)
-                            .removeHighlight(refStr);
-                      }
-                      Navigator.of(ctx).pop();
-                      onClearSelection();
-                    },
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: theme.scaffoldBackgroundColor,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                                color: Colors.black.withValues(alpha: 0.2),
-                                width: 1.5),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.1),
-                                  blurRadius: 4,
-                                  spreadRadius: 1)
-                            ],
-                          ),
-                          child: Icon(Icons.block,
-                              size: 20,
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.6)),
+                  // Clear highlight button. Swatches: 44 dp wide hit areas
+                  // (six must fit a narrow phone).
+                  Semantics(
+                    button: true,
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        VerseActionLogic.clearHighlights(ctx, theme, ref,
+                            bookAbbrev, chapterNum, targetVerses);
+                        Navigator.of(ctx).pop();
+                        onClearSelection();
+                      },
+                      child: ConstrainedBox(
+                        constraints:
+                            const BoxConstraints(minWidth: kMinTouchTarget - 4),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: theme.scaffoldBackgroundColor,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                    color: theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.2),
+                                    width: 1.5),
+                                boxShadow: [
+                                  BoxShadow(
+                                      color: ctx.palette.shadow,
+                                      blurRadius: 4,
+                                      spreadRadius: 1)
+                                ],
+                              ),
+                              child: Icon(Icons.block,
+                                  size: 20,
+                                  color: theme.colorScheme.onSurface
+                                      .withValues(alpha: 0.6)),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(context.l10n.readNone,
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: theme.colorScheme.onSurface
+                                      .withValues(alpha: 0.7),
+                                )),
+                          ],
                         ),
-                        const SizedBox(height: 6),
-                        Text('None',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.7),
-                            )),
-                      ],
+                      ),
                     ),
                   ),
                   ...List.generate(highlightPalette.length, (i) {
@@ -2985,44 +3160,53 @@ class VerseActionLogic {
                         highlightPaletteSwatches[i],
                         theme.brightness,
                         theme.scaffoldBackgroundColor);
-                    return GestureDetector(
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        ref
-                            .read(readSettingsProvider.notifier)
-                            .setActiveHighlightColorIndex(i);
-                        VerseActionLogic.handleHighlight(ctx, theme, ref,
-                            bookAbbrev, chapterNum, targetVerses, i);
-                        Navigator.of(ctx).pop();
-                        onClearSelection();
-                      },
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: color,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                  color: Colors.black.withValues(alpha: 0.2),
-                                  width: 1.5),
-                              boxShadow: [
-                                BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.1),
-                                    blurRadius: 4,
-                                    spreadRadius: 1)
-                              ],
-                            ),
+                    return Semantics(
+                      button: true,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          ref
+                              .read(readSettingsProvider.notifier)
+                              .setActiveHighlightColorIndex(i);
+                          VerseActionLogic.handleHighlight(ctx, theme, ref,
+                              bookAbbrev, chapterNum, targetVerses, i);
+                          Navigator.of(ctx).pop();
+                          onClearSelection();
+                        },
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(
+                              minWidth: kMinTouchTarget - 4),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: color,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                      color: theme.colorScheme.onSurface
+                                          .withValues(alpha: 0.2),
+                                      width: 1.5),
+                                  boxShadow: [
+                                    BoxShadow(
+                                        color: ctx.palette.shadow,
+                                        blurRadius: 4,
+                                        spreadRadius: 1)
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(highlightPaletteName(i, context.l10n),
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    color: theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.7),
+                                  )),
+                            ],
                           ),
-                          const SizedBox(height: 6),
-                          Text(highlightPaletteNames[i],
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: theme.colorScheme.onSurface
-                                    .withValues(alpha: 0.7),
-                              )),
-                        ],
+                        ),
                       ),
                     );
                   }),
@@ -3061,6 +3245,13 @@ class VerseActionLogic {
       final refStr = generateVerseKey(bookAbbrev, chapterNum, v);
       return ref.read(highlightsProvider)[refStr] == activeIndex;
     });
+    final container = ProviderScope.containerOf(context, listen: false);
+    final before = ref.read(highlightsProvider);
+    final previous = <String, int?>{
+      for (final v in targetVerses)
+        generateVerseKey(bookAbbrev, chapterNum, v):
+            before[generateVerseKey(bookAbbrev, chapterNum, v)],
+    };
 
     for (var v in targetVerses) {
       final refStr = generateVerseKey(bookAbbrev, chapterNum, v);
@@ -3075,11 +3266,13 @@ class VerseActionLogic {
         context,
         theme,
         isRemoving
-            ? '$count Highlight(s) removed'
-            : '$count verse(s) highlighted',
+            ? context.l10n.readHighlightsRemoved(count)
+            : context.l10n.readVersesHighlighted(count),
         icon: isRemoving
             ? Icons.format_paint_outlined
-            : Icons.format_paint_rounded);
+            : Icons.format_paint_rounded,
+        onUndo:
+            isRemoving ? () => _restoreHighlights(container, previous) : null);
   }
 
   static void handleBookmark(
@@ -3092,6 +3285,17 @@ class VerseActionLogic {
     final isAllBookmarked = targetVerses.every((v) => ref
         .read(bookmarksProvider)
         .contains(generateVerseKey(canonicalBookName, chapterNum, v)));
+    final container = ProviderScope.containerOf(context, listen: false);
+    // Folder of each bookmark about to be removed, so Undo can put it back
+    // where it was.
+    final nodes = ref.read(bookmarkDataProvider).nodes;
+    final removedFolders = <String, String?>{
+      if (isAllBookmarked)
+        for (final v in targetVerses)
+          generateVerseKey(canonicalBookName, chapterNum, v):
+              nodes[generateVerseKey(canonicalBookName, chapterNum, v)]
+                  ?.folderId,
+    };
     for (var v in targetVerses) {
       final refStr = generateVerseKey(canonicalBookName, chapterNum, v);
       if (isAllBookmarked) {
@@ -3104,11 +3308,23 @@ class VerseActionLogic {
         context,
         theme,
         isAllBookmarked
-            ? '${targetVerses.length} verse(s) removed from bookmarks'
-            : '${targetVerses.length} verse(s) bookmarked!',
+            ? context.l10n.readBookmarksRemoved(targetVerses.length)
+            : context.l10n.readVersesBookmarked(targetVerses.length),
         icon: isAllBookmarked
             ? Icons.bookmark_outline_rounded
-            : Icons.bookmark_rounded);
+            : Icons.bookmark_rounded,
+        onUndo: isAllBookmarked
+            ? () {
+                final data = container.read(bookmarkDataProvider.notifier);
+                removedFolders.forEach((refStr, folderId) {
+                  if (container.read(bookmarksProvider).contains(refStr)) {
+                    return;
+                  }
+                  data.toggle(refStr);
+                  if (folderId != null) data.moveBookmark(refStr, folderId);
+                });
+              }
+            : null);
   }
 
   static Future<void> handleNote(

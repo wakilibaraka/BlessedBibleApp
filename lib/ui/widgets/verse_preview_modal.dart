@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../theme/design_tokens.dart';
+import '../../l10n/l10n.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/bible_provider.dart';
 import '../../state/typography_provider.dart';
@@ -37,7 +39,7 @@ class VersePreviewModal extends ConsumerWidget {
     final typography = ref.watch(typographyProvider);
     final bibleState = ref.watch(bibleProvider);
 
-    String verseText = 'Loading...';
+    String verseText = context.l10n.readLoading;
 
     if (!bibleState.isLoading) {
       final book = bibleState.books.cast<BibleBook?>().firstWhere(
@@ -74,15 +76,16 @@ class VersePreviewModal extends ConsumerWidget {
         if (texts.isNotEmpty) {
           verseText = texts.join('\n\n');
         } else {
-          verseText = 'Verse not found.';
+          verseText = context.l10n.readVerseNotFound;
         }
       } else {
-        verseText = 'Book or chapter not found.';
+        verseText = context.l10n.readBookOrChapterNotFound;
       }
     }
 
     return TexturedGlassContainer(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(24.0)),
+      borderRadius:
+          const BorderRadius.vertical(top: Radius.circular(Radii.xxl)),
       padding: EdgeInsets.zero,
       child: SafeArea(
         child: Column(
@@ -108,6 +111,7 @@ class VersePreviewModal extends ConsumerWidget {
                     ),
                   ),
                   IconButton(
+                    tooltip: context.l10n.commonClose,
                     icon: Icon(Icons.close_rounded,
                         color:
                             theme.colorScheme.onSurface.withValues(alpha: 0.6)),
@@ -156,7 +160,7 @@ class VersePreviewModal extends ConsumerWidget {
                     );
                   },
                   icon: const Icon(Icons.menu_book_rounded),
-                  label: const Text('Open in Read'),
+                  label: Text(context.l10n.readOpenInRead),
                 ),
               ),
             ),

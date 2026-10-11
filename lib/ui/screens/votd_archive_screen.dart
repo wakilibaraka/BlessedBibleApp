@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import '../../state/home_provider.dart';
 import '../../state/votd_tracker_provider.dart';
@@ -8,6 +9,8 @@ import '../../state/theme_provider.dart';
 import 'commentary_hub_screen.dart';
 import '../../state/commentary_provider.dart';
 import '../../theme/reading_tokens.dart';
+import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
 
 class VotdArchiveScreen extends ConsumerWidget {
   const VotdArchiveScreen({super.key});
@@ -50,7 +53,7 @@ class VotdArchiveScreen extends ConsumerWidget {
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsets.only(left: 16, bottom: 16),
               title: Text(
-                'Daily Verses',
+                context.l10n.plansDailyVerses,
                 style: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: theme.primaryColor,
@@ -91,28 +94,15 @@ class VotdArchiveScreen extends ConsumerWidget {
 
                   String displayDate;
                   if (index == 0) {
-                    displayDate = 'Today';
+                    displayDate = context.l10n.plansToday;
                   } else if (index == 1) {
-                    displayDate = 'Yesterday';
+                    displayDate = context.l10n.plansYesterday;
                   } else if (index == 2) {
-                    displayDate = '2 days ago';
+                    displayDate = context.l10n.plansDaysAgo(2);
                   } else {
-                    final months = [
-                      'Jan',
-                      'Feb',
-                      'Mar',
-                      'Apr',
-                      'May',
-                      'Jun',
-                      'Jul',
-                      'Aug',
-                      'Sep',
-                      'Oct',
-                      'Nov',
-                      'Dec'
-                    ];
-                    displayDate =
-                        '${months[date.month - 1]} ${date.day}, ${date.year}';
+                    displayDate = DateFormat.yMMMd(
+                      Localizations.localeOf(context).toString(),
+                    ).format(date);
                   }
 
                   final bookName = reference.split(' ').first;
@@ -122,7 +112,7 @@ class VotdArchiveScreen extends ConsumerWidget {
                     padding: const EdgeInsets.only(bottom: 16.0),
                     child: Container(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(Radii.xl),
                         boxShadow: isToday
                             ? [
                                 BoxShadow(
@@ -140,17 +130,17 @@ class VotdArchiveScreen extends ConsumerWidget {
                           color: is3DTheme
                               ? theme.colorScheme.surface
                               : tokens.readingSurface,
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(Radii.xl),
                           border: Border.all(
                             width: 0.5,
                             color: is3DTheme
-                                ? Colors.white.withValues(alpha: 0.15)
+                                ? context.palette.divider
                                 : tokens.readingBorder,
                           ),
                           boxShadow: appThemeMode.is3DTheme
                               ? [
                                   BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.08),
+                                    color: context.palette.shadow,
                                     blurRadius: 24,
                                     spreadRadius: 0,
                                     offset: const Offset(0, 10),
@@ -161,7 +151,7 @@ class VotdArchiveScreen extends ConsumerWidget {
                         child: Material(
                           color: Colors.transparent,
                           child: InkWell(
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(Radii.xl),
                             onTap: () {
                               ref
                                   .read(votdTrackerProvider.notifier)
@@ -202,7 +192,7 @@ class VotdArchiveScreen extends ConsumerWidget {
                             child: Container(
                               padding: const EdgeInsets.all(20),
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(Radii.xl),
                                 border: isToday
                                     ? Border.all(
                                         color: theme.primaryColor
@@ -236,7 +226,7 @@ class VotdArchiveScreen extends ConsumerWidget {
                                           color: theme.primaryColor
                                               .withValues(alpha: 0.1),
                                           borderRadius:
-                                              BorderRadius.circular(8),
+                                              BorderRadius.circular(Radii.sm),
                                         ),
                                         child: Text(
                                           bookTag,

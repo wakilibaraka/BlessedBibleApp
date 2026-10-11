@@ -1,6 +1,8 @@
+import '../../l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/reminders_provider.dart';
+import '../../theme/design_tokens.dart';
 
 class ReminderSettingsCard extends ConsumerWidget {
   final ThemeData theme;
@@ -48,7 +50,7 @@ class ReminderSettingsCard extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(Radii.xxl),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
@@ -57,7 +59,7 @@ class ReminderSettingsCard extends ConsumerWidget {
             context,
             ref,
             icon: Icons.menu_book_rounded,
-            title: 'Daily Reading',
+            title: context.l10n.settingsDailyReading,
             enabled: state.dailyEnabled,
             time: readingTime,
             onToggle: (v) =>
@@ -71,7 +73,7 @@ class ReminderSettingsCard extends ConsumerWidget {
             context,
             ref,
             icon: Icons.volunteer_activism_rounded,
-            title: 'Custom Reminder',
+            title: context.l10n.settingsCustomReminder,
             enabled: state.customWeeklyEnabled,
             time: prayerTime,
             onToggle: (v) =>
@@ -108,10 +110,13 @@ class ReminderSettingsCard extends ConsumerWidget {
         style:
             theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
       ),
-      subtitle: GestureDetector(
-        onTap: onTimeTap,
-        child: Padding(
-          padding: const EdgeInsets.only(top: 4.0),
+      // The whole row opens the time picker: the time text alone was far
+      // smaller than a 48 dp touch target.
+      onTap: onTimeTap,
+      subtitle: Padding(
+        padding: const EdgeInsets.only(top: 4.0),
+        child: Semantics(
+          label: context.l10n.onboardingReminderTime,
           child: Text(
             time.format(context),
             style: theme.textTheme.bodySmall?.copyWith(

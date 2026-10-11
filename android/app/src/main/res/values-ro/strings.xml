@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home-screen widget text. Generated alongside tool/l10n/parts/system.json;
+     the app also pushes these strings in its own interface language. -->
+<resources>
+    <string name="widget_votd_title">VERSETUL ZILEI</string>
+    <string name="widget_votd_loading">Se încarcă versetul…</string>
+    <string name="widget_wotd_title">CUVÂNTUL ZILEI</string>
+    <string name="widget_streak_zero">0 zile</string>
+    <string name="widget_streak_read_today">Citește astăzi!</string>
+    <string name="widget_streak_active">Serie activă! 🔥</string>
+    <string name="widget_streak_inactive">Citește astăzi ca să-ți păstrezi seria</string>
+    <string name="widget_wotd_fallback_word">Har (Charis)</string>
+    <string name="widget_wotd_fallback_snippet">Favoarea nemeritată și dragostea divină a lui Dumnezeu revărsate asupra omenirii.</string>
+    <plurals name="widget_streak_days">
+        <item quantity="one">%d zi</item>
+        <item quantity="few">%d zile</item>
+        <item quantity="other">%d de zile</item>
+    </plurals>
+</resources>

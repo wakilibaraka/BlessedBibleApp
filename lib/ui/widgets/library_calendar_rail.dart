@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 import '../../state/reading_plan_provider.dart';
 import 'study_v2_widgets.dart';
+import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
 
-const List<String> _weekdayNames = [
-  'MON',
-  'TUE',
-  'WED',
-  'THU',
-  'FRI',
-  'SAT',
-  'SUN',
-];
+/// Short, upper-cased weekday name for [day] in the current locale.
+String _weekdayShort(BuildContext context, DateTime day) =>
+    DateFormat.E(Localizations.localeOf(context).toString())
+        .format(day)
+        .toUpperCase();
 
 /// Monday-first week containing [day].
 List<DateTime> libraryWeekDays(DateTime day) {
@@ -94,11 +93,13 @@ class LibraryCalendarRailState extends State<LibraryCalendarRail> {
     HapticFeedback.selectionClick();
     setState(() => _index = next);
     if (_controller.hasClients) {
-      _controller.animateToPage(
-        next,
-        duration: const Duration(milliseconds: 260),
-        curve: Curves.easeOutCubic,
-      );
+      final d = Motion.of(context, const Duration(milliseconds: 260));
+      if (d == Duration.zero) {
+        _controller.jumpToPage(next);
+      } else {
+        _controller.animateToPage(next,
+            duration: d, curve: Curves.easeOutCubic);
+      }
     }
   }
 
@@ -121,6 +122,7 @@ class LibraryCalendarRailState extends State<LibraryCalendarRail> {
       children: [
         _StepButton(
           icon: Icons.chevron_left_rounded,
+          label: context.l10n.a11yPreviousWeek,
           enabled: _index > 0,
           onTap: () =>
               _goTo(_visibleWeekStart.subtract(const Duration(days: 7))),
@@ -132,7 +134,8 @@ class LibraryCalendarRailState extends State<LibraryCalendarRail> {
           child: V2Card(
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
             child: SizedBox(
-              height: 64,
+              // Grows with the system text size so the day labels fit.
+              height: MediaQuery.textScalerOf(context).scale(64),
               child: PageView.builder(
                 controller: _controller,
                 onPageChanged: (i) {
@@ -166,6 +169,7 @@ class LibraryCalendarRailState extends State<LibraryCalendarRail> {
         ),
         _StepButton(
           icon: Icons.chevron_right_rounded,
+          label: context.l10n.a11yNextWeek,
           enabled: _index < _lastIndex,
           onTap: () => _goTo(_visibleWeekStart.add(const Duration(days: 7))),
         ),
@@ -189,6 +193,14 @@ class _DayCell extends StatelessWidget {
     this.complete = false,
   });
 
+  String _dayLabel(BuildContext context, bool isToday) {
+    final l10n = context.l10n;
+    var label = '${_weekdayShort(context, day)} ${day.day}';
+    if (complete) label = l10n.plansCalendarDayComplete(label);
+    if (isToday) label = l10n.plansCalendarDayToday(label);
+    return label;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -200,9 +212,7 @@ class _DayCell extends StatelessWidget {
         ? theme.primaryColor
         : theme.colorScheme.onSurface.withValues(alpha: inFuture ? 0.3 : 0.5);
     return Semantics(
-      label: '${_weekdayNames[day.weekday - 1]} ${day.day}'
-          '${complete ? ', reading complete' : ''}'
-          '${isToday ? ', today' : ''}',
+      label: _dayLabel(context, isToday),
       child: ExcludeSemantics(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -217,11 +227,11 @@ class _DayCell extends StatelessWidget {
             ),
             const SizedBox(height: 1),
             Text(
-              _weekdayNames[day.weekday - 1],
+              _weekdayShort(context, day),
               style: theme.textTheme.labelSmall?.copyWith(
                 fontWeight: isToday ? FontWeight.w800 : FontWeight.w500,
                 letterSpacing: 0.5,
-                fontSize: 9,
+                fontSize: TypeScale.micro,
                 color: color,
               ),
             ),
@@ -251,11 +261,13 @@ class _DayCell extends StatelessWidget {
 
 class _StepButton extends StatelessWidget {
   final IconData icon;
+  final String label;
   final bool enabled;
   final VoidCallback onTap;
 
   const _StepButton({
     required this.icon,
+    required this.label,
     required this.enabled,
     required this.onTap,
   });
@@ -266,20 +278,20 @@ class _StepButton extends StatelessWidget {
     return Semantics(
       button: true,
       enabled: enabled,
-      label: 'Change week',
-      child: ExcludeSemantics(
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: enabled
-              ? () {
-                  HapticFeedback.selectionClick();
-                  onTap();
-                }
-              : null,
-          // 44pt target with the icon centered.
-          child: SizedBox(
-            width: 44,
-            height: 44,
+      label: label,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: enabled
+            ? () {
+                HapticFeedback.selectionClick();
+                onTap();
+              }
+            : null,
+        // 48dp target with the icon centered.
+        child: SizedBox(
+          width: kMinTouchTarget,
+          height: kMinTouchTarget,
+          child: ExcludeSemantics(
             child: Icon(
               icon,
               size: 22,

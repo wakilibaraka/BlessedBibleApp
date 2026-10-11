@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../state/nav_provider.dart';
 import 'glass_container.dart';
+import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
 
 class AppErrorFallback extends StatelessWidget {
   final FlutterErrorDetails? details;
@@ -21,7 +23,7 @@ class AppErrorFallback extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 32.0),
             child: GlassContainer(
               padding: const EdgeInsets.all(32.0),
-              borderRadius: BorderRadius.circular(28),
+              borderRadius: BorderRadius.circular(Radii.xxxl),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -40,7 +42,7 @@ class AppErrorFallback extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'Something Went Wrong',
+                    context.l10n.errorTitle,
                     textAlign: TextAlign.center,
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
@@ -49,7 +51,7 @@ class AppErrorFallback extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'An unexpected issue occurred. Tap below to return to the home screen.',
+                    context.l10n.errorBody,
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
@@ -71,18 +73,18 @@ class AppErrorFallback extends StatelessWidget {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: theme.primaryColor,
-                          foregroundColor: Colors.white,
+                          foregroundColor: context.palette.onAccent,
                           padding: const EdgeInsets.symmetric(
                               horizontal: 24, vertical: 12),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(Radii.xl),
                           ),
                           elevation: 0,
                         ),
                         icon: const Icon(Icons.home_rounded, size: 20),
-                        label: const Text(
-                          'Back to Home',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                        label: Text(
+                          context.l10n.errorBackHome,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       );
                     },

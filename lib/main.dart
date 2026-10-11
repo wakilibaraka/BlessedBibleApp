@@ -22,6 +22,9 @@ import 'data/credits.dart';
 import 'services/firebase_setup.dart';
 import 'services/widget_update_service.dart';
 import 'sync/bible_sync.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'l10n/l10n.dart';
+import 'state/locale_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -120,8 +123,19 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
 
     final hasCompletedOnboarding = prefsService.hasCompletedOnboarding();
 
+    final locale = ref.watch(appLocaleProvider);
+
     return MaterialApp(
-      title: 'The Blessed Bible',
+      onGenerateTitle: (context) => context.l10n.appTitle,
+      locale: locale,
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      localeListResolutionCallback: resolveAppLocale,
       debugShowCheckedModeBanner: false,
       themeAnimationDuration: const Duration(milliseconds: 600),
       themeAnimationCurve: Curves.easeInOut,

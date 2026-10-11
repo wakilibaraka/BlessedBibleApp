@@ -1,7 +1,9 @@
+import '../../l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/typography_provider.dart';
+import '../../theme/design_tokens.dart';
 import 'pill_segmented_control.dart';
 
 // Fonts grouped by family for 3-per-row grid
@@ -12,7 +14,12 @@ const _fontGroups = [
   ['Lexend', 'Source Sans 3', 'OpenDyslexic'],
 ];
 
-const _weightLabels = ['Light', 'Regular', 'Medium', 'Bold'];
+List<String> _weightLabels(AppLocalizations l10n) => [
+      l10n.settingsWeightLight,
+      l10n.settingsWeightRegular,
+      l10n.settingsWeightMedium,
+      l10n.settingsWeightBold,
+    ];
 const _weightValues = [300, 400, 500, 700];
 
 class TypographyControls extends ConsumerWidget {
@@ -28,7 +35,7 @@ class TypographyControls extends ConsumerWidget {
       color: theme.primaryColor,
       letterSpacing: 1.2,
       fontWeight: FontWeight.bold,
-      fontSize: 10,
+      fontSize: TypeScale.micro,
     );
     final valueStyle = theme.textTheme.labelMedium?.copyWith(
       color: theme.primaryColor,
@@ -46,7 +53,8 @@ class TypographyControls extends ConsumerWidget {
             Row(children: [
               Icon(Icons.text_increase_rounded, size: 16, color: iconColor),
               const SizedBox(width: 8),
-              Text('FONT SIZE', style: sectionLabelStyle),
+              Text(context.l10n.settingsFontSizeHeader,
+                  style: sectionLabelStyle),
             ]),
             Text('${typography.fontSize.clamp(12.0, 32.0).round()}',
                 style: valueStyle),
@@ -56,6 +64,7 @@ class TypographyControls extends ConsumerWidget {
         Row(children: [
           _IconStepButton(
               icon: Icons.remove,
+              label: context.l10n.a11yTextSmaller,
               iconColor: iconColor,
               theme: theme,
               onTap: () {
@@ -97,6 +106,7 @@ class TypographyControls extends ConsumerWidget {
           const SizedBox(width: 12),
           _IconStepButton(
               icon: Icons.add,
+              label: context.l10n.a11yTextLarger,
               iconColor: iconColor,
               theme: theme,
               onTap: () {
@@ -116,12 +126,15 @@ class TypographyControls extends ConsumerWidget {
             Row(children: [
               Icon(Icons.line_weight_rounded, size: 16, color: iconColor),
               const SizedBox(width: 8),
-              Text('FONT WEIGHT', style: sectionLabelStyle),
+              Text(context.l10n.settingsFontWeightHeader,
+                  style: sectionLabelStyle),
             ]),
             Text(
               () {
                 final idx = _weightValues.indexOf(typography.fontWeightValue);
-                return idx >= 0 ? _weightLabels[idx] : 'Regular';
+                return idx >= 0
+                    ? _weightLabels(context.l10n)[idx]
+                    : context.l10n.settingsWeightRegular;
               }(),
               style: valueStyle,
             ),
@@ -135,32 +148,46 @@ class TypographyControls extends ConsumerWidget {
               child: Padding(
                 padding: EdgeInsets.only(
                     right: i < _weightValues.length - 1 ? 6 : 0),
-                child: GestureDetector(
-                  onTap: () {
-                    HapticFeedback.selectionClick();
-                    typographyNotifier.setFontWeight(_weightValues[i]);
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 180),
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? theme.primaryColor
-                          : theme.colorScheme.onSurface.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      _weightLabels[i],
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.values.firstWhere(
-                            (w) => w.value == _weightValues[i],
-                            orElse: () => FontWeight.normal),
-                        color: isSelected
-                            ? theme.colorScheme.surface
-                            : theme.colorScheme.onSurface
-                                .withValues(alpha: 0.7),
+                child: Semantics(
+                  button: true,
+                  selected: isSelected,
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      HapticFeedback.selectionClick();
+                      typographyNotifier.setFontWeight(_weightValues[i]);
+                    },
+                    // 48 dp hit area around the slimmer chip.
+                    child: ConstrainedBox(
+                      constraints:
+                          const BoxConstraints(minHeight: kMinTouchTarget),
+                      child: Center(
+                        child: AnimatedContainer(
+                          duration: Motion.of(
+                              context, const Duration(milliseconds: 180)),
+                          alignment: Alignment.center,
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? theme.primaryColor
+                                : theme.colorScheme.onSurface
+                                    .withValues(alpha: 0.05),
+                            borderRadius: BorderRadius.circular(Radii.md),
+                          ),
+                          child: Text(
+                            _weightLabels(context.l10n)[i],
+                            style: TextStyle(
+                              fontSize: TypeScale.caption,
+                              fontWeight: FontWeight.values.firstWhere(
+                                  (w) => w.value == _weightValues[i],
+                                  orElse: () => FontWeight.normal),
+                              color: isSelected
+                                  ? theme.colorScheme.surface
+                                  : theme.colorScheme.onSurface
+                                      .withValues(alpha: 0.7),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -179,19 +206,26 @@ class TypographyControls extends ConsumerWidget {
               Icon(Icons.format_line_spacing_rounded,
                   size: 16, color: iconColor),
               const SizedBox(width: 8),
-              Text('LINE SPACING', style: sectionLabelStyle),
+              Text(context.l10n.settingsLineSpacingHeader,
+                  style: sectionLabelStyle),
             ]),
             Text(
                 typography.lineHeight <= 1.4
-                    ? 'Compact'
-                    : (typography.lineHeight >= 1.8 ? 'Relaxed' : 'Normal'),
+                    ? context.l10n.settingsSpacingCompact
+                    : (typography.lineHeight >= 1.8
+                        ? context.l10n.settingsSpeedRelaxed
+                        : context.l10n.settingsSpacingNormal),
                 style: valueStyle),
           ],
         ),
         const SizedBox(height: 8),
         Center(
           child: PillSegmentedControl(
-            segments: const ['Compact', 'Normal', 'Relaxed'],
+            segments: [
+              context.l10n.settingsSpacingCompact,
+              context.l10n.settingsSpacingNormal,
+              context.l10n.settingsSpeedRelaxed
+            ],
             selectedIndex: typography.lineHeight <= 1.4
                 ? 0
                 : (typography.lineHeight >= 1.8 ? 2 : 1),
@@ -210,7 +244,8 @@ class TypographyControls extends ConsumerWidget {
             Row(children: [
               Icon(Icons.padding_rounded, size: 16, color: iconColor),
               const SizedBox(width: 8),
-              Text('MARGINS', style: sectionLabelStyle),
+              Text(context.l10n.settingsMarginsHeader,
+                  style: sectionLabelStyle),
             ]),
             Text('${typography.marginPercent.toStringAsFixed(0)}%',
                 style: valueStyle),
@@ -249,14 +284,16 @@ class TypographyControls extends ConsumerWidget {
             Row(children: [
               Icon(Icons.format_align_left_rounded, size: 16, color: iconColor),
               const SizedBox(width: 8),
-              Text('ALIGNMENT', style: sectionLabelStyle),
+              Text(context.l10n.settingsAlignmentHeader,
+                  style: sectionLabelStyle),
             ]),
             Text(
                 switch (typography.textAlignMode) {
-                  TextAlignMode.left => 'Left',
-                  TextAlignMode.center => 'Center',
-                  TextAlignMode.right => 'Right',
-                  TextAlignMode.justified => 'Justified',
+                  TextAlignMode.left => context.l10n.settingsAlignLeft,
+                  TextAlignMode.center => context.l10n.settingsAlignCenter,
+                  TextAlignMode.right => context.l10n.settingsAlignRight,
+                  TextAlignMode.justified =>
+                    context.l10n.settingsAlignJustified,
                 },
                 style: valueStyle),
           ],
@@ -267,6 +304,7 @@ class TypographyControls extends ConsumerWidget {
           children: [
             _AlignmentButton(
                 icon: Icons.format_align_left_rounded,
+                label: context.l10n.settingsAlignLeft,
                 isSelected: typography.textAlignMode == TextAlignMode.left,
                 onTap: () {
                   HapticFeedback.selectionClick();
@@ -275,6 +313,7 @@ class TypographyControls extends ConsumerWidget {
             const SizedBox(width: 12),
             _AlignmentButton(
                 icon: Icons.format_align_center_rounded,
+                label: context.l10n.settingsAlignCenter,
                 isSelected: typography.textAlignMode == TextAlignMode.center,
                 onTap: () {
                   HapticFeedback.selectionClick();
@@ -283,6 +322,7 @@ class TypographyControls extends ConsumerWidget {
             const SizedBox(width: 12),
             _AlignmentButton(
                 icon: Icons.format_align_right_rounded,
+                label: context.l10n.settingsAlignRight,
                 isSelected: typography.textAlignMode == TextAlignMode.right,
                 onTap: () {
                   HapticFeedback.selectionClick();
@@ -291,6 +331,7 @@ class TypographyControls extends ConsumerWidget {
             const SizedBox(width: 12),
             _AlignmentButton(
                 icon: Icons.format_align_justify_rounded,
+                label: context.l10n.settingsAlignJustified,
                 isSelected: typography.textAlignMode == TextAlignMode.justified,
                 onTap: () {
                   HapticFeedback.selectionClick();
@@ -304,7 +345,7 @@ class TypographyControls extends ConsumerWidget {
         Row(children: [
           Icon(Icons.font_download_rounded, size: 16, color: iconColor),
           const SizedBox(width: 8),
-          Text('FONT FAMILY', style: sectionLabelStyle),
+          Text(context.l10n.settingsFontFamilyHeader, style: sectionLabelStyle),
         ]),
         const SizedBox(height: 8),
         for (final group in _fontGroups)
@@ -320,51 +361,58 @@ class TypographyControls extends ConsumerWidget {
                 return Expanded(
                   child: Padding(
                     padding: EdgeInsets.only(right: i < 2 ? 6 : 0),
-                    child: GestureDetector(
-                      onTap: () {
-                        HapticFeedback.selectionClick();
-                        typographyNotifier.setFontFamily(font);
-                      },
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 180),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 4),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? theme.primaryColor
-                              : theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.05),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text('Aa',
+                    child: Semantics(
+                      button: true,
+                      selected: isSelected,
+                      label: font,
+                      excludeSemantics: true,
+                      child: GestureDetector(
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          typographyNotifier.setFontFamily(font);
+                        },
+                        child: AnimatedContainer(
+                          duration: Motion.of(
+                              context, const Duration(milliseconds: 180)),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 4),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? theme.primaryColor
+                                : theme.colorScheme.onSurface
+                                    .withValues(alpha: 0.05),
+                            borderRadius: BorderRadius.circular(Radii.md),
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text('Aa',
+                                  style: TextStyle(
+                                    fontFamily: font,
+                                    fontSize: TypeScale.title,
+                                    fontWeight: typography.fontWeight,
+                                    color: isSelected
+                                        ? theme.colorScheme.surface
+                                        : theme.colorScheme.onSurface
+                                            .withValues(alpha: 0.85),
+                                  )),
+                              const SizedBox(height: 2),
+                              Text(
+                                font,
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
-                                  fontFamily: font,
-                                  fontSize: 18,
-                                  fontWeight: typography.fontWeight,
+                                  fontSize: TypeScale.micro,
                                   color: isSelected
                                       ? theme.colorScheme.surface
+                                          .withValues(alpha: 0.85)
                                       : theme.colorScheme.onSurface
-                                          .withValues(alpha: 0.85),
-                                )),
-                            const SizedBox(height: 2),
-                            Text(
-                              font,
-                              textAlign: TextAlign.center,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 9,
-                                color: isSelected
-                                    ? theme.colorScheme.surface
-                                        .withValues(alpha: 0.85)
-                                    : theme.colorScheme.onSurface
-                                        .withValues(alpha: 0.55),
+                                          .withValues(alpha: 0.55),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -380,13 +428,14 @@ class TypographyControls extends ConsumerWidget {
           child: Container(
             decoration: BoxDecoration(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.03),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(Radii.lg),
             ),
             child: SwitchListTile(
               title: Row(children: [
                 Icon(Icons.format_italic_rounded, size: 16, color: iconColor),
                 const SizedBox(width: 8),
-                Text('ITALIC READING TEXT', style: sectionLabelStyle),
+                Text(context.l10n.settingsItalicHeader,
+                    style: sectionLabelStyle),
               ]),
               value: typography.italicEnabled,
               onChanged: (val) {
@@ -406,26 +455,40 @@ class TypographyControls extends ConsumerWidget {
 
 class _IconStepButton extends StatelessWidget {
   final IconData icon;
+  final String label;
   final Color iconColor;
   final ThemeData theme;
   final VoidCallback onTap;
   const _IconStepButton(
       {required this.icon,
+      required this.label,
       required this.iconColor,
       required this.theme,
       required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(12),
+    return Semantics(
+      button: true,
+      label: label,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        // 48 dp hit area; the visible square stays 36 dp.
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+              minWidth: kMinTouchTarget, minHeight: kMinTouchTarget),
+          child: Center(
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(Radii.md),
+              ),
+              child: Icon(icon, size: 20, color: iconColor),
+            ),
+          ),
         ),
-        child: Icon(icon, size: 20, color: iconColor),
       ),
     );
   }
@@ -433,30 +496,49 @@ class _IconStepButton extends StatelessWidget {
 
 class _AlignmentButton extends StatelessWidget {
   final IconData icon;
+  final String label;
   final bool isSelected;
   final VoidCallback onTap;
   const _AlignmentButton(
-      {required this.icon, required this.isSelected, required this.onTap});
+      {required this.icon,
+      required this.label,
+      required this.isSelected,
+      required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? theme.primaryColor
-              : theme.colorScheme.onSurface.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-              color: isSelected ? theme.primaryColor : Colors.transparent),
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: label,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        // 48 dp tall hit area around the 36 dp pill.
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: kMinTouchTarget),
+          child: Center(
+            child: AnimatedContainer(
+              duration: Motion.of(context, Motion.normal),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? theme.primaryColor
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(Radii.pill),
+                border: Border.all(
+                    color:
+                        isSelected ? theme.primaryColor : Colors.transparent),
+              ),
+              child: Icon(icon,
+                  size: 20,
+                  color: isSelected
+                      ? theme.colorScheme.surface
+                      : theme.primaryColor),
+            ),
+          ),
         ),
-        child: Icon(icon,
-            size: 20,
-            color: isSelected ? theme.colorScheme.surface : theme.primaryColor),
       ),
     );
   }

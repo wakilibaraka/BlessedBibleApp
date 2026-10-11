@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/local_storage/preferences_service.dart';
 import '../services/notification_service.dart';
+import '../utils/log.dart';
 
 class RemindersState {
   final bool sabbathEnabled;
@@ -78,8 +79,11 @@ class RemindersNotifier extends Notifier<RemindersState> {
   RemindersState build() {
     final prefs = ref.watch(preferencesProvider);
 
-    // Initialize Notification Service on build
-    ref.read(notificationServiceProvider).initialize();
+    // Initialize Notification Service on build (best effort: no platform
+    // plugin in tests, or notifications unavailable, must not throw).
+    ref.read(notificationServiceProvider).initialize().catchError((Object e) {
+      logDebug('notification init failed (non-fatal): $e');
+    });
 
     return RemindersState(
       sabbathEnabled: prefs.getSabbathReminderEnabled(),
@@ -197,6 +201,49 @@ class RemindersNotifier extends Notifier<RemindersState> {
       ns.schedulePrayerReminder(state.prayerHour, state.prayerMinute);
     } else {
       ns.cancelPrayerReminder();
+    }
+  }
+
+  /// Re-schedules every enabled reminder so its text follows the current
+  /// interface language. Never asks for permission and never throws: a
+  /// reminder that can't be scheduled (no permission, no platform) is
+  /// simply left as it was.
+  Future<void> rescheduleAll() async {
+    final ns = ref.read(notificationServiceProvider);
+    final s = state;
+    Future<void> attempt(Future<void> Function() run) async {
+      try {
+        await run();
+      } catch (e) {
+        logDebug('reminder reschedule failed (non-fatal): $e');
+      }
+    }
+
+    final anyEnabled = s.dailyEnabled ||
+        s.prayerEnabled ||
+        s.customWeeklyEnabled ||
+        s.sabbathEnabled;
+    if (!anyEnabled) return;
+    await attempt(ns.initialize);
+
+    if (s.dailyEnabled) {
+      await attempt(() => ns.scheduleDailyReminder(s.dailyHour, s.dailyMinute,
+          askPermission: false));
+    }
+    if (s.prayerEnabled) {
+      await attempt(() => ns.schedulePrayerReminder(
+          s.prayerHour, s.prayerMinute,
+          askPermission: false));
+    }
+    if (s.customWeeklyEnabled) {
+      await attempt(() => ns.scheduleWeeklyReminder(
+          s.customWeeklyDay, s.customWeeklyHour, s.customWeeklyMinute,
+          askPermission: false));
+    }
+    if (s.sabbathEnabled && s.sabbathLat != null && s.sabbathLng != null) {
+      await attempt(() => ns.scheduleSabbathReminder(
+          s.sabbathLat!, s.sabbathLng!,
+          askPermission: false));
     }
   }
 }

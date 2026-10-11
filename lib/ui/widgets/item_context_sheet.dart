@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../l10n/l10n.dart';
 import 'package:flutter/services.dart';
+import '../../theme/design_tokens.dart';
 
 /// Apple-standard context sheet rows for Your Space items.
 ///
@@ -64,7 +66,7 @@ class ItemContextSheet extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(Radii.xl),
           border: Border.all(color: theme.dividerColor),
         ),
         clipBehavior: Clip.antiAlias,
@@ -130,20 +132,25 @@ class ItemContextSheet extends StatelessWidget {
                                 Navigator.of(context).pop();
                                 a.onTap!();
                               },
-                        child: SizedBox(
-                          height: 50,
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(minHeight: 50),
                           child: Row(
                             children: [
                               const SizedBox(width: 18),
                               Icon(a.icon, size: 20, color: color),
                               const SizedBox(width: 14),
                               Expanded(
-                                child: Text(
-                                  a.label,
-                                  style: theme.textTheme.bodyLarge?.copyWith(
-                                    color: color,
-                                    fontWeight:
-                                        a.destructive ? FontWeight.w600 : null,
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12),
+                                  child: Text(
+                                    a.label,
+                                    style: theme.textTheme.bodyLarge?.copyWith(
+                                      color: color,
+                                      fontWeight: a.destructive
+                                          ? FontWeight.w600
+                                          : null,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -162,11 +169,11 @@ class ItemContextSheet extends StatelessWidget {
                 height: 1, color: theme.dividerColor.withValues(alpha: 0.5)),
             InkWell(
               onTap: () => Navigator.of(context).pop(),
-              child: SizedBox(
-                height: 50,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 50),
                 child: Center(
                   child: Text(
-                    'Cancel',
+                    context.l10n.commonCancel,
                     style: theme.textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.w700,
                       color: theme.primaryColor,
@@ -187,7 +194,7 @@ Future<bool> confirmDestructive(
   BuildContext context, {
   required String title,
   required String message,
-  String confirmLabel = 'Delete',
+  String? confirmLabel,
 }) async {
   final result = await showDialog<bool>(
     context: context,
@@ -197,12 +204,12 @@ Future<bool> confirmDestructive(
       actions: [
         TextButton(
           onPressed: () => Navigator.of(ctx).pop(false),
-          child: const Text('Cancel'),
+          child: Text(context.l10n.commonCancel),
         ),
         TextButton(
           onPressed: () => Navigator.of(ctx).pop(true),
           child: Text(
-            confirmLabel,
+            confirmLabel ?? context.l10n.commonDelete,
             style: TextStyle(color: Theme.of(ctx).colorScheme.error),
           ),
         ),

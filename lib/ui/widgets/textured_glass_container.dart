@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/theme_provider.dart';
 import '../../state/surface_style_provider.dart';
+import '../../theme/design_tokens.dart';
 import '../../theme/reading_tokens.dart';
 
 // FROSTED GLASS TUNING CONSTANTS
@@ -15,6 +16,14 @@ const double _kRimDarkAlpha = 0.30;
 const double _kNoiseAlphaDark = 0.030;
 const double _kNoiseAlphaLight = 0.025;
 const double _kNoiseDensity = 0.015;
+
+// The surface styles below simulate light falling on a material: white
+// highlights and black shading, with alphas tuned per style and per
+// light/dark background. They model light, not theme colours, so they stay
+// fixed rather than following the colour scheme.
+const Color _kHighlight = Colors.white;
+const Color _kShade = Colors.black;
+const Color _kSepiaTint = Color(0xFFF5EAD0);
 
 class TexturedGlassContainer extends ConsumerWidget {
   final Widget child;
@@ -51,22 +60,24 @@ class TexturedGlassContainer extends ConsumerWidget {
     final isFrutigerAero = surfaceStyle == SurfaceStyle.frutigerAero;
     final isSkeuomorphic = surfaceStyle == SurfaceStyle.skeuomorphic;
     final isFrosted = surfaceStyle == SurfaceStyle.frosted;
-    final useBlur = isFrosted && !isScrollable;
+    // Reduced transparency (system high contrast): no blur, opaque fill.
+    final opaque = reduceTransparency(context);
+    final useBlur = isFrosted && !isScrollable && !opaque;
 
     BorderRadius radius;
     if (isClaymorphic) {
-      final minR = borderRadius != null && borderRadius!.topLeft.x > 24
+      final minR = borderRadius != null && borderRadius!.topLeft.x > Radii.xxl
           ? borderRadius!.topLeft.x
-          : 28.0;
+          : Radii.xxxl;
       radius = BorderRadius.circular(minR);
     } else if (isSkeuomorphic) {
-      if (borderRadius != null && borderRadius!.topLeft.x < 28) {
-        radius = BorderRadius.circular(28);
+      if (borderRadius != null && borderRadius!.topLeft.x < Radii.xxxl) {
+        radius = BorderRadius.circular(Radii.xxxl);
       } else {
-        radius = borderRadius ?? BorderRadius.circular(28);
+        radius = borderRadius ?? BorderRadius.circular(Radii.xxxl);
       }
     } else {
-      radius = borderRadius ?? BorderRadius.circular(24);
+      radius = borderRadius ?? BorderRadius.circular(Radii.xxl);
     }
 
     final tokens = Theme.of(context).extension<ReadingTokens>()!;
@@ -93,8 +104,8 @@ class TexturedGlassContainer extends ConsumerWidget {
     } else if (useBlur) {
       switch (appTheme.resolve(context)) {
         case AppThemeMode.sepia:
-          fillColor =
-              const Color(0xFFF5EAD0).withValues(alpha: _kTintLightAlpha);
+          // Warm parchment tint tuned for the sepia frost.
+          fillColor = _kSepiaTint.withValues(alpha: _kTintLightAlpha);
           isDarkPanel = false;
           break;
         case AppThemeMode.light:
@@ -106,14 +117,14 @@ class TexturedGlassContainer extends ConsumerWidget {
         case AppThemeMode.roses:
         case AppThemeMode.olives:
         case AppThemeMode.fresh:
-          fillColor = Colors.white.withValues(alpha: _kTintLightAlpha);
+          fillColor = _kHighlight.withValues(alpha: _kTintLightAlpha);
           isDarkPanel = false;
           break;
         case AppThemeMode.dusk:
         case AppThemeMode.dark:
         case AppThemeMode.oled:
         case AppThemeMode.automatic:
-          fillColor = Colors.black.withValues(alpha: _kTintDarkAlpha);
+          fillColor = _kShade.withValues(alpha: _kTintDarkAlpha);
           isDarkPanel = true;
           break;
       }
@@ -125,6 +136,8 @@ class TexturedGlassContainer extends ConsumerWidget {
       isDarkPanel = tokens.readingSurface.computeLuminance() < 0.4;
     }
 
+    if (opaque) fillColor = fillColor.withValues(alpha: 1);
+
     final bgLuminance = tokens.readingSurface.computeLuminance();
     final isDarkBg = bgLuminance < 0.4;
 
@@ -132,11 +145,11 @@ class TexturedGlassContainer extends ConsumerWidget {
     if (isClaymorphic) {
       final primary = Theme.of(context).primaryColor;
       final dropColor = isDarkBg
-          ? Colors.black.withValues(alpha: 0.45)
+          ? _kShade.withValues(alpha: 0.45)
           : primary.withValues(alpha: 0.22);
       final floorColor = isDarkBg
-          ? Colors.black.withValues(alpha: 0.25)
-          : Colors.black.withValues(alpha: 0.10);
+          ? _kShade.withValues(alpha: 0.25)
+          : _kShade.withValues(alpha: 0.10);
       shadows = [
         BoxShadow(
           color: dropColor,
@@ -155,7 +168,7 @@ class TexturedGlassContainer extends ConsumerWidget {
           Colors.lightBlue.withValues(alpha: isDarkBg ? 0.30 : 0.20);
       shadows = [
         BoxShadow(
-          color: Colors.black.withValues(alpha: isDarkBg ? 0.45 : 0.18),
+          color: _kShade.withValues(alpha: isDarkBg ? 0.45 : 0.18),
           blurRadius: 28,
           spreadRadius: -2,
           offset: const Offset(0, 12),
@@ -171,34 +184,34 @@ class TexturedGlassContainer extends ConsumerWidget {
       shadows = isDarkBg
           ? [
               BoxShadow(
-                  color: Colors.white.withValues(alpha: 0.08),
+                  color: _kHighlight.withValues(alpha: 0.08),
                   offset: const Offset(-2.0, -2.0),
                   blurRadius: 4),
               BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.40),
+                  color: _kShade.withValues(alpha: 0.40),
                   offset: const Offset(4.0, 4.0),
                   blurRadius: 6),
             ]
           : [
               BoxShadow(
-                  color: Colors.white.withValues(alpha: 0.90),
+                  color: _kHighlight.withValues(alpha: 0.90),
                   offset: const Offset(-2.0, -2.0),
                   blurRadius: 4),
               BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.08),
+                  color: _kShade.withValues(alpha: 0.08),
                   offset: const Offset(4.0, 4.0),
                   blurRadius: 6),
             ];
     } else if (isFrosted) {
       shadows = [
         BoxShadow(
-          color: Colors.black.withValues(alpha: isDarkBg ? 0.45 : 0.18),
+          color: _kShade.withValues(alpha: isDarkBg ? 0.45 : 0.18),
           blurRadius: 36,
           spreadRadius: -4,
           offset: const Offset(0, 14),
         ),
         BoxShadow(
-          color: Colors.black.withValues(alpha: isDarkBg ? 0.20 : 0.06),
+          color: _kShade.withValues(alpha: isDarkBg ? 0.20 : 0.06),
           blurRadius: 10,
           spreadRadius: 0,
           offset: const Offset(0, 3),
@@ -207,14 +220,14 @@ class TexturedGlassContainer extends ConsumerWidget {
     } else if (isPaperlike) {
       shadows = [
         BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: _kShade.withValues(alpha: 0.04),
             blurRadius: 2,
             offset: const Offset(0, 1)),
       ];
     } else {
       shadows = [
         BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: _kShade.withValues(alpha: 0.03),
             blurRadius: 8,
             offset: const Offset(0, 2)),
       ];
@@ -229,8 +242,8 @@ class TexturedGlassContainer extends ConsumerWidget {
       containerBorder = Border.all(
         width: 1.0,
         color: isDarkBg
-            ? Colors.white.withValues(alpha: 0.08)
-            : Colors.black.withValues(alpha: 0.15),
+            ? _kHighlight.withValues(alpha: 0.08)
+            : _kShade.withValues(alpha: 0.15),
       );
     } else if (isFrutigerAero) {
       containerBorder = Border.all(
@@ -249,7 +262,7 @@ class TexturedGlassContainer extends ConsumerWidget {
     }
 
     Widget content = AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
+      duration: Motion.of(context, const Duration(milliseconds: 300)),
       padding: padding,
       decoration: BoxDecoration(
         color: fillColor,
@@ -297,7 +310,7 @@ class TexturedGlassContainer extends ConsumerWidget {
     }
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
+      duration: Motion.of(context, const Duration(milliseconds: 300)),
       curve: Curves.easeOut,
       margin: margin,
       clipBehavior: Clip.antiAlias,
@@ -309,7 +322,7 @@ class TexturedGlassContainer extends ConsumerWidget {
         borderRadius: radius,
         clipBehavior: Clip.antiAlias,
         child: RepaintBoundary(
-          child: (useBlur || isFrutigerAero)
+          child: (useBlur || (isFrutigerAero && !opaque))
               ? BackdropFilter(
                   filter: ImageFilter.blur(
                     sigmaX: isFrutigerAero
@@ -364,13 +377,13 @@ class _RimAndNoisePainter extends CustomPainter {
         PointMode.points,
         darkPoints,
         Paint()
-          ..color = Colors.black.withValues(alpha: _kNoiseAlphaDark)
+          ..color = _kShade.withValues(alpha: _kNoiseAlphaDark)
           ..strokeWidth = 1.0);
     canvas.drawPoints(
         PointMode.points,
         lightPoints,
         Paint()
-          ..color = Colors.white.withValues(alpha: _kNoiseAlphaLight)
+          ..color = _kHighlight.withValues(alpha: _kNoiseAlphaLight)
           ..strokeWidth = 1.0);
 
     final rimPaint = Paint()
@@ -378,9 +391,9 @@ class _RimAndNoisePainter extends CustomPainter {
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
         colors: [
-          Colors.white.withValues(alpha: rimAlpha),
-          Colors.white.withValues(alpha: rimAlpha * 0.25),
-          Colors.white.withValues(alpha: 0.0),
+          _kHighlight.withValues(alpha: rimAlpha),
+          _kHighlight.withValues(alpha: rimAlpha * 0.25),
+          _kHighlight.withValues(alpha: 0.0),
         ],
         stops: const [0.0, 0.25, 0.6],
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
@@ -398,7 +411,7 @@ class _RimAndNoisePainter extends CustomPainter {
         borderRadius.toRRect(
             Rect.fromLTWH(0.4, 0.4, size.width - 0.8, size.height - 0.8)),
         Paint()
-          ..color = Colors.black.withValues(alpha: 0.08)
+          ..color = _kShade.withValues(alpha: 0.08)
           ..style = PaintingStyle.stroke
           ..strokeWidth = 0.8,
       );
@@ -434,8 +447,8 @@ class _ClaymorphicPainter extends CustomPainter {
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
         colors: [
-          Colors.white.withValues(alpha: isDark ? 0.28 : 0.55),
-          Colors.white.withValues(alpha: 0.0),
+          _kHighlight.withValues(alpha: isDark ? 0.28 : 0.55),
+          _kHighlight.withValues(alpha: 0.0),
         ],
         stops: const [0.0, 1.0],
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height * 0.50));
@@ -450,7 +463,7 @@ class _ClaymorphicPainter extends CustomPainter {
         begin: Alignment.bottomCenter,
         end: Alignment.topCenter,
         colors: [
-          Colors.black.withValues(alpha: isDark ? 0.32 : 0.16),
+          _kShade.withValues(alpha: isDark ? 0.32 : 0.16),
           Colors.transparent,
         ],
         stops: const [0.0, 1.0],
@@ -495,8 +508,8 @@ class _FrutigerAeroPainter extends CustomPainter {
           center: const Alignment(0.0, -0.4),
           radius: 0.65,
           colors: [
-            Colors.white.withValues(alpha: isDark ? 0.45 : 0.55),
-            Colors.white.withValues(alpha: isDark ? 0.08 : 0.12),
+            _kHighlight.withValues(alpha: isDark ? 0.45 : 0.55),
+            _kHighlight.withValues(alpha: isDark ? 0.08 : 0.12),
             Colors.transparent,
           ],
           stops: const [0.0, 0.55, 1.0],
@@ -510,7 +523,7 @@ class _FrutigerAeroPainter extends CustomPainter {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Colors.white.withValues(alpha: isDark ? 0.12 : 0.22),
+            _kHighlight.withValues(alpha: isDark ? 0.12 : 0.22),
             Colors.transparent,
             Colors.lightBlue.withValues(alpha: isDark ? 0.06 : 0.10),
           ],
@@ -526,7 +539,7 @@ class _FrutigerAeroPainter extends CustomPainter {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Colors.white.withValues(alpha: isDark ? 0.55 : 0.70),
+            _kHighlight.withValues(alpha: isDark ? 0.55 : 0.70),
             Colors.lightBlue.withValues(alpha: isDark ? 0.20 : 0.35),
             Colors.cyan.withValues(alpha: 0.0),
           ],
@@ -580,13 +593,13 @@ class _SkeuomorphicPainter extends CustomPainter {
         PointMode.points,
         darkPoints,
         Paint()
-          ..color = Colors.black.withValues(alpha: noiseAlphaDark)
+          ..color = _kShade.withValues(alpha: noiseAlphaDark)
           ..strokeWidth = 1.2);
     canvas.drawPoints(
         PointMode.points,
         lightPoints,
         Paint()
-          ..color = Colors.white.withValues(alpha: noiseAlphaLight)
+          ..color = _kHighlight.withValues(alpha: noiseAlphaLight)
           ..strokeWidth = 1.2);
 
     canvas.drawRRect(
@@ -596,9 +609,9 @@ class _SkeuomorphicPainter extends CustomPainter {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Colors.white.withValues(alpha: isDark ? 0.10 : 0.35),
+            _kHighlight.withValues(alpha: isDark ? 0.10 : 0.35),
             Colors.transparent,
-            Colors.black.withValues(alpha: isDark ? 0.40 : 0.05),
+            _kShade.withValues(alpha: isDark ? 0.40 : 0.05),
           ],
           stops: const [0.0, 0.4, 1.0],
         ).createShader(Rect.fromLTWH(0, 0, size.width, size.height)),
@@ -608,7 +621,7 @@ class _SkeuomorphicPainter extends CustomPainter {
       borderRadius.toRRect(
           Rect.fromLTWH(1.5, 1.5, size.width - 3.0, size.height * 0.18)),
       Paint()
-        ..color = Colors.white.withValues(alpha: isDark ? 0.12 : 0.40)
+        ..color = _kHighlight.withValues(alpha: isDark ? 0.12 : 0.40)
         ..style = PaintingStyle.fill,
     );
 

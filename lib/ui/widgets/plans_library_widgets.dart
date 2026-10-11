@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import '../../services/devotional_service.dart';
 import '../../state/devotional_provider.dart';
+import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
 
 /// Presentation widgets for the Plans Library redesign.
 ///
@@ -11,22 +14,10 @@ import '../../state/devotional_provider.dart';
 /// dark and gold. Only the mascot character keeps its own fixed friendly
 /// colors (it is an illustration, not chrome).
 
-const List<String> _monthNames = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
-String libraryDateHeader(DateTime day) =>
-    '${_monthNames[day.month - 1]} ${day.day}, ${day.year}';
+/// Long date for the library header, e.g. "November 10, 2025", formatted
+/// for [locale] (intl's default locale when null).
+String libraryDateHeader(DateTime day, [String? locale]) =>
+    DateFormat.yMMMMd(locale).format(day);
 
 /// Greeting row: "Hello," + name on the left, a year-progress / verse
 /// button on the right. Both blocks share a baseline so the row reads as
@@ -61,7 +52,7 @@ class LibraryGreetingHeader extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Hello,',
+                context.l10n.plansHello,
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w800,
                   height: 1.1,
@@ -81,20 +72,20 @@ class LibraryGreetingHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        // 44pt min target, two lines of context, no magic offsets.
+        // 48dp min target, two lines of context, no magic offsets.
         ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 44),
+          constraints: const BoxConstraints(minHeight: kMinTouchTarget),
           child: Material(
             color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(Radii.lg),
             child: InkWell(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(Radii.lg),
               onTap: onReadPressed,
               child: Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(Radii.lg),
                   border: Border.all(color: theme.dividerColor),
                 ),
                 child: Column(
@@ -148,8 +139,9 @@ class MascotPlaceholder extends StatelessWidget {
           width: size * 0.55,
           height: 5,
           decoration: BoxDecoration(
+            // Mascot art: fixed green underline, same in every theme.
             color: const Color(0xFF4CAF50).withValues(alpha: 0.85),
-            borderRadius: BorderRadius.circular(3),
+            borderRadius: BorderRadius.circular(Radii.xs),
           ),
         ),
       ],
@@ -162,6 +154,7 @@ class _ToastPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final w = size.width;
     final h = size.height;
+    // Mascot illustration colours are fixed art, not theme chrome.
     final crust = Paint()..color = const Color(0xFFB0712E);
     final bread = Paint()..color = const Color(0xFFE9B36A);
     final dark = Paint()
@@ -251,7 +244,7 @@ class PlanCoverPlaceholder extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(Radii.lg),
         gradient: LinearGradient(
           colors: [base, deep],
           begin: Alignment.topLeft,
@@ -271,17 +264,29 @@ class PlanCoverPlaceholder extends StatelessWidget {
               height: width * 0.8,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
+                // Highlight over the generated hue gradient (art).
                 color: Colors.white.withValues(alpha: 0.15),
               ),
             ),
           ),
-          Center(
-            child: Text(
-              initials,
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
-                letterSpacing: 1.0,
+          // Decorative initials: the title is read elsewhere. Scales
+          // down instead of wrapping at large text sizes.
+          ExcludeSemantics(
+            child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: Center(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    initials,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      // Always on the mid/deep hue gradient, never the surface.
+                      color: Colors.white,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
@@ -332,15 +337,17 @@ class LibraryPlateBand extends ConsumerWidget {
         if (p == null) return const SizedBox.shrink();
         return Semantics(
           button: true,
-          label: 'Open story: ${p.caption}',
+          label: context.l10n.plansOpenStory(p.caption),
+          excludeSemantics: true,
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: () => onOpen(p),
             child: SizedBox(
-              height: height,
+              // Grows with the system text size so the caption fits.
+              height: MediaQuery.textScalerOf(context).scale(height),
               width: double.infinity,
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(Radii.xl),
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
@@ -351,6 +358,8 @@ class LibraryPlateBand extends ConsumerWidget {
                       errorBuilder: (_, __, ___) =>
                           Container(color: theme.colorScheme.surface),
                     ),
+                    // Fixed dark scrim + white text: sits over artwork,
+                    // independent of the app theme.
                     // Scrim so the caption stays legible on light plates.
                     DecoratedBox(
                       decoration: BoxDecoration(
@@ -372,7 +381,7 @@ class LibraryPlateBand extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Text(
-                            'Bible story',
+                            context.l10n.plansBibleStory,
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: Colors.white.withValues(alpha: 0.75),
                               letterSpacing: 1.6,

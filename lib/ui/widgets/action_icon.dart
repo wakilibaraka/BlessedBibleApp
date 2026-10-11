@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../theme/design_tokens.dart';
+
 class ActionIcon extends StatefulWidget {
   final IconData icon;
   final String tooltip;
@@ -44,10 +46,13 @@ class _ActionIconState extends State<ActionIcon> {
         onLongPress: widget.onLongPress,
         radius: 24,
         child: Container(
-          constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+          constraints: const BoxConstraints(
+            minWidth: kMinTouchTarget,
+            minHeight: kMinTouchTarget,
+          ),
           alignment: Alignment.center,
           child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 200),
+            duration: Motion.of(context, const Duration(milliseconds: 200)),
             transitionBuilder: (child, anim) =>
                 ScaleTransition(scale: anim, child: child),
             child: Icon(

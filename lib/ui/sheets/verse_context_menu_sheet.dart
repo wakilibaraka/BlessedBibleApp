@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../theme/design_tokens.dart';
+import '../../l10n/l10n.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../widgets/textured_glass_container.dart';
 import '../../state/notes_provider.dart';
@@ -63,7 +65,7 @@ class _VerseContextMenuSheetState extends ConsumerState<VerseContextMenuSheet> {
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
             child: TexturedGlassContainer(
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(Radii.xxl),
               child: Padding(
                 padding:
                     const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
@@ -79,7 +81,7 @@ class _VerseContextMenuSheetState extends ConsumerState<VerseContextMenuSheet> {
                             child: _MenuButton(
                               icon: const Icon(Icons.comment_bank_outlined,
                                   size: 24),
-                              label: 'Commentary',
+                              label: context.l10n.readActionCommentary,
                               onTap: () {
                                 Navigator.of(context).pop();
                                 Navigator.of(context)
@@ -96,7 +98,9 @@ class _VerseContextMenuSheetState extends ConsumerState<VerseContextMenuSheet> {
                         Expanded(
                           child: _MenuButton(
                             icon: Icon(Icons.edit_document, size: 24),
-                            label: hasNote ? 'Edit Note' : 'Note',
+                            label: hasNote
+                                ? context.l10n.readActionEditNote
+                                : context.l10n.readActionNote,
                             color: hasNote ? Colors.blue.shade600 : null,
                             onTap: () {
                               Navigator.of(context).pop();
@@ -114,7 +118,7 @@ class _VerseContextMenuSheetState extends ConsumerState<VerseContextMenuSheet> {
                         Expanded(
                           child: _MenuButton(
                             icon: Icon(Icons.ios_share_rounded, size: 24),
-                            label: 'Share',
+                            label: context.l10n.commonShare,
                             onTap: () {
                               Navigator.of(context).pop();
                               VerseActionLogic.handleShareOptions(
@@ -130,7 +134,7 @@ class _VerseContextMenuSheetState extends ConsumerState<VerseContextMenuSheet> {
                         Expanded(
                           child: _MenuButton(
                             icon: const Icon(Icons.link_rounded, size: 24),
-                            label: 'Related',
+                            label: context.l10n.readActionRelated,
                             onTap: () {
                               Navigator.of(context).pop();
                               showCrossReferencesSheet(
@@ -146,7 +150,7 @@ class _VerseContextMenuSheetState extends ConsumerState<VerseContextMenuSheet> {
                         Expanded(
                           child: _MenuButton(
                             icon: Icon(Icons.crop_free_rounded, size: 24),
-                            label: 'Select Text',
+                            label: context.l10n.readActionSelectText,
                             onTap: () {
                               Navigator.of(context).pop();
                               widget.onCustomSelection();
@@ -191,37 +195,41 @@ class _MenuButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: color != null
-                  ? color!.withValues(alpha: 0.15)
-                  : theme.colorScheme.onSurface.withValues(alpha: 0.08),
-              shape: BoxShape.circle,
-            ),
-            child: IconTheme(
-              data: IconThemeData(
-                color: color ?? theme.colorScheme.onSurface,
-                size: 24,
+    return Semantics(
+      button: true,
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: color != null
+                    ? color!.withValues(alpha: 0.15)
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.08),
+                shape: BoxShape.circle,
               ),
-              child: icon,
+              child: IconTheme(
+                data: IconThemeData(
+                  color: color ?? theme.colorScheme.onSurface,
+                  size: 24,
+                ),
+                child: icon,
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: theme.textTheme.labelSmall?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: color,
+            const SizedBox(height: 8),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.labelSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: color,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

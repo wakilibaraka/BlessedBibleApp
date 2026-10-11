@@ -1,0 +1,26 @@
+{
+  "a11yPreviousWeek": {
+    "en": "Previous week",
+    "fr": "Semaine précédente",
+    "it": "Settimana precedente",
+    "ro": "Săptămâna anterioară",
+    "sw": "Wiki iliyopita",
+    "tl": "Nakaraang linggo"
+  },
+  "a11yNextWeek": {
+    "en": "Next week",
+    "fr": "Semaine suivante",
+    "it": "Settimana successiva",
+    "ro": "Săptămâna următoare",
+    "sw": "Wiki ijayo",
+    "tl": "Susunod na linggo"
+  },
+  "a11yRead": {
+    "en": "Read",
+    "fr": "Lu",
+    "it": "Letto",
+    "ro": "Citit",
+    "sw": "Imesomwa",
+    "tl": "Nabasa na"
+  }
+}

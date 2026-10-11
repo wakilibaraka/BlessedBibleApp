@@ -9,6 +9,9 @@ import '../../models/commentary_entry.dart';
 import '../../models/study_content_category.dart';
 import '../../state/typography_provider.dart';
 import 'dart:ui';
+import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
+import '../widgets/state_views.dart';
 
 class CommentaryHubScreen extends ConsumerStatefulWidget {
   final String book;
@@ -57,9 +60,9 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
         case AppThemeMode.olives:
           return AppColors.olivesBackground;
         case AppThemeMode.dusk:
-          return const Color(0xFF312C51);
+          return AppColors.duskBackground;
         case AppThemeMode.fresh:
-          return const Color(0xFF132C33);
+          return AppColors.freshBackground;
         default:
           return tokens.readingPaper;
       }
@@ -76,6 +79,7 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
             leading: IconButton(
               icon: Icon(Icons.arrow_back_ios_new_rounded,
                   color: theme.primaryColor, size: 20),
+              tooltip: context.l10n.commonBack,
               onPressed: () => Navigator.of(context).pop(),
             ),
             title: Text(
@@ -86,37 +90,30 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
                 color: theme.primaryColor,
               ),
             ),
-            flexibleSpace: ClipRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: Container(
-                    color: getThemeBackgroundColor().withValues(alpha: 0.8)),
-              ),
-            ),
+            flexibleSpace: reduceTransparency(context)
+                ? Container(color: getThemeBackgroundColor())
+                : ClipRect(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                          color:
+                              getThemeBackgroundColor().withValues(alpha: 0.8)),
+                    ),
+                  ),
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(60),
               child: _buildFilters(theme, tokens),
             ),
           ),
           asyncEntries.when(
-            loading: () => const SliverFillRemaining(
-                child: Center(child: CircularProgressIndicator())),
+            loading: () => const SliverFillRemaining(child: LoadingView()),
             error: (e, st) => SliverFillRemaining(
-                child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('Could not load commentary.\n$e',
-                      textAlign: TextAlign.center),
-                  const SizedBox(height: 12),
-                  TextButton.icon(
-                    onPressed: () => ref.invalidate(commentaryProvider),
-                    icon: const Icon(Icons.refresh_rounded),
-                    label: const Text('Retry'),
-                  ),
-                ],
+              child: ErrorState(
+                error: e,
+                message: context.l10n.studyCommentaryLoadError,
+                onRetry: () => ref.invalidate(commentaryProvider),
               ),
-            )),
+            ),
             data: (entries) {
               // Filter data based on context and selected chips
               final filtered = entries.where((e) {
@@ -154,7 +151,7 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
               if (filtered.isEmpty) {
                 return SliverFillRemaining(
                   child: Center(
-                    child: Text('No content found for these filters.',
+                    child: Text(context.l10n.studyNoContentForFilters,
                         style: theme.textTheme.bodyLarge
                             ?.copyWith(color: tokens.readingInkMuted)),
                   ),
@@ -179,6 +176,27 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
         ],
       ),
     );
+  }
+
+  /// Display label for a filter option; the option strings themselves are
+  /// identifiers used by the filtering logic.
+  String _optionLabel(String value) {
+    final l10n = context.l10n;
+    switch (value) {
+      case 'All':
+        return l10n.studyFilterAll;
+      case 'Commentary':
+        return l10n.studyCategoryCommentary;
+      case 'Devotionals':
+        return l10n.studyFilterDevotionals;
+      case 'All Contexts':
+        return l10n.studyFilterAllContexts;
+      case 'Chapter Level':
+        return l10n.studyFilterChapterLevel;
+      case 'Verse Level':
+        return l10n.studyFilterVerseLevel;
+    }
+    return value;
   }
 
   Widget _buildFilters(ThemeData theme, ReadingTokens tokens) {
@@ -207,12 +225,12 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
       String current, List<String> options, ValueChanged<String> onChanged) {
     return Center(
       child: Container(
-        height: 36,
+        constraints: const BoxConstraints(minHeight: kMinTouchTarget),
         padding: const EdgeInsets.symmetric(horizontal: 4),
         decoration: BoxDecoration(
           color: theme.primaryColor.withValues(alpha: 0.05),
           border: Border.all(color: theme.primaryColor.withValues(alpha: 0.1)),
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(Radii.xl),
         ),
         child: DropdownButtonHideUnderline(
           child: DropdownButton<String>(
@@ -221,7 +239,7 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
                 size: 16, color: theme.primaryColor),
             alignment: Alignment.center,
             dropdownColor: theme.scaffoldBackgroundColor,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(Radii.lg),
             style: theme.textTheme.labelMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: theme.primaryColor,
@@ -231,7 +249,7 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
                 value: value,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Text(value),
+                  child: Text(_optionLabel(value)),
                 ),
               );
             }).toList(),
@@ -265,7 +283,7 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
       decoration: BoxDecoration(
         color: bgColor,
         border: border,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(Radii.xl),
       ),
       child: _buildEntryContent(theme, tokens, entry, typography),
     );
@@ -322,7 +340,9 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  entry.source.isNotEmpty ? entry.source : 'Commentary',
+                  entry.source.isNotEmpty
+                      ? entry.source
+                      : context.l10n.studyCommentaryEyebrow,
                   style: theme.textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.1,
@@ -335,12 +355,12 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: tokens.readingAccent.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(Radii.md),
                 ),
                 child: Text(
                   entry.scope.type == 'verse'
-                      ? 'Verse ${entry.scope.verse}'
-                      : 'Chapter View',
+                      ? context.l10n.studyVerseLabel('${entry.scope.verse}')
+                      : context.l10n.studyChapterView,
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: tokens.readingAccent,
                     fontWeight: FontWeight.bold,
@@ -353,6 +373,7 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
           ...paragraphs.map((p) => Padding(
                 padding: const EdgeInsets.only(bottom: 16.0),
                 child: RichText(
+                  textScaler: MediaQuery.textScalerOf(context),
                   text: TextSpan(
                     style: baseStyle,
                     children: _parseMarkdown(p.trim(), baseStyle),

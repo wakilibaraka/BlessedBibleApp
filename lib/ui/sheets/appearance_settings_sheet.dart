@@ -1,8 +1,10 @@
+import '../../l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../theme/app_colors.dart';
+import '../../theme/design_tokens.dart';
 import '../widgets/textured_glass_container.dart';
 import '../widgets/typography_controls.dart';
 import 'theme_picker_sheet.dart';
@@ -62,7 +64,7 @@ class _AppearanceSettingsSheetState
         child: TexturedGlassContainer(
           sigmaX: 45.0,
           sigmaY: 45.0,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: Radii.sheet,
           padding: EdgeInsets.zero,
           child: Column(
             children: [
@@ -85,23 +87,26 @@ class _AppearanceSettingsSheetState
                         decoration: BoxDecoration(
                           color: theme.colorScheme.onSurface
                               .withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(2),
+                          borderRadius: BorderRadius.circular(Radii.xs),
                         ),
                       ),
                     ),
                     const SizedBox(height: 14),
                     // Tab toggle
                     Container(
-                      height: 36,
+                      // Was a fixed 36: grows with text and gives each tab
+                      // a 42 dp target.
+                      constraints:
+                          const BoxConstraints(minHeight: kMinTouchTarget),
                       decoration: BoxDecoration(
                         color:
                             theme.colorScheme.onSurface.withValues(alpha: 0.06),
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(Radii.pill),
                       ),
                       child: Row(
                         children: [
                           _TabButton(
-                            label: 'Typography',
+                            label: context.l10n.settingsTypography,
                             icon: Icons.text_fields_rounded,
                             isSelected: _activeTab == AppearanceTab.typography,
                             onTap: () {
@@ -113,7 +118,7 @@ class _AppearanceSettingsSheetState
                             },
                           ),
                           _TabButton(
-                            label: 'Theme',
+                            label: context.l10n.settingsTheme,
                             icon: Icons.palette_rounded,
                             isSelected: _activeTab == AppearanceTab.theme,
                             onTap: () {
@@ -134,7 +139,7 @@ class _AppearanceSettingsSheetState
               // ── Body ────────────────────────────────────────────
               Expanded(
                 child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 220),
+                  duration: Motion.of(context, Motion.normal),
                   switchInCurve: Curves.easeOutCubic,
                   switchOutCurve: Curves.easeInCubic,
                   child: _activeTab == AppearanceTab.typography
@@ -204,38 +209,48 @@ class _TabButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOutCubic,
-          margin: const EdgeInsets.all(3),
-          decoration: BoxDecoration(
-            color: isSelected ? theme.primaryColor : Colors.transparent,
-            borderRadius: BorderRadius.circular(17),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                icon,
-                size: 13,
-                color: isSelected
-                    ? AppColors.lightTextPrimary
-                    : theme.colorScheme.onSurface.withValues(alpha: 0.55),
-              ),
-              const SizedBox(width: 5),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
+      child: Semantics(
+        button: true,
+        selected: isSelected,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onTap,
+          child: AnimatedContainer(
+            duration: Motion.of(context, Motion.normal),
+            curve: Curves.easeOutCubic,
+            margin: const EdgeInsets.all(3),
+            constraints: const BoxConstraints(minHeight: kMinTouchTarget - 6),
+            decoration: BoxDecoration(
+              color: isSelected ? theme.primaryColor : Colors.transparent,
+              borderRadius: BorderRadius.circular(Radii.pill),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  size: 13,
                   color: isSelected
                       ? AppColors.lightTextPrimary
                       : theme.colorScheme.onSurface.withValues(alpha: 0.55),
                 ),
-              ),
-            ],
+                const SizedBox(width: 5),
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: TypeScale.caption,
+                      fontWeight: FontWeight.w600,
+                      color: isSelected
+                          ? AppColors.lightTextPrimary
+                          : theme.colorScheme.onSurface.withValues(alpha: 0.55),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

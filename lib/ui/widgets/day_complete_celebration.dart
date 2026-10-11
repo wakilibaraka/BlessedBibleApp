@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:confetti/confetti.dart';
+import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
 
 class DayCompleteCelebration extends StatefulWidget {
   final int day;
@@ -74,6 +76,7 @@ class _DayCompleteCelebrationState extends State<DayCompleteCelebration>
 
   @override
   Widget build(BuildContext context) {
+    final reduceMotion = Motion.of(context, Motion.normal) == Duration.zero;
     return Material(
       color: Colors.black45,
       child: GestureDetector(
@@ -90,13 +93,15 @@ class _DayCompleteCelebrationState extends State<DayCompleteCelebration>
                 return FadeTransition(
                   opacity: _fadeAnimation,
                   child: ScaleTransition(
-                    scale: _scaleAnimation,
+                    scale: reduceMotion
+                        ? const AlwaysStoppedAnimation<double>(1.0)
+                        : _scaleAnimation,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 40, vertical: 32),
                       decoration: BoxDecoration(
                         color: Theme.of(context).colorScheme.surface,
-                        borderRadius: BorderRadius.circular(24),
+                        borderRadius: BorderRadius.circular(Radii.xxl),
                         boxShadow: [
                           BoxShadow(
                             color: Theme.of(context)
@@ -114,7 +119,8 @@ class _DayCompleteCelebrationState extends State<DayCompleteCelebration>
                               color: Theme.of(context).primaryColor, size: 64),
                           const SizedBox(height: 16),
                           Text(
-                            'Reading Plan\nDay ${widget.day} Complete!',
+                            context.l10n
+                                .plansDayCompleteCelebration(widget.day),
                             textAlign: TextAlign.center,
                             style: Theme.of(context)
                                 .textTheme
@@ -132,25 +138,26 @@ class _DayCompleteCelebrationState extends State<DayCompleteCelebration>
                 );
               },
             ),
-            Align(
-              alignment: Alignment.topCenter,
-              child: ConfettiWidget(
-                confettiController: _confettiController,
-                blastDirection: 3.14159 / 2, // straight down
-                maxBlastForce: 5,
-                minBlastForce: 2,
-                emissionFrequency: 0.05,
-                numberOfParticles: 50,
-                gravity: 0.2,
-                colors: const [
-                  Colors.green,
-                  Colors.blue,
-                  Colors.pink,
-                  Colors.orange,
-                  Colors.purple
-                ],
+            if (!reduceMotion)
+              Align(
+                alignment: Alignment.topCenter,
+                child: ConfettiWidget(
+                  confettiController: _confettiController,
+                  blastDirection: 3.14159 / 2, // straight down
+                  maxBlastForce: 5,
+                  minBlastForce: 2,
+                  emissionFrequency: 0.05,
+                  numberOfParticles: 50,
+                  gravity: 0.2,
+                  colors: const [
+                    Colors.green,
+                    Colors.blue,
+                    Colors.pink,
+                    Colors.orange,
+                    Colors.purple
+                  ],
+                ),
               ),
-            ),
           ],
         ),
       ),

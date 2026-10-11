@@ -1,5 +1,7 @@
 import 'dart:async';
+import '../../theme/design_tokens.dart';
 import 'package:flutter/material.dart';
+import '../../l10n/l10n.dart';
 import '../sheets/search_settings_sheet.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,9 +14,12 @@ import '../../state/bible_provider.dart';
 import '../../state/search_settings_provider.dart';
 import '../widgets/dictionary_entry_sheet.dart';
 import '../../state/most_read_provider.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import '../../state/typography_provider.dart';
 import '../widgets/textured_glass_container.dart';
+import '../widgets/item_context_sheet.dart' show confirmDestructive;
+import '../widgets/state_views.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -62,7 +67,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
 
-      _animationController.forward();
+      _animationController
+        ..duration = Motion.of(context, const Duration(milliseconds: 500))
+        ..forward();
       _focusTimer = Timer(const Duration(milliseconds: 150), () {
         if (mounted) _focusNode.requestFocus();
       });
@@ -190,9 +197,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24.0),
                       child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
+                        duration: Motion.of(
+                            context, const Duration(milliseconds: 300)),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(32),
+                          borderRadius: BorderRadius.circular(Radii.xxxl),
                           boxShadow: [
                             if (isGlassy)
                               BoxShadow(
@@ -208,7 +216,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                           ],
                         ),
                         child: TexturedGlassContainer(
-                          borderRadius: BorderRadius.circular(32),
+                          borderRadius: BorderRadius.circular(Radii.xxxl),
                           padding: EdgeInsets.zero,
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
@@ -261,8 +269,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                         },
                                         style: theme.textTheme.titleMedium,
                                         decoration: InputDecoration(
-                                          hintText:
-                                              'Search verses, commentary…',
+                                          hintText: context.l10n.searchHint,
                                           hintStyle: theme.textTheme.titleMedium
                                               ?.copyWith(
                                             color: theme.colorScheme.onSurface
@@ -273,15 +280,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                       ),
                                     ),
                                     if (_controller.text.isNotEmpty)
-                                      GestureDetector(
-                                        onTap: () {
+                                      IconButton(
+                                        tooltip:
+                                            context.l10n.storiesClearSearch,
+                                        onPressed: () {
                                           _controller.clear();
                                           ref
                                               .read(
                                                   searchStateProvider.notifier)
                                               .setQuery('');
                                         },
-                                        child: Icon(
+                                        icon: Icon(
                                           Icons.close_rounded,
                                           size: 20,
                                           color: theme.colorScheme.onSurface
@@ -299,10 +308,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                     .withValues(alpha: 0.08),
                               ),
 
-                              // Filter chips row
+                              // Filter chips row. Chips now have 48 dp hit
+                              // areas, so the vertical padding shrank to
+                              // keep the card the same height.
                               Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0, vertical: 10.0),
+                                    horizontal: 16.0, vertical: 2.0),
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
                                   child: Row(
@@ -310,7 +321,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                     children: [
                                       _buildFilterChip(
                                         label: searchState.filterBook ??
-                                            'All Books',
+                                            context.l10n.searchAllBooks,
                                         icon: Icons.menu_book_rounded,
                                         isActive:
                                             searchState.filterBook != null,
@@ -354,7 +365,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                       if (searchState.filterBook == null) ...[
                                         const SizedBox(width: 8),
                                         _buildFilterChip(
-                                          label: 'OT',
+                                          label: context.l10n.readOtShort,
                                           icon: Icons.history_edu_rounded,
                                           isActive: searchState.filterOt,
                                           onTap: () => ref
@@ -367,7 +378,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                       if (searchState.filterBook == null) ...[
                                         const SizedBox(width: 8),
                                         _buildFilterChip(
-                                          label: 'NT',
+                                          label: context.l10n.readNtShort,
                                           icon: Icons.menu_book_rounded,
                                           isActive: searchState.filterNt,
                                           onTap: () => ref
@@ -379,7 +390,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                       ],
                                       const SizedBox(width: 8),
                                       _buildFilterChip(
-                                        label: 'Commentary',
+                                        label:
+                                            context.l10n.readActionCommentary,
                                         icon: Icons.library_books_rounded,
                                         isActive: searchState.filterCommentary,
                                         onTap: () => ref
@@ -396,7 +408,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                           return const SizedBox.shrink();
                                         }
                                         return _buildFilterChip(
-                                          label: 'My Notes',
+                                          label:
+                                              context.l10n.searchFilterMyNotes,
                                           icon: Icons.sticky_note_2_outlined,
                                           isActive: searchState.filterNotes,
                                           onTap: () => ref
@@ -408,13 +421,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                       }),
                                       const SizedBox(width: 8),
                                       IconButton(
+                                        tooltip:
+                                            context.l10n.settingsSearchSettings,
                                         icon: Icon(Icons.settings_rounded,
                                             color: theme.colorScheme.onSurface
                                                 .withValues(alpha: 0.6)),
                                         iconSize: 20,
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8, vertical: 4),
-                                        constraints: const BoxConstraints(),
                                         onPressed: () {
                                           showModalBottomSheet<void>(
                                             context: context,
@@ -469,41 +481,53 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     required VoidCallback onTap,
     required ThemeData theme,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-        decoration: BoxDecoration(
-          color: isActive ? theme.primaryColor : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isActive
-                ? Colors.transparent
-                : theme.colorScheme.onSurface.withValues(alpha: 0.2),
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 15,
-              color: isActive
-                  ? theme.colorScheme.surface
-                  : theme.colorScheme.onSurface,
-            ),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: theme.textTheme.labelMedium?.copyWith(
-                fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-                color: isActive
-                    ? theme.colorScheme.surface
-                    : theme.colorScheme.onSurface,
+    return Semantics(
+      button: true,
+      selected: isActive,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        // 48 dp tall hit area around the slimmer chip.
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: kMinTouchTarget),
+          child: Center(
+            child: AnimatedContainer(
+              duration: Motion.of(context, const Duration(milliseconds: 200)),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+              decoration: BoxDecoration(
+                color: isActive ? theme.primaryColor : Colors.transparent,
+                borderRadius: BorderRadius.circular(Radii.xl),
+                border: Border.all(
+                  color: isActive
+                      ? Colors.transparent
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    icon,
+                    size: 15,
+                    color: isActive
+                        ? theme.colorScheme.surface
+                        : theme.colorScheme.onSurface,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    label,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      fontWeight:
+                          isActive ? FontWeight.bold : FontWeight.normal,
+                      color: isActive
+                          ? theme.colorScheme.surface
+                          : theme.colorScheme.onSurface,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -528,7 +552,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
             ),
             const SizedBox(height: 16),
             Text(
-              'Search the Bible, commentary\nand your notes',
+              context.l10n.searchEmptyPrompt,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.45),
@@ -550,75 +574,105 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'RECENT SEARCHES',
+                context.l10n.searchRecentSearches,
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.2,
                 ),
               ),
-              GestureDetector(
-                onTap: () =>
-                    ref.read(searchStateProvider.notifier).clearRecentQueries(),
-                child: Text(
-                  'CLEAR',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.primaryColor,
-                    fontWeight: FontWeight.bold,
+              Semantics(
+                button: true,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () async {
+                    final ok = await confirmDestructive(
+                      context,
+                      title: context.l10n.searchClearRecentTitle,
+                      message: context.l10n.searchClearRecentBody,
+                      confirmLabel: context.l10n.searchClearRecentConfirm,
+                    );
+                    if (!ok || !mounted) return;
+                    ref.read(searchStateProvider.notifier).clearRecentQueries();
+                  },
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                        minWidth: kMinTouchTarget, minHeight: kMinTouchTarget),
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      widthFactor: 1,
+                      child: Text(
+                        context.l10n.searchClear,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.primaryColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 4),
           Wrap(
             spacing: 8,
-            runSpacing: 8,
             children: state.recentQueries
-                .map((query) => GestureDetector(
+                .map((query) => Semantics(
+                    button: true,
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
                       onTap: () {
                         _controller.text = query;
                         ref.read(searchStateProvider.notifier).setQuery(query);
                       },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.surface,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: theme.colorScheme.onSurface
-                                .withValues(alpha: 0.1),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.history_rounded,
-                              size: 14,
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.5),
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              query,
-                              style: theme.textTheme.labelMedium?.copyWith(
+                      // 48 dp tall hit area; the chip stays 32 dp.
+                      child: ConstrainedBox(
+                        constraints:
+                            const BoxConstraints(minHeight: kMinTouchTarget),
+                        child: Center(
+                          widthFactor: 1,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 14, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surface,
+                              borderRadius: BorderRadius.circular(Radii.xl),
+                              border: Border.all(
                                 color: theme.colorScheme.onSurface
-                                    .withValues(alpha: 0.8),
+                                    .withValues(alpha: 0.1),
                               ),
                             ),
-                          ],
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.history_rounded,
+                                  size: 14,
+                                  color: theme.colorScheme.onSurface
+                                      .withValues(alpha: 0.5),
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  query,
+                                  style: theme.textTheme.labelMedium?.copyWith(
+                                    color: theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.8),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
-                    ))
+                    )))
                 .toList(),
           ),
           const SizedBox(height: 24),
         ],
         if (state.recentPlaces.isNotEmpty) ...[
           Text(
-            'RECENT PLACES',
+            context.l10n.searchRecentPlaces,
             style: theme.textTheme.labelSmall?.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
               fontWeight: FontWeight.bold,
@@ -631,7 +685,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
         ],
         if (showMostRead) ...[
           Text(
-            'MOST READ',
+            context.l10n.searchMostRead,
             style: theme.textTheme.labelSmall?.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
               fontWeight: FontWeight.bold,
@@ -651,33 +705,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
   // ── Search results ─────────────────────────────────────────────────────
   Widget _buildSearchResults(SearchState state, ThemeData theme) {
     if (state.isSearching && state.results.isEmpty) {
-      return Center(
-        child: CircularProgressIndicator(
-          color: theme.primaryColor,
-          strokeWidth: 2,
-        ),
-      );
+      return const LoadingView();
     }
 
     if (state.results.isEmpty && !state.isSearching) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.search_off_rounded,
-              size: 48,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'No results found',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-              ),
-            ),
-          ],
-        ),
+      return EmptyState(
+        icon: Icons.search_off_rounded,
+        title: context.l10n.searchNoResults,
       );
     }
 
@@ -708,8 +742,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
           padding: const EdgeInsets.only(bottom: 16.0, left: 4.0),
           child: Text(
             state.results.length >= 100
-                ? 'Showing top 100 results'
-                : '${state.results.length} results found',
+                ? context.l10n.searchTopResults
+                : context.l10n.searchResultsFound(state.results.length),
             style: theme.textTheme.labelMedium?.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
               fontStyle: FontStyle.italic,
@@ -718,38 +752,44 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
         ),
         if (dictionaryResults.isNotEmpty) ...[
           _buildSectionHeader(
-              'DICTIONARY (${dictionaryResults.length})', theme),
+              context.l10n.searchSectionDictionary(dictionaryResults.length),
+              theme),
           ...dictionaryResults
               .map((r) => _buildResultItem(r, theme, state.query)),
           const SizedBox(height: 12),
         ],
 
         if (pericopeResults.isNotEmpty) ...[
-          _buildSectionHeader('STORIES (${pericopeResults.length})', theme),
+          _buildSectionHeader(
+              context.l10n.searchSectionStories(pericopeResults.length), theme),
           ...pericopeResults
               .map((r) => _buildResultItem(r, theme, state.query)),
           const SizedBox(height: 12),
         ],
         if (referenceResults.isNotEmpty) ...[
-          _buildSectionHeader('JUMP TO (${referenceResults.length})', theme),
+          _buildSectionHeader(
+              context.l10n.searchSectionJumpTo(referenceResults.length), theme),
           ...referenceResults
               .map((r) => _buildResultItem(r, theme, state.query)),
           const SizedBox(height: 12),
         ],
         if (bibleResults.isNotEmpty) ...[
-          _buildSectionHeader('VERSES (${bibleResults.length})', theme),
+          _buildSectionHeader(
+              context.l10n.searchSectionVerses(bibleResults.length), theme),
           ...bibleResults.map((r) => _buildResultItem(r, theme, state.query)),
           const SizedBox(height: 12),
         ],
         if (commentaryResults.isNotEmpty) ...[
           _buildSectionHeader(
-              'COMMENTARY (${commentaryResults.length})', theme),
+              context.l10n.searchSectionCommentary(commentaryResults.length),
+              theme),
           ...commentaryResults
               .map((r) => _buildResultItem(r, theme, state.query)),
           const SizedBox(height: 12),
         ],
         if (noteResults.isNotEmpty) ...[
-          _buildSectionHeader('MY NOTES (${noteResults.length})', theme),
+          _buildSectionHeader(
+              context.l10n.searchSectionMyNotes(noteResults.length), theme),
           ...noteResults.map((r) => _buildResultItem(r, theme, state.query)),
           const SizedBox(height: 12),
         ],
@@ -790,51 +830,61 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
       icon = Icons.library_books_rounded;
     }
 
+    void copy() {
+      Clipboard.setData(ClipboardData(
+          text:
+              '${result.title}\n${searchResultSnippet(result, context.l10n).replaceAll('...', '')}'));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.searchCopied)),
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
-      child: GestureDetector(
-        onTap: () => _onResultTap(result),
-        onLongPress: () {
-          Clipboard.setData(ClipboardData(
-              text:
-                  '${result.title}\n${result.snippet.replaceAll('...', '')}'));
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Copied to clipboard')),
-          );
+      // Long-press copies; screen readers get the same as a custom action.
+      child: Semantics(
+        button: true,
+        customSemanticsActions: {
+          CustomSemanticsAction(label: context.l10n.commonCopy): copy,
         },
-        child: TexturedGlassContainer(
-          isScrollable: true,
-          borderRadius: BorderRadius.circular(20),
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(icon, size: 15, color: theme.primaryColor),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      result.subtitle,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.primaryColor,
-                        fontWeight: FontWeight.bold,
+        child: GestureDetector(
+          onTap: () => _onResultTap(result),
+          onLongPress: copy,
+          child: TexturedGlassContainer(
+            isScrollable: true,
+            borderRadius: BorderRadius.circular(Radii.xl),
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(icon, size: 15, color: theme.primaryColor),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        searchResultSubtitle(result, context.l10n),
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.primaryColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                result.title,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+                  ],
                 ),
-              ),
-              const SizedBox(height: 4),
-              _buildSnippet(result.snippet, query, theme),
-            ],
+                const SizedBox(height: 8),
+                Text(
+                  result.title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                _buildSnippet(
+                    searchResultSnippet(result, context.l10n), query, theme),
+              ],
+            ),
           ),
         ),
       ),
@@ -895,13 +945,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
       spans.add(TextSpan(text: text.substring(start), style: baseStyle));
     }
 
-    return RichText(
-      maxLines: 2,
-      overflow: TextOverflow.ellipsis,
-      text: TextSpan(
+    // Text.rich (not RichText) so the snippet follows the system text size.
+    return Text.rich(
+      TextSpan(
         style: baseStyle,
         children: spans,
       ),
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../l10n/l10n.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/pericopes_provider.dart';
@@ -12,6 +13,26 @@ import '../../data/models/home_data.dart';
 import '../widgets/textured_glass_container.dart';
 import '../widgets/shared_app_bar.dart';
 import '../sheets/book_chapter_selector_sheet.dart';
+import '../../theme/design_tokens.dart';
+
+/// Deletes [note] straight away and offers Undo, which puts it back.
+void deleteNoteWithUndo(
+    BuildContext context, WidgetRef ref, PersonalNote note) {
+  final notes = ref.read(notesProvider.notifier);
+  notes.remove(note.id);
+  final messenger = ScaffoldMessenger.of(context);
+  messenger.hideCurrentSnackBar();
+  messenger.showSnackBar(
+    SnackBar(
+      content: Text(context.l10n.notesDeleted),
+      behavior: SnackBarBehavior.floating,
+      action: SnackBarAction(
+        label: context.l10n.commonUndo,
+        onPressed: () => notes.add(note),
+      ),
+    ),
+  );
+}
 
 class NotesListScreen extends ConsumerWidget {
   const NotesListScreen({super.key});
@@ -26,7 +47,7 @@ class NotesListScreen extends ConsumerWidget {
       appBar: SharedAppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text('My Notes',
+        title: Text(context.l10n.notesMyNotes,
             style: theme.textTheme.titleMedium
                 ?.copyWith(fontWeight: FontWeight.bold)),
       ),
@@ -40,7 +61,7 @@ class NotesListScreen extends ConsumerWidget {
                       color: theme.primaryColor.withValues(alpha: 0.5)),
                   const SizedBox(height: 16),
                   Text(
-                    'No notes yet',
+                    context.l10n.notesEmptyTitle,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -48,7 +69,7 @@ class NotesListScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Tap the + button to add your first note.',
+                    context.l10n.notesEmptyBody,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
@@ -68,11 +89,10 @@ class NotesListScreen extends ConsumerWidget {
                     alignment: Alignment.centerRight,
                     padding: const EdgeInsets.only(right: 20),
                     color: Colors.red.withValues(alpha: 0.8),
+                    // White on the fixed red swipe background in every theme.
                     child: const Icon(Icons.delete, color: Colors.white),
                   ),
-                  onDismissed: (_) {
-                    ref.read(notesProvider.notifier).remove(note.id);
-                  },
+                  onDismissed: (_) => deleteNoteWithUndo(context, ref, note),
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: 12.0),
                     child: TexturedGlassContainer(
@@ -97,6 +117,18 @@ class NotesListScreen extends ConsumerWidget {
                                     color: theme.colorScheme.onSurface
                                         .withValues(alpha: 0.5),
                                   ),
+                                ),
+                                // Visible alternative to swipe-to-delete.
+                                IconButton(
+                                  tooltip: context.l10n.notesDeleteNote,
+                                  icon: Icon(
+                                    Icons.delete_outline_rounded,
+                                    size: 20,
+                                    color: theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.5),
+                                  ),
+                                  onPressed: () =>
+                                      deleteNoteWithUndo(context, ref, note),
                                 ),
                               ],
                             ),
@@ -129,9 +161,10 @@ class NotesListScreen extends ConsumerWidget {
               },
             ),
       floatingActionButton: FloatingActionButton(
+        tooltip: context.l10n.notesNewNote,
         onPressed: () => showAddNoteSheet(context, ref, theme),
         backgroundColor: theme.primaryColor,
-        child: const Icon(Icons.add, color: Colors.white),
+        child: Icon(Icons.add, color: context.palette.onAccent),
       ),
     );
   }
@@ -332,9 +365,9 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
                 _insertText(insertedText);
 
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: const Text('Verse inserted'),
+                    content: Text(context.l10n.notesVerseInserted),
                     action: SnackBarAction(
-                        label: 'Add Commentary',
+                        label: context.l10n.notesAddCommentary,
                         onPressed: () {
                           final commentaryList =
                               ref.read(commentaryProvider).value ?? [];
@@ -375,21 +408,7 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
       _showSlashMenu = false;
     });
     final now = DateTime.now();
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec'
-    ];
-    _insertText('${months[now.month - 1]} ${now.day}, ${now.year} ');
+    _insertText('${MaterialLocalizations.of(context).formatMediumDate(now)} ');
   }
 
   void _insertChapterTitle() {
@@ -419,14 +438,15 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
         }
       }
     }
-    _insertText('Chapter Title ');
+    _insertText('${context.l10n.notesChapterTitlePlaceholder} ');
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = widget.theme;
     return TexturedGlassContainer(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+      borderRadius:
+          const BorderRadius.vertical(top: Radius.circular(Radii.xxxl)),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom + 24,
         left: 24,
@@ -440,10 +460,10 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
           children: [
             Text(
               widget.editingNote != null
-                  ? 'Edit Note'
+                  ? context.l10n.notesEditNote
                   : (widget.initialReference != null
-                      ? 'New Note on ${widget.initialReference}'
-                      : 'New Note'),
+                      ? context.l10n.notesNewNoteOn(widget.initialReference!)
+                      : context.l10n.notesNewNote),
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: theme.primaryColor,
@@ -454,24 +474,25 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
               controller: titleController,
               style: TextStyle(color: theme.colorScheme.onSurface),
               decoration: InputDecoration(
-                hintText: 'Note Title',
+                hintText: context.l10n.notesTitleHint,
                 hintStyle: TextStyle(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
                 filled: true,
+                // Glass field tint: darkens on dark themes, lightens on light.
                 fillColor: theme.brightness == Brightness.dark
                     ? Colors.black.withValues(alpha: 0.25)
                     : Colors.white.withValues(alpha: 0.6),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(Radii.sm),
                   borderSide: BorderSide.none,
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(Radii.sm),
                   borderSide: BorderSide(
                       color: theme.primaryColor.withValues(alpha: 0.1)),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(Radii.sm),
                   borderSide: BorderSide(
                       color: theme.primaryColor.withValues(alpha: 0.4)),
                 ),
@@ -491,25 +512,26 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
                 maxLines: null,
                 keyboardType: TextInputType.multiline,
                 decoration: InputDecoration(
-                  hintText: 'Start typing... (type / for commands)',
+                  hintText: context.l10n.notesContentHint,
                   hintStyle: TextStyle(
                       color:
                           theme.colorScheme.onSurface.withValues(alpha: 0.5)),
                   filled: true,
+                  // Glass field tint: darkens on dark themes, lightens on light.
                   fillColor: theme.brightness == Brightness.dark
                       ? Colors.black.withValues(alpha: 0.25)
                       : Colors.white.withValues(alpha: 0.6),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(Radii.sm),
                     borderSide: BorderSide.none,
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(Radii.sm),
                     borderSide: BorderSide(
                         color: theme.primaryColor.withValues(alpha: 0.1)),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(Radii.sm),
                     borderSide: BorderSide(
                         color: theme.primaryColor.withValues(alpha: 0.4)),
                   ),
@@ -523,10 +545,10 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
                 margin: const EdgeInsets.only(top: 8),
                 decoration: BoxDecoration(
                   color: theme.colorScheme.surface,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(Radii.md),
                   boxShadow: [
                     BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
+                        color: context.palette.shadow,
                         blurRadius: 10,
                         offset: const Offset(0, 4)),
                   ],
@@ -536,17 +558,17 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
                   children: [
                     ListTile(
                       leading: const Icon(Icons.book),
-                      title: const Text('Insert verse'),
+                      title: Text(context.l10n.notesInsertVerse),
                       onTap: _insertVerse,
                     ),
                     ListTile(
                       leading: const Icon(Icons.calendar_today),
-                      title: const Text('Insert date'),
+                      title: Text(context.l10n.notesInsertDate),
                       onTap: _insertDate,
                     ),
                     ListTile(
                       leading: const Icon(Icons.title),
-                      title: const Text('Insert chapter title'),
+                      title: Text(context.l10n.notesInsertChapterTitle),
                       onTap: _insertChapterTitle,
                     ),
                   ],
@@ -556,9 +578,9 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
             FilledButton(
               style: FilledButton.styleFrom(
                 backgroundColor: theme.primaryColor,
-                foregroundColor: Colors.white,
+                foregroundColor: context.palette.onAccent,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(Radii.xxl),
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
@@ -604,11 +626,13 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
                 Navigator.pop(context);
 
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Note saved!')),
+                  SnackBar(content: Text(context.l10n.notesSaved)),
                 );
               },
               child: Text(
-                  widget.editingNote != null ? 'Save Changes' : 'Save Note',
+                  widget.editingNote != null
+                      ? context.l10n.notesSaveChanges
+                      : context.l10n.notesSaveNote,
                   style: const TextStyle(fontWeight: FontWeight.bold)),
             ),
             if (widget.editingId != null) ...[
@@ -619,13 +643,31 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 onPressed: () {
-                  ref.read(notesProvider.notifier).remove(widget.editingId!);
+                  final messenger = ScaffoldMessenger.of(context);
+                  final undoLabel = context.l10n.commonUndo;
+                  final deletedLabel = context.l10n.notesDeleted;
+                  final notes = ref.read(notesProvider.notifier);
+                  final id = widget.editingId!;
+                  final removed = ref
+                      .read(notesProvider)
+                      .where((n) => n.id == id)
+                      .firstOrNull;
+                  notes.remove(id);
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Note deleted')),
+                  messenger.hideCurrentSnackBar();
+                  messenger.showSnackBar(
+                    SnackBar(
+                      content: Text(deletedLabel),
+                      action: removed == null
+                          ? null
+                          : SnackBarAction(
+                              label: undoLabel,
+                              onPressed: () => notes.add(removed),
+                            ),
+                    ),
                   );
                 },
-                child: const Text('Delete Note',
+                child: Text(context.l10n.notesDeleteNote,
                     style: TextStyle(fontWeight: FontWeight.bold)),
               ),
             ],

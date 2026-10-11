@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home-screen widget text. Generated alongside tool/l10n/parts/system.json;
+     the app also pushes these strings in its own interface language. -->
+<resources>
+    <string name="widget_votd_title">VERSE OF THE DAY</string>
+    <string name="widget_votd_loading">Loading verse…</string>
+    <string name="widget_wotd_title">WORD OF THE DAY</string>
+    <string name="widget_streak_zero">0 days</string>
+    <string name="widget_streak_read_today">Read today!</string>
+    <string name="widget_streak_active">Streak active! 🔥</string>
+    <string name="widget_streak_inactive">Read today to keep your streak</string>
+    <string name="widget_wotd_fallback_word">Grace (Charis)</string>
+    <string name="widget_wotd_fallback_snippet">The unmerited favor and divine love of God bestowed upon humanity.</string>
+    <plurals name="widget_streak_days">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
+</resources>

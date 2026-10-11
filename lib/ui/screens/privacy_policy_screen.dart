@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:url_launcher/url_launcher.dart';
+import '../../l10n/l10n.dart';
+import '../widgets/state_views.dart';
 
 /// Privacy policy parsed from assets/legal/privacy_policy.json, the same
 /// source that generates the hosted docs/privacy_policy.html.
@@ -55,7 +57,7 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Privacy Policy'),
+        title: Text(context.l10n.privacyTitle),
         centerTitle: true,
       ),
       body: FutureBuilder<PrivacyPolicy>(
@@ -63,11 +65,12 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
         builder: (context, snapshot) {
           final policy = snapshot.data;
           if (policy == null) {
-            return Center(
-              child: snapshot.hasError
-                  ? const Text('Could not load the privacy policy.')
-                  : const CircularProgressIndicator(),
-            );
+            return snapshot.hasError
+                ? ErrorState(
+                    error: snapshot.error,
+                    message: context.l10n.privacyLoadError,
+                  )
+                : const LoadingView();
           }
           return ListView(
             padding: const EdgeInsets.all(24.0),
@@ -79,10 +82,17 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Effective Date: ${policy.effectiveDate}',
+                context.l10n.privacyEffectiveDate(policy.effectiveDate),
                 style: theme.textTheme.bodySmall
                     ?.copyWith(fontStyle: FontStyle.italic),
               ),
+              if (Localizations.localeOf(context).languageCode != 'en') ...[
+                const SizedBox(height: 8),
+                Text(
+                  context.l10n.privacyEnglishOnly,
+                  style: theme.textTheme.bodySmall,
+                ),
+              ],
               const SizedBox(height: 24),
               for (final (heading, paragraphs) in policy.sections)
                 _buildSection(theme, heading, paragraphs.join('\n\n')),
@@ -90,7 +100,7 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                 onPressed: () => launchUrl(Uri.parse(policy.url),
                     mode: LaunchMode.externalApplication),
                 icon: const Icon(Icons.open_in_new_rounded, size: 18),
-                label: const Text('View online'),
+                label: Text(context.l10n.privacyViewOnline),
               ),
               const SizedBox(height: 48),
             ],

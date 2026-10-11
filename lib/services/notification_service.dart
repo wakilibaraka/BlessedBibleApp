@@ -2,7 +2,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as tz;
+import '../l10n/l10n.dart';
+import '../state/locale_provider.dart';
 import '../utils/sunset_calculator.dart';
 
 final notificationServiceProvider = Provider<NotificationService>((ref) {
@@ -45,6 +48,18 @@ class NotificationService {
     _initialized = true;
   }
 
+  /// Strings in the app's saved interface language. Notifications are
+  /// scheduled ahead of time, so callers re-schedule when it changes
+  /// (see [AppLocaleNotifier.setLanguage]).
+  Future<AppLocalizations> _strings() async {
+    String? code;
+    try {
+      code = (await SharedPreferences.getInstance())
+          .getString(AppLocaleNotifier.key);
+    } catch (_) {}
+    return l10nFor(code);
+  }
+
   Future<void> requestPermissions() async {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       await _flutterLocalNotificationsPlugin
@@ -65,8 +80,10 @@ class NotificationService {
     }
   }
 
-  Future<void> scheduleDailyReminder(int hour, int minute) async {
-    await requestPermissions();
+  Future<void> scheduleDailyReminder(int hour, int minute,
+      {bool askPermission = true}) async {
+    if (askPermission) await requestPermissions();
+    final l10n = await _strings();
 
     final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
     tz.TZDateTime scheduledDate =
@@ -78,14 +95,14 @@ class NotificationService {
 
     await _flutterLocalNotificationsPlugin.zonedSchedule(
       id: 0,
-      title: 'Time to Read',
-      body: 'Take a moment to read and reflect today.',
+      title: l10n.notifDailyTitle,
+      body: l10n.notifDailyBody,
       scheduledDate: scheduledDate,
-      notificationDetails: const NotificationDetails(
+      notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           'daily_reminder_channel',
-          'Daily Reminders',
-          channelDescription: 'Reminders for daily reading',
+          l10n.notifDailyChannel,
+          channelDescription: l10n.notifDailyChannelDesc,
           importance: Importance.high,
           priority: Priority.high,
         ),
@@ -95,8 +112,10 @@ class NotificationService {
     );
   }
 
-  Future<void> schedulePrayerReminder(int hour, int minute) async {
-    await requestPermissions();
+  Future<void> schedulePrayerReminder(int hour, int minute,
+      {bool askPermission = true}) async {
+    if (askPermission) await requestPermissions();
+    final l10n = await _strings();
 
     final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
     tz.TZDateTime scheduledDate =
@@ -108,14 +127,14 @@ class NotificationService {
 
     await _flutterLocalNotificationsPlugin.zonedSchedule(
       id: 2,
-      title: "Time for Prayer",
-      body: "Pause for a moment of reflection and prayer.",
+      title: l10n.notifPrayerTitle,
+      body: l10n.notifPrayerBody,
       scheduledDate: scheduledDate,
-      notificationDetails: const NotificationDetails(
+      notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           "prayer_reminder_channel",
-          "Prayer Reminders",
-          channelDescription: "Daily prayer reminders",
+          l10n.notifPrayerChannel,
+          channelDescription: l10n.notifPrayerChannelDesc,
           importance: Importance.high,
           priority: Priority.high,
         ),
@@ -125,8 +144,10 @@ class NotificationService {
     );
   }
 
-  Future<void> scheduleWeeklyReminder(int weekday, int hour, int minute) async {
-    await requestPermissions();
+  Future<void> scheduleWeeklyReminder(int weekday, int hour, int minute,
+      {bool askPermission = true}) async {
+    if (askPermission) await requestPermissions();
+    final l10n = await _strings();
 
     final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
     tz.TZDateTime scheduledDate =
@@ -144,14 +165,14 @@ class NotificationService {
 
     await _flutterLocalNotificationsPlugin.zonedSchedule(
       id: 1,
-      title: 'Weekly Study Time',
-      body: 'It\'s your scheduled time for study and reflection.',
+      title: l10n.notifWeeklyTitle,
+      body: l10n.notifWeeklyBody,
       scheduledDate: scheduledDate,
-      notificationDetails: const NotificationDetails(
+      notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           'weekly_reminder_channel',
-          'Weekly Reminders',
-          channelDescription: 'Custom weekly study reminders',
+          l10n.notifWeeklyChannel,
+          channelDescription: l10n.notifWeeklyChannelDesc,
           importance: Importance.high,
           priority: Priority.high,
         ),
@@ -161,8 +182,10 @@ class NotificationService {
     );
   }
 
-  Future<void> scheduleSabbathReminder(double lat, double lng) async {
-    await requestPermissions();
+  Future<void> scheduleSabbathReminder(double lat, double lng,
+      {bool askPermission = true}) async {
+    if (askPermission) await requestPermissions();
+    final l10n = await _strings();
 
     final now = DateTime.now();
     // Start checking from this Friday (or today if it's Friday)
@@ -192,14 +215,14 @@ class NotificationService {
 
       await _flutterLocalNotificationsPlugin.zonedSchedule(
         id: 10 + i,
-        title: 'The Sabbath is Approaching',
-        body: 'Welcome the day of rest.',
+        title: l10n.notifSabbathTitle,
+        body: l10n.notifSabbathBody,
         scheduledDate: tDate,
-        notificationDetails: const NotificationDetails(
+        notificationDetails: NotificationDetails(
           android: AndroidNotificationDetails(
             'sabbath_reminder_channel',
-            'Sabbath Reminders',
-            channelDescription: 'Weekly sunset reminders for Sabbath',
+            l10n.notifSabbathChannel,
+            channelDescription: l10n.notifSabbathChannelDesc,
             importance: Importance.high,
             priority: Priority.high,
           ),
@@ -242,7 +265,7 @@ class NotificationService {
   /// comparing them directly skipped the wrong day.
   Future<void> syncReadingPlanReminder(
       bool enabled, int hour, int minute, int? restDay,
-      {Set<int>? restDays, String? planId}) async {
+      {Set<int>? restDays, String? planId, bool askPermission = true}) async {
     // One-time cleanup of the legacy shared range.
     for (int i = 100; i <= 107; i++) {
       await _flutterLocalNotificationsPlugin.cancel(id: i);
@@ -255,7 +278,15 @@ class NotificationService {
     }
 
     if (!enabled) return;
-    await requestPermissions();
+    if (askPermission) await requestPermissions();
+    final l10n = await _strings();
+    final details = NotificationDetails(
+      android: AndroidNotificationDetails(
+          'reading_plan_channel', l10n.notifPlanChannel,
+          channelDescription: l10n.notifPlanChannelDesc,
+          importance: Importance.high,
+          priority: Priority.high),
+    );
 
     final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
 
@@ -280,14 +311,10 @@ class NotificationService {
 
       await _flutterLocalNotificationsPlugin.zonedSchedule(
         id: base,
-        title: 'Time to Read',
-        body: 'Take a moment to read your daily passage.',
+        title: l10n.notifDailyTitle,
+        body: l10n.notifPlanBody,
         scheduledDate: scheduledDate,
-        notificationDetails: const NotificationDetails(
-          android: AndroidNotificationDetails(
-              'reading_plan_channel', 'Reading Plan',
-              importance: Importance.high, priority: Priority.high),
-        ),
+        notificationDetails: details,
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         matchDateTimeComponents: DateTimeComponents.time,
       );
@@ -306,14 +333,10 @@ class NotificationService {
 
         await _flutterLocalNotificationsPlugin.zonedSchedule(
           id: base + i,
-          title: 'Time to Read',
-          body: 'Take a moment to read your daily passage.',
+          title: l10n.notifDailyTitle,
+          body: l10n.notifPlanBody,
           scheduledDate: scheduledDate,
-          notificationDetails: const NotificationDetails(
-            android: AndroidNotificationDetails(
-                'reading_plan_channel', 'Reading Plan',
-                importance: Importance.high, priority: Priority.high),
-          ),
+          notificationDetails: details,
           androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
           matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
         );

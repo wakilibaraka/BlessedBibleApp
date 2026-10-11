@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+
+import '../../l10n/l10n.dart';
 
 import '../../theme/app_colors.dart';
 import '../widgets/shared_top_header.dart';
@@ -26,6 +29,7 @@ import '../../state/bible_provider.dart';
 import '../../state/study_provider.dart';
 import '../../state/commentary_provider.dart';
 import 'votd_archive_screen.dart';
+import '../../theme/design_tokens.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TODAY SCREEN — static scaffold (Stage 1: design / no data wiring)
@@ -60,40 +64,19 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
     final theme = Theme.of(context);
     final mq = MediaQuery.of(context);
     final now = DateTime.now();
-    final weekdays = [
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday'
-    ];
-    final months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December'
-    ];
-    final dayLabel =
-        '${weekdays[now.weekday - 1]} · ${months[now.month - 1]} ${now.day}';
+    final l10n = context.l10n;
+    final locale = Localizations.localeOf(context).toString();
+    final dayLabel = '${DateFormat.EEEE(locale).format(now)} · '
+        '${DateFormat.MMMMd(locale).format(now)}';
 
     final streak = ref.watch(streakProvider);
     final showNudge = !streak.readToday && streak.count > 0;
 
     final greetings = [
-      'Good morning',
-      'Good afternoon',
-      'Good evening',
-      'Good night'
+      l10n.todayGoodMorning,
+      l10n.todayGoodAfternoon,
+      l10n.todayGoodEvening,
+      l10n.todayGoodNight,
     ];
     final hour = now.hour;
     final greeting = hour < 12
@@ -145,52 +128,53 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                             // ── Shared top header ──────────────────────────────────
                             SharedTopHeader(
                               leading: IconButton(
+                                tooltip: l10n.commonBack,
                                 icon: const Icon(
                                     Icons.arrow_back_ios_new_rounded),
                                 color: theme.colorScheme.onSurface,
                                 padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(
-                                    minWidth: 44, minHeight: 44),
                                 onPressed: () => Navigator.of(context).pop(),
                               ),
-                              trailing: GestureDetector(
-                                behavior: HitTestBehavior.opaque,
-                                onTap: () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(showNudge
-                                          ? 'Read today to save your streak!'
-                                          : 'Notifications coming soon!'),
-                                      behavior: SnackBarBehavior.floating,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12)),
+                              trailing: Semantics(
+                                button: true,
+                                label: l10n.a11yNotifications,
+                                excludeSemantics: true,
+                                child: GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: () {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(showNudge
+                                            ? l10n.todayStreakNudge
+                                            : l10n.todayNotificationsSoon),
+                                        behavior: SnackBarBehavior.floating,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                                Radii.md)),
+                                      ),
+                                    );
+                                  },
+                                  // Center fills the 48 dp slot, so the
+                                  // whole slot is tappable.
+                                  child: Center(
+                                    child: Stack(
+                                      alignment: Alignment.topRight,
+                                      children: [
+                                        Icon(Icons.notifications_none_rounded,
+                                            size: 26,
+                                            color: theme.colorScheme.onSurface),
+                                        if (showNudge)
+                                          Container(
+                                            margin: const EdgeInsets.only(
+                                                top: 2, right: 2),
+                                            width: 8,
+                                            height: 8,
+                                            decoration: const BoxDecoration(
+                                                color: Colors.red,
+                                                shape: BoxShape.circle),
+                                          ),
+                                      ],
                                     ),
-                                  );
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      right: 8.0,
-                                      top: 8.0,
-                                      bottom: 8.0,
-                                      left: 8.0),
-                                  child: Stack(
-                                    alignment: Alignment.topRight,
-                                    children: [
-                                      Icon(Icons.notifications_none_rounded,
-                                          size: 26,
-                                          color: theme.colorScheme.onSurface),
-                                      if (showNudge)
-                                        Container(
-                                          margin: const EdgeInsets.only(
-                                              top: 2, right: 2),
-                                          width: 8,
-                                          height: 8,
-                                          decoration: const BoxDecoration(
-                                              color: Colors.red,
-                                              shape: BoxShape.circle),
-                                        ),
-                                    ],
                                   ),
                                 ),
                               ),
@@ -216,7 +200,8 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                             // ═══════════════════════════════════════════════════════
                             // 1B. CONTINUE READING
                             // ═══════════════════════════════════════════════════════
-                            _SectionLabel(label: 'RESUME', theme: theme),
+                            _SectionLabel(
+                                label: l10n.todaySectionResume, theme: theme),
                             const SizedBox(height: 8),
                             ContinueReadingCard(theme: theme),
 
@@ -226,7 +211,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                             // 2. READING STREAK
                             // ═══════════════════════════════════════════════════════
                             _SectionLabel(
-                                label: 'READING STREAK', theme: theme),
+                                label: l10n.todaySectionStreak, theme: theme),
                             const SizedBox(height: 8),
                             _StreakProgressCard(theme: theme),
 
@@ -242,7 +227,9 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                             // ═══════════════════════════════════════════════════════
                             // 4. LATEST NOTE / HIGHLIGHT
                             // ═══════════════════════════════════════════════════════
-                            _SectionLabel(label: 'LATEST NOTE', theme: theme),
+                            _SectionLabel(
+                                label: l10n.todaySectionLatestNote,
+                                theme: theme),
                             const SizedBox(height: 8),
                             _LatestNoteCard(theme: theme),
 
@@ -251,7 +238,9 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                             // ═══════════════════════════════════════════════════════
                             // 5. QUICK ACTIONS
                             // ═══════════════════════════════════════════════════════
-                            _SectionLabel(label: 'QUICK ACTIONS', theme: theme),
+                            _SectionLabel(
+                                label: l10n.todaySectionQuickActions,
+                                theme: theme),
                             const SizedBox(height: 8),
                             _QuickActionsRow(theme: theme),
 
@@ -261,7 +250,8 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                             // 6. DAILY REMINDERS
                             // ═══════════════════════════════════════════════════════
                             _SectionLabel(
-                                label: 'DAILY REMINDERS', theme: theme),
+                                label: l10n.todaySectionReminders,
+                                theme: theme),
                             const SizedBox(height: 8),
                             ReminderSettingsCard(theme: theme),
 
@@ -319,7 +309,7 @@ class _GreetingHeader extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(Radii.xxl),
       ),
       padding: const EdgeInsets.all(20),
       child: Row(
@@ -353,7 +343,7 @@ class _GreetingHeader extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Your daily moment of peace.',
+                  context.l10n.todayTagline,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
                   ),
@@ -378,9 +368,10 @@ class _LatestNoteCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final notes = ref.watch(notesProvider);
     final hasNote = notes.isNotEmpty;
-    final noteTitle = hasNote ? notes.first.title : 'No notes yet';
+    final noteTitle =
+        hasNote ? notes.first.title : context.l10n.todayNoNotesYet;
     final notePreview =
-        hasNote ? notes.first.content : 'Write your first note to see it here.';
+        hasNote ? notes.first.content : context.l10n.todayWriteFirstNote;
     final noteDate = hasNote ? notes.first.date : '';
 
     return GlassContainer(
@@ -433,7 +424,7 @@ class _LatestNoteCard extends ConsumerWidget {
                 );
               },
               icon: const Icon(Icons.arrow_forward_rounded, size: 14),
-              label: const Text('View all notes'),
+              label: Text(context.l10n.todayViewAllNotes),
               style: TextButton.styleFrom(
                 foregroundColor: AppColors.goldAccent,
                 textStyle: theme.textTheme.labelSmall
@@ -474,7 +465,7 @@ class _StreakProgressCard extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(Radii.xxl),
       ),
       padding: const EdgeInsets.all(20),
       child: Row(
@@ -495,7 +486,7 @@ class _StreakProgressCard extends ConsumerWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                streakDays == 1 ? '1 day streak' : '$streakDays days streak',
+                context.l10n.todayStreakDays(streakDays),
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.primary,
                   fontWeight: FontWeight.w700,
@@ -519,7 +510,7 @@ class _StreakProgressCard extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Day $dayOfYear of $daysInYear',
+                  context.l10n.plansDayOfTotal(dayOfYear, daysInYear),
                   style: theme.textTheme.titleSmall?.copyWith(
                     color: theme.colorScheme.onSurface,
                     fontWeight: FontWeight.w700,
@@ -527,7 +518,7 @@ class _StreakProgressCard extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(Radii.xs),
                   child: LinearProgressIndicator(
                     value: progress,
                     minHeight: 7,
@@ -539,7 +530,7 @@ class _StreakProgressCard extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '$daysRemaining days of year remaining.',
+                  context.l10n.todayDaysRemaining(daysRemaining),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.50),
                   ),
@@ -565,7 +556,7 @@ class _QuickActionsRow extends ConsumerWidget {
     final actions = [
       (
         icon: Icons.menu_book_rounded,
-        label: 'Read',
+        label: context.l10n.todayActionRead,
         color: theme.colorScheme.primary,
         onTap: () {
           Navigator.of(context).pop();
@@ -574,7 +565,7 @@ class _QuickActionsRow extends ConsumerWidget {
       ),
       (
         icon: Icons.casino_rounded,
-        label: 'Surprise Me',
+        label: context.l10n.todayActionSurprise,
         color: theme.colorScheme.primary,
         onTap: () {
           final availableVerses =
@@ -625,7 +616,7 @@ class _QuickActionsRow extends ConsumerWidget {
       ),
       (
         icon: Icons.calendar_today_rounded,
-        label: 'Reading Plan',
+        label: context.l10n.todayActionReadingPlan,
         color: theme.colorScheme.primary,
         onTap: () {
           Navigator.of(context).push(
@@ -636,7 +627,7 @@ class _QuickActionsRow extends ConsumerWidget {
       ),
       (
         icon: Icons.self_improvement_rounded,
-        label: 'Your Space',
+        label: context.l10n.todayActionYourSpace,
         color: theme.colorScheme.primary,
         onTap: () {
           Navigator.of(context).push(
@@ -650,19 +641,22 @@ class _QuickActionsRow extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(Radii.xxl),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: actions
             .map(
-              (a) => _QuickActionButton(
-                icon: a.icon,
-                label: a.label,
-                color: a.color,
-                theme: theme,
-                onTap: a.onTap,
+              // Expanded so long labels at large text wrap, not overflow.
+              (a) => Expanded(
+                child: _QuickActionButton(
+                  icon: a.icon,
+                  label: a.label,
+                  color: a.color,
+                  theme: theme,
+                  onTap: a.onTap,
+                ),
               ),
             )
             .toList(),
@@ -688,30 +682,35 @@ class _QuickActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: color.withValues(alpha: 0.13),
+    return Semantics(
+      button: true,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: color.withValues(alpha: 0.13),
+              ),
+              child: Icon(icon, color: color, size: 24),
             ),
-            child: Icon(icon, color: color, size: 24),
-          ),
-          const SizedBox(height: 7),
-          Text(
-            label,
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.colorScheme.onSurface,
-              fontWeight: FontWeight.w600,
-              fontSize: 11,
+            const SizedBox(height: 7),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSurface,
+                fontWeight: FontWeight.w600,
+                fontSize: TypeScale.caption,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -726,12 +725,12 @@ class _VotdArchiveBanner extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(Radii.xxl),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(Radii.xxl),
           onTap: () {
             Navigator.of(context).push(
               CupertinoPageRoute<void>(
@@ -754,13 +753,13 @@ class _VotdArchiveBanner extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Verse of the Day Archive',
+                            context.l10n.todayVotdArchive,
                             style: theme.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           Text(
-                            'Catch up on verses from days you missed.',
+                            context.l10n.todayVotdArchiveBody,
                             style: theme.textTheme.bodySmall?.copyWith(
                                 color: theme.colorScheme.onSurface
                                     .withValues(alpha: 0.6)),
@@ -777,7 +776,7 @@ class _VotdArchiveBanner extends StatelessWidget {
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(Radii.md),
                   ),
                   child: Row(
                     children: [
@@ -785,10 +784,12 @@ class _VotdArchiveBanner extends StatelessWidget {
                           color: theme.primaryColor.withValues(alpha: 0.7),
                           size: 16),
                       const SizedBox(width: 8),
-                      Text('Explore your past daily verses',
-                          style: theme.textTheme.labelSmall?.copyWith(
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.7))),
+                      Flexible(
+                        child: Text(context.l10n.todayVotdArchiveExplore,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                                color: theme.colorScheme.onSurface
+                                    .withValues(alpha: 0.7))),
+                      ),
                     ],
                   ),
                 ),

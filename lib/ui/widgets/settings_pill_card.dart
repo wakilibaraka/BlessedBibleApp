@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../theme/design_tokens.dart';
 import 'textured_glass_container.dart';
 
 class SettingsPillCard extends StatelessWidget {
@@ -14,7 +15,7 @@ class SettingsPillCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 24.0),
       child: TexturedGlassContainer(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(Radii.xxl),
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Material(
           color: Colors.transparent,

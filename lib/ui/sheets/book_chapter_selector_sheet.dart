@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../theme/design_tokens.dart';
+import '../../l10n/l10n.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/bible_model.dart';
 import '../../state/pericopes_provider.dart';
@@ -204,7 +206,8 @@ class _BookChapterSelectorSheetState
         expand: false,
         builder: (context, scrollController) {
           return TexturedGlassContainer(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+            borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(Radii.xxxl)),
             padding: EdgeInsets.zero,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -218,7 +221,7 @@ class _BookChapterSelectorSheetState
                       decoration: BoxDecoration(
                         color:
                             theme.colorScheme.onSurface.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(2),
+                        borderRadius: BorderRadius.circular(Radii.xs),
                       ),
                     ),
                   ),
@@ -242,7 +245,7 @@ class _BookChapterSelectorSheetState
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(Radii.xxxl),
       ),
       child: Row(
         children: [
@@ -251,16 +254,20 @@ class _BookChapterSelectorSheetState
               final isOld = ref
                   .watch(_sheetStateProvider.select((s) => s.isOldTestament));
               final mode = ref.watch(_sheetStateProvider.select((s) => s.mode));
-              return _buildBreadcrumbSegment('Testament', isOld ? 'OT' : 'NT',
-                  SelectionMode.testament, mode, theme);
+              return _buildBreadcrumbSegment(
+                  context.l10n.readTestament,
+                  isOld ? context.l10n.readOtShort : context.l10n.readNtShort,
+                  SelectionMode.testament,
+                  mode,
+                  theme);
             }),
           Consumer(builder: (context, ref, _) {
             final bookName = ref
                 .watch(_sheetStateProvider.select((s) => s.book?.name ?? ''));
             final mode = ref.watch(_sheetStateProvider.select((s) => s.mode));
             return _buildBreadcrumbSegment(
-                'Book',
-                bookName.isEmpty ? 'Select Book' : bookName,
+                context.l10n.readBook,
+                bookName.isEmpty ? context.l10n.readSelectBook : bookName,
                 SelectionMode.book,
                 mode,
                 theme);
@@ -269,8 +276,8 @@ class _BookChapterSelectorSheetState
             final chapter =
                 ref.watch(_sheetStateProvider.select((s) => s.chapter));
             final mode = ref.watch(_sheetStateProvider.select((s) => s.mode));
-            return _buildBreadcrumbSegment(
-                'Chapter', '$chapter', SelectionMode.chapter, mode, theme);
+            return _buildBreadcrumbSegment(context.l10n.readChapter, '$chapter',
+                SelectionMode.chapter, mode, theme);
           }),
           if (settings.depth != NavigationDepth.twoPart)
             Consumer(builder: (context, ref, _) {
@@ -278,7 +285,7 @@ class _BookChapterSelectorSheetState
                   ref.watch(_sheetStateProvider.select((s) => s.verse));
               final mode = ref.watch(_sheetStateProvider.select((s) => s.mode));
               return _buildBreadcrumbSegment(
-                  'Verse',
+                  context.l10n.readVerse,
                   verse != null ? '$verse' : '1',
                   SelectionMode.verse,
                   mode,
@@ -293,51 +300,56 @@ class _BookChapterSelectorSheetState
       SelectionMode targetMode, SelectionMode currentMode, ThemeData theme) {
     final isSelected = currentMode == targetMode;
     return Expanded(
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () => ref.read(_sheetStateProvider.notifier).setMode(targetMode),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          decoration: BoxDecoration(
-            color: isSelected ? theme.primaryColor : Colors.transparent,
-            borderRadius: BorderRadius.circular(30),
-            boxShadow: isSelected
-                ? [
-                    BoxShadow(
-                        color: theme.primaryColor.withValues(alpha: 0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2))
-                  ]
-                : [],
-          ),
-          child: Column(
-            children: [
-              Text(
-                label.toUpperCase(),
-                style: theme.textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1,
-                  fontFamily: theme.textTheme.bodyMedium?.fontFamily,
-                  color: isSelected
-                      ? Colors.white.withValues(alpha: 0.8)
-                      : theme.colorScheme.onSurface.withValues(alpha: 0.5),
+      child: Semantics(
+        button: true,
+        selected: isSelected,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () =>
+              ref.read(_sheetStateProvider.notifier).setMode(targetMode),
+          child: AnimatedContainer(
+            duration: Motion.of(context, const Duration(milliseconds: 200)),
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            decoration: BoxDecoration(
+              color: isSelected ? theme.primaryColor : Colors.transparent,
+              borderRadius: BorderRadius.circular(Radii.xxxl),
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                          color: theme.primaryColor.withValues(alpha: 0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2))
+                    ]
+                  : [],
+            ),
+            child: Column(
+              children: [
+                Text(
+                  label.toUpperCase(),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1,
+                    fontFamily: theme.textTheme.bodyMedium?.fontFamily,
+                    color: isSelected
+                        ? context.palette.onAccent.withValues(alpha: 0.8)
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: theme.textTheme.labelMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontFamily: theme.textTheme.bodyMedium?.fontFamily,
-                  color: isSelected
-                      ? Colors.white
-                      : theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontFamily: theme.textTheme.bodyMedium?.fontFamily,
+                    color: isSelected
+                        ? context.palette.onAccent
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -367,7 +379,7 @@ class _BookChapterSelectorSheetState
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: _buildGridTile(
-              text: 'Old\nTestament',
+              text: context.l10n.readOldTestamentTwoLine,
               isSelected: isOldTestament,
               onTap: () => _onTestamentSelected(true),
               theme: theme,
@@ -378,7 +390,7 @@ class _BookChapterSelectorSheetState
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: _buildGridTile(
-              text: 'New\nTestament',
+              text: context.l10n.readNewTestamentTwoLine,
               isSelected: !isOldTestament,
               onTap: () => _onTestamentSelected(false),
               theme: theme,
@@ -431,7 +443,7 @@ class _BookChapterSelectorSheetState
         Expanded(
           child: Column(
             children: [
-              Text('Old Testament',
+              Text(context.l10n.readOldTestament,
                   style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                       color:
@@ -473,7 +485,7 @@ class _BookChapterSelectorSheetState
         Expanded(
           child: Column(
             children: [
-              Text('New Testament',
+              Text(context.l10n.readNewTestament,
                   style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                       color:
@@ -585,7 +597,7 @@ class _BookChapterSelectorSheetState
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 12.0, left: 4.0),
                 child: Text(
-                  'Stories & Sections',
+                  context.l10n.readStoriesSections,
                   style: theme.textTheme.labelMedium?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     fontWeight: FontWeight.bold,
@@ -600,45 +612,48 @@ class _BookChapterSelectorSheetState
                   (context, index) {
                     final p = chapterPericopes[index];
                     final isSel = p.startVerse == selectedVerse;
-                    return InkWell(
-                      borderRadius: BorderRadius.circular(12),
-                      onTap: () => _onVerseSelected(p.startVerse, settings),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12),
-                        margin: const EdgeInsets.only(bottom: 8),
-                        decoration: BoxDecoration(
-                          color: isSel
-                              ? theme.primaryColor
-                              : theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.05),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                p.title,
-                                style: theme.textTheme.titleSmall?.copyWith(
-                                  color: isSel
-                                      ? theme.colorScheme.onPrimary
-                                      : theme.colorScheme.onSurface,
-                                  fontWeight: FontWeight.w600,
+                    return Semantics(
+                      selected: isSel,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(Radii.md),
+                        onTap: () => _onVerseSelected(p.startVerse, settings),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
+                          margin: const EdgeInsets.only(bottom: 8),
+                          decoration: BoxDecoration(
+                            color: isSel
+                                ? theme.primaryColor
+                                : theme.colorScheme.onSurface
+                                    .withValues(alpha: 0.05),
+                            borderRadius: BorderRadius.circular(Radii.md),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  p.title,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    color: isSel
+                                        ? theme.colorScheme.onPrimary
+                                        : theme.colorScheme.onSurface,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            Text(
-                              'v. ${p.startVerse}',
-                              style: theme.textTheme.labelMedium?.copyWith(
-                                color: isSel
-                                    ? theme.colorScheme.onPrimary
-                                        .withValues(alpha: 0.7)
-                                    : theme.colorScheme.primary,
-                                fontWeight: FontWeight.bold,
+                              const SizedBox(width: 12),
+                              Text(
+                                'v. ${p.startVerse}',
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  color: isSel
+                                      ? theme.colorScheme.onPrimary
+                                          .withValues(alpha: 0.7)
+                                      : theme.colorScheme.primary,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     );
@@ -651,7 +666,7 @@ class _BookChapterSelectorSheetState
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 12.0, left: 4.0),
                 child: Text(
-                  'All Verses',
+                  context.l10n.readAllVerses,
                   style: theme.textTheme.labelMedium?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     fontWeight: FontWeight.bold,
@@ -706,7 +721,7 @@ class _BookChapterSelectorSheetState
           ? theme.textTheme.bodyMedium?.fontFamily
           : null, // Font consistency for books
       color: isSelected
-          ? Colors.white
+          ? context.palette.onAccent
           : theme.colorScheme.onSurface.withValues(alpha: 0.8),
     );
 
@@ -727,9 +742,9 @@ class _BookChapterSelectorSheetState
           Text(
             subtitle,
             style: theme.textTheme.bodySmall?.copyWith(
-              fontSize: 9,
+              fontSize: TypeScale.micro,
               color: isSelected
-                  ? Colors.white.withValues(alpha: 0.9)
+                  ? context.palette.onAccent.withValues(alpha: 0.9)
                   : theme.colorScheme.onSurface.withValues(alpha: 0.6),
               height: 1.1,
             ),
@@ -751,44 +766,53 @@ class _BookChapterSelectorSheetState
             ),
     );
 
+    // Book rows are 44 dp tall (dense list); every other tile is larger.
     if (!isSelected) {
-      return GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: onTap,
-        child: Container(
-          decoration: BoxDecoration(
-            color: backgroundColor ??
-                theme.colorScheme.surface.withValues(alpha: 0.8),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-              width: 1,
+      return Semantics(
+        button: true,
+        selected: false,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onTap,
+          child: Container(
+            decoration: BoxDecoration(
+              color: backgroundColor ??
+                  theme.colorScheme.surface.withValues(alpha: 0.8),
+              borderRadius: BorderRadius.circular(Radii.lg),
+              border: Border.all(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                width: 1,
+              ),
             ),
-          ),
-          child: Center(
-            child: textWidget,
+            child: Center(
+              child: textWidget,
+            ),
           ),
         ),
       );
     }
 
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: theme.primaryColor,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-                color: theme.primaryColor.withValues(alpha: 0.4),
-                blurRadius: 8,
-                offset: const Offset(0, 3))
-          ],
+    return Semantics(
+      button: true,
+      selected: true,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: Motion.of(context, const Duration(milliseconds: 200)),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: theme.primaryColor,
+            borderRadius: BorderRadius.circular(Radii.lg),
+            boxShadow: [
+              BoxShadow(
+                  color: theme.primaryColor.withValues(alpha: 0.4),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3))
+            ],
+          ),
+          child: textWidget,
         ),
-        child: textWidget,
       ),
     );
   }

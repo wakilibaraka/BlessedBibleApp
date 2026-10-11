@@ -182,6 +182,8 @@ class _VerseLinkTextState extends State<VerseLinkText> {
   Widget build(BuildContext context) {
     return RichText(
       textAlign: widget.textAlign,
+      // RichText ignores the system text size unless told otherwise.
+      textScaler: MediaQuery.textScalerOf(context),
       text: TextSpan(children: _spans),
     );
   }

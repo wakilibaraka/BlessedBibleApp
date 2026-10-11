@@ -6,6 +6,12 @@ import '../../state/typography_provider.dart';
 import '../../services/share_service.dart';
 import 'share_card.dart';
 import '../dialogs/verse_preview_dialog.dart';
+import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
+import 'state_views.dart';
+
+/// Decorative size for the headword at the top of the sheet.
+const double _kHeroWordSize = 40;
 
 class DictionaryEntrySheet extends ConsumerWidget {
   final String normalizedWord;
@@ -46,12 +52,12 @@ class DictionaryEntrySheet extends ConsumerWidget {
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
         borderRadius: isFloating
-            ? BorderRadius.circular(24)
-            : const BorderRadius.vertical(top: Radius.circular(32)),
+            ? BorderRadius.circular(Radii.xxl)
+            : const BorderRadius.vertical(top: Radius.circular(Radii.xxxl)),
         boxShadow: isFloating
             ? [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.2),
+                  color: context.palette.shadow,
                   blurRadius: 24,
                   spreadRadius: 8,
                 )
@@ -74,9 +80,10 @@ class DictionaryEntrySheet extends ConsumerWidget {
                     onPressed: () => Navigator.of(context).pop(),
                     icon: Icon(Icons.arrow_back_ios_new_rounded,
                         size: 18, color: theme.primaryColor),
-                    label: Text('Back',
-                        style:
-                            TextStyle(fontSize: 16, color: theme.primaryColor)),
+                    label: Text(context.l10n.commonBack,
+                        style: TextStyle(
+                            fontSize: TypeScale.bodyLarge,
+                            color: theme.primaryColor)),
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 8),
@@ -85,6 +92,9 @@ class DictionaryEntrySheet extends ConsumerWidget {
                   Row(
                     children: [
                       IconButton(
+                        tooltip: isBookmarked
+                            ? context.l10n.studyRemoveSavedWord
+                            : context.l10n.studySaveWord,
                         onPressed: () {
                           ref
                               .read(bookmarkedWordsProvider.notifier)
@@ -103,6 +113,7 @@ class DictionaryEntrySheet extends ConsumerWidget {
                       ),
                       const SizedBox(width: 4),
                       IconButton(
+                        tooltip: context.l10n.commonShare,
                         onPressed: () {
                           final defs = definitionsAsync.asData?.value;
                           if (defs == null || defs.isEmpty) return;
@@ -126,7 +137,8 @@ class DictionaryEntrySheet extends ConsumerWidget {
                             shareText: full,
                             imageFilename: 'word',
                             buildCard: (backdrop, style) => ShareCard.word(
-                              eyebrow: 'DICTIONARY',
+                              eyebrow: context.l10n.studyDictionaryEyebrow
+                                  .toUpperCase(),
                               word: displayWord,
                               definition: defs.first.definition,
                               source: _formatSourceName(defs.first.source),
@@ -151,9 +163,9 @@ class DictionaryEntrySheet extends ConsumerWidget {
               child: definitionsAsync.when(
                 data: (defs) {
                   if (defs.isEmpty) {
-                    return const Padding(
-                      padding: EdgeInsets.all(32.0),
-                      child: Text('No definition found.'),
+                    return Padding(
+                      padding: const EdgeInsets.all(32.0),
+                      child: Text(context.l10n.studyNoDefinition),
                     );
                   }
 
@@ -168,7 +180,7 @@ class DictionaryEntrySheet extends ConsumerWidget {
                         displayWord,
                         style: TextStyle(
                           fontFamily: typography.fontFamily,
-                          fontSize: 40,
+                          fontSize: _kHeroWordSize,
                           fontWeight: FontWeight.w800,
                           height: 1.1,
                           letterSpacing: -1.0,
@@ -228,12 +240,16 @@ class DictionaryEntrySheet extends ConsumerWidget {
                     ],
                   );
                 },
-                loading: () => const Center(
-                    child: Padding(
+                loading: () => const Padding(
                   padding: EdgeInsets.all(40.0),
-                  child: CircularProgressIndicator(),
-                )),
-                error: (e, __) => Center(child: Text('Failed to load: $e')),
+                  child: LoadingView(),
+                ),
+                error: (e, __) => ErrorState(
+                  error: e,
+                  message: context.l10n.studyEntryLoadFailed,
+                  onRetry: () => ref
+                      .invalidate(dictionaryDefinitionProvider(normalizedWord)),
+                ),
               ),
             ),
           ],

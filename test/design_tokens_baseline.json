@@ -1,0 +1,53 @@
+{
+  "lib/ui/screens/bible_stories_screen.dart": {
+    "blackWhite": 2
+  },
+  "lib/ui/screens/bible_story_reader_screen.dart": {
+    "blackWhite": 1
+  },
+  "lib/ui/screens/home_screen.dart": {
+    "hexColor": 1
+  },
+  "lib/ui/screens/journey_map_screen.dart": {
+    "blackWhite": 1
+  },
+  "lib/ui/screens/main_nav_screen.dart": {
+    "blackWhite": 2
+  },
+  "lib/ui/screens/notes_list_screen.dart": {
+    "blackWhite": 5
+  },
+  "lib/ui/screens/onboarding_screen.dart": {
+    "hexColor": 8,
+    "blackWhite": 1
+  },
+  "lib/ui/screens/read_screen.dart": {
+    "hexColor": 3
+  },
+  "lib/ui/screens/study_reader_screen.dart": {
+    "blackWhite": 2
+  },
+  "lib/ui/sheets/theme_picker_sheet.dart": {
+    "hexColor": 23,
+    "blackWhite": 5
+  },
+  "lib/ui/sheets/widget_settings_sheet.dart": {
+    "hexColor": 7,
+    "blackWhite": 6
+  },
+  "lib/ui/widgets/animated_background.dart": {
+    "hexColor": 40
+  },
+  "lib/ui/widgets/plans_library_widgets.dart": {
+    "hexColor": 6,
+    "blackWhite": 6
+  },
+  "lib/ui/widgets/share_card.dart": {
+    "hexColor": 5,
+    "blackWhite": 4
+  },
+  "lib/ui/widgets/textured_glass_container.dart": {
+    "hexColor": 1,
+    "blackWhite": 2
+  }
+}

@@ -1,3 +1,4 @@
+import '../../l10n/l10n.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,6 +9,7 @@ import '../../state/streak_provider.dart';
 import '../../state/wotd_provider.dart';
 import '../../services/widget_update_service.dart';
 import '../widgets/dynamic_toast.dart';
+import '../../theme/design_tokens.dart';
 
 class WidgetSettingsSheet extends ConsumerWidget {
   const WidgetSettingsSheet({super.key});
@@ -41,6 +43,9 @@ class WidgetSettingsSheet extends ConsumerWidget {
             settings.backgroundStyle != WidgetBackgroundStyle.solidLight &&
             settings.backgroundStyle != WidgetBackgroundStyle.glassLight);
 
+    // The previews mimic the home-screen widget, which has its own fixed
+    // palette (chosen in widget settings), so these stay literal and do not
+    // follow the app theme.
     final primaryTextColor = isDark ? Colors.white : const Color(0xFF18181B);
     final secondaryTextColor =
         isDark ? const Color(0xFFD4D4D8) : const Color(0xFF52525B);
@@ -51,10 +56,11 @@ class WidgetSettingsSheet extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        borderRadius:
+            const BorderRadius.vertical(top: Radius.circular(Radii.xxxl)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.25),
+            color: context.palette.shadow.withValues(alpha: 0.25),
             blurRadius: 30,
             offset: const Offset(0, -10),
           ),
@@ -75,7 +81,7 @@ class WidgetSettingsSheet extends ConsumerWidget {
                   height: 5,
                   decoration: BoxDecoration(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(Radii.xs),
                   ),
                 ),
               ),
@@ -88,7 +94,7 @@ class WidgetSettingsSheet extends ConsumerWidget {
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: theme.primaryColor.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(Radii.lg),
                     ),
                     child: Icon(Icons.widgets_rounded,
                         color: theme.primaryColor, size: 24),
@@ -99,12 +105,12 @@ class WidgetSettingsSheet extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Home Screen Widgets',
+                          context.l10n.settingsWidgetsTitle,
                           style: theme.textTheme.titleLarge
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          'Live preview & style customization',
+                          context.l10n.settingsWidgetsLivePreview,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurface
                                 .withValues(alpha: 0.6),
@@ -120,7 +126,7 @@ class WidgetSettingsSheet extends ConsumerWidget {
 
               // Section: Live Previews
               Text(
-                'LIVE WIDGET PREVIEW',
+                context.l10n.settingsWidgetPreviewHeader,
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.2,
@@ -137,30 +143,33 @@ class WidgetSettingsSheet extends ConsumerWidget {
                   children: [
                     Row(
                       children: [
-                        const Text('🔥', style: TextStyle(fontSize: 22)),
+                        const Text('🔥',
+                            style: TextStyle(fontSize: TypeScale.headline)),
                         const SizedBox(width: 8),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '${streak.count} Days',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: primaryTextColor,
+                        Flexible(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                context.l10n.studyStreakDays(streak.count),
+                                style: TextStyle(
+                                  fontSize: TypeScale.bodyLarge,
+                                  fontWeight: FontWeight.bold,
+                                  color: primaryTextColor,
+                                ),
                               ),
-                            ),
-                            Text(
-                              'Streak Active! • Daily Goal',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: isDark
-                                    ? const Color(0xFF4ADE80)
-                                    : const Color(0xFF16A34A),
-                                fontWeight: FontWeight.w600,
+                              Text(
+                                context.l10n.settingsWidgetStreak,
+                                style: TextStyle(
+                                  fontSize: TypeScale.caption,
+                                  color: isDark
+                                      ? const Color(0xFF4ADE80)
+                                      : const Color(0xFF16A34A),
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -169,9 +178,9 @@ class WidgetSettingsSheet extends ConsumerWidget {
                       child: Divider(height: 1, color: dividerColor),
                     ),
                     Text(
-                      'WORD OF THE DAY',
+                      context.l10n.settingsWidgetWotd,
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: TypeScale.micro,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.8,
                         color: labelColor,
@@ -181,7 +190,7 @@ class WidgetSettingsSheet extends ConsumerWidget {
                     Text(
                       wotdWord,
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: TypeScale.body,
                         fontWeight: FontWeight.bold,
                         color: primaryTextColor,
                       ),
@@ -192,7 +201,7 @@ class WidgetSettingsSheet extends ConsumerWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: TypeScale.caption,
                         color: secondaryTextColor,
                         height: 1.3,
                       ),
@@ -210,9 +219,9 @@ class WidgetSettingsSheet extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'VERSE OF THE DAY',
+                      context.l10n.settingsWidgetVotd,
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: TypeScale.micro,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.8,
                         color: labelColor,
@@ -227,7 +236,7 @@ class WidgetSettingsSheet extends ConsumerWidget {
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: TypeScale.body,
                         color: primaryTextColor,
                         height: 1.35,
                       ),
@@ -238,7 +247,7 @@ class WidgetSettingsSheet extends ConsumerWidget {
                       child: Text(
                         '— $votdRef',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: TypeScale.caption,
                           fontWeight: FontWeight.bold,
                           fontStyle: FontStyle.italic,
                           color: secondaryTextColor,
@@ -253,7 +262,7 @@ class WidgetSettingsSheet extends ConsumerWidget {
 
               // Section: Style Selection
               Text(
-                'BACKGROUND THEME & GRADIENTS',
+                context.l10n.settingsWidgetBackgroundHeader,
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.2,
@@ -288,7 +297,7 @@ class WidgetSettingsSheet extends ConsumerWidget {
                         ),
                       ),
                     ),
-                    label: Text(style.label),
+                    label: Text(style.label(context.l10n)),
                     selected: isSelected,
                     onSelected: (selected) {
                       if (selected) {
@@ -306,7 +315,7 @@ class WidgetSettingsSheet extends ConsumerWidget {
 
               // Section: Text Contrast Mode
               Text(
-                'TEXT CONTRAST',
+                context.l10n.settingsWidgetContrastHeader,
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.2,
@@ -321,10 +330,10 @@ class WidgetSettingsSheet extends ConsumerWidget {
                     value: mode,
                     label: Text(
                       mode == WidgetTextMode.auto
-                          ? 'Auto ✨'
+                          ? context.l10n.settingsWidgetTextAuto
                           : (mode == WidgetTextMode.light
-                              ? 'Dark Text ☀️'
-                              : 'White Text 🌙'),
+                              ? context.l10n.settingsWidgetTextDark
+                              : context.l10n.settingsWidgetTextWhite),
                     ),
                   );
                 }).toList(),
@@ -351,18 +360,18 @@ class WidgetSettingsSheet extends ConsumerWidget {
                     if (context.mounted) {
                       DynamicToast.show(
                         context,
-                        'Widgets synced with new style! ✨',
+                        context.l10n.settingsWidgetSynced,
                         icon: Icons.check_circle_rounded,
                       );
                       Navigator.of(context).pop();
                     }
                   },
                   icon: const Icon(Icons.sync_rounded),
-                  label: const Text('Apply & Sync to Home Screen'),
+                  label: Text(context.l10n.settingsWidgetApply),
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
+                      borderRadius: BorderRadius.circular(Radii.xl),
                     ),
                   ),
                 ),
@@ -381,11 +390,12 @@ class WidgetSettingsSheet extends ConsumerWidget {
     final style = settings.backgroundStyle;
     final isTransparent = style == WidgetBackgroundStyle.transparent;
 
+    // Fixed preview styling (matches the home-screen widget, not the theme).
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(Radii.xxl),
         gradient: style.previewColors.length > 1
             ? LinearGradient(
                 colors: style.previewColors,

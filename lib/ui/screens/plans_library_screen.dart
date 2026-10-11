@@ -21,6 +21,8 @@ import 'custom_plan_builder_v2_screen.dart';
 import '../../data/curated_plans.dart';
 import 'reading_plan_detail_v2_screen.dart';
 import 'bible_story_reader_screen.dart';
+import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
 
 /// Preset book plans for the Books tab: a title, an inclusive book range
 /// (matched by book name) and a day count. Tapping one opens the custom
@@ -37,6 +39,14 @@ class BookPlanPreset {
     required this.endBook,
     required this.days,
   });
+
+  /// Display title in the current language. [title] stays the stable,
+  /// English seed used for artwork and initials.
+  String localizedTitle(AppLocalizations l10n) => startBook == endBook
+      ? l10n.plansPresetBookTitle(startBook, days)
+      : (startBook == 'Matthew' && endBook == 'John'
+          ? l10n.plansPresetGospelsTitle(days)
+          : title);
 }
 
 const bookPlanPresets = [
@@ -138,9 +148,8 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
     if (!added) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-              'All 3 plan slots are in use. Pause a plan to free a slot — progress is kept.'),
+        SnackBar(
+          content: Text(context.l10n.plansSlotsFull(3)),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -162,9 +171,8 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
     if (!added) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-              'All 3 plan slots are in use. Pause a plan to free a slot — progress is kept.'),
+        SnackBar(
+          content: Text(context.l10n.plansSlotsFull(3)),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -176,12 +184,21 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
 
   void _pausePlan(String id) {
     HapticFeedback.selectionClick();
-    ref.read(activePlanIdsProvider.notifier).removePlan(id);
+    final active = ref.read(activePlanIdsProvider.notifier);
+    final ids = ref.read(activePlanIdsProvider);
+    final wasPrimary = ids.isNotEmpty && ids.first == id;
+    active.removePlan(id);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Plan paused — all progress is kept.'),
+      SnackBar(
+        content: Text(context.l10n.plansPausedSnack),
         behavior: SnackBarBehavior.floating,
+        action: SnackBarAction(
+          label: context.l10n.commonUndo,
+          onPressed: () {
+            if (active.addPlan(id) && wasPrimary) active.makePrimary(id);
+          },
+        ),
       ),
     );
   }
@@ -191,7 +208,7 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
       initialDays: preset.days,
       initialStartBook: preset.startBook,
       initialEndBook: preset.endBook,
-      initialTitle: preset.title,
+      initialTitle: preset.localizedTitle(context.l10n),
     ));
   }
 
@@ -219,8 +236,9 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => _LetReadSheet(
-        dayLabel: YearProgress.label(now),
-        remainingLabel: YearProgress.remainingLabel(now),
+        day: YearProgress.dayOfYear(now),
+        total: YearProgress.daysInYear(now.year),
+        remainingLabel: YearProgress.remainingLabel(now, context.l10n),
         verse: verse,
         onRead: () {
           Navigator.of(ctx).pop();
@@ -247,8 +265,8 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
     if (activeIds.isEmpty) {
       HapticFeedback.selectionClick();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Browse Reading to start your first plan.'),
+        SnackBar(
+          content: Text(context.l10n.plansBrowseToStart),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -264,8 +282,9 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
     final now = DateTime.now();
     final rawName =
         ref.watch(accountUserProvider).value?.displayName?.trim() ?? '';
-    final name =
-        rawName.isEmpty ? 'Friend' : rawName.split(RegExp(r'\s+')).first;
+    final name = rawName.isEmpty
+        ? context.l10n.plansFriend
+        : rawName.split(RegExp(r'\s+')).first;
     final activeIds = ref.watch(activePlanIdsProvider);
     final activeCount = activeIds.length;
     // First active plan drives the calendar's completion dots.
@@ -279,7 +298,7 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
       appThemeMode: appThemeMode,
       page: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: const SharedAppBar(title: Text('Plans')),
+        appBar: SharedAppBar(title: Text(context.l10n.plansTitle)),
         body: SafeArea(
           bottom: false,
           child: Center(
@@ -289,36 +308,47 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
                   children: [
-                    const SizedBox(height: 8),
                     // Date header doubles as a picker: choosing a date
-                    // scrolls the calendar rail to that week.
-                    GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: _pickDateAndScroll,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              libraryDateHeader(now),
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w700,
+                    // scrolls the calendar rail to that week. The 48dp
+                    // min height replaces the old 8/12dp spacers.
+                    Semantics(
+                      button: true,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: _pickDateAndScroll,
+                        child: ConstrainedBox(
+                          constraints:
+                              const BoxConstraints(minHeight: kMinTouchTarget),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  libraryDateHeader(
+                                    now,
+                                    Localizations.localeOf(context).toString(),
+                                  ),
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
                               ),
-                            ),
+                              const SizedBox(width: 6),
+                              Icon(Icons.edit_calendar_outlined,
+                                  size: 16,
+                                  color: theme.colorScheme.onSurface
+                                      .withValues(alpha: 0.45)),
+                            ],
                           ),
-                          const SizedBox(width: 6),
-                          Icon(Icons.edit_calendar_outlined,
-                              size: 16,
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.45)),
-                        ],
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 4),
                     LibraryGreetingHeader(
                       name: name,
-                      progressLabel: YearProgress.label(now),
-                      remainingLabel: YearProgress.remainingLabel(now),
+                      progressLabel: YearProgress.label(now, context.l10n),
+                      remainingLabel:
+                          YearProgress.remainingLabel(now, context.l10n),
                       onReadPressed: _openLetRead,
                     ),
                     const SizedBox(height: 12),
@@ -333,9 +363,9 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
                     V2PillTabs(
                       controller: _tabs,
                       tabs: [
-                        'Reading',
-                        'Books',
-                        'My Plans ($activeCount)',
+                        context.l10n.plansTabReading,
+                        context.l10n.plansTabBooks,
+                        context.l10n.plansTabMyPlans(activeCount),
                       ],
                     ),
                     const SizedBox(height: 8),
@@ -445,8 +475,10 @@ class _LibraryCard extends StatelessWidget {
                       Text(
                         // Words read better than a bare "0%".
                         fraction <= 0
-                            ? 'Not started'
-                            : '${(fraction.clamp(0.0, 1.0) * 100).round()}% done',
+                            ? context.l10n.plansNotStarted
+                            : context.l10n.plansPercentDone(
+                                (fraction.clamp(0.0, 1.0) * 100).round(),
+                              ),
                         style: theme.textTheme.labelSmall?.copyWith(
                           fontWeight: FontWeight.w700,
                           color: theme.colorScheme.onSurface
@@ -458,11 +490,12 @@ class _LibraryCard extends StatelessWidget {
                 ],
               ),
             ),
-            // 44pt target, icon centred.
+            // 48dp target, icon centred.
             SizedBox(
-              width: 44,
-              height: 44,
+              width: kMinTouchTarget,
+              height: kMinTouchTarget,
               child: PopupMenuButton<String>(
+                tooltip: context.l10n.spaceMore,
                 padding: EdgeInsets.zero,
                 icon: Icon(
                   Icons.more_vert_rounded,
@@ -480,7 +513,7 @@ class _LibraryCard extends StatelessWidget {
 }
 
 List<PopupMenuEntry<String>> _openMenu(BuildContext context) => [
-      const PopupMenuItem(value: 'open', child: Text('Open')),
+      PopupMenuItem(value: 'open', child: Text(context.l10n.plansOpen)),
     ];
 
 /// Reading tab: every curated plan with live progress.
@@ -499,6 +532,7 @@ class _ReadingTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final activeIds = ref.watch(activePlanIdsProvider);
+    final l10n = context.l10n;
     return ListView(
       padding: const EdgeInsets.only(top: 8, bottom: 140),
       children: [
@@ -514,18 +548,18 @@ class _ReadingTab extends ConsumerWidget {
             final pct = started ? st.percentComplete : 0.0;
             final String status;
             if (!started) {
-              status = hasProgress ? 'Paused' : 'Not started';
+              status = hasProgress ? l10n.plansPaused : l10n.plansNotStarted;
             } else if (total <= 0) {
-              status = 'Started';
+              status = l10n.plansStarted;
             } else if (behind > 0) {
-              status = '$behind day${behind == 1 ? '' : 's'} behind';
+              status = l10n.plansDaysBehind(behind);
             } else if (current < total && st.isDayComplete(current)) {
-              status = 'Caught up';
+              status = l10n.plansCaughtUp;
             } else if (pct >= 1.0) {
-              status = 'Complete';
+              status = l10n.plansComplete;
             } else {
               final left = total - current;
-              status = 'Day $current of $total · $left left';
+              status = l10n.plansDayOfTotalLeft(current, total, left);
             }
             return _LibraryCard(
               seed: meta.id,
@@ -535,13 +569,13 @@ class _ReadingTab extends ConsumerWidget {
               featured: isActive,
               onOpen: () => onOpen(meta.id),
               menuBuilder: (_) => [
-                const PopupMenuItem(value: 'open', child: Text('Open')),
+                PopupMenuItem(value: 'open', child: Text(l10n.plansOpen)),
                 PopupMenuItem(
                   value:
                       isActive ? 'pause' : (hasProgress ? 'resume' : 'start'),
                   child: Text(isActive
-                      ? 'Pause (keeps progress)'
-                      : (hasProgress ? 'Resume' : 'Start')),
+                      ? l10n.plansPauseKeepsProgress
+                      : (hasProgress ? l10n.plansResume : l10n.plansStart)),
                 ),
               ],
               onMenu: (action) {
@@ -603,14 +637,14 @@ class _BooksTab extends ConsumerWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          preset.title,
+                          preset.localizedTitle(context.l10n),
                           style: theme.textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '${preset.days} days · tap to build',
+                          context.l10n.plansPresetSubtitle(preset.days),
                           style: theme.textTheme.labelSmall?.copyWith(
                             fontWeight: FontWeight.w800,
                             color: theme.primaryColor,
@@ -631,7 +665,7 @@ class _BooksTab extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(4, 8, 4, 8),
             child: Text(
-              'YOUR CUSTOM PLANS',
+              context.l10n.plansYourCustomPlans,
               style: theme.textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1.5,
@@ -649,8 +683,10 @@ class _BooksTab extends ConsumerWidget {
                 seed: id,
                 title: titleFor(id),
                 statusLine: started
-                    ? (total > 0 ? 'Day $current of $total' : 'Started')
-                    : 'Custom plan',
+                    ? (total > 0
+                        ? context.l10n.plansDayOfTotal(current, total)
+                        : context.l10n.plansStarted)
+                    : context.l10n.plansCustomPlan,
                 fraction: started ? st.percentComplete : 0,
                 featured: false,
                 onOpen: () => onOpen(id),
@@ -689,13 +725,13 @@ class _MyPlansTab extends ConsumerWidget {
               children: [
                 Icon(Icons.spa_rounded, size: 32, color: theme.primaryColor),
                 const SizedBox(height: 10),
-                Text('No active plans',
+                Text(context.l10n.plansNoActivePlans,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     )),
                 const SizedBox(height: 4),
                 Text(
-                  'Browse Reading or Books to start your first plan.',
+                  context.l10n.plansNoActivePlansBody,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -718,14 +754,18 @@ class _MyPlansTab extends ConsumerWidget {
             return _LibraryCard(
               seed: id,
               title: titleFor(id),
-              statusLine: total > 0 ? 'Day $current of $total' : 'Started',
+              statusLine: total > 0
+                  ? context.l10n.plansDayOfTotal(current, total)
+                  : context.l10n.plansStarted,
               fraction: st.percentComplete,
               featured: true,
               onOpen: () => onOpen(id),
-              menuBuilder: (_) => const [
-                PopupMenuItem(value: 'open', child: Text('Open')),
+              menuBuilder: (_) => [
                 PopupMenuItem(
-                    value: 'pause', child: Text('Pause (keeps progress)')),
+                    value: 'open', child: Text(context.l10n.plansOpen)),
+                PopupMenuItem(
+                    value: 'pause',
+                    child: Text(context.l10n.plansPauseKeepsProgress)),
               ],
               onMenu: (action) {
                 if (action == 'pause') {
@@ -745,13 +785,15 @@ class _MyPlansTab extends ConsumerWidget {
 /// Uses the shared VOTD pool, so Home and Plans always show the same
 /// verse on the same day.
 class _LetReadSheet extends StatelessWidget {
-  final String dayLabel;
+  final int day;
+  final int total;
   final String remainingLabel;
   final VerseOfTheDay verse;
   final VoidCallback onRead;
 
   const _LetReadSheet({
-    required this.dayLabel,
+    required this.day,
+    required this.total,
     required this.remainingLabel,
     required this.verse,
     required this.onRead,
@@ -765,7 +807,7 @@ class _LetReadSheet extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(Radii.xxl),
           border: Border.all(color: theme.dividerColor),
         ),
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
@@ -779,15 +821,15 @@ class _LetReadSheet extends StatelessWidget {
                 height: 5,
                 decoration: BoxDecoration(
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
-                  borderRadius: BorderRadius.circular(3),
+                  borderRadius: BorderRadius.circular(Radii.xs),
                 ),
               ),
             ),
             const SizedBox(height: 14),
-            const V2Eyebrow('Let\'s read'),
+            V2Eyebrow(context.l10n.plansLetsRead),
             const SizedBox(height: 6),
             Text(
-              dayLabel,
+              context.l10n.plansDayOfTotal(day, total),
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w800,
               ),
@@ -802,13 +844,9 @@ class _LetReadSheet extends StatelessWidget {
             // Year progress bar: proportional share of the year read.
             LayoutBuilder(
               builder: (context, c) {
-                final parts = dayLabel.split(' ');
-                final day = int.tryParse(parts.length > 1 ? parts[1] : '') ?? 0;
-                final total =
-                    int.tryParse(parts.length > 3 ? parts[3] : '') ?? 365;
                 final fraction = total == 0 ? 0.0 : day / total;
                 return ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(Radii.xs),
                   child: LinearProgressIndicator(
                     value: fraction.clamp(0.0, 1.0),
                     minHeight: 6,
@@ -820,7 +858,7 @@ class _LetReadSheet extends StatelessWidget {
               },
             ),
             const SizedBox(height: 18),
-            const V2Eyebrow('Verse of the day'),
+            V2Eyebrow(context.l10n.plansVerseOfTheDay),
             const SizedBox(height: 6),
             Text(
               '"${verse.text}"',
@@ -845,10 +883,10 @@ class _LetReadSheet extends StatelessWidget {
                 style: FilledButton.styleFrom(
                   minimumSize: const Size.fromHeight(50),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(Radii.lg),
                   ),
                 ),
-                child: const Text('Open today\'s reading'),
+                child: Text(context.l10n.plansOpenTodaysReading),
               ),
             ),
           ],

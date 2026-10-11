@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:convert';
 import '../data/models/bookmark_model.dart';
 import '../data/local_storage/preferences_service.dart';
+import '../l10n/l10n.dart';
 import '../utils/log.dart';
 
 /// Canonical key for persistent verse data (bookmarks, highlights, etc.).
@@ -28,13 +29,37 @@ const List<Color> highlightPaletteSwatches = [
   Color(0xFFFECACA), // Red pastel (used for swatch rendering only)
 ];
 
-const List<String> highlightPaletteNames = [
-  'Purple',
-  'Green',
-  'Blue',
-  'Pink',
-  'Red',
-];
+/// Display name of highlight swatch [index] (same order as the palettes).
+String highlightPaletteName(int index, AppLocalizations l10n) =>
+    switch (index) {
+      0 => l10n.miscColorPurple,
+      1 => l10n.miscColorGreen,
+      2 => l10n.miscColorBlue,
+      3 => l10n.miscColorPink,
+      _ => l10n.miscColorRed,
+    };
+
+/// English names the default folders are stored and synced under. They
+/// stay English in storage so every device agrees; [bookmarkFolderLabel]
+/// translates them for display.
+const Map<String, String> kDefaultFolderNames = {
+  'folder_sermon': 'Sermon prep',
+  'folder_memorize': 'Memorize',
+  'folder_comfort': 'Comfort',
+  'folder_study': 'Study',
+};
+
+/// The name to show for [folder]: a default folder the user hasn't
+/// renamed reads in the interface language; anything else as stored.
+String bookmarkFolderLabel(BookmarkFolder folder, AppLocalizations l10n) {
+  if (kDefaultFolderNames[folder.id] != folder.name) return folder.name;
+  return switch (folder.id) {
+    'folder_sermon' => l10n.miscFolderSermon,
+    'folder_memorize' => l10n.miscFolderMemorize,
+    'folder_comfort' => l10n.miscFolderComfort,
+    _ => l10n.miscFolderStudy,
+  };
+}
 
 class BookmarkDataNotifier extends Notifier<BookmarkData> {
   @override
@@ -198,10 +223,8 @@ class BookmarkDataNotifier extends Notifier<BookmarkData> {
   }
 
   static List<BookmarkFolder> _defaultFolders() => [
-        BookmarkFolder(id: 'folder_sermon', name: 'Sermon prep'),
-        BookmarkFolder(id: 'folder_memorize', name: 'Memorize'),
-        BookmarkFolder(id: 'folder_comfort', name: 'Comfort'),
-        BookmarkFolder(id: 'folder_study', name: 'Study'),
+        for (final e in kDefaultFolderNames.entries)
+          BookmarkFolder(id: e.key, name: e.value),
       ];
 
   void moveBookmark(String reference, String? newFolderId) {

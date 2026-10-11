@@ -1,4 +1,5 @@
 import '../../data/models/home_data.dart';
+import '../l10n/l10n.dart';
 
 /// Year-progress helpers for the Plans Library header.
 ///
@@ -18,14 +19,14 @@ class YearProgress {
       daysInYear(day.year) - dayOfYear(day);
 
   /// "Day 277 of 365"
-  static String label(DateTime day) =>
-      'Day ${dayOfYear(day)} of ${daysInYear(day.year)}';
+  static String label(DateTime day, AppLocalizations l10n) =>
+      l10n.plansDayOfTotal(dayOfYear(day), daysInYear(day.year));
 
   /// "89 days left in the year" (or "Last day of the year").
-  static String remainingLabel(DateTime day) {
+  static String remainingLabel(DateTime day, AppLocalizations l10n) {
     final left = daysRemaining(day);
-    if (left == 0) return 'Last day of the year';
-    return '$left day${left == 1 ? '' : 's'} left in the year';
+    if (left == 0) return l10n.plansLastDayOfYear;
+    return l10n.plansDaysLeftInYear(left);
   }
 }
 

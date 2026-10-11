@@ -4,6 +4,7 @@ import '../../state/theme_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/read_settings_provider.dart';
 import '../../state/nav_provider.dart';
+import '../../theme/design_tokens.dart';
 
 class AnimatedBackground extends ConsumerStatefulWidget {
   final AppThemeMode appThemeMode;
@@ -54,7 +55,10 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground>
     final isFull = readSettings.readingViewMode == ReadingViewMode.full;
     final disableGlow = (isReadTab && isFull) || !readSettings.isGlowEnabled;
 
-    final shouldAnimate = isRouteCurrent && isTabActive && !disableGlow;
+    final shouldAnimate = isRouteCurrent &&
+        isTabActive &&
+        !disableGlow &&
+        !MediaQuery.disableAnimationsOf(context);
 
     if (shouldAnimate && !_bgAnimation.isAnimating) {
       _bgAnimation.repeat(reverse: true);
@@ -98,6 +102,9 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground>
               : lerpDouble(-0.4, 0.1, t);
           final radius = isTopGlow ? 1.0 : 1.6;
 
+          // Decorative per-theme glow art: each theme's gradient is
+          // hand-picked, so these literals are intentional and do not come
+          // from the colour scheme.
           final List<Color> colors;
           switch (widget.appThemeMode.resolve(context)) {
             case AppThemeMode.dark:
@@ -196,7 +203,7 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground>
               .toList();
 
           return AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
+            duration: Motion.of(context, const Duration(milliseconds: 300)),
             switchInCurve: Curves.easeOut,
             switchOutCurve: Curves.easeOut,
             child: Container(

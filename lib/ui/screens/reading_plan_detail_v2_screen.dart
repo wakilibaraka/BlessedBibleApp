@@ -2,16 +2,21 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+
+import '../../l10n/l10n.dart';
 
 import '../../state/reading_plan_provider.dart'
     show readingPlanProvider, appWeekday, ReadingPlanState;
 import '../../state/theme_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../widgets/shared_app_bar.dart';
+import '../widgets/state_views.dart';
 import '../widgets/study_v2_widgets.dart';
 import 'journey_map_screen.dart';
 import '../../data/curated_plans.dart';
 import 'study_reader_screen.dart';
+import '../../theme/design_tokens.dart';
 
 /// Rebuilt plan detail (V2). Shown from [StudyScreenV2].
 ///
@@ -47,7 +52,7 @@ class _ReadingPlanDetailV2ScreenState
       if (ctx != null) {
         Scrollable.ensureVisible(
           ctx,
-          duration: const Duration(milliseconds: 350),
+          duration: Motion.of(context, const Duration(milliseconds: 350)),
           alignment: 0.05,
         );
       }
@@ -91,10 +96,10 @@ class _ReadingPlanDetailV2ScreenState
       // Order Monday-first for stable display.
       final ordered = days.toList()
         ..sort((a, b) => ((a + 6) % 7).compareTo((b + 6) % 7));
-      return 'Rest ${ordered.map(_weekdayName).join(', ')}';
+      return context.l10n.plansRestChip(ordered.map(_weekdayName).join(', '));
     }
     if (single == null) return '';
-    return 'Rest ${_weekdayName(single)}';
+    return context.l10n.plansRestChip(_weekdayName(single));
   }
 
   DateTime? _restDateForSelected(
@@ -129,8 +134,7 @@ class _ReadingPlanDetailV2ScreenState
     unawaited(HapticFeedback.mediumImpact());
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-            'Schedule rebased +$behind reading days. Completed days untouched.'),
+        content: Text(context.l10n.plansRebasedSnack(behind)),
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -148,8 +152,8 @@ class _ReadingPlanDetailV2ScreenState
         appThemeMode: appThemeMode,
         page: Scaffold(
           backgroundColor: Colors.transparent,
-          appBar: const SharedAppBar(title: Text('Plan')),
-          body: const Center(child: CircularProgressIndicator()),
+          appBar: SharedAppBar(title: Text(context.l10n.plansPlan)),
+          body: const LoadingView(),
         ),
       );
     }
@@ -160,26 +164,12 @@ class _ReadingPlanDetailV2ScreenState
         appThemeMode: appThemeMode,
         page: Scaffold(
           backgroundColor: Colors.transparent,
-          appBar: const SharedAppBar(title: Text('Plan')),
-          body: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(32),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    loadError,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  FilledButton.tonal(
-                    onPressed: () =>
-                        ref.invalidate(readingPlanProvider(widget.planId)),
-                    child: const Text('Retry'),
-                  ),
-                ],
-              ),
-            ),
+          appBar: SharedAppBar(title: Text(context.l10n.plansPlan)),
+          // The provider's message carries exception text, so show a
+          // plain line instead.
+          body: ErrorState(
+            message: context.l10n.plansDetailLoadFailed,
+            onRetry: () => ref.invalidate(readingPlanProvider(widget.planId)),
           ),
         ),
       );
@@ -194,7 +184,7 @@ class _ReadingPlanDetailV2ScreenState
         appThemeMode: appThemeMode,
         page: Scaffold(
           backgroundColor: Colors.transparent,
-          appBar: const SharedAppBar(title: Text('Plan')),
+          appBar: SharedAppBar(title: Text(context.l10n.plansPlan)),
           body: SafeArea(
             child: ListView(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 60),
@@ -206,8 +196,9 @@ class _ReadingPlanDetailV2ScreenState
                 const SizedBox(height: 4),
                 Text(
                   total == 0
-                      ? 'This plan has no readings yet.'
-                      : '$total reading days · ~${(total / 7).ceil()} weeks',
+                      ? context.l10n.plansNoReadingsYet
+                      : context.l10n
+                          .plansReadingDaysWeeks(total, (total / 7).ceil()),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
@@ -218,14 +209,15 @@ class _ReadingPlanDetailV2ScreenState
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const V2Eyebrow('Begin plan'),
+                      V2Eyebrow(context.l10n.plansBeginPlan),
                       const SizedBox(height: 8),
                       ListTile(
                         contentPadding: EdgeInsets.zero,
                         leading: const Icon(Icons.calendar_month_rounded),
-                        title: const Text('Start date'),
-                        subtitle: Text(
-                            '${start.year}-${start.month.toString().padLeft(2, '0')}-${start.day.toString().padLeft(2, '0')}'),
+                        title: Text(context.l10n.plansStartDate),
+                        subtitle: Text(DateFormat.yMMMEd(
+                          Localizations.localeOf(context).toString(),
+                        ).format(start)),
                         trailing: const Icon(Icons.chevron_right_rounded),
                         onTap: () async {
                           final picked = await showDatePicker(
@@ -255,12 +247,12 @@ class _ReadingPlanDetailV2ScreenState
                                   );
                                   HapticFeedback.mediumImpact();
                                 },
-                          child: const Text('Start Day 1 →'),
+                          child: Text(context.l10n.plansStartDayOne),
                         ),
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        'The chosen date is passed into startPlan — it is honoured, not replaced with today.',
+                        context.l10n.plansStartDateNote,
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: theme.colorScheme.onSurface
                               .withValues(alpha: 0.55),
@@ -291,6 +283,7 @@ class _ReadingPlanDetailV2ScreenState
           title: Text(_title()),
           actions: [
             IconButton(
+              tooltip: context.l10n.plansSettings,
               icon: const Icon(Icons.more_horiz_rounded),
               onPressed: () => _showPlanSettings(plan),
             ),
@@ -321,19 +314,20 @@ class _ReadingPlanDetailV2ScreenState
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'SCHEDULE',
+                                    context.l10n.plansScheduleLabel,
                                     style: theme.textTheme.labelSmall?.copyWith(
                                       fontWeight: FontWeight.w800,
                                       letterSpacing: 1.4,
-                                      fontSize: 10,
+                                      fontSize: TypeScale.micro,
                                       color: theme.colorScheme.onSurface
                                           .withValues(alpha: 0.55),
                                     ),
                                   ),
                                   Text(
                                     total == 0
-                                        ? 'No readings'
-                                        : 'Day $current of $total',
+                                        ? context.l10n.plansNoReadings
+                                        : context.l10n
+                                            .plansDayOfTotal(current, total),
                                     style:
                                         theme.textTheme.titleMedium?.copyWith(
                                       fontWeight: FontWeight.w800,
@@ -343,7 +337,8 @@ class _ReadingPlanDetailV2ScreenState
                                   V2ProgressBar(fraction: plan.percentComplete),
                                   const SizedBox(height: 4),
                                   Text(
-                                    '${(plan.percentComplete * 100).round()}% complete',
+                                    context.l10n.plansPercentComplete(
+                                        (plan.percentComplete * 100).round()),
                                     style: theme.textTheme.labelSmall?.copyWith(
                                       fontWeight: FontWeight.w700,
                                       color: theme.colorScheme.onSurface
@@ -356,16 +351,18 @@ class _ReadingPlanDetailV2ScreenState
                                     runSpacing: 6,
                                     children: [
                                       V2MetaChip(plan.paceMode == 'flexible'
-                                          ? 'Flexible'
-                                          : 'Scheduled'),
+                                          ? context.l10n.plansFlexible
+                                          : context.l10n.plansScheduled),
                                       if (plan.restDay != null ||
                                           plan.restDays.isNotEmpty)
                                         V2MetaChip(_restChipLabel(
                                             plan.restDays, plan.restDay)),
                                       if (behind > 0)
-                                        V2MetaChip('⚠ $behind behind')
+                                        V2MetaChip(
+                                            '⚠ ${context.l10n.plansBehindChip(behind)}')
                                       else
-                                        const V2MetaChip('On track ✓'),
+                                        V2MetaChip(
+                                            '${context.l10n.plansOnTrack} ✓'),
                                     ],
                                   ),
                                 ],
@@ -378,39 +375,46 @@ class _ReadingPlanDetailV2ScreenState
                         Container(
                           decoration: BoxDecoration(
                             color: theme.colorScheme.surface,
-                            borderRadius: BorderRadius.circular(999),
+                            borderRadius: BorderRadius.circular(Radii.pill),
                             border: Border.all(color: theme.dividerColor),
                           ),
                           child: Row(
                             children: ['scheduled', 'flexible'].map((m) {
                               final on = plan.paceMode == m;
                               return Expanded(
-                                child: GestureDetector(
-                                  onTap: () {
-                                    HapticFeedback.selectionClick();
-                                    notifier.setPaceMode(m);
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 10),
-                                    decoration: BoxDecoration(
-                                      color: on
-                                          ? theme.colorScheme.onSurface
-                                          : Colors.transparent,
-                                      borderRadius: BorderRadius.circular(999),
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      m == 'scheduled'
-                                          ? 'Scheduled'
-                                          : 'Flexible',
-                                      style:
-                                          theme.textTheme.labelLarge?.copyWith(
-                                        fontWeight: FontWeight.w800,
+                                child: Semantics(
+                                  button: true,
+                                  selected: on,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      HapticFeedback.selectionClick();
+                                      notifier.setPaceMode(m);
+                                    },
+                                    child: Container(
+                                      constraints: const BoxConstraints(
+                                          minHeight: kMinTouchTarget),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10),
+                                      decoration: BoxDecoration(
                                         color: on
-                                            ? theme.colorScheme.surface
-                                            : theme.colorScheme.onSurface
-                                                .withValues(alpha: 0.7),
+                                            ? theme.colorScheme.onSurface
+                                            : Colors.transparent,
+                                        borderRadius:
+                                            BorderRadius.circular(Radii.pill),
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        m == 'scheduled'
+                                            ? context.l10n.plansScheduled
+                                            : context.l10n.plansFlexible,
+                                        style: theme.textTheme.labelLarge
+                                            ?.copyWith(
+                                          fontWeight: FontWeight.w800,
+                                          color: on
+                                              ? theme.colorScheme.surface
+                                              : theme.colorScheme.onSurface
+                                                  .withValues(alpha: 0.7),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -422,8 +426,8 @@ class _ReadingPlanDetailV2ScreenState
                         const SizedBox(height: 6),
                         Text(
                           plan.paceMode == 'flexible'
-                              ? 'Flexible: work oldest-unread first. No missed days accrue.'
-                              : 'Scheduled: each date maps to a reading day. Missed days accrue as behind — catch up below.',
+                              ? context.l10n.plansFlexibleHelp
+                              : context.l10n.plansScheduledHelp,
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: theme.colorScheme.onSurface
                                 .withValues(alpha: 0.6),
@@ -441,17 +445,18 @@ class _ReadingPlanDetailV2ScreenState
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const V2Eyebrow('Catch up'),
+                            V2Eyebrow(context.l10n.plansCatchUp),
                             const SizedBox(height: 6),
                             Text(
-                              'Behind by $behind — oldest unread is Day ${plan.oldestUnread}.',
+                              context.l10n
+                                  .plansBehindBy(behind, plan.oldestUnread),
                               style: theme.textTheme.titleSmall?.copyWith(
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Backfilling marks progress. Rebase shifts the remaining schedule forward instead.',
+                              context.l10n.plansCatchUpHelp,
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: theme.colorScheme.onSurface
                                     .withValues(alpha: 0.6),
@@ -465,7 +470,7 @@ class _ReadingPlanDetailV2ScreenState
                                 FilledButton(
                                   onPressed: () => setState(
                                       () => _selectedDay = plan.oldestUnread),
-                                  child: const Text('Go to oldest'),
+                                  child: Text(context.l10n.plansGoToOldest),
                                 ),
                                 FilledButton.tonal(
                                   onPressed: () {
@@ -473,7 +478,7 @@ class _ReadingPlanDetailV2ScreenState
                                         .markReadingComplete(plan.oldestUnread);
                                     HapticFeedback.mediumImpact();
                                   },
-                                  child: const Text('Mark oldest done'),
+                                  child: Text(context.l10n.plansMarkOldestDone),
                                 ),
                                 FilledButton.tonal(
                                   onPressed: () {
@@ -488,17 +493,20 @@ class _ReadingPlanDetailV2ScreenState
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(newly == 0
-                                            ? 'Everything before today is already done.'
-                                            : '$newly previous day${newly == 1 ? '' : 's'} marked as read.'),
+                                            ? context.l10n.plansAllPreviousDone
+                                            : context.l10n
+                                                .plansPreviousMarked(newly)),
                                         behavior: SnackBarBehavior.floating,
                                       ),
                                     );
                                   },
-                                  child: const Text('Mark all previous done'),
+                                  child:
+                                      Text(context.l10n.plansMarkAllPrevious),
                                 ),
                                 OutlinedButton(
                                   onPressed: () => _rebase(behind),
-                                  child: Text('Rebase +$behind days'),
+                                  child: Text(
+                                      context.l10n.plansRebaseDays(behind)),
                                 ),
                               ],
                             ),
@@ -521,7 +529,7 @@ class _ReadingPlanDetailV2ScreenState
                             children: [
                               Expanded(
                                 child: Text(
-                                  'READINGS · $total DAYS',
+                                  context.l10n.plansReadingsHeader(total),
                                   style: theme.textTheme.labelSmall?.copyWith(
                                     fontWeight: FontWeight.w800,
                                     letterSpacing: 1.5,
@@ -531,9 +539,8 @@ class _ReadingPlanDetailV2ScreenState
                                 ),
                               ),
                               IconButton(
-                                visualDensity: VisualDensity.compact,
                                 icon: const Icon(Icons.map_rounded),
-                                tooltip: 'Journey map view',
+                                tooltip: context.l10n.plansJourneyMap,
                                 onPressed: () {
                                   Navigator.of(context).push(
                                     MaterialPageRoute<void>(
@@ -544,9 +551,8 @@ class _ReadingPlanDetailV2ScreenState
                                 },
                               ),
                               IconButton(
-                                visualDensity: VisualDensity.compact,
                                 icon: const Icon(Icons.today_rounded),
-                                tooltip: 'Jump to today',
+                                tooltip: context.l10n.plansJumpToToday,
                                 onPressed: () {
                                   setState(() => _selectedDay = current);
                                   _reveal(_todayRowKey);
@@ -569,7 +575,7 @@ class _ReadingPlanDetailV2ScreenState
                                       .markAllPreviousRead(plan.oldestUnread);
                                   HapticFeedback.mediumImpact();
                                 },
-                                child: const Text('Mark all previous done'),
+                                child: Text(context.l10n.plansMarkAllPrevious),
                               ),
                             ),
                           for (var day = 1; day <= total; day++)
@@ -579,8 +585,8 @@ class _ReadingPlanDetailV2ScreenState
                               final isToday = day == current;
                               final date = dateMap[day];
                               final dateLabel = date == null
-                                  ? 'Day $day'
-                                  : 'Day $day · ${_weekdayName(appWeekday(date))} ${date.month}/${date.day}';
+                                  ? context.l10n.plansDayN(day)
+                                  : '${context.l10n.plansDayN(day)} · ${_weekdayName(appWeekday(date))} ${DateFormat.Md(Localizations.localeOf(context).toString()).format(date)}';
                               final summary = plan.planData[day - 1].passages
                                   .map((p) => p.label)
                                   .join(', ');
@@ -612,9 +618,12 @@ class _ReadingPlanDetailV2ScreenState
                             spacing: 12,
                             runSpacing: 4,
                             children: [
-                              _Legend(theme.primaryColor, 'Done'),
-                              _Legend(null, 'Today = ring', ring: true),
-                              _Legend(theme.colorScheme.error, 'Missed'),
+                              _Legend(theme.primaryColor,
+                                  context.l10n.plansLegendDone),
+                              _Legend(null, context.l10n.plansLegendToday,
+                                  ring: true),
+                              _Legend(theme.colorScheme.error,
+                                  context.l10n.plansLegendMissed),
                             ],
                           ),
                         ],
@@ -655,14 +664,16 @@ class _ReadingPlanDetailV2ScreenState
                               children: [
                                 Text(
                                   plan.reminderEnabled
-                                      ? 'Reminder · ${_fmtTime(plan.reminderTimeHour, plan.reminderTimeMinute)}'
-                                      : 'Reminder off',
+                                      ? context.l10n.plansReminderAtTime(
+                                          _fmtTime(plan.reminderTimeHour,
+                                              plan.reminderTimeMinute))
+                                      : context.l10n.plansReminderOff,
                                   style: theme.textTheme.titleSmall?.copyWith(
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
                                 Text(
-                                  'Per-plan notification — skips the rest day automatically.',
+                                  context.l10n.plansReminderHelp,
                                   style: theme.textTheme.bodySmall?.copyWith(
                                     color: theme.colorScheme.onSurface
                                         .withValues(alpha: 0.6),
@@ -705,9 +716,13 @@ class _ReadingPlanDetailV2ScreenState
     );
   }
 
+  /// Short weekday name in the current locale for the app convention
+  /// 1=Sun..7=Sat ('' when out of range).
   String _weekdayName(int appDay) {
-    const names = ['', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    return (appDay >= 1 && appDay <= 7) ? names[appDay] : '';
+    if (appDay < 1 || appDay > 7) return '';
+    // 2024-01-07 was a Sunday.
+    return DateFormat.E(Localizations.localeOf(context).toString())
+        .format(DateTime(2024, 1, 6 + appDay));
   }
 
   /// 'None' or 'Sun, Wed' for the settings row.
@@ -717,7 +732,9 @@ class _ReadingPlanDetailV2ScreenState
         ..sort((a, b) => ((a + 6) % 7).compareTo((b + 6) % 7));
       return ordered.map(_weekdayName).join(', ');
     }
-    return plan.restDay == null ? 'None' : _weekdayName(plan.restDay!);
+    return plan.restDay == null
+        ? context.l10n.plansNone
+        : _weekdayName(plan.restDay!);
   }
 
   /// Multi-select rest weekdays (app convention 1=Sun..7=Sat).
@@ -731,7 +748,7 @@ class _ReadingPlanDetailV2ScreenState
       context: context,
       builder: (ctx) {
         return AlertDialog(
-          title: const Text('Rest days'),
+          title: Text(context.l10n.plansRestDays),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -760,14 +777,16 @@ class _ReadingPlanDetailV2ScreenState
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(null),
-              child: const Text('Cancel'),
+              child: Text(context.l10n.commonCancel),
             ),
             FilledButton(
               onPressed: () {
                 HapticFeedback.selectionClick();
                 Navigator.of(ctx).pop(Set<int>.from(selected));
               },
-              child: Text(selected.isEmpty ? 'No rest days' : 'Save'),
+              child: Text(selected.isEmpty
+                  ? context.l10n.plansNoRestDays
+                  : context.l10n.commonSave),
             ),
           ],
         );
@@ -775,11 +794,8 @@ class _ReadingPlanDetailV2ScreenState
     );
   }
 
-  String _fmtTime(int h, int m) {
-    final hh = h % 12 == 0 ? 12 : h % 12;
-    final ap = h < 12 ? 'AM' : 'PM';
-    return '$hh:${m.toString().padLeft(2, '0')} $ap';
-  }
+  String _fmtTime(int h, int m) =>
+      TimeOfDay(hour: h, minute: m).format(context);
 
   PlanMetadata? _metadata() {
     for (final p in availablePlans) {
@@ -800,23 +816,23 @@ class _ReadingPlanDetailV2ScreenState
         return Container(
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            borderRadius: Radii.sheet,
           ),
           padding: const EdgeInsets.fromLTRB(8, 8, 8, 32),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const V2Eyebrow('Plan settings'),
+              V2Eyebrow(context.l10n.plansSettings),
               if (meta?.attribution != null)
                 ListTile(
                   leading: const Icon(Icons.info_outline_rounded),
-                  title: const Text('About this plan…'),
+                  title: Text(context.l10n.plansAboutEllipsis),
                   onTap: () {
                     Navigator.of(ctx).pop();
                     showDialog<void>(
                       context: context,
                       builder: (d) => AlertDialog(
-                        title: Text(meta?.title ?? 'About this plan'),
+                        title: Text(meta?.title ?? context.l10n.plansAbout),
                         content: SingleChildScrollView(
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
@@ -847,7 +863,7 @@ class _ReadingPlanDetailV2ScreenState
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.of(d).pop(),
-                            child: const Text('Close'),
+                            child: Text(context.l10n.commonClose),
                           ),
                         ],
                       ),
@@ -856,7 +872,7 @@ class _ReadingPlanDetailV2ScreenState
                 ),
               ListTile(
                 leading: const Icon(Icons.calendar_month_rounded),
-                title: const Text('Change start date…'),
+                title: Text(context.l10n.plansChangeStartDate),
                 onTap: () async {
                   Navigator.of(ctx).pop();
                   final picked = await showDatePicker(
@@ -871,8 +887,8 @@ class _ReadingPlanDetailV2ScreenState
               ),
               ListTile(
                 leading: const Icon(Icons.bedtime_rounded),
-                title: Text('Rest days: ${_restSummary(p)}'),
-                subtitle: const Text('Tap to choose any weekdays'),
+                title: Text(context.l10n.plansRestDaysValue(_restSummary(p))),
+                subtitle: Text(context.l10n.plansRestDaysHelp),
                 onTap: () async {
                   final picked = await _pickRestDays(context, p);
                   if (!ctx.mounted) return;
@@ -883,23 +899,26 @@ class _ReadingPlanDetailV2ScreenState
               ListTile(
                 leading: Icon(Icons.restart_alt_rounded,
                     color: theme.colorScheme.error),
-                title: Text('Restart from Day 1…',
+                title: Text(context.l10n.plansRestartFromDayOne,
                     style: TextStyle(color: theme.colorScheme.error)),
                 onTap: () async {
                   Navigator.of(ctx).pop();
                   final confirm = await showDialog<bool>(
                     context: context,
                     builder: (d) => AlertDialog(
-                      title: const Text('Restart plan?'),
-                      content: const Text('Completed days will be cleared.'),
+                      title: Text(context.l10n.plansRestartTitle),
+                      content: Text(context.l10n.plansRestartBody),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.of(d).pop(false),
-                          child: const Text('Cancel'),
+                          child: Text(context.l10n.commonCancel),
                         ),
                         TextButton(
                           onPressed: () => Navigator.of(d).pop(true),
-                          child: const Text('Restart'),
+                          child: Text(
+                            context.l10n.plansRestart,
+                            style: TextStyle(color: d.palette.danger),
+                          ),
                         ),
                       ],
                     ),
@@ -957,82 +976,89 @@ class _DayRow extends StatelessWidget {
         color: isSelected
             ? theme.primaryColor.withValues(alpha: 0.08)
             : Colors.transparent,
-        borderRadius: BorderRadius.circular(14),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(14),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
-            child: Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: done ? theme.primaryColor : Colors.transparent,
-                    border: Border.all(
-                      color: statusColor,
-                      width: (isToday || done) ? 2 : 1.5,
+        borderRadius: BorderRadius.circular(Radii.lg),
+        child: Semantics(
+          selected: isSelected,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(Radii.lg),
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+              child: Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: done ? theme.primaryColor : Colors.transparent,
+                      border: Border.all(
+                        color: statusColor,
+                        width: (isToday || done) ? 2 : 1.5,
+                      ),
                     ),
+                    alignment: Alignment.center,
+                    child: done
+                        ? Icon(
+                            Icons.check_rounded,
+                            size: 20,
+                            color: theme.colorScheme.surface,
+                          )
+                        : FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              '$day',
+                              style: theme.textTheme.labelLarge?.copyWith(
+                                fontWeight: FontWeight.w800,
+                                color: (isToday || isMissed)
+                                    ? statusColor
+                                    : theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.65),
+                              ),
+                            ),
+                          ),
                   ),
-                  alignment: Alignment.center,
-                  child: done
-                      ? Icon(
-                          Icons.check_rounded,
-                          size: 20,
-                          color: theme.colorScheme.surface,
-                        )
-                      : Text(
-                          '$day',
-                          style: theme.textTheme.labelLarge?.copyWith(
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          dateLabel,
+                          style: theme.textTheme.labelSmall?.copyWith(
                             fontWeight: FontWeight.w800,
-                            color: (isToday || isMissed)
-                                ? statusColor
-                                : theme.colorScheme.onSurface
-                                    .withValues(alpha: 0.65),
+                            letterSpacing: 0.8,
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.6),
                           ),
                         ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        dateLabel,
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.8,
-                          color: theme.colorScheme.onSurface
-                              .withValues(alpha: 0.6),
+                        const SizedBox(height: 2),
+                        Text(
+                          summary,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        summary,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                IconButton(
-                  visualDensity: VisualDensity.compact,
-                  tooltip: done ? 'Mark unread' : 'Mark read',
-                  icon: Icon(
-                    done ? Icons.check_circle_rounded : Icons.circle_outlined,
-                    color: done
-                        ? theme.primaryColor
-                        : theme.colorScheme.onSurface.withValues(alpha: 0.35),
+                  IconButton(
+                    tooltip: done
+                        ? context.l10n.plansMarkUnread
+                        : context.l10n.plansMarkRead,
+                    icon: Icon(
+                      done ? Icons.check_circle_rounded : Icons.circle_outlined,
+                      color: done
+                          ? theme.primaryColor
+                          : theme.colorScheme.onSurface.withValues(alpha: 0.35),
+                    ),
+                    onPressed: onToggle,
                   ),
-                  onPressed: onToggle,
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -1059,7 +1085,7 @@ class _Legend extends StatelessWidget {
           decoration: BoxDecoration(
             color: color?.withValues(alpha: 0.25) ??
                 theme.colorScheme.onSurface.withValues(alpha: 0.06),
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(Radii.xs),
             border: Border.all(
               color: color ?? theme.primaryColor,
               width: ring ? 2 : 1,
@@ -1118,10 +1144,10 @@ class _DayDetailCardState extends ConsumerState<_DayDetailCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const V2Eyebrow('Rest & reflect'),
+            V2Eyebrow(context.l10n.plansRestAndReflect),
             const SizedBox(height: 6),
             Text(
-              'A day of rest — no reading assigned. Rest days carry no reading.',
+              context.l10n.plansRestDayBody,
               style: theme.textTheme.bodyMedium,
             ),
           ],
@@ -1131,12 +1157,12 @@ class _DayDetailCardState extends ConsumerState<_DayDetailCard> {
 
     final dateLabel = widget.date == null
         ? ''
-        : ' · ${widget.date!.month}/${widget.date!.day}';
+        : ' · ${DateFormat.Md(Localizations.localeOf(context).toString()).format(widget.date!)}';
     return V2Card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          V2Eyebrow('Day ${widget.day}$dateLabel'),
+          V2Eyebrow('${context.l10n.plansDayN(widget.day)}$dateLabel'),
           const SizedBox(height: 6),
           Text(
             dayData.passages.map((p) => p.label).join(' · '),
@@ -1146,7 +1172,7 @@ class _DayDetailCardState extends ConsumerState<_DayDetailCard> {
           ),
           const SizedBox(height: 4),
           Text(
-            'Tap a passage to open it. Check each one off as you read.',
+            context.l10n.plansDayDetailHelp,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
             ),
@@ -1154,75 +1180,80 @@ class _DayDetailCardState extends ConsumerState<_DayDetailCard> {
           for (var i = 0; i < dayData.passages.length; i++)
             Padding(
               padding: const EdgeInsets.only(top: 8),
-              child: InkWell(
-                borderRadius: BorderRadius.circular(14),
-                onTap: () async {
-                  // Open the passage in the shared study reader; the
-                  // checkbox below tracks it as read for this plan day.
-                  final markedComplete = await Navigator.of(context).push<bool>(
-                    MaterialPageRoute(
-                      builder: (_) => StudyReaderScreen(
-                        payload: StudySessionPayload.plan(
-                          planId: widget.planId,
-                          dayNum: widget.day,
-                          initialPassageIndex: i,
+              child: Semantics(
+                button: true,
+                checked: _checked.contains(i),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(Radii.lg),
+                  onTap: () async {
+                    // Open the passage in the shared study reader; the
+                    // checkbox below tracks it as read for this plan day.
+                    final markedComplete =
+                        await Navigator.of(context).push<bool>(
+                      MaterialPageRoute(
+                        builder: (_) => StudyReaderScreen(
+                          payload: StudySessionPayload.plan(
+                            planId: widget.planId,
+                            dayNum: widget.day,
+                            initialPassageIndex: i,
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                  if (!mounted) return;
-                  setState(() => _checked.add(i));
-                  if (markedComplete == true && !done) {
-                    notifier.markReadingComplete(widget.day);
-                  }
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: _checked.contains(i)
-                        ? theme.primaryColor.withValues(alpha: 0.1)
-                        : theme.colorScheme.onSurface.withValues(alpha: 0.03),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
+                    );
+                    if (!mounted) return;
+                    setState(() => _checked.add(i));
+                    if (markedComplete == true && !done) {
+                      notifier.markReadingComplete(widget.day);
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
                       color: _checked.contains(i)
-                          ? theme.primaryColor.withValues(alpha: 0.35)
-                          : theme.dividerColor,
+                          ? theme.primaryColor.withValues(alpha: 0.1)
+                          : theme.colorScheme.onSurface.withValues(alpha: 0.03),
+                      borderRadius: BorderRadius.circular(Radii.lg),
+                      border: Border.all(
+                        color: _checked.contains(i)
+                            ? theme.primaryColor.withValues(alpha: 0.35)
+                            : theme.dividerColor,
+                      ),
                     ),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 24,
-                        height: 24,
-                        decoration: BoxDecoration(
-                          color: _checked.contains(i)
-                              ? theme.primaryColor
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
                             color: _checked.contains(i)
                                 ? theme.primaryColor
-                                : theme.dividerColor,
-                            width: 2,
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(Radii.sm),
+                            border: Border.all(
+                              color: _checked.contains(i)
+                                  ? theme.primaryColor
+                                  : theme.dividerColor,
+                              width: 2,
+                            ),
+                          ),
+                          child: _checked.contains(i)
+                              ? Icon(Icons.check_rounded,
+                                  size: 16, color: theme.colorScheme.surface)
+                              : null,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            dayData.passages[i].label,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                        child: _checked.contains(i)
-                            ? Icon(Icons.check_rounded,
-                                size: 16, color: theme.colorScheme.surface)
-                            : null,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          dayData.passages[i].label,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      Icon(Icons.chevron_right_rounded,
-                          color: theme.primaryColor),
-                    ],
+                        Icon(Icons.chevron_right_rounded,
+                            color: theme.primaryColor),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -1233,7 +1264,10 @@ class _DayDetailCardState extends ConsumerState<_DayDetailCard> {
             child: FilledButton(
               style: done
                   ? FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFF2E7D32),
+                      backgroundColor: context.palette.success,
+                      // Surface colour reads on success green in light and
+                      // dark themes (dark used to get black on dark green).
+                      foregroundColor: theme.colorScheme.surface,
                     )
                   : null,
               onPressed: () {
@@ -1247,7 +1281,7 @@ class _DayDetailCardState extends ConsumerState<_DayDetailCard> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                            '🎉 $completed readings completed — keep going!'),
+                            '🎉 ${context.l10n.plansMilestone(completed)}'),
                         behavior: SnackBarBehavior.floating,
                       ),
                     );
@@ -1255,8 +1289,9 @@ class _DayDetailCardState extends ConsumerState<_DayDetailCard> {
                 }
               },
               child: Text(done
-                  ? '✓ Completed — tap to undo'
-                  : 'Mark Day ${widget.day} as Read ✓ (${_checked.length}/${dayData.passages.length} passages)'),
+                  ? '✓ ${context.l10n.plansCompletedTapToUndo}'
+                  : context.l10n.plansMarkDayRead(
+                      widget.day, _checked.length, dayData.passages.length)),
             ),
           ),
         ],

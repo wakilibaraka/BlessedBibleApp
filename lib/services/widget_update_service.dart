@@ -1,6 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:home_widget/home_widget.dart';
+import '../data/local_storage/preferences_service.dart';
+import '../l10n/l10n.dart';
 import '../state/home_provider.dart';
+import '../state/locale_provider.dart';
 import '../state/streak_provider.dart';
 import '../state/votd_tracker_provider.dart';
 import '../state/wotd_provider.dart';
@@ -44,6 +47,8 @@ class WidgetUpdateService {
     // Listen to StreakProvider
     _ref.listen(streakProvider, (previous, next) {
       HomeWidget.saveWidgetData<int>('streak_count', next.count);
+      HomeWidget.saveWidgetData<String>(
+          'label_streak_days', _l10n().studyStreakDays(next.count));
       HomeWidget.updateWidget(name: streakWidgetName, iOSName: 'StreakWidget');
     });
 
@@ -66,11 +71,21 @@ class WidgetUpdateService {
       });
     });
 
+    // Re-push the labels when the interface language changes.
+    _ref.listen(appLocaleProvider, (previous, next) {
+      syncAllWidgets();
+    });
+
     // Listen to Widget Customization Settings
     _ref.listen(widgetSettingsProvider, (previous, next) {
       syncAllWidgets();
     });
   }
+
+  /// Widget text in the app's saved interface language (the native side
+  /// falls back to its own device-language resources until this arrives).
+  AppLocalizations _l10n() => l10nFor(
+      _ref.read(preferencesProvider).prefs.getString(AppLocaleNotifier.key));
 
   String _formatDate(DateTime date) {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
@@ -90,6 +105,19 @@ class WidgetUpdateService {
     await HomeWidget.saveWidgetData<String>(
         'widget_text_mode', settings.textMode.id);
 
+    // 1b. Save interface-language labels
+    final l10n = _l10n();
+    await HomeWidget.saveWidgetData<String>(
+        'label_votd', l10n.homeVerseOfTheDay);
+    await HomeWidget.saveWidgetData<String>(
+        'label_wotd', l10n.homeWordOfTheDayHeading);
+    await HomeWidget.saveWidgetData<String>(
+        'label_streak_days', l10n.studyStreakDays(streak.count));
+    await HomeWidget.saveWidgetData<String>(
+        'label_streak_active', '${l10n.widgetStreakActive} 🔥');
+    await HomeWidget.saveWidgetData<String>(
+        'label_streak_inactive', l10n.widgetStreakInactive);
+
     // 2. Save VOTD data
     final votd = homeData.verseOfTheDay;
     await HomeWidget.saveWidgetData<String>('votd_reference', votd.reference);
@@ -106,11 +134,10 @@ class WidgetUpdateService {
       await HomeWidget.saveWidgetData<String>('wotd_word', wotd.word);
       await HomeWidget.saveWidgetData<String>('wotd_snippet', wotd.snippet);
     } else {
-      await HomeWidget.saveWidgetData<String>('wotd_word', 'Grace (Charis)');
       await HomeWidget.saveWidgetData<String>(
-        'wotd_snippet',
-        'The unmerited favor and divine love of God bestowed upon humanity.',
-      );
+          'wotd_word', l10n.widgetFallbackWord);
+      await HomeWidget.saveWidgetData<String>(
+          'wotd_snippet', l10n.widgetFallbackDefinition);
     }
 
     // 5. Trigger Native Widget Renders

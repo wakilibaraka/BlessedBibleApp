@@ -1,0 +1,20 @@
+{
+  "appTitle": {"en": "The Blessed Bible", "fr": "The Blessed Bible", "it": "The Blessed Bible", "ro": "The Blessed Bible", "sw": "The Blessed Bible", "tl": "The Blessed Bible"},
+  "commonCancel": {"en": "Cancel", "fr": "Annuler", "it": "Annulla", "ro": "Anulează", "sw": "Ghairi", "tl": "Kanselahin"},
+  "commonContinue": {"en": "Continue", "fr": "Continuer", "it": "Continua", "ro": "Continuă", "sw": "Endelea", "tl": "Magpatuloy"},
+  "commonSkip": {"en": "Skip", "fr": "Passer", "it": "Salta", "ro": "Omite", "sw": "Ruka", "tl": "Laktawan"},
+  "commonBack": {"en": "Back", "fr": "Retour", "it": "Indietro", "ro": "Înapoi", "sw": "Rudi", "tl": "Bumalik"},
+  "commonDone": {"en": "Done", "fr": "Terminé", "it": "Fatto", "ro": "Gata", "sw": "Imekamilika", "tl": "Tapos na"},
+  "commonSave": {"en": "Save", "fr": "Enregistrer", "it": "Salva", "ro": "Salvează", "sw": "Hifadhi", "tl": "I-save"},
+  "commonDelete": {"en": "Delete", "fr": "Supprimer", "it": "Elimina", "ro": "Șterge", "sw": "Futa", "tl": "Burahin"},
+  "commonClose": {"en": "Close", "fr": "Fermer", "it": "Chiudi", "ro": "Închide", "sw": "Funga", "tl": "Isara"},
+  "commonOk": {"en": "OK", "fr": "OK", "it": "OK", "ro": "OK", "sw": "Sawa", "tl": "OK"},
+  "commonRetry": {"en": "Try again", "fr": "Réessayer", "it": "Riprova", "ro": "Încearcă din nou", "sw": "Jaribu tena", "tl": "Subukan muli"},
+  "commonShare": {"en": "Share", "fr": "Partager", "it": "Condividi", "ro": "Distribuie", "sw": "Shiriki", "tl": "Ibahagi"},
+  "commonCopy": {"en": "Copy", "fr": "Copier", "it": "Copia", "ro": "Copiază", "sw": "Nakili", "tl": "Kopyahin"},
+  "commonEdit": {"en": "Edit", "fr": "Modifier", "it": "Modifica", "ro": "Editează", "sw": "Hariri", "tl": "I-edit"},
+  "commonSearch": {"en": "Search", "fr": "Rechercher", "it": "Cerca", "ro": "Caută", "sw": "Tafuta", "tl": "Maghanap"},
+  "languageTitle": {"en": "Language", "fr": "Langue", "it": "Lingua", "ro": "Limbă", "sw": "Lugha", "tl": "Wika"},
+  "languageSystem": {"en": "Same as device", "fr": "Comme l'appareil", "it": "Come il dispositivo", "ro": "La fel ca dispozitivul", "sw": "Sawa na kifaa", "tl": "Kapareho ng device"},
+  "languageSubtitle": {"en": "The language of menus and buttons. Your Bible translation is chosen separately.", "fr": "La langue des menus et des boutons. Votre traduction de la Bible se choisit à part.", "it": "La lingua di menu e pulsanti. La traduzione della Bibbia si sceglie a parte.", "ro": "Limba meniurilor și a butoanelor. Traducerea Bibliei se alege separat.", "sw": "Lugha ya menyu na vitufe. Tafsiri ya Biblia huchaguliwa kando.", "tl": "Ang wika ng mga menu at button. Hiwalay na pinipili ang salin ng Bibliya."}
+}

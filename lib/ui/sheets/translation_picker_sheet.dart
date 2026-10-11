@@ -1,14 +1,19 @@
 import 'dart:async';
+import '../../theme/design_tokens.dart';
 import 'package:flutter/material.dart';
+import '../../l10n/l10n.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/translation_provider.dart';
 import '../../state/read_settings_provider.dart';
 import '../../data/models/translation_model.dart';
 import '../../services/bible_database_service.dart';
+import '../../services/firebase_setup.dart';
 import '../../services/translation_downloader.dart';
 import '../../services/translation_pack_store.dart';
 import '../widgets/animated_segmented_tile.dart';
+import '../widgets/item_context_sheet.dart' show confirmDestructive;
+import '../widgets/state_views.dart';
 import '../widgets/textured_glass_container.dart';
 
 class TranslationPickerSheet extends ConsumerStatefulWidget {
@@ -69,7 +74,8 @@ class _TranslationPickerSheetState
     return FractionallySizedBox(
       heightFactor: 0.75,
       child: TexturedGlassContainer(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        borderRadius:
+            const BorderRadius.vertical(top: Radius.circular(Radii.xxxl)),
         padding: EdgeInsets.only(
           top: 24,
           bottom: MediaQuery.of(context).padding.bottom + 24,
@@ -84,13 +90,14 @@ class _TranslationPickerSheetState
               children: [
                 Expanded(
                   child: Text(
-                    'Bible Translation',
+                    context.l10n.readTranslationTitle,
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),
                 IconButton(
+                  tooltip: context.l10n.commonClose,
                   onPressed: () => Navigator.of(context).pop(),
                   icon: const Icon(Icons.close_rounded),
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
@@ -99,25 +106,27 @@ class _TranslationPickerSheetState
             ),
             const SizedBox(height: 8),
             AnimatedSegmentedTile<ReadingLayout>(
-              title: 'Reading Layout',
+              title: context.l10n.readLayoutTitle,
               subtitle: () {
                 switch (readingLayout) {
                   case ReadingLayout.single:
-                    return 'One translation';
+                    return context.l10n.readLayoutSingleDesc;
                   case ReadingLayout.interleaved:
-                    return 'Two translations stacked per verse';
+                    return context.l10n.readLayoutBilingualDesc;
                   case ReadingLayout.sideBySide:
-                    return 'Two translations in side-by-side columns';
+                    return context.l10n.readLayoutParallelDesc;
                   case ReadingLayout.chips:
-                    return 'Tap a verse to switch its translation';
+                    return context.l10n.readLayoutChipsDesc;
                 }
               }(),
               selectedValue: readingLayout,
-              options: const [
-                MapEntry(ReadingLayout.single, 'Single'),
-                MapEntry(ReadingLayout.interleaved, 'Bilingual'),
-                MapEntry(ReadingLayout.sideBySide, 'Parallel'),
-                MapEntry(ReadingLayout.chips, 'Chips'),
+              options: [
+                MapEntry(ReadingLayout.single, context.l10n.readLayoutSingle),
+                MapEntry(ReadingLayout.interleaved,
+                    context.l10n.readLayoutBilingual),
+                MapEntry(
+                    ReadingLayout.sideBySide, context.l10n.readLayoutParallel),
+                MapEntry(ReadingLayout.chips, context.l10n.readLayoutChips),
               ],
               onChanged: (val) {
                 HapticFeedback.selectionClick();
@@ -129,7 +138,7 @@ class _TranslationPickerSheetState
               Container(
                 decoration: BoxDecoration(
                   color: theme.colorScheme.surface,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(Radii.md),
                   border: Border.all(
                       color:
                           theme.colorScheme.onSurface.withValues(alpha: 0.1)),
@@ -139,7 +148,7 @@ class _TranslationPickerSheetState
                   children: [
                     Expanded(
                       child: _buildTabButton(
-                        'Primary',
+                        context.l10n.readPrimary,
                         !_isSelectingSecondary,
                         () => setState(() => _isSelectingSecondary = false),
                         theme,
@@ -147,7 +156,7 @@ class _TranslationPickerSheetState
                     ),
                     Expanded(
                       child: _buildTabButton(
-                        'Secondary',
+                        context.l10n.readSecondary,
                         _isSelectingSecondary,
                         () => setState(() => _isSelectingSecondary = true),
                         theme,
@@ -169,12 +178,13 @@ class _TranslationPickerSheetState
                       activeTranslationId,
                       otherTranslationId,
                       installed),
-                  loading: () => const Center(
-                      child: Padding(
-                          padding: EdgeInsets.all(32),
-                          child: CircularProgressIndicator())),
-                  error: (e, st) =>
-                      Center(child: Text('Error loading translations: $e')),
+                  loading: () => const Padding(
+                      padding: EdgeInsets.all(32), child: LoadingView()),
+                  error: (e, st) => ErrorState(
+                      error: e,
+                      message: context.l10n.readTranslationsLoadErrorPlain,
+                      onRetry: () =>
+                          ref.invalidate(availableTranslationsProvider)),
                 ),
               ),
             ),
@@ -186,28 +196,34 @@ class _TranslationPickerSheetState
 
   Widget _buildTabButton(
       String text, bool isSelected, VoidCallback onTap, ThemeData theme) {
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.selectionClick();
-        onTap();
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: isSelected
-              ? theme.primaryColor.withValues(alpha: 0.15)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(
-          text,
-          style: theme.textTheme.labelLarge?.copyWith(
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          HapticFeedback.selectionClick();
+          onTap();
+        },
+        child: AnimatedContainer(
+          duration: Motion.of(context, const Duration(milliseconds: 200)),
+          constraints: const BoxConstraints(minHeight: kMinTouchTarget),
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
             color: isSelected
-                ? theme.primaryColor
-                : theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                ? theme.primaryColor.withValues(alpha: 0.15)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(Radii.sm),
+          ),
+          child: Text(
+            text,
+            style: theme.textTheme.labelLarge?.copyWith(
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              color: isSelected
+                  ? theme.primaryColor
+                  : theme.colorScheme.onSurface.withValues(alpha: 0.7),
+            ),
           ),
         ),
       ),
@@ -224,6 +240,12 @@ class _TranslationPickerSheetState
   ) async {
     final id = item.translationId;
     if (TranslationPackStore.isCoreId(id)) return;
+    final ok = await confirmDestructive(
+      context,
+      title: context.l10n.spaceDeletePackTitle(item.translationName),
+      message: context.l10n.readDeleteTranslationBody,
+    );
+    if (!ok || !context.mounted) return;
     if (ref.read(activeTranslationProvider) == id) {
       await ref.read(activeTranslationProvider.notifier).setTranslation('kjv');
     }
@@ -238,16 +260,18 @@ class _TranslationPickerSheetState
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${item.translationName} deleted.'),
+            content:
+                Text(context.l10n.readTranslationDeleted(item.translationName)),
             behavior: SnackBarBehavior.floating,
           ),
         );
       }
     } catch (e) {
+      reportNonFatal('delete translation', code: e.runtimeType.toString());
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Could not delete: $e'),
+            content: Text(context.l10n.readDeleteFailedPlain),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -328,108 +352,113 @@ class _TranslationPickerSheetState
             padding: const EdgeInsets.only(bottom: 8.0),
             child: Opacity(
               opacity: isOtherSelected ? 0.4 : 1.0,
-              child: Material(
-                color: isSelected
-                    ? theme.primaryColor.withValues(alpha: 0.1)
-                    : theme.colorScheme.surface,
-                borderRadius: BorderRadius.circular(16),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(16),
-                  onTap: isOtherSelected
-                      ? null
-                      : () {
-                          if (_isSelectingSecondary) {
-                            ref
-                                .read(secondaryTranslationProvider.notifier)
-                                .setTranslation(item.translationId);
-                          } else {
-                            ref
-                                .read(activeTranslationProvider.notifier)
-                                .setTranslation(item.translationId);
-                          }
-                          Navigator.of(context).pop();
-                        },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 16),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: isSelected
-                            ? theme.primaryColor.withValues(alpha: 0.5)
-                            : theme.colorScheme.onSurface
-                                .withValues(alpha: 0.1),
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                item.translationName,
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: isSelected
-                                      ? theme.primaryColor
-                                      : theme.colorScheme.onSurface,
-                                ),
-                              ),
-                              Builder(builder: (_) {
-                                final subtitle = isKjv
-                                    ? 'Always available · app backbone'
-                                    : item.license;
-                                if (subtitle.isEmpty) {
-                                  return const SizedBox.shrink();
-                                }
-                                return Padding(
-                                  padding: const EdgeInsets.only(top: 4),
-                                  child: Text(
-                                    subtitle,
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: theme.colorScheme.onSurface
-                                          .withValues(alpha: 0.6),
-                                    ),
-                                  ),
-                                );
-                              }),
-                            ],
-                          ),
+              child: Semantics(
+                selected: isSelected,
+                child: Material(
+                  color: isSelected
+                      ? theme.primaryColor.withValues(alpha: 0.1)
+                      : theme.colorScheme.surface,
+                  borderRadius: BorderRadius.circular(Radii.lg),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(Radii.lg),
+                    onTap: isOtherSelected
+                        ? null
+                        : () {
+                            if (_isSelectingSecondary) {
+                              ref
+                                  .read(secondaryTranslationProvider.notifier)
+                                  .setTranslation(item.translationId);
+                            } else {
+                              ref
+                                  .read(activeTranslationProvider.notifier)
+                                  .setTranslation(item.translationId);
+                            }
+                            Navigator.of(context).pop();
+                          },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 16),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: isSelected
+                              ? theme.primaryColor.withValues(alpha: 0.5)
+                              : theme.colorScheme.onSurface
+                                  .withValues(alpha: 0.1),
                         ),
-                        if (!isLocked)
-                          IconButton(
-                            tooltip: 'Delete ${item.translationName}',
-                            icon: const Icon(Icons.delete_outline_rounded,
-                                size: 20),
-                            color: theme.colorScheme.onSurface
-                                .withValues(alpha: 0.4),
-                            onPressed: () =>
-                                _deleteTranslation(context, ref, item),
+                        borderRadius: BorderRadius.circular(Radii.lg),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item.translationName,
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: isSelected
+                                        ? theme.primaryColor
+                                        : theme.colorScheme.onSurface,
+                                  ),
+                                ),
+                                Builder(builder: (_) {
+                                  final subtitle = isKjv
+                                      ? context.l10n.readKjvAlwaysAvailable
+                                      : item.license;
+                                  if (subtitle.isEmpty) {
+                                    return const SizedBox.shrink();
+                                  }
+                                  return Padding(
+                                    padding: const EdgeInsets.only(top: 4),
+                                    child: Text(
+                                      subtitle,
+                                      style:
+                                          theme.textTheme.bodySmall?.copyWith(
+                                        color: theme.colorScheme.onSurface
+                                            .withValues(alpha: 0.6),
+                                      ),
+                                    ),
+                                  );
+                                }),
+                              ],
+                            ),
                           ),
-                        if (isSelected)
-                          Icon(
-                            Icons.check_circle_rounded,
-                            color: theme.primaryColor,
-                          )
-                        else if (isLocked)
-                          Tooltip(
-                            message: 'Cannot delete — app backbone',
-                            child: Icon(
-                              Icons.lock_outline_rounded,
+                          if (!isLocked)
+                            IconButton(
+                              tooltip: context.l10n
+                                  .readDeleteTranslation(item.translationName),
+                              icon: const Icon(Icons.delete_outline_rounded,
+                                  size: 20),
+                              color: theme.colorScheme.onSurface
+                                  .withValues(alpha: 0.4),
+                              onPressed: () =>
+                                  _deleteTranslation(context, ref, item),
+                            ),
+                          if (isSelected)
+                            Icon(
+                              Icons.check_circle_rounded,
+                              color: theme.primaryColor,
+                            )
+                          else if (isLocked)
+                            Tooltip(
+                              message: context.l10n.readCannotDeleteBackbone,
+                              child: Icon(
+                                Icons.lock_outline_rounded,
+                                size: 20,
+                                color: theme.colorScheme.onSurface
+                                    .withValues(alpha: 0.3),
+                              ),
+                            )
+                          else
+                            Icon(
+                              Icons.cloud_done_outlined,
                               size: 20,
                               color: theme.colorScheme.onSurface
                                   .withValues(alpha: 0.3),
                             ),
-                          )
-                        else
-                          Icon(
-                            Icons.cloud_done_outlined,
-                            size: 20,
-                            color: theme.colorScheme.onSurface
-                                .withValues(alpha: 0.3),
-                          ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -445,7 +474,7 @@ class _TranslationPickerSheetState
         Padding(
           padding: const EdgeInsets.only(bottom: 4.0, top: 16.0),
           child: Text(
-            'AVAILABLE TO ADD',
+            context.l10n.readAvailableToAdd,
             style: theme.textTheme.labelLarge?.copyWith(
               color: theme.primaryColor,
               fontWeight: FontWeight.w700,
@@ -535,11 +564,20 @@ class _DownloadableTileState extends ConsumerState<_DownloadableTile> {
             text.contains('Connection refused') ||
             text.contains('Connection reset');
         final message = offline
-            ? 'No internet connection — try again when online.'
-            : (_isRestore ? 'Restore failed ($e).' : 'Download failed ($e).');
+            ? context.l10n.readNoInternet
+            : (_isRestore
+                ? context.l10n.readRestoreFailed
+                : context.l10n.readDownloadFailed);
+        if (!offline) {
+          reportNonFatal(
+              _isRestore ? 'restore translation' : 'download translation',
+              code: e.runtimeType.toString());
+        }
         setState(() {
           _isDownloading = false;
-          _error = _isRestore ? 'Restore failed' : 'Download failed';
+          _error = _isRestore
+              ? context.l10n.readRestoreFailed
+              : context.l10n.readDownloadFailed;
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(message)),
@@ -557,9 +595,9 @@ class _DownloadableTileState extends ConsumerState<_DownloadableTile> {
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Material(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(Radii.lg),
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(Radii.lg),
           onTap: _isDownloading ? null : _startDownload,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -569,7 +607,7 @@ class _DownloadableTileState extends ConsumerState<_DownloadableTile> {
                     ? theme.colorScheme.error
                     : theme.colorScheme.onSurface.withValues(alpha: 0.1),
               ),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(Radii.lg),
             ),
             child: Row(
               children: [
@@ -589,7 +627,7 @@ class _DownloadableTileState extends ConsumerState<_DownloadableTile> {
                       Builder(builder: (_) {
                         final isRestore = widget.item['source'] == 'bundled';
                         final label = isRestore
-                            ? "${widget.item['license']} · ${sizeMB.toStringAsFixed(1)} MB · restore offline"
+                            ? "${widget.item['license']} · ${sizeMB.toStringAsFixed(1)} MB · ${context.l10n.readRestoreOffline}"
                             : "${widget.item['license']} · ${sizeMB.toStringAsFixed(1)} MB";
                         return Text(
                           label,
@@ -611,7 +649,7 @@ class _DownloadableTileState extends ConsumerState<_DownloadableTile> {
                         const SizedBox(height: 8),
                         LinearProgressIndicator(
                           value: _progress,
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(Radii.xs),
                         ),
                       ]
                     ],
