@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/search_provider.dart';
 import '../../state/search_settings_provider.dart';
+import '../../theme/design_tokens.dart';
 
 class SearchSettingsSheet extends ConsumerWidget {
   const SearchSettingsSheet({super.key});
@@ -16,7 +17,8 @@ class SearchSettingsSheet extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius:
+            const BorderRadius.vertical(top: Radius.circular(Radii.xxxl)),
       ),
       child: SafeArea(
         child: Column(
@@ -30,7 +32,7 @@ class SearchSettingsSheet extends ConsumerWidget {
                 height: 4,
                 decoration: BoxDecoration(
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: BorderRadius.circular(Radii.xs),
                 ),
               ),
             ),

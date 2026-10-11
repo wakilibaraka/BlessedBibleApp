@@ -199,6 +199,7 @@ class _WeeklyJourneyPath extends StatelessWidget {
                       isMilestone
                           ? Icons.emoji_events_rounded
                           : Icons.check_rounded,
+                      // Fixed: icon on the fixed gold completed-day badge.
                       color: Colors.white,
                       size: 40)
                   : (isMilestone

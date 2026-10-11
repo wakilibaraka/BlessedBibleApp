@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../theme/design_tokens.dart';
 import '../../l10n/l10n.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../widgets/textured_glass_container.dart';
@@ -64,7 +65,7 @@ class _VerseContextMenuSheetState extends ConsumerState<VerseContextMenuSheet> {
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
             child: TexturedGlassContainer(
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(Radii.xxl),
               child: Padding(
                 padding:
                     const EdgeInsets.symmetric(vertical: 24, horizontal: 16),

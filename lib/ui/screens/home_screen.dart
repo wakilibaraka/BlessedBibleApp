@@ -1,4 +1,5 @@
 import 'dart:async';
+import '../../theme/design_tokens.dart';
 import 'package:flutter/material.dart';
 import '../../l10n/l10n.dart';
 import 'package:flutter/gestures.dart';
@@ -361,7 +362,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             delay: const Duration(milliseconds: 400),
             child: GlassContainer(
               isScrollable: true,
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(Radii.xxl),
               // Tighter vertical padding so the card fits without nav overlap
               padding:
                   const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
@@ -395,7 +396,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                               fontWeight: FontWeight.w700,
                               letterSpacing: 0.8,
                               color: theme.primaryColor,
-                              fontSize: 11,
+                              fontSize: TypeScale.caption,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -500,7 +501,7 @@ class _PillButton extends StatelessWidget {
     final gold = theme.primaryColor;
 
     final shape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(50),
+      borderRadius: BorderRadius.circular(Radii.pill),
     );
 
     if (filled) {
@@ -510,15 +511,15 @@ class _PillButton extends StatelessWidget {
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
             backgroundColor: gold,
-            foregroundColor: Colors.white,
+            foregroundColor: context.palette.onAccent,
             elevation: 0,
             shape: shape,
             padding: EdgeInsets.zero,
           ),
           child: Text(
             label,
-            style: theme.textTheme.labelMedium
-                ?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+            style: theme.textTheme.labelMedium?.copyWith(
+                color: context.palette.onAccent, fontWeight: FontWeight.bold),
           ),
         ),
       );
@@ -532,8 +533,9 @@ class _PillButton extends StatelessWidget {
             side: BorderSide(
               color: Theme.of(context).brightness == Brightness.dark
                   ? gold.withValues(alpha: 0.55)
-                  : const Color(0xFF8C6300).withValues(
-                      alpha: 0.8), // Deeper bronze for sharper contrast
+                  // Hand-tuned deeper bronze for outline contrast on light
+                  // paper; kept literal on purpose.
+                  : const Color(0xFF8C6300).withValues(alpha: 0.8),
             ),
             shape: shape,
             padding: EdgeInsets.zero,
@@ -591,7 +593,7 @@ class WordOfTheDaySection extends ConsumerWidget {
               const SizedBox(height: 16),
               GlassContainer(
                 isScrollable: false,
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(Radii.xxl),
                 padding: const EdgeInsets.symmetric(
                     horizontal: 20.0, vertical: 14.0),
                 child: Column(
@@ -699,7 +701,7 @@ class _WotdFallback extends StatelessWidget {
         const SizedBox(height: 12),
         GlassContainer(
           isScrollable: false,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(Radii.xxl),
           padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
           child: Text(
             message,

@@ -5,6 +5,10 @@ import '../../state/strongs_provider.dart';
 import '../../state/typography_provider.dart';
 import '../../state/read_settings_provider.dart';
 import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
+
+/// Decorative size for the headword at the top of the sheet.
+const double _kHeroWordSize = 40;
 
 void showStrongsEntrySheet(BuildContext context, String strongsId) {
   final ref = ProviderScope.containerOf(context);
@@ -51,12 +55,12 @@ class _StrongsEntrySheet extends ConsumerWidget {
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
         borderRadius: isFloating
-            ? BorderRadius.circular(24)
-            : const BorderRadius.vertical(top: Radius.circular(32)),
+            ? BorderRadius.circular(Radii.xxl)
+            : const BorderRadius.vertical(top: Radius.circular(Radii.xxxl)),
         boxShadow: isFloating
             ? [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.2),
+                  color: context.palette.shadow,
                   blurRadius: 24,
                   spreadRadius: 8,
                 )
@@ -80,8 +84,9 @@ class _StrongsEntrySheet extends ConsumerWidget {
                     icon: Icon(Icons.arrow_back_ios_new_rounded,
                         size: 18, color: theme.primaryColor),
                     label: Text(context.l10n.commonBack,
-                        style:
-                            TextStyle(fontSize: 16, color: theme.primaryColor)),
+                        style: TextStyle(
+                            fontSize: TypeScale.bodyLarge,
+                            color: theme.primaryColor)),
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 8),
@@ -134,7 +139,7 @@ class _StrongsEntrySheet extends ConsumerWidget {
                             entry.lemma,
                             style: TextStyle(
                               fontFamily: typography.fontFamily,
-                              fontSize: 40,
+                              fontSize: _kHeroWordSize,
                               fontWeight: FontWeight.w800,
                               height: 1.1,
                               letterSpacing: -1.0,
@@ -147,7 +152,7 @@ class _StrongsEntrySheet extends ConsumerWidget {
                             child: Text(
                               entry.id,
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: TypeScale.title,
                                 fontWeight: FontWeight.bold,
                                 color: theme.primaryColor,
                               ),
@@ -169,7 +174,7 @@ class _StrongsEntrySheet extends ConsumerWidget {
                               decoration: BoxDecoration(
                                 color:
                                     theme.primaryColor.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(Radii.lg),
                               ),
                               child: Text(
                                 entry.transliteration,
@@ -186,7 +191,7 @@ class _StrongsEntrySheet extends ConsumerWidget {
                               decoration: BoxDecoration(
                                 color: theme.colorScheme.onSurface
                                     .withValues(alpha: 0.05),
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(Radii.lg),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,

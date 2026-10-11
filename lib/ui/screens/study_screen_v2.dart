@@ -26,6 +26,7 @@ import 'reading_plan_detail_v2_screen.dart';
 import 'your_space_screen.dart';
 import '../../data/curated_plans.dart';
 import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
 
 /// Redesigned Study hub (V2): Large by default, every card the same
 /// size.
@@ -164,7 +165,8 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
         return Container(
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(Radii.xxl)),
           ),
           padding: const EdgeInsets.fromLTRB(8, 8, 8, 32),
           child: Column(
@@ -178,7 +180,7 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                   margin: const EdgeInsets.only(top: 6, bottom: 2),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
-                    borderRadius: BorderRadius.circular(3),
+                    borderRadius: BorderRadius.circular(Radii.pill),
                   ),
                 ),
               ),
@@ -540,7 +542,7 @@ class _YourSpaceCard extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(vertical: 10),
               decoration: BoxDecoration(
                 color: theme.primaryColor.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(Radii.lg),
                 border: Border.all(
                   color: theme.primaryColor.withValues(alpha: 0.22),
                 ),
@@ -555,7 +557,7 @@ class _YourSpaceCard extends ConsumerWidget {
                       )),
                   Text(c.$2,
                       style: theme.textTheme.labelSmall?.copyWith(
-                        fontSize: 10,
+                        fontSize: TypeScale.micro,
                         color:
                             theme.colorScheme.onSurface.withValues(alpha: 0.65),
                       )),
@@ -841,7 +843,7 @@ class _TodayRow extends ConsumerWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: theme.colorScheme.onSurface.withValues(alpha: 0.04),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(Radii.lg),
         border: Border.all(color: theme.dividerColor),
       ),
       child: Row(
@@ -911,7 +913,7 @@ class _ToolCard extends StatelessWidget {
             height: iconBox,
             decoration: BoxDecoration(
               color: theme.primaryColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(11),
+              borderRadius: BorderRadius.circular(Radii.md),
               border: Border.all(
                 color: theme.primaryColor.withValues(alpha: 0.3),
               ),
@@ -980,7 +982,7 @@ class _VotdArchiveCard extends ConsumerWidget {
             height: iconBox,
             decoration: BoxDecoration(
               color: theme.primaryColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(11),
+              borderRadius: BorderRadius.circular(Radii.md),
               border: Border.all(
                 color: theme.primaryColor.withValues(alpha: 0.3),
               ),
@@ -1095,7 +1097,7 @@ class _StreakCard extends ConsumerWidget {
             height: iconBox,
             decoration: BoxDecoration(
               color: theme.primaryColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(11),
+              borderRadius: BorderRadius.circular(Radii.md),
               border: Border.all(
                 color: theme.primaryColor.withValues(alpha: 0.3),
               ),

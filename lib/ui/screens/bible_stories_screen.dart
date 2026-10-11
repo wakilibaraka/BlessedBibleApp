@@ -8,6 +8,7 @@ import '../../state/devotional_provider.dart';
 import '../../theme/app_colors.dart';
 import 'bible_story_reader_screen.dart';
 import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
 
 /// Entry point: "Bible Stories" — an illustrated journey through Scripture.
 class BibleStoriesScreen extends ConsumerStatefulWidget {
@@ -113,7 +114,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                       filled: true,
                       fillColor: theme.colorScheme.surface,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(Radii.lg),
                         borderSide: BorderSide.none,
                       ),
                     ),
@@ -269,7 +270,8 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
           ),
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(Radii.xxl)),
           ),
           padding: const EdgeInsets.fromLTRB(8, 8, 8, 32),
           child: StatefulBuilder(
@@ -291,7 +293,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                       decoration: BoxDecoration(
                         color:
                             theme.colorScheme.onSurface.withValues(alpha: 0.25),
-                        borderRadius: BorderRadius.circular(3),
+                        borderRadius: BorderRadius.circular(Radii.pill),
                       ),
                     ),
                   ),
@@ -305,7 +307,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                         filled: true,
                         fillColor: theme.colorScheme.surface,
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(Radii.lg),
                           borderSide: BorderSide.none,
                         ),
                       ),
@@ -371,7 +373,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
           color: active
               ? theme.primaryColor.withValues(alpha: 0.15)
               : Colors.transparent,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(Radii.lg),
           border: Border.all(
             color: active
                 ? theme.primaryColor
@@ -419,7 +421,7 @@ class _FilterPill extends StatelessWidget {
           color: selected
               ? theme.primaryColor.withValues(alpha: 0.15)
               : theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(999),
+          borderRadius: BorderRadius.circular(Radii.pill),
           border: Border.all(
             color: selected
                 ? theme.primaryColor
@@ -580,9 +582,9 @@ class _StoryCard extends ConsumerWidget {
 
     return Material(
       color: theme.colorScheme.surface,
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(Radii.xl),
       child: InkWell(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(Radii.xl),
         onTap: () {
           Navigator.of(context).push(CupertinoPageRoute<void>(
             builder: (_) => BibleStoryReaderScreen(initialStory: story),
@@ -590,7 +592,7 @@ class _StoryCard extends ConsumerWidget {
         },
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(Radii.xl),
             border: Border.all(
               color: isFavorite
                   ? AppColors.goldAccent.withValues(alpha: 0.8)
@@ -608,7 +610,8 @@ class _StoryCard extends ConsumerWidget {
                 : null,
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(17),
+            // Inset by the 1px border so the clip sits inside it.
+            borderRadius: BorderRadius.circular(Radii.xl - 1),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -631,8 +634,9 @@ class _StoryCard extends ConsumerWidget {
                         child: Container(
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
+                            // Fixed: read badge sits over the story artwork.
                             color: Colors.black.withValues(alpha: 0.35),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(Radii.md),
                           ),
                           child: Icon(
                             isRead

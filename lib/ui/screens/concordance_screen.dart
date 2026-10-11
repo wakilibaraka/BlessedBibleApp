@@ -9,6 +9,7 @@ import '../../state/theme_provider.dart';
 import '../widgets/shared_app_bar.dart';
 import '../widgets/study_v2_widgets.dart';
 import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
 
 /// Standalone concordance (V2): word -> every KJV verse containing it.
 ///
@@ -146,11 +147,11 @@ class _ConcordanceScreenState extends ConsumerState<ConcordanceScreen> {
                       filled: true,
                       fillColor: theme.colorScheme.surface,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(Radii.lg),
                         borderSide: BorderSide(color: theme.dividerColor),
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(Radii.lg),
                         borderSide: BorderSide(color: theme.dividerColor),
                       ),
                     ),
@@ -229,7 +230,7 @@ class _HitRow extends StatelessWidget {
     final theme = Theme.of(context);
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(Radii.md),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
         child: Column(

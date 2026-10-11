@@ -4,6 +4,7 @@ import '../../state/theme_provider.dart';
 import '../../theme/reading_tokens.dart';
 import 'animated_background.dart';
 import 'textured_glass_container.dart';
+import '../../theme/design_tokens.dart';
 
 /// Shared presentation primitives for the redesigned (V2) Study screens.
 ///
@@ -57,7 +58,7 @@ class V2PillTabs extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(Radii.pill),
         border: Border.all(color: theme.dividerColor),
       ),
       child: TabBar(
@@ -65,7 +66,7 @@ class V2PillTabs extends StatelessWidget {
         dividerColor: Colors.transparent,
         indicator: BoxDecoration(
           color: theme.colorScheme.onSurface,
-          borderRadius: BorderRadius.circular(999),
+          borderRadius: BorderRadius.circular(Radii.pill),
         ),
         indicatorSize: TabBarIndicatorSize.tab,
         labelColor: theme.colorScheme.surface,
@@ -294,7 +295,7 @@ class V2Badge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color: theme.primaryColor.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(Radii.pill),
         border: Border.all(
           color: theme.primaryColor.withValues(alpha: 0.3),
         ),
@@ -322,7 +323,7 @@ class V2MetaChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: theme.colorScheme.onSurface.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(Radii.pill),
         border: Border.all(color: theme.dividerColor),
       ),
       child: Text(
@@ -344,7 +345,7 @@ class V2ProgressBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return ClipRRect(
-      borderRadius: BorderRadius.circular(99),
+      borderRadius: BorderRadius.circular(Radii.pill),
       child: LinearProgressIndicator(
         value: fraction.clamp(0.0, 1.0),
         minHeight: 8,

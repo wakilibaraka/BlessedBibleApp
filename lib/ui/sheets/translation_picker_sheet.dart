@@ -1,4 +1,5 @@
 import 'dart:async';
+import '../../theme/design_tokens.dart';
 import 'package:flutter/material.dart';
 import '../../l10n/l10n.dart';
 import 'package:flutter/services.dart';
@@ -70,7 +71,8 @@ class _TranslationPickerSheetState
     return FractionallySizedBox(
       heightFactor: 0.75,
       child: TexturedGlassContainer(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        borderRadius:
+            const BorderRadius.vertical(top: Radius.circular(Radii.xxxl)),
         padding: EdgeInsets.only(
           top: 24,
           bottom: MediaQuery.of(context).padding.bottom + 24,
@@ -132,7 +134,7 @@ class _TranslationPickerSheetState
               Container(
                 decoration: BoxDecoration(
                   color: theme.colorScheme.surface,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(Radii.md),
                   border: Border.all(
                       color:
                           theme.colorScheme.onSurface.withValues(alpha: 0.1)),
@@ -203,7 +205,7 @@ class _TranslationPickerSheetState
           color: isSelected
               ? theme.primaryColor.withValues(alpha: 0.15)
               : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(Radii.sm),
         ),
         child: Text(
           text,
@@ -337,9 +339,9 @@ class _TranslationPickerSheetState
                 color: isSelected
                     ? theme.primaryColor.withValues(alpha: 0.1)
                     : theme.colorScheme.surface,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(Radii.lg),
                 child: InkWell(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(Radii.lg),
                   onTap: isOtherSelected
                       ? null
                       : () {
@@ -364,7 +366,7 @@ class _TranslationPickerSheetState
                             : theme.colorScheme.onSurface
                                 .withValues(alpha: 0.1),
                       ),
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(Radii.lg),
                     ),
                     child: Row(
                       children: [
@@ -567,9 +569,9 @@ class _DownloadableTileState extends ConsumerState<_DownloadableTile> {
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Material(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(Radii.lg),
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(Radii.lg),
           onTap: _isDownloading ? null : _startDownload,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -579,7 +581,7 @@ class _DownloadableTileState extends ConsumerState<_DownloadableTile> {
                     ? theme.colorScheme.error
                     : theme.colorScheme.onSurface.withValues(alpha: 0.1),
               ),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(Radii.lg),
             ),
             child: Row(
               children: [
@@ -621,7 +623,7 @@ class _DownloadableTileState extends ConsumerState<_DownloadableTile> {
                         const SizedBox(height: 8),
                         LinearProgressIndicator(
                           value: _progress,
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(Radii.xs),
                         ),
                       ]
                     ],

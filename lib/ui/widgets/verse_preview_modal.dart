@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../theme/design_tokens.dart';
 import '../../l10n/l10n.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/bible_provider.dart';
@@ -83,7 +84,8 @@ class VersePreviewModal extends ConsumerWidget {
     }
 
     return TexturedGlassContainer(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(24.0)),
+      borderRadius:
+          const BorderRadius.vertical(top: Radius.circular(Radii.xxl)),
       padding: EdgeInsets.zero,
       child: SafeArea(
         child: Column(

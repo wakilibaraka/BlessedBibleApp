@@ -19,6 +19,7 @@ import '../../state/translation_provider.dart';
 import '../../state/user_data_provider.dart'
     show bookmarkDataProvider, highlightsProvider;
 import '../../sync/bible_sync.dart';
+import '../../theme/design_tokens.dart';
 
 /// Shared account avatar: photo → initial → person icon, themed.
 /// Extracted from the account button so every surface matches.
@@ -98,14 +99,14 @@ void showAccountMenu(BuildContext context) {
       return Container(
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: Radii.sheet,
         ),
         padding: const EdgeInsets.fromLTRB(8, 8, 8, 32),
         // Material ancestor so ListTile ink splashes paint above the
         // decorated sheet background (debug assertion otherwise).
         child: Material(
           color: Colors.transparent,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: Radii.sheet,
           child: Consumer(
             builder: (ctx, ref, _) {
               // Scrollable so the menu never overflows short screens;
@@ -141,7 +142,7 @@ class _AccountMenuBody extends ConsumerWidget {
             margin: const EdgeInsets.only(top: 6, bottom: 10),
             decoration: BoxDecoration(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
-              borderRadius: BorderRadius.circular(3),
+              borderRadius: BorderRadius.circular(Radii.xs),
             ),
           ),
         ),
@@ -301,8 +302,7 @@ void _showAccountSheet(BuildContext context) {
             child: Container(
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.surface,
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(24)),
+                borderRadius: Radii.sheet,
               ),
               padding: const EdgeInsets.fromLTRB(8, 8, 8, 32),
               child: Column(
@@ -315,7 +315,8 @@ void _showAccountSheet(BuildContext context) {
                           ? context.l10n.accountAccount
                           : context.l10n.accountSignIn,
                       style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold),
+                          fontSize: TypeScale.titleLarge,
+                          fontWeight: FontWeight.bold),
                     ),
                   ),
                   if (user == null) ...[

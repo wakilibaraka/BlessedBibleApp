@@ -1,5 +1,6 @@
 import '../../l10n/l10n.dart';
 import '../widgets/language_picker.dart';
+import '../../theme/design_tokens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
@@ -181,7 +182,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 Padding(
                   padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
                   child: Text(context.l10n.settingsImmersiveReading,
-                      style: TextStyle(fontSize: 16)),
+                      style: TextStyle(fontSize: TypeScale.bodyLarge)),
                 ),
                 _buildImmersiveTile(
                   context,
@@ -403,7 +404,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 Padding(
                   padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
                   child: Text(context.l10n.settingsUnderlineScope,
-                      style: TextStyle(fontSize: 16)),
+                      style: TextStyle(fontSize: TypeScale.bodyLarge)),
                 ),
                 _buildDictScopeTile(
                   context,
@@ -488,7 +489,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 Padding(
                   padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
                   child: Text(context.l10n.settingsOtherEnglishVersions,
-                      style: TextStyle(fontSize: 16)),
+                      style: TextStyle(fontSize: TypeScale.bodyLarge)),
                 ),
                 _buildRadioTile<NonKjvDictionaryMode>(
                   context,
@@ -942,7 +943,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           Padding(
             padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
             child: Text(context.l10n.settingsPageSearch,
-                style: TextStyle(fontSize: 16)),
+                style: TextStyle(fontSize: TypeScale.bodyLarge)),
           ),
           Consumer(builder: (context, ref, _) {
             final autoOpen = ref.watch(searchSettingsProvider
@@ -1019,7 +1020,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 Padding(
                   padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
                   child: Text(context.l10n.settingsDefaultScopes,
-                      style: TextStyle(fontSize: 14)),
+                      style: TextStyle(fontSize: TypeScale.body)),
                 ),
                 SwitchListTile(
                   title: Text(context.l10n.settingsOldTestament),
@@ -1064,7 +1065,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           Padding(
             padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
             child: Text(context.l10n.settingsGestures,
-                style: TextStyle(fontSize: 16)),
+                style: TextStyle(fontSize: TypeScale.bodyLarge)),
           ),
           Consumer(builder: (context, ref, _) {
             final pullDown = ref.watch(
@@ -1419,7 +1420,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
       isScrollControlled: true,
       backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(Radii.lg))),
       builder: (ctx) {
         return Padding(
           padding: EdgeInsets.only(
@@ -1448,7 +1449,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 label: Text(context.l10n.settingsUseMyLocation),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).primaryColor,
-                  foregroundColor: Colors.white,
+                  foregroundColor: context.palette.onAccent,
                 ),
               ),
               const SizedBox(height: 16),
@@ -1578,7 +1579,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 children: [
                   Text(title,
                       style: TextStyle(
-                          fontSize: 15,
+                          fontSize: TypeScale.bodyLarge,
                           fontWeight:
                               isSelected ? FontWeight.w600 : FontWeight.w400,
                           color: isSelected
@@ -1587,7 +1588,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                   const SizedBox(height: 2),
                   Text(subtitle,
                       style: TextStyle(
-                          fontSize: 13,
+                          fontSize: TypeScale.body,
                           color: theme.colorScheme.onSurface
                               .withValues(alpha: 0.6))),
                 ],

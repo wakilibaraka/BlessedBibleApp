@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../state/reading_plan_provider.dart';
 import 'study_v2_widgets.dart';
 import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
 
 /// Short, upper-cased weekday name for [day] in the current locale.
 String _weekdayShort(BuildContext context, DateTime day) =>
@@ -225,7 +226,7 @@ class _DayCell extends StatelessWidget {
               style: theme.textTheme.labelSmall?.copyWith(
                 fontWeight: isToday ? FontWeight.w800 : FontWeight.w500,
                 letterSpacing: 0.5,
-                fontSize: 9,
+                fontSize: TypeScale.micro,
                 color: color,
               ),
             ),

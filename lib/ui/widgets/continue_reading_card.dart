@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../theme/design_tokens.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/read_location_provider.dart';
 import '../../state/translation_provider.dart';
@@ -17,7 +18,7 @@ class ContinueReadingCard extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(Radii.xxl),
       ),
       padding: const EdgeInsets.all(20),
       child: Row(
@@ -27,7 +28,7 @@ class ContinueReadingCard extends ConsumerWidget {
             height: 56,
             decoration: BoxDecoration(
               color: theme.colorScheme.primary.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(Radii.lg),
             ),
             child: Icon(
               Icons.menu_book_rounded,
@@ -75,7 +76,7 @@ class ContinueReadingCard extends ConsumerWidget {
               foregroundColor: theme.colorScheme.onPrimary,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(Radii.xl),
               ),
             ),
             child: Text(

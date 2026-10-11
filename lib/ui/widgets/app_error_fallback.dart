@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/nav_provider.dart';
 import 'glass_container.dart';
 import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
 
 class AppErrorFallback extends StatelessWidget {
   final FlutterErrorDetails? details;
@@ -22,7 +23,7 @@ class AppErrorFallback extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 32.0),
             child: GlassContainer(
               padding: const EdgeInsets.all(32.0),
-              borderRadius: BorderRadius.circular(28),
+              borderRadius: BorderRadius.circular(Radii.xxxl),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -72,11 +73,11 @@ class AppErrorFallback extends StatelessWidget {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: theme.primaryColor,
-                          foregroundColor: Colors.white,
+                          foregroundColor: context.palette.onAccent,
                           padding: const EdgeInsets.symmetric(
                               horizontal: 24, vertical: 12),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(Radii.xl),
                           ),
                           elevation: 0,
                         ),

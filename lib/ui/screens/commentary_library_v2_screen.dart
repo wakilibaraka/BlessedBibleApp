@@ -9,6 +9,7 @@ import '../../state/theme_provider.dart';
 import '../widgets/shared_app_bar.dart';
 import '../widgets/study_v2_widgets.dart';
 import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
 
 /// Redesigned commentary library (V2).
 ///
@@ -40,7 +41,8 @@ class _CommentaryLibraryV2ScreenState
         return Container(
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(Radii.xxl)),
           ),
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
           child: Column(
@@ -70,7 +72,7 @@ class _CommentaryLibraryV2ScreenState
                   itemBuilder: (context, i) {
                     final ch = chapters[i];
                     return InkWell(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(Radii.md),
                       onTap: () {
                         Navigator.of(ctx).pop();
                         Navigator.of(context).push(CupertinoPageRoute<void>(
@@ -82,7 +84,7 @@ class _CommentaryLibraryV2ScreenState
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
                           color: theme.primaryColor.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(Radii.md),
                           border: Border.all(
                             color: theme.primaryColor.withValues(alpha: 0.3),
                           ),
@@ -212,12 +214,12 @@ class _CommentaryLibraryV2ScreenState
                               filled: true,
                               fillColor: theme.colorScheme.surface,
                               border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(14),
+                                borderRadius: BorderRadius.circular(Radii.lg),
                                 borderSide:
                                     BorderSide(color: theme.dividerColor),
                               ),
                               enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(14),
+                                borderRadius: BorderRadius.circular(Radii.lg),
                                 borderSide:
                                     BorderSide(color: theme.dividerColor),
                               ),
@@ -241,7 +243,7 @@ class _CommentaryLibraryV2ScreenState
                                 decoration: BoxDecoration(
                                   color: theme.primaryColor
                                       .withValues(alpha: 0.12),
-                                  borderRadius: BorderRadius.circular(13),
+                                  borderRadius: BorderRadius.circular(Radii.md),
                                   border: Border.all(
                                     color: theme.primaryColor
                                         .withValues(alpha: 0.3),
@@ -357,7 +359,7 @@ class _CommentaryHubV2ScreenState extends ConsumerState<CommentaryHubV2Screen> {
                             padding: const EdgeInsets.all(13),
                             decoration: BoxDecoration(
                               color: theme.primaryColor.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius: BorderRadius.circular(Radii.lg),
                               border: Border.all(
                                 color:
                                     theme.primaryColor.withValues(alpha: 0.3),
@@ -411,11 +413,11 @@ class _CommentaryHubV2ScreenState extends ConsumerState<CommentaryHubV2Screen> {
                             filled: true,
                             fillColor: theme.colorScheme.surface,
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(14),
+                              borderRadius: BorderRadius.circular(Radii.lg),
                               borderSide: BorderSide(color: theme.dividerColor),
                             ),
                             enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(14),
+                              borderRadius: BorderRadius.circular(Radii.lg),
                               borderSide: BorderSide(color: theme.dividerColor),
                             ),
                           ),
@@ -522,7 +524,7 @@ class _FilterChip extends StatelessWidget {
           color: selected
               ? theme.colorScheme.onSurface
               : theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(999),
+          borderRadius: BorderRadius.circular(Radii.pill),
           border: Border.all(
             color: selected ? theme.colorScheme.onSurface : theme.dividerColor,
           ),

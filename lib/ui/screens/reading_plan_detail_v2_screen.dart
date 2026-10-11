@@ -15,6 +15,7 @@ import '../widgets/study_v2_widgets.dart';
 import 'journey_map_screen.dart';
 import '../../data/curated_plans.dart';
 import 'study_reader_screen.dart';
+import '../../theme/design_tokens.dart';
 
 /// Rebuilt plan detail (V2). Shown from [StudyScreenV2].
 ///
@@ -329,7 +330,7 @@ class _ReadingPlanDetailV2ScreenState
                                     style: theme.textTheme.labelSmall?.copyWith(
                                       fontWeight: FontWeight.w800,
                                       letterSpacing: 1.4,
-                                      fontSize: 10,
+                                      fontSize: TypeScale.micro,
                                       color: theme.colorScheme.onSurface
                                           .withValues(alpha: 0.55),
                                     ),
@@ -386,7 +387,7 @@ class _ReadingPlanDetailV2ScreenState
                         Container(
                           decoration: BoxDecoration(
                             color: theme.colorScheme.surface,
-                            borderRadius: BorderRadius.circular(999),
+                            borderRadius: BorderRadius.circular(Radii.pill),
                             border: Border.all(color: theme.dividerColor),
                           ),
                           child: Row(
@@ -405,7 +406,8 @@ class _ReadingPlanDetailV2ScreenState
                                       color: on
                                           ? theme.colorScheme.onSurface
                                           : Colors.transparent,
-                                      borderRadius: BorderRadius.circular(999),
+                                      borderRadius:
+                                          BorderRadius.circular(Radii.pill),
                                     ),
                                     alignment: Alignment.center,
                                     child: Text(
@@ -822,7 +824,7 @@ class _ReadingPlanDetailV2ScreenState
         return Container(
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            borderRadius: Radii.sheet,
           ),
           padding: const EdgeInsets.fromLTRB(8, 8, 8, 32),
           child: Column(
@@ -979,9 +981,9 @@ class _DayRow extends StatelessWidget {
         color: isSelected
             ? theme.primaryColor.withValues(alpha: 0.08)
             : Colors.transparent,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(Radii.lg),
         child: InkWell(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(Radii.lg),
           onTap: onTap,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
@@ -1083,7 +1085,7 @@ class _Legend extends StatelessWidget {
           decoration: BoxDecoration(
             color: color?.withValues(alpha: 0.25) ??
                 theme.colorScheme.onSurface.withValues(alpha: 0.06),
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(Radii.xs),
             border: Border.all(
               color: color ?? theme.primaryColor,
               width: ring ? 2 : 1,
@@ -1179,7 +1181,7 @@ class _DayDetailCardState extends ConsumerState<_DayDetailCard> {
             Padding(
               padding: const EdgeInsets.only(top: 8),
               child: InkWell(
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(Radii.lg),
                 onTap: () async {
                   // Open the passage in the shared study reader; the
                   // checkbox below tracks it as read for this plan day.
@@ -1206,7 +1208,7 @@ class _DayDetailCardState extends ConsumerState<_DayDetailCard> {
                     color: _checked.contains(i)
                         ? theme.primaryColor.withValues(alpha: 0.1)
                         : theme.colorScheme.onSurface.withValues(alpha: 0.03),
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(Radii.lg),
                     border: Border.all(
                       color: _checked.contains(i)
                           ? theme.primaryColor.withValues(alpha: 0.35)
@@ -1222,7 +1224,7 @@ class _DayDetailCardState extends ConsumerState<_DayDetailCard> {
                           color: _checked.contains(i)
                               ? theme.primaryColor
                               : Colors.transparent,
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(Radii.sm),
                           border: Border.all(
                             color: _checked.contains(i)
                                 ? theme.primaryColor
@@ -1257,7 +1259,10 @@ class _DayDetailCardState extends ConsumerState<_DayDetailCard> {
             child: FilledButton(
               style: done
                   ? FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFF2E7D32),
+                      backgroundColor: context.palette.success,
+                      // Surface colour reads on success green in light and
+                      // dark themes (dark used to get black on dark green).
+                      foregroundColor: theme.colorScheme.surface,
                     )
                   : null,
               onPressed: () {

@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/local_storage/preferences_service.dart';
 import '../../services/share_service.dart';
+import '../../theme/design_tokens.dart';
 
 /// Shareable image cards (1080x1350, WhatsApp-Status-friendly 4:5).
 ///
@@ -205,6 +206,7 @@ class ShareCard extends StatelessWidget {
             : 92.0) *
         s.scale;
 
+    // Exported image: fixed white-on-dark styling, independent of app theme.
     TextStyle textStyle(double size, FontWeight weight) => TextStyle(
           fontFamily: s.fontFamily,
           fontSize: size,
@@ -340,6 +342,7 @@ class _Backdrop extends StatelessWidget {
           ],
         );
 
+      // Backdrop tints below are fixed art for the exported image.
       case ShareCardBackdrop.dawn:
         // Warm: primary lifted toward a sunrise amber.
         return _gradient(
@@ -396,6 +399,7 @@ class _GrainPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final rand = Random(7);
+    // Grain is part of the exported image's fixed look.
     final paint = Paint()..color = Colors.white.withValues(alpha: 0.05);
     for (var i = 0; i < 2200; i++) {
       canvas.drawCircle(
@@ -499,7 +503,7 @@ class _ShareCardSheetState extends ConsumerState<_ShareCardSheet> {
           BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.92),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: Radii.sheet,
       ),
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
       child: SingleChildScrollView(
@@ -511,7 +515,7 @@ class _ShareCardSheetState extends ConsumerState<_ShareCardSheet> {
               height: 5,
               decoration: BoxDecoration(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
-                borderRadius: BorderRadius.circular(3),
+                borderRadius: BorderRadius.circular(Radii.xs),
               ),
             ),
             const SizedBox(height: 12),
@@ -655,7 +659,7 @@ class _ShareCardSheetState extends ConsumerState<_ShareCardSheet> {
                 style: FilledButton.styleFrom(
                   minimumSize: const Size.fromHeight(52),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(Radii.lg),
                   ),
                 ),
               ),
@@ -717,7 +721,7 @@ Future<void> showShareOptionsSheet({
       return Container(
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: Radii.sheet,
         ),
         padding: const EdgeInsets.fromLTRB(8, 8, 8, 32),
         child: Column(
@@ -729,7 +733,7 @@ Future<void> showShareOptionsSheet({
               margin: const EdgeInsets.only(top: 6, bottom: 6),
               decoration: BoxDecoration(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
-                borderRadius: BorderRadius.circular(3),
+                borderRadius: BorderRadius.circular(Radii.xs),
               ),
             ),
             row(

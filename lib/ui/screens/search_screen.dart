@@ -1,4 +1,5 @@
 import 'dart:async';
+import '../../theme/design_tokens.dart';
 import 'package:flutter/material.dart';
 import '../../l10n/l10n.dart';
 import '../sheets/search_settings_sheet.dart';
@@ -193,7 +194,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 300),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(32),
+                          borderRadius: BorderRadius.circular(Radii.xxxl),
                           boxShadow: [
                             if (isGlassy)
                               BoxShadow(
@@ -209,7 +210,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                           ],
                         ),
                         child: TexturedGlassContainer(
-                          borderRadius: BorderRadius.circular(32),
+                          borderRadius: BorderRadius.circular(Radii.xxxl),
                           padding: EdgeInsets.zero,
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
@@ -478,7 +479,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
           color: isActive ? theme.primaryColor : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(Radii.xl),
           border: Border.all(
             color: isActive
                 ? Colors.transparent
@@ -587,7 +588,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                             horizontal: 14, vertical: 8),
                         decoration: BoxDecoration(
                           color: theme.colorScheme.surface,
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(Radii.xl),
                           border: Border.all(
                             color: theme.colorScheme.onSurface
                                 .withValues(alpha: 0.1),
@@ -812,7 +813,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
         },
         child: TexturedGlassContainer(
           isScrollable: true,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(Radii.xl),
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

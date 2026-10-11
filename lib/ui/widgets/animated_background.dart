@@ -98,6 +98,9 @@ class _AnimatedBackgroundState extends ConsumerState<AnimatedBackground>
               : lerpDouble(-0.4, 0.1, t);
           final radius = isTopGlow ? 1.0 : 1.6;
 
+          // Decorative per-theme glow art: each theme's gradient is
+          // hand-picked, so these literals are intentional and do not come
+          // from the colour scheme.
           final List<Color> colors;
           switch (widget.appThemeMode.resolve(context)) {
             case AppThemeMode.dark:

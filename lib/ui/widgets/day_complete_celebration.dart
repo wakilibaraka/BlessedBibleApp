@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:confetti/confetti.dart';
 import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
 
 class DayCompleteCelebration extends StatefulWidget {
   final int day;
@@ -97,7 +98,7 @@ class _DayCompleteCelebrationState extends State<DayCompleteCelebration>
                           horizontal: 40, vertical: 32),
                       decoration: BoxDecoration(
                         color: Theme.of(context).colorScheme.surface,
-                        borderRadius: BorderRadius.circular(24),
+                        borderRadius: BorderRadius.circular(Radii.xxl),
                         boxShadow: [
                           BoxShadow(
                             color: Theme.of(context)

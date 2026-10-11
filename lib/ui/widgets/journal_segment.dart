@@ -3,6 +3,7 @@ import '../../l10n/l10n.dart';
 import '../../services/ai_journal_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/journal_provider.dart';
+import '../../theme/design_tokens.dart';
 
 class JournalSegment extends ConsumerWidget {
   final ThemeData theme;
@@ -76,7 +77,7 @@ class JournalSegment extends ConsumerWidget {
               elevation: 0,
               color: theme.primaryColor.withValues(alpha: 0.05),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
+                  borderRadius: BorderRadius.circular(Radii.lg)),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(

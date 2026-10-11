@@ -20,6 +20,7 @@ import '../widgets/item_context_sheet.dart';
 import '../widgets/share_card.dart';
 import 'package:flutter/services.dart';
 import '../../data/models/home_data.dart';
+import '../../theme/design_tokens.dart';
 
 class YourSpaceScreen extends ConsumerStatefulWidget {
   final int initialTab; // 0=Highlights, 1=Bookmarks, 2=Notes
@@ -206,7 +207,7 @@ class _SegmentTab extends StatelessWidget {
           color: isSelected
               ? theme.primaryColor.withValues(alpha: 0.15)
               : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(Radii.xl),
           border: Border.all(
             color: isSelected
                 ? theme.primaryColor.withValues(alpha: 0.5)
@@ -426,8 +427,7 @@ void _showMoveToFolderSheet(
   showModalBottomSheet<void>(
     context: context,
     backgroundColor: theme.scaffoldBackgroundColor,
-    shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+    shape: const RoundedRectangleBorder(borderRadius: Radii.sheet),
     builder: (context) {
       return SafeArea(
         child: SingleChildScrollView(
@@ -781,12 +781,12 @@ class _NotesSegment extends ConsumerWidget {
                         decoration: BoxDecoration(
                           color:
                               theme.colorScheme.surface.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(Radii.lg),
                           border: Border.all(
                               color: theme.dividerColor.withValues(alpha: 0.1)),
                         ),
                         child: InkWell(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(Radii.lg),
                           onTap: () {
                             showAddNoteSheet(
                               context,
@@ -821,7 +821,7 @@ class _NotesSegment extends ConsumerWidget {
                                           theme.textTheme.bodySmall?.copyWith(
                                         color: theme.colorScheme.onSurface
                                             .withValues(alpha: 0.5),
-                                        fontSize: 10,
+                                        fontSize: TypeScale.micro,
                                       ),
                                     ),
                                   ],
@@ -944,7 +944,7 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
         color: highlightColor != null
             ? highlightColor.withValues(alpha: 0.18)
             : theme.colorScheme.surface.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(Radii.lg),
         border: Border.all(
           color: highlightColor != null
               ? highlightColor.withValues(alpha: 0.35)
@@ -952,7 +952,7 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
         ),
       ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(Radii.lg),
         onTap: () {
           ref.read(readLocationProvider.notifier).updateLocation(
                 bookAbbrev: data.bookAbbrev,
@@ -1181,7 +1181,8 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                                               .withValues(alpha: 0.15)
                                           : theme.colorScheme.surface,
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(16),
+                                        borderRadius:
+                                            BorderRadius.circular(Radii.lg),
                                         side: BorderSide(
                                           color: isSelected
                                               ? theme.primaryColor
@@ -1223,7 +1224,7 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
                                               style: TextStyle(
-                                                fontSize: 10,
+                                                fontSize: TypeScale.micro,
                                                 fontWeight: isSelected
                                                     ? FontWeight.bold
                                                     : FontWeight.w600,
@@ -1457,7 +1458,7 @@ void _showHighlightColorSheet(
         padding: const EdgeInsets.fromLTRB(18, 16, 18, 20),
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(Radii.xl),
           border: Border.all(color: theme.dividerColor),
         ),
         child: Column(

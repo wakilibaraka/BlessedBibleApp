@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../l10n/l10n.dart';
 import 'package:flutter/services.dart';
+import '../../theme/design_tokens.dart';
 
 /// Apple-standard context sheet rows for Your Space items.
 ///
@@ -65,7 +66,7 @@ class ItemContextSheet extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(Radii.xl),
           border: Border.all(color: theme.dividerColor),
         ),
         clipBehavior: Clip.antiAlias,

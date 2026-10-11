@@ -24,6 +24,7 @@ import '../widgets/shared_app_bar.dart';
 import '../widgets/study_v2_widgets.dart';
 import '../sheets/book_chapter_selector_sheet.dart';
 import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
 
 class _TrackDraftV2 {
   BibleBook? startBook;
@@ -458,7 +459,7 @@ class _CustomPlanBuilderV2ScreenState
                             filled: true,
                             fillColor: theme.colorScheme.surface,
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(14),
+                              borderRadius: BorderRadius.circular(Radii.lg),
                               borderSide: BorderSide(color: theme.dividerColor),
                             ),
                           ),
@@ -497,7 +498,7 @@ class _CustomPlanBuilderV2ScreenState
                               decoration: BoxDecoration(
                                 color: theme.colorScheme.error
                                     .withValues(alpha: 0.08),
-                                borderRadius: BorderRadius.circular(14),
+                                borderRadius: BorderRadius.circular(Radii.lg),
                                 border: Border.all(
                                     color: theme.colorScheme.error
                                         .withValues(alpha: 0.4)),
@@ -542,7 +543,7 @@ class _CustomPlanBuilderV2ScreenState
                                             context.l10n.plansDaysSuffix,
                                         border: OutlineInputBorder(
                                           borderRadius:
-                                              BorderRadius.circular(12),
+                                              BorderRadius.circular(Radii.md),
                                         ),
                                         contentPadding:
                                             const EdgeInsets.symmetric(
@@ -799,7 +800,7 @@ class _TrackCard extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(Radii.lg),
         border: Border.all(color: theme.dividerColor),
       ),
       child: Column(
@@ -849,13 +850,13 @@ class _RefBox extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return InkWell(
-      borderRadius: BorderRadius.circular(11),
+      borderRadius: BorderRadius.circular(Radii.md),
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(11),
+          borderRadius: BorderRadius.circular(Radii.md),
           border: Border.all(color: theme.dividerColor),
         ),
         child: Column(
@@ -864,7 +865,7 @@ class _RefBox extends StatelessWidget {
             Text(label,
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.w800,
-                  fontSize: 10,
+                  fontSize: TypeScale.micro,
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
                 )),
             const SizedBox(height: 2),
@@ -897,7 +898,7 @@ class _RestChip extends StatelessWidget {
           color: selected
               ? theme.primaryColor
               : theme.colorScheme.onSurface.withValues(alpha: 0.06),
-          borderRadius: BorderRadius.circular(11),
+          borderRadius: BorderRadius.circular(Radii.md),
           border: Border.all(
             color: selected ? theme.primaryColor : theme.dividerColor,
           ),

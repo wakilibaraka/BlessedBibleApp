@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../theme/design_tokens.dart';
+
 class PillSegmentedControl extends StatelessWidget {
   final List<String> segments;
   final int selectedIndex;
@@ -18,7 +20,7 @@ class PillSegmentedControl extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(Radii.xxl),
         border: Border.all(color: theme.dividerTheme.color ?? Colors.grey),
       ),
       child: Row(
@@ -32,14 +34,14 @@ class PillSegmentedControl extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
                 color: isSelected ? theme.primaryColor : Colors.transparent,
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(Radii.xxl),
               ),
               child: Center(
                 child: Text(
                   segments[index],
                   style: TextStyle(
                     color: isSelected
-                        ? Colors.white
+                        ? context.palette.onAccent
                         : theme.textTheme.bodyMedium?.color,
                     fontWeight:
                         isSelected ? FontWeight.bold : FontWeight.normal,

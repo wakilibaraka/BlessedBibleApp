@@ -22,6 +22,7 @@ import '../../data/curated_plans.dart';
 import 'reading_plan_detail_v2_screen.dart';
 import 'bible_story_reader_screen.dart';
 import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
 
 /// Preset book plans for the Books tab: a title, an inclusive book range
 /// (matched by book name) and a day count. Tapping one opens the custom
@@ -789,7 +790,7 @@ class _LetReadSheet extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(Radii.xxl),
           border: Border.all(color: theme.dividerColor),
         ),
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
@@ -803,7 +804,7 @@ class _LetReadSheet extends StatelessWidget {
                 height: 5,
                 decoration: BoxDecoration(
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
-                  borderRadius: BorderRadius.circular(3),
+                  borderRadius: BorderRadius.circular(Radii.xs),
                 ),
               ),
             ),
@@ -828,7 +829,7 @@ class _LetReadSheet extends StatelessWidget {
               builder: (context, c) {
                 final fraction = total == 0 ? 0.0 : day / total;
                 return ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(Radii.xs),
                   child: LinearProgressIndicator(
                     value: fraction.clamp(0.0, 1.0),
                     minHeight: 6,
@@ -865,7 +866,7 @@ class _LetReadSheet extends StatelessWidget {
                 style: FilledButton.styleFrom(
                   minimumSize: const Size.fromHeight(50),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(Radii.lg),
                   ),
                 ),
                 child: Text(context.l10n.plansOpenTodaysReading),

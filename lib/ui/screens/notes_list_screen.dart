@@ -13,6 +13,7 @@ import '../../data/models/home_data.dart';
 import '../widgets/textured_glass_container.dart';
 import '../widgets/shared_app_bar.dart';
 import '../sheets/book_chapter_selector_sheet.dart';
+import '../../theme/design_tokens.dart';
 
 class NotesListScreen extends ConsumerWidget {
   const NotesListScreen({super.key});
@@ -69,6 +70,7 @@ class NotesListScreen extends ConsumerWidget {
                     alignment: Alignment.centerRight,
                     padding: const EdgeInsets.only(right: 20),
                     color: Colors.red.withValues(alpha: 0.8),
+                    // White on the fixed red swipe background in every theme.
                     child: const Icon(Icons.delete, color: Colors.white),
                   ),
                   onDismissed: (_) {
@@ -132,7 +134,7 @@ class NotesListScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () => showAddNoteSheet(context, ref, theme),
         backgroundColor: theme.primaryColor,
-        child: const Icon(Icons.add, color: Colors.white),
+        child: Icon(Icons.add, color: context.palette.onAccent),
       ),
     );
   }
@@ -413,7 +415,8 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
   Widget build(BuildContext context) {
     final theme = widget.theme;
     return TexturedGlassContainer(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+      borderRadius:
+          const BorderRadius.vertical(top: Radius.circular(Radii.xxxl)),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom + 24,
         left: 24,
@@ -445,20 +448,21 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
                 hintStyle: TextStyle(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
                 filled: true,
+                // Glass field tint: darkens on dark themes, lightens on light.
                 fillColor: theme.brightness == Brightness.dark
                     ? Colors.black.withValues(alpha: 0.25)
                     : Colors.white.withValues(alpha: 0.6),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(Radii.sm),
                   borderSide: BorderSide.none,
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(Radii.sm),
                   borderSide: BorderSide(
                       color: theme.primaryColor.withValues(alpha: 0.1)),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(Radii.sm),
                   borderSide: BorderSide(
                       color: theme.primaryColor.withValues(alpha: 0.4)),
                 ),
@@ -483,20 +487,21 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
                       color:
                           theme.colorScheme.onSurface.withValues(alpha: 0.5)),
                   filled: true,
+                  // Glass field tint: darkens on dark themes, lightens on light.
                   fillColor: theme.brightness == Brightness.dark
                       ? Colors.black.withValues(alpha: 0.25)
                       : Colors.white.withValues(alpha: 0.6),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(Radii.sm),
                     borderSide: BorderSide.none,
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(Radii.sm),
                     borderSide: BorderSide(
                         color: theme.primaryColor.withValues(alpha: 0.1)),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(Radii.sm),
                     borderSide: BorderSide(
                         color: theme.primaryColor.withValues(alpha: 0.4)),
                   ),
@@ -510,10 +515,10 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
                 margin: const EdgeInsets.only(top: 8),
                 decoration: BoxDecoration(
                   color: theme.colorScheme.surface,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(Radii.md),
                   boxShadow: [
                     BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
+                        color: context.palette.shadow,
                         blurRadius: 10,
                         offset: const Offset(0, 4)),
                   ],
@@ -543,9 +548,9 @@ class _NoteEditorFormState extends ConsumerState<_NoteEditorForm> {
             FilledButton(
               style: FilledButton.styleFrom(
                 backgroundColor: theme.primaryColor,
-                foregroundColor: Colors.white,
+                foregroundColor: context.palette.onAccent,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(Radii.xxl),
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),

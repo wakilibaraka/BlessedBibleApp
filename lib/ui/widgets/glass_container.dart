@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
+import '../../theme/design_tokens.dart';
 import '../../theme/reading_tokens.dart';
 
 class GlassContainer extends StatelessWidget {
@@ -22,7 +23,7 @@ class GlassContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = Theme.of(context).extension<ReadingTokens>()!;
-    final radius = borderRadius ?? BorderRadius.circular(24);
+    final radius = borderRadius ?? BorderRadius.circular(Radii.xxl);
 
     return Container(
       margin: margin,
@@ -31,7 +32,8 @@ class GlassContainer extends StatelessWidget {
         borderRadius: radius,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
+            // Deliberately softer than palette.shadow's default alpha.
+            color: context.palette.shadow.withValues(alpha: 0.08),
             blurRadius: 24,
             spreadRadius: 0,
             offset: const Offset(0, 10),

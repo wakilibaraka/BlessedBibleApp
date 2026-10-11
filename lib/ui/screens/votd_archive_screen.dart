@@ -10,6 +10,7 @@ import 'commentary_hub_screen.dart';
 import '../../state/commentary_provider.dart';
 import '../../theme/reading_tokens.dart';
 import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
 
 class VotdArchiveScreen extends ConsumerWidget {
   const VotdArchiveScreen({super.key});
@@ -111,7 +112,7 @@ class VotdArchiveScreen extends ConsumerWidget {
                     padding: const EdgeInsets.only(bottom: 16.0),
                     child: Container(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(Radii.xl),
                         boxShadow: isToday
                             ? [
                                 BoxShadow(
@@ -129,17 +130,17 @@ class VotdArchiveScreen extends ConsumerWidget {
                           color: is3DTheme
                               ? theme.colorScheme.surface
                               : tokens.readingSurface,
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(Radii.xl),
                           border: Border.all(
                             width: 0.5,
                             color: is3DTheme
-                                ? Colors.white.withValues(alpha: 0.15)
+                                ? context.palette.divider
                                 : tokens.readingBorder,
                           ),
                           boxShadow: appThemeMode.is3DTheme
                               ? [
                                   BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.08),
+                                    color: context.palette.shadow,
                                     blurRadius: 24,
                                     spreadRadius: 0,
                                     offset: const Offset(0, 10),
@@ -150,7 +151,7 @@ class VotdArchiveScreen extends ConsumerWidget {
                         child: Material(
                           color: Colors.transparent,
                           child: InkWell(
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(Radii.xl),
                             onTap: () {
                               ref
                                   .read(votdTrackerProvider.notifier)
@@ -191,7 +192,7 @@ class VotdArchiveScreen extends ConsumerWidget {
                             child: Container(
                               padding: const EdgeInsets.all(20),
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(Radii.xl),
                                 border: isToday
                                     ? Border.all(
                                         color: theme.primaryColor
@@ -225,7 +226,7 @@ class VotdArchiveScreen extends ConsumerWidget {
                                           color: theme.primaryColor
                                               .withValues(alpha: 0.1),
                                           borderRadius:
-                                              BorderRadius.circular(8),
+                                              BorderRadius.circular(Radii.sm),
                                         ),
                                         child: Text(
                                           bookTag,

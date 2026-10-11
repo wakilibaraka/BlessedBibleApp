@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../theme/design_tokens.dart';
 import '../../l10n/l10n.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/bible_model.dart';
@@ -205,7 +206,8 @@ class _BookChapterSelectorSheetState
         expand: false,
         builder: (context, scrollController) {
           return TexturedGlassContainer(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+            borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(Radii.xxxl)),
             padding: EdgeInsets.zero,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -219,7 +221,7 @@ class _BookChapterSelectorSheetState
                       decoration: BoxDecoration(
                         color:
                             theme.colorScheme.onSurface.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(2),
+                        borderRadius: BorderRadius.circular(Radii.xs),
                       ),
                     ),
                   ),
@@ -243,7 +245,7 @@ class _BookChapterSelectorSheetState
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(Radii.xxxl),
       ),
       child: Row(
         children: [
@@ -306,7 +308,7 @@ class _BookChapterSelectorSheetState
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: isSelected ? theme.primaryColor : Colors.transparent,
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(Radii.xxxl),
             boxShadow: isSelected
                 ? [
                     BoxShadow(
@@ -325,7 +327,7 @@ class _BookChapterSelectorSheetState
                   letterSpacing: 1,
                   fontFamily: theme.textTheme.bodyMedium?.fontFamily,
                   color: isSelected
-                      ? Colors.white.withValues(alpha: 0.8)
+                      ? context.palette.onAccent.withValues(alpha: 0.8)
                       : theme.colorScheme.onSurface.withValues(alpha: 0.5),
                 ),
               ),
@@ -336,7 +338,7 @@ class _BookChapterSelectorSheetState
                   fontWeight: FontWeight.bold,
                   fontFamily: theme.textTheme.bodyMedium?.fontFamily,
                   color: isSelected
-                      ? Colors.white
+                      ? context.palette.onAccent
                       : theme.colorScheme.onSurface.withValues(alpha: 0.8),
                 ),
                 maxLines: 1,
@@ -606,7 +608,7 @@ class _BookChapterSelectorSheetState
                     final p = chapterPericopes[index];
                     final isSel = p.startVerse == selectedVerse;
                     return InkWell(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(Radii.md),
                       onTap: () => _onVerseSelected(p.startVerse, settings),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
@@ -617,7 +619,7 @@ class _BookChapterSelectorSheetState
                               ? theme.primaryColor
                               : theme.colorScheme.onSurface
                                   .withValues(alpha: 0.05),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(Radii.md),
                         ),
                         child: Row(
                           children: [
@@ -711,7 +713,7 @@ class _BookChapterSelectorSheetState
           ? theme.textTheme.bodyMedium?.fontFamily
           : null, // Font consistency for books
       color: isSelected
-          ? Colors.white
+          ? context.palette.onAccent
           : theme.colorScheme.onSurface.withValues(alpha: 0.8),
     );
 
@@ -732,9 +734,9 @@ class _BookChapterSelectorSheetState
           Text(
             subtitle,
             style: theme.textTheme.bodySmall?.copyWith(
-              fontSize: 9,
+              fontSize: TypeScale.micro,
               color: isSelected
-                  ? Colors.white.withValues(alpha: 0.9)
+                  ? context.palette.onAccent.withValues(alpha: 0.9)
                   : theme.colorScheme.onSurface.withValues(alpha: 0.6),
               height: 1.1,
             ),
@@ -764,7 +766,7 @@ class _BookChapterSelectorSheetState
           decoration: BoxDecoration(
             color: backgroundColor ??
                 theme.colorScheme.surface.withValues(alpha: 0.8),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(Radii.lg),
             border: Border.all(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
               width: 1,
@@ -785,7 +787,7 @@ class _BookChapterSelectorSheetState
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: theme.primaryColor,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(Radii.lg),
           boxShadow: [
             BoxShadow(
                 color: theme.primaryColor.withValues(alpha: 0.4),

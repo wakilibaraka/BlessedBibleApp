@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../theme/design_tokens.dart';
+
 class AnimatedSegmentedTile<T> extends StatelessWidget {
   final String? title;
   final String? subtitle;
@@ -24,13 +26,14 @@ class AnimatedSegmentedTile<T> extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (title != null) Text(title!, style: const TextStyle(fontSize: 16)),
+          if (title != null)
+            Text(title!, style: const TextStyle(fontSize: TypeScale.bodyLarge)),
           if (title != null && subtitle != null) const SizedBox(height: 4),
           if (subtitle != null)
             Text(
               subtitle!,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: TypeScale.body,
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
@@ -39,7 +42,7 @@ class AnimatedSegmentedTile<T> extends StatelessWidget {
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(Radii.md),
             ),
             child: Row(
               children: options.map((option) {
@@ -92,18 +95,18 @@ class _SegmentItemState<T> extends State<_SegmentItem<T>> {
           scale: _isPressed ? 0.95 : 1.0,
           duration: const Duration(milliseconds: 100),
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
+            duration: Motion.normal,
             curve: Curves.easeOutCubic,
             padding: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
               color: widget.isSelected
                   ? theme.colorScheme.surface
                   : Colors.transparent,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(Radii.sm),
               boxShadow: widget.isSelected
                   ? [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
+                        color: context.palette.shadow.withValues(alpha: 0.1),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       )
@@ -114,7 +117,7 @@ class _SegmentItemState<T> extends State<_SegmentItem<T>> {
               widget.option.value,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 13,
+                fontSize: TypeScale.body,
                 fontWeight:
                     widget.isSelected ? FontWeight.w600 : FontWeight.w400,
                 color: widget.isSelected

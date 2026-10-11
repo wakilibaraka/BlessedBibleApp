@@ -1,4 +1,5 @@
 import 'dart:async';
+import '../../theme/design_tokens.dart';
 import 'dart:ui';
 import '../widgets/strongs_entry_sheet.dart';
 
@@ -589,11 +590,11 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       child: RepaintBoundary(
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(Radii.xxl),
             boxShadow: isEarth
                 ? [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.12),
+                      color: context.palette.shadow,
                       blurRadius: 8,
                       offset: const Offset(0, 4),
                     ),
@@ -601,7 +602,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                 : null,
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(Radii.xxl),
             child: Stack(
               children: [
                 Positioned.fill(
@@ -615,7 +616,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                       const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(
                     color: tokens.readingPaper.withValues(alpha: 0.85),
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: BorderRadius.circular(Radii.xxl),
                     border: Border.all(
                       color: tokens.readingBorder.withValues(alpha: 0.3),
                       width: 1,
@@ -1620,7 +1621,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                       children: [
                                                                         AnimatedContainer(
                                                                           duration:
-                                                                              const Duration(milliseconds: 250),
+                                                                              Motion.normal,
                                                                           clipBehavior:
                                                                               Clip.antiAlias,
                                                                           padding: const EdgeInsets
@@ -1635,7 +1636,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                                 ? (highlightColor != null ? highlightColor.withValues(alpha: 0.35) : theme.primaryColor.withValues(alpha: 0.15))
                                                                                 : (_navigatedVerseIndex == index ? theme.primaryColor.withValues(alpha: 0.15) : (highlightColor != null ? highlightColor.withValues(alpha: 0.35) : Colors.transparent)),
                                                                             borderRadius:
-                                                                                BorderRadius.circular(12),
+                                                                                BorderRadius.circular(Radii.md),
                                                                             border: (isSelected && highlightColor != null)
                                                                                 ? Border.all(color: theme.primaryColor.withValues(alpha: 0.5), width: 1.5)
                                                                                 : Border.all(color: Colors.transparent, width: 1.5),
@@ -1808,10 +1809,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                 horizontal: 12, vertical: 8),
                             decoration: BoxDecoration(
                               color: theme.colorScheme.surface,
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(Radii.md),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.1),
+                                  color: context.palette.shadow,
                                   blurRadius: 10,
                                   offset: const Offset(0, 4),
                                 )
@@ -1860,7 +1861,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                           padding: const EdgeInsets.symmetric(
                               horizontal: 24, vertical: 12),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
+                            borderRadius: BorderRadius.circular(Radii.xxxl),
                           ),
                           elevation: 8,
                         ),
@@ -1945,7 +1946,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     if (layout == ReadingLayout.interleaved) {
       final tokens = theme.extension<ReadingTokens>();
       final secondaryColor = tokens?.readingInk.withValues(alpha: 0.65) ??
-          Colors.black.withValues(alpha: 0.65);
+          theme.colorScheme.onSurface.withValues(alpha: 0.65);
 
       final secondaryTypography = typography.copyWith(
         fontSize: typography.fontSize * 0.95,
@@ -1990,7 +1991,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     if (layout == ReadingLayout.sideBySide) {
       final tokens = theme.extension<ReadingTokens>();
       final secondaryColor = tokens?.readingInk.withValues(alpha: 0.75) ??
-          Colors.black.withValues(alpha: 0.75);
+          theme.colorScheme.onSurface.withValues(alpha: 0.75);
 
       final secondaryTypography = typography.copyWith(
         fontSize: typography.fontSize * 0.95,
@@ -2037,7 +2038,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
       final tokens = theme.extension<ReadingTokens>();
       final secondaryColor = tokens?.readingInk.withValues(alpha: 0.75) ??
-          Colors.black.withValues(alpha: 0.75);
+          theme.colorScheme.onSurface.withValues(alpha: 0.75);
 
       final secondaryTypography = typography.copyWith(
         fontSize: typography.fontSize * 0.95,
@@ -2137,7 +2138,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                             ? theme.primaryColor.withValues(alpha: 0.15)
                             : theme.colorScheme.surface,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(Radii.lg),
                           side: BorderSide(
                             color: isSelected
                                 ? theme.primaryColor.withValues(alpha: 0.5)
@@ -2271,7 +2272,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           fontSize: typography.fontSize,
           height: typography.lineHeight,
           letterSpacing: 0.15,
-          color: overrideColor ?? tokens?.readingInk ?? Colors.black,
+          color: overrideColor ??
+              tokens?.readingInk ??
+              theme.colorScheme.onSurface,
           decoration: isBookmarked ? TextDecoration.underline : null,
           decorationColor: isBookmarked ? theme.primaryColor : null,
           decorationStyle: isBookmarked ? TextDecorationStyle.solid : null,
@@ -2280,6 +2283,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         const TextStyle();
 
     Color starColor;
+    // Red-letter ink is a fixed, hand-tuned scripture palette per theme
+    // family (like highlight colours), so these stay literal.
     Color redLetterColor;
     switch (appThemeMode.resolve(context)) {
       case AppThemeMode.light:
@@ -2552,7 +2557,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
               decoration: BoxDecoration(
                 color: theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(Radii.xs),
               ),
               child: Text(
                 'WEB',
@@ -2634,7 +2639,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
               context.l10n.readChapterCommentary,
               style: theme.textTheme.titleSmall?.copyWith(
                 color: hasChapterCommentary
-                    ? (tokens?.readingInk ?? Colors.black)
+                    ? (tokens?.readingInk ?? theme.colorScheme.onSurface)
                     : theme.disabledColor,
                 fontWeight: FontWeight.w600,
               ),
@@ -2642,9 +2647,10 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
             style: TextButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               backgroundColor:
-                  (tokens?.readingInk ?? Colors.black).withValues(alpha: 0.05),
+                  (tokens?.readingInk ?? theme.colorScheme.onSurface)
+                      .withValues(alpha: 0.05),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
+                  borderRadius: BorderRadius.circular(Radii.lg)),
             ),
           ),
           const SizedBox(height: 32),
@@ -2727,7 +2733,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
               return Padding(
                 padding: const EdgeInsets.only(top: 32.0, bottom: 16.0),
                 child: TexturedGlassContainer(
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(Radii.xxl),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                   child: Column(
@@ -2883,13 +2889,14 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                             elevation: 0,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16)),
+                                borderRadius: BorderRadius.circular(Radii.lg)),
                           ),
                           label: Text(
                               context.l10n.readMarkDoneContinue(
                                   fc.book.name, fc.chapter.number),
                               style: const TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w600)),
+                                  fontSize: TypeScale.bodyLarge,
+                                  fontWeight: FontWeight.w600)),
                         ),
                       ),
                     ],
@@ -2929,7 +2936,7 @@ class VerseActionLogic {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
           decoration: BoxDecoration(
             color: theme.cardColor,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(Radii.xl),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -2961,11 +2968,12 @@ class VerseActionLogic {
                             color: theme.scaffoldBackgroundColor,
                             shape: BoxShape.circle,
                             border: Border.all(
-                                color: Colors.black.withValues(alpha: 0.2),
+                                color: theme.colorScheme.onSurface
+                                    .withValues(alpha: 0.2),
                                 width: 1.5),
                             boxShadow: [
                               BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.1),
+                                  color: ctx.palette.shadow,
                                   blurRadius: 4,
                                   spreadRadius: 1)
                             ],
@@ -3010,11 +3018,12 @@ class VerseActionLogic {
                               color: color,
                               shape: BoxShape.circle,
                               border: Border.all(
-                                  color: Colors.black.withValues(alpha: 0.2),
+                                  color: theme.colorScheme.onSurface
+                                      .withValues(alpha: 0.2),
                                   width: 1.5),
                               boxShadow: [
                                 BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.1),
+                                    color: ctx.palette.shadow,
                                     blurRadius: 4,
                                     spreadRadius: 1)
                               ],

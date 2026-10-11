@@ -1,4 +1,5 @@
 import 'dart:async';
+import '../../theme/design_tokens.dart';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../l10n/l10n.dart';
@@ -202,7 +203,7 @@ class MainNavScreen extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             AnimatedOpacity(
-                              duration: const Duration(milliseconds: 250),
+                              duration: Motion.normal,
                               opacity: effectiveNavHidden ? 0.0 : 1.0,
                               alwaysIncludeSemantics: true,
                               child: IgnorePointer(
@@ -235,7 +236,7 @@ class MainNavScreen extends ConsumerWidget {
                                                 .scaffoldBackgroundColor
                                                 .withValues(alpha: 0.9),
                                             borderRadius:
-                                                BorderRadius.circular(12),
+                                                BorderRadius.circular(Radii.md),
                                             border: Border.all(
                                                 color: Theme.of(context)
                                                     .primaryColor
@@ -252,7 +253,7 @@ class MainNavScreen extends ConsumerWidget {
                                                   color: Theme.of(context)
                                                       .primaryColor,
                                                   fontWeight: FontWeight.w600,
-                                                  fontSize: 10,
+                                                  fontSize: TypeScale.micro,
                                                   letterSpacing: 0.2,
                                                 ),
                                           ),
@@ -263,7 +264,7 @@ class MainNavScreen extends ConsumerWidget {
                               ),
                             ),
                             AnimatedContainer(
-                              duration: const Duration(milliseconds: 400),
+                              duration: Motion.slow,
                               width: effectiveNavHidden
                                   ? 0.0
                                   : kBottomDockGap, // Collapse the gap too!
@@ -281,7 +282,7 @@ class MainNavScreen extends ConsumerWidget {
                               duration: const Duration(milliseconds: 300),
                               curve: Curves.easeOutCubic,
                               child: TweenAnimationBuilder<double>(
-                                duration: const Duration(milliseconds: 400),
+                                duration: Motion.slow,
                                 curve: Curves.easeOutCubic,
                                 tween: Tween<double>(
                                   begin: kBottomDockHeight,
@@ -451,6 +452,7 @@ class MainNavScreen extends ConsumerWidget {
                                                           });
 
                                                           return _buildColorDot(
+                                                            context,
                                                             color,
                                                             isSelected:
                                                                 allHaveThisColor,
@@ -840,7 +842,7 @@ class MainNavScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildColorDot(Color color,
+  Widget _buildColorDot(BuildContext context, Color color,
       {bool isSelected = false, VoidCallback? onTap}) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -855,6 +857,8 @@ class MainNavScreen extends ConsumerWidget {
           decoration: BoxDecoration(
             color: color.withValues(alpha: 0.8),
             shape: BoxShape.circle,
+            // Highlight swatch ring: white reads against every swatch
+            // colour, so it stays fixed across themes.
             border: Border.all(
               color: isSelected
                   ? Colors.white
@@ -870,7 +874,7 @@ class MainNavScreen extends ConsumerWidget {
                   ]
                 : [
                     BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
+                        color: context.palette.shadow,
                         blurRadius: 4,
                         spreadRadius: 1)
                   ],
@@ -1174,7 +1178,7 @@ class MainNavScreen extends ConsumerWidget {
       {required Key key, required double dockMaxWidth, required Widget child}) {
     return TweenAnimationBuilder<BorderRadius?>(
       key: key,
-      duration: const Duration(milliseconds: 400),
+      duration: Motion.slow,
       curve: Curves.easeOutCubic,
       tween: BorderRadiusTween(
         begin: BorderRadius.circular(kBottomDockHeight / 2),
@@ -1233,6 +1237,7 @@ class MainNavScreen extends ConsumerWidget {
               });
 
           return _buildColorDot(
+            context,
             AppColors.getRenderedHighlightColor(
                 highlightPaletteSwatches[paletteIndex],
                 theme.brightness,
@@ -1335,7 +1340,7 @@ class _CastingLotsDialogState extends State<CastingLotsDialog>
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
           decoration: BoxDecoration(
             color: theme.scaffoldBackgroundColor,
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(Radii.xxl),
             border: Border.all(
               color: AppColors.goldAccent.withValues(alpha: 0.3),
               width: 1.5,

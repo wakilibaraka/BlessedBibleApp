@@ -10,6 +10,7 @@ import '../../models/study_content_category.dart';
 import '../../state/typography_provider.dart';
 import 'dart:ui';
 import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
 
 class CommentaryHubScreen extends ConsumerStatefulWidget {
   final String book;
@@ -58,9 +59,9 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
         case AppThemeMode.olives:
           return AppColors.olivesBackground;
         case AppThemeMode.dusk:
-          return const Color(0xFF312C51);
+          return AppColors.duskBackground;
         case AppThemeMode.fresh:
-          return const Color(0xFF132C33);
+          return AppColors.freshBackground;
         default:
           return tokens.readingPaper;
       }
@@ -234,7 +235,7 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
         decoration: BoxDecoration(
           color: theme.primaryColor.withValues(alpha: 0.05),
           border: Border.all(color: theme.primaryColor.withValues(alpha: 0.1)),
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(Radii.xl),
         ),
         child: DropdownButtonHideUnderline(
           child: DropdownButton<String>(
@@ -243,7 +244,7 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
                 size: 16, color: theme.primaryColor),
             alignment: Alignment.center,
             dropdownColor: theme.scaffoldBackgroundColor,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(Radii.lg),
             style: theme.textTheme.labelMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: theme.primaryColor,
@@ -287,7 +288,7 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
       decoration: BoxDecoration(
         color: bgColor,
         border: border,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(Radii.xl),
       ),
       child: _buildEntryContent(theme, tokens, entry, typography),
     );
@@ -359,7 +360,7 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: tokens.readingAccent.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(Radii.md),
                 ),
                 child: Text(
                   entry.scope.type == 'verse'

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../theme/design_tokens.dart';
 import '../../l10n/l10n.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -38,7 +39,8 @@ class CrossReferencesSheet extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius:
+            const BorderRadius.vertical(top: Radius.circular(Radii.xl)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -52,7 +54,7 @@ class CrossReferencesSheet extends ConsumerWidget {
               height: 4,
               decoration: BoxDecoration(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: BorderRadius.circular(Radii.xs),
               ),
             ),
           ),
@@ -247,7 +249,7 @@ class _CrossRefTileState extends ConsumerState<_CrossRefTile> {
           );
         }
       },
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(Radii.sm),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
         child: Row(
@@ -258,12 +260,12 @@ class _CrossRefTileState extends ConsumerState<_CrossRefTile> {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
                 color: theme.primaryColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.circular(Radii.sm),
               ),
               child: Text(
                 widget.refLabel,
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: TypeScale.caption,
                   fontWeight: FontWeight.w600,
                   color: theme.primaryColor,
                 ),
@@ -277,7 +279,7 @@ class _CrossRefTileState extends ConsumerState<_CrossRefTile> {
                       decoration: BoxDecoration(
                         color:
                             theme.colorScheme.onSurface.withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(Radii.xs),
                       ),
                     )
                   : Text(

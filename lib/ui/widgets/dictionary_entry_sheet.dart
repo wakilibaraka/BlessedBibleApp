@@ -7,6 +7,10 @@ import '../../services/share_service.dart';
 import 'share_card.dart';
 import '../dialogs/verse_preview_dialog.dart';
 import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
+
+/// Decorative size for the headword at the top of the sheet.
+const double _kHeroWordSize = 40;
 
 class DictionaryEntrySheet extends ConsumerWidget {
   final String normalizedWord;
@@ -47,12 +51,12 @@ class DictionaryEntrySheet extends ConsumerWidget {
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
         borderRadius: isFloating
-            ? BorderRadius.circular(24)
-            : const BorderRadius.vertical(top: Radius.circular(32)),
+            ? BorderRadius.circular(Radii.xxl)
+            : const BorderRadius.vertical(top: Radius.circular(Radii.xxxl)),
         boxShadow: isFloating
             ? [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.2),
+                  color: context.palette.shadow,
                   blurRadius: 24,
                   spreadRadius: 8,
                 )
@@ -76,8 +80,9 @@ class DictionaryEntrySheet extends ConsumerWidget {
                     icon: Icon(Icons.arrow_back_ios_new_rounded,
                         size: 18, color: theme.primaryColor),
                     label: Text(context.l10n.commonBack,
-                        style:
-                            TextStyle(fontSize: 16, color: theme.primaryColor)),
+                        style: TextStyle(
+                            fontSize: TypeScale.bodyLarge,
+                            color: theme.primaryColor)),
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 8),
@@ -174,7 +179,7 @@ class DictionaryEntrySheet extends ConsumerWidget {
                         displayWord,
                         style: TextStyle(
                           fontFamily: typography.fontFamily,
-                          fontSize: 40,
+                          fontSize: _kHeroWordSize,
                           fontWeight: FontWeight.w800,
                           height: 1.1,
                           letterSpacing: -1.0,

@@ -1,4 +1,5 @@
 import 'dart:async';
+import '../../theme/design_tokens.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../l10n/l10n.dart';
@@ -58,7 +59,8 @@ Future<bool> showVerseActionSheet(BuildContext context, WidgetRef ref) async {
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    barrierColor: Colors.black.withValues(alpha: 0.32),
+    // Lighter than the default scrim so the selected verse stays visible.
+    barrierColor: context.palette.scrim.withValues(alpha: 0.32),
     builder: (ctx) => VerseActionSheet(
       contextLabel: verseSelectionContextLabel(
           readLoc.bookName, readLoc.chapter, verses,
@@ -175,7 +177,8 @@ class VerseActionSheet extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      barrierColor: Colors.black.withValues(alpha: 0.32),
+      // Lighter than the default scrim so the selected verse stays visible.
+      barrierColor: context.palette.scrim.withValues(alpha: 0.32),
       builder: (ctx) => VerseActionSheet(
         contextLabel: contextLabel,
         actionCount: actionCount,
@@ -203,7 +206,7 @@ class VerseActionSheet extends StatelessWidget {
       child: ConstrainedBox(
         constraints: BoxConstraints(maxHeight: maxHeight),
         child: TexturedGlassContainer(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(Radii.xxl),
           padding: const EdgeInsets.fromLTRB(8, 10, 8, 12),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -214,7 +217,7 @@ class VerseActionSheet extends StatelessWidget {
                   height: 5,
                   decoration: BoxDecoration(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
-                    borderRadius: BorderRadius.circular(3),
+                    borderRadius: BorderRadius.circular(Radii.xs),
                   ),
                 ),
               ),
@@ -282,7 +285,7 @@ class _SheetActionButton extends StatelessWidget {
               Text(
                 action.label,
                 style: theme.textTheme.labelSmall?.copyWith(
-                  fontSize: 11,
+                  fontSize: TypeScale.caption,
                   fontWeight: FontWeight.w600,
                   color: color,
                 ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../theme/design_tokens.dart';
 import 'package:flutter/services.dart';
 import 'textured_glass_container.dart';
 
@@ -56,7 +57,7 @@ class _ToastOverlayState extends State<_ToastOverlay>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
-      reverseDuration: const Duration(milliseconds: 400),
+      reverseDuration: Motion.slow,
     );
 
     _slideAnimation = Tween<double>(begin: -100, end: 64).animate(
@@ -111,7 +112,7 @@ class _ToastOverlayState extends State<_ToastOverlay>
             constraints: const BoxConstraints(maxWidth: 400),
             child: TexturedGlassContainer(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-              borderRadius: BorderRadius.circular(32),
+              borderRadius: BorderRadius.circular(Radii.xxxl),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [

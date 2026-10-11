@@ -15,6 +15,7 @@ import '../../state/typography_provider.dart';
 import '../../theme/app_colors.dart';
 import '../widgets/account_menu.dart';
 import 'main_nav_screen.dart';
+import '../../theme/design_tokens.dart';
 
 // Onboarding keeps its own warm sepia look whatever theme is picked, so the
 // first impression is the same for everyone.
@@ -23,6 +24,9 @@ const Color _surface = AppColors.warmGoldSurface;
 const Color _ink = AppColors.warmGoldTextPrimary;
 const Color _muted = AppColors.sepiaTextPrimary;
 const Color _accent = AppColors.warmGoldAccent;
+// Decorative display size for the welcome title; larger than the type scale.
+const double _kWelcomeTitleSize = 36;
+
 const Color _amber = Color(0xFFD49A36);
 const Color _terracotta = Color(0xFFB56553);
 const Color _olive = Color(0xFF7D8C61);
@@ -119,7 +123,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         pageBuilder: (_, __, ___) => const MainNavScreen(),
         transitionsBuilder: (_, animation, __, child) =>
             FadeTransition(opacity: animation, child: child),
-        transitionDuration: const Duration(milliseconds: 400),
+        transitionDuration: Motion.slow,
       ),
     ));
   }
@@ -205,7 +209,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                             children: [
                               for (var i = 0; i < _pageCount; i++)
                                 AnimatedContainer(
-                                  duration: const Duration(milliseconds: 250),
+                                  duration: Motion.normal,
                                   margin:
                                       const EdgeInsets.symmetric(horizontal: 4),
                                   width: i == _page ? 22 : 8,
@@ -214,7 +218,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                                     color: i == _page
                                         ? _terracotta
                                         : _muted.withValues(alpha: 0.25),
-                                    borderRadius: BorderRadius.circular(4),
+                                    borderRadius:
+                                        BorderRadius.circular(Radii.xs),
                                   ),
                                 ),
                             ],
@@ -229,9 +234,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           foregroundColor: _cream,
                           minimumSize: const Size.fromHeight(52),
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14)),
+                              borderRadius: BorderRadius.circular(Radii.lg)),
                           textStyle: const TextStyle(
-                              fontSize: 17, fontWeight: FontWeight.w600),
+                              fontSize: TypeScale.title,
+                              fontWeight: FontWeight.w600),
                         ),
                         child: Text(
                             last ? l10n.onboardingBegin : l10n.commonContinue),
@@ -268,7 +274,7 @@ class _PageFrame extends StatelessWidget {
             title,
             style: const TextStyle(
               fontFamily: 'EB Garamond',
-              fontSize: 30,
+              fontSize: TypeScale.display,
               fontWeight: FontWeight.bold,
               color: _ink,
               height: 1.1,
@@ -279,7 +285,7 @@ class _PageFrame extends StatelessWidget {
           const SizedBox(height: 10),
           Text(body!,
               style: TextStyle(
-                  fontSize: 16,
+                  fontSize: TypeScale.bodyLarge,
                   height: 1.35,
                   color: _muted.withValues(alpha: 0.75))),
         ],
@@ -315,14 +321,14 @@ class _ChoiceTile extends StatelessWidget {
         child: Material(
           color: selected ? _cream : _cream.withValues(alpha: 0.45),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(Radii.lg),
             side: BorderSide(
               color: selected ? _terracotta : _muted.withValues(alpha: 0.15),
               width: selected ? 2 : 1,
             ),
           ),
           child: InkWell(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(Radii.lg),
             onTap: onTap,
             child: ConstrainedBox(
               constraints: const BoxConstraints(minHeight: 56),
@@ -337,13 +343,13 @@ class _ChoiceTile extends StatelessWidget {
                         children: [
                           Text(title,
                               style: const TextStyle(
-                                  fontSize: 17,
+                                  fontSize: TypeScale.title,
                                   fontWeight: FontWeight.w600,
                                   color: _ink)),
                           if (subtitle != null)
                             Text(subtitle!,
                                 style: TextStyle(
-                                    fontSize: 14,
+                                    fontSize: TypeScale.body,
                                     color: _muted.withValues(alpha: 0.7))),
                         ],
                       ),
@@ -394,7 +400,7 @@ class _LanguagePage extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontFamily: 'EB Garamond',
-                        fontSize: 36,
+                        fontSize: _kWelcomeTitleSize,
                         fontWeight: FontWeight.bold,
                         color: _ink,
                         height: 1.05,
@@ -406,7 +412,8 @@ class _LanguagePage extends StatelessWidget {
                   Text(l10n.onboardingTagline,
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                          fontSize: 17, color: _muted.withValues(alpha: 0.7))),
+                          fontSize: TypeScale.title,
+                          color: _muted.withValues(alpha: 0.7))),
                 ],
               ),
             ],
@@ -415,7 +422,9 @@ class _LanguagePage extends StatelessWidget {
         const SizedBox(height: 32),
         Text(l10n.onboardingPickLanguage,
             style: const TextStyle(
-                fontSize: 19, fontWeight: FontWeight.w700, color: _ink)),
+                fontSize: TypeScale.titleLarge,
+                fontWeight: FontWeight.w700,
+                color: _ink)),
         const SizedBox(height: 12),
         for (final language in appLanguages)
           _ChoiceTile(
@@ -426,8 +435,9 @@ class _LanguagePage extends StatelessWidget {
         const SizedBox(height: 4),
         Text(l10n.onboardingLanguageHint,
             textAlign: TextAlign.center,
-            style:
-                TextStyle(fontSize: 14, color: _muted.withValues(alpha: 0.6))),
+            style: TextStyle(
+                fontSize: TypeScale.body,
+                color: _muted.withValues(alpha: 0.6))),
         const SizedBox(height: 16),
       ],
     );
@@ -475,7 +485,8 @@ class _BiblePage extends ConsumerWidget {
               value: showParallel,
               onChanged: onParallel,
               title: Text(l10n.onboardingParallel(nameOf('kjv')),
-                  style: const TextStyle(fontSize: 16, color: _ink)),
+                  style: const TextStyle(
+                      fontSize: TypeScale.bodyLarge, color: _ink)),
             ),
         ],
       ),
@@ -491,6 +502,8 @@ class _ComfortPage extends ConsumerWidget {
     final l10n = context.l10n;
     final theme = ref.watch(themeProvider);
     final size = ref.watch(typographyProvider).fontSize;
+    // Theme preview swatches show each theme's own colours, so they stay
+    // literal.
     final options = [
       (
         AppThemeMode.light,
@@ -540,7 +553,7 @@ class _ComfortPage extends ConsumerWidget {
                           height: 72,
                           decoration: BoxDecoration(
                             color: o.$3,
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius: BorderRadius.circular(Radii.lg),
                             border: Border.all(
                               color: o.$1 == theme
                                   ? _terracotta
@@ -564,12 +577,14 @@ class _ComfortPage extends ConsumerWidget {
           const SizedBox(height: 24),
           Text(l10n.onboardingTextSize,
               style: const TextStyle(
-                  fontSize: 16, fontWeight: FontWeight.w600, color: _ink)),
+                  fontSize: TypeScale.bodyLarge,
+                  fontWeight: FontWeight.w600,
+                  color: _ink)),
           Row(
             children: [
               const ExcludeSemantics(
-                  child:
-                      Text('A', style: TextStyle(fontSize: 14, color: _ink))),
+                  child: Text('A',
+                      style: TextStyle(fontSize: TypeScale.body, color: _ink))),
               Expanded(
                 child: Slider(
                   value: size.clamp(14, 30),
@@ -584,8 +599,9 @@ class _ComfortPage extends ConsumerWidget {
                 ),
               ),
               const ExcludeSemantics(
-                  child:
-                      Text('A', style: TextStyle(fontSize: 24, color: _ink))),
+                  child: Text('A',
+                      style: TextStyle(
+                          fontSize: TypeScale.headline, color: _ink))),
             ],
           ),
           const SizedBox(height: 12),
@@ -594,7 +610,7 @@ class _ComfortPage extends ConsumerWidget {
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
               color: current.$3,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(Radii.lg),
               border: Border.all(color: _muted.withValues(alpha: 0.15)),
             ),
             child: Column(
@@ -609,7 +625,7 @@ class _ComfortPage extends ConsumerWidget {
                 const SizedBox(height: 8),
                 Text(l10n.onboardingPreviewRef,
                     style: TextStyle(
-                        fontSize: 13,
+                        fontSize: TypeScale.body,
                         fontWeight: FontWeight.w600,
                         color: current.$4.withValues(alpha: 0.6))),
               ],
@@ -639,7 +655,7 @@ class _ReminderPage extends ConsumerWidget {
         children: [
           Material(
             color: _cream.withValues(alpha: 0.6),
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(Radii.lg),
             clipBehavior: Clip.antiAlias,
             child: Column(
               children: [
@@ -652,7 +668,8 @@ class _ReminderPage extends ConsumerWidget {
                   secondary: const Icon(Icons.notifications_active_outlined,
                       color: _terracotta),
                   title: Text(l10n.onboardingReminderToggle,
-                      style: const TextStyle(fontSize: 16, color: _ink)),
+                      style: const TextStyle(
+                          fontSize: TypeScale.bodyLarge, color: _ink)),
                 ),
                 AnimatedSize(
                   duration: const Duration(milliseconds: 200),
@@ -664,7 +681,7 @@ class _ReminderPage extends ConsumerWidget {
                               style: const TextStyle(color: _ink)),
                           trailing: Text(time.format(context),
                               style: const TextStyle(
-                                  fontSize: 16,
+                                  fontSize: TypeScale.bodyLarge,
                                   fontWeight: FontWeight.w600,
                                   color: _terracotta)),
                           onTap: () async {
@@ -683,7 +700,8 @@ class _ReminderPage extends ConsumerWidget {
           const SizedBox(height: 12),
           Text(l10n.onboardingReminderPermission,
               style: TextStyle(
-                  fontSize: 14, color: _muted.withValues(alpha: 0.65))),
+                  fontSize: TypeScale.body,
+                  color: _muted.withValues(alpha: 0.65))),
         ],
       ),
     );
@@ -703,7 +721,8 @@ class _AccountPage extends ConsumerWidget {
       backgroundColor: _cream,
       minimumSize: const Size.fromHeight(52),
       side: BorderSide(color: _muted.withValues(alpha: 0.25)),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(Radii.lg)),
     );
     return _PageFrame(
       title: l10n.onboardingAccountTitle,
@@ -800,7 +819,7 @@ class _FeatureRow extends StatelessWidget {
               width: 52,
               height: 52,
               decoration: BoxDecoration(
-                  color: color, borderRadius: BorderRadius.circular(14)),
+                  color: color, borderRadius: BorderRadius.circular(Radii.lg)),
               child: Icon(icon, size: 26, color: _cream),
             ),
             const SizedBox(width: 16),
@@ -811,13 +830,13 @@ class _FeatureRow extends StatelessWidget {
                   Text(title,
                       style: const TextStyle(
                           fontFamily: 'EB Garamond',
-                          fontSize: 18,
+                          fontSize: TypeScale.title,
                           fontWeight: FontWeight.w600,
                           color: _ink)),
                   const SizedBox(height: 3),
                   Text(body,
                       style: TextStyle(
-                          fontSize: 15,
+                          fontSize: TypeScale.bodyLarge,
                           height: 1.3,
                           color: _muted.withValues(alpha: 0.65))),
                 ],

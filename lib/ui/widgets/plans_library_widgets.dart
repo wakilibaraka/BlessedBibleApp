@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../services/devotional_service.dart';
 import '../../state/devotional_provider.dart';
 import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
 
 /// Presentation widgets for the Plans Library redesign.
 ///
@@ -76,15 +77,15 @@ class LibraryGreetingHeader extends StatelessWidget {
           constraints: const BoxConstraints(minHeight: 44),
           child: Material(
             color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(Radii.lg),
             child: InkWell(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(Radii.lg),
               onTap: onReadPressed,
               child: Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(Radii.lg),
                   border: Border.all(color: theme.dividerColor),
                 ),
                 child: Column(
@@ -138,8 +139,9 @@ class MascotPlaceholder extends StatelessWidget {
           width: size * 0.55,
           height: 5,
           decoration: BoxDecoration(
+            // Mascot art: fixed green underline, same in every theme.
             color: const Color(0xFF4CAF50).withValues(alpha: 0.85),
-            borderRadius: BorderRadius.circular(3),
+            borderRadius: BorderRadius.circular(Radii.xs),
           ),
         ),
       ],
@@ -152,6 +154,7 @@ class _ToastPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final w = size.width;
     final h = size.height;
+    // Mascot illustration colours are fixed art, not theme chrome.
     final crust = Paint()..color = const Color(0xFFB0712E);
     final bread = Paint()..color = const Color(0xFFE9B36A);
     final dark = Paint()
@@ -241,7 +244,7 @@ class PlanCoverPlaceholder extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(Radii.lg),
         gradient: LinearGradient(
           colors: [base, deep],
           begin: Alignment.topLeft,
@@ -261,6 +264,7 @@ class PlanCoverPlaceholder extends StatelessWidget {
               height: width * 0.8,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
+                // Highlight over the generated hue gradient (art).
                 color: Colors.white.withValues(alpha: 0.15),
               ),
             ),
@@ -270,6 +274,7 @@ class PlanCoverPlaceholder extends StatelessWidget {
               initials,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w800,
+                // Always on the mid/deep hue gradient, never the surface.
                 color: Colors.white,
                 letterSpacing: 1.0,
               ),
@@ -330,7 +335,7 @@ class LibraryPlateBand extends ConsumerWidget {
               height: height,
               width: double.infinity,
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(Radii.xl),
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
@@ -341,6 +346,8 @@ class LibraryPlateBand extends ConsumerWidget {
                       errorBuilder: (_, __, ___) =>
                           Container(color: theme.colorScheme.surface),
                     ),
+                    // Fixed dark scrim + white text: sits over artwork,
+                    // independent of the app theme.
                     // Scrim so the caption stays legible on light plates.
                     DecoratedBox(
                       decoration: BoxDecoration(

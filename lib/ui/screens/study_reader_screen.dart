@@ -36,6 +36,7 @@ import '../../state/pericopes_provider.dart';
 
 import '../../models/pericope_entry.dart';
 import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
 
 enum StudyMode { plan, deepDive }
 
@@ -410,7 +411,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                      borderRadius: BorderRadius.circular(Radii.md)),
                 ),
                 child: const Icon(Icons.arrow_back_rounded, size: 20),
               ),
@@ -421,10 +422,11 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor:
                           isDone ? gold.withValues(alpha: 0.6) : gold,
+                      // Fixed: sits on the fixed gold accent, not a theme colour.
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                          borderRadius: BorderRadius.circular(Radii.md)),
                     ),
                     onPressed: () {
                       if (widget.payload.mode == StudyMode.plan && isDone) {
@@ -441,17 +443,18 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                           : context.l10n.commonDone,
                       style: const TextStyle(
                           fontFamily: 'EB Garamond',
-                          fontSize: 18,
+                          fontSize: TypeScale.title,
                           fontWeight: FontWeight.bold),
                     ),
                   )
                 : ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: gold,
+                      // Fixed: sits on the fixed gold accent, not a theme colour.
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                          borderRadius: BorderRadius.circular(Radii.md)),
                     ),
                     onPressed: () => _goToPassage(_passageIndex + 1),
                     child: Row(
@@ -460,7 +463,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                         Text(context.l10n.studyNextPassage,
                             style: const TextStyle(
                                 fontFamily: 'EB Garamond',
-                                fontSize: 18,
+                                fontSize: TypeScale.title,
                                 fontWeight: FontWeight.bold)),
                         const SizedBox(width: 8),
                         const Icon(Icons.arrow_forward_rounded, size: 20),
@@ -486,9 +489,9 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
         case AppThemeMode.olives:
           return AppColors.olivesBackground;
         case AppThemeMode.dusk:
-          return const Color(0xFF312C51);
+          return AppColors.duskBackground;
         case AppThemeMode.fresh:
-          return const Color(0xFF132C33);
+          return AppColors.freshBackground;
         default:
           return theme.scaffoldBackgroundColor;
       }
@@ -539,7 +542,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                                         passage.label,
                                         style: TextStyle(
                                           fontFamily: 'EB Garamond',
-                                          fontSize: 18,
+                                          fontSize: TypeScale.title,
                                           fontWeight: FontWeight.bold,
                                           color:
                                               theme.textTheme.bodyLarge?.color,
@@ -555,7 +558,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                                           color: theme.colorScheme.onSurface
                                               .withValues(alpha: 0.4),
                                           letterSpacing: 1.0,
-                                          fontSize: 10,
+                                          fontSize: TypeScale.micro,
                                         ),
                                       ),
                                     ],
@@ -580,12 +583,13 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                                               ? gold
                                               : theme.dividerColor,
                                           width: 1),
-                                      borderRadius: BorderRadius.circular(16),
+                                      borderRadius:
+                                          BorderRadius.circular(Radii.lg),
                                     ),
                                     child: Text(
                                       context.l10n.studyFullChapter,
                                       style: TextStyle(
-                                        fontSize: 11,
+                                        fontSize: TypeScale.caption,
                                         fontWeight: FontWeight.w600,
                                         color: _showFullChapter
                                             ? gold
@@ -685,7 +689,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                               padding: const EdgeInsets.all(16.0),
                               decoration: BoxDecoration(
                                 color: gold.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(Radii.lg),
                                 border: Border.all(
                                     color: gold.withValues(alpha: 0.3)),
                               ),
@@ -775,7 +779,8 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                                             ? highlightColor.withValues(
                                                 alpha: 0.3)
                                             : Colors.transparent),
-                                    borderRadius: BorderRadius.circular(8),
+                                    borderRadius:
+                                        BorderRadius.circular(Radii.sm),
                                   ),
                                   child: Builder(builder: (ctx) {
                                     final fontStyle = TextStyle(
@@ -858,7 +863,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
               Align(
                 alignment: Alignment.bottomCenter,
                 child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 250),
+                  duration: Motion.normal,
                   switchInCurve: Curves.easeOutCubic,
                   switchOutCurve: Curves.easeInCubic,
                   transitionBuilder: (child, animation) {
@@ -959,7 +964,7 @@ class _VerseActionBar extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 24.0, left: 16, right: 16),
       child: TexturedGlassContainer(
-        borderRadius: BorderRadius.circular(32),
+        borderRadius: BorderRadius.circular(Radii.xxxl),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         child: FittedBox(
           fit: BoxFit.scaleDown,

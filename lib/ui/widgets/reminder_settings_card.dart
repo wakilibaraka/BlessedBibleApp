@@ -2,6 +2,7 @@ import '../../l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/reminders_provider.dart';
+import '../../theme/design_tokens.dart';
 
 class ReminderSettingsCard extends ConsumerWidget {
   final ThemeData theme;
@@ -49,7 +50,7 @@ class ReminderSettingsCard extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(Radii.xxl),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(

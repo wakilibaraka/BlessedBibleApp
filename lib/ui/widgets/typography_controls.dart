@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/typography_provider.dart';
+import '../../theme/design_tokens.dart';
 import 'pill_segmented_control.dart';
 
 // Fonts grouped by family for 3-per-row grid
@@ -34,7 +35,7 @@ class TypographyControls extends ConsumerWidget {
       color: theme.primaryColor,
       letterSpacing: 1.2,
       fontWeight: FontWeight.bold,
-      fontSize: 10,
+      fontSize: TypeScale.micro,
     );
     final valueStyle = theme.textTheme.labelMedium?.copyWith(
       color: theme.primaryColor,
@@ -158,12 +159,12 @@ class TypographyControls extends ConsumerWidget {
                       color: isSelected
                           ? theme.primaryColor
                           : theme.colorScheme.onSurface.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(Radii.md),
                     ),
                     child: Text(
                       _weightLabels(context.l10n)[i],
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: TypeScale.caption,
                         fontWeight: FontWeight.values.firstWhere(
                             (w) => w.value == _weightValues[i],
                             orElse: () => FontWeight.normal),
@@ -354,7 +355,7 @@ class TypographyControls extends ConsumerWidget {
                               ? theme.primaryColor
                               : theme.colorScheme.onSurface
                                   .withValues(alpha: 0.05),
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(Radii.md),
                         ),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
@@ -362,7 +363,7 @@ class TypographyControls extends ConsumerWidget {
                             Text('Aa',
                                 style: TextStyle(
                                   fontFamily: font,
-                                  fontSize: 18,
+                                  fontSize: TypeScale.title,
                                   fontWeight: typography.fontWeight,
                                   color: isSelected
                                       ? theme.colorScheme.surface
@@ -376,7 +377,7 @@ class TypographyControls extends ConsumerWidget {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                fontSize: 9,
+                                fontSize: TypeScale.micro,
                                 color: isSelected
                                     ? theme.colorScheme.surface
                                         .withValues(alpha: 0.85)
@@ -400,7 +401,7 @@ class TypographyControls extends ConsumerWidget {
           child: Container(
             decoration: BoxDecoration(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.03),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(Radii.lg),
             ),
             child: SwitchListTile(
               title: Row(children: [
@@ -444,7 +445,7 @@ class _IconStepButton extends StatelessWidget {
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(Radii.md),
         ),
         child: Icon(icon, size: 20, color: iconColor),
       ),
@@ -465,13 +466,13 @@ class _AlignmentButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+        duration: Motion.normal,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected
               ? theme.primaryColor
               : theme.colorScheme.onSurface.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(Radii.pill),
           border: Border.all(
               color: isSelected ? theme.primaryColor : Colors.transparent),
         ),

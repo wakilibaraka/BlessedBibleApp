@@ -8,6 +8,7 @@ import '../widgets/dictionary_entry_sheet.dart';
 import '../widgets/shared_app_bar.dart';
 import '../widgets/study_v2_widgets.dart';
 import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
 
 /// Standalone dictionary (V2): just words — bookmarks, highlights and
 /// notes moved to the Your Space banner.
@@ -59,11 +60,11 @@ class _DictionaryV2ScreenState extends ConsumerState<DictionaryV2Screen> {
                       filled: true,
                       fillColor: theme.colorScheme.surface,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(Radii.lg),
                         borderSide: BorderSide(color: theme.dividerColor),
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(Radii.lg),
                         borderSide: BorderSide(color: theme.dividerColor),
                       ),
                     ),

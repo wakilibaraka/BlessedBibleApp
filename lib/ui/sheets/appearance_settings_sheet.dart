@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../theme/app_colors.dart';
+import '../../theme/design_tokens.dart';
 import '../widgets/textured_glass_container.dart';
 import '../widgets/typography_controls.dart';
 import 'theme_picker_sheet.dart';
@@ -63,7 +64,7 @@ class _AppearanceSettingsSheetState
         child: TexturedGlassContainer(
           sigmaX: 45.0,
           sigmaY: 45.0,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: Radii.sheet,
           padding: EdgeInsets.zero,
           child: Column(
             children: [
@@ -86,7 +87,7 @@ class _AppearanceSettingsSheetState
                         decoration: BoxDecoration(
                           color: theme.colorScheme.onSurface
                               .withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(2),
+                          borderRadius: BorderRadius.circular(Radii.xs),
                         ),
                       ),
                     ),
@@ -97,7 +98,7 @@ class _AppearanceSettingsSheetState
                       decoration: BoxDecoration(
                         color:
                             theme.colorScheme.onSurface.withValues(alpha: 0.06),
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(Radii.pill),
                       ),
                       child: Row(
                         children: [
@@ -135,7 +136,7 @@ class _AppearanceSettingsSheetState
               // ── Body ────────────────────────────────────────────
               Expanded(
                 child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 220),
+                  duration: Motion.normal,
                   switchInCurve: Curves.easeOutCubic,
                   switchOutCurve: Curves.easeInCubic,
                   child: _activeTab == AppearanceTab.typography
@@ -208,12 +209,12 @@ class _TabButton extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
+          duration: Motion.normal,
           curve: Curves.easeOutCubic,
           margin: const EdgeInsets.all(3),
           decoration: BoxDecoration(
             color: isSelected ? theme.primaryColor : Colors.transparent,
-            borderRadius: BorderRadius.circular(17),
+            borderRadius: BorderRadius.circular(Radii.pill),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -229,7 +230,7 @@ class _TabButton extends StatelessWidget {
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: TypeScale.caption,
                   fontWeight: FontWeight.w600,
                   color: isSelected
                       ? AppColors.lightTextPrimary

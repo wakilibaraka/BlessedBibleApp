@@ -7,6 +7,7 @@ import '../widgets/verse_link_text.dart' show splitBoldSegments;
 import '../../theme/app_colors.dart';
 import 'bible_stories_screen.dart';
 import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
 
 /// Two-page devotional reader: engraving on top, scripture + retelling below.
 class BibleStoryReaderScreen extends ConsumerStatefulWidget {
@@ -136,6 +137,7 @@ class _BibleStoryReaderScreenState
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
+                          // Fixed: darkens the top of the artwork so the back button reads.
                           Colors.black.withValues(alpha: 0.55),
                           Colors.transparent,
                           Colors.transparent,
@@ -189,7 +191,7 @@ class _BibleStoryReaderScreenState
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
                         color: theme.primaryColor.withValues(alpha: 0.06),
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(Radii.lg),
                         border: Border.all(
                           color: theme.primaryColor.withValues(alpha: 0.25),
                         ),
@@ -283,12 +285,12 @@ class _BibleStoryReaderScreenState
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(Radii.xl),
             border:
                 Border.all(color: theme.dividerColor.withValues(alpha: 0.4)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.08),
+                color: context.palette.shadow,
                 blurRadius: 16,
                 offset: const Offset(0, 4),
               ),
@@ -352,7 +354,7 @@ class _PassageText extends StatelessWidget {
                       text: segment.text,
                       style: theme.textTheme.bodyLarge?.copyWith(
                         fontFamily: 'Cormorant Garamond',
-                        fontSize: 19,
+                        fontSize: TypeScale.titleLarge,
                         height: 1.55,
                         fontWeight: segment.bold ? FontWeight.bold : null,
                       ),

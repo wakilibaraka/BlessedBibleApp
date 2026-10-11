@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import '../../theme/design_tokens.dart';
 
 class BouncyEntrance extends StatefulWidget {
   final Widget child;
@@ -36,7 +37,7 @@ class _BouncyEntranceState extends State<BouncyEntrance>
       vsync: this,
       value: (widget.isVisible && !widget.animateIn) ? 1.0 : 0.0,
       duration: widget.duration,
-      reverseDuration: const Duration(milliseconds: 250),
+      reverseDuration: Motion.normal,
     );
 
     _scaleAnimation = Tween<double>(begin: 0.85, end: 1.0).animate(

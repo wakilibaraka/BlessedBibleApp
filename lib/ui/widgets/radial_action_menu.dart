@@ -1,4 +1,5 @@
 import 'dart:math';
+import '../../theme/design_tokens.dart';
 
 import 'package:flutter/material.dart';
 import '../../l10n/l10n.dart';
@@ -107,7 +108,8 @@ class RadialActionMenu extends StatefulWidget {
       context: context,
       barrierDismissible: true,
       barrierLabel: context.l10n.readVerseActions,
-      barrierColor: Colors.black.withValues(alpha: 0.28),
+      // Light scrim so the verse under the menu stays readable.
+      barrierColor: context.palette.scrim.withValues(alpha: 0.28),
       transitionDuration: const Duration(milliseconds: 180),
       pageBuilder: (_, __, ___) => RadialActionMenu(
         anchor: anchor,
@@ -213,7 +215,7 @@ class _RadialItem extends StatelessWidget {
               border: Border.all(color: color.withValues(alpha: 0.45)),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.18),
+                  color: context.palette.shadow,
                   blurRadius: 10,
                   offset: const Offset(0, 3),
                 ),

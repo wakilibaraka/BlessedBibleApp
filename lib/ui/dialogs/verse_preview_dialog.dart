@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../theme/design_tokens.dart';
 import '../../l10n/l10n.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/bible_provider.dart';
@@ -49,10 +50,10 @@ class VersePreviewDialog extends ConsumerWidget {
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           color: theme.scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(Radii.xxl),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
+              color: context.palette.shadow,
               blurRadius: 24,
               spreadRadius: 8,
             )
@@ -71,7 +72,7 @@ class VersePreviewDialog extends ConsumerWidget {
                         ? '$fullBookName $chapter:$verseNum'
                         : reference,
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: TypeScale.title,
                       fontWeight: FontWeight.bold,
                       color: theme.primaryColor,
                     ),

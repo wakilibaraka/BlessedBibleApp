@@ -6,11 +6,20 @@ import 'package:flutter/services.dart';
 import '../../state/theme_provider.dart';
 import '../../state/surface_style_provider.dart';
 import '../../theme/app_colors.dart';
+import '../../theme/design_tokens.dart';
 
 import '../widgets/textured_glass_container.dart';
 import '../../state/read_settings_provider.dart';
 
 const double kAppearanceSheetHeightFactor = 0.70;
+
+// Highlight/shade for the neumorphic theme pills (simulated light, fixed).
+const Color _kHighlight = Colors.white;
+const Color _kShade = Colors.black;
+
+// Subtitle in the four-across surface-style tiles; smaller than
+// TypeScale.micro so it fits.
+const double _kTileSubtitleSize = 8.5;
 
 class ThemePickerSheet extends ConsumerStatefulWidget {
   const ThemePickerSheet({super.key});
@@ -54,7 +63,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
         child: TexturedGlassContainer(
           sigmaX: 45.0,
           sigmaY: 45.0,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: Radii.sheet,
           padding: EdgeInsets.zero,
           child: SingleChildScrollView(
             physics: const ClampingScrollPhysics(),
@@ -74,7 +83,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                     height: 4,
                     decoration: BoxDecoration(
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(2),
+                      borderRadius: BorderRadius.circular(Radii.xs),
                     ),
                   ),
                 ),
@@ -113,11 +122,12 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                                   left: 16, right: 16, bottom: 8),
                               title: Text(context.l10n.settingsBackgroundGlow,
                                   style: TextStyle(
-                                      fontSize: 14,
+                                      fontSize: TypeScale.body,
                                       fontWeight: FontWeight.bold)),
                               subtitle: Text(
                                   context.l10n.settingsBackgroundGlowSubtitle,
-                                  style: TextStyle(fontSize: 12)),
+                                  style:
+                                      TextStyle(fontSize: TypeScale.caption)),
                               value: readSettings.isGlowEnabled,
                               onChanged: (value) {
                                 HapticFeedback.selectionClick();
@@ -136,7 +146,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                           color: theme.primaryColor,
                           letterSpacing: 1.2,
                           fontWeight: FontWeight.bold,
-                          fontSize: 10,
+                          fontSize: TypeScale.micro,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -184,7 +194,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                           color: theme.primaryColor,
                           letterSpacing: 1.2,
                           fontWeight: FontWeight.bold,
-                          fontSize: 10,
+                          fontSize: TypeScale.micro,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -243,7 +253,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                           color: theme.primaryColor,
                           letterSpacing: 1.2,
                           fontWeight: FontWeight.bold,
-                          fontSize: 10,
+                          fontSize: TypeScale.micro,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -302,7 +312,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                           color: theme.primaryColor,
                           letterSpacing: 1.2,
                           fontWeight: FontWeight.bold,
-                          fontSize: 10,
+                          fontSize: TypeScale.micro,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -314,6 +324,7 @@ class _ThemePickerSheetState extends ConsumerState<ThemePickerSheet> {
                               mode: AppThemeMode.priestlyPurple,
                               currentMode: currentMode,
                               fillColor: AppColors.lightBackground,
+                              // Swatch colours preview each theme, so they stay literal.
                               textColor: const Color(0xFF673AB7),
                               swatchColors: const [
                                 Color(0xFF673AB7),
@@ -399,7 +410,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
             style: OutlinedButton.styleFrom(
               minimumSize: const Size.fromHeight(48),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(Radii.lg),
               ),
             ),
           ),
@@ -423,10 +434,10 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
                 contentPadding:
                     const EdgeInsets.only(left: 16, right: 16, bottom: 8),
                 title: Text(context.l10n.settingsBackgroundGlow,
-                    style:
-                        TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                    style: TextStyle(
+                        fontSize: TypeScale.body, fontWeight: FontWeight.bold)),
                 subtitle: Text(context.l10n.settingsBackgroundGlowSubtitle,
-                    style: TextStyle(fontSize: 12)),
+                    style: TextStyle(fontSize: TypeScale.caption)),
                 value: readSettings.isGlowEnabled,
                 onChanged: (value) {
                   HapticFeedback.selectionClick();
@@ -442,7 +453,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
                 color: theme.primaryColor,
                 letterSpacing: 1.2,
                 fontWeight: FontWeight.bold,
-                fontSize: 10)),
+                fontSize: TypeScale.micro)),
         const SizedBox(height: 8),
         Row(children: [
           Expanded(
@@ -479,7 +490,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
                 color: theme.primaryColor,
                 letterSpacing: 1.2,
                 fontWeight: FontWeight.bold,
-                fontSize: 10)),
+                fontSize: TypeScale.micro)),
         const SizedBox(height: 8),
         Row(children: [
           Expanded(
@@ -527,7 +538,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
                 color: theme.primaryColor,
                 letterSpacing: 1.2,
                 fontWeight: FontWeight.bold,
-                fontSize: 10)),
+                fontSize: TypeScale.micro)),
         const SizedBox(height: 8),
         Row(children: [
           Expanded(
@@ -575,7 +586,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
                 color: theme.primaryColor,
                 letterSpacing: 1.2,
                 fontWeight: FontWeight.bold,
-                fontSize: 10)),
+                fontSize: TypeScale.micro)),
         const SizedBox(height: 8),
         Row(children: [
           Expanded(
@@ -584,6 +595,7 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
                   mode: AppThemeMode.priestlyPurple,
                   currentMode: currentMode,
                   fillColor: AppColors.lightBackground,
+                  // Swatch colours preview each theme, so they stay literal.
                   textColor: const Color(0xFF673AB7),
                   swatchColors: const [
                 Color(0xFF673AB7),
@@ -679,27 +691,28 @@ class _ThemePillState extends ConsumerState<_ThemePill>
             .computeLuminance();
     final isDarkBg = bgLuminance < 0.4;
 
+    // Neumorphic light/shade pair: models light, not theme colours.
     final neumorphicShadows = isDarkBg
         ? [
             BoxShadow(
-              color: Colors.white.withValues(alpha: 0.15),
+              color: _kHighlight.withValues(alpha: 0.15),
               offset: const Offset(-2, -2),
               blurRadius: 4,
             ),
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.45),
+              color: _kShade.withValues(alpha: 0.45),
               offset: const Offset(3, 3),
               blurRadius: 6,
             ),
           ]
         : [
             BoxShadow(
-              color: Colors.white.withValues(alpha: 0.85),
+              color: _kHighlight.withValues(alpha: 0.85),
               offset: const Offset(-2, -2),
               blurRadius: 4,
             ),
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.12),
+              color: _kShade.withValues(alpha: 0.12),
               offset: const Offset(3, 3),
               blurRadius: 6,
             ),
@@ -722,7 +735,7 @@ class _ThemePillState extends ConsumerState<_ThemePill>
           color: isSelected
               ? widget.fillColor
               : theme.colorScheme.onSurface.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(26),
+          borderRadius: BorderRadius.circular(Radii.pill),
           border: Border.all(
             color: isSelected
                 ? theme.primaryColor
@@ -755,7 +768,7 @@ class _ThemePillState extends ConsumerState<_ThemePill>
                         ? widget.textColor
                         : theme.colorScheme.onSurface,
                     fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
-                    fontSize: 10,
+                    fontSize: TypeScale.micro,
                     height: 1.1,
                   ),
                 ),
@@ -779,7 +792,7 @@ class _ThemePillState extends ConsumerState<_ThemePill>
                     ]),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
+                        color: context.palette.shadow.withValues(alpha: 0.2),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       ),
@@ -852,6 +865,7 @@ class _DarkThemePillState extends ConsumerState<_DarkThemePill>
         ? (isOledActive ? AppThemeMode.oled : AppThemeMode.dark)
         : _lastDarkVariant;
 
+    // Preview of the dark/OLED themes' own colours, so these stay literal.
     final fillColor = activeVariant == AppThemeMode.oled
         ? Colors.black
         : const Color(0xFF333333);
@@ -864,27 +878,28 @@ class _DarkThemePillState extends ConsumerState<_DarkThemePill>
         (isSelected ? fillColor : theme.colorScheme.surface).computeLuminance();
     final isDarkBg = bgLuminance < 0.4;
 
+    // Neumorphic light/shade pair: models light, not theme colours.
     final neumorphicShadows = isDarkBg
         ? [
             BoxShadow(
-              color: Colors.white.withValues(alpha: 0.15),
+              color: _kHighlight.withValues(alpha: 0.15),
               offset: const Offset(-2, -2),
               blurRadius: 4,
             ),
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.45),
+              color: _kShade.withValues(alpha: 0.45),
               offset: const Offset(3, 3),
               blurRadius: 6,
             ),
           ]
         : [
             BoxShadow(
-              color: Colors.white.withValues(alpha: 0.85),
+              color: _kHighlight.withValues(alpha: 0.85),
               offset: const Offset(-2, -2),
               blurRadius: 4,
             ),
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.12),
+              color: _kShade.withValues(alpha: 0.12),
               offset: const Offset(3, 3),
               blurRadius: 6,
             ),
@@ -914,7 +929,7 @@ class _DarkThemePillState extends ConsumerState<_DarkThemePill>
           color: isSelected
               ? fillColor
               : theme.colorScheme.onSurface.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(26),
+          borderRadius: BorderRadius.circular(Radii.pill),
           border: Border.all(
             color: isSelected
                 ? theme.primaryColor
@@ -945,7 +960,7 @@ class _DarkThemePillState extends ConsumerState<_DarkThemePill>
                   style: TextStyle(
                     color: isSelected ? textColor : theme.colorScheme.onSurface,
                     fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
-                    fontSize: 10,
+                    fontSize: TypeScale.micro,
                     height: 1.1,
                   ),
                 ),
@@ -967,7 +982,7 @@ class _DarkThemePillState extends ConsumerState<_DarkThemePill>
                         colors: [...swatchColors, swatchColors.first]),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
+                        color: context.palette.shadow.withValues(alpha: 0.2),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       ),
@@ -1135,7 +1150,7 @@ class _SurfaceStyleGrid extends StatelessWidget {
               color: theme.primaryColor,
               letterSpacing: 1.2,
               fontWeight: FontWeight.bold,
-              fontSize: 10,
+              fontSize: TypeScale.micro,
             ),
           ),
           const SizedBox(height: 4),
@@ -1143,7 +1158,7 @@ class _SurfaceStyleGrid extends StatelessWidget {
             context.l10n.settingsSurfaceStyleSubtitle,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
-              fontSize: 11,
+              fontSize: TypeScale.caption,
             ),
           ),
           const SizedBox(height: 12),
@@ -1211,14 +1226,14 @@ class _SurfaceStyleTile extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
+        duration: Motion.normal,
         curve: Curves.easeOutCubic,
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
         decoration: BoxDecoration(
           color: isSelected
               ? primary.withValues(alpha: 0.10)
               : onSurface.withValues(alpha: 0.04),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(Radii.lg),
           border: Border.all(
             color: isSelected
                 ? primary.withValues(alpha: 0.75)
@@ -1248,7 +1263,7 @@ class _SurfaceStyleTile extends StatelessWidget {
               meta.label(context.l10n),
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 10.5,
+                fontSize: TypeScale.micro,
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                 color: isSelected ? primary : onSurface.withValues(alpha: 0.80),
                 height: 1.1,
@@ -1261,7 +1276,7 @@ class _SurfaceStyleTile extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 8.5,
+                fontSize: _kTileSubtitleSize,
                 fontWeight: FontWeight.w400,
                 color: onSurface.withValues(alpha: 0.45),
                 height: 1.1,

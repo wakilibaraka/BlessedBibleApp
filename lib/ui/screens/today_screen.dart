@@ -29,6 +29,7 @@ import '../../state/bible_provider.dart';
 import '../../state/study_provider.dart';
 import '../../state/commentary_provider.dart';
 import 'votd_archive_screen.dart';
+import '../../theme/design_tokens.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TODAY SCREEN — static scaffold (Stage 1: design / no data wiring)
@@ -146,7 +147,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                                       behavior: SnackBarBehavior.floating,
                                       shape: RoundedRectangleBorder(
                                           borderRadius:
-                                              BorderRadius.circular(12)),
+                                              BorderRadius.circular(Radii.md)),
                                     ),
                                   );
                                 },
@@ -307,7 +308,7 @@ class _GreetingHeader extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(Radii.xxl),
       ),
       padding: const EdgeInsets.all(20),
       child: Row(
@@ -463,7 +464,7 @@ class _StreakProgressCard extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(Radii.xxl),
       ),
       padding: const EdgeInsets.all(20),
       child: Row(
@@ -516,7 +517,7 @@ class _StreakProgressCard extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(Radii.xs),
                   child: LinearProgressIndicator(
                     value: progress,
                     minHeight: 7,
@@ -639,7 +640,7 @@ class _QuickActionsRow extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(Radii.xxl),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Row(
@@ -697,7 +698,7 @@ class _QuickActionButton extends StatelessWidget {
             style: theme.textTheme.labelSmall?.copyWith(
               color: theme.colorScheme.onSurface,
               fontWeight: FontWeight.w600,
-              fontSize: 11,
+              fontSize: TypeScale.caption,
             ),
           ),
         ],
@@ -715,12 +716,12 @@ class _VotdArchiveBanner extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(Radii.xxl),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(Radii.xxl),
           onTap: () {
             Navigator.of(context).push(
               CupertinoPageRoute<void>(
@@ -766,7 +767,7 @@ class _VotdArchiveBanner extends StatelessWidget {
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(Radii.md),
                   ),
                   child: Row(
                     children: [

@@ -18,6 +18,7 @@ import '../screens/commentary_hub_screen.dart';
 import '../../state/read_location_provider.dart';
 import 'verse_link_text.dart';
 import '../../l10n/l10n.dart';
+import '../../theme/design_tokens.dart';
 
 class CommentaryView extends ConsumerStatefulWidget {
   final String book;
@@ -210,7 +211,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                 decoration: BoxDecoration(
                   color: Colors.transparent,
-                  borderRadius: BorderRadius.circular(30),
+                  borderRadius: BorderRadius.circular(Radii.xxxl),
                   border: Border.all(
                       color: tokens.readingAccent.withValues(alpha: 0.5)),
                 ),
@@ -355,13 +356,13 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                     padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
                     decoration: BoxDecoration(
                       color: tokens.readingSurface,
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(Radii.xxl),
                       border: Border.all(
                           color:
                               tokens.readingInkMuted.withValues(alpha: 0.15)),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.08),
+                          color: context.palette.shadow,
                           blurRadius: 20,
                           offset: const Offset(0, 8),
                         )
@@ -492,10 +493,10 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
     return Container(
       decoration: BoxDecoration(
         color: is3DTheme ? theme.colorScheme.surface : tokens.readingSurface,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(Radii.xl),
         border: Border.all(
             color: is3DTheme
-                ? Colors.white.withValues(alpha: 0.15)
+                ? theme.colorScheme.onSurface.withValues(alpha: 0.15)
                 : tokens.readingBorder),
       ),
       padding: const EdgeInsets.symmetric(vertical: 40.0, horizontal: 24.0),
@@ -542,7 +543,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
         children: [
           InkWell(
             onTap: onToggle,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(Radii.md),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),
               child: Row(
@@ -604,7 +605,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
       decoration: BoxDecoration(
         color: bgColor,
         border: border,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(Radii.lg),
       ),
       child: _buildEntryContent(theme, tokens, entry, typography),
     );
@@ -697,7 +698,7 @@ void showCommentaryBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    barrierColor: Colors.black.withValues(alpha: 0.5),
+    barrierColor: context.palette.scrim,
     builder: (context) {
       return Consumer(
         builder: (context, ref, _) {
@@ -723,8 +724,8 @@ void showCommentaryBottomSheet(
                       (is3DTheme
                           ? theme.colorScheme.surface
                           : tokens.readingSurface),
-                  borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(28)),
+                  borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(Radii.xxxl)),
                 ),
                 child: SafeArea(
                   top: false,
@@ -739,7 +740,7 @@ void showCommentaryBottomSheet(
                           height: 4,
                           decoration: BoxDecoration(
                             color: tokens.readingBorder,
-                            borderRadius: BorderRadius.circular(2),
+                            borderRadius: BorderRadius.circular(Radii.xs),
                           ),
                         ),
                       ),
