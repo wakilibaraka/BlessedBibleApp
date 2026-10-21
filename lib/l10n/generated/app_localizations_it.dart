@@ -240,11 +240,34 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get onboardingPrimaryVersion => 'Traduzione principale';
+
+  @override
+  String get onboardingSecondaryVersion => 'Seconda traduzione';
+
+  @override
+  String get onboardingSecondaryDesc =>
+      'Mostrata a fianco della tua Bibbia principale nella vista parallela';
+
+  @override
   String get onboardingLookTitle => 'Leggi comodamente';
 
   @override
   String get onboardingLookBody =>
-      'Scegli il colore della pagina e la dimensione del testo. Potrai regolare tutto in seguito.';
+      'Scegli il colore della pagina, il carattere e la dimensione del testo. Potrai regolare tutto in seguito.';
+
+  @override
+  String get onboardingThemeDaily => 'Rotazione giornaliera';
+
+  @override
+  String get onboardingThemeDailyDesc =>
+      'Cambia ogni giorno per riflettere i ricchi temi delle Scritture';
+
+  @override
+  String get onboardingFontFamily => 'Stile del carattere';
+
+  @override
+  String get onboardingShuffleHint => 'Tocca per mescolare';
 
   @override
   String get onboardingThemeLight => 'Chiaro';
@@ -2645,6 +2668,48 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get studySizeHalfHint => 'Compatta, due per riga';
+
+  @override
+  String get studySizeFull => 'Piena';
+
+  @override
+  String get studySizeFullHint => 'Larghezza piena, una per riga';
+
+  @override
+  String get studyPresetLayout => 'Layout predefiniti';
+
+  @override
+  String get studyPresetFull => 'Tutte piene';
+
+  @override
+  String get studyPresetHalf => 'Tutte a metà';
+
+  @override
+  String get studyVerseOfTheDay => 'Versetto del giorno';
+
+  @override
+  String get studyRecentVerses => 'Versetti recenti';
+
+  @override
+  String get studyWordLookUp => 'Cerca';
+
+  @override
+  String get studyConcordanceClear => 'Cancella';
+
+  @override
+  String get studyConcordanceBrowseAll => 'Sfoglia tutti i termini';
+
+  @override
+  String get studyConcordanceFeatured => 'Termini biblici in evidenza';
+
+  @override
+  String get studyConcordanceFilterAll => 'Tutti';
+
+  @override
+  String get studyConcordanceFilterOT => 'Antico Testamento';
+
+  @override
+  String get studyConcordanceFilterNT => 'Nuovo Testamento';
 
   @override
   String get studyMoveUp => 'Sposta su';

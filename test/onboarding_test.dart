@@ -65,7 +65,7 @@ void main() {
   });
 
   testWidgets('the last step offers optional sign-in', (tester) async {
-    await _pump(tester, {OnboardingScreen.pageKey: 5});
+    await _pump(tester, {OnboardingScreen.pageKey: 4});
     expect(find.text('Keep your notes safe'), findsOneWidget);
     expect(find.text('Sign in with Google'), findsOneWidget);
     expect(find.text('Skip'), findsNothing);

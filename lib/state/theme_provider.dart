@@ -156,18 +156,8 @@ class ThemeNotifier extends Notifier<AppThemeMode> {
     final saved = prefs.getInt(_themeKey) ?? prefs.getInt(_lockedThemeKey);
     if (saved != null && saved >= 0 && saved < AppThemeMode.values.length) {
       state = AppThemeMode.values[saved];
-    } else if (prefs.getInt(_themeKey) == null &&
-        prefs.getInt(_lockedThemeKey) == null) {
-      // Fresh install: deal a random theme so day one feels personal.
-      // Runs once — the pick is persisted like any manual choice.
-      final pool = AppThemeMode.values
-          .where((m) => m != AppThemeMode.automatic)
-          .toList();
-      final pick = pool[Random().nextInt(pool.length)];
-      state = pick;
-      await prefs.setInt(_themeKey, pick.index);
-      await prefs.setInt(_lockedThemeKey, pick.index);
     } else {
+      // By default themes change daily (automatic mode).
       state = AppThemeMode.automatic;
     }
   }

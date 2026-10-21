@@ -100,3 +100,7 @@ assets/bible/bible_*.db
 
 # FVM (Flutter version is pinned in .fvmrc)
 .fvm/
+
+# Knowledge graph cache
+graphify-out/cache/
+

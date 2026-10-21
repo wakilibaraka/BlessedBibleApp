@@ -1,7 +1,24 @@
 import 'package:flutter/material.dart';
+import '../state/theme_provider.dart';
 import 'app_colors.dart';
 import 'app_typography.dart';
 import 'reading_tokens.dart';
+
+class ThemePreviewColors {
+  final Color background;
+  final Color surface;
+  final Color textPrimary;
+  final Color textSecondary;
+  final Color accent;
+
+  const ThemePreviewColors({
+    required this.background,
+    required this.surface,
+    required this.textPrimary,
+    required this.textSecondary,
+    required this.accent,
+  });
+}
 
 class AppTheme {
   static ThemeData lightTheme(double baseFontSize) {
@@ -503,6 +520,117 @@ class AppTheme {
       customAccentTheme(baseFontSize, const Color(0xFF2196F3));
   static ThemeData scarletRedTheme(double baseFontSize) =>
       customAccentTheme(baseFontSize, const Color(0xFFE53935));
+
+  static ThemePreviewColors previewColors(AppThemeMode mode) {
+    switch (mode) {
+      case AppThemeMode.light:
+        return const ThemePreviewColors(
+          background: AppColors.lightBackground,
+          surface: AppColors.lightSurface,
+          textPrimary: AppColors.lightTextPrimary,
+          textSecondary: AppColors.lightTextSecondary,
+          accent: AppColors.lightAccent,
+        );
+      case AppThemeMode.sepia:
+        return const ThemePreviewColors(
+          background: AppColors.warmGoldBackground,
+          surface: AppColors.warmGoldSurface,
+          textPrimary: AppColors.warmGoldTextPrimary,
+          textSecondary: AppColors.warmGoldTextSecondary,
+          accent: AppColors.warmGoldAccent,
+        );
+      case AppThemeMode.dark:
+        return const ThemePreviewColors(
+          background: AppColors.darkBackground,
+          surface: AppColors.darkSurface,
+          textPrimary: AppColors.darkTextPrimary,
+          textSecondary: AppColors.darkTextSecondary,
+          accent: AppColors.goldAccent,
+        );
+      case AppThemeMode.oled:
+        return const ThemePreviewColors(
+          background: Color(0xFF000000),
+          surface: Color(0xFF101010),
+          textPrimary: AppColors.darkTextPrimary,
+          textSecondary: AppColors.darkTextSecondary,
+          accent: AppColors.goldAccent,
+        );
+      case AppThemeMode.dawn:
+        return const ThemePreviewColors(
+          background: AppColors.dawnBackground,
+          surface: AppColors.dawnSurface,
+          textPrimary: AppColors.dawnTextPrimary,
+          textSecondary: AppColors.dawnTextSecondary,
+          accent: AppColors.dawnPrimary,
+        );
+      case AppThemeMode.fresh:
+        return const ThemePreviewColors(
+          background: AppColors.freshBackground,
+          surface: AppColors.freshSurface,
+          textPrimary: AppColors.freshTextPrimary,
+          textSecondary: AppColors.freshTextSecondary,
+          accent: AppColors.freshPrimary,
+        );
+      case AppThemeMode.dusk:
+        return const ThemePreviewColors(
+          background: AppColors.duskBackground,
+          surface: AppColors.duskSurface,
+          textPrimary: AppColors.duskTextPrimary,
+          textSecondary: AppColors.duskTextSecondary,
+          accent: AppColors.duskPrimary,
+        );
+      case AppThemeMode.lilies:
+        return const ThemePreviewColors(
+          background: AppColors.liliesBackground,
+          surface: AppColors.liliesSurface,
+          textPrimary: AppColors.liliesTextPrimary,
+          textSecondary: AppColors.liliesTextSecondary,
+          accent: AppColors.liliesPrimary,
+        );
+      case AppThemeMode.roses:
+        return const ThemePreviewColors(
+          background: AppColors.rosesBackground,
+          surface: AppColors.rosesSurface,
+          textPrimary: AppColors.rosesTextPrimary,
+          textSecondary: AppColors.rosesTextSecondary,
+          accent: AppColors.rosesPrimary,
+        );
+      case AppThemeMode.olives:
+        return const ThemePreviewColors(
+          background: AppColors.olivesBackground,
+          surface: AppColors.olivesSurface,
+          textPrimary: AppColors.olivesTextPrimary,
+          textSecondary: AppColors.olivesTextSecondary,
+          accent: AppColors.olivesPrimary,
+        );
+      case AppThemeMode.priestlyPurple:
+        return const ThemePreviewColors(
+          background: AppColors.lightBackground,
+          surface: AppColors.lightSurface,
+          textPrimary: Color(0xFF673AB7),
+          textSecondary: AppColors.lightTextSecondary,
+          accent: Color(0xFF673AB7),
+        );
+      case AppThemeMode.galileeBlue:
+        return const ThemePreviewColors(
+          background: AppColors.lightBackground,
+          surface: AppColors.lightSurface,
+          textPrimary: Color(0xFF2196F3),
+          textSecondary: AppColors.lightTextSecondary,
+          accent: Color(0xFF2196F3),
+        );
+      case AppThemeMode.scarletRed:
+        return const ThemePreviewColors(
+          background: AppColors.lightBackground,
+          surface: AppColors.lightSurface,
+          textPrimary: Color(0xFFE53935),
+          textSecondary: AppColors.lightTextSecondary,
+          accent: Color(0xFFE53935),
+        );
+      case AppThemeMode.automatic:
+        return previewColors(mode.resolve());
+    }
+  }
 }
 
 extension PaperlikeTransform on ThemeData {

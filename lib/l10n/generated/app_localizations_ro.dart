@@ -245,11 +245,34 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
+  String get onboardingPrimaryVersion => 'Traducerea principală';
+
+  @override
+  String get onboardingSecondaryVersion => 'A doua traducere';
+
+  @override
+  String get onboardingSecondaryDesc =>
+      'Afișată alături de Biblia principală în vizualizarea paralelă';
+
+  @override
   String get onboardingLookTitle => 'Citește confortabil';
 
   @override
   String get onboardingLookBody =>
-      'Alege culoarea paginii și mărimea textului. Totul se poate ajusta ulterior.';
+      'Alege culoarea paginii, fontul și mărimea textului. Totul se poate ajusta ulterior.';
+
+  @override
+  String get onboardingThemeDaily => 'Rotație zilnică';
+
+  @override
+  String get onboardingThemeDailyDesc =>
+      'Se schimbă zilnic pentru a reflecta temele bogate ale Scripturii';
+
+  @override
+  String get onboardingFontFamily => 'Stil font';
+
+  @override
+  String get onboardingShuffleHint => 'Apasă pentru amestecare';
 
   @override
   String get onboardingThemeLight => 'Luminos';
@@ -2654,6 +2677,48 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get studySizeHalfHint => 'Compact, două pe rând';
+
+  @override
+  String get studySizeFull => 'Completă';
+
+  @override
+  String get studySizeFullHint => 'Lățime completă, una pe rând';
+
+  @override
+  String get studyPresetLayout => 'Aspecte prestabilite';
+
+  @override
+  String get studyPresetFull => 'Toate complete';
+
+  @override
+  String get studyPresetHalf => 'Toate jumătăți';
+
+  @override
+  String get studyVerseOfTheDay => 'Versetul zilei';
+
+  @override
+  String get studyRecentVerses => 'Versete recente';
+
+  @override
+  String get studyWordLookUp => 'Caută';
+
+  @override
+  String get studyConcordanceClear => 'Șterge';
+
+  @override
+  String get studyConcordanceBrowseAll => 'Răsfoiește toți termenii';
+
+  @override
+  String get studyConcordanceFeatured => 'Termeni biblici recomandați';
+
+  @override
+  String get studyConcordanceFilterAll => 'Toate';
+
+  @override
+  String get studyConcordanceFilterOT => 'Vechiul Testament';
+
+  @override
+  String get studyConcordanceFilterNT => 'Noul Testament';
 
   @override
   String get studyMoveUp => 'Mută în sus';

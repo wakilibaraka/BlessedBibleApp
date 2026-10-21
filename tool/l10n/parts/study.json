@@ -63,6 +63,118 @@
   "sw": "Ndogo, mbili kwa safu",
   "tl": "Siksik, dalawa bawat hanay"
  },
+ "studySizeFull": {
+  "en": "Full",
+  "fr": "Pleine",
+  "it": "Piena",
+  "ro": "Completă",
+  "sw": "Kamili",
+  "tl": "Buo"
+ },
+ "studySizeFullHint": {
+  "en": "Full width, one per row",
+  "fr": "Pleine largeur, une par ligne",
+  "it": "Larghezza piena, una per riga",
+  "ro": "Lățime completă, una pe rând",
+  "sw": "Upana kamili, moja kwa safu",
+  "tl": "Buong lapad, isa bawat hanay"
+ },
+ "studyPresetLayout": {
+  "en": "Layout presets",
+  "fr": "Dispositions prédéfinies",
+  "it": "Layout predefiniti",
+  "ro": "Aspecte prestabilite",
+  "sw": "Mipangilio iliyowekwa",
+  "tl": "Mga nakatakdang layout"
+ },
+ "studyPresetFull": {
+  "en": "All full",
+  "fr": "Toutes pleines",
+  "it": "Tutte piene",
+  "ro": "Toate complete",
+  "sw": "Zote kamili",
+  "tl": "Lahat buo"
+ },
+ "studyPresetHalf": {
+  "en": "All half",
+  "fr": "Toutes moitiés",
+  "it": "Tutte a metà",
+  "ro": "Toate jumătăți",
+  "sw": "Zote nusu",
+  "tl": "Lahat kalahati"
+ },
+ "studyVerseOfTheDay": {
+  "en": "Verse of the day",
+  "fr": "Verset du jour",
+  "it": "Versetto del giorno",
+  "ro": "Versetul zilei",
+  "sw": "Aya ya siku",
+  "tl": "Talata para sa araw na ito"
+ },
+ "studyRecentVerses": {
+  "en": "Recent verses",
+  "fr": "Versets récents",
+  "it": "Versetti recenti",
+  "ro": "Versete recente",
+  "sw": "Aya za hivi karibuni",
+  "tl": "Kamakailang mga talata"
+ },
+ "studyWordLookUp": {
+  "en": "Look up",
+  "fr": "Consulter",
+  "it": "Cerca",
+  "ro": "Caută",
+  "sw": "Tafuta",
+  "tl": "Hanapin"
+ },
+ "studyConcordanceClear": {
+  "en": "Clear",
+  "fr": "Effacer",
+  "it": "Cancella",
+  "ro": "Șterge",
+  "sw": "Futa",
+  "tl": "Burahin"
+ },
+ "studyConcordanceBrowseAll": {
+  "en": "Browse all terms",
+  "fr": "Parcourir tous les termes",
+  "it": "Sfoglia tutti i termini",
+  "ro": "Răsfoiește toți termenii",
+  "sw": "Vinjari maneno yote",
+  "tl": "I-browse ang lahat ng termino"
+ },
+ "studyConcordanceFeatured": {
+  "en": "Featured biblical terms",
+  "fr": "Termes bibliques en vedette",
+  "it": "Termini biblici in evidenza",
+  "ro": "Termeni biblici recomandați",
+  "sw": "Maneno makuu ya kibiblia",
+  "tl": "Mga tampok na salitang biblikal"
+ },
+ "studyConcordanceFilterAll": {
+  "en": "All",
+  "fr": "Tous",
+  "it": "Tutti",
+  "ro": "Toate",
+  "sw": "Zote",
+  "tl": "Lahat"
+ },
+ "studyConcordanceFilterOT": {
+  "en": "Old Testament",
+  "fr": "Ancien Testament",
+  "it": "Antico Testamento",
+  "ro": "Vechiul Testament",
+  "sw": "Agano la Kale",
+  "tl": "Lumang Tipan"
+ },
+ "studyConcordanceFilterNT": {
+  "en": "New Testament",
+  "fr": "Nouveau Testament",
+  "it": "Nuovo Testamento",
+  "ro": "Noul Testament",
+  "sw": "Agano Jipya",
+  "tl": "Bagong Tipan"
+ },
  "studyMoveUp": {
   "en": "Move up",
   "fr": "Monter",

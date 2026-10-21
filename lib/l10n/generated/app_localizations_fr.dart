@@ -243,11 +243,34 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get onboardingPrimaryVersion => 'Traduction principale';
+
+  @override
+  String get onboardingSecondaryVersion => 'Deuxième traduction';
+
+  @override
+  String get onboardingSecondaryDesc =>
+      'Affichée à côté de votre Bible principale en vue parallèle';
+
+  @override
   String get onboardingLookTitle => 'Lisez à votre aise';
 
   @override
   String get onboardingLookBody =>
-      'Choisissez une couleur de page et une taille de texte. Tout reste ajustable ensuite.';
+      'Choisissez une couleur de page, une police et une taille de texte. Tout reste ajustable ensuite.';
+
+  @override
+  String get onboardingThemeDaily => 'Rotation quotidienne';
+
+  @override
+  String get onboardingThemeDailyDesc =>
+      'Change chaque jour pour refléter les riches thèmes des Écritures';
+
+  @override
+  String get onboardingFontFamily => 'Style de police';
+
+  @override
+  String get onboardingShuffleHint => 'Appuyez pour mélanger';
 
   @override
   String get onboardingThemeLight => 'Clair';
@@ -2655,6 +2678,48 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get studySizeHalfHint => 'Compacte, deux par ligne';
+
+  @override
+  String get studySizeFull => 'Pleine';
+
+  @override
+  String get studySizeFullHint => 'Pleine largeur, une par ligne';
+
+  @override
+  String get studyPresetLayout => 'Dispositions prédéfinies';
+
+  @override
+  String get studyPresetFull => 'Toutes pleines';
+
+  @override
+  String get studyPresetHalf => 'Toutes moitiés';
+
+  @override
+  String get studyVerseOfTheDay => 'Verset du jour';
+
+  @override
+  String get studyRecentVerses => 'Versets récents';
+
+  @override
+  String get studyWordLookUp => 'Consulter';
+
+  @override
+  String get studyConcordanceClear => 'Effacer';
+
+  @override
+  String get studyConcordanceBrowseAll => 'Parcourir tous les termes';
+
+  @override
+  String get studyConcordanceFeatured => 'Termes bibliques en vedette';
+
+  @override
+  String get studyConcordanceFilterAll => 'Tous';
+
+  @override
+  String get studyConcordanceFilterOT => 'Ancien Testament';
+
+  @override
+  String get studyConcordanceFilterNT => 'Nouveau Testament';
 
   @override
   String get studyMoveUp => 'Monter';

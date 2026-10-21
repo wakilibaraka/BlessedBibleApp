@@ -240,11 +240,34 @@ class AppLocalizationsTl extends AppLocalizations {
   }
 
   @override
+  String get onboardingPrimaryVersion => 'Pangunahing salin';
+
+  @override
+  String get onboardingSecondaryVersion => 'Pangalawang salin';
+
+  @override
+  String get onboardingSecondaryDesc =>
+      'Ipinapakita sa tabi ng iyong Bibliya sa parallel view';
+
+  @override
   String get onboardingLookTitle => 'Gawing komportable';
 
   @override
   String get onboardingLookBody =>
-      'Pumili ng kulay ng pahina at laki ng teksto. Maaaring ayusin ang lahat mamaya.';
+      'Pumili ng kulay ng pahina, font at laki ng teksto. Maaaring ayusin ang lahat mamaya.';
+
+  @override
+  String get onboardingThemeDaily => 'Araw-araw na pagpapalit';
+
+  @override
+  String get onboardingThemeDailyDesc =>
+      'Nagbabago araw-araw upang ipakita ang mayayamang tema ng Kasulatan';
+
+  @override
+  String get onboardingFontFamily => 'Estilo ng font';
+
+  @override
+  String get onboardingShuffleHint => 'Pindutin para i-shuffle';
 
   @override
   String get onboardingThemeLight => 'Maliwanag';
@@ -2643,6 +2666,48 @@ class AppLocalizationsTl extends AppLocalizations {
 
   @override
   String get studySizeHalfHint => 'Siksik, dalawa bawat hanay';
+
+  @override
+  String get studySizeFull => 'Buo';
+
+  @override
+  String get studySizeFullHint => 'Buong lapad, isa bawat hanay';
+
+  @override
+  String get studyPresetLayout => 'Mga nakatakdang layout';
+
+  @override
+  String get studyPresetFull => 'Lahat buo';
+
+  @override
+  String get studyPresetHalf => 'Lahat kalahati';
+
+  @override
+  String get studyVerseOfTheDay => 'Talata para sa araw na ito';
+
+  @override
+  String get studyRecentVerses => 'Kamakailang mga talata';
+
+  @override
+  String get studyWordLookUp => 'Hanapin';
+
+  @override
+  String get studyConcordanceClear => 'Burahin';
+
+  @override
+  String get studyConcordanceBrowseAll => 'I-browse ang lahat ng termino';
+
+  @override
+  String get studyConcordanceFeatured => 'Mga tampok na salitang biblikal';
+
+  @override
+  String get studyConcordanceFilterAll => 'Lahat';
+
+  @override
+  String get studyConcordanceFilterOT => 'Lumang Tipan';
+
+  @override
+  String get studyConcordanceFilterNT => 'Bagong Tipan';
 
   @override
   String get studyMoveUp => 'Iakyat';

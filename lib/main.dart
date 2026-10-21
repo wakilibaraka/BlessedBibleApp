@@ -73,37 +73,39 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
     ref.listen(syncControllerProvider, (_, __) {});
 
     final themeMode = ref.watch(themeProvider);
+    final resolvedTheme = themeMode.resolve(context);
     final surfaceStyle = ref.watch(surfaceStyleProvider);
     final isBibleLoading = ref.watch(bibleProvider.select((s) => s.isLoading));
 
-    ThemeData lightBase = themeMode == AppThemeMode.lilies
+    ThemeData lightBase = resolvedTheme == AppThemeMode.lilies
         ? AppTheme.liliesTheme(14.0)
-        : themeMode == AppThemeMode.roses
+        : resolvedTheme == AppThemeMode.roses
             ? AppTheme.rosesTheme(14.0)
-            : themeMode == AppThemeMode.olives
+            : resolvedTheme == AppThemeMode.olives
                 ? AppTheme.olivesTheme(14.0)
-                : themeMode == AppThemeMode.priestlyPurple
+                : resolvedTheme == AppThemeMode.priestlyPurple
                     ? AppTheme.priestlyPurpleTheme(14.0)
-                    : themeMode == AppThemeMode.galileeBlue
+                    : resolvedTheme == AppThemeMode.galileeBlue
                         ? AppTheme.galileeBlueTheme(14.0)
-                        : themeMode == AppThemeMode.scarletRed
+                        : resolvedTheme == AppThemeMode.scarletRed
                             ? AppTheme.scarletRedTheme(14.0)
-                            : themeMode == AppThemeMode.sepia
+                            : resolvedTheme == AppThemeMode.sepia
                                 ? AppTheme.sepiaTheme(14.0)
-                                : themeMode == AppThemeMode.automatic
-                                    ? AppTheme.freshTheme(14.0)
-                                    : AppTheme.lightTheme(14.0);
+                                : resolvedTheme == AppThemeMode.dawn
+                                    ? AppTheme.dawnTheme(14.0)
+                                    : resolvedTheme == AppThemeMode.fresh
+                                        ? AppTheme.freshTheme(14.0)
+                                        : AppTheme.lightTheme(14.0);
 
-    ThemeData darkBase = themeMode == AppThemeMode.dawn
+    ThemeData darkBase = resolvedTheme == AppThemeMode.dawn
         ? AppTheme.dawnTheme(14.0)
-        : themeMode == AppThemeMode.dusk
+        : resolvedTheme == AppThemeMode.dusk
             ? AppTheme.duskTheme(14.0)
-            : themeMode == AppThemeMode.fresh
+            : resolvedTheme == AppThemeMode.fresh
                 ? AppTheme.freshTheme(14.0)
-                : themeMode == AppThemeMode.automatic
-                    ? AppTheme.duskTheme(14.0)
-                    : AppTheme.darkTheme(14.0,
-                        isAmoled: themeMode == AppThemeMode.oled);
+                : resolvedTheme == AppThemeMode.oled
+                    ? AppTheme.darkTheme(14.0, isAmoled: true)
+                    : AppTheme.darkTheme(14.0);
 
     final prefsService = ref.watch(preferencesProvider);
     final hasExplicitSurface =

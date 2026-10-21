@@ -34,6 +34,7 @@ void main() {
       'dictionary',
       'concordance',
       'commentary',
+      'wotd',
       'votd_archive',
       'streak',
     ]);
@@ -50,6 +51,7 @@ void main() {
     for (final id in [
       'bible_stories',
       'dictionary',
+      'wotd',
       'votd_archive',
       'streak'
     ]) {
@@ -68,6 +70,7 @@ void main() {
         'bible_stories',
         'dictionary',
         'commentary',
+        'wotd',
         'votd_archive',
         'streak',
       ])
@@ -94,11 +97,13 @@ void main() {
       'dictionary',
       'concordance',
       'commentary',
+      'wotd',
       'votd_archive',
       'streak',
     ]);
     final byId = {for (final c in layout) c.id: c};
     expect(byId['dictionary']!.span, CardSpan.half);
+    expect(byId['wotd']!.span, CardSpan.half);
     expect(byId['streak']!.span, CardSpan.half);
     expect(byId['commentary']!.span, CardSpan.full);
     expect(byId['concordance']!.span, CardSpan.full);
@@ -137,6 +142,7 @@ void main() {
         'bible_stories',
         'dictionary',
         'commentary',
+        'wotd',
         'votd_archive',
         'streak',
       ])
@@ -160,6 +166,26 @@ void main() {
     final byId = {for (final c in layout) c.id: c};
     expect(byId['dictionary']!.span, CardSpan.half);
     expect(byId['concordance']!.span, CardSpan.full);
+  });
+
+  test('applyPreset switches cards to full or half', () async {
+    final container = await makeContainer();
+    addTearDown(container.dispose);
+
+    container.read(studyLayoutProvider);
+    // Apply full preset
+    container.read(studyLayoutProvider.notifier).applyPreset(CardSpan.full);
+    var layout = container.read(studyLayoutProvider);
+    expect(layout.every((c) => c.span == CardSpan.full), isTrue);
+
+    // Apply half preset (your_space stays full banner)
+    container.read(studyLayoutProvider.notifier).applyPreset(CardSpan.half);
+    layout = container.read(studyLayoutProvider);
+    final byId = {for (final c in layout) c.id: c};
+    expect(byId['your_space']!.span, CardSpan.full);
+    expect(byId['dictionary']!.span, CardSpan.half);
+    expect(byId['concordance']!.span, CardSpan.half);
+    expect(byId['commentary']!.span, CardSpan.half);
   });
 
   test('setCardSize persists span + expanded at version 5', () async {
