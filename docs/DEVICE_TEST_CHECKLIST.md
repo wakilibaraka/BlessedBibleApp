@@ -79,11 +79,24 @@ Turn these on in the phone's settings, one at a time, then use the app for a min
 - [ ] Deleting a folder or your account asks you to confirm first.
 - [ ] Buttons and titles use sentence case ("Save note", not "Save Note").
 
-## 6. Sign-in and sync (regression)
+## 6. Sign-in and sync
 
-- [ ] Sign in with Google from Your Space → account menu.
-- [ ] Add a bookmark on phone A; it appears on phone B after sign-in.
-- [ ] Sign out works and the app still opens offline.
+Run this on a **release build installed from the Play internal track**, not a
+debug build: the Play-signed app uses a different signing key, which is the
+usual reason Google sign-in works in testing and fails for users. Setup:
+`docs/ANDROID_SIGNIN_SETUP.md`.
+
+- [ ] Sign in with Google from Your Space → account menu. Name and photo show.
+- [ ] Close and reopen the app: still signed in. Restart the phone: still signed in.
+- [ ] Add a bookmark, a highlight and a note. Check they appear on a second phone after sign-in.
+- [ ] **Reinstall:** uninstall, install again from Play. If a "Welcome back" prompt appears, tap Sign in; otherwise sign in from onboarding. Bookmarks, highlights, notes, plans and reading days return.
+- [ ] Reinstall, tap **Not now** on the prompt, relaunch: no prompt again.
+- [ ] Sign out (keep data on device), relaunch: no "Welcome back" prompt.
+- [ ] Airplane mode: the app opens, existing data is readable, edits made offline sync after reconnecting.
+- [ ] Airplane mode: tapping Sign in shows "No internet connection", not technical text.
+- [ ] Dismiss the Google account picker: nothing breaks, no error shown.
+- [ ] Sign in with a second Google account on a device that has the first account's data: the merge / start-fresh question appears.
+- [ ] Delete account: asks to confirm, re-prompts Google, then the app is signed out and empty. Signing in again starts a fresh account (the old data is gone).
 
 ## When you are done
 

@@ -2611,6 +2611,13 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get welcomeBackTitle => 'Bon retour';
+
+  @override
+  String get welcomeBackBody =>
+      'Connectez-vous pour retrouver vos surlignages, notes, signets et plans de lecture.';
+
+  @override
   String get stateLoading => 'Chargement';
 
   @override

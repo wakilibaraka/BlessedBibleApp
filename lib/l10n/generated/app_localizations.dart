@@ -4504,6 +4504,18 @@ abstract class AppLocalizations {
   /// **'Delete {name}'**
   String spaceDeletePackTooltip(String name);
 
+  /// No description provided for @welcomeBackTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back'**
+  String get welcomeBackTitle;
+
+  /// No description provided for @welcomeBackBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to bring back your highlights, notes, bookmarks and reading plans.'**
+  String get welcomeBackBody;
+
   /// No description provided for @stateLoading.
   ///
   /// In en, this message translates to:

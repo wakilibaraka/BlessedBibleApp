@@ -733,6 +733,8 @@
   "spaceCoreNotRemovable": "KJV na BBE ni sehemu ya programu na haziwezi kuondolewa.",
   "spaceGet": "Pata",
   "spaceDeletePackTooltip": "Futa {name}",
+  "welcomeBackTitle": "Karibu tena",
+  "welcomeBackBody": "Ingia ili kurudisha vionjo, maelezo, alamisho na mipango yako ya kusoma.",
   "stateLoading": "Inapakia",
   "stateErrorTitle": "Hitilafu imetokea",
   "stateErrorBody": "Tafadhali jaribu tena baada ya muda mfupi.",

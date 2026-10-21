@@ -14,6 +14,7 @@ import 'data/local_storage/preferences_service.dart';
 import 'ui/screens/splash_loading_screen.dart';
 import 'state/bible_provider.dart';
 import 'ui/screens/onboarding_screen.dart';
+import 'ui/widgets/restore_prompt.dart';
 
 import 'package:flutter/foundation.dart';
 import 'ui/widgets/app_error_fallback.dart';
@@ -161,7 +162,7 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
           ? const OnboardingScreen()
           : (isBibleLoading
               ? const SplashLoadingScreen()
-              : const MainNavScreen()),
+              : const RestorePromptHost(child: MainNavScreen())),
     );
   }
 }

@@ -1366,5 +1366,21 @@
     }
    }
   }
+ },
+ "welcomeBackTitle": {
+  "en": "Welcome back",
+  "fr": "Bon retour",
+  "it": "Bentornato",
+  "ro": "Bine ai revenit",
+  "sw": "Karibu tena",
+  "tl": "Maligayang pagbabalik"
+ },
+ "welcomeBackBody": {
+  "en": "Sign in to bring back your highlights, notes, bookmarks and reading plans.",
+  "fr": "Connectez-vous pour retrouver vos surlignages, notes, signets et plans de lecture.",
+  "it": "Accedi per ripristinare evidenziazioni, note, segnalibri e piani di lettura.",
+  "ro": "Conectează-te pentru a-ți recupera evidențierile, notițele, semnele de carte și planurile de citire.",
+  "sw": "Ingia ili kurudisha vionjo, maelezo, alamisho na mipango yako ya kusoma.",
+  "tl": "Mag-sign in para maibalik ang iyong mga highlight, tala, bookmark at reading plan."
  }
 }

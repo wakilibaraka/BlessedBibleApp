@@ -2601,6 +2601,13 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get welcomeBackTitle => 'Bentornato';
+
+  @override
+  String get welcomeBackBody =>
+      'Accedi per ripristinare evidenziazioni, note, segnalibri e piani di lettura.';
+
+  @override
   String get stateLoading => 'Caricamento';
 
   @override

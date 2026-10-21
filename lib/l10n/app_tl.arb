@@ -733,6 +733,8 @@
   "spaceCoreNotRemovable": "Bahagi ng app ang KJV at BBE at hindi maaalis.",
   "spaceGet": "Kunin",
   "spaceDeletePackTooltip": "Burahin ang {name}",
+  "welcomeBackTitle": "Maligayang pagbabalik",
+  "welcomeBackBody": "Mag-sign in para maibalik ang iyong mga highlight, tala, bookmark at reading plan.",
   "stateLoading": "Naglo-load",
   "stateErrorTitle": "May nangyaring mali",
   "stateErrorBody": "Pakisubukan muli mamaya.",

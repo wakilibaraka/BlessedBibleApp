@@ -733,6 +733,8 @@
   "spaceCoreNotRemovable": "KJV și BBE fac parte din aplicație și nu pot fi eliminate.",
   "spaceGet": "Obține",
   "spaceDeletePackTooltip": "Șterge {name}",
+  "welcomeBackTitle": "Bine ai revenit",
+  "welcomeBackBody": "Conectează-te pentru a-ți recupera evidențierile, notițele, semnele de carte și planurile de citire.",
   "stateLoading": "Se încarcă",
   "stateErrorTitle": "Ceva nu a mers bine",
   "stateErrorBody": "Încearcă din nou peste câteva clipe.",
