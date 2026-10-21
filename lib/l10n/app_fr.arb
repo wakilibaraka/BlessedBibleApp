@@ -733,6 +733,8 @@
   "spaceCoreNotRemovable": "Les versions KJV et BBE font partie de l'app et ne peuvent pas être supprimées.",
   "spaceGet": "Obtenir",
   "spaceDeletePackTooltip": "Supprimer {name}",
+  "welcomeBackTitle": "Bon retour",
+  "welcomeBackBody": "Connectez-vous pour retrouver vos surlignages, notes, signets et plans de lecture.",
   "stateLoading": "Chargement",
   "stateErrorTitle": "Un problème est survenu",
   "stateErrorBody": "Veuillez réessayer dans un instant.",

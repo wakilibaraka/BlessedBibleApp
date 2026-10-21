@@ -2599,6 +2599,13 @@ class AppLocalizationsTl extends AppLocalizations {
   }
 
   @override
+  String get welcomeBackTitle => 'Maligayang pagbabalik';
+
+  @override
+  String get welcomeBackBody =>
+      'Mag-sign in para maibalik ang iyong mga highlight, tala, bookmark at reading plan.';
+
+  @override
   String get stateLoading => 'Naglo-load';
 
   @override

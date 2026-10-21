@@ -18,6 +18,8 @@ All notable changes to The Blessed Bible. Newest first.
 - **Sync:** while signed in, bookmarks, folders, highlights and notes sync between devices (per item; the newer change wins; deletions sync too). The account menu shows when it last synced and has **Sync now**. Signing out asks whether to keep the data on the device. Signing in to a different account asks whether to merge this device's data or start fresh.
 - Custom reading plans, plan progress, active plans and reading days (streak) sync too; reading days from all devices add up.
 - Deleting the account now also clears notes and journal entries from the device.
+- After a reinstall that restores app settings but not the sign-in (Android Auto Backup), a one-time "Welcome back" prompt offers to sign in and bring back your data. It stays quiet if you signed out yourself, said "Not now", or never had an account.
+- CI now builds a signed, shrunk release app bundle on every PR, so release-only (R8/signing) breakage is caught before shipping.
 
 ### Fixed
 - Signed-in users can create custom reading plans again (the cloud copy used nested arrays, which Firestore rejects, and failed before the local save). Plans now save locally first and back up in the background.

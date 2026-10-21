@@ -2584,6 +2584,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get welcomeBackTitle => 'Welcome back';
+
+  @override
+  String get welcomeBackBody =>
+      'Sign in to bring back your highlights, notes, bookmarks and reading plans.';
+
+  @override
   String get stateLoading => 'Loading';
 
   @override

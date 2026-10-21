@@ -1340,6 +1340,8 @@
       }
     }
   },
+  "welcomeBackTitle": "Welcome back",
+  "welcomeBackBody": "Sign in to bring back your highlights, notes, bookmarks and reading plans.",
   "stateLoading": "Loading",
   "stateErrorTitle": "Something went wrong",
   "stateErrorBody": "Please try again in a moment.",

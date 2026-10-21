@@ -2593,6 +2593,13 @@ class AppLocalizationsSw extends AppLocalizations {
   }
 
   @override
+  String get welcomeBackTitle => 'Karibu tena';
+
+  @override
+  String get welcomeBackBody =>
+      'Ingia ili kurudisha vionjo, maelezo, alamisho na mipango yako ya kusoma.';
+
+  @override
   String get stateLoading => 'Inapakia';
 
   @override

@@ -2610,6 +2610,13 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
+  String get welcomeBackTitle => 'Bine ai revenit';
+
+  @override
+  String get welcomeBackBody =>
+      'Conectează-te pentru a-ți recupera evidențierile, notițele, semnele de carte și planurile de citire.';
+
+  @override
   String get stateLoading => 'Se încarcă';
 
   @override
