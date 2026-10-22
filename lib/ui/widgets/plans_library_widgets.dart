@@ -12,12 +12,22 @@ import '../../theme/design_tokens.dart';
 /// colors (it is an illustration, not chrome).
 
 /// Short month and day for the hero, e.g. "October 22", for [locale].
-String libraryMonthDay(DateTime day, [String? locale]) =>
-    DateFormat.MMMMd(locale).format(day);
+String libraryMonthDay(DateTime day, [String? locale]) {
+  try {
+    return DateFormat.MMMMd(locale).format(day);
+  } catch (_) {
+    return DateFormat.MMMMd().format(day);
+  }
+}
 
 /// Weekday name for the hero's eyebrow label, e.g. "THURSDAY".
-String libraryWeekday(DateTime day, [String? locale]) =>
-    DateFormat.EEEE(locale).format(day).toUpperCase();
+String libraryWeekday(DateTime day, [String? locale]) {
+  try {
+    return DateFormat.EEEE(locale).format(day).toUpperCase();
+  } catch (_) {
+    return DateFormat.EEEE().format(day).toUpperCase();
+  }
+}
 
 /// Plans hero header: a small weekday eyebrow over a large left-aligned
 /// date, with a quiet year-progress line underneath (tap opens Let's Read)

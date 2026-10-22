@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:the_blessed_bible/data/bible_books.dart';
 import 'package:the_blessed_bible/data/local_storage/preferences_service.dart';
@@ -12,6 +13,10 @@ import 'package:the_blessed_bible/ui/screens/plans_library_screen.dart';
 import 'package:the_blessed_bible/ui/widgets/plans_library_widgets.dart';
 
 void main() {
+  setUpAll(() async {
+    await initializeDateFormatting('en', null);
+  });
+
   group('plans library helpers', () {
     test('hero date is month and day, weekday is upper-cased', () {
       final day = DateTime(2026, 10, 22);
